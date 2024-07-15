@@ -19,4 +19,5 @@ features = [
     "Win32_System_Registry",
     "Win32_Security",
     "Win32_System_Memory",
+    "Win32_Media_Multimedia",
 ]

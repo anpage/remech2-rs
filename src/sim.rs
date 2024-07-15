@@ -13,6 +13,10 @@ use windows::{
             FreeLibrary, BOOL, FALSE, HMODULE, HWND, LPARAM, LRESULT, RECT, TRUE, WPARAM,
         },
         Graphics::Gdi::BITMAPINFO,
+        Media::Multimedia::{
+            mciSendCommandA, MCI_FORMAT_TMSF, MCI_OPEN, MCI_OPEN_PARMSA, MCI_OPEN_TYPE, MCI_SET,
+            MCI_SET_PARMS, MCI_SET_TIME_FORMAT,
+        },
         System::LibraryLoader::{GetProcAddress, LoadLibraryA},
         UI::WindowsAndMessaging::{
             DispatchMessageA, PeekMessageA, TranslateMessage, WaitMessage, MSG,
@@ -185,7 +189,7 @@ static mut G_BLIT_GLOBAL_2: *mut u32 = std::ptr::null_mut();
 static mut G_BLIT_GLOBAL_3: *mut u32 = std::ptr::null_mut();
 static mut G_WIDTH_SCALE: *mut i32 = std::ptr::null_mut();
 static mut G_SOME_POINTER: *mut *mut i32 = std::ptr::null_mut();
-static mut G_CD_AUDIO_DEVICE: *mut i32 = std::ptr::null_mut();
+static mut G_CD_AUDIO_DEVICE: *mut u32 = std::ptr::null_mut();
 static mut G_CD_AUDIO_AUX_DEVICE: *mut i32 = std::ptr::null_mut();
 static mut G_CD_AUDIO_GLOBAL_1: *mut u32 = std::ptr::null_mut();
 static mut G_CD_AUDIO_GLOBAL_2: *mut u32 = std::ptr::null_mut();
@@ -195,6 +199,8 @@ static mut G_CD_AUDIO_TRACK_DATA: *mut CdAudioTracks = std::ptr::null_mut();
 static mut G_PAUSED_CD_AUDIO_POSITION: *mut CdAudioPosition = std::ptr::null_mut();
 static mut G_CD_AUDIO_VOLUME: *mut i32 = std::ptr::null_mut();
 static mut G_MESSAGES_HANDLED: *mut BOOL = std::ptr::null_mut();
+
+static mut CD_AUDIO_DEVICE: u32 = u32::MAX;
 
 pub struct Sim {
     _ail: Ail,
@@ -231,7 +237,7 @@ impl Sim {
             G_BLIT_GLOBAL_3 = (base_address + 0x000a5a24) as *mut u32;
             G_WIDTH_SCALE = (base_address + 0x000e9610) as *mut i32;
             G_SOME_POINTER = (base_address + 0x000a6cc0) as *mut *mut i32;
-            G_CD_AUDIO_DEVICE = (base_address + 0x000aa278) as *mut i32;
+            G_CD_AUDIO_DEVICE = (base_address + 0x000aa278) as *mut u32;
             G_CD_AUDIO_AUX_DEVICE = (base_address + 0x000aa27c) as *mut i32;
             G_CD_AUDIO_GLOBAL_1 = (base_address + 0x000beca8) as *mut u32;
             G_CD_AUDIO_GLOBAL_2 = (base_address + 0x000becac) as *mut u32;
@@ -285,14 +291,82 @@ impl Sim {
                 Some(hook_function(target, Self::blit)?)
             };
 
-            // INIT_CD_AUDIO_HOOK = {
-            //     let target: InitCdAudioFunc = std::mem::transmute(base_address + 0x0005a8b5);
-            //     Some(hook_function(target, Self::init_cd_audio)?)
-            // };
+            INIT_CD_AUDIO_HOOK = {
+                let target: InitCdAudioFunc = std::mem::transmute(base_address + 0x0005a8b5);
+                Some(hook_function(target, Self::init_cd_audio)?)
+            };
 
             // GET_GAME_CD_NUMBER_HOOK = {
             //     let target: GetGameCdNumberFunc = std::mem::transmute(base_address + 0x00002df5);
             //     Some(hook_function(target, Self::get_game_cd_number)?)
+            // };
+
+            GET_CD_AUDIO_AUX_DEVICE_HOOK = {
+                let target: GetCdAudioAuxDeviceFunc =
+                    std::mem::transmute(base_address + 0x0005a7a0);
+                Some(hook_function(target, Self::get_cd_audio_aux_device)?)
+            };
+
+            CLOSE_CD_AUDIO_HOOK = {
+                let target: CloseCdAudioFunc = std::mem::transmute(base_address + 0x0005aa0a);
+                Some(hook_function(target, Self::close_cd_audio)?)
+            };
+
+            // PLAY_CD_AUDIO_HOOK = {
+            //     let target: PlayCdAudioFunc = std::mem::transmute(base_address + 0x0005aabe);
+            //     Some(hook_function(target, Self::play_cd_audio)?)
+            // };
+
+            // PAUSE_CD_AUDIO_HOOK = {
+            //     let target: PauseCdAudioFunc = std::mem::transmute(base_address + 0x0005aa40);
+            //     Some(hook_function(target, Self::pause_cd_audio)?)
+            // };
+
+            // RESUME_CD_AUDIO_HOOK = {
+            //     let target: ResumeCdAudioFunc = std::mem::transmute(base_address + 0x0005aa6a);
+            //     Some(hook_function(target, Self::resume_cd_audio)?)
+            // };
+
+            // START_CD_AUDIO_HOOK = {
+            //     let target: StartCdAudioFunc = std::mem::transmute(base_address + 0x0005ab0b);
+            //     Some(hook_function(target, Self::start_cd_audio)?)
+            // };
+
+            // GET_CD_STATUS_HOOK = {
+            //     let target: GetCdStatusFunc = std::mem::transmute(base_address + 0x0005ac33);
+            //     Some(hook_function(target, Self::get_cd_status)?)
+            // };
+
+            // GET_CD_AUDIO_TRACKS_HOOK = {
+            //     let target: GetCdAudioTracksFunc = std::mem::transmute(base_address + 0x0005b49e);
+            //     Some(hook_function(target, Self::get_cd_audio_tracks)?)
+            // };
+
+            // GET_CD_AUDIO_POSITION_HOOK = {
+            //     let target: GetCdAudioPositionFunc = std::mem::transmute(base_address + 0x0005b61d);
+            //     Some(hook_function(target, Self::get_cd_audio_position)?)
+            // };
+
+            // SET_CD_AUDIO_VOLUME_HOOK = {
+            //     let target: SetCdAudioVolumeFunc = std::mem::transmute(base_address + 0x0005b734);
+            //     Some(hook_function(target, Self::set_cd_audio_volume)?)
+            // };
+
+            // DE_INIT_CD_AUDIO_HOOK = {
+            //     let target: DeInitCdAudioFunc = std::mem::transmute(base_address + 0x0005abff);
+            //     Some(hook_function(target, Self::de_init_cd_audio)?)
+            // };
+
+            // UPDATE_CD_AUDIO_POSITION_HOOK = {
+            //     let target: UpdateCdAudioPositionFunc =
+            //         std::mem::transmute(base_address + 0x0005af07);
+            //     Some(hook_function(target, Self::update_cd_audio_position)?)
+            // };
+
+            // CD_AUDIO_TOGGLE_PAUSED_HOOK = {
+            //     let target: CdAudioTogglePausedFunc =
+            //         std::mem::transmute(base_address + 0x0005ad5e);
+            //     Some(hook_function(target, Self::cd_audio_toggle_paused)?)
             // };
 
             HANDLE_MESSAGES_HOOK = {
@@ -410,6 +484,57 @@ impl Sim {
         }
     }
 
+    unsafe extern "stdcall" fn init_cd_audio() -> u32 {
+        if CD_AUDIO_DEVICE != u32::MAX {
+            *G_CD_AUDIO_DEVICE = CD_AUDIO_DEVICE;
+            *G_CD_AUDIO_INITIALIZED = 1;
+            return 0;
+        }
+
+        let mut mci_open_parms = MCI_OPEN_PARMSA {
+            lpstrDeviceType: s!("cdaudio"),
+            ..Default::default()
+        };
+        let mci_open_error = mciSendCommandA(
+            0,
+            MCI_OPEN,
+            MCI_OPEN_TYPE as usize,
+            &mut mci_open_parms as *mut _ as usize,
+        );
+        if mci_open_error != 0 {
+            return 1;
+        }
+
+        *G_CD_AUDIO_DEVICE = mci_open_parms.wDeviceID;
+        CD_AUDIO_DEVICE = *G_CD_AUDIO_DEVICE;
+
+        let mut mci_set_parms = MCI_SET_PARMS {
+            dwTimeFormat: MCI_FORMAT_TMSF,
+            ..Default::default()
+        };
+        let mci_set_error = mciSendCommandA(
+            *G_CD_AUDIO_DEVICE,
+            MCI_SET,
+            MCI_SET_TIME_FORMAT as usize,
+            &mut mci_set_parms as *mut _ as usize,
+        );
+        if mci_set_error != 0 {
+            CLOSE_CD_AUDIO_HOOK.as_ref().unwrap().call();
+            return 1;
+        }
+
+        *G_CD_AUDIO_AUX_DEVICE = GET_CD_AUDIO_AUX_DEVICE_HOOK.as_ref().unwrap().call();
+        0
+    }
+
+    unsafe extern "stdcall" fn get_cd_audio_aux_device() -> i32 {
+        GET_CD_AUDIO_AUX_DEVICE_HOOK.as_ref().unwrap().call()
+    }
+
+    unsafe extern "stdcall" fn close_cd_audio() -> i32 {
+        0
+    }
+
     unsafe extern "stdcall" fn handle_messages() {
         if *G_WINDOW_ACTIVE == FALSE {
             let _ = WaitMessage();
@@ -450,7 +575,21 @@ impl Drop for Sim {
             INTEGER_OVERFLOW_HAPPENS_HERE_HOOK = None;
             SET_GAME_RESOLUTION_HOOK = None;
             BLIT_HOOK = None;
-
+            INIT_CD_AUDIO_HOOK = None;
+            GET_GAME_CD_NUMBER_HOOK = None;
+            GET_CD_AUDIO_AUX_DEVICE_HOOK = None;
+            CLOSE_CD_AUDIO_HOOK = None;
+            PLAY_CD_AUDIO_HOOK = None;
+            PAUSE_CD_AUDIO_HOOK = None;
+            RESUME_CD_AUDIO_HOOK = None;
+            START_CD_AUDIO_HOOK = None;
+            GET_CD_STATUS_HOOK = None;
+            GET_CD_AUDIO_TRACKS_HOOK = None;
+            GET_CD_AUDIO_POSITION_HOOK = None;
+            SET_CD_AUDIO_VOLUME_HOOK = None;
+            DE_INIT_CD_AUDIO_HOOK = None;
+            UPDATE_CD_AUDIO_POSITION_HOOK = None;
+            CD_AUDIO_TOGGLE_PAUSED_HOOK = None;
             HANDLE_MESSAGES_HOOK = None;
             RANDOM_INT_BELOW_HOOK = None;
             FreeLibrary(self.module).unwrap();
