@@ -8,7 +8,7 @@ use retour::{GenericDetour, RawDetour};
 use windows::{
     core::{s, PCSTR},
     Win32::{
-        Foundation::{FreeLibrary, HMODULE, HWND, LPARAM, LRESULT, WIN32_ERROR, WPARAM},
+        Foundation::{FreeLibrary, HMODULE, HWND, WIN32_ERROR},
         Graphics::Gdi::{BitBlt, HDC, SRCCOPY},
         Security::SECURITY_ATTRIBUTES,
         System::{
@@ -25,6 +25,7 @@ use crate::{
     ail::Ail,
     common::{debug_log, fake_heap_free, HeapFreeFunc},
     hooker::hook_function,
+    WindowProc,
 };
 
 type ShellMainProc = unsafe extern "stdcall" fn(HMODULE, i32, *const c_char, i32, HWND) -> i32;
@@ -79,17 +80,6 @@ impl Shell {
 
         let module = unsafe { LoadLibraryA(s!("MW2SHELL.DLL"))? };
         let base_address = module.0 as usize;
-
-        let window_proc = unsafe {
-            GetProcAddress(module, s!("ShellWindowProc"))
-                .context("Couldn't find ShellWindowProc")?
-        };
-        unsafe {
-            crate::SHELL_WINDOW_PROC = Some(std::mem::transmute::<
-                *const (),
-                unsafe extern "system" fn(HWND, u32, WPARAM, LPARAM) -> LRESULT,
-            >(window_proc as *const ()));
-        }
 
         unsafe {
             let heap_free_thunk = (base_address + 0x0009952c) as *mut HeapFreeFunc;
@@ -157,7 +147,22 @@ impl Shell {
         let intro_or_sim = CString::new(intro_or_sim).context("CString::new failed")?;
         let result = unsafe { shell_main(self.module, 0, intro_or_sim.as_ptr(), 1, window) };
 
+        if result == -1 {
+            bail!("REMECH 2 is unable to locate necessary program components.");
+        }
+
         Ok(result)
+    }
+
+    pub fn window_proc(&self) -> Result<WindowProc> {
+        unsafe {
+            let window_proc = GetProcAddress(self.module, s!("ShellWindowProc"))
+                .context("Couldn't find ShellWindowProc")?;
+            Ok(std::mem::transmute::<
+                unsafe extern "system" fn() -> isize,
+                WindowProc,
+            >(window_proc))
+        }
     }
 
     unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) {

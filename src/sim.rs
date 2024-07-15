@@ -9,9 +9,7 @@ use retour::{GenericDetour, RawDetour};
 use windows::{
     core::s,
     Win32::{
-        Foundation::{
-            FreeLibrary, BOOL, FALSE, HMODULE, HWND, LPARAM, LRESULT, RECT, TRUE, WPARAM,
-        },
+        Foundation::{FreeLibrary, BOOL, FALSE, HMODULE, HWND, RECT, TRUE},
         Graphics::Gdi::BITMAPINFO,
         Media::Multimedia::{
             mciSendCommandA, MCI_FORMAT_TMSF, MCI_FROM, MCI_MODE_OPEN, MCI_MODE_PAUSE,
@@ -31,6 +29,7 @@ use crate::{
     ail::Ail,
     common::{debug_log, fake_heap_free, HeapFreeFunc},
     hooker::hook_function,
+    WindowProc,
 };
 
 type SimMainProc = unsafe extern "stdcall" fn(
@@ -227,16 +226,6 @@ impl Sim {
         let module = unsafe { LoadLibraryA(s!("MW2.DLL"))? };
         let base_address = module.0 as usize;
 
-        let window_proc = unsafe {
-            GetProcAddress(module, s!("SimWindowProc")).context("Couldn't find SimWindowProc")?
-        };
-        unsafe {
-            crate::SIM_WINDOW_PROC = Some(std::mem::transmute::<
-                *const (),
-                unsafe extern "system" fn(HWND, u32, WPARAM, LPARAM) -> LRESULT,
-            >(window_proc as *const ()));
-        }
-
         unsafe {
             G_TICKS_CHECK = (base_address + 0x000ad008) as *mut u32;
             G_TICKS_1 = (base_address + 0x000ad20c) as *mut u32;
@@ -422,7 +411,22 @@ impl Sim {
             )
         };
 
+        if result == -1 {
+            bail!("REMECH 2 is unable to locate necessary program components.");
+        }
+
         Ok(result)
+    }
+
+    pub fn window_proc(&self) -> Result<WindowProc> {
+        unsafe {
+            let window_proc = GetProcAddress(self.module, s!("SimWindowProc"))
+                .context("Couldn't find SimWindowProc")?;
+            Ok(std::mem::transmute::<
+                unsafe extern "system" fn() -> isize,
+                WindowProc,
+            >(window_proc))
+        }
     }
 
     unsafe extern "stdcall" fn game_tick_timer_callback(_: u32) {

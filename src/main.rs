@@ -21,12 +21,10 @@ mod hooker;
 mod shell;
 mod sim;
 
-static mut SIM_WINDOW_PROC: Option<
-    unsafe extern "system" fn(HWND, u32, WPARAM, LPARAM) -> LRESULT,
-> = None;
-static mut SHELL_WINDOW_PROC: Option<
-    unsafe extern "system" fn(HWND, u32, WPARAM, LPARAM) -> LRESULT,
-> = None;
+type WindowProc = unsafe extern "system" fn(HWND, u32, WPARAM, LPARAM) -> LRESULT;
+
+static mut SIM_WINDOW_PROC: Option<WindowProc> = None;
+static mut SHELL_WINDOW_PROC: Option<WindowProc> = None;
 
 enum ProcessType {
     None,
@@ -136,12 +134,18 @@ fn create_window(instance: HINSTANCE, width: i32, height: i32) -> Result<HWND> {
 
 fn start_shell(window: HWND, intro_or_sim: &str) -> Result<i32> {
     let shell = shell::Shell::new()?;
-    shell.shell_main(intro_or_sim, window)
+    unsafe { SHELL_WINDOW_PROC = Some(shell.window_proc()?) };
+    let result = shell.shell_main(intro_or_sim, window)?;
+    unsafe { SHELL_WINDOW_PROC = None };
+    Ok(result)
 }
 
 fn start_sim(window: HWND, cmd_line: &str) -> Result<i32> {
     let sim = sim::Sim::new()?;
-    sim.sim_main(cmd_line, std::ptr::null(), FALSE, window)
+    unsafe { SIM_WINDOW_PROC = Some(sim.window_proc()?) };
+    let result = sim.sim_main(cmd_line, std::ptr::null(), FALSE, window)?;
+    unsafe { SIM_WINDOW_PROC = None };
+    Ok(result)
 }
 
 fn main() -> Result<()> {
@@ -159,12 +163,6 @@ fn main() -> Result<()> {
     let mut result = start_shell(window, "intro")?;
 
     loop {
-        if result == -1 {
-            return Err(anyhow::anyhow!(
-                "REMECH 2 is unable to locate necessary program components."
-            ));
-        }
-
         if result == 255 {
             return Ok(());
         }
@@ -184,12 +182,6 @@ fn main() -> Result<()> {
         };
 
         result = start_sim(window, &cmd_line)?;
-
-        if result == -1 {
-            return Err(anyhow::anyhow!(
-                "REMECH 2 is unable to locate necessary program components."
-            ));
-        }
 
         if result == 255 {
             return Ok(());
