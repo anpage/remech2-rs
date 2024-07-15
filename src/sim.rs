@@ -3,7 +3,7 @@ use std::{
     time::Instant,
 };
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use rand::Rng;
 use retour::{GenericDetour, RawDetour};
 use windows::{
@@ -211,6 +211,8 @@ static mut G_MESSAGES_HANDLED: *mut BOOL = std::ptr::null_mut();
 
 static mut CD_AUDIO_DEVICE: u32 = u32::MAX;
 
+static mut LOADED: bool = false;
+
 pub struct Sim {
     ail: Ail,
     module: HMODULE,
@@ -218,6 +220,10 @@ pub struct Sim {
 
 impl Sim {
     pub fn new() -> Result<Self> {
+        if unsafe { LOADED } {
+            bail!("Can't load shell more than once");
+        }
+
         let module = unsafe { LoadLibraryA(s!("MW2.DLL"))? };
         let base_address = module.0 as usize;
 
@@ -384,6 +390,8 @@ impl Sim {
             };
 
             let ail = Ail::new()?;
+
+            LOADED = true;
 
             Ok(Self { ail, module })
         }
@@ -751,6 +759,7 @@ impl Drop for Sim {
             RANDOM_INT_BELOW_HOOK = None;
             self.ail.unhook();
             FreeLibrary(self.module).unwrap();
+            LOADED = false;
         }
     }
 }

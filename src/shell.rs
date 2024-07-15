@@ -3,7 +3,7 @@ use std::{
     fs,
 };
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use retour::{GenericDetour, RawDetour};
 use windows::{
     core::{s, PCSTR},
@@ -64,6 +64,8 @@ static mut G_BIT_BLIT_WIDTH: *mut i32 = std::ptr::null_mut();
 static mut G_BIT_BLIT_HEIGHT: *mut i32 = std::ptr::null_mut();
 static mut G_BIT_BLIT_RESULT: *mut i32 = std::ptr::null_mut();
 
+static mut LOADED: bool = false;
+
 pub struct Shell {
     ail: Ail,
     module: HMODULE,
@@ -71,6 +73,10 @@ pub struct Shell {
 
 impl Shell {
     pub fn new() -> Result<Self> {
+        if unsafe { LOADED } {
+            bail!("Can't load shell more than once");
+        }
+
         let module = unsafe { LoadLibraryA(s!("MW2SHELL.DLL"))? };
         let base_address = module.0 as usize;
 
@@ -134,6 +140,8 @@ impl Shell {
             };
 
             let _ail = Ail::new()?;
+
+            LOADED = true;
 
             Ok(Self { ail: _ail, module })
         }
@@ -305,6 +313,7 @@ impl Drop for Shell {
             CALLS_BIT_BLIT_HOOK = None;
             self.ail.unhook();
             FreeLibrary(self.module).unwrap();
+            LOADED = false;
         }
     }
 }
