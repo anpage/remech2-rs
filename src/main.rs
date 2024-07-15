@@ -191,6 +191,10 @@ fn main() -> Result<()> {
             ));
         }
 
+        if result == 255 {
+            return Ok(());
+        }
+
         result = start_shell(window, "sim")?;
     }
 }
