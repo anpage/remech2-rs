@@ -156,33 +156,41 @@ fn main() -> Result<()> {
     }
 
     let window = create_window(instance, 640, 480)?;
-    let result = start_shell(window, "intro")?;
+    let mut result = start_shell(window, "intro")?;
 
-    if result == -1 {
-        return Err(anyhow::anyhow!(
-            "REMECH 2 is unable to locate necessary program components."
-        ));
-    }
-
-    if result == 255 {
-        return Ok(());
-    }
-
-    let cmd_line = {
-        let mut buffer = vec![];
-        let mut file = BufReader::new(File::open("mw2prm.cfg")?);
-        file.seek(SeekFrom::Start(280))?;
-        for byte in file.bytes() {
-            let byte = byte?;
-            if byte == 0 {
-                break;
-            }
-            buffer.push(byte);
+    loop {
+        if result == -1 {
+            return Err(anyhow::anyhow!(
+                "REMECH 2 is unable to locate necessary program components."
+            ));
         }
-        String::from_utf8_lossy(&buffer).to_string()
-    };
 
-    start_sim(window, &cmd_line)?;
+        if result == 255 {
+            return Ok(());
+        }
 
-    Ok(())
+        let cmd_line = {
+            let mut buffer = vec![];
+            let mut file = BufReader::new(File::open("mw2prm.cfg")?);
+            file.seek(SeekFrom::Start(280))?;
+            for byte in file.bytes() {
+                let byte = byte?;
+                if byte == 0 {
+                    break;
+                }
+                buffer.push(byte);
+            }
+            String::from_utf8_lossy(&buffer).to_string()
+        };
+
+        result = start_sim(window, &cmd_line)?;
+
+        if result == -1 {
+            return Err(anyhow::anyhow!(
+                "REMECH 2 is unable to locate necessary program components."
+            ));
+        }
+
+        result = start_shell(window, "sim")?;
+    }
 }

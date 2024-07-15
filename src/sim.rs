@@ -203,7 +203,7 @@ static mut G_MESSAGES_HANDLED: *mut BOOL = std::ptr::null_mut();
 static mut CD_AUDIO_DEVICE: u32 = u32::MAX;
 
 pub struct Sim {
-    _ail: Ail,
+    ail: Ail,
     module: HMODULE,
 }
 
@@ -379,9 +379,9 @@ impl Sim {
                 Some(hook_function(target, Self::random_int_below)?)
             };
 
-            let _ail = Ail::new()?;
+            let ail = Ail::new()?;
 
-            Ok(Self { _ail, module })
+            Ok(Self { ail, module })
         }
     }
 
@@ -569,6 +569,7 @@ impl Sim {
 impl Drop for Sim {
     fn drop(&mut self) {
         unsafe {
+            crate::SIM_WINDOW_PROC = None;
             DEBUG_LOG_HOOK = None;
             GAME_TICK_TIMER_CALLBACK_HOOK = None;
             SUP_ANIM_TIMER_CALLBACK_HOOK = None;
@@ -592,6 +593,7 @@ impl Drop for Sim {
             CD_AUDIO_TOGGLE_PAUSED_HOOK = None;
             HANDLE_MESSAGES_HOOK = None;
             RANDOM_INT_BELOW_HOOK = None;
+            self.ail.unhook();
             FreeLibrary(self.module).unwrap();
         }
     }

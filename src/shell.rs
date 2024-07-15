@@ -299,6 +299,7 @@ impl Shell {
 impl Drop for Shell {
     fn drop(&mut self) {
         unsafe {
+            crate::SHELL_WINDOW_PROC = None;
             DEBUG_LOG_HOOK = None;
             LOAD_MECH_VARIANT_LIST_HOOK = None;
             CALLS_BIT_BLIT_HOOK = None;
