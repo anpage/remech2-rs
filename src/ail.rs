@@ -106,6 +106,7 @@ impl Ail {
         Ok(Self {})
     }
 
+    /// Replacement for AIL's waveOutOpen callback that doesn't try to suspend the main thread
     unsafe extern "stdcall" fn wave_out_proc(
         _h_wave_out: HWAVEOUT,
         u_msg: u32,
@@ -132,6 +133,7 @@ impl Ail {
         }
     }
 
+    /// Hooked to keep track of the allocated blocks
     unsafe extern "stdcall" fn file_read(
         file_name: *const c_char,
         buffer: *mut c_void,
@@ -145,6 +147,7 @@ impl Ail {
         }
     }
 
+    /// Only try to free blocks that we know haven't been freed yet
     unsafe extern "stdcall" fn mem_free_lock(lp_mem: *mut c_void) {
         unsafe {
             if ALLOCATED_BLOCKS.contains(&(lp_mem as usize)) {
@@ -154,6 +157,8 @@ impl Ail {
         }
     }
 
+    /// Passed to timeSetEvent in AIL to handle timers.
+    /// This also had calls to SuspendThread that needed to be removed.
     unsafe extern "stdcall" fn time_proc(
         _u_timer_id: u32,
         _u_msg: u32,

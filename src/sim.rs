@@ -208,6 +208,8 @@ static mut G_PAUSED_CD_AUDIO_POSITION: *mut CdAudioPosition = std::ptr::null_mut
 static mut G_CD_AUDIO_VOLUME: *mut i32 = std::ptr::null_mut();
 static mut G_MESSAGES_HANDLED: *mut BOOL = std::ptr::null_mut();
 
+/// Cache the CD audio device to reuse between sim launches.
+/// Windows 11 crashes if we try to close the CD audio device.
 static mut CD_AUDIO_DEVICE: u32 = u32::MAX;
 
 static mut LOADED: bool = false;
@@ -429,6 +431,10 @@ impl Sim {
         }
     }
 
+    /// This is the callback executed by Miles Sound System (AIL) with a 181Hz timer to update the game's internal ticks.
+    /// The game uses these ticks to update the game state, including calculating delta time (ticks) between frames.
+    /// The original function was corrupting the stack with my custom AIL time_proc.
+    /// Replacing it with this freshly recompiled copy fixed the problem (for now?)
     unsafe extern "stdcall" fn game_tick_timer_callback(_: u32) {
         if *G_TICKS_CHECK & 0x200 == 0 {
             *G_TICKS_1 += 1;
@@ -438,12 +444,18 @@ impl Sim {
         }
     }
 
+    /// I'm not sure what exactly this does yet, but it's related to the loading screen with the dropship: "sup anim"
+    /// This is the same situation as the tick timer callback: Hooking it to avoid stack corruption.
     unsafe extern "stdcall" fn sup_anim_timer_callback(_: u32) {
         let original: unsafe extern "stdcall" fn() =
             std::mem::transmute(SUP_ANIM_TIMER_CALLBACK_HOOK.as_ref().unwrap().trampoline());
         original();
     }
 
+    /// This function is used all over the game to perform ((a * b) / c).
+    /// It sometimes overflows and sometimes divides by zero, especially when the FPS is too high.
+    ///
+    /// TODO: Fix that, probably.
     unsafe extern "cdecl" fn integer_overflow_happens_here(a: i32, b: i32, c: i32) -> i32 {
         let a = a as i64;
         let b = b as i64;
@@ -451,7 +463,10 @@ impl Sim {
         a.wrapping_mul(b).wrapping_div(c) as i32
     }
 
+    /// The game decides which resolution to use based on the DLL name passed to this function.
+    /// This is presumably a leftover from the DOS version of the game, possibly to preserve config file compatibility.
     unsafe extern "cdecl" fn set_game_resolution(resolution: *mut c_char) {
+        // "MCGA.DLL"
         *G_GAME_WINDOW_WIDTH = 320;
         *G_GAME_WINDOW_HEIGHT = 200;
 
@@ -468,6 +483,9 @@ impl Sim {
         }
     }
 
+    /// This function is called every frame to draw the game.
+    /// For now, we hook it in order to limit the framerate to a resonable 45 FPS.
+    /// Any higher and your jumpjet fuel will not recharge reliably and if unconstrained, the game's physics will break.
     unsafe extern "stdcall" fn blit() {
         static mut LAST_INSTANT: Option<Instant> = None;
         if LAST_INSTANT.is_none() {
@@ -500,6 +518,8 @@ impl Sim {
         }
     }
 
+    /// This function initializes the CD audio device for the game's background music.
+    /// We hook it to work around bugs in modern Windows' MCI implementation.
     unsafe extern "stdcall" fn init_cd_audio() -> u32 {
         if CD_AUDIO_DEVICE != u32::MAX {
             *G_CD_AUDIO_DEVICE = CD_AUDIO_DEVICE;
@@ -546,6 +566,8 @@ impl Sim {
         GET_CD_AUDIO_AUX_DEVICE_HOOK.as_ref().unwrap().call()
     }
 
+    /// Windows 11 was throwing an error if the CD device was closed.
+    /// Now we just cache the device and re-use it between sim launches.
     unsafe extern "stdcall" fn close_cd_audio() -> i32 {
         0
     }
@@ -632,6 +654,7 @@ impl Sim {
         }
 
         match mci_status_parms.dwReturn as u32 {
+            // Some CD emulation software reports MCI_MODE_OPEN when stopped
             MCI_MODE_OPEN | MCI_MODE_STOP => AudioCdStatus::Stopped,
             MCI_MODE_PLAY => AudioCdStatus::Playing,
             MCI_MODE_PAUSE => AudioCdStatus::Paused,
@@ -681,6 +704,8 @@ impl Sim {
         }
     }
 
+    /// The game would reset to the first track of the CD when you unpause.
+    /// This starts playback again from the saved pause position instead;
     unsafe extern "stdcall" fn cd_audio_toggle_paused() {
         if *G_CD_AUDIO_INITIALIZED == 0 {
             return;
@@ -704,6 +729,8 @@ impl Sim {
         }
     }
 
+    /// The original function has a loop was causing bad stuttering when the mouse was moved.
+    /// I'm keeping it around in case removing it causes other problems.
     unsafe extern "stdcall" fn handle_messages() {
         if *G_WINDOW_ACTIVE == FALSE {
             let _ = WaitMessage();
@@ -730,6 +757,11 @@ impl Sim {
         }
     }
 
+    /// Returns a truly pseudorandom number instead of picking from the pregenerated table.
+    /// This fixes the chance to explode if you're overheating because the pregenerated random
+    /// numbers had a chance to never return a number < 3 when modulo with a fixed DeltaTime.
+    ///
+    /// TODO: This could break multiplayer. Look into another solution if it causes desync.
     unsafe extern "cdecl" fn random_int_below(max: i32) -> i32 {
         rand::thread_rng().gen_range(0..max)
     }

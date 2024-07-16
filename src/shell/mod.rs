@@ -169,6 +169,8 @@ impl Shell {
         }
     }
 
+    /// Loads the list of mech variants from the MW2.PRJ file and any user variants from the filesystem.
+    /// Patched to avoid a bug where the game was using an older Win32 API
     unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) {
         unsafe {
             let mech_type: &str = std::ffi::CStr::from_ptr(mech_type).to_str().unwrap();
@@ -230,6 +232,8 @@ impl Shell {
         }
     }
 
+    /// This is the function that the shell uses to draw to the window with GDI's BitBlt function.
+    /// The original function incorrectly failed if the call didn't return the number of lines blitted.
     unsafe extern "stdcall" fn calls_bit_blit() -> i32 {
         unsafe {
             let result = BitBlt(
