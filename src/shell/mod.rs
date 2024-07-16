@@ -28,6 +28,8 @@ use crate::{
     WindowProc,
 };
 
+mod audio;
+
 type ShellMainProc = unsafe extern "stdcall" fn(HMODULE, i32, *const c_char, i32, HWND) -> i32;
 
 type RegCreateKeyExAFunc = unsafe extern "system" fn(
@@ -129,11 +131,13 @@ impl Shell {
                 Some(hook_function(calls_bit_blit, Self::calls_bit_blit)?)
             };
 
-            let _ail = Ail::new()?;
+            audio::hook_functions(base_address)?;
+
+            let ail = Ail::new()?;
 
             LOADED = true;
 
-            Ok(Self { ail: _ail, module })
+            Ok(Self { ail, module })
         }
     }
 
@@ -316,6 +320,7 @@ impl Drop for Shell {
             DEBUG_LOG_HOOK = None;
             LOAD_MECH_VARIANT_LIST_HOOK = None;
             CALLS_BIT_BLIT_HOOK = None;
+            audio::unhook_functions();
             self.ail.unhook();
             FreeLibrary(self.module).unwrap();
             LOADED = false;
