@@ -14,7 +14,9 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
+          target: i686-pc-windows-msvc
           toolchain: nightly
+          override: true
       
       - name: Build Debug
         run: cargo build

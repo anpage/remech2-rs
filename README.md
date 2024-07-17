@@ -29,7 +29,7 @@ copy-protection has not been removed.
 ## Building
 ### Requirements
 * [The Rust toolchain](https://rustup.rs/)
-* Windows, MSVC
+* **Nightly**, Windows, MSVC
 
 ### Steps
 Nothing special for a Rust project. Just:
