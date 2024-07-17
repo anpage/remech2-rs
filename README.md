@@ -29,10 +29,14 @@ copy-protection has not been removed.
 ## Building
 ### Requirements
 * [The Rust toolchain](https://rustup.rs/)
+* Windows, MSVC
 
 ### Steps
 Nothing special for a Rust project. Just:
+
 `cargo build`
+
+Until the dependency on the original game's DLLs is lifted, a 32-bit build target is required.
 
 ## License
 The source code provided in this repository is licensed under the

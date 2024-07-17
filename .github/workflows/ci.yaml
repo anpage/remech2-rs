@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+      
+      - name: Build Debug
+        run: cargo build
+      
+      - name: Build Release
+        run: cargo build --release
+
+      - name: Archive Debug Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: ReMech2-Debug
+          path: |
+            target/i686-pc-windows-msvc/debug/remech2.pdb
+            target/i686-pc-windows-msvc/debug/remech2.exe
+      
+      - name: Archive Release Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: ReMech2-Release
+          path: |
+            target/i686-pc-windows-msvc/release/remech2.pdb
+            target/i686-pc-windows-msvc/release/remech2.exe
