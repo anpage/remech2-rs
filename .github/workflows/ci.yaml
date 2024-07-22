@@ -37,5 +37,4 @@ jobs:
         with:
           name: ReMech2-Release
           path: |
-            target/i686-pc-windows-msvc/release/remech2.pdb
             target/i686-pc-windows-msvc/release/remech2.exe
