@@ -18,8 +18,10 @@ use windows::{
 mod ail;
 mod common;
 mod hooker;
+mod midi_source;
 mod shell;
 mod sim;
+mod xmi;
 
 type WindowProc = unsafe extern "system" fn(HWND, u32, WPARAM, LPARAM) -> LRESULT;
 

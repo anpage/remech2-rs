@@ -1,7 +1,7 @@
 # ReMech 2
 
-ReMech 2 is an unofficial open-source replacement executable for the Windows 95
-version of the game _MechWarrior 2: 31st Century Combat_, built for modern
+ReMech 2 is an **unofficial** open-source replacement executable for the Windows
+95 version of the game _MechWarrior 2: 31st Century Combat_, built for modern
 Windows.
 
 The goal is to reimplement the entire engine function-by-function, focusing on
@@ -36,7 +36,8 @@ Nothing special for a Rust project. Just:
 
 `cargo build`
 
-Until the dependency on the original game's DLLs is lifted, a 32-bit build target is required.
+Until the dependency on the original game's DLLs is lifted, a 32-bit build 
+target is required.
 
 ## License
 The source code provided in this repository is licensed under the
@@ -45,4 +46,8 @@ The source code provided in this repository is licensed under the
 ReMech dynamically links with the proprietary code within the original game's
 DLL files in order to fill in the gaps until everything is 100% reimplemented.
 
-ReMech2 is in no way associated with or endorsed by Activision Blizzard, Inc.
+ReMech2 is in no way associated with or endorsed by Activision Blizzard, Inc. or
+any other company.
+
+GeneralUser GS by S. Christian Collins is included as the default soundfont. 
+See `GUGS-LICENSE.txt` for more information.

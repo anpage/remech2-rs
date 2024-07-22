@@ -225,44 +225,66 @@ static mut MIDI_SEQUENCE_CONSTRUCTOR_HOOK: Option<GenericDetour<MidiSequenceCons
 unsafe extern "fastcall" fn midi_sequence_constructor(
     this: *mut MidiSequenceProxy,
     _: *mut c_void,
-    _audio_subsystem_proxy: *mut AudioSubsystemProxy,
+    audio_subsystem_proxy: *mut AudioSubsystemProxy,
     _data: *mut c_void,
     _data_size: i32,
 ) -> *mut MidiSequenceProxy {
+    let audio_subsystem = (*audio_subsystem_proxy).audio_subsystem;
+    let data = std::slice::from_raw_parts(_data as *const u8, _data_size as usize);
+    let midi_sequence = Box::new(MidiSequence::new(audio_subsystem, data));
+    (*this).midi_sequence = Box::into_raw(midi_sequence);
     this
 }
 
 pub type MidiSequenceDestructorFunc = unsafe extern "fastcall" fn(*mut MidiSequenceProxy);
 static mut MIDI_SEQUENCE_DESTRUCTOR_HOOK: Option<GenericDetour<MidiSequenceDestructorFunc>> = None;
 
-unsafe extern "fastcall" fn midi_sequence_destructor(_this: *mut MidiSequenceProxy) {}
+unsafe extern "fastcall" fn midi_sequence_destructor(_this: *mut MidiSequenceProxy) {
+    let midi_sequence = Box::from_raw((*_this).midi_sequence);
+    drop(midi_sequence);
+}
 
 pub type MidiSequenceStartFunc = unsafe extern "fastcall" fn(*mut MidiSequenceProxy);
 static mut MIDI_SEQUENCE_START_HOOK: Option<GenericDetour<MidiSequenceStartFunc>> = None;
 
-unsafe extern "fastcall" fn midi_sequence_start(_this: *mut MidiSequenceProxy) {}
+unsafe extern "fastcall" fn midi_sequence_start(_this: *mut MidiSequenceProxy) {
+    let mut midi_sequence = Box::from_raw((*_this).midi_sequence);
+    midi_sequence.start();
+    Box::into_raw(midi_sequence);
+}
 
 pub type MidiSequenceStopFunc = unsafe extern "fastcall" fn(*mut MidiSequenceProxy);
 static mut MIDI_SEQUENCE_STOP_HOOK: Option<GenericDetour<MidiSequenceStopFunc>> = None;
 
-unsafe extern "fastcall" fn midi_sequence_stop(_this: *mut MidiSequenceProxy) {}
+unsafe extern "fastcall" fn midi_sequence_stop(_this: *mut MidiSequenceProxy) {
+    let mut midi_sequence = Box::from_raw((*_this).midi_sequence);
+    midi_sequence.stop();
+    Box::into_raw(midi_sequence);
+}
 
 pub type MidiSequenceApplyCurrentVolumeFunc = unsafe extern "fastcall" fn(*mut MidiSequenceProxy);
 static mut MIDI_SEQUENCE_APPLY_CURRENT_VOLUME_HOOK: Option<
     GenericDetour<MidiSequenceApplyCurrentVolumeFunc>,
 > = None;
 
-unsafe extern "fastcall" fn midi_sequence_apply_current_volume(_this: *mut MidiSequenceProxy) {}
+unsafe extern "fastcall" fn midi_sequence_apply_current_volume(_this: *mut MidiSequenceProxy) {
+    let mut midi_sequence = Box::from_raw((*_this).midi_sequence);
+    midi_sequence.apply_current_volume();
+    Box::into_raw(midi_sequence);
+}
 
 pub type MidiSequenceSetVolumeFunc =
     unsafe extern "fastcall" fn(*mut MidiSequenceProxy, *mut c_void, i32);
 static mut MIDI_SEQUENCE_SET_VOLUME_HOOK: Option<GenericDetour<MidiSequenceSetVolumeFunc>> = None;
 
 unsafe extern "fastcall" fn midi_sequence_set_volume(
-    _this: *mut MidiSequenceProxy,
+    this: *mut MidiSequenceProxy,
     _: *mut c_void,
-    _volume: i32,
+    volume: i32,
 ) {
+    let mut midi_sequence = Box::from_raw((*this).midi_sequence);
+    midi_sequence.set_volume(volume);
+    Box::into_raw(midi_sequence);
 }
 
 pub type MidiSequenceSetLoopCountFunc =
@@ -275,6 +297,7 @@ unsafe extern "fastcall" fn midi_sequence_set_loop_count(
     _: *mut c_void,
     _loop_count: i32,
 ) {
+    // Do nothing. We're always looping.
 }
 
 pub type MidiSequenceGetGlobalActiveSequenceCountFunc =
@@ -286,7 +309,8 @@ static mut MIDI_SEQUENCE_GET_GLOBAL_ACTIVE_SEQUENCE_COUNT_HOOK: Option<
 unsafe extern "fastcall" fn midi_sequence_get_global_active_sequence_count(
     _this: *mut MidiSequenceProxy,
 ) -> u32 {
-    0
+    // Just return 1 because if this object exists, there's at least 1 playing.
+    1
 }
 
 pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
