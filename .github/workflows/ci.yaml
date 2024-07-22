@@ -25,7 +25,7 @@ jobs:
         run: cargo build --release
 
       - name: Archive Debug Build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ReMech2-Debug
           path: |
@@ -33,7 +33,7 @@ jobs:
             target/i686-pc-windows-msvc/debug/remech2.exe
       
       - name: Archive Release Build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ReMech2-Release
           path: |
