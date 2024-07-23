@@ -1,7 +1,7 @@
 #![feature(layout_for_ptr)]
 #![feature(c_variadic)]
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use std::{
     env,
     fs::File,
@@ -10,7 +10,10 @@ use std::{
 use windows::{
     core::{s, PCSTR},
     Win32::{
-        Foundation::*, Graphics::Gdi::*, System::LibraryLoader::GetModuleHandleA,
+        Foundation::*,
+        Graphics::Gdi::*,
+        Storage::FileSystem::{GetDriveTypeA, GetLogicalDriveStringsA},
+        System::{LibraryLoader::GetModuleHandleA, WindowsProgramming::DRIVE_CDROM},
         UI::WindowsAndMessaging::*,
     },
 };
@@ -150,6 +153,32 @@ fn start_sim(window: HWND, cmd_line: &str) -> Result<i32> {
     Ok(result)
 }
 
+fn cd_check() -> bool {
+    let mut drive_strings = [0u8; 128];
+    unsafe {
+        GetLogicalDriveStringsA(Some(&mut drive_strings));
+    }
+
+    for drive in drive_strings.split(|&c| c == 0) {
+        if drive.is_empty() {
+            continue;
+        }
+
+        let drive_type = unsafe { GetDriveTypeA(PCSTR(drive.as_ptr())) };
+
+        if drive_type != DRIVE_CDROM {
+            continue;
+        }
+
+        let path = format!("{}:\\OLD_HERC.DRV", *drive.first().unwrap() as char);
+        if File::open(&path).is_ok() {
+            return true;
+        }
+    }
+
+    false
+}
+
 fn main() -> Result<()> {
     let instance: HINSTANCE = unsafe { GetModuleHandleA(None)?.into() };
     let args: Vec<String> = env::args().collect();
@@ -159,6 +188,18 @@ fn main() -> Result<()> {
         let window = create_window(instance, 640, 480)?;
         start_sim(window, &args[1..].join(" "))?;
         return Ok(());
+    }
+
+    if !cd_check() {
+        unsafe {
+            MessageBoxA(
+                HWND::default(),
+                s!("You must insert the game's CD into your CD-ROM drive."),
+                s!("REMECH 2"),
+                MB_ICONERROR,
+            )
+        };
+        bail!("You must insert the game's CD into your CD-ROM drive.");
     }
 
     let window = create_window(instance, 640, 480)?;
