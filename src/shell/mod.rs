@@ -54,6 +54,10 @@ static mut LOAD_MECH_VARIANT_LIST_HOOK: Option<GenericDetour<LoadMechVariantList
 type CallsBitBlitFunc = unsafe extern "stdcall" fn() -> i32;
 static mut CALLS_BIT_BLIT_HOOK: Option<GenericDetour<CallsBitBlitFunc>> = None;
 
+type GetDbItemLzFunc =
+    unsafe extern "fastcall" fn(*mut c_void, *mut c_void, i32, *mut *mut u8, *mut usize) -> i32;
+static mut GET_DB_ITEM_LZ_HOOK: Option<GenericDetour<GetDbItemLzFunc>> = None;
+
 type LoadFileFromPrjFunc = unsafe extern "thiscall" fn(*mut c_void, *const c_char, i32) -> i32;
 static mut G_LOAD_FILE_FROM_PRJ: Option<LoadFileFromPrjFunc> = None;
 
@@ -66,6 +70,8 @@ static mut G_HDC_SRC: *mut HDC = std::ptr::null_mut();
 static mut G_BIT_BLIT_WIDTH: *mut i32 = std::ptr::null_mut();
 static mut G_BIT_BLIT_HEIGHT: *mut i32 = std::ptr::null_mut();
 static mut G_BIT_BLIT_RESULT: *mut i32 = std::ptr::null_mut();
+
+static mut G_DATABASE_MW2: *mut *mut c_void = std::ptr::null_mut();
 
 static mut LOADED: bool = false;
 
@@ -107,6 +113,8 @@ impl Shell {
             G_BIT_BLIT_HEIGHT = (base_address + 0x00096e90) as *mut i32;
             G_BIT_BLIT_RESULT = (base_address + 0x000965f4) as *mut i32;
 
+            G_DATABASE_MW2 = (base_address + 0x0007122c) as *mut *mut c_void;
+
             DEBUG_LOG_HOOK = {
                 let hook = RawDetour::new(
                     (base_address + 0x00017982) as *const (),
@@ -129,6 +137,12 @@ impl Shell {
                 let calls_bit_blit: CallsBitBlitFunc =
                     std::mem::transmute(base_address + 0x00030ef9);
                 Some(hook_function(calls_bit_blit, Self::calls_bit_blit)?)
+            };
+
+            GET_DB_ITEM_LZ_HOOK = {
+                let get_db_item_midi: GetDbItemLzFunc =
+                    std::mem::transmute(base_address + 0x0004813f);
+                Some(hook_function(get_db_item_midi, Self::get_db_item_lz)?)
             };
 
             audio::hook_functions(base_address)?;
@@ -169,67 +183,77 @@ impl Shell {
         }
     }
 
+    /// Called by the game to load a file from DATABASE.MW2 and LZ decompress it.
+    ///
+    /// Hooking it for now to allow for reimplementation later.
+    unsafe extern "fastcall" fn get_db_item_lz(
+        db: *mut c_void,
+        unused: *mut c_void,
+        index: i32,
+        midi_data: *mut *mut u8,
+        midi_data_size: *mut usize,
+    ) -> i32 {
+        GET_DB_ITEM_LZ_HOOK
+            .as_ref()
+            .unwrap()
+            .call(db, unused, index, midi_data, midi_data_size)
+    }
+
     /// Loads the list of mech variants from the MW2.PRJ file and any user variants from the filesystem.
     /// Patched to avoid a bug where the game was using an older Win32 API
     unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) {
-        unsafe {
-            let mech_type: &str = std::ffi::CStr::from_ptr(mech_type).to_str().unwrap();
+        let mech_type: &str = std::ffi::CStr::from_ptr(mech_type).to_str().unwrap();
 
-            // Clear the list
-            (*G_MECH_VARIANT_FILENAMES).fill([0; 13]);
+        // Clear the list
+        (*G_MECH_VARIANT_FILENAMES).fill([0; 13]);
 
-            // Make sure we have at least the default variant
-            let default_variant = format!("{mech_type}00std");
-            std::ptr::copy_nonoverlapping(
-                default_variant.as_ptr(),
-                G_MECH_VARIANT_FILENAME.cast(),
-                13,
-            );
-            std::ptr::copy_nonoverlapping(
-                default_variant.as_ptr(),
-                (*G_MECH_VARIANT_FILENAMES)[0].as_mut_ptr().cast(),
-                13,
-            );
+        // Make sure we have at least the default variant
+        let default_variant = format!("{mech_type}00std");
+        std::ptr::copy_nonoverlapping(default_variant.as_ptr(), G_MECH_VARIANT_FILENAME.cast(), 13);
+        std::ptr::copy_nonoverlapping(
+            default_variant.as_ptr(),
+            (*G_MECH_VARIANT_FILENAMES)[0].as_mut_ptr().cast(),
+            13,
+        );
 
-            // Load the built-in mech variants from the MW2.PRJ file into the next 99 indices
-            for i in 1..100 {
-                let variant = format!("{mech_type}{i:02}std");
-                std::ptr::copy_nonoverlapping(variant.as_ptr(), G_MECH_VARIANT_FILENAME.cast(), 13);
+        // Load the built-in mech variants from the MW2.PRJ file into the next 99 indices
+        for i in 1..100 {
+            let variant = format!("{mech_type}{i:02}std");
+            std::ptr::copy_nonoverlapping(variant.as_ptr(), G_MECH_VARIANT_FILENAME.cast(), 13);
 
-                let variant = CString::new(variant).unwrap();
+            let variant = CString::new(variant).unwrap();
 
-                let result = G_LOAD_FILE_FROM_PRJ.unwrap()(G_PRJ_OBJECT, variant.as_ptr(), 6);
+            let result = G_LOAD_FILE_FROM_PRJ.unwrap()(G_PRJ_OBJECT, variant.as_ptr(), 6);
 
-                if result > -1 {
-                    std::ptr::copy_nonoverlapping(
-                        variant.as_ptr(),
-                        (*G_MECH_VARIANT_FILENAMES)[i].as_mut_ptr(),
-                        13,
-                    );
-                }
+            if result > -1 {
+                std::ptr::copy_nonoverlapping(
+                    variant.as_ptr(),
+                    (*G_MECH_VARIANT_FILENAMES)[i].as_mut_ptr(),
+                    13,
+                );
             }
-
-            // Find all user-defined mech variants from the filesystem and load their names into index 100 and higher
-            let files = fs::read_dir("mek").unwrap();
-            for file in files {
-                let path = file.unwrap().path();
-                let filename = path.file_name().unwrap().to_str().unwrap();
-                if &filename[..3] == mech_type && &filename[5..] == "usr.mek" {
-                    let variant = CString::new(filename[..8].to_string()).unwrap();
-                    let variant = variant.as_ptr();
-                    let i = 100 + filename[3..5].parse::<usize>().unwrap();
-
-                    std::ptr::copy_nonoverlapping(variant, G_MECH_VARIANT_FILENAME, 13);
-
-                    if (*G_MECH_VARIANT_FILENAMES)[i][0] == 0 {
-                        std::ptr::copy_nonoverlapping(variant, G_MECH_VARIANT_FILENAME, 13);
-                        break;
-                    }
-                }
-            }
-
-            dbg!(&(*G_MECH_VARIANT_FILENAMES));
         }
+
+        // Find all user-defined mech variants from the filesystem and load their names into index 100 and higher
+        let files = fs::read_dir("mek").unwrap();
+        for file in files {
+            let path = file.unwrap().path();
+            let filename = path.file_name().unwrap().to_str().unwrap();
+            if &filename[..3] == mech_type && &filename[5..] == "usr.mek" {
+                let variant = CString::new(filename[..8].to_string()).unwrap();
+                let variant = variant.as_ptr();
+                let i = 100 + filename[3..5].parse::<usize>().unwrap();
+
+                std::ptr::copy_nonoverlapping(variant, G_MECH_VARIANT_FILENAME, 13);
+
+                if (*G_MECH_VARIANT_FILENAMES)[i][0] == 0 {
+                    std::ptr::copy_nonoverlapping(variant, G_MECH_VARIANT_FILENAME, 13);
+                    break;
+                }
+            }
+        }
+
+        dbg!(&(*G_MECH_VARIANT_FILENAMES));
     }
 
     /// This is the function that the shell uses to draw to the window with GDI's BitBlt function.
@@ -324,6 +348,7 @@ impl Drop for Shell {
             DEBUG_LOG_HOOK = None;
             LOAD_MECH_VARIANT_LIST_HOOK = None;
             CALLS_BIT_BLIT_HOOK = None;
+            GET_DB_ITEM_LZ_HOOK = None;
             audio::unhook_functions();
             self.ail.unhook();
             FreeLibrary(self.module).unwrap();
