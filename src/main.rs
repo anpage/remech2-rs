@@ -1,19 +1,18 @@
 #![feature(layout_for_ptr)]
 #![feature(c_variadic)]
 
-use anyhow::{bail, Result};
+use anyhow::Result;
 use std::{
     env,
     fs::File,
     io::{BufReader, Read, Seek, SeekFrom},
 };
+use tracing::Level;
+use tracing_subscriber::{filter, prelude::*};
 use windows::{
     core::{s, PCSTR},
     Win32::{
-        Foundation::*,
-        Graphics::Gdi::*,
-        Storage::FileSystem::{GetDriveTypeA, GetLogicalDriveStringsA},
-        System::{LibraryLoader::GetModuleHandleA, WindowsProgramming::DRIVE_CDROM},
+        Foundation::*, Graphics::Gdi::*, System::LibraryLoader::GetModuleHandleA,
         UI::WindowsAndMessaging::*,
     },
 };
@@ -21,6 +20,7 @@ use windows::{
 mod ail;
 mod common;
 mod hooker;
+mod launcher;
 mod midi_source;
 mod shell;
 mod sim;
@@ -72,8 +72,10 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
     }
 }
 
-fn create_window(instance: HINSTANCE, width: i32, height: i32) -> Result<HWND> {
+fn create_window(width: i32, height: i32) -> Result<HWND> {
     unsafe {
+        let instance: HINSTANCE = GetModuleHandleA(None)?.into();
+
         let class_name = s!("REMECH 2");
 
         let wc = WNDCLASSA {
@@ -85,6 +87,7 @@ fn create_window(instance: HINSTANCE, width: i32, height: i32) -> Result<HWND> {
             hbrBackground: HBRUSH(GetStockObject(BLACK_BRUSH).0),
             lpszMenuName: PCSTR::null(),
             lpszClassName: class_name,
+            hCursor: LoadCursorW(None, IDC_ARROW)?,
             ..Default::default()
         };
 
@@ -137,6 +140,12 @@ fn create_window(instance: HINSTANCE, width: i32, height: i32) -> Result<HWND> {
     }
 }
 
+fn start_launcher(window: HWND) -> Result<()> {
+    let mut launcher = launcher::Launcher::new(window)?;
+    launcher.launch()?;
+    Ok(())
+}
+
 fn start_shell(window: HWND, intro_or_sim: &str) -> Result<i32> {
     let shell = shell::Shell::new()?;
     unsafe { SHELL_WINDOW_PROC = Some(shell.window_proc()?) };
@@ -153,56 +162,25 @@ fn start_sim(window: HWND, cmd_line: &str) -> Result<i32> {
     Ok(result)
 }
 
-fn cd_check() -> bool {
-    let mut drive_strings = [0u8; 128];
-    unsafe {
-        GetLogicalDriveStringsA(Some(&mut drive_strings));
-    }
-
-    for drive in drive_strings.split(|&c| c == 0) {
-        if drive.is_empty() {
-            continue;
-        }
-
-        let drive_type = unsafe { GetDriveTypeA(PCSTR(drive.as_ptr())) };
-
-        if drive_type != DRIVE_CDROM {
-            continue;
-        }
-
-        let path = format!("{}:\\OLD_HERC.DRV", *drive.first().unwrap() as char);
-        if File::open(&path).is_ok() {
-            return true;
-        }
-    }
-
-    false
-}
-
 fn main() -> Result<()> {
-    let instance: HINSTANCE = unsafe { GetModuleHandleA(None)?.into() };
+    let filter = filter::Targets::new().with_target("remech2", Level::DEBUG);
+    tracing_subscriber::registry()
+        .with(tracing_subscriber::fmt::layer())
+        .with(filter)
+        .init();
+
     let args: Vec<String> = env::args().collect();
+
+    let window = create_window(640, 480)?;
+
+    start_launcher(window)?;
 
     if args.len() > 1 {
         // launch the sim with the given cmdline
-        let window = create_window(instance, 640, 480)?;
         start_sim(window, &args[1..].join(" "))?;
         return Ok(());
     }
 
-    if !cd_check() {
-        unsafe {
-            MessageBoxA(
-                HWND::default(),
-                s!("You must insert the game's CD into your CD-ROM drive."),
-                s!("REMECH 2"),
-                MB_ICONERROR,
-            )
-        };
-        bail!("You must insert the game's CD into your CD-ROM drive.");
-    }
-
-    let window = create_window(instance, 640, 480)?;
     let mut result = start_shell(window, "intro")?;
 
     loop {

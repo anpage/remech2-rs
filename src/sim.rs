@@ -19,8 +19,7 @@ use windows::{
         },
         System::LibraryLoader::{GetProcAddress, LoadLibraryA},
         UI::WindowsAndMessaging::{
-            DispatchMessageA, PeekMessageA, TranslateMessage, WaitMessage, MSG,
-            PEEK_MESSAGE_REMOVE_TYPE, WM_QUIT,
+            DispatchMessageA, PeekMessageA, TranslateMessage, WaitMessage, MSG, PM_REMOVE, WM_QUIT,
         },
     },
 };
@@ -206,7 +205,7 @@ static mut G_AUDIO_CD_STATUS: *mut AudioCdStatus = std::ptr::null_mut();
 static mut G_CD_AUDIO_TRACK_DATA: *mut CdAudioTracks = std::ptr::null_mut();
 static mut G_PAUSED_CD_AUDIO_POSITION: *mut CdAudioPosition = std::ptr::null_mut();
 static mut G_CD_AUDIO_VOLUME: *mut i32 = std::ptr::null_mut();
-static mut G_MESSAGES_HANDLED: *mut BOOL = std::ptr::null_mut();
+static mut G_SHOULD_QUIT: *mut BOOL = std::ptr::null_mut();
 
 /// Cache the CD audio device to reuse between sim launches.
 /// Windows 11 crashes if we try to close the CD audio device.
@@ -252,7 +251,7 @@ impl Sim {
             G_CD_AUDIO_TRACK_DATA = (base_address + 0x000aa280) as *mut CdAudioTracks;
             G_PAUSED_CD_AUDIO_POSITION = (base_address + 0x000becb0) as *mut CdAudioPosition;
             G_CD_AUDIO_VOLUME = (base_address + 0x000a14a4) as *mut i32;
-            G_MESSAGES_HANDLED = (base_address + 0x000acb18) as *mut BOOL;
+            G_SHOULD_QUIT = (base_address + 0x000acb18) as *mut BOOL;
 
             let heap_free_thunk = (base_address + 0x001834d0) as *mut HeapFreeFunc;
             *heap_free_thunk = fake_heap_free;
@@ -729,29 +728,21 @@ impl Sim {
         }
     }
 
-    /// The original function has a loop was causing bad stuttering when the mouse was moved.
-    /// I'm keeping it around in case removing it causes other problems.
+    /// The original function had a loop that was causing bad stuttering when the mouse was moved.
     unsafe extern "stdcall" fn handle_messages() {
         if *G_WINDOW_ACTIVE == FALSE {
             let _ = WaitMessage();
         }
 
-        if *G_MESSAGES_HANDLED == FALSE {
+        if *G_SHOULD_QUIT == FALSE {
             let mut msg: MSG = MSG::default();
-            let message_available = PeekMessageA(
-                &mut msg as *mut MSG,
-                HWND::default(),
-                0,
-                0,
-                PEEK_MESSAGE_REMOVE_TYPE(1),
-            );
 
-            if message_available == TRUE {
+            if PeekMessageA(&mut msg as *mut MSG, HWND::default(), 0, 0, PM_REMOVE).into() {
                 if msg.hwnd == HWND::default() || msg.message != WM_QUIT {
                     let _ = TranslateMessage(&msg);
                     DispatchMessageA(&msg);
                 } else {
-                    *G_MESSAGES_HANDLED = TRUE;
+                    *G_SHOULD_QUIT = TRUE;
                 }
             }
         }
