@@ -34,4 +34,15 @@ features = [
     "Win32_Storage_FileSystem",
     "Win32_System_WindowsProgramming",
     "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_Storage_FileSystem",
+    "Win32_System_IO",
+]
+
+[dependencies.windows-sys]
+version = "0.52.0"
+features = [
+    "Win32_Storage_FileSystem",
+    "Win32_System_IO",
+    "Win32_Foundation",
+    "Win32_Security",
 ]

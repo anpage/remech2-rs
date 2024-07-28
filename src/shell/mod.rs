@@ -12,12 +12,18 @@ use windows::{
         Graphics::Gdi::{BitBlt, HDC, SRCCOPY},
         Security::SECURITY_ATTRIBUTES,
         System::{
-            LibraryLoader::{GetProcAddress, LoadLibraryA},
+            LibraryLoader::{GetModuleHandleA, GetProcAddress, LoadLibraryA},
             Registry::{
                 RegCreateKeyExA, RegOpenKeyExA, HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE,
                 REG_CREATE_KEY_DISPOSITION, REG_OPEN_CREATE_OPTIONS, REG_SAM_FLAGS,
             },
         },
+    },
+};
+use windows_sys::Win32::{
+    Foundation::HANDLE,
+    Storage::FileSystem::{
+        CreateFileA, FILE_CREATION_DISPOSITION, FILE_FLAGS_AND_ATTRIBUTES, FILE_SHARE_MODE,
     },
 };
 
@@ -45,6 +51,16 @@ type RegCreateKeyExAFunc = unsafe extern "system" fn(
 ) -> WIN32_ERROR;
 type RegOpenKeyExAFunc =
     unsafe extern "system" fn(HKEY, PCSTR, u32, REG_SAM_FLAGS, *mut HKEY) -> WIN32_ERROR;
+
+type CreateFileFunc = unsafe extern "system" fn(
+    lpfilename: windows_sys::core::PCSTR,
+    dwdesiredaccess: u32,
+    dwsharemode: FILE_SHARE_MODE,
+    lpsecurityattributes: *const windows_sys::Win32::Security::SECURITY_ATTRIBUTES,
+    dwcreationdisposition: FILE_CREATION_DISPOSITION,
+    dwflagsandattributes: FILE_FLAGS_AND_ATTRIBUTES,
+    htemplatefile: HANDLE,
+) -> HANDLE;
 
 static mut DEBUG_LOG_HOOK: Option<RawDetour> = None;
 
@@ -89,6 +105,9 @@ impl Shell {
         let module = unsafe { LoadLibraryA(s!("MW2SHELL.DLL"))? };
         let base_address = module.0 as usize;
 
+        let smack_module = unsafe { GetModuleHandleA(s!("SMACKW32.DLL"))? };
+        let smack_base_address = smack_module.0 as usize;
+
         unsafe {
             let heap_free_thunk = (base_address + 0x0009952c) as *mut HeapFreeFunc;
             *heap_free_thunk = fake_heap_free;
@@ -98,6 +117,9 @@ impl Shell {
 
             let reg_open_key_ex_a_thunk = (base_address + 0x000993e8) as *mut RegOpenKeyExAFunc;
             *reg_open_key_ex_a_thunk = Self::reg_open_key_ex_a;
+
+            let create_file_thunk = (smack_base_address + 0x0000e150) as *mut CreateFileFunc;
+            *create_file_thunk = Self::create_file;
 
             G_LOAD_FILE_FROM_PRJ = Some(std::mem::transmute::<usize, LoadFileFromPrjFunc>(
                 base_address + 0x0002e346,
@@ -181,6 +203,30 @@ impl Shell {
                 WindowProc,
             >(window_proc))
         }
+    }
+
+    /// Patched to avoid a bug where Smacker would infinite loop as it failed to read the video file.
+    /// It seems like reading a file without buffering has stricter requirements in modern WIndows.
+    unsafe extern "system" fn create_file(
+        lpfilename: windows_sys::core::PCSTR,
+        dwdesiredaccess: u32,
+        dwsharemode: FILE_SHARE_MODE,
+        lpsecurityattributes: *const windows_sys::Win32::Security::SECURITY_ATTRIBUTES,
+        dwcreationdisposition: FILE_CREATION_DISPOSITION,
+        dwflagsandattributes: FILE_FLAGS_AND_ATTRIBUTES,
+        htemplatefile: HANDLE,
+    ) -> HANDLE {
+        // Remove FILE_FLAG_NO_BUFFERING
+        let dwflagsandattributes = dwflagsandattributes & !0x2000_0000;
+        CreateFileA(
+            lpfilename,
+            dwdesiredaccess,
+            dwsharemode,
+            lpsecurityattributes,
+            dwcreationdisposition,
+            dwflagsandattributes,
+            htemplatefile,
+        )
     }
 
     /// Called by the game to load a file from DATABASE.MW2 and LZ decompress it.

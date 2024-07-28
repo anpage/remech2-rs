@@ -1279,6 +1279,7 @@ dependencies = [
  "web-time 1.1.0",
  "wgpu",
  "windows 0.58.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
