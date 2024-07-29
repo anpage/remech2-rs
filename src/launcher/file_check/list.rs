@@ -54,10 +54,6 @@ pub const GAME_FILES: &[GameFile] = &[
         cd_paths: &["GAMEKEY.MAP"],
     },
     GameFile {
-        path: "GIDDI",
-        cd_paths: &["GIDDI"],
-    },
-    GameFile {
         path: "INPUT.MAP",
         cd_paths: &["INPUT.MAP"],
     },
@@ -66,12 +62,8 @@ pub const GAME_FILES: &[GameFile] = &[
         cd_paths: &["INSTMAP1.BWD"],
     },
     GameFile {
-        path: "KEATING",
-        cd_paths: &["KEATING"],
-    },
-    GameFile {
-        path: "LAUNCH",
-        cd_paths: &["LAUNCH"],
+        path: "MW2.DLL",
+        cd_paths: &["MW2.DLL"],
     },
     GameFile {
         path: "MW2.PRJ",
@@ -112,10 +104,6 @@ pub const GAME_FILES: &[GameFile] = &[
     GameFile {
         path: "SMACKW32.DLL",
         cd_paths: &["SMACKW32.DLL"],
-    },
-    GameFile {
-        path: "SMK",
-        cd_paths: &["SMK"],
     },
     GameFile {
         path: "USERSTAR.BWD",
