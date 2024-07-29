@@ -1,19 +1,20 @@
 use std::num::NonZeroIsize;
 
 use anyhow::{bail, Result};
-use egui::{Modifiers, RawInput};
+use egui::{Modifiers, MouseWheelUnit, RawInput};
 use egui_wgpu::WgpuConfiguration;
 use painter::Painter;
 use windows::Win32::{
     Foundation::HWND,
     UI::WindowsAndMessaging::{
         DispatchMessageA, PeekMessageA, TranslateMessage, MSG, PM_REMOVE, WM_LBUTTONDOWN,
-        WM_LBUTTONUP, WM_MOUSEMOVE, WM_QUIT,
+        WM_LBUTTONUP, WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_QUIT,
     },
 };
 
 mod cd_check;
 mod dll_check;
+mod file_check;
 mod painter;
 
 type Window = raw_window_handle::Win32WindowHandle;
@@ -104,6 +105,16 @@ impl Launcher {
                         pos: egui::pos2(x as f32, y as f32),
                         button: egui::PointerButton::Primary,
                         pressed: false,
+                        modifiers: Modifiers::default(),
+                    });
+                }
+
+                if lpmsg.message == WM_MOUSEWHEEL {
+                    let distance = (lpmsg.wParam.0 >> 16) as i16;
+
+                    raw_input.events.push(egui::Event::MouseWheel {
+                        unit: MouseWheelUnit::Point,
+                        delta: egui::vec2(0.0, distance as f32),
                         modifiers: Modifiers::default(),
                     });
                 }

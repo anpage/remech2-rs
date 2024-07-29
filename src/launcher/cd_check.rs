@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::{fs::File, path::PathBuf};
 
 use anyhow::{bail, Result};
 use windows::{
@@ -12,17 +12,17 @@ use windows::{
 use super::{Action, Stage};
 
 pub struct CdCheck {
-    check: bool,
+    cd_path: Option<PathBuf>,
 }
 
 impl CdCheck {
     pub fn new() -> Self {
         Self {
-            check: Self::cd_check(),
+            cd_path: Self::cd_check(),
         }
     }
 
-    fn cd_check() -> bool {
+    fn cd_check() -> Option<PathBuf> {
         let mut drive_strings = [0u8; 128];
         unsafe {
             GetLogicalDriveStringsA(Some(&mut drive_strings));
@@ -39,23 +39,27 @@ impl CdCheck {
                 continue;
             }
 
-            let path = format!("{}:\\OLD_HERC.DRV", *drive.first().unwrap() as char);
+            let drive_letter = *drive.first().unwrap() as char;
+            let path = format!("{}:\\OLD_HERC.DRV", drive_letter);
             if File::open(&path).is_ok() {
-                return true;
+                let drive = format!("{}:\\", drive_letter);
+                return Some(PathBuf::from(drive));
             }
         }
 
-        false
+        None
     }
 }
 
 impl Stage for CdCheck {
     fn ui(&mut self, ctx: &egui::Context) -> Result<Action> {
-        if self.check {
-            return Ok(Action::Continue(Box::new(super::dll_check::DllCheck)));
+        if let Some(path) = &self.cd_path {
+            return Ok(Action::Continue(Box::new(
+                super::file_check::FileCheck::new(path),
+            )));
         }
         let mut should_bail = false;
-        egui::Window::new("Please insert CD")
+        egui::Window::new("💿 Please Insert CD")
             .resizable(false)
             .collapsible(false)
             .pivot(egui::Align2::CENTER_CENTER)
@@ -64,11 +68,11 @@ impl Stage for CdCheck {
                 ui.label("You must insert the game's CD into your CD-ROM drive.");
                 ui.add_space(10.0);
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
-                    if ui.button("Retry").clicked() {
-                        self.check = Self::cd_check();
-                    }
                     if ui.button("Quit").clicked() {
                         should_bail = true;
+                    }
+                    if ui.button("Retry").clicked() {
+                        self.cd_path = Self::cd_check();
                     }
                 });
             });
