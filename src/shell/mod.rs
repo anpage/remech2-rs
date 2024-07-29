@@ -248,6 +248,9 @@ impl Shell {
     /// Loads the list of mech variants from the MW2.PRJ file and any user variants from the filesystem.
     /// Patched to avoid a bug where the game was using an older Win32 API
     unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) {
+        // Create "MEK" folder if it doesn't exist
+        fs::create_dir_all("MEK").unwrap();
+
         let mech_type: &str = std::ffi::CStr::from_ptr(mech_type).to_str().unwrap();
 
         // Clear the list
