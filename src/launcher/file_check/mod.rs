@@ -143,7 +143,11 @@ impl FileCheck {
             let status = self.copying_status.lock().unwrap();
             match *status {
                 CopyStatus::Copying(ref progress) => progress.clone(),
-                CopyStatus::Done => return Ok(Action::Continue(Box::new(dll_check::DllCheck))),
+                CopyStatus::Done => {
+                    self.copying_files = false;
+                    self.missing_files = check_files(".");
+                    return Ok(Action::Nothing);
+                }
                 CopyStatus::Error(ref file) => {
                     self.copying_error = Some(file.clone());
                     return Ok(Action::Nothing);
