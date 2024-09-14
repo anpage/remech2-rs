@@ -186,7 +186,7 @@ impl Stage for FileCheck {
         }
 
         if self.missing_files.is_empty() {
-            return Ok(Action::Continue(Box::new(dll_check::DllCheck)));
+            return Ok(Action::Continue(Box::new(dll_check::DllCheck::new())));
         }
 
         enum Choice {
@@ -239,7 +239,7 @@ impl Stage for FileCheck {
                 self.missing_files = check_files(".");
                 Ok(Action::Nothing)
             }
-            Some(Choice::No) => Ok(Action::Continue(Box::new(dll_check::DllCheck))),
+            Some(Choice::No) => Ok(Action::Continue(Box::new(dll_check::DllCheck::new()))),
             Some(Choice::Yes) => {
                 self.start_copy();
                 Ok(super::Action::Nothing)

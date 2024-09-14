@@ -20,8 +20,11 @@ mod painter;
 type Window = raw_window_handle::Win32WindowHandle;
 
 enum Action {
+    /// Stay on current stage
     Nothing,
+    /// Move on to another stage
     Continue(Box<dyn Stage>),
+    /// Exit the launcher and run the game
     Break,
 }
 
