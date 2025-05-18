@@ -2,10 +2,11 @@ use std::num::NonZeroIsize;
 
 use anyhow::{bail, Result};
 use egui::{Modifiers, MouseWheelUnit, RawInput};
-use egui_wgpu::WgpuConfiguration;
+use egui_wgpu::{WgpuConfiguration, WgpuSetupCreateNew};
 use painter::Painter;
+use wgpu::InstanceDescriptor;
 use windows::Win32::{
-    Foundation::HWND,
+    Foundation::{HINSTANCE, HWND},
     UI::WindowsAndMessaging::{
         DispatchMessageA, PeekMessageA, TranslateMessage, MSG, PM_REMOVE, WM_LBUTTONDOWN,
         WM_LBUTTONUP, WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_QUIT,
@@ -40,15 +41,27 @@ pub struct Launcher {
 }
 
 impl Launcher {
-    pub fn new(wnd: HWND) -> Result<Self> {
-        let window =
-            raw_window_handle::Win32WindowHandle::new(NonZeroIsize::new(wnd.0 as isize).unwrap());
+    pub fn new(wnd: HWND, instance: HINSTANCE) -> Result<Self> {
+        let window = {
+            let mut wnd = raw_window_handle::Win32WindowHandle::new(
+                NonZeroIsize::new(wnd.0 as isize).unwrap(),
+            );
+            wnd.hinstance = Some(NonZeroIsize::new(instance.0 as isize).unwrap());
+            wnd
+        };
         let ctx = egui::Context::default();
         let config = WgpuConfiguration {
-            supported_backends: wgpu::Backends::GL,
+            wgpu_setup: WgpuSetupCreateNew {
+                instance_descriptor: InstanceDescriptor {
+                    backends: wgpu::Backends::GL,
+                    ..Default::default()
+                },
+                ..Default::default()
+            }
+            .into(),
             ..Default::default()
         };
-        let mut painter = Painter::new(config, 2, None, false, false);
+        let mut painter = pollster::block_on(Painter::new(config, 2, None, false, false));
         unsafe {
             pollster::block_on(painter.set_window(ctx.viewport_id(), Some(&window)))?;
         }

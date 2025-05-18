@@ -5,8 +5,8 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.86"
-egui = { git="https://github.com/emilk/egui/", rev="34db001db14940c948eb03d3fe87f2af2c45daba" }
-egui-wgpu = { git="https://github.com/emilk/egui/", rev="34db001db14940c948eb03d3fe87f2af2c45daba" }
+egui = { git = "https://github.com/emilk/egui/", rev = "12cd35f48c01b77a208a8ec45edb7a14bac7c9f9" }
+egui-wgpu = { git = "https://github.com/emilk/egui/", rev = "12cd35f48c01b77a208a8ec45edb7a14bac7c9f9" }
 hex-literal = "0.4.1"
 pollster = "0.3.0"
 rand = "0.8.5"
@@ -19,7 +19,7 @@ sha2 = "0.10.8"
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
 web-time = "1.1.0"
-wgpu = "22.0.0"
+wgpu = "25.0.0"
 
 [dependencies.windows]
 version = "0.58.0"

@@ -1,3 +1,5 @@
+//! Adapted from egui-wgpu's `winit.rs`
+
 use std::{ffi::c_void, num::NonZeroU32};
 
 use egui::{ViewportId, ViewportIdMap, ViewportIdSet};
@@ -47,17 +49,14 @@ impl Painter {
     /// Before calling [`paint_and_update_textures()`](Self::paint_and_update_textures) a
     /// [`wgpu::Surface`] must be initialized (and corresponding render state) by calling
     /// [`set_window()`](Self::set_window) once you have a valid window handle.
-    pub fn new(
+    pub async fn new(
         configuration: WgpuConfiguration,
         msaa_samples: u32,
         depth_format: Option<wgpu::TextureFormat>,
         support_transparent_backbuffer: bool,
         dithering: bool,
     ) -> Self {
-        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
-            backends: configuration.supported_backends,
-            ..Default::default()
-        });
+        let instance = configuration.wgpu_setup.new_instance().await;
 
         Self {
             configuration,
@@ -155,7 +154,7 @@ impl Painter {
             let render_state = RenderState::create(
                 &self.configuration,
                 &self.instance,
-                &surface,
+                Some(&surface),
                 self.depth_format,
                 self.msaa_samples,
                 self.dithering,
@@ -381,7 +380,7 @@ impl Painter {
                     (texture_view, Some(&frame_view))
                 });
 
-            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            let render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("egui_render"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                     view,
@@ -412,14 +411,14 @@ impl Painter {
                 occlusion_query_set: None,
             });
 
-            renderer.render(&mut render_pass, clipped_primitives, &screen_descriptor);
-        }
-
-        {
-            let mut renderer = render_state.renderer.write();
-            for id in &textures_delta.free {
-                renderer.free_texture(id);
-            }
+            // Forgetting the pass' lifetime means that we are no longer compile-time protected from
+            // runtime errors caused by accessing the parent encoder before the render pass is dropped.
+            // Since we don't pass it on to the renderer, we should be perfectly safe against this mistake here!
+            renderer.render(
+                &mut render_pass.forget_lifetime(),
+                clipped_primitives,
+                &screen_descriptor,
+            );
         }
 
         let encoded = { encoder.finish() };
@@ -433,6 +432,16 @@ impl Painter {
                 .submit(user_cmd_bufs.into_iter().chain([encoded]));
             vsync_sec += start.elapsed().as_secs_f32();
         };
+
+        // Free textures marked for destruction **after** queue submit since they might still be used in the current frame.
+        // Calling `wgpu::Texture::destroy` on a texture that is still in use would invalidate the command buffer(s) it is used in.
+        // However, once we called `wgpu::Queue::submit`, it is up for wgpu to determine how long the underlying gpu resource has to live.
+        {
+            let mut renderer = render_state.renderer.write();
+            for id in &textures_delta.free {
+                renderer.free_texture(id);
+            }
+        }
 
         {
             // wgpu doesn't document where vsync can happen. Maybe here?
@@ -452,7 +461,7 @@ impl Painter {
             .retain(|id, _| active_viewports.contains(id));
     }
 
-    #[allow(clippy::unused_self)]
+    #[expect(clippy::needless_pass_by_ref_mut, clippy::unused_self)]
     pub fn destroy(&mut self) {
         // TODO(emilk): something here?
     }

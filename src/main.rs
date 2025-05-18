@@ -72,7 +72,7 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
     }
 }
 
-fn create_window(width: i32, height: i32) -> Result<HWND> {
+fn create_window(width: i32, height: i32) -> Result<(HWND, HINSTANCE)> {
     unsafe {
         let instance: HINSTANCE = GetModuleHandleA(None)?.into();
 
@@ -136,12 +136,12 @@ fn create_window(width: i32, height: i32) -> Result<HWND> {
         let _ = ShowWindow(window, SW_SHOWDEFAULT);
         let _ = UpdateWindow(window);
 
-        Ok(window)
+        Ok((window, instance))
     }
 }
 
-fn start_launcher(window: HWND) -> Result<()> {
-    let mut launcher = launcher::Launcher::new(window)?;
+fn start_launcher(window: HWND, instance: HINSTANCE) -> Result<()> {
+    let mut launcher = launcher::Launcher::new(window, instance)?;
     launcher.launch()?;
     Ok(())
 }
@@ -171,9 +171,9 @@ fn main() -> Result<()> {
 
     let args: Vec<String> = env::args().collect();
 
-    let window = create_window(640, 480)?;
+    let (window, instance) = create_window(640, 480)?;
 
-    start_launcher(window)?;
+    start_launcher(window, instance)?;
 
     if args.len() > 1 {
         // launch the sim with the given cmdline
