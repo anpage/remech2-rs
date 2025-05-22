@@ -6,7 +6,9 @@ where
     T: HookableWith<D>,
     D: Function,
 {
-    let detour = GenericDetour::new(address, detour)?;
-    detour.enable()?;
-    Ok(detour)
+    unsafe {
+        let detour = GenericDetour::new(address, detour)?;
+        detour.enable()?;
+        Ok(detour)
+    }
 }

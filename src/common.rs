@@ -18,9 +18,9 @@ pub unsafe extern "system" fn fake_heap_free(
     TRUE
 }
 
-pub unsafe extern "C" fn debug_log(format: *const c_char, mut args: ...) {
+pub unsafe extern "C" fn debug_log(format: *const c_char, mut args: ...) { unsafe {
     let mut buffer = [0; 256];
     sprintf(buffer.as_mut_ptr(), format, args.as_va_list());
     let buffer = CStr::from_ptr(buffer.as_ptr());
     print!("{}", buffer.to_str().unwrap());
-}
+}}

@@ -114,7 +114,7 @@ impl Painter {
         &mut self,
         viewport_id: ViewportId,
         window: Option<&super::Window>,
-    ) -> Result<(), WgpuError> {
+    ) -> Result<(), WgpuError> { unsafe {
         if let Some(window) = window {
             let size = {
                 let rect = &mut RECT::default();
@@ -140,7 +140,7 @@ impl Painter {
             self.surfaces.clear();
         }
         Ok(())
-    }
+    }}
 
     async fn add_surface(
         &mut self,

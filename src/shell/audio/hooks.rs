@@ -31,20 +31,20 @@ static mut AUDIO_SUBSYSTEM_CONSTRUCTOR_HOOK: Option<GenericDetour<AudioSubsystem
 
 unsafe extern "fastcall" fn audio_subsystem_constructor(
     this: *mut AudioSubsystemProxy,
-) -> *mut AudioSubsystemProxy {
+) -> *mut AudioSubsystemProxy { unsafe {
     let audio_subsystem = Box::new(AudioSubsystem::new());
     (*this).audio_subsystem = Box::into_raw(audio_subsystem);
     this
-}
+}}
 
 type AudioSubsystemDestructorFunc = unsafe extern "fastcall" fn(*mut AudioSubsystemProxy);
 static mut AUDIO_SUBSYSTEM_DESTRUCTOR_HOOK: Option<GenericDetour<AudioSubsystemDestructorFunc>> =
     None;
 
-unsafe extern "fastcall" fn audio_subsystem_destructor(this: *mut AudioSubsystemProxy) {
+unsafe extern "fastcall" fn audio_subsystem_destructor(this: *mut AudioSubsystemProxy) { unsafe {
     let audio_subsystem = Box::from_raw((*this).audio_subsystem);
     drop(audio_subsystem);
-}
+}}
 
 type AudioSubsystemGetDigitalDriverFunc =
     unsafe extern "fastcall" fn(*mut AudioSubsystemProxy) -> *mut c_void;
@@ -63,22 +63,22 @@ static mut AUDIO_SUBSYSTEM_CLOSE_DIGITAL_DRIVER_HOOK: Option<
     GenericDetour<AudioSubsystemCloseDigitalDriverFunc>,
 > = None;
 
-unsafe extern "fastcall" fn audio_subsystem_close_digital_driver(this: *mut AudioSubsystemProxy) {
+unsafe extern "fastcall" fn audio_subsystem_close_digital_driver(this: *mut AudioSubsystemProxy) { unsafe {
     let mut audio_subsystem = Box::from_raw((*this).audio_subsystem);
     audio_subsystem.close_digital_driver();
     Box::into_raw(audio_subsystem);
-}
+}}
 
 type AudioSubsystemApplyMidiVolumeFunc = unsafe extern "fastcall" fn(*mut AudioSubsystemProxy);
 static mut AUDIO_SUBSYSTEM_APPLY_MIDI_VOLUME_HOOK: Option<
     GenericDetour<AudioSubsystemApplyMidiVolumeFunc>,
 > = None;
 
-unsafe extern "fastcall" fn audio_subsystem_apply_midi_volume(this: *mut AudioSubsystemProxy) {
+unsafe extern "fastcall" fn audio_subsystem_apply_midi_volume(this: *mut AudioSubsystemProxy) { unsafe {
     let mut audio_subsystem = Box::from_raw((*this).audio_subsystem);
     audio_subsystem.apply_midi_volume();
     Box::into_raw(audio_subsystem);
-}
+}}
 
 type AudioSubsystemGetActiveSequenceCountFunc =
     unsafe extern "fastcall" fn(*mut AudioSubsystemProxy) -> u32;
@@ -88,12 +88,12 @@ static mut AUDIO_SUBSYSTEM_GET_ACTIVE_SEQUENCE_COUNT_HOOK: Option<
 
 unsafe extern "fastcall" fn audio_subsystem_get_active_sequence_count(
     this: *mut AudioSubsystemProxy,
-) -> u32 {
+) -> u32 { unsafe {
     let audio_subsystem = Box::from_raw((*this).audio_subsystem);
     let count = audio_subsystem.active_sequence_count();
     Box::into_raw(audio_subsystem);
     count
-}
+}}
 
 pub type AudioSampleConstructorFunc = unsafe extern "fastcall" fn(
     *mut AudioSampleProxy,
@@ -110,41 +110,41 @@ unsafe extern "fastcall" fn audio_sample_constructor(
     audio_subsystem_proxy: *mut AudioSubsystemProxy,
     data: *const u8,
     data_size: i32,
-) -> *mut AudioSampleProxy {
+) -> *mut AudioSampleProxy { unsafe {
     let audio_subsystem = (*audio_subsystem_proxy).audio_subsystem;
     let data = std::slice::from_raw_parts(data, data_size as usize);
     let audio_sample = Box::new(AudioSample::new(audio_subsystem, data));
     (*this).audio_sample = Box::into_raw(audio_sample);
     this
-}
+}}
 
 pub type AudioSampleDestructorFunc = unsafe extern "fastcall" fn(*mut AudioSampleProxy);
 static mut AUDIO_SAMPLE_DESTRUCTOR_HOOK: Option<GenericDetour<AudioSampleDestructorFunc>> = None;
 
-unsafe extern "fastcall" fn audio_sample_destructor(this: *mut AudioSampleProxy) {
+unsafe extern "fastcall" fn audio_sample_destructor(this: *mut AudioSampleProxy) { unsafe {
     let audio_sample = Box::from_raw((*this).audio_sample);
     drop(audio_sample);
-}
+}}
 
 pub type AudioSampleStartFunc = unsafe extern "fastcall" fn(*mut AudioSampleProxy);
 static mut AUDIO_SAMPLE_START_HOOK: Option<GenericDetour<AudioSampleStartFunc>> = None;
 
-unsafe extern "fastcall" fn audio_sample_start(this: *mut AudioSampleProxy) {
+unsafe extern "fastcall" fn audio_sample_start(this: *mut AudioSampleProxy) { unsafe {
     let mut audio_sample = Box::from_raw((*this).audio_sample);
     audio_sample.start();
     Box::into_raw(audio_sample);
-}
+}}
 
 pub type AudioSampleGetIsPlayingFunc = unsafe extern "fastcall" fn(*mut AudioSampleProxy) -> u32;
 static mut AUDIO_SAMPLE_GET_IS_PLAYING_HOOK: Option<GenericDetour<AudioSampleGetIsPlayingFunc>> =
     None;
 
-unsafe extern "fastcall" fn audio_sample_get_is_playing(this: *mut AudioSampleProxy) -> u32 {
+unsafe extern "fastcall" fn audio_sample_get_is_playing(this: *mut AudioSampleProxy) -> u32 { unsafe {
     let audio_sample = Box::from_raw((*this).audio_sample);
     let is_playing = audio_sample.is_playing() as u32;
     Box::into_raw(audio_sample);
     is_playing
-}
+}}
 
 pub type AudioSampleSetFadeFunc =
     unsafe extern "fastcall" fn(*mut AudioSampleProxy, *mut c_void, i32, i32, i32, i32);
@@ -157,29 +157,29 @@ unsafe extern "fastcall" fn audio_sample_set_fade(
     max: i32,
     start: i32,
     end: i32,
-) {
+) { unsafe {
     let mut audio_sample = Box::from_raw((*this).audio_sample);
     audio_sample.set_fade(rate, max, start, end);
     Box::into_raw(audio_sample);
-}
+}}
 
 pub type AudioSampleDoFadeFunc = unsafe extern "fastcall" fn(*mut AudioSampleProxy);
 static mut AUDIO_SAMPLE_DO_FADE_HOOK: Option<GenericDetour<AudioSampleDoFadeFunc>> = None;
 
-unsafe extern "fastcall" fn audio_sample_do_fade(this: *mut AudioSampleProxy) {
+unsafe extern "fastcall" fn audio_sample_do_fade(this: *mut AudioSampleProxy) { unsafe {
     let mut audio_sample = Box::from_raw((*this).audio_sample);
     audio_sample.do_fade();
     Box::into_raw(audio_sample);
-}
+}}
 
 pub type AudioSampleEnableLoopFunc = unsafe extern "fastcall" fn(*mut AudioSampleProxy);
 static mut AUDIO_SAMPLE_ENABLE_LOOP_HOOK: Option<GenericDetour<AudioSampleEnableLoopFunc>> = None;
 
-unsafe extern "fastcall" fn audio_sample_enable_loop(this: *mut AudioSampleProxy) {
+unsafe extern "fastcall" fn audio_sample_enable_loop(this: *mut AudioSampleProxy) { unsafe {
     let mut audio_sample = Box::from_raw((*this).audio_sample);
     audio_sample.enable_loop();
     Box::into_raw(audio_sample);
-}
+}}
 
 pub type AudioSampleSetLoopCountFunc =
     unsafe extern "fastcall" fn(*mut AudioSampleProxy, *mut c_void, i32);
@@ -190,13 +190,13 @@ unsafe extern "fastcall" fn audio_sample_set_loop_count(
     this: *mut AudioSampleProxy,
     _: *mut c_void,
     loop_count: i32,
-) {
+) { unsafe {
     let mut audio_sample = Box::from_raw((*this).audio_sample);
     if loop_count == 0 {
         audio_sample.enable_loop();
     }
     Box::into_raw(audio_sample);
-}
+}}
 
 pub type AudioSampleSetVolumeFunc =
     unsafe extern "fastcall" fn(*mut AudioSampleProxy, *mut c_void, i32);
@@ -206,11 +206,11 @@ unsafe extern "fastcall" fn audio_sample_set_volume(
     this: *mut AudioSampleProxy,
     _: *mut c_void,
     volume: i32,
-) {
+) { unsafe {
     let mut audio_sample = Box::from_raw((*this).audio_sample);
     audio_sample.set_volume(volume);
     Box::into_raw(audio_sample);
-}
+}}
 
 pub type MidiSequenceConstructorFunc = unsafe extern "fastcall" fn(
     *mut MidiSequenceProxy,
@@ -228,50 +228,50 @@ unsafe extern "fastcall" fn midi_sequence_constructor(
     audio_subsystem_proxy: *mut AudioSubsystemProxy,
     _data: *mut c_void,
     _data_size: i32,
-) -> *mut MidiSequenceProxy {
+) -> *mut MidiSequenceProxy { unsafe {
     let audio_subsystem = (*audio_subsystem_proxy).audio_subsystem;
     let data = std::slice::from_raw_parts(_data as *const u8, _data_size as usize);
     let midi_sequence = Box::new(MidiSequence::new(audio_subsystem, data));
     (*this).midi_sequence = Box::into_raw(midi_sequence);
     this
-}
+}}
 
 pub type MidiSequenceDestructorFunc = unsafe extern "fastcall" fn(*mut MidiSequenceProxy);
 static mut MIDI_SEQUENCE_DESTRUCTOR_HOOK: Option<GenericDetour<MidiSequenceDestructorFunc>> = None;
 
-unsafe extern "fastcall" fn midi_sequence_destructor(_this: *mut MidiSequenceProxy) {
+unsafe extern "fastcall" fn midi_sequence_destructor(_this: *mut MidiSequenceProxy) { unsafe {
     let midi_sequence = Box::from_raw((*_this).midi_sequence);
     drop(midi_sequence);
-}
+}}
 
 pub type MidiSequenceStartFunc = unsafe extern "fastcall" fn(*mut MidiSequenceProxy);
 static mut MIDI_SEQUENCE_START_HOOK: Option<GenericDetour<MidiSequenceStartFunc>> = None;
 
-unsafe extern "fastcall" fn midi_sequence_start(_this: *mut MidiSequenceProxy) {
+unsafe extern "fastcall" fn midi_sequence_start(_this: *mut MidiSequenceProxy) { unsafe {
     let mut midi_sequence = Box::from_raw((*_this).midi_sequence);
     midi_sequence.start();
     Box::into_raw(midi_sequence);
-}
+}}
 
 pub type MidiSequenceStopFunc = unsafe extern "fastcall" fn(*mut MidiSequenceProxy);
 static mut MIDI_SEQUENCE_STOP_HOOK: Option<GenericDetour<MidiSequenceStopFunc>> = None;
 
-unsafe extern "fastcall" fn midi_sequence_stop(_this: *mut MidiSequenceProxy) {
+unsafe extern "fastcall" fn midi_sequence_stop(_this: *mut MidiSequenceProxy) { unsafe {
     let mut midi_sequence = Box::from_raw((*_this).midi_sequence);
     midi_sequence.stop();
     Box::into_raw(midi_sequence);
-}
+}}
 
 pub type MidiSequenceApplyCurrentVolumeFunc = unsafe extern "fastcall" fn(*mut MidiSequenceProxy);
 static mut MIDI_SEQUENCE_APPLY_CURRENT_VOLUME_HOOK: Option<
     GenericDetour<MidiSequenceApplyCurrentVolumeFunc>,
 > = None;
 
-unsafe extern "fastcall" fn midi_sequence_apply_current_volume(_this: *mut MidiSequenceProxy) {
+unsafe extern "fastcall" fn midi_sequence_apply_current_volume(_this: *mut MidiSequenceProxy) { unsafe {
     let mut midi_sequence = Box::from_raw((*_this).midi_sequence);
     midi_sequence.apply_current_volume();
     Box::into_raw(midi_sequence);
-}
+}}
 
 pub type MidiSequenceSetVolumeFunc =
     unsafe extern "fastcall" fn(*mut MidiSequenceProxy, *mut c_void, i32);
@@ -281,11 +281,11 @@ unsafe extern "fastcall" fn midi_sequence_set_volume(
     this: *mut MidiSequenceProxy,
     _: *mut c_void,
     volume: i32,
-) {
+) { unsafe {
     let mut midi_sequence = Box::from_raw((*this).midi_sequence);
     midi_sequence.set_volume(volume);
     Box::into_raw(midi_sequence);
-}
+}}
 
 pub type MidiSequenceSetLoopCountFunc =
     unsafe extern "fastcall" fn(*mut MidiSequenceProxy, *mut c_void, i32);
@@ -313,7 +313,7 @@ unsafe extern "fastcall" fn midi_sequence_get_global_active_sequence_count(
     1
 }
 
-pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
+pub unsafe fn hook_functions(base_address: usize) -> Result<()> { unsafe {
     AUDIO_SUBSYSTEM_CONSTRUCTOR_HOOK = {
         let target: AudioSubsystemConstructorFunc = std::mem::transmute(base_address + 0x0003ceb0);
         Some(hook_function(target, audio_subsystem_constructor)?)
@@ -422,9 +422,9 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
     };
 
     Ok(())
-}
+}}
 
-pub unsafe fn unhook_functions() {
+pub unsafe fn unhook_functions() { unsafe {
     AUDIO_SUBSYSTEM_CONSTRUCTOR_HOOK = None;
     AUDIO_SUBSYSTEM_DESTRUCTOR_HOOK = None;
     AUDIO_SUBSYSTEM_GET_DIGITAL_DRIVER_HOOK = None;
@@ -450,4 +450,4 @@ pub unsafe fn unhook_functions() {
     MIDI_SEQUENCE_SET_VOLUME_HOOK = None;
     MIDI_SEQUENCE_SET_LOOP_COUNT_HOOK = None;
     MIDI_SEQUENCE_GET_GLOBAL_ACTIVE_SEQUENCE_COUNT_HOOK = None;
-}
+}}

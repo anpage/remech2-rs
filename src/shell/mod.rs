@@ -218,7 +218,7 @@ impl Shell {
         dwcreationdisposition: FILE_CREATION_DISPOSITION,
         dwflagsandattributes: FILE_FLAGS_AND_ATTRIBUTES,
         htemplatefile: HANDLE,
-    ) -> HANDLE {
+    ) -> HANDLE { unsafe {
         // Remove FILE_FLAG_NO_BUFFERING
         let dwflagsandattributes = dwflagsandattributes & !0x2000_0000;
         CreateFileA(
@@ -230,7 +230,7 @@ impl Shell {
             dwflagsandattributes,
             htemplatefile,
         )
-    }
+    }}
 
     /// Called by the game to load a file from DATABASE.MW2 and LZ decompress it.
     ///
@@ -241,7 +241,7 @@ impl Shell {
         index: i32,
         midi_data: *mut *mut u8,
         midi_data_size: *mut usize,
-    ) -> i32 {
+    ) -> i32 { unsafe {
         GET_DB_ITEM_LZ_HOOK.read().unwrap().as_ref().unwrap().call(
             db,
             unused,
@@ -249,11 +249,11 @@ impl Shell {
             midi_data,
             midi_data_size,
         )
-    }
+    }}
 
     /// Loads the list of mech variants from the MW2.PRJ file and any user variants from the filesystem.
     /// Patched to avoid a bug where the game was using an older Win32 API
-    unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) {
+    unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) { unsafe {
         // Create "MEK" folder if it doesn't exist
         fs::create_dir_all("MEK").unwrap();
 
@@ -310,7 +310,7 @@ impl Shell {
         }
 
         dbg!(&(*G_MECH_VARIANT_FILENAMES));
-    }
+    }}
 
     /// This is the function that the shell uses to draw to the window with GDI's BitBlt function.
     /// The original function incorrectly failed if the call didn't return the number of lines blitted.
@@ -348,7 +348,7 @@ impl Shell {
         security_attributes: *const SECURITY_ATTRIBUTES,
         result: *mut HKEY,
         disposition: *mut REG_CREATE_KEY_DISPOSITION,
-    ) -> WIN32_ERROR {
+    ) -> WIN32_ERROR { unsafe {
         let h_key = if h_key == HKEY_LOCAL_MACHINE {
             HKEY_CURRENT_USER
         } else {
@@ -378,7 +378,7 @@ impl Shell {
             result,
             disposition,
         )
-    }
+    }}
 
     unsafe extern "system" fn reg_open_key_ex_a(
         h_key: HKEY,
@@ -386,7 +386,7 @@ impl Shell {
         reserved: u32,
         sam: REG_SAM_FLAGS,
         result: *mut HKEY,
-    ) -> WIN32_ERROR {
+    ) -> WIN32_ERROR { unsafe {
         let h_key = if h_key == HKEY_LOCAL_MACHINE {
             HKEY_CURRENT_USER
         } else {
@@ -394,7 +394,7 @@ impl Shell {
         };
 
         RegOpenKeyExA(h_key, sub_key, reserved, sam, result)
-    }
+    }}
 }
 
 impl Drop for Shell {
