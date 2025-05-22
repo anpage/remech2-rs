@@ -1,11 +1,11 @@
-use std::ffi::{c_char, c_int, c_void, CStr};
+use std::ffi::{CStr, c_char, c_int, c_void};
 
 use windows::Win32::{
     Foundation::{BOOL, HANDLE, TRUE},
     System::Memory::HEAP_FLAGS,
 };
 
-extern "C" {
+unsafe extern "C" {
     fn sprintf(s: *mut c_char, format: *const c_char, ...) -> c_int;
 }
 

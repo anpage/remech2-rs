@@ -1,12 +1,12 @@
 use std::{
-    ffi::{c_char, c_void, CString},
+    ffi::{CString, c_char, c_void},
     fs,
+    sync::RwLock,
 };
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use retour::{GenericDetour, RawDetour};
 use windows::{
-    core::{s, PCSTR},
     Win32::{
         Foundation::{FreeLibrary, HMODULE, HWND, WIN32_ERROR},
         Graphics::Gdi::{BitBlt, HDC, SRCCOPY},
@@ -14,11 +14,12 @@ use windows::{
         System::{
             LibraryLoader::{GetModuleHandleA, GetProcAddress, LoadLibraryA},
             Registry::{
-                RegCreateKeyExA, RegOpenKeyExA, HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE,
-                REG_CREATE_KEY_DISPOSITION, REG_OPEN_CREATE_OPTIONS, REG_SAM_FLAGS,
+                HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, REG_CREATE_KEY_DISPOSITION,
+                REG_OPEN_CREATE_OPTIONS, REG_SAM_FLAGS, RegCreateKeyExA, RegOpenKeyExA,
             },
         },
     },
+    core::{PCSTR, s},
 };
 use windows_sys::Win32::{
     Foundation::HANDLE,
@@ -28,10 +29,10 @@ use windows_sys::Win32::{
 };
 
 use crate::{
-    ail::Ail,
-    common::{debug_log, fake_heap_free, HeapFreeFunc},
-    hooker::hook_function,
     WindowProc,
+    ail::Ail,
+    common::{HeapFreeFunc, debug_log, fake_heap_free},
+    hooker::hook_function,
 };
 
 mod audio;
@@ -62,20 +63,21 @@ type CreateFileFunc = unsafe extern "system" fn(
     htemplatefile: HANDLE,
 ) -> HANDLE;
 
-static mut DEBUG_LOG_HOOK: Option<RawDetour> = None;
+static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
 
 type LoadMechVariantListFunc = unsafe extern "cdecl" fn(*const c_char);
-static mut LOAD_MECH_VARIANT_LIST_HOOK: Option<GenericDetour<LoadMechVariantListFunc>> = None;
+static LOAD_MECH_VARIANT_LIST_HOOK: RwLock<Option<GenericDetour<LoadMechVariantListFunc>>> =
+    RwLock::new(None);
 
 type CallsBitBlitFunc = unsafe extern "stdcall" fn() -> i32;
-static mut CALLS_BIT_BLIT_HOOK: Option<GenericDetour<CallsBitBlitFunc>> = None;
+static CALLS_BIT_BLIT_HOOK: RwLock<Option<GenericDetour<CallsBitBlitFunc>>> = RwLock::new(None);
 
 type GetDbItemLzFunc =
     unsafe extern "fastcall" fn(*mut c_void, *mut c_void, i32, *mut *mut u8, *mut usize) -> i32;
-static mut GET_DB_ITEM_LZ_HOOK: Option<GenericDetour<GetDbItemLzFunc>> = None;
+static GET_DB_ITEM_LZ_HOOK: RwLock<Option<GenericDetour<GetDbItemLzFunc>>> = RwLock::new(None);
 
 type LoadFileFromPrjFunc = unsafe extern "thiscall" fn(*mut c_void, *const c_char, i32) -> i32;
-static mut G_LOAD_FILE_FROM_PRJ: Option<LoadFileFromPrjFunc> = None;
+static G_LOAD_FILE_FROM_PRJ: RwLock<Option<LoadFileFromPrjFunc>> = RwLock::new(None);
 
 static mut G_MECH_VARIANT_FILENAME: *mut c_char = std::ptr::null_mut();
 static mut G_MECH_VARIANT_FILENAMES: *mut [[c_char; 13]; 200] = std::ptr::null_mut();
@@ -121,9 +123,10 @@ impl Shell {
             let create_file_thunk = (smack_base_address + 0x0000e150) as *mut CreateFileFunc;
             *create_file_thunk = Self::create_file;
 
-            G_LOAD_FILE_FROM_PRJ = Some(std::mem::transmute::<usize, LoadFileFromPrjFunc>(
-                base_address + 0x0002e346,
-            ));
+            *G_LOAD_FILE_FROM_PRJ.write().unwrap() = Some(std::mem::transmute::<
+                usize,
+                LoadFileFromPrjFunc,
+            >(base_address + 0x0002e346));
 
             G_MECH_VARIANT_FILENAME = (base_address + 0x0007a800) as *mut c_char;
             G_MECH_VARIANT_FILENAMES = (base_address + 0x00079d80) as *mut [[c_char; 13]; 200];
@@ -137,7 +140,7 @@ impl Shell {
 
             G_DATABASE_MW2 = (base_address + 0x0007122c) as *mut *mut c_void;
 
-            DEBUG_LOG_HOOK = {
+            *DEBUG_LOG_HOOK.write().unwrap() = {
                 let hook = RawDetour::new(
                     (base_address + 0x00017982) as *const (),
                     debug_log as *const (),
@@ -146,7 +149,7 @@ impl Shell {
                 Some(hook)
             };
 
-            LOAD_MECH_VARIANT_LIST_HOOK = {
+            *LOAD_MECH_VARIANT_LIST_HOOK.write().unwrap() = {
                 let load_mech_variant_list: LoadMechVariantListFunc =
                     std::mem::transmute(base_address + 0x0000c8b8);
                 Some(hook_function(
@@ -155,13 +158,13 @@ impl Shell {
                 )?)
             };
 
-            CALLS_BIT_BLIT_HOOK = {
+            *CALLS_BIT_BLIT_HOOK.write().unwrap() = {
                 let calls_bit_blit: CallsBitBlitFunc =
                     std::mem::transmute(base_address + 0x00030ef9);
                 Some(hook_function(calls_bit_blit, Self::calls_bit_blit)?)
             };
 
-            GET_DB_ITEM_LZ_HOOK = {
+            *GET_DB_ITEM_LZ_HOOK.write().unwrap() = {
                 let get_db_item_midi: GetDbItemLzFunc =
                     std::mem::transmute(base_address + 0x0004813f);
                 Some(hook_function(get_db_item_midi, Self::get_db_item_lz)?)
@@ -239,10 +242,13 @@ impl Shell {
         midi_data: *mut *mut u8,
         midi_data_size: *mut usize,
     ) -> i32 {
-        GET_DB_ITEM_LZ_HOOK
-            .as_ref()
-            .unwrap()
-            .call(db, unused, index, midi_data, midi_data_size)
+        GET_DB_ITEM_LZ_HOOK.read().unwrap().as_ref().unwrap().call(
+            db,
+            unused,
+            index,
+            midi_data,
+            midi_data_size,
+        )
     }
 
     /// Loads the list of mech variants from the MW2.PRJ file and any user variants from the filesystem.
@@ -272,7 +278,8 @@ impl Shell {
 
             let variant = CString::new(variant).unwrap();
 
-            let result = G_LOAD_FILE_FROM_PRJ.unwrap()(G_PRJ_OBJECT, variant.as_ptr(), 6);
+            let result =
+                G_LOAD_FILE_FROM_PRJ.read().unwrap().unwrap()(G_PRJ_OBJECT, variant.as_ptr(), 6);
 
             if result > -1 {
                 std::ptr::copy_nonoverlapping(
@@ -394,10 +401,10 @@ impl Drop for Shell {
     fn drop(&mut self) {
         unsafe {
             crate::SHELL_WINDOW_PROC = None;
-            DEBUG_LOG_HOOK = None;
-            LOAD_MECH_VARIANT_LIST_HOOK = None;
-            CALLS_BIT_BLIT_HOOK = None;
-            GET_DB_ITEM_LZ_HOOK = None;
+            DEBUG_LOG_HOOK.write().unwrap().take();
+            LOAD_MECH_VARIANT_LIST_HOOK.write().unwrap().take();
+            CALLS_BIT_BLIT_HOOK.write().unwrap().take();
+            GET_DB_ITEM_LZ_HOOK.write().unwrap().take();
             audio::unhook_functions();
             self.ail.unhook();
             FreeLibrary(self.module).unwrap();

@@ -1,9 +1,11 @@
-use std::ffi::{c_char, c_void};
+use std::{
+    ffi::{c_char, c_void},
+    sync::RwLock,
+};
 
 use anyhow::Result;
 use retour::GenericDetour;
 use windows::{
-    core::s,
     Win32::{
         Media::{
             Audio::{HWAVEOUT, WAVEHDR},
@@ -11,6 +13,7 @@ use windows::{
         },
         System::LibraryLoader::*,
     },
+    core::s,
 };
 
 use crate::hooker::hook_function;
@@ -37,16 +40,16 @@ struct SomeTimerStruct {
 }
 
 type WaveOutProc = unsafe extern "stdcall" fn(HWAVEOUT, u32, usize, usize, usize);
-static mut WAVE_OUT_HOOK: Option<GenericDetour<WaveOutProc>> = None;
+static WAVE_OUT_HOOK: RwLock<Option<GenericDetour<WaveOutProc>>> = RwLock::new(None);
 
 type FileReadFunc = unsafe extern "stdcall" fn(*const c_char, *mut c_void) -> *mut c_void;
-static mut FILE_READ_HOOK: Option<GenericDetour<FileReadFunc>> = None;
+static FILE_READ_HOOK: RwLock<Option<GenericDetour<FileReadFunc>>> = RwLock::new(None);
 
 type MemFreeLockFunc = unsafe extern "stdcall" fn(*mut c_void);
-static mut MEM_FREE_LOCK_HOOK: Option<GenericDetour<MemFreeLockFunc>> = None;
+static MEM_FREE_LOCK_HOOK: RwLock<Option<GenericDetour<MemFreeLockFunc>>> = RwLock::new(None);
 
 type TimeProc = unsafe extern "stdcall" fn(u32, u32, *mut c_void, *mut c_void, *mut c_void);
-static mut TIME_HOOK: Option<GenericDetour<TimeProc>> = None;
+static TIME_HOOK: RwLock<Option<GenericDetour<TimeProc>>> = RwLock::new(None);
 
 static mut G_LAST_FINISHED_WAVE_HDR: *mut *mut WAVEHDR = std::ptr::null_mut();
 static mut G_LAST_FINISHED_WAVE_HDR_USER: *mut *mut WaveHdrUser = std::ptr::null_mut();
@@ -60,7 +63,7 @@ static mut G_TIME_PROC_LOCKED: *mut i32 = std::ptr::null_mut();
 static mut G_GLOBAL_5: *mut u32 = std::ptr::null_mut();
 static mut G_NUM_TIMERS: *mut u32 = std::ptr::null_mut();
 
-static mut ALLOCATED_BLOCKS: Vec<usize> = Vec::<usize>::new();
+static ALLOCATED_BLOCKS: RwLock<Vec<usize>> = RwLock::new(Vec::<usize>::new());
 
 pub struct Ail {}
 
@@ -82,22 +85,22 @@ impl Ail {
             G_GLOBAL_5 = (base_address + 0x0001c59c) as *mut u32;
             G_NUM_TIMERS = (base_address + 0x0001b800) as *mut u32;
 
-            WAVE_OUT_HOOK = {
+            *WAVE_OUT_HOOK.write().unwrap() = {
                 let wave_out: WaveOutProc = std::mem::transmute(base_address + 0x00008e6d);
                 Some(hook_function(wave_out, Self::wave_out_proc)?)
             };
 
-            FILE_READ_HOOK = {
+            *FILE_READ_HOOK.write().unwrap() = {
                 let file_read: FileReadFunc = std::mem::transmute(base_address + 0x0000845f);
                 Some(hook_function(file_read, Self::file_read)?)
             };
 
-            MEM_FREE_LOCK_HOOK = {
+            *MEM_FREE_LOCK_HOOK.write().unwrap() = {
                 let mem_free_lock: MemFreeLockFunc = std::mem::transmute(base_address + 0x00001f14);
                 Some(hook_function(mem_free_lock, Self::mem_free_lock)?)
             };
 
-            TIME_HOOK = {
+            *TIME_HOOK.write().unwrap() = {
                 let time_proc: TimeProc = std::mem::transmute(base_address + 0x000011c6);
                 Some(hook_function(time_proc, Self::time_proc)?)
             };
@@ -139,9 +142,15 @@ impl Ail {
         buffer: *mut c_void,
     ) -> *mut c_void {
         unsafe {
-            let result = FILE_READ_HOOK.as_ref().unwrap().call(file_name, buffer);
-            if !ALLOCATED_BLOCKS.contains(&(result as usize)) {
-                ALLOCATED_BLOCKS.push(result as usize);
+            let mut allocated_blocks = ALLOCATED_BLOCKS.write().unwrap();
+            let result = FILE_READ_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(file_name, buffer);
+            if !allocated_blocks.contains(&(result as usize)) {
+                allocated_blocks.push(result as usize);
             }
             result
         }
@@ -150,9 +159,15 @@ impl Ail {
     /// Only try to free blocks that we know haven't been freed yet
     unsafe extern "stdcall" fn mem_free_lock(lp_mem: *mut c_void) {
         unsafe {
-            if ALLOCATED_BLOCKS.contains(&(lp_mem as usize)) {
-                MEM_FREE_LOCK_HOOK.as_ref().unwrap().call(lp_mem);
-                ALLOCATED_BLOCKS.retain(|&x| x != lp_mem as usize);
+            let mut allocated_blocks = ALLOCATED_BLOCKS.write().unwrap();
+            if allocated_blocks.contains(&(lp_mem as usize)) {
+                MEM_FREE_LOCK_HOOK
+                    .read()
+                    .unwrap()
+                    .as_ref()
+                    .unwrap()
+                    .call(lp_mem);
+                allocated_blocks.retain(|&x| x != lp_mem as usize);
             }
         }
     }
@@ -196,11 +211,9 @@ impl Ail {
     }
 
     pub fn unhook(&mut self) {
-        unsafe {
-            WAVE_OUT_HOOK = None;
-            FILE_READ_HOOK = None;
-            MEM_FREE_LOCK_HOOK = None;
-            TIME_HOOK = None;
-        }
+        WAVE_OUT_HOOK.write().unwrap().take();
+        FILE_READ_HOOK.write().unwrap().take();
+        MEM_FREE_LOCK_HOOK.write().unwrap().take();
+        TIME_HOOK.write().unwrap().take();
     }
 }

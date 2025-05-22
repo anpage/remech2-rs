@@ -1,34 +1,35 @@
 use std::{
-    ffi::{c_char, c_void, CString},
+    ffi::{CString, c_char, c_void},
+    sync::RwLock,
     time::Instant,
 };
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use rand::Rng;
 use retour::{GenericDetour, RawDetour};
 use windows::{
-    core::s,
     Win32::{
-        Foundation::{FreeLibrary, BOOL, FALSE, HMODULE, HWND, RECT, TRUE},
+        Foundation::{BOOL, FALSE, FreeLibrary, HMODULE, HWND, RECT, TRUE},
         Graphics::Gdi::BITMAPINFO,
         Media::Multimedia::{
-            mciSendCommandA, MCI_FORMAT_TMSF, MCI_FROM, MCI_MODE_OPEN, MCI_MODE_PAUSE,
-            MCI_MODE_PLAY, MCI_MODE_STOP, MCI_OPEN, MCI_OPEN_PARMSA, MCI_OPEN_TYPE, MCI_PLAY,
-            MCI_PLAY_PARMS, MCI_SET, MCI_SET_PARMS, MCI_SET_TIME_FORMAT, MCI_STATUS,
-            MCI_STATUS_ITEM, MCI_STATUS_MODE, MCI_STATUS_PARMS, MCI_TO,
+            MCI_FORMAT_TMSF, MCI_FROM, MCI_MODE_OPEN, MCI_MODE_PAUSE, MCI_MODE_PLAY, MCI_MODE_STOP,
+            MCI_OPEN, MCI_OPEN_PARMSA, MCI_OPEN_TYPE, MCI_PLAY, MCI_PLAY_PARMS, MCI_SET,
+            MCI_SET_PARMS, MCI_SET_TIME_FORMAT, MCI_STATUS, MCI_STATUS_ITEM, MCI_STATUS_MODE,
+            MCI_STATUS_PARMS, MCI_TO, mciSendCommandA,
         },
         System::LibraryLoader::{GetProcAddress, LoadLibraryA},
         UI::WindowsAndMessaging::{
-            DispatchMessageA, PeekMessageA, TranslateMessage, WaitMessage, MSG, PM_REMOVE, WM_QUIT,
+            DispatchMessageA, MSG, PM_REMOVE, PeekMessageA, TranslateMessage, WM_QUIT, WaitMessage,
         },
     },
+    core::s,
 };
 
 use crate::{
-    ail::Ail,
-    common::{debug_log, fake_heap_free, HeapFreeFunc},
-    hooker::hook_function,
     WindowProc,
+    ail::Ail,
+    common::{HeapFreeFunc, debug_log, fake_heap_free},
+    hooker::hook_function,
 };
 
 type SimMainProc = unsafe extern "stdcall" fn(
@@ -115,71 +116,79 @@ impl From<CdAudioPosition> for u32 {
 }
 
 // Functions to hook
-static mut DEBUG_LOG_HOOK: Option<RawDetour> = None;
+static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
 
 type GameTickTimerCallbackFunc = unsafe extern "stdcall" fn(u32);
-static mut GAME_TICK_TIMER_CALLBACK_HOOK: Option<GenericDetour<GameTickTimerCallbackFunc>> = None;
+static GAME_TICK_TIMER_CALLBACK_HOOK: RwLock<Option<GenericDetour<GameTickTimerCallbackFunc>>> =
+    RwLock::new(None);
 
-static mut SUP_ANIM_TIMER_CALLBACK_HOOK: Option<RawDetour> = None;
+static SUP_ANIM_TIMER_CALLBACK_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
 
 type IntegerOverflowHappensHereFunc = unsafe extern "cdecl" fn(i32, i32, i32) -> i32;
-static mut INTEGER_OVERFLOW_HAPPENS_HERE_HOOK: Option<
-    GenericDetour<IntegerOverflowHappensHereFunc>,
-> = None;
+static INTEGER_OVERFLOW_HAPPENS_HERE_HOOK: RwLock<
+    Option<GenericDetour<IntegerOverflowHappensHereFunc>>,
+> = RwLock::new(None);
 
 type SetGameResolutionFunc = unsafe extern "cdecl" fn(*mut c_char);
-static mut SET_GAME_RESOLUTION_HOOK: Option<GenericDetour<SetGameResolutionFunc>> = None;
+static SET_GAME_RESOLUTION_HOOK: RwLock<Option<GenericDetour<SetGameResolutionFunc>>> =
+    RwLock::new(None);
 
 type BlitFunc = unsafe extern "stdcall" fn();
-static mut BLIT_HOOK: Option<GenericDetour<BlitFunc>> = None;
+static BLIT_HOOK: RwLock<Option<GenericDetour<BlitFunc>>> = RwLock::new(None);
 
 type InitCdAudioFunc = unsafe extern "stdcall" fn() -> u32;
-static mut INIT_CD_AUDIO_HOOK: Option<GenericDetour<InitCdAudioFunc>> = None;
+static INIT_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<InitCdAudioFunc>>> = RwLock::new(None);
 
 type GetCdAudioAuxDeviceFunc = unsafe extern "stdcall" fn() -> i32;
-static mut GET_CD_AUDIO_AUX_DEVICE_HOOK: Option<GenericDetour<GetCdAudioAuxDeviceFunc>> = None;
+static GET_CD_AUDIO_AUX_DEVICE_HOOK: RwLock<Option<GenericDetour<GetCdAudioAuxDeviceFunc>>> =
+    RwLock::new(None);
 
 type CloseCdAudioFunc = unsafe extern "stdcall" fn() -> i32;
-static mut CLOSE_CD_AUDIO_HOOK: Option<GenericDetour<CloseCdAudioFunc>> = None;
+static CLOSE_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<CloseCdAudioFunc>>> = RwLock::new(None);
 
 type PlayCdAudioFunc = unsafe extern "cdecl" fn(u32, u32);
-static mut PLAY_CD_AUDIO_HOOK: Option<GenericDetour<PlayCdAudioFunc>> = None;
+static PLAY_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<PlayCdAudioFunc>>> = RwLock::new(None);
 
 type PauseCdAudioFunc = unsafe extern "stdcall" fn();
-static mut PAUSE_CD_AUDIO_HOOK: Option<GenericDetour<PauseCdAudioFunc>> = None;
+static PAUSE_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<PauseCdAudioFunc>>> = RwLock::new(None);
 
 type ResumeCdAudioFunc = unsafe extern "stdcall" fn();
-static mut RESUME_CD_AUDIO_HOOK: Option<GenericDetour<ResumeCdAudioFunc>> = None;
+static RESUME_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<ResumeCdAudioFunc>>> = RwLock::new(None);
 
 type StartCdAudioFunc = unsafe extern "stdcall" fn() -> i32;
-static mut START_CD_AUDIO_HOOK: Option<GenericDetour<StartCdAudioFunc>> = None;
+static START_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<StartCdAudioFunc>>> = RwLock::new(None);
 
 type GetCdStatusFunc = unsafe extern "cdecl" fn() -> AudioCdStatus;
-static mut GET_CD_STATUS_HOOK: Option<GenericDetour<GetCdStatusFunc>> = None;
+static GET_CD_STATUS_HOOK: RwLock<Option<GenericDetour<GetCdStatusFunc>>> = RwLock::new(None);
 
 type GetCdAudioTracksFunc = unsafe extern "cdecl" fn(*mut CdAudioTracks) -> i32;
-static mut GET_CD_AUDIO_TRACKS_HOOK: Option<GenericDetour<GetCdAudioTracksFunc>> = None;
+static GET_CD_AUDIO_TRACKS_HOOK: RwLock<Option<GenericDetour<GetCdAudioTracksFunc>>> =
+    RwLock::new(None);
 
 type GetCdAudioPositionFunc = unsafe extern "cdecl" fn(*mut CdAudioPosition);
-static mut GET_CD_AUDIO_POSITION_HOOK: Option<GenericDetour<GetCdAudioPositionFunc>> = None;
+static GET_CD_AUDIO_POSITION_HOOK: RwLock<Option<GenericDetour<GetCdAudioPositionFunc>>> =
+    RwLock::new(None);
 
 type SetCdAudioVolumeFunc = unsafe extern "cdecl" fn(i32) -> i32;
-static mut SET_CD_AUDIO_VOLUME_HOOK: Option<GenericDetour<SetCdAudioVolumeFunc>> = None;
+static SET_CD_AUDIO_VOLUME_HOOK: RwLock<Option<GenericDetour<SetCdAudioVolumeFunc>>> =
+    RwLock::new(None);
 
 type DeInitCdAudioFunc = unsafe extern "stdcall" fn();
-static mut DEINIT_CD_AUDIO_HOOK: Option<GenericDetour<DeInitCdAudioFunc>> = None;
+static DEINIT_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<DeInitCdAudioFunc>>> = RwLock::new(None);
 
 type UpdateCdAudioPositionFunc = unsafe extern "cdecl" fn(*mut CdAudioPosition);
-static mut UPDATE_CD_AUDIO_POSITION_HOOK: Option<GenericDetour<UpdateCdAudioPositionFunc>> = None;
+static UPDATE_CD_AUDIO_POSITION_HOOK: RwLock<Option<GenericDetour<UpdateCdAudioPositionFunc>>> =
+    RwLock::new(None);
 
 type CdAudioTogglePausedFunc = unsafe extern "stdcall" fn();
-static mut CD_AUDIO_TOGGLE_PAUSED_HOOK: Option<GenericDetour<CdAudioTogglePausedFunc>> = None;
+static CD_AUDIO_TOGGLE_PAUSED_HOOK: RwLock<Option<GenericDetour<CdAudioTogglePausedFunc>>> =
+    RwLock::new(None);
 
 type HandleMessagesFunc = unsafe extern "stdcall" fn();
-static mut HANDLE_MESSAGES_HOOK: Option<GenericDetour<HandleMessagesFunc>> = None;
+static HANDLE_MESSAGES_HOOK: RwLock<Option<GenericDetour<HandleMessagesFunc>>> = RwLock::new(None);
 
 type RandomIntBelowFunc = unsafe extern "cdecl" fn(i32) -> i32;
-static mut RANDOM_INT_BELOW_HOOK: Option<GenericDetour<RandomIntBelowFunc>> = None;
+static RANDOM_INT_BELOW_HOOK: RwLock<Option<GenericDetour<RandomIntBelowFunc>>> = RwLock::new(None);
 
 // Global variables
 static mut G_TICKS_CHECK: *mut u32 = std::ptr::null_mut();
@@ -256,7 +265,7 @@ impl Sim {
             let heap_free_thunk = (base_address + 0x001834d0) as *mut HeapFreeFunc;
             *heap_free_thunk = fake_heap_free;
 
-            DEBUG_LOG_HOOK = {
+            *DEBUG_LOG_HOOK.write().unwrap() = {
                 let hook = RawDetour::new(
                     (base_address + 0x00017982) as *const (),
                     debug_log as *const (),
@@ -265,13 +274,13 @@ impl Sim {
                 Some(hook)
             };
 
-            GAME_TICK_TIMER_CALLBACK_HOOK = {
+            *GAME_TICK_TIMER_CALLBACK_HOOK.write().unwrap() = {
                 let target: GameTickTimerCallbackFunc =
                     std::mem::transmute(base_address + 0x00067ed8);
                 Some(hook_function(target, Self::game_tick_timer_callback)?)
             };
 
-            SUP_ANIM_TIMER_CALLBACK_HOOK = {
+            *SUP_ANIM_TIMER_CALLBACK_HOOK.write().unwrap() = {
                 let hook = RawDetour::new(
                     (base_address + 0x00003f3d) as *const (),
                     Self::sup_anim_timer_callback as *const (),
@@ -280,101 +289,101 @@ impl Sim {
                 Some(hook)
             };
 
-            INTEGER_OVERFLOW_HAPPENS_HERE_HOOK = {
+            *INTEGER_OVERFLOW_HAPPENS_HERE_HOOK.write().unwrap() = {
                 let target: IntegerOverflowHappensHereFunc =
                     std::mem::transmute(base_address + 0x000035a0);
                 Some(hook_function(target, Self::integer_overflow_happens_here)?)
             };
 
-            SET_GAME_RESOLUTION_HOOK = {
+            *SET_GAME_RESOLUTION_HOOK.write().unwrap() = {
                 let target: SetGameResolutionFunc = std::mem::transmute(base_address + 0x00067e23);
                 Some(hook_function(target, Self::set_game_resolution)?)
             };
 
-            BLIT_HOOK = {
+            *BLIT_HOOK.write().unwrap() = {
                 let target: BlitFunc = std::mem::transmute(base_address + 0x00012e15);
                 Some(hook_function(target, Self::blit)?)
             };
 
-            INIT_CD_AUDIO_HOOK = {
+            *INIT_CD_AUDIO_HOOK.write().unwrap() = {
                 let target: InitCdAudioFunc = std::mem::transmute(base_address + 0x0005a8b5);
                 Some(hook_function(target, Self::init_cd_audio)?)
             };
 
-            GET_CD_AUDIO_AUX_DEVICE_HOOK = {
+            *GET_CD_AUDIO_AUX_DEVICE_HOOK.write().unwrap() = {
                 let target: GetCdAudioAuxDeviceFunc =
                     std::mem::transmute(base_address + 0x0005a7a0);
                 Some(hook_function(target, Self::get_cd_audio_aux_device)?)
             };
 
-            CLOSE_CD_AUDIO_HOOK = {
+            *CLOSE_CD_AUDIO_HOOK.write().unwrap() = {
                 let target: CloseCdAudioFunc = std::mem::transmute(base_address + 0x0005aa0a);
                 Some(hook_function(target, Self::close_cd_audio)?)
             };
 
-            PLAY_CD_AUDIO_HOOK = {
+            *PLAY_CD_AUDIO_HOOK.write().unwrap() = {
                 let target: PlayCdAudioFunc = std::mem::transmute(base_address + 0x0005aabe);
                 Some(hook_function(target, Self::play_cd_audio)?)
             };
 
-            PAUSE_CD_AUDIO_HOOK = {
+            *PAUSE_CD_AUDIO_HOOK.write().unwrap() = {
                 let target: PauseCdAudioFunc = std::mem::transmute(base_address + 0x0005aa40);
                 Some(hook_function(target, Self::pause_cd_audio)?)
             };
 
-            RESUME_CD_AUDIO_HOOK = {
+            *RESUME_CD_AUDIO_HOOK.write().unwrap() = {
                 let target: ResumeCdAudioFunc = std::mem::transmute(base_address + 0x0005aa6a);
                 Some(hook_function(target, Self::resume_cd_audio)?)
             };
 
-            START_CD_AUDIO_HOOK = {
+            *START_CD_AUDIO_HOOK.write().unwrap() = {
                 let target: StartCdAudioFunc = std::mem::transmute(base_address + 0x0005ab0b);
                 Some(hook_function(target, Self::start_cd_audio)?)
             };
 
-            GET_CD_STATUS_HOOK = {
+            *GET_CD_STATUS_HOOK.write().unwrap() = {
                 let target: GetCdStatusFunc = std::mem::transmute(base_address + 0x0005ac33);
                 Some(hook_function(target, Self::get_cd_status)?)
             };
 
-            GET_CD_AUDIO_TRACKS_HOOK = {
+            *GET_CD_AUDIO_TRACKS_HOOK.write().unwrap() = {
                 let target: GetCdAudioTracksFunc = std::mem::transmute(base_address + 0x0005b49e);
                 Some(hook_function(target, Self::get_cd_audio_tracks)?)
             };
 
-            GET_CD_AUDIO_POSITION_HOOK = {
+            *GET_CD_AUDIO_POSITION_HOOK.write().unwrap() = {
                 let target: GetCdAudioPositionFunc = std::mem::transmute(base_address + 0x0005b61d);
                 Some(hook_function(target, Self::get_cd_audio_position)?)
             };
 
-            SET_CD_AUDIO_VOLUME_HOOK = {
+            *SET_CD_AUDIO_VOLUME_HOOK.write().unwrap() = {
                 let target: SetCdAudioVolumeFunc = std::mem::transmute(base_address + 0x0005b734);
                 Some(hook_function(target, Self::set_cd_audio_volume)?)
             };
 
-            DEINIT_CD_AUDIO_HOOK = {
+            *DEINIT_CD_AUDIO_HOOK.write().unwrap() = {
                 let target: DeInitCdAudioFunc = std::mem::transmute(base_address + 0x0005abff);
                 Some(hook_function(target, Self::deinit_cd_audio)?)
             };
 
-            UPDATE_CD_AUDIO_POSITION_HOOK = {
+            *UPDATE_CD_AUDIO_POSITION_HOOK.write().unwrap() = {
                 let target: UpdateCdAudioPositionFunc =
                     std::mem::transmute(base_address + 0x0005af07);
                 Some(hook_function(target, Self::update_cd_audio_position)?)
             };
 
-            CD_AUDIO_TOGGLE_PAUSED_HOOK = {
+            *CD_AUDIO_TOGGLE_PAUSED_HOOK.write().unwrap() = {
                 let target: CdAudioTogglePausedFunc =
                     std::mem::transmute(base_address + 0x0005ad5e);
                 Some(hook_function(target, Self::cd_audio_toggle_paused)?)
             };
 
-            HANDLE_MESSAGES_HOOK = {
+            *HANDLE_MESSAGES_HOOK.write().unwrap() = {
                 let target: HandleMessagesFunc = std::mem::transmute(base_address + 0x00067bbc);
                 Some(hook_function(target, Self::handle_messages)?)
             };
 
-            RANDOM_INT_BELOW_HOOK = {
+            *RANDOM_INT_BELOW_HOOK.write().unwrap() = {
                 let target: RandomIntBelowFunc = std::mem::transmute(base_address + 0x000736b3);
                 Some(hook_function(target, Self::random_int_below)?)
             };
@@ -446,8 +455,14 @@ impl Sim {
     /// I'm not sure what exactly this does yet, but it's related to the loading screen with the dropship: "sup anim"
     /// This is the same situation as the tick timer callback: Hooking it to avoid stack corruption.
     unsafe extern "stdcall" fn sup_anim_timer_callback(_: u32) {
-        let original: unsafe extern "stdcall" fn() =
-            std::mem::transmute(SUP_ANIM_TIMER_CALLBACK_HOOK.as_ref().unwrap().trampoline());
+        let original: unsafe extern "stdcall" fn() = std::mem::transmute(
+            SUP_ANIM_TIMER_CALLBACK_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .trampoline(),
+        );
         original();
     }
 
@@ -486,17 +501,21 @@ impl Sim {
     /// For now, we hook it in order to limit the framerate to a resonable 45 FPS.
     /// Any higher and your jumpjet fuel will not recharge reliably and if unconstrained, the game's physics will break.
     unsafe extern "stdcall" fn blit() {
-        static mut LAST_INSTANT: Option<Instant> = None;
-        if LAST_INSTANT.is_none() {
-            LAST_INSTANT = Some(Instant::now());
-        }
+        static LAST_INSTANT: RwLock<Option<Instant>> = RwLock::new(None);
 
-        // Limit framerate to 45 FPS
-        // Spin until 1/45th of a second has passed
-        while LAST_INSTANT.unwrap().elapsed().as_secs_f64() < 1.0 / 45.0 {
-            std::thread::yield_now();
+        {
+            let mut last_instant = LAST_INSTANT.write().unwrap();
+            if last_instant.is_none() {
+                *last_instant = Some(Instant::now());
+            }
+
+            // Limit framerate to 45 FPS
+            // Spin until 1/45th of a second has passed
+            while last_instant.unwrap().elapsed().as_secs_f64() < 1.0 / 45.0 {
+                std::thread::yield_now();
+            }
+            *last_instant = Some(Instant::now());
         }
-        LAST_INSTANT = Some(Instant::now());
 
         if *G_BLIT_GLOBAL_1 == FALSE {
             if *G_WINDOW_ACTIVE == TRUE {
@@ -562,7 +581,12 @@ impl Sim {
     }
 
     unsafe extern "stdcall" fn get_cd_audio_aux_device() -> i32 {
-        GET_CD_AUDIO_AUX_DEVICE_HOOK.as_ref().unwrap().call()
+        GET_CD_AUDIO_AUX_DEVICE_HOOK
+            .read()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .call()
     }
 
     /// Windows 11 was throwing an error if the CD device was closed.
@@ -591,11 +615,16 @@ impl Sim {
     }
 
     unsafe extern "stdcall" fn pause_cd_audio() {
-        PAUSE_CD_AUDIO_HOOK.as_ref().unwrap().call();
+        PAUSE_CD_AUDIO_HOOK.read().unwrap().as_ref().unwrap().call();
     }
 
     unsafe extern "stdcall" fn resume_cd_audio() {
-        RESUME_CD_AUDIO_HOOK.as_ref().unwrap().call();
+        RESUME_CD_AUDIO_HOOK
+            .read()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .call();
     }
 
     unsafe extern "stdcall" fn start_cd_audio() -> i32 {
@@ -663,6 +692,8 @@ impl Sim {
 
     unsafe extern "cdecl" fn get_cd_audio_tracks(cd_audio_tracks: *mut CdAudioTracks) -> i32 {
         GET_CD_AUDIO_TRACKS_HOOK
+            .read()
+            .unwrap()
             .as_ref()
             .unwrap()
             .call(cd_audio_tracks)
@@ -670,17 +701,29 @@ impl Sim {
 
     unsafe extern "cdecl" fn get_cd_audio_position(cd_audio_position: *mut CdAudioPosition) {
         GET_CD_AUDIO_POSITION_HOOK
+            .read()
+            .unwrap()
             .as_ref()
             .unwrap()
             .call(cd_audio_position)
     }
 
     unsafe extern "cdecl" fn set_cd_audio_volume(volume: i32) -> i32 {
-        SET_CD_AUDIO_VOLUME_HOOK.as_ref().unwrap().call(volume)
+        SET_CD_AUDIO_VOLUME_HOOK
+            .read()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .call(volume)
     }
 
     unsafe extern "stdcall" fn deinit_cd_audio() {
-        DEINIT_CD_AUDIO_HOOK.as_ref().unwrap().call();
+        DEINIT_CD_AUDIO_HOOK
+            .read()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .call();
     }
 
     unsafe extern "cdecl" fn update_cd_audio_position(position: *mut CdAudioPosition) {
@@ -762,28 +805,28 @@ impl Drop for Sim {
     fn drop(&mut self) {
         unsafe {
             crate::SIM_WINDOW_PROC = None;
-            DEBUG_LOG_HOOK = None;
-            GAME_TICK_TIMER_CALLBACK_HOOK = None;
-            SUP_ANIM_TIMER_CALLBACK_HOOK = None;
-            INTEGER_OVERFLOW_HAPPENS_HERE_HOOK = None;
-            SET_GAME_RESOLUTION_HOOK = None;
-            BLIT_HOOK = None;
-            INIT_CD_AUDIO_HOOK = None;
-            GET_CD_AUDIO_AUX_DEVICE_HOOK = None;
-            CLOSE_CD_AUDIO_HOOK = None;
-            PLAY_CD_AUDIO_HOOK = None;
-            PAUSE_CD_AUDIO_HOOK = None;
-            RESUME_CD_AUDIO_HOOK = None;
-            START_CD_AUDIO_HOOK = None;
-            GET_CD_STATUS_HOOK = None;
-            GET_CD_AUDIO_TRACKS_HOOK = None;
-            GET_CD_AUDIO_POSITION_HOOK = None;
-            SET_CD_AUDIO_VOLUME_HOOK = None;
-            DEINIT_CD_AUDIO_HOOK = None;
-            UPDATE_CD_AUDIO_POSITION_HOOK = None;
-            CD_AUDIO_TOGGLE_PAUSED_HOOK = None;
-            HANDLE_MESSAGES_HOOK = None;
-            RANDOM_INT_BELOW_HOOK = None;
+            DEBUG_LOG_HOOK.write().unwrap().take();
+            GAME_TICK_TIMER_CALLBACK_HOOK.write().unwrap().take();
+            SUP_ANIM_TIMER_CALLBACK_HOOK.write().unwrap().take();
+            INTEGER_OVERFLOW_HAPPENS_HERE_HOOK.write().unwrap().take();
+            SET_GAME_RESOLUTION_HOOK.write().unwrap().take();
+            BLIT_HOOK.write().unwrap().take();
+            INIT_CD_AUDIO_HOOK.write().unwrap().take();
+            GET_CD_AUDIO_AUX_DEVICE_HOOK.write().unwrap().take();
+            CLOSE_CD_AUDIO_HOOK.write().unwrap().take();
+            PLAY_CD_AUDIO_HOOK.write().unwrap().take();
+            PAUSE_CD_AUDIO_HOOK.write().unwrap().take();
+            RESUME_CD_AUDIO_HOOK.write().unwrap().take();
+            START_CD_AUDIO_HOOK.write().unwrap().take();
+            GET_CD_STATUS_HOOK.write().unwrap().take();
+            GET_CD_AUDIO_TRACKS_HOOK.write().unwrap().take();
+            GET_CD_AUDIO_POSITION_HOOK.write().unwrap().take();
+            SET_CD_AUDIO_VOLUME_HOOK.write().unwrap().take();
+            DEINIT_CD_AUDIO_HOOK.write().unwrap().take();
+            UPDATE_CD_AUDIO_POSITION_HOOK.write().unwrap().take();
+            CD_AUDIO_TOGGLE_PAUSED_HOOK.write().unwrap().take();
+            HANDLE_MESSAGES_HOOK.write().unwrap().take();
+            RANDOM_INT_BELOW_HOOK.write().unwrap().take();
             self.ail.unhook();
             FreeLibrary(self.module).unwrap();
             LOADED = false;
