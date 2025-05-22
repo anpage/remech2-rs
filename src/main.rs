@@ -199,7 +199,8 @@ fn main() -> Result<()> {
                 }
                 buffer.push(byte);
             }
-            String::from_utf8_lossy(&buffer).to_string()
+            let cmd_line = String::from_utf8_lossy(&buffer).to_string();
+            format!("{} {}", cmd_line, "/V=5")
         };
 
         result = start_sim(window, &cmd_line)?;
