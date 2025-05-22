@@ -2,7 +2,7 @@
 
 use std::{ffi::c_void, num::NonZeroU32};
 
-use egui::{ViewportId, ViewportIdMap, ViewportIdSet};
+use egui::{ViewportId, ViewportIdMap};
 use egui_wgpu::{RenderState, SurfaceErrorAction, WgpuConfiguration, WgpuError};
 use raw_window_handle::WindowsDisplayHandle;
 use tracing::{debug, warn};
@@ -74,13 +74,6 @@ impl Painter {
         }
     }
 
-    /// Get the [`RenderState`].
-    ///
-    /// Will return [`None`] if the render state has not been initialized yet.
-    pub fn render_state(&self) -> Option<RenderState> {
-        self.render_state.clone()
-    }
-
     fn configure_surface(
         surface_state: &SurfaceState,
         render_state: &RenderState,
@@ -115,34 +108,33 @@ impl Painter {
         viewport_id: ViewportId,
         window: Option<&super::Window>,
     ) -> Result<(), WgpuError> {
-        unsafe {
-            if let Some(window) = window {
-                let size = {
-                    let rect = &mut RECT::default();
+        if let Some(window) = window {
+            let size = {
+                let rect = &mut RECT::default();
+                unsafe {
                     GetClientRect(HWND(window.hwnd.get() as *mut c_void), rect)
                         .expect("GetClientRect failed");
-                    (
-                        (rect.right - rect.left) as u32,
-                        (rect.bottom - rect.top) as u32,
-                    )
-                };
-                if !self.surfaces.contains_key(&viewport_id) {
-                    let surface = unsafe {
-                        self.instance.create_surface_unsafe(
-                            wgpu::SurfaceTargetUnsafe::RawHandle {
-                                raw_display_handle: WindowsDisplayHandle::new().into(),
-                                raw_window_handle: (*window).into(),
-                            },
-                        )?
-                    };
-                    self.add_surface(surface, viewport_id, size).await?;
                 }
-            } else {
-                warn!("No window - clearing all surfaces");
-                self.surfaces.clear();
+                (
+                    (rect.right - rect.left) as u32,
+                    (rect.bottom - rect.top) as u32,
+                )
+            };
+            if !self.surfaces.contains_key(&viewport_id) {
+                let surface = unsafe {
+                    self.instance
+                        .create_surface_unsafe(wgpu::SurfaceTargetUnsafe::RawHandle {
+                            raw_display_handle: WindowsDisplayHandle::new().into(),
+                            raw_window_handle: (*window).into(),
+                        })?
+                };
+                self.add_surface(surface, viewport_id, size).await?;
             }
-            Ok(())
+        } else {
+            warn!("No window - clearing all surfaces");
+            self.surfaces.clear();
         }
+        Ok(())
     }
 
     async fn add_surface(
@@ -201,17 +193,6 @@ impl Painter {
         };
         self.resize_and_generate_depth_texture_view_and_msaa_view(viewport_id, width, height);
         Ok(())
-    }
-
-    /// Returns the maximum texture dimension supported if known
-    ///
-    /// This API will only return a known dimension after `set_window()` has been called
-    /// at least once, since the underlying device and render state are initialized lazily
-    /// once we have a window (that may determine the choice of adapter/device).
-    pub fn max_texture_side(&self) -> Option<usize> {
-        self.render_state
-            .as_ref()
-            .map(|rs| rs.device.limits().max_texture_dimension_2d as usize)
     }
 
     fn resize_and_generate_depth_texture_view_and_msaa_view(
@@ -281,25 +262,6 @@ impl Painter {
                     .create_view(&wgpu::TextureViewDescriptor::default()),
             );
         };
-    }
-
-    pub fn on_window_resized(
-        &mut self,
-        viewport_id: ViewportId,
-        width_in_pixels: NonZeroU32,
-        height_in_pixels: NonZeroU32,
-    ) {
-        if self.surfaces.contains_key(&viewport_id) {
-            self.resize_and_generate_depth_texture_view_and_msaa_view(
-                viewport_id,
-                width_in_pixels,
-                height_in_pixels,
-            );
-        } else {
-            warn!(
-                "Ignoring window resize notification with no surface created via Painter::set_window()"
-            );
-        }
     }
 
     /// Returns the approximate number of seconds spent on vsync-waiting (if any)
@@ -458,18 +420,5 @@ impl Painter {
         }
 
         vsync_sec
-    }
-
-    pub fn gc_viewports(&mut self, active_viewports: &ViewportIdSet) {
-        self.surfaces.retain(|id, _| active_viewports.contains(id));
-        self.depth_texture_view
-            .retain(|id, _| active_viewports.contains(id));
-        self.msaa_texture_view
-            .retain(|id, _| active_viewports.contains(id));
-    }
-
-    #[expect(clippy::needless_pass_by_ref_mut, clippy::unused_self)]
-    pub fn destroy(&mut self) {
-        // TODO(emilk): something here?
     }
 }
