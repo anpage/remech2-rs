@@ -69,7 +69,7 @@ impl Launcher {
             painter,
             ctx,
             window: wnd,
-            current_stage: Box::new(dll_check::DllCheck::new()),
+            current_stage: Box::new(cd_check::CdCheck::new()),
         })
     }
 
