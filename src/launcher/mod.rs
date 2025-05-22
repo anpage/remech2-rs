@@ -1,6 +1,6 @@
 use std::num::NonZeroIsize;
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use egui::{Modifiers, MouseWheelUnit, RawInput};
 use egui_wgpu::{WgpuConfiguration, WgpuSetupCreateNew};
 use painter::Painter;
@@ -8,7 +8,7 @@ use wgpu::InstanceDescriptor;
 use windows::Win32::{
     Foundation::{HINSTANCE, HWND},
     UI::WindowsAndMessaging::{
-        DispatchMessageA, PeekMessageA, TranslateMessage, MSG, PM_REMOVE, WM_LBUTTONDOWN,
+        DispatchMessageA, MSG, PM_REMOVE, PeekMessageA, TranslateMessage, WM_LBUTTONDOWN,
         WM_LBUTTONUP, WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_QUIT,
     },
 };

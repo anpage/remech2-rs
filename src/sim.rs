@@ -443,28 +443,32 @@ impl Sim {
     /// The game uses these ticks to update the game state, including calculating delta time (ticks) between frames.
     /// The original function was corrupting the stack with my custom AIL time_proc.
     /// Replacing it with this freshly recompiled copy fixed the problem (for now?)
-    unsafe extern "stdcall" fn game_tick_timer_callback(_: u32) { unsafe {
-        if *G_TICKS_CHECK & 0x200 == 0 {
-            *G_TICKS_1 += 1;
+    unsafe extern "stdcall" fn game_tick_timer_callback(_: u32) {
+        unsafe {
+            if *G_TICKS_CHECK & 0x200 == 0 {
+                *G_TICKS_1 += 1;
+            }
+            if *G_TICKS_CHECK & 0x100 == 0 {
+                *G_TICKS_2 += 1;
+            }
         }
-        if *G_TICKS_CHECK & 0x100 == 0 {
-            *G_TICKS_2 += 1;
-        }
-    }}
+    }
 
     /// I'm not sure what exactly this does yet, but it's related to the loading screen with the dropship: "sup anim"
     /// This is the same situation as the tick timer callback: Hooking it to avoid stack corruption.
-    unsafe extern "stdcall" fn sup_anim_timer_callback(_: u32) { unsafe {
-        let original: unsafe extern "stdcall" fn() = std::mem::transmute(
-            SUP_ANIM_TIMER_CALLBACK_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .trampoline(),
-        );
-        original();
-    }}
+    unsafe extern "stdcall" fn sup_anim_timer_callback(_: u32) {
+        unsafe {
+            let original: unsafe extern "stdcall" fn() = std::mem::transmute(
+                SUP_ANIM_TIMER_CALLBACK_HOOK
+                    .read()
+                    .unwrap()
+                    .as_ref()
+                    .unwrap()
+                    .trampoline(),
+            );
+            original();
+        }
+    }
 
     /// This function is used all over the game to perform ((a * b) / c).
     /// It sometimes overflows and sometimes divides by zero, especially when the FPS is too high.
@@ -479,115 +483,123 @@ impl Sim {
 
     /// The game decides which resolution to use based on the DLL name passed to this function.
     /// This is presumably a leftover from the DOS version of the game, possibly to preserve config file compatibility.
-    unsafe extern "cdecl" fn set_game_resolution(resolution: *mut c_char) { unsafe {
-        // "MCGA.DLL"
-        *G_GAME_WINDOW_WIDTH = 320;
-        *G_GAME_WINDOW_HEIGHT = 200;
+    unsafe extern "cdecl" fn set_game_resolution(resolution: *mut c_char) {
+        unsafe {
+            // "MCGA.DLL"
+            *G_GAME_WINDOW_WIDTH = 320;
+            *G_GAME_WINDOW_HEIGHT = 200;
 
-        let resolution = std::ffi::CStr::from_ptr(resolution)
-            .to_str()
-            .unwrap()
-            .to_uppercase();
-        if resolution == "VESA480.DLL" {
-            *G_GAME_WINDOW_WIDTH = 640;
-            *G_GAME_WINDOW_HEIGHT = 480;
-        } else if resolution == "VESA768.DLL" {
-            *G_GAME_WINDOW_WIDTH = 1024;
-            *G_GAME_WINDOW_HEIGHT = 768;
+            let resolution = std::ffi::CStr::from_ptr(resolution)
+                .to_str()
+                .unwrap()
+                .to_uppercase();
+            if resolution == "VESA480.DLL" {
+                *G_GAME_WINDOW_WIDTH = 640;
+                *G_GAME_WINDOW_HEIGHT = 480;
+            } else if resolution == "VESA768.DLL" {
+                *G_GAME_WINDOW_WIDTH = 1024;
+                *G_GAME_WINDOW_HEIGHT = 768;
+            }
         }
-    }}
+    }
 
     /// This function is called every frame to draw the game.
     /// For now, we hook it in order to limit the framerate to a resonable 45 FPS.
     /// Any higher and your jumpjet fuel will not recharge reliably and if unconstrained, the game's physics will break.
-    unsafe extern "stdcall" fn blit() { unsafe {
-        static LAST_INSTANT: RwLock<Option<Instant>> = RwLock::new(None);
+    unsafe extern "stdcall" fn blit() {
+        unsafe {
+            static LAST_INSTANT: RwLock<Option<Instant>> = RwLock::new(None);
 
-        {
-            let mut last_instant = LAST_INSTANT.write().unwrap();
-            if last_instant.is_none() {
+            {
+                let mut last_instant = LAST_INSTANT.write().unwrap();
+                if last_instant.is_none() {
+                    *last_instant = Some(Instant::now());
+                }
+
+                // Limit framerate to 45 FPS
+                // Spin until 1/45th of a second has passed
+                while last_instant.unwrap().elapsed().as_secs_f64() < 1.0 / 45.0 {
+                    std::thread::yield_now();
+                }
                 *last_instant = Some(Instant::now());
             }
 
-            // Limit framerate to 45 FPS
-            // Spin until 1/45th of a second has passed
-            while last_instant.unwrap().elapsed().as_secs_f64() < 1.0 / 45.0 {
-                std::thread::yield_now();
+            if *G_BLIT_GLOBAL_1 == FALSE {
+                if *G_WINDOW_ACTIVE == TRUE {
+                    ((**G_CURRENT_DRAW_MODE).blit_flip_func)();
+                }
+            } else {
+                ((**G_CURRENT_DRAW_MODE).stretch_blit_func)(
+                    (*G_STRETCH_BLIT_SOURCE_RECT).x1 + 1,
+                    (*G_STRETCH_BLIT_SOURCE_RECT).y2 + 1,
+                    (*G_STRETCH_BLIT_SOURCE_RECT).x2,
+                    (*G_STRETCH_BLIT_SOURCE_RECT).y1,
+                );
+
+                *G_STRETCH_BLIT_SOURCE_RECT = (*G_STRETCH_BLIT_OTHER_SOURCE_RECT).clone();
+
+                *G_BLIT_GLOBAL_2 = *G_BLIT_GLOBAL_3;
+                *G_BLIT_GLOBAL_1 = FALSE;
             }
-            *last_instant = Some(Instant::now());
         }
-
-        if *G_BLIT_GLOBAL_1 == FALSE {
-            if *G_WINDOW_ACTIVE == TRUE {
-                ((**G_CURRENT_DRAW_MODE).blit_flip_func)();
-            }
-        } else {
-            ((**G_CURRENT_DRAW_MODE).stretch_blit_func)(
-                (*G_STRETCH_BLIT_SOURCE_RECT).x1 + 1,
-                (*G_STRETCH_BLIT_SOURCE_RECT).y2 + 1,
-                (*G_STRETCH_BLIT_SOURCE_RECT).x2,
-                (*G_STRETCH_BLIT_SOURCE_RECT).y1,
-            );
-
-            *G_STRETCH_BLIT_SOURCE_RECT = (*G_STRETCH_BLIT_OTHER_SOURCE_RECT).clone();
-
-            *G_BLIT_GLOBAL_2 = *G_BLIT_GLOBAL_3;
-            *G_BLIT_GLOBAL_1 = FALSE;
-        }
-    }}
+    }
 
     /// This function initializes the CD audio device for the game's background music.
     /// We hook it to work around bugs in modern Windows' MCI implementation.
-    unsafe extern "stdcall" fn init_cd_audio() -> u32 { unsafe {
-        if CD_AUDIO_DEVICE != u32::MAX {
-            *G_CD_AUDIO_DEVICE = CD_AUDIO_DEVICE;
-            *G_CD_AUDIO_INITIALIZED = 1;
-            return 0;
+    unsafe extern "stdcall" fn init_cd_audio() -> u32 {
+        unsafe {
+            if CD_AUDIO_DEVICE != u32::MAX {
+                *G_CD_AUDIO_DEVICE = CD_AUDIO_DEVICE;
+                *G_CD_AUDIO_INITIALIZED = 1;
+                return 0;
+            }
+
+            let mut mci_open_parms = MCI_OPEN_PARMSA {
+                lpstrDeviceType: s!("cdaudio"),
+                ..Default::default()
+            };
+            let mci_open_error = mciSendCommandA(
+                0,
+                MCI_OPEN,
+                MCI_OPEN_TYPE as usize,
+                &mut mci_open_parms as *mut _ as usize,
+            );
+            if mci_open_error != 0 {
+                return 1;
+            }
+
+            *G_CD_AUDIO_DEVICE = mci_open_parms.wDeviceID;
+            CD_AUDIO_DEVICE = *G_CD_AUDIO_DEVICE;
+
+            let mut mci_set_parms = MCI_SET_PARMS {
+                dwTimeFormat: MCI_FORMAT_TMSF,
+                ..Default::default()
+            };
+            let mci_set_error = mciSendCommandA(
+                *G_CD_AUDIO_DEVICE,
+                MCI_SET,
+                MCI_SET_TIME_FORMAT as usize,
+                &mut mci_set_parms as *mut _ as usize,
+            );
+            if mci_set_error != 0 {
+                return 1;
+            }
+
+            *G_CD_AUDIO_AUX_DEVICE = Self::get_cd_audio_aux_device();
+            0
         }
+    }
 
-        let mut mci_open_parms = MCI_OPEN_PARMSA {
-            lpstrDeviceType: s!("cdaudio"),
-            ..Default::default()
-        };
-        let mci_open_error = mciSendCommandA(
-            0,
-            MCI_OPEN,
-            MCI_OPEN_TYPE as usize,
-            &mut mci_open_parms as *mut _ as usize,
-        );
-        if mci_open_error != 0 {
-            return 1;
+    unsafe extern "stdcall" fn get_cd_audio_aux_device() -> i32 {
+        unsafe {
+            GET_CD_AUDIO_AUX_DEVICE_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call()
         }
-
-        *G_CD_AUDIO_DEVICE = mci_open_parms.wDeviceID;
-        CD_AUDIO_DEVICE = *G_CD_AUDIO_DEVICE;
-
-        let mut mci_set_parms = MCI_SET_PARMS {
-            dwTimeFormat: MCI_FORMAT_TMSF,
-            ..Default::default()
-        };
-        let mci_set_error = mciSendCommandA(
-            *G_CD_AUDIO_DEVICE,
-            MCI_SET,
-            MCI_SET_TIME_FORMAT as usize,
-            &mut mci_set_parms as *mut _ as usize,
-        );
-        if mci_set_error != 0 {
-            return 1;
-        }
-
-        *G_CD_AUDIO_AUX_DEVICE = Self::get_cd_audio_aux_device();
-        0
-    }}
-
-    unsafe extern "stdcall" fn get_cd_audio_aux_device() -> i32 { unsafe {
-        GET_CD_AUDIO_AUX_DEVICE_HOOK
-            .read()
-            .unwrap()
-            .as_ref()
-            .unwrap()
-            .call()
-    }}
+    }
 
     /// Windows 11 was throwing an error if the CD device was closed.
     /// Now we just cache the device and re-use it between sim launches.
@@ -595,201 +607,225 @@ impl Sim {
         0
     }
 
-    unsafe extern "cdecl" fn play_cd_audio(from: u32, to: u32) { unsafe {
-        let mut flags = MCI_FROM;
+    unsafe extern "cdecl" fn play_cd_audio(from: u32, to: u32) {
+        unsafe {
+            let mut flags = MCI_FROM;
 
-        let mut mci_play_parms = MCI_PLAY_PARMS {
-            dwFrom: from,
-            ..Default::default()
-        };
-        if to != 0 {
-            flags = MCI_FROM | MCI_TO;
-            mci_play_parms.dwTo = to;
-        }
-        let _ = mciSendCommandA(
-            *G_CD_AUDIO_DEVICE,
-            MCI_PLAY,
-            flags as usize,
-            &mut mci_play_parms as *mut _ as usize,
-        );
-    }}
-
-    unsafe extern "stdcall" fn pause_cd_audio() { unsafe {
-        PAUSE_CD_AUDIO_HOOK.read().unwrap().as_ref().unwrap().call();
-    }}
-
-    unsafe extern "stdcall" fn resume_cd_audio() { unsafe {
-        RESUME_CD_AUDIO_HOOK
-            .read()
-            .unwrap()
-            .as_ref()
-            .unwrap()
-            .call();
-    }}
-
-    unsafe extern "stdcall" fn start_cd_audio() -> i32 { unsafe {
-        *G_CD_AUDIO_GLOBAL_1 = 0;
-        *G_CD_AUDIO_GLOBAL_2 = 0;
-
-        let init_cd_audio_result = Self::init_cd_audio();
-        if init_cd_audio_result != 0 {
-            return 0;
-        }
-
-        *G_CD_AUDIO_INITIALIZED = 1;
-
-        *G_AUDIO_CD_STATUS = Self::get_cd_status();
-
-        match *G_AUDIO_CD_STATUS {
-            AudioCdStatus::_Open => {
-                *G_CD_AUDIO_INITIALIZED = 0;
+            let mut mci_play_parms = MCI_PLAY_PARMS {
+                dwFrom: from,
+                ..Default::default()
+            };
+            if to != 0 {
+                flags = MCI_FROM | MCI_TO;
+                mci_play_parms.dwTo = to;
             }
-            AudioCdStatus::Stopped => {
-                Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA);
-            }
-            AudioCdStatus::Playing => {
-                Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA);
-            }
-            AudioCdStatus::Paused => {
-                Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA);
-                Self::get_cd_audio_position(G_PAUSED_CD_AUDIO_POSITION);
-            }
-            AudioCdStatus::Error | AudioCdStatus::_Unknown => {}
+            let _ = mciSendCommandA(
+                *G_CD_AUDIO_DEVICE,
+                MCI_PLAY,
+                flags as usize,
+                &mut mci_play_parms as *mut _ as usize,
+            );
         }
+    }
 
-        Self::set_cd_audio_volume(*G_CD_AUDIO_VOLUME);
-        1
-    }}
-
-    unsafe extern "cdecl" fn get_cd_status() -> AudioCdStatus { unsafe {
-        if *G_CD_AUDIO_INITIALIZED == 0 {
-            return AudioCdStatus::Error;
+    unsafe extern "stdcall" fn pause_cd_audio() {
+        unsafe {
+            PAUSE_CD_AUDIO_HOOK.read().unwrap().as_ref().unwrap().call();
         }
+    }
 
-        let mut mci_status_parms = MCI_STATUS_PARMS {
-            dwItem: MCI_STATUS_MODE as u32,
-            ..Default::default()
-        };
-        let mci_status_error = mciSendCommandA(
-            *G_CD_AUDIO_DEVICE,
-            MCI_STATUS,
-            MCI_STATUS_ITEM as usize,
-            &mut mci_status_parms as *mut _ as usize,
-        );
-        if mci_status_error != 0 {
-            Self::deinit_cd_audio();
-            return AudioCdStatus::Error;
+    unsafe extern "stdcall" fn resume_cd_audio() {
+        unsafe {
+            RESUME_CD_AUDIO_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call();
         }
+    }
 
-        match mci_status_parms.dwReturn as u32 {
-            // Some CD emulation software reports MCI_MODE_OPEN when stopped
-            MCI_MODE_OPEN | MCI_MODE_STOP => AudioCdStatus::Stopped,
-            MCI_MODE_PLAY => AudioCdStatus::Playing,
-            MCI_MODE_PAUSE => AudioCdStatus::Paused,
-            _ => AudioCdStatus::Error,
-        }
-    }}
+    unsafe extern "stdcall" fn start_cd_audio() -> i32 {
+        unsafe {
+            *G_CD_AUDIO_GLOBAL_1 = 0;
+            *G_CD_AUDIO_GLOBAL_2 = 0;
 
-    unsafe extern "cdecl" fn get_cd_audio_tracks(cd_audio_tracks: *mut CdAudioTracks) -> i32 { unsafe {
-        GET_CD_AUDIO_TRACKS_HOOK
-            .read()
-            .unwrap()
-            .as_ref()
-            .unwrap()
-            .call(cd_audio_tracks)
-    }}
-
-    unsafe extern "cdecl" fn get_cd_audio_position(cd_audio_position: *mut CdAudioPosition) { unsafe {
-        GET_CD_AUDIO_POSITION_HOOK
-            .read()
-            .unwrap()
-            .as_ref()
-            .unwrap()
-            .call(cd_audio_position)
-    }}
-
-    unsafe extern "cdecl" fn set_cd_audio_volume(volume: i32) -> i32 { unsafe {
-        SET_CD_AUDIO_VOLUME_HOOK
-            .read()
-            .unwrap()
-            .as_ref()
-            .unwrap()
-            .call(volume)
-    }}
-
-    unsafe extern "stdcall" fn deinit_cd_audio() { unsafe {
-        DEINIT_CD_AUDIO_HOOK
-            .read()
-            .unwrap()
-            .as_ref()
-            .unwrap()
-            .call();
-    }}
-
-    unsafe extern "cdecl" fn update_cd_audio_position(position: *mut CdAudioPosition) { unsafe {
-        if *G_CD_AUDIO_INITIALIZED == 0 {
-            return;
-        }
-
-        let cd_status = Self::get_cd_status();
-        match cd_status {
-            AudioCdStatus::_Open | AudioCdStatus::Stopped => {
-                *position = CdAudioPosition::default();
+            let init_cd_audio_result = Self::init_cd_audio();
+            if init_cd_audio_result != 0 {
+                return 0;
             }
-            AudioCdStatus::Playing => {
-                Self::get_cd_audio_position(position);
+
+            *G_CD_AUDIO_INITIALIZED = 1;
+
+            *G_AUDIO_CD_STATUS = Self::get_cd_status();
+
+            match *G_AUDIO_CD_STATUS {
+                AudioCdStatus::_Open => {
+                    *G_CD_AUDIO_INITIALIZED = 0;
+                }
+                AudioCdStatus::Stopped => {
+                    Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA);
+                }
+                AudioCdStatus::Playing => {
+                    Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA);
+                }
+                AudioCdStatus::Paused => {
+                    Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA);
+                    Self::get_cd_audio_position(G_PAUSED_CD_AUDIO_POSITION);
+                }
+                AudioCdStatus::Error | AudioCdStatus::_Unknown => {}
             }
-            AudioCdStatus::Paused => {
-                *position = (*G_PAUSED_CD_AUDIO_POSITION).clone();
-            }
-            AudioCdStatus::Error | AudioCdStatus::_Unknown => {}
+
+            Self::set_cd_audio_volume(*G_CD_AUDIO_VOLUME);
+            1
         }
-    }}
+    }
+
+    unsafe extern "cdecl" fn get_cd_status() -> AudioCdStatus {
+        unsafe {
+            if *G_CD_AUDIO_INITIALIZED == 0 {
+                return AudioCdStatus::Error;
+            }
+
+            let mut mci_status_parms = MCI_STATUS_PARMS {
+                dwItem: MCI_STATUS_MODE as u32,
+                ..Default::default()
+            };
+            let mci_status_error = mciSendCommandA(
+                *G_CD_AUDIO_DEVICE,
+                MCI_STATUS,
+                MCI_STATUS_ITEM as usize,
+                &mut mci_status_parms as *mut _ as usize,
+            );
+            if mci_status_error != 0 {
+                Self::deinit_cd_audio();
+                return AudioCdStatus::Error;
+            }
+
+            match mci_status_parms.dwReturn as u32 {
+                // Some CD emulation software reports MCI_MODE_OPEN when stopped
+                MCI_MODE_OPEN | MCI_MODE_STOP => AudioCdStatus::Stopped,
+                MCI_MODE_PLAY => AudioCdStatus::Playing,
+                MCI_MODE_PAUSE => AudioCdStatus::Paused,
+                _ => AudioCdStatus::Error,
+            }
+        }
+    }
+
+    unsafe extern "cdecl" fn get_cd_audio_tracks(cd_audio_tracks: *mut CdAudioTracks) -> i32 {
+        unsafe {
+            GET_CD_AUDIO_TRACKS_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(cd_audio_tracks)
+        }
+    }
+
+    unsafe extern "cdecl" fn get_cd_audio_position(cd_audio_position: *mut CdAudioPosition) {
+        unsafe {
+            GET_CD_AUDIO_POSITION_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(cd_audio_position)
+        }
+    }
+
+    unsafe extern "cdecl" fn set_cd_audio_volume(volume: i32) -> i32 {
+        unsafe {
+            SET_CD_AUDIO_VOLUME_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(volume)
+        }
+    }
+
+    unsafe extern "stdcall" fn deinit_cd_audio() {
+        unsafe {
+            DEINIT_CD_AUDIO_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call();
+        }
+    }
+
+    unsafe extern "cdecl" fn update_cd_audio_position(position: *mut CdAudioPosition) {
+        unsafe {
+            if *G_CD_AUDIO_INITIALIZED == 0 {
+                return;
+            }
+
+            let cd_status = Self::get_cd_status();
+            match cd_status {
+                AudioCdStatus::_Open | AudioCdStatus::Stopped => {
+                    *position = CdAudioPosition::default();
+                }
+                AudioCdStatus::Playing => {
+                    Self::get_cd_audio_position(position);
+                }
+                AudioCdStatus::Paused => {
+                    *position = (*G_PAUSED_CD_AUDIO_POSITION).clone();
+                }
+                AudioCdStatus::Error | AudioCdStatus::_Unknown => {}
+            }
+        }
+    }
 
     /// The game would reset to the first track of the CD when you unpause.
     /// This starts playback again from the saved pause position instead;
-    unsafe extern "stdcall" fn cd_audio_toggle_paused() { unsafe {
-        if *G_CD_AUDIO_INITIALIZED == 0 {
-            return;
-        }
+    unsafe extern "stdcall" fn cd_audio_toggle_paused() {
+        unsafe {
+            if *G_CD_AUDIO_INITIALIZED == 0 {
+                return;
+            }
 
-        let cd_status = Self::get_cd_status();
-        match cd_status {
-            AudioCdStatus::_Open => {}
-            AudioCdStatus::Stopped => {
-                let position = (*G_PAUSED_CD_AUDIO_POSITION).clone().into();
-                Self::play_cd_audio(position, 0);
+            let cd_status = Self::get_cd_status();
+            match cd_status {
+                AudioCdStatus::_Open => {}
+                AudioCdStatus::Stopped => {
+                    let position = (*G_PAUSED_CD_AUDIO_POSITION).clone().into();
+                    Self::play_cd_audio(position, 0);
+                }
+                AudioCdStatus::Playing => {
+                    Self::update_cd_audio_position(G_PAUSED_CD_AUDIO_POSITION);
+                    Self::pause_cd_audio();
+                }
+                AudioCdStatus::Paused => {
+                    Self::resume_cd_audio();
+                }
+                AudioCdStatus::Error | AudioCdStatus::_Unknown => {}
             }
-            AudioCdStatus::Playing => {
-                Self::update_cd_audio_position(G_PAUSED_CD_AUDIO_POSITION);
-                Self::pause_cd_audio();
-            }
-            AudioCdStatus::Paused => {
-                Self::resume_cd_audio();
-            }
-            AudioCdStatus::Error | AudioCdStatus::_Unknown => {}
         }
-    }}
+    }
 
     /// The original function had a loop that was causing bad stuttering when the mouse was moved.
-    unsafe extern "stdcall" fn handle_messages() { unsafe {
-        if *G_WINDOW_ACTIVE == FALSE {
-            let _ = WaitMessage();
-        }
+    unsafe extern "stdcall" fn handle_messages() {
+        unsafe {
+            if *G_WINDOW_ACTIVE == FALSE {
+                let _ = WaitMessage();
+            }
 
-        if *G_SHOULD_QUIT == FALSE {
-            let mut msg: MSG = MSG::default();
+            if *G_SHOULD_QUIT == FALSE {
+                let mut msg: MSG = MSG::default();
 
-            if PeekMessageA(&mut msg as *mut MSG, HWND::default(), 0, 0, PM_REMOVE).into() {
-                if msg.hwnd == HWND::default() || msg.message != WM_QUIT {
-                    let _ = TranslateMessage(&msg);
-                    DispatchMessageA(&msg);
-                } else {
-                    *G_SHOULD_QUIT = TRUE;
+                if PeekMessageA(&mut msg as *mut MSG, HWND::default(), 0, 0, PM_REMOVE).into() {
+                    if msg.hwnd == HWND::default() || msg.message != WM_QUIT {
+                        let _ = TranslateMessage(&msg);
+                        DispatchMessageA(&msg);
+                    } else {
+                        *G_SHOULD_QUIT = TRUE;
+                    }
                 }
             }
         }
-    }}
+    }
 
     /// Returns a truly pseudorandom number instead of picking from the pregenerated table.
     /// This fixes the chance to explode if you're overheating because the pregenerated random

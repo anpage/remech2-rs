@@ -10,11 +10,11 @@ use std::{
 use tracing::Level;
 use tracing_subscriber::{filter, prelude::*};
 use windows::{
-    core::{s, PCSTR},
     Win32::{
         Foundation::*, Graphics::Gdi::*, System::LibraryLoader::GetModuleHandleA,
         UI::WindowsAndMessaging::*,
     },
+    core::{PCSTR, s},
 };
 
 mod ail;

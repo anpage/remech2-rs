@@ -218,19 +218,21 @@ impl Shell {
         dwcreationdisposition: FILE_CREATION_DISPOSITION,
         dwflagsandattributes: FILE_FLAGS_AND_ATTRIBUTES,
         htemplatefile: HANDLE,
-    ) -> HANDLE { unsafe {
-        // Remove FILE_FLAG_NO_BUFFERING
-        let dwflagsandattributes = dwflagsandattributes & !0x2000_0000;
-        CreateFileA(
-            lpfilename,
-            dwdesiredaccess,
-            dwsharemode,
-            lpsecurityattributes,
-            dwcreationdisposition,
-            dwflagsandattributes,
-            htemplatefile,
-        )
-    }}
+    ) -> HANDLE {
+        unsafe {
+            // Remove FILE_FLAG_NO_BUFFERING
+            let dwflagsandattributes = dwflagsandattributes & !0x2000_0000;
+            CreateFileA(
+                lpfilename,
+                dwdesiredaccess,
+                dwsharemode,
+                lpsecurityattributes,
+                dwcreationdisposition,
+                dwflagsandattributes,
+                htemplatefile,
+            )
+        }
+    }
 
     /// Called by the game to load a file from DATABASE.MW2 and LZ decompress it.
     ///
@@ -241,76 +243,87 @@ impl Shell {
         index: i32,
         midi_data: *mut *mut u8,
         midi_data_size: *mut usize,
-    ) -> i32 { unsafe {
-        GET_DB_ITEM_LZ_HOOK.read().unwrap().as_ref().unwrap().call(
-            db,
-            unused,
-            index,
-            midi_data,
-            midi_data_size,
-        )
-    }}
+    ) -> i32 {
+        unsafe {
+            GET_DB_ITEM_LZ_HOOK.read().unwrap().as_ref().unwrap().call(
+                db,
+                unused,
+                index,
+                midi_data,
+                midi_data_size,
+            )
+        }
+    }
 
     /// Loads the list of mech variants from the MW2.PRJ file and any user variants from the filesystem.
     /// Patched to avoid a bug where the game was using an older Win32 API
-    unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) { unsafe {
-        // Create "MEK" folder if it doesn't exist
-        fs::create_dir_all("MEK").unwrap();
+    unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) {
+        unsafe {
+            // Create "MEK" folder if it doesn't exist
+            fs::create_dir_all("MEK").unwrap();
 
-        let mech_type: &str = std::ffi::CStr::from_ptr(mech_type).to_str().unwrap();
+            let mech_type: &str = std::ffi::CStr::from_ptr(mech_type).to_str().unwrap();
 
-        // Clear the list
-        (*G_MECH_VARIANT_FILENAMES).fill([0; 13]);
+            // Clear the list
+            (*G_MECH_VARIANT_FILENAMES).fill([0; 13]);
 
-        // Make sure we have at least the default variant
-        let default_variant = format!("{mech_type}00std");
-        std::ptr::copy_nonoverlapping(default_variant.as_ptr(), G_MECH_VARIANT_FILENAME.cast(), 13);
-        std::ptr::copy_nonoverlapping(
-            default_variant.as_ptr(),
-            (*G_MECH_VARIANT_FILENAMES)[0].as_mut_ptr().cast(),
-            13,
-        );
+            // Make sure we have at least the default variant
+            let default_variant = format!("{mech_type}00std");
+            std::ptr::copy_nonoverlapping(
+                default_variant.as_ptr(),
+                G_MECH_VARIANT_FILENAME.cast(),
+                13,
+            );
+            std::ptr::copy_nonoverlapping(
+                default_variant.as_ptr(),
+                (*G_MECH_VARIANT_FILENAMES)[0].as_mut_ptr().cast(),
+                13,
+            );
 
-        // Load the built-in mech variants from the MW2.PRJ file into the next 99 indices
-        for i in 1..100 {
-            let variant = format!("{mech_type}{i:02}std");
-            std::ptr::copy_nonoverlapping(variant.as_ptr(), G_MECH_VARIANT_FILENAME.cast(), 13);
+            // Load the built-in mech variants from the MW2.PRJ file into the next 99 indices
+            for i in 1..100 {
+                let variant = format!("{mech_type}{i:02}std");
+                std::ptr::copy_nonoverlapping(variant.as_ptr(), G_MECH_VARIANT_FILENAME.cast(), 13);
 
-            let variant = CString::new(variant).unwrap();
+                let variant = CString::new(variant).unwrap();
 
-            let result =
-                G_LOAD_FILE_FROM_PRJ.read().unwrap().unwrap()(G_PRJ_OBJECT, variant.as_ptr(), 6);
-
-            if result > -1 {
-                std::ptr::copy_nonoverlapping(
+                let result = G_LOAD_FILE_FROM_PRJ.read().unwrap().unwrap()(
+                    G_PRJ_OBJECT,
                     variant.as_ptr(),
-                    (*G_MECH_VARIANT_FILENAMES)[i].as_mut_ptr(),
-                    13,
+                    6,
                 );
-            }
-        }
 
-        // Find all user-defined mech variants from the filesystem and load their names into index 100 and higher
-        let files = fs::read_dir("mek").unwrap();
-        for file in files {
-            let path = file.unwrap().path();
-            let filename = path.file_name().unwrap().to_str().unwrap();
-            if &filename[..3] == mech_type && &filename[5..] == "usr.mek" {
-                let variant = CString::new(filename[..8].to_string()).unwrap();
-                let variant = variant.as_ptr();
-                let i = 100 + filename[3..5].parse::<usize>().unwrap();
-
-                std::ptr::copy_nonoverlapping(variant, G_MECH_VARIANT_FILENAME, 13);
-
-                if (*G_MECH_VARIANT_FILENAMES)[i][0] == 0 {
-                    std::ptr::copy_nonoverlapping(variant, G_MECH_VARIANT_FILENAME, 13);
-                    break;
+                if result > -1 {
+                    std::ptr::copy_nonoverlapping(
+                        variant.as_ptr(),
+                        (*G_MECH_VARIANT_FILENAMES)[i].as_mut_ptr(),
+                        13,
+                    );
                 }
             }
-        }
 
-        dbg!(&(*G_MECH_VARIANT_FILENAMES));
-    }}
+            // Find all user-defined mech variants from the filesystem and load their names into index 100 and higher
+            let files = fs::read_dir("mek").unwrap();
+            for file in files {
+                let path = file.unwrap().path();
+                let filename = path.file_name().unwrap().to_str().unwrap();
+                if &filename[..3] == mech_type && &filename[5..] == "usr.mek" {
+                    let variant = CString::new(filename[..8].to_string()).unwrap();
+                    let variant = variant.as_ptr();
+                    let i = 100 + filename[3..5].parse::<usize>().unwrap();
+
+                    std::ptr::copy_nonoverlapping(variant, G_MECH_VARIANT_FILENAME, 13);
+
+                    if (*G_MECH_VARIANT_FILENAMES)[i][0] == 0 {
+                        std::ptr::copy_nonoverlapping(variant, G_MECH_VARIANT_FILENAME, 13);
+                        break;
+                    }
+                }
+            }
+
+            dbg!(&(*G_MECH_VARIANT_FILENAMES));
+        }
+    }
 
     /// This is the function that the shell uses to draw to the window with GDI's BitBlt function.
     /// The original function incorrectly failed if the call didn't return the number of lines blitted.
@@ -348,37 +361,39 @@ impl Shell {
         security_attributes: *const SECURITY_ATTRIBUTES,
         result: *mut HKEY,
         disposition: *mut REG_CREATE_KEY_DISPOSITION,
-    ) -> WIN32_ERROR { unsafe {
-        let h_key = if h_key == HKEY_LOCAL_MACHINE {
-            HKEY_CURRENT_USER
-        } else {
-            h_key
-        };
+    ) -> WIN32_ERROR {
+        unsafe {
+            let h_key = if h_key == HKEY_LOCAL_MACHINE {
+                HKEY_CURRENT_USER
+            } else {
+                h_key
+            };
 
-        let security_attributes = if security_attributes.is_null() {
-            None
-        } else {
-            Some(security_attributes)
-        };
+            let security_attributes = if security_attributes.is_null() {
+                None
+            } else {
+                Some(security_attributes)
+            };
 
-        let disposition = if disposition.is_null() {
-            None
-        } else {
-            Some(disposition)
-        };
+            let disposition = if disposition.is_null() {
+                None
+            } else {
+                Some(disposition)
+            };
 
-        RegCreateKeyExA(
-            h_key,
-            sub_key,
-            reserved,
-            class,
-            options,
-            sam,
-            security_attributes,
-            result,
-            disposition,
-        )
-    }}
+            RegCreateKeyExA(
+                h_key,
+                sub_key,
+                reserved,
+                class,
+                options,
+                sam,
+                security_attributes,
+                result,
+                disposition,
+            )
+        }
+    }
 
     unsafe extern "system" fn reg_open_key_ex_a(
         h_key: HKEY,
@@ -386,15 +401,17 @@ impl Shell {
         reserved: u32,
         sam: REG_SAM_FLAGS,
         result: *mut HKEY,
-    ) -> WIN32_ERROR { unsafe {
-        let h_key = if h_key == HKEY_LOCAL_MACHINE {
-            HKEY_CURRENT_USER
-        } else {
-            h_key
-        };
+    ) -> WIN32_ERROR {
+        unsafe {
+            let h_key = if h_key == HKEY_LOCAL_MACHINE {
+                HKEY_CURRENT_USER
+            } else {
+                h_key
+            };
 
-        RegOpenKeyExA(h_key, sub_key, reserved, sam, result)
-    }}
+            RegOpenKeyExA(h_key, sub_key, reserved, sam, result)
+        }
+    }
 }
 
 impl Drop for Shell {

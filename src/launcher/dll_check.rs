@@ -7,7 +7,7 @@
 //! from the internet and install them if they are missing or invalid.
 use std::sync::{Arc, Mutex};
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use hex_literal::hex;
 use sha2::{Digest, Sha256};
 

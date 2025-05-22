@@ -3,9 +3,9 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
-use super::{dll_check, Action, Stage};
+use super::{Action, Stage, dll_check};
 
 mod list;
 

@@ -1,12 +1,12 @@
 use std::{fs::File, path::PathBuf};
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use windows::{
-    core::PCSTR,
     Win32::{
         Storage::FileSystem::{GetDriveTypeA, GetLogicalDriveStringsA},
         System::WindowsProgramming::DRIVE_CDROM,
     },
+    core::PCSTR,
 };
 
 use super::{Action, Stage};

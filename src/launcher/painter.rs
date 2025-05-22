@@ -114,33 +114,36 @@ impl Painter {
         &mut self,
         viewport_id: ViewportId,
         window: Option<&super::Window>,
-    ) -> Result<(), WgpuError> { unsafe {
-        if let Some(window) = window {
-            let size = {
-                let rect = &mut RECT::default();
-                GetClientRect(HWND(window.hwnd.get() as *mut c_void), rect)
-                    .expect("GetClientRect failed");
-                (
-                    (rect.right - rect.left) as u32,
-                    (rect.bottom - rect.top) as u32,
-                )
-            };
-            if !self.surfaces.contains_key(&viewport_id) {
-                let surface = unsafe {
-                    self.instance
-                        .create_surface_unsafe(wgpu::SurfaceTargetUnsafe::RawHandle {
-                            raw_display_handle: WindowsDisplayHandle::new().into(),
-                            raw_window_handle: (*window).into(),
-                        })?
+    ) -> Result<(), WgpuError> {
+        unsafe {
+            if let Some(window) = window {
+                let size = {
+                    let rect = &mut RECT::default();
+                    GetClientRect(HWND(window.hwnd.get() as *mut c_void), rect)
+                        .expect("GetClientRect failed");
+                    (
+                        (rect.right - rect.left) as u32,
+                        (rect.bottom - rect.top) as u32,
+                    )
                 };
-                self.add_surface(surface, viewport_id, size).await?;
+                if !self.surfaces.contains_key(&viewport_id) {
+                    let surface = unsafe {
+                        self.instance.create_surface_unsafe(
+                            wgpu::SurfaceTargetUnsafe::RawHandle {
+                                raw_display_handle: WindowsDisplayHandle::new().into(),
+                                raw_window_handle: (*window).into(),
+                            },
+                        )?
+                    };
+                    self.add_surface(surface, viewport_id, size).await?;
+                }
+            } else {
+                warn!("No window - clearing all surfaces");
+                self.surfaces.clear();
             }
-        } else {
-            warn!("No window - clearing all surfaces");
-            self.surfaces.clear();
+            Ok(())
         }
-        Ok(())
-    }}
+    }
 
     async fn add_surface(
         &mut self,
@@ -171,7 +174,9 @@ impl Painter {
             } else if supported_alpha_modes.contains(&wgpu::CompositeAlphaMode::PostMultiplied) {
                 wgpu::CompositeAlphaMode::PostMultiplied
             } else {
-                warn!("Transparent window was requested, but the active wgpu surface does not support a `CompositeAlphaMode` with transparency.");
+                warn!(
+                    "Transparent window was requested, but the active wgpu surface does not support a `CompositeAlphaMode` with transparency."
+                );
                 wgpu::CompositeAlphaMode::Auto
             }
         } else {
@@ -291,7 +296,9 @@ impl Painter {
                 height_in_pixels,
             );
         } else {
-            warn!("Ignoring window resize notification with no surface created via Painter::set_window()");
+            warn!(
+                "Ignoring window resize notification with no surface created via Painter::set_window()"
+            );
         }
     }
 
