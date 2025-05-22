@@ -1,48 +1,57 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
-            "name": "Debug",
-            "type": "cppvsdbg",
+            "name": "Attach to gdbserver",
+            "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/target/i686-pc-windows-msvc/debug/remech2.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/data",
-            "environment": [],
-            "console": "internalConsole",
-            "preLaunchTask": "rust: cargo build",
+            "program": "${workspaceFolder}/target/i686-pc-windows-gnu/debug/remech2.exe",
+            "miDebuggerServerAddress": "localhost:12345",
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "DISPLAY",
+                    "value": ":0"
+                },
+                {
+                    "name": "WINEPREFIX",
+                    "value": "${workspaceFolder}/wineprefix"
+                }
+            ],
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "presentation": {
+                "hidden": true,
+                "group": "",
+                "order": 1
+            }
         },
-
+    ],
+    "compounds": [
         {
-            "name": "Debug Sim",
-            "type": "cppvsdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/target/i686-pc-windows-msvc/debug/remech2.exe",
-            "args": ["jackscn1", "-b=liagoat", "-of=echelonl", "-oe=echelonl"],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/data",
-            "environment": [],
-            "console": "internalConsole",
-            "preLaunchTask": "rust: cargo build",
-        },
-
-        {
-            "name": "Release",
-            "type": "cppvsdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/target/i686-pc-windows-msvc/release/remech2.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/data",
-            "environment": [],
-            "console": "internalConsole",
-            "preLaunchTask": "rust: cargo build release",
+            "name": "Launch and Attach",
+            "configurations": [
+                "Attach to gdbserver"
+            ],
+            "preLaunchTask": "Launch Debugger",
+            "stopAll": true,
+            "presentation": {
+                "hidden": false,
+                "group": "Build",
+                "order": 1
+            }
         }
-
     ]
 }

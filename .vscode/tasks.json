@@ -2,25 +2,80 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "cargo",
-			"command": "build",
-			"problemMatcher": [
-				"$rustc"
+			"label": "build",
+			"args": [
+				"build",
+				"-v",
+				"--target=i686-pc-windows-gnu"
 			],
-			"group": "build",
-			"label": "rust: cargo build"
+			"command": "cargo",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				{
+					"owner": "rust",
+					"fileLocation": [
+						"relative",
+						"${workspaceRoot}"
+					],
+					"pattern": {
+						"regexp": "^(.*):(\\d+):(\\d+):\\s+(\\d+):(\\d+)\\s+(warning|error):\\s+(.*)$",
+						"file": 1,
+						"line": 2,
+						"column": 3,
+						"endLine": 4,
+						"endColumn": 5,
+						"severity": 6,
+						"message": 7
+					}
+				}
+			]
 		},
 		{
-			"type": "cargo",
-			"command": "build",
+			"label": "Launch Debugger",
+			"dependsOn": "build",
+			"type": "shell",
+			"command": "/home/alex/.local/share/lutris/runners/wine/raw-wine-10.3-stg/bin/wine",
 			"args": [
-				"--release"
+				"Z:/usr/share/win32/gdbserver.exe",
+				"localhost:12345",
+				"${workspaceFolder}/target/i686-pc-windows-gnu/debug/remech2.exe"
 			],
+			"options": {
+				"cwd": "${workspaceFolder}/data",
+				"env": {
+					"DISPLAY": ":0",
+					"WINEPREFIX": "${workspaceFolder}/wineprefix",
+				}
+			},
 			"problemMatcher": [
-				"$rustc"
+				{
+					"owner": "rust",
+					"fileLocation": [
+						"relative",
+						"${workspaceRoot}"
+					],
+					"pattern": {
+						"regexp": "^(.*):(\\d+):(\\d+):\\s+(\\d+):(\\d+)\\s+(warning|error):\\s+(.*)$",
+						"file": 1,
+						"line": 2,
+						"column": 3,
+						"endLine": 4,
+						"endColumn": 5,
+						"severity": 6,
+						"message": 7
+					},
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": ".",
+						"endsPattern": "."
+					}
+				}
 			],
-			"group": "build",
-			"label": "rust: cargo build release"
+			"isBackground": true,
+			"hide": true
 		}
 	]
 }
