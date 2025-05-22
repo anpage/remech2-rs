@@ -71,7 +71,7 @@ unsafe extern "fastcall" fn audio_subsystem_close_digital_driver(this: *mut Audi
     unsafe {
         let mut audio_subsystem = Box::from_raw((*this).audio_subsystem);
         audio_subsystem.close_digital_driver();
-        Box::into_raw(audio_subsystem);
+        let _ = Box::into_raw(audio_subsystem);
     }
 }
 
@@ -84,7 +84,7 @@ unsafe extern "fastcall" fn audio_subsystem_apply_midi_volume(this: *mut AudioSu
     unsafe {
         let mut audio_subsystem = Box::from_raw((*this).audio_subsystem);
         audio_subsystem.apply_midi_volume();
-        Box::into_raw(audio_subsystem);
+        let _ = Box::into_raw(audio_subsystem);
     }
 }
 
@@ -100,7 +100,7 @@ unsafe extern "fastcall" fn audio_subsystem_get_active_sequence_count(
     unsafe {
         let audio_subsystem = Box::from_raw((*this).audio_subsystem);
         let count = audio_subsystem.active_sequence_count();
-        Box::into_raw(audio_subsystem);
+        let _ = Box::into_raw(audio_subsystem);
         count
     }
 }
@@ -147,7 +147,7 @@ unsafe extern "fastcall" fn audio_sample_start(this: *mut AudioSampleProxy) {
     unsafe {
         let mut audio_sample = Box::from_raw((*this).audio_sample);
         audio_sample.start();
-        Box::into_raw(audio_sample);
+        let _ = Box::into_raw(audio_sample);
     }
 }
 
@@ -159,7 +159,7 @@ unsafe extern "fastcall" fn audio_sample_get_is_playing(this: *mut AudioSamplePr
     unsafe {
         let audio_sample = Box::from_raw((*this).audio_sample);
         let is_playing = audio_sample.is_playing() as u32;
-        Box::into_raw(audio_sample);
+        let _ = Box::into_raw(audio_sample);
         is_playing
     }
 }
@@ -179,7 +179,7 @@ unsafe extern "fastcall" fn audio_sample_set_fade(
     unsafe {
         let mut audio_sample = Box::from_raw((*this).audio_sample);
         audio_sample.set_fade(rate, max, start, end);
-        Box::into_raw(audio_sample);
+        let _ = Box::into_raw(audio_sample);
     }
 }
 
@@ -190,7 +190,7 @@ unsafe extern "fastcall" fn audio_sample_do_fade(this: *mut AudioSampleProxy) {
     unsafe {
         let mut audio_sample = Box::from_raw((*this).audio_sample);
         audio_sample.do_fade();
-        Box::into_raw(audio_sample);
+        let _ = Box::into_raw(audio_sample);
     }
 }
 
@@ -201,7 +201,7 @@ unsafe extern "fastcall" fn audio_sample_enable_loop(this: *mut AudioSampleProxy
     unsafe {
         let mut audio_sample = Box::from_raw((*this).audio_sample);
         audio_sample.enable_loop();
-        Box::into_raw(audio_sample);
+        let _ = Box::into_raw(audio_sample);
     }
 }
 
@@ -220,7 +220,7 @@ unsafe extern "fastcall" fn audio_sample_set_loop_count(
         if loop_count == 0 {
             audio_sample.enable_loop();
         }
-        Box::into_raw(audio_sample);
+        let _ = Box::into_raw(audio_sample);
     }
 }
 
@@ -236,7 +236,7 @@ unsafe extern "fastcall" fn audio_sample_set_volume(
     unsafe {
         let mut audio_sample = Box::from_raw((*this).audio_sample);
         audio_sample.set_volume(volume);
-        Box::into_raw(audio_sample);
+        let _ = Box::into_raw(audio_sample);
     }
 }
 
@@ -283,7 +283,7 @@ unsafe extern "fastcall" fn midi_sequence_start(_this: *mut MidiSequenceProxy) {
     unsafe {
         let mut midi_sequence = Box::from_raw((*_this).midi_sequence);
         midi_sequence.start();
-        Box::into_raw(midi_sequence);
+        let _ = Box::into_raw(midi_sequence);
     }
 }
 
@@ -294,7 +294,7 @@ unsafe extern "fastcall" fn midi_sequence_stop(_this: *mut MidiSequenceProxy) {
     unsafe {
         let mut midi_sequence = Box::from_raw((*_this).midi_sequence);
         midi_sequence.stop();
-        Box::into_raw(midi_sequence);
+        let _ = Box::into_raw(midi_sequence);
     }
 }
 
@@ -307,7 +307,7 @@ unsafe extern "fastcall" fn midi_sequence_apply_current_volume(_this: *mut MidiS
     unsafe {
         let mut midi_sequence = Box::from_raw((*_this).midi_sequence);
         midi_sequence.apply_current_volume();
-        Box::into_raw(midi_sequence);
+        let _ = Box::into_raw(midi_sequence);
     }
 }
 
@@ -323,7 +323,7 @@ unsafe extern "fastcall" fn midi_sequence_set_volume(
     unsafe {
         let mut midi_sequence = Box::from_raw((*this).midi_sequence);
         midi_sequence.set_volume(volume);
-        Box::into_raw(midi_sequence);
+        let _ = Box::into_raw(midi_sequence);
     }
 }
 
