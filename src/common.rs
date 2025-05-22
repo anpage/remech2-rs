@@ -1,8 +1,11 @@
 use std::ffi::{CStr, c_char, c_int, c_void};
 
-use windows::Win32::{
-    Foundation::{BOOL, HANDLE, TRUE},
-    System::Memory::HEAP_FLAGS,
+use windows::{
+    Win32::{
+        Foundation::{HANDLE, TRUE},
+        System::Memory::HEAP_FLAGS,
+    },
+    core::BOOL,
 };
 
 unsafe extern "C" {

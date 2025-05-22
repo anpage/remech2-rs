@@ -9,7 +9,7 @@ use rand::Rng;
 use retour::{GenericDetour, RawDetour};
 use windows::{
     Win32::{
-        Foundation::{BOOL, FALSE, FreeLibrary, HMODULE, HWND, RECT, TRUE},
+        Foundation::{FALSE, FreeLibrary, HMODULE, HWND, RECT, TRUE},
         Graphics::Gdi::BITMAPINFO,
         Media::Multimedia::{
             MCI_FORMAT_TMSF, MCI_FROM, MCI_MODE_OPEN, MCI_MODE_PAUSE, MCI_MODE_PLAY, MCI_MODE_STOP,
@@ -22,7 +22,7 @@ use windows::{
             DispatchMessageA, MSG, PM_REMOVE, PeekMessageA, TranslateMessage, WM_QUIT, WaitMessage,
         },
     },
-    core::s,
+    core::{BOOL, s},
 };
 
 use crate::{
@@ -561,8 +561,8 @@ impl Sim {
             let mci_open_error = mciSendCommandA(
                 0,
                 MCI_OPEN,
-                MCI_OPEN_TYPE as usize,
-                &mut mci_open_parms as *mut _ as usize,
+                Some(MCI_OPEN_TYPE as usize),
+                Some(&mut mci_open_parms as *mut _ as usize),
             );
             if mci_open_error != 0 {
                 return 1;
@@ -578,8 +578,8 @@ impl Sim {
             let mci_set_error = mciSendCommandA(
                 *G_CD_AUDIO_DEVICE,
                 MCI_SET,
-                MCI_SET_TIME_FORMAT as usize,
-                &mut mci_set_parms as *mut _ as usize,
+                Some(MCI_SET_TIME_FORMAT as usize),
+                Some(&mut mci_set_parms as *mut _ as usize),
             );
             if mci_set_error != 0 {
                 return 1;
@@ -622,8 +622,8 @@ impl Sim {
             let _ = mciSendCommandA(
                 *G_CD_AUDIO_DEVICE,
                 MCI_PLAY,
-                flags as usize,
-                &mut mci_play_parms as *mut _ as usize,
+                Some(flags as usize),
+                Some(&mut mci_play_parms as *mut _ as usize),
             );
         }
     }
@@ -694,8 +694,8 @@ impl Sim {
             let mci_status_error = mciSendCommandA(
                 *G_CD_AUDIO_DEVICE,
                 MCI_STATUS,
-                MCI_STATUS_ITEM as usize,
-                &mut mci_status_parms as *mut _ as usize,
+                Some(MCI_STATUS_ITEM as usize),
+                Some(&mut mci_status_parms as *mut _ as usize),
             );
             if mci_status_error != 0 {
                 Self::deinit_cd_audio();
@@ -815,7 +815,8 @@ impl Sim {
             if *G_SHOULD_QUIT == FALSE {
                 let mut msg: MSG = MSG::default();
 
-                if PeekMessageA(&mut msg as *mut MSG, HWND::default(), 0, 0, PM_REMOVE).into() {
+                if PeekMessageA(&mut msg as *mut MSG, Some(HWND::default()), 0, 0, PM_REMOVE).into()
+                {
                     if msg.hwnd == HWND::default() || msg.message != WM_QUIT {
                         let _ = TranslateMessage(&msg);
                         DispatchMessageA(&msg);
@@ -833,7 +834,7 @@ impl Sim {
     ///
     /// TODO: This could break multiplayer. Look into another solution if it causes desync.
     unsafe extern "cdecl" fn random_int_below(max: i32) -> i32 {
-        rand::thread_rng().gen_range(0..max)
+        rand::rng().random_range(0..max)
     }
 }
 

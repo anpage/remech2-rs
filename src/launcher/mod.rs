@@ -69,7 +69,7 @@ impl Launcher {
             painter,
             ctx,
             window: wnd,
-            current_stage: Box::new(cd_check::CdCheck::new()),
+            current_stage: Box::new(dll_check::DllCheck::new()),
         })
     }
 
@@ -77,7 +77,7 @@ impl Launcher {
         let mut lpmsg = MSG::default();
         loop {
             let message_received: bool =
-                unsafe { PeekMessageA(&mut lpmsg, self.window, 0, 0, PM_REMOVE).into() };
+                unsafe { PeekMessageA(&mut lpmsg, Some(self.window), 0, 0, PM_REMOVE).into() };
 
             let mut raw_input = RawInput {
                 screen_rect: Some(egui::Rect {

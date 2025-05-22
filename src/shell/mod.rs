@@ -335,7 +335,7 @@ impl Shell {
                 0,
                 *G_BIT_BLIT_WIDTH,
                 *G_BIT_BLIT_HEIGHT,
-                *G_HDC_SRC,
+                Some(*G_HDC_SRC),
                 0,
                 0,
                 SRCCOPY,
@@ -384,7 +384,7 @@ impl Shell {
             RegCreateKeyExA(
                 h_key,
                 sub_key,
-                reserved,
+                Some(reserved),
                 class,
                 options,
                 sam,
@@ -409,7 +409,7 @@ impl Shell {
                 h_key
             };
 
-            RegOpenKeyExA(h_key, sub_key, reserved, sam, result)
+            RegOpenKeyExA(h_key, sub_key, Some(reserved), sam, result)
         }
     }
 }

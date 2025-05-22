@@ -128,7 +128,7 @@ fn create_window(width: i32, height: i32) -> Result<(HWND, HINSTANCE)> {
             window_rect.bottom,
             None,
             None,
-            instance,
+            Some(instance),
             None,
         )?;
 
