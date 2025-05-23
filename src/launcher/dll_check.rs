@@ -5,11 +5,16 @@
 //! but there are multiple possible versions of `MW2.DLL` and `MW2SHELL.DLL`. ReMech2 deliberately
 //! targets the DLL files included with the official 1.1 patch, which means we can download them
 //! from the internet and install them if they are missing or invalid.
-use std::sync::{Arc, Mutex};
+use std::{
+    io::Write,
+    sync::{Arc, Mutex},
+};
 
 use anyhow::{Result, bail};
+use futures_util::StreamExt;
 use hex_literal::hex;
 use sha2::{Digest, Sha256};
+use tokio::runtime::Runtime;
 
 use super::{Action, Stage};
 
@@ -22,6 +27,14 @@ const SHELL_DLL_HASH: [u8; 32] =
 const AIL_DLL_HASH: [u8; 32] =
     hex!("2a2134551ad7cc20f66172571b07d1650703db389b30dc6543fff1da1a761d85");
 
+const MW2_PATCH_HASH: [u8; 32] =
+    hex!("7846d3ac5885887e9371cfed7ababf4632b914fbec7469a5e2cc92348e0b5bd8");
+
+const MW2_PATCH_URLS: [&str; 2] = [
+    "https://web.archive.org/web/19961025085815/http://www2.activision.com/CustomerSupport/MW2PATCH.EXE",
+    "https://archive.org/download/mw2patch/MW2PATCH.EXE",
+];
+
 #[derive(Clone, Debug)]
 struct DownloadError {
     error: String,
@@ -31,7 +44,6 @@ struct DownloadError {
 enum DownloadStatus {
     Downloading(f32),
     Extracting(f32),
-    Copying((Option<String>, f32)),
     Done,
     Error(DownloadError),
 }
@@ -97,16 +109,148 @@ impl DllCheck {
         let status = self.downloading_status.clone();
         let missing_files = self.missing_files.clone();
 
+        let rt = Runtime::new().expect("Unable to create Runtime");
+        let _enter = rt.enter();
+
         std::thread::spawn(move || {
-            // TODO: Download the files
-            let mut status = status.lock().unwrap();
-            *status = DownloadStatus::Done;
+            rt.block_on(async {
+                let download_file = async |url: &str| -> Result<Vec<u8>, String> {
+                    let Ok(request) = reqwest::get(url).await else {
+                        return Err("Failed to download patch".to_string());
+                    };
+
+                    let total_size = request.content_length().unwrap_or(1_001_315);
+                    let mut downloaded: u64 = 0;
+
+                    let mut stream = request.bytes_stream();
+                    let mut archive = Vec::<u8>::with_capacity(total_size as usize);
+
+                    while let Some(item) = stream.next().await {
+                        match item {
+                            Ok(bytes) => {
+                                archive.write_all(&bytes).unwrap();
+                                downloaded += bytes.len() as u64;
+                                let mut status = status.lock().unwrap();
+                                *status = DownloadStatus::Downloading(
+                                    downloaded as f32 / total_size as f32,
+                                );
+                            }
+                            Err(e) => {
+                                return Err(e.to_string());
+                            }
+                        }
+                    }
+
+                    let mut hasher = Sha256::new();
+                    hasher.update(&archive);
+                    let file_hash = hasher.finalize();
+                    if file_hash.as_slice() != &MW2_PATCH_HASH {
+                        return Err("Downloaded file hash mismatch".to_string());
+                    }
+
+                    Ok(archive)
+                };
+
+                let mut archive: Result<Vec<u8>, String> = Err("No URLs".to_string());
+                for url in MW2_PATCH_URLS.iter() {
+                    let result = download_file(url).await;
+                    archive = result;
+                    if archive.is_ok() {
+                        break;
+                    }
+                }
+
+                let archive = match archive {
+                    Err(e) => {
+                        let mut status = status.lock().unwrap();
+                        *status = DownloadStatus::Error(DownloadError {
+                            error: format!("Failed to download patch: {e}"),
+                        });
+                        return;
+                    }
+                    Ok(archive) => archive,
+                };
+
+                let mut status = status.lock().unwrap();
+                *status = DownloadStatus::Extracting(0.0);
+
+                // TODO: Extract the archive
+            })
         });
 
         self.downloading_files = true;
     }
 
+    fn download_error_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
+        let mut quit = false;
+        egui::Window::new("🚫 Error Downloading Files")
+            .resizable(false)
+            .collapsible(false)
+            .pivot(egui::Align2::CENTER_CENTER)
+            .fixed_pos(ctx.screen_rect().center())
+            .show(ctx, |ui| {
+                ui.label("An error occurred while downloading the patch files.");
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
+                    if ui.button("Quit").clicked() {
+                        quit = true;
+                    }
+                    if ui.button("Retry").clicked() {
+                        self.start_download();
+                    }
+                });
+            });
+
+        if quit {
+            bail!("User chose to quit");
+        }
+
+        Ok(Action::Nothing)
+    }
+
     fn download_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
+        if self.downloading_error.is_some() {
+            return self.download_error_ui(ctx);
+        }
+
+        let status = self.downloading_status.lock().unwrap();
+        match *status {
+            DownloadStatus::Downloading(progress) => {
+                egui::Window::new("Downloading 1.1 Patch")
+                    .resizable(false)
+                    .collapsible(false)
+                    .pivot(egui::Align2::CENTER_CENTER)
+                    .fixed_pos(ctx.screen_rect().center())
+                    .show(ctx, |ui| {
+                        ui.label("Downloading 1.1 patch...");
+                        ui.add_space(10.0);
+                        ui.label(format!("{:.0}%", progress * 100.0));
+                        ui.add(egui::ProgressBar::new(progress).animate(true));
+                    });
+            }
+            DownloadStatus::Extracting(progress) => {
+                egui::Window::new("Extracting DLLs")
+                    .resizable(false)
+                    .collapsible(false)
+                    .pivot(egui::Align2::CENTER_CENTER)
+                    .fixed_pos(ctx.screen_rect().center())
+                    .show(ctx, |ui| {
+                        ui.label("Extracting DLL files...");
+                        ui.add_space(10.0);
+                        ui.label(format!("{:.0}%", progress * 100.0));
+                        ui.add(egui::ProgressBar::new(progress));
+                    });
+            }
+            DownloadStatus::Done => {
+                self.downloading_files = false;
+                self.missing_files = Self::check_files();
+                return Ok(Action::Nothing);
+            }
+            DownloadStatus::Error(ref error) => {
+                self.downloading_error = Some(error.clone());
+                self.downloading_files = false;
+            }
+        }
+
         Ok(Action::Nothing)
     }
 }
