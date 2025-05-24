@@ -6,7 +6,8 @@
 //! targets the DLL files included with the official 1.1 patch, which means we can download them
 //! from the internet and install them if they are missing or invalid.
 use std::{
-    io::Write,
+    fs,
+    io::{Cursor, Write},
     sync::{Arc, Mutex},
 };
 
@@ -15,6 +16,7 @@ use futures_util::StreamExt;
 use hex_literal::hex;
 use sha2::{Digest, Sha256};
 use tokio::runtime::Runtime;
+use unarc_rs::arj::arj_archive::ArjArchieve as ArjArchive;
 
 use super::{Action, Stage};
 
@@ -107,7 +109,6 @@ impl DllCheck {
         self.downloading_status = Arc::new(Mutex::new(DownloadStatus::Downloading(0.0)));
 
         let status = self.downloading_status.clone();
-        let missing_files = self.missing_files.clone();
 
         let rt = Runtime::new().expect("Unable to create Runtime");
         let _enter = rt.enter();
@@ -171,10 +172,48 @@ impl DllCheck {
                     Ok(archive) => archive,
                 };
 
-                let mut status = status.lock().unwrap();
-                *status = DownloadStatus::Extracting(0.0);
+                {
+                    let mut status = status.lock().unwrap();
+                    *status = DownloadStatus::Extracting(0.0);
+                }
 
-                // TODO: Extract the archive
+                {
+                    let mut archive = ArjArchive::new(Cursor::new(&archive[0x1853..])).unwrap();
+                    if let Ok(Some(header)) = archive.get_next_entry() {
+                        let buffer = archive.read(&header).unwrap();
+                        if let Err(e) = fs::write("MW2SHELL.DLL", buffer) {
+                            let mut status = status.lock().unwrap();
+                            *status = DownloadStatus::Error(DownloadError {
+                                error: format!("Failed to write MW2SHELL.DLL: {e}"),
+                            });
+                            return;
+                        }
+                    }
+                }
+
+                {
+                    let mut status = status.lock().unwrap();
+                    *status = DownloadStatus::Extracting(0.5);
+                }
+
+                {
+                    let mut archive = ArjArchive::new(Cursor::new(&archive[0x9E311..])).unwrap();
+                    if let Ok(Some(header)) = archive.get_next_entry() {
+                        let buffer = archive.read(&header).unwrap();
+                        if let Err(e) = fs::write("MW2.DLL", buffer) {
+                            let mut status = status.lock().unwrap();
+                            *status = DownloadStatus::Error(DownloadError {
+                                error: format!("Failed to write MW2.DLL: {e}"),
+                            });
+                            return;
+                        }
+                    }
+                }
+
+                {
+                    let mut status = status.lock().unwrap();
+                    *status = DownloadStatus::Done;
+                }
             })
         });
 
@@ -183,13 +222,13 @@ impl DllCheck {
 
     fn download_error_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
         let mut quit = false;
-        egui::Window::new("🚫 Error Downloading Files")
+        egui::Window::new("🚫 Error Installing Patch")
             .resizable(false)
             .collapsible(false)
             .pivot(egui::Align2::CENTER_CENTER)
             .fixed_pos(ctx.screen_rect().center())
             .show(ctx, |ui| {
-                ui.label("An error occurred while downloading the patch files.");
+                ui.label(&self.downloading_error.as_ref().unwrap().error);
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
                     if ui.button("Quit").clicked() {
                         quit = true;
@@ -247,7 +286,6 @@ impl DllCheck {
             }
             DownloadStatus::Error(ref error) => {
                 self.downloading_error = Some(error.clone());
-                self.downloading_files = false;
             }
         }
 
