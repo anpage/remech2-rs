@@ -19,10 +19,10 @@ jobs:
           override: true
       
       - name: Build Debug
-        run: cargo build
+        run: cargo build --target i686-pc-windows-msvc
       
       - name: Build Release
-        run: cargo build --release
+        run: cargo build --release --target i686-pc-windows-msvc
 
       - name: Archive Debug Build
         uses: actions/upload-artifact@v4
