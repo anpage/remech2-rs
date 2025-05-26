@@ -63,6 +63,18 @@ type CreateFileFunc = unsafe extern "system" fn(
     htemplatefile: HANDLE,
 ) -> HANDLE;
 
+#[repr(C)]
+struct SomeSettingsStruct {
+    unknown1: i32,
+    unknown2: i32,
+    unknown3: i32,
+    unknown4: i32,
+    unknown5: [u8; 12],
+    label_func: ResolutionLabelFunc,
+    toggle_func: ResolutionToggleFunc,
+    value: *mut [c_char; 15],
+}
+
 static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
 
 type LoadMechVariantListFunc = unsafe extern "cdecl" fn(*const c_char);
@@ -75,6 +87,18 @@ static CALLS_BIT_BLIT_HOOK: RwLock<Option<GenericDetour<CallsBitBlitFunc>>> = Rw
 type GetDbItemLzFunc =
     unsafe extern "fastcall" fn(*mut c_void, *mut c_void, i32, *mut *mut u8, *mut usize) -> i32;
 static GET_DB_ITEM_LZ_HOOK: RwLock<Option<GenericDetour<GetDbItemLzFunc>>> = RwLock::new(None);
+
+type ResolutionLabelFunc = unsafe extern "cdecl" fn(*mut SomeSettingsStruct) -> *mut *mut c_void;
+static RESOLUTION_LABEL_HOOK: RwLock<Option<GenericDetour<ResolutionLabelFunc>>> =
+    RwLock::new(None);
+
+type ResolutionToggleFunc = unsafe extern "cdecl" fn(*mut SomeSettingsStruct);
+static RESOLTUTION_TOGGLE_HOOK: RwLock<Option<GenericDetour<ResolutionToggleFunc>>> =
+    RwLock::new(None);
+
+type SomeSettingsWeirdFunc =
+    unsafe extern "thiscall" fn(*mut c_void, i32, i32, *const c_char, u32) -> *mut *mut c_void;
+static G_SOME_SETTINGS_WEIRD_FUNC: RwLock<Option<SomeSettingsWeirdFunc>> = RwLock::new(None);
 
 type LoadFileFromPrjFunc = unsafe extern "thiscall" fn(*mut c_void, *const c_char, i32) -> i32;
 static G_LOAD_FILE_FROM_PRJ: RwLock<Option<LoadFileFromPrjFunc>> = RwLock::new(None);
@@ -90,6 +114,8 @@ static mut G_BIT_BLIT_HEIGHT: *mut i32 = std::ptr::null_mut();
 static mut G_BIT_BLIT_RESULT: *mut i32 = std::ptr::null_mut();
 
 static mut G_DATABASE_MW2: *mut *mut c_void = std::ptr::null_mut();
+
+static mut G_SOME_SETTINGS_WEIRD_GLOBAL: *mut *mut c_void = std::ptr::null_mut();
 
 static mut LOADED: bool = false;
 
@@ -128,6 +154,11 @@ impl Shell {
                 LoadFileFromPrjFunc,
             >(base_address + 0x0002e346));
 
+            *G_SOME_SETTINGS_WEIRD_FUNC.write().unwrap() =
+                Some(std::mem::transmute::<usize, SomeSettingsWeirdFunc>(
+                    base_address + 0x0000544e,
+                ));
+
             G_MECH_VARIANT_FILENAME = (base_address + 0x0007a800) as *mut c_char;
             G_MECH_VARIANT_FILENAMES = (base_address + 0x00079d80) as *mut [[c_char; 13]; 200];
             G_PRJ_OBJECT = (base_address + 0x00071230) as *mut c_void;
@@ -139,6 +170,8 @@ impl Shell {
             G_BIT_BLIT_RESULT = (base_address + 0x000965f4) as *mut i32;
 
             G_DATABASE_MW2 = (base_address + 0x0007122c) as *mut *mut c_void;
+
+            G_SOME_SETTINGS_WEIRD_GLOBAL = (base_address + 0x00071214) as *mut *mut c_void;
 
             *DEBUG_LOG_HOOK.write().unwrap() = {
                 let hook = RawDetour::new(
@@ -168,6 +201,18 @@ impl Shell {
                 let get_db_item_midi: GetDbItemLzFunc =
                     std::mem::transmute(base_address + 0x0004813f);
                 Some(hook_function(get_db_item_midi, Self::get_db_item_lz)?)
+            };
+
+            *RESOLUTION_LABEL_HOOK.write().unwrap() = {
+                let resolution_label: ResolutionLabelFunc =
+                    std::mem::transmute(base_address + 0x000435e9);
+                Some(hook_function(resolution_label, Self::resolution_label)?)
+            };
+
+            *RESOLTUTION_TOGGLE_HOOK.write().unwrap() = {
+                let resolution_toggle: ResolutionToggleFunc =
+                    std::mem::transmute(base_address + 0x00043703);
+                Some(hook_function(resolution_toggle, Self::resolution_toggle)?)
             };
 
             audio::hook_functions(base_address)?;
@@ -412,6 +457,50 @@ impl Shell {
             RegOpenKeyExA(h_key, sub_key, Some(reserved), sam, result)
         }
     }
+
+    unsafe extern "cdecl" fn resolution_label(
+        settings: *mut SomeSettingsStruct,
+    ) -> *mut *mut c_void {
+        unsafe {
+            let value = (*(*settings).value)[4];
+            let label = if value == 0x34 {
+                "~640x480"
+            } else if value == 0x37 {
+                "~1024x768"
+            } else {
+                "~320x200"
+            };
+
+            let weird_func = G_SOME_SETTINGS_WEIRD_FUNC.read().unwrap().unwrap();
+            return weird_func(
+                *G_SOME_SETTINGS_WEIRD_GLOBAL,
+                (*settings).unknown1 + (*settings).unknown3 / 2,
+                (*settings).unknown2,
+                CString::new(label).unwrap().as_ptr(),
+                0,
+            );
+        }
+    }
+
+    unsafe extern "cdecl" fn resolution_toggle(settings: *mut SomeSettingsStruct) {
+        unsafe {
+            if (*(*settings).value)[4] == 0x34 {
+                std::ptr::copy_nonoverlapping(
+                    c"vesa768.dll".as_ptr(),
+                    (*(*settings).value).as_mut_ptr(),
+                    12,
+                );
+            } else if (*(*settings).value)[4] == 0x37 {
+                (*(*settings).value).fill(0);
+            } else {
+                std::ptr::copy_nonoverlapping(
+                    c"vesa480.dll".as_ptr(),
+                    (*(*settings).value).as_mut_ptr(),
+                    12,
+                );
+            }
+        }
+    }
 }
 
 impl Drop for Shell {
@@ -422,6 +511,8 @@ impl Drop for Shell {
             LOAD_MECH_VARIANT_LIST_HOOK.write().unwrap().take();
             CALLS_BIT_BLIT_HOOK.write().unwrap().take();
             GET_DB_ITEM_LZ_HOOK.write().unwrap().take();
+            RESOLUTION_LABEL_HOOK.write().unwrap().take();
+            RESOLTUTION_TOGGLE_HOOK.write().unwrap().take();
             audio::unhook_functions();
             self.ail.unhook();
             FreeLibrary(self.module).unwrap();
