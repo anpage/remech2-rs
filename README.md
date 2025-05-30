@@ -18,12 +18,16 @@ game currently works well enough to play on Windows 11.
 __ReMech 2 does not include any part of the original game data.__
 
 Documentation is forthcoming. You'll need an installed copy of the orginal
-Windows 95 version (a.k.a. Pentium Edition), a specific version of the game's
+Windows 95 version (a.k.a. Pentium Edition) and a specific version of the game's
 DLL files contained in the
 [Windows 95 1.1 _patch_](https://archive.org/details/mw2patch), not the 1.1 CD.
 
+If you don't currently have the game installed, run Remech 2 from within its own
+(writable) folder with the CD mounted. It can pull all the necessary files
+from the CD and install the 1.1 patch from the internet automatically.
+
 You'll also need the game's CD inserted in order to play, but it can be any
-version of the original software-rendered release, DOS or Windows. The game's
+copy of the original Windows 95 software-rendered release. The game's
 copy-protection has not been removed.
 
 ## Building
