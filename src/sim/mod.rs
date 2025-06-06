@@ -238,6 +238,16 @@ impl Sim {
         let module = unsafe { LoadLibraryA(s!("MW2.DLL"))? };
         let base_address = module.0 as usize;
 
+        let flee_option = (base_address + 0x000a1ad0) as *mut [u8; 7];
+        unsafe {
+            flee_option.write_volatile(*(b"Desktop"));
+        }
+
+        let flee_title = (base_address + 0x000a1b08) as *mut [u8; 7];
+        unsafe {
+            flee_title.write_volatile(*(b"DESKTOP"));
+        }
+
         unsafe {
             G_TICKS_CHECK = (base_address + 0x000ad008) as *mut u32;
             G_TICKS_1 = (base_address + 0x000ad20c) as *mut u32;
