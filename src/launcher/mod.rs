@@ -16,7 +16,7 @@ use windows::Win32::{
 mod cd_check;
 mod dll_check;
 mod file_check;
-mod painter;
+pub mod painter;
 
 type Window = raw_window_handle::Win32WindowHandle;
 

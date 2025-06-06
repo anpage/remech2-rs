@@ -32,6 +32,8 @@ use crate::{
     hooker::hook_function,
 };
 
+mod drawmode;
+
 type SimMainProc = unsafe extern "stdcall" fn(
     HMODULE,
     u32,
@@ -387,6 +389,8 @@ impl Sim {
                 let target: RandomIntBelowFunc = std::mem::transmute(base_address + 0x000736b3);
                 Some(hook_function(target, Self::random_int_below)?)
             };
+
+            drawmode::hook_functions(base_address)?;
 
             let ail = Ail::new()?;
 
@@ -864,6 +868,7 @@ impl Drop for Sim {
             CD_AUDIO_TOGGLE_PAUSED_HOOK.write().unwrap().take();
             HANDLE_MESSAGES_HOOK.write().unwrap().take();
             RANDOM_INT_BELOW_HOOK.write().unwrap().take();
+            drawmode::unhook_functions();
             self.ail.unhook();
             FreeLibrary(self.module).unwrap();
             LOADED = false;
