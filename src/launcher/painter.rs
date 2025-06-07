@@ -264,6 +264,25 @@ impl Painter {
         };
     }
 
+    pub fn on_window_resized(
+        &mut self,
+        viewport_id: ViewportId,
+        width_in_pixels: NonZeroU32,
+        height_in_pixels: NonZeroU32,
+    ) {
+        if self.surfaces.contains_key(&viewport_id) {
+            self.resize_and_generate_depth_texture_view_and_msaa_view(
+                viewport_id,
+                width_in_pixels,
+                height_in_pixels,
+            );
+        } else {
+            tracing::warn!(
+                "Ignoring window resize notification with no surface created via Painter::set_window()"
+            );
+        }
+    }
+
     /// Returns the approximate number of seconds spent on vsync-waiting (if any)
     pub fn paint_and_update_textures(
         &mut self,
