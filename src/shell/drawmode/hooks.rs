@@ -306,7 +306,8 @@ pub unsafe extern "stdcall" fn bit_blt_rect(
         x2_dest,
         y2_dest
     );
-    0
+
+    unsafe { blit_flip() }
 }
 
 pub unsafe extern "stdcall" fn stretch_blit(
@@ -347,6 +348,11 @@ pub unsafe extern "stdcall" fn set_palette(
             let index = (start + i as i32) as usize;
             (*G_PALETTE_COLORS)[index] = *color;
         }
+    }
+
+    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
+    if let Some(ref mut draw_mode) = *custom_draw_mode {
+        draw_mode.set_palette(unsafe { G_PALETTE_COLORS.as_ref().unwrap() });
     }
 
     0
