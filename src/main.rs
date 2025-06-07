@@ -39,6 +39,9 @@ enum ProcessType {
 
 static mut PROCESS_TYPE: ProcessType = ProcessType::None;
 
+pub static mut WINDOW_WIDTH: i32 = 640;
+pub static mut WINDOW_HEIGHT: i32 = 480;
+
 extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     unsafe {
         match message {
@@ -50,6 +53,17 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
             }
             0x420 => {
                 PROCESS_TYPE = ProcessType::Shell;
+            }
+            WM_SIZE => {
+                let width = (lparam.0 as i32) & 0xFFFF;
+                let height = (lparam.0 as i32 >> 16) & 0xFFFF;
+
+                tracing::debug!("Window resized: width = {}, height = {}", width, height);
+
+                if width != WINDOW_WIDTH || height != WINDOW_HEIGHT {
+                    WINDOW_WIDTH = width;
+                    WINDOW_HEIGHT = height;
+                }
             }
             _ => {}
         }
