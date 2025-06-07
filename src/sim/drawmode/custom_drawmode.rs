@@ -1,4 +1,7 @@
-use std::{num::NonZeroIsize, sync::Arc};
+use std::{
+    num::{NonZero, NonZeroIsize},
+    sync::Arc,
+};
 
 use anyhow::Result;
 use egui::{
@@ -11,20 +14,19 @@ use windows::Win32::{
     System::LibraryLoader::GetModuleHandleA,
 };
 
-use crate::{
-    launcher::painter::Painter,
-    sim::drawmode::hooks::{PaletteColor, WINDOW_HEIGHT, WINDOW_WIDTH},
-};
+use crate::{launcher::painter::Painter, sim::drawmode::hooks::PaletteColor};
 
 pub struct CustomDrawMode {
     ctx: Context,
     painter: Painter,
     texture: TextureHandle,
     palette: [[u8; 3]; 256],
+    cached_width: i32,
+    cached_height: i32,
 }
 
 impl CustomDrawMode {
-    pub fn new(wnd: HWND) -> Result<Self> {
+    pub fn new(wnd: HWND, window_width: i32, window_height: i32) -> Result<Self> {
         let instance: HINSTANCE = unsafe { GetModuleHandleA(None)?.into() };
 
         let window = {
@@ -59,14 +61,33 @@ impl CustomDrawMode {
             ctx,
             texture,
             palette: [[0; 3]; 256],
+            cached_width: window_width,
+            cached_height: window_height,
         })
     }
 
-    pub fn draw(&mut self, pixel_data: &[u8], width: usize, height: usize) {
+    pub fn draw(
+        &mut self,
+        pixel_data: &[u8],
+        game_width: usize,
+        game_height: usize,
+        window_width: i32,
+        window_height: i32,
+    ) {
+        if self.cached_width != window_width || self.cached_height != window_height {
+            self.painter.on_window_resized(
+                self.ctx.viewport_id(),
+                NonZero::new(window_width as u32).unwrap(),
+                NonZero::new(window_height as u32).unwrap(),
+            );
+            self.cached_width = window_width;
+            self.cached_height = window_height;
+        }
+
         let raw_input = RawInput {
             screen_rect: Some(egui::Rect {
                 min: egui::pos2(0.0, 0.0),
-                max: egui::pos2(WINDOW_WIDTH as f32, WINDOW_HEIGHT as f32),
+                max: egui::pos2(window_width as f32, window_height as f32),
             }),
             ..Default::default()
         };
@@ -82,11 +103,21 @@ impl CustomDrawMode {
         // Update the texture with the current pixel data
         self.texture.set(
             ColorImage {
-                size: [width, height],
+                size: [game_width, game_height],
                 pixels,
             },
             Default::default(),
         );
+
+        // calculate width and height, preserving 4:3 aspect ratio
+        let aspect_ratio = 4.0 / 3.0;
+        let mut width = window_width as f32;
+        let mut height = window_height as f32;
+        if width / height > aspect_ratio {
+            width = height * aspect_ratio;
+        } else {
+            height = width / aspect_ratio;
+        }
 
         let full_output = self.ctx.run(raw_input, |ctx| {
             egui::CentralPanel::default()
@@ -100,10 +131,7 @@ impl CustomDrawMode {
                         |ui| {
                             ui.image(SizedTexture {
                                 id: self.texture.id(),
-                                size: Vec2::new(
-                                    WINDOW_HEIGHT as f32 / 3. * 4.,
-                                    WINDOW_HEIGHT as f32,
-                                ),
+                                size: Vec2::new(width, height),
                             });
                         },
                     )

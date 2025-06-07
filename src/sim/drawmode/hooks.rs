@@ -7,12 +7,16 @@ use windows::Win32::{
     Graphics::Gdi::BITMAPINFO,
     System::Memory::{HEAP_FLAGS, HeapAlloc, HeapFree},
     UI::WindowsAndMessaging::{
-        AdjustWindowRect, GetSystemMetrics, HWND_NOTOPMOST, HWND_TOP, HWND_TOPMOST, SM_CXSCREEN,
-        SM_CYSCREEN, SWP_FRAMECHANGED, SWP_NOZORDER, SetWindowPos, WINDOW_STYLE,
+        AdjustWindowRect, GWL_STYLE, GetSystemMetrics, HWND_TOP, SM_CXSCREEN, SM_CYSCREEN,
+        SWP_FRAMECHANGED, SWP_NOZORDER, SetWindowLongA, SetWindowPos, WS_CAPTION, WS_GROUP,
+        WS_MAXIMIZEBOX, WS_SIZEBOX, WS_SYSMENU,
     },
 };
 
-use crate::{hooker::hook_function, sim::drawmode::custom_drawmode::CustomDrawMode};
+use crate::{
+    WINDOW_HEIGHT, WINDOW_WIDTH, hooker::hook_function,
+    sim::drawmode::custom_drawmode::CustomDrawMode,
+};
 
 #[repr(C)]
 pub struct PixelBuffer {
@@ -138,8 +142,8 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
 
 static CUSTOM_DRAW_MODE: RwLock<Option<CustomDrawMode>> = RwLock::new(None);
 
-pub const WINDOW_WIDTH: i32 = 1920;
-pub const WINDOW_HEIGHT: i32 = 1080;
+// pub const WINDOW_WIDTH: i32 = 1920;
+// pub const WINDOW_HEIGHT: i32 = 1080;
 
 pub unsafe extern "stdcall" fn begin(
     pixel_buffer: *mut PixelBuffer,
@@ -168,11 +172,10 @@ pub unsafe extern "stdcall" fn begin(
         let desktop_width = GetSystemMetrics(SM_CXSCREEN);
         let desktop_height = GetSystemMetrics(SM_CYSCREEN);
 
-        // let _ = SetWindowLongA(
-        //     *G_GAME_WINDOW,
-        //     GWL_STYLE,
-        //     0x80000000u32 as i32 & 0xfff7ffffu32 as i32 | 0x10000000u32 as i32,
-        // );
+        // let style = WS_CAPTION | WS_SYSMENU | WS_GROUP;
+        let style = WS_CAPTION | WS_GROUP | WS_SYSMENU | WS_SIZEBOX | WS_MAXIMIZEBOX;
+
+        let _ = SetWindowLongA(*G_GAME_WINDOW, GWL_STYLE, style.0 as i32);
 
         let mut rect = RECT {
             left: 0,
@@ -181,7 +184,7 @@ pub unsafe extern "stdcall" fn begin(
             bottom: WINDOW_HEIGHT,
         };
 
-        let _ = AdjustWindowRect(&mut rect, WINDOW_STYLE(0xca0000), false);
+        let _ = AdjustWindowRect(&mut rect, style, false);
         // let _ = AdjustWindowRect(&mut rect, WINDOW_STYLE(0x80000000), false);
 
         let _ = SetWindowPos(
@@ -195,7 +198,7 @@ pub unsafe extern "stdcall" fn begin(
         );
 
         let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-        *custom_draw_mode = CustomDrawMode::new(*G_GAME_WINDOW).ok();
+        *custom_draw_mode = CustomDrawMode::new(*G_GAME_WINDOW, WINDOW_WIDTH, WINDOW_HEIGHT).ok();
 
         tracing::trace!("GdiBegin finish");
 
@@ -243,7 +246,13 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
 
     let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
     if let Some(ref mut draw_mode) = *custom_draw_mode {
-        draw_mode.draw(pixel_slice, width as usize, height as usize);
+        draw_mode.draw(
+            pixel_slice,
+            width as usize,
+            height as usize,
+            unsafe { WINDOW_WIDTH },
+            unsafe { WINDOW_HEIGHT },
+        );
     }
 
     0
