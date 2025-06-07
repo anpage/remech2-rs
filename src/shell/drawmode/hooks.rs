@@ -2,15 +2,18 @@ use std::{ffi::c_void, sync::RwLock};
 
 use anyhow::Result;
 use retour::GenericDetour;
-use windows::Win32::{
-    Foundation::{HANDLE, HWND, RECT},
-    Graphics::Gdi::BITMAPINFO,
-    System::Memory::{HEAP_FLAGS, HeapAlloc, HeapFree},
-    UI::WindowsAndMessaging::{
-        AdjustWindowRect, GWL_STYLE, GetSystemMetrics, HWND_TOP, SM_CXSCREEN, SM_CYSCREEN,
-        SWP_FRAMECHANGED, SWP_NOZORDER, SetWindowLongA, SetWindowPos, WS_CAPTION, WS_GROUP,
-        WS_MAXIMIZEBOX, WS_SIZEBOX, WS_SYSMENU,
+use windows::{
+    Win32::{
+        Foundation::{HANDLE, HWND, RECT},
+        Graphics::Gdi::BITMAPINFO,
+        System::Memory::{HEAP_FLAGS, HeapAlloc, HeapFree},
+        UI::WindowsAndMessaging::{
+            AdjustWindowRect, GWL_STYLE, GetSystemMetrics, HWND_TOP, SM_CXSCREEN, SM_CYSCREEN,
+            SWP_FRAMECHANGED, SWP_NOZORDER, SetWindowLongA, SetWindowPos, WS_CAPTION, WS_GROUP,
+            WS_MAXIMIZEBOX, WS_SIZEBOX, WS_SYSMENU,
+        },
     },
+    core::BOOL,
 };
 
 use crate::{
@@ -19,7 +22,7 @@ use crate::{
     hooker::hook_function,
 };
 
-#[repr(C)]
+#[repr(C, packed(2))]
 pub struct PixelBuffer {
     pub data: *mut c_void,
     pub width: i32,
@@ -27,6 +30,10 @@ pub struct PixelBuffer {
     pub bitmap_info: *mut BITMAPINFO,
     pub unknown: u32,
 }
+
+type InitDrawModeFunc =
+    unsafe extern "cdecl" fn(i32, i32, *mut PixelBuffer, i32, i32, BOOL) -> BOOL;
+static INIT_DRAW_MODE_HOOK: RwLock<Option<GenericDetour<InitDrawModeFunc>>> = RwLock::new(None);
 
 // Draw Mode Functions
 type GdiBeginFunc = unsafe extern "stdcall" fn(*mut PixelBuffer, i32, i32) -> i32;
@@ -63,7 +70,7 @@ static mut G_CURRENT_DRAW_MODE_EXTENSION: *mut *mut c_void = std::ptr::null_mut(
 static mut G_PRIMARY_HEAP: *mut HANDLE = std::ptr::null_mut();
 static mut G_BITS_TO_BLIT: *mut *mut u8 = std::ptr::null_mut();
 static mut G_GDI_BLIT_BITMAP_INFO: *mut BITMAPINFO = std::ptr::null_mut();
-static mut G_GAME_WINDOW: *mut HWND = std::ptr::null_mut();
+static mut G_WINDOW: *mut HWND = std::ptr::null_mut();
 static mut G_CURRENT_PIXEL_BUFFER: *mut *mut PixelBuffer = std::ptr::null_mut();
 static mut G_DISPLAY_BRIGHTNESS: *mut u32 = std::ptr::null_mut();
 static mut G_GAMMA_TABLE: *mut [u8; 1024] = std::ptr::null_mut();
@@ -72,61 +79,66 @@ static mut G_PALETTE_COLORS_PRE_BRIGHTNESS: *mut [PaletteColor; 256] = std::ptr:
 
 pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
     unsafe {
-        G_CURRENT_DRAW_MODE_EXTENSION = (base_address + 0x000b1770) as *mut *mut c_void;
-        G_PRIMARY_HEAP = (base_address + 0x000acb68) as *mut HANDLE;
-        G_BITS_TO_BLIT = (base_address + 0x000b1a88) as *mut *mut u8;
-        G_GDI_BLIT_BITMAP_INFO = (base_address + 0x000c28a0) as *mut BITMAPINFO;
-        G_GAME_WINDOW = (base_address + 0x000acb60) as *mut HWND;
-        G_CURRENT_PIXEL_BUFFER = (base_address + 0x000b1784) as *mut *mut PixelBuffer;
-        G_DISPLAY_BRIGHTNESS = (base_address + 0x000a9468) as *mut u32;
-        G_GAMMA_TABLE = (base_address + 0x000e99a0) as *mut [u8; 1024];
-        G_PALETTE_COLORS = (base_address + 0x000b1788) as *mut [PaletteColor; 256];
-        G_PALETTE_COLORS_PRE_BRIGHTNESS = (base_address + 0x000e96a0) as *mut [PaletteColor; 256];
+        G_CURRENT_DRAW_MODE_EXTENSION = (base_address + 0x00062cc8) as *mut *mut c_void;
+        G_PRIMARY_HEAP = (base_address + 0x0006a9f4) as *mut HANDLE;
+        G_BITS_TO_BLIT = (base_address + 0x00062fe0) as *mut *mut u8;
+        G_GDI_BLIT_BITMAP_INFO = (base_address + 0x00096a64) as *mut BITMAPINFO;
+        G_WINDOW = (base_address + 0x000965ec) as *mut HWND;
+        G_CURRENT_PIXEL_BUFFER = (base_address + 0x00062cdc) as *mut *mut PixelBuffer;
+        G_DISPLAY_BRIGHTNESS = (base_address + 0x000717a4) as *mut u32;
+        G_GAMMA_TABLE = (base_address + 0x000961d0) as *mut [u8; 1024];
+        G_PALETTE_COLORS = (base_address + 0x00062ce0) as *mut [PaletteColor; 256];
+        G_PALETTE_COLORS_PRE_BRIGHTNESS = (base_address + 0x00095ed0) as *mut [PaletteColor; 256];
+
+        *INIT_DRAW_MODE_HOOK.write().unwrap() = {
+            let target: InitDrawModeFunc = std::mem::transmute(base_address + 0x00010a30);
+            Some(hook_function(target, init_draw_mode)?)
+        };
 
         GDI_BEGIN_HOOK = {
-            let target: GdiBeginFunc = std::mem::transmute(base_address + 0x0006de70);
+            let target: GdiBeginFunc = std::mem::transmute(base_address + 0x00030b90);
             Some(hook_function(target, begin)?)
         };
 
         GDI_END_HOOK = {
-            let target: GdiEndFunc = std::mem::transmute(base_address + 0x0006dffe);
+            let target: GdiEndFunc = std::mem::transmute(base_address + 0x00030d31);
             Some(hook_function(target, end)?)
         };
 
         GDI_BLIT_FLIP_HOOK = {
-            let target: GdiBlitFlipFunc = std::mem::transmute(base_address + 0x0006e197);
+            let target: GdiBlitFlipFunc = std::mem::transmute(base_address + 0x00030ef9);
             Some(hook_function(target, blit_flip)?)
         };
 
         GDI_BIT_BLT_RECT_HOOK = {
-            let target: GdiBitBltRectFunc = std::mem::transmute(base_address + 0x0006e21f);
+            let target: GdiBitBltRectFunc = std::mem::transmute(base_address + 0x00030f77);
             Some(hook_function(target, bit_blt_rect)?)
         };
 
         GDI_STRETCH_BLIT_HOOK = {
-            let target: GdiStretchBlitFunc = std::mem::transmute(base_address + 0x0006e357);
+            let target: GdiStretchBlitFunc = std::mem::transmute(base_address + 0x00031095);
             Some(hook_function(target, stretch_blit)?)
         };
 
         GDI_SET_PALETTE_HOOK = {
-            let target: GdiSetPaletteFunc = std::mem::transmute(base_address + 0x0006e5d8);
+            let target: GdiSetPaletteFunc = std::mem::transmute(base_address + 0x00031591);
             Some(hook_function(target, set_palette)?)
         };
 
         GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK = {
             let target: GdiSetPaletteWithBrightnessFunc =
-                std::mem::transmute(base_address + 0x0006e633);
+                std::mem::transmute(base_address + 0x0003162c);
             Some(hook_function(target, set_palette_with_brightness)?)
         };
 
         // Leave this out for now because the vanilla function works fine
         // GDI_BLEND_PALETTES_HOOK = {
-        //     let target: GdiBlendPalettesFunc = std::mem::transmute(base_address + 0x0006e6d0);
+        //     let target: GdiBlendPalettesFunc = std::mem::transmute(base_address + 0x000316c9);
         //     Some(hook_function(target, blend_palettes)?)
         // };
 
         GDI_SWAP_BUFFERS_HOOK = {
-            let target: GdiSwapBuffersFunc = std::mem::transmute(base_address + 0x0006e94f);
+            let target: GdiSwapBuffersFunc = std::mem::transmute(base_address + 0x00031948);
             Some(hook_function(target, swap_buffers)?)
         };
     }
@@ -135,15 +147,45 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
 
 static CUSTOM_DRAW_MODE: RwLock<Option<CustomDrawMode>> = RwLock::new(None);
 
-// pub const WINDOW_WIDTH: i32 = 1920;
-// pub const WINDOW_HEIGHT: i32 = 1080;
+pub unsafe extern "cdecl" fn init_draw_mode(
+    draw_mode_index: i32,
+    allow_fallback: i32,
+    output_pixel_buffer: *mut PixelBuffer,
+    width: i32,
+    height: i32,
+    show_menu: BOOL,
+) -> BOOL {
+    tracing::trace!(
+        "InitDrawMode called with index: {}, allow_fallback: {}, width: {}, height: {}, show_menu: {}",
+        draw_mode_index,
+        allow_fallback,
+        width,
+        height,
+        show_menu.0
+    );
+    unsafe {
+        INIT_DRAW_MODE_HOOK.read().unwrap().as_ref().unwrap().call(
+            5,
+            allow_fallback,
+            output_pixel_buffer,
+            width,
+            height,
+            show_menu,
+        )
+    }
+}
 
 pub unsafe extern "stdcall" fn begin(
     pixel_buffer: *mut PixelBuffer,
     width: i32,
     height: i32,
 ) -> i32 {
-    tracing::trace!("GdiBegin called with width: {}, height: {}!", width, height);
+    tracing::trace!(
+        "GdiBegin called with pixel_buffer: {:?}, width: {}, height: {}!",
+        pixel_buffer,
+        width,
+        height
+    );
 
     unsafe {
         let pixel_buf = HeapAlloc(
@@ -168,7 +210,7 @@ pub unsafe extern "stdcall" fn begin(
         // let style = WS_CAPTION | WS_SYSMENU | WS_GROUP;
         let style = WS_CAPTION | WS_GROUP | WS_SYSMENU | WS_SIZEBOX | WS_MAXIMIZEBOX;
 
-        let _ = SetWindowLongA(*G_GAME_WINDOW, GWL_STYLE, style.0 as i32);
+        let _ = SetWindowLongA(*G_WINDOW, GWL_STYLE, style.0 as i32);
 
         let mut rect = RECT {
             left: 0,
@@ -181,7 +223,7 @@ pub unsafe extern "stdcall" fn begin(
         // let _ = AdjustWindowRect(&mut rect, WINDOW_STYLE(0x80000000), false);
 
         let _ = SetWindowPos(
-            *G_GAME_WINDOW,
+            *G_WINDOW,
             Some(HWND_TOP),
             (desktop_width - (rect.right - rect.left)) / 2,
             (desktop_height - (rect.bottom - rect.top)) / 2,
@@ -191,7 +233,7 @@ pub unsafe extern "stdcall" fn begin(
         );
 
         let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-        *custom_draw_mode = CustomDrawMode::new(*G_GAME_WINDOW, WINDOW_WIDTH, WINDOW_HEIGHT).ok();
+        *custom_draw_mode = CustomDrawMode::new(*G_WINDOW, WINDOW_WIDTH, WINDOW_HEIGHT).ok();
 
         tracing::trace!("GdiBegin finish");
 
@@ -224,28 +266,28 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
     let width = unsafe { (**G_CURRENT_PIXEL_BUFFER).width } + 1;
     let height = unsafe { (**G_CURRENT_PIXEL_BUFFER).height };
 
-    if width <= 0 || height <= 0 {
-        tracing::warn!(
-            "GdiBlitFlip called with invalid dimensions: {}x{}",
-            width,
-            height
-        );
-        return 0;
-    }
+        if width <= 0 || height <= 0 {
+            tracing::warn!(
+                "GdiBlitFlip called with invalid dimensions: {}x{}",
+                width,
+                height
+            );
+            return 0;
+        }
 
     let bits_to_blit = unsafe { *G_BITS_TO_BLIT };
     let pixel_slice =
         unsafe { std::slice::from_raw_parts(bits_to_blit, (width * height) as usize) };
 
-    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-    if let Some(ref mut draw_mode) = *custom_draw_mode {
-        draw_mode.draw(
-            pixel_slice,
-            width as usize,
-            height as usize,
+        let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
+        if let Some(ref mut draw_mode) = *custom_draw_mode {
+            draw_mode.draw(
+                pixel_slice,
+                width as usize,
+                height as usize,
             unsafe { WINDOW_WIDTH },
             unsafe { WINDOW_HEIGHT },
-        );
+            );
     }
 
     0
@@ -358,6 +400,7 @@ pub unsafe extern "stdcall" fn swap_buffers() -> i32 {
 
 pub unsafe fn unhook_functions() {
     unsafe {
+        *INIT_DRAW_MODE_HOOK.write().unwrap() = None;
         GDI_BEGIN_HOOK = None;
         GDI_END_HOOK = None;
         GDI_BLIT_FLIP_HOOK = None;

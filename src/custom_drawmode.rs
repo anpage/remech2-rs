@@ -14,7 +14,15 @@ use windows::Win32::{
     System::LibraryLoader::GetModuleHandleA,
 };
 
-use crate::{launcher::painter::Painter, sim::drawmode::hooks::PaletteColor};
+use crate::launcher::painter::Painter;
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct PaletteColor {
+    pub red: u8,
+    pub green: u8,
+    pub blue: u8,
+}
 
 pub struct CustomDrawMode {
     ctx: Context,

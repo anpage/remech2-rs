@@ -36,6 +36,7 @@ use crate::{
 };
 
 mod audio;
+mod drawmode;
 
 type ShellMainProc = unsafe extern "stdcall" fn(HMODULE, i32, *const c_char, i32, HWND) -> i32;
 
@@ -216,6 +217,7 @@ impl Shell {
             };
 
             audio::hook_functions(base_address)?;
+            drawmode::hook_functions(base_address)?;
 
             let ail = Ail::new()?;
 
@@ -514,6 +516,7 @@ impl Drop for Shell {
             RESOLUTION_LABEL_HOOK.write().unwrap().take();
             RESOLTUTION_TOGGLE_HOOK.write().unwrap().take();
             audio::unhook_functions();
+            drawmode::unhook_functions();
             self.ail.unhook();
             FreeLibrary(self.module).unwrap();
             LOADED = false;

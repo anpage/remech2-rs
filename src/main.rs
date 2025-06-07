@@ -19,6 +19,7 @@ use windows::{
 
 mod ail;
 mod common;
+mod custom_drawmode;
 mod hooker;
 mod launcher;
 mod midi_source;
@@ -177,7 +178,7 @@ fn start_sim(window: HWND, cmd_line: &str) -> Result<i32> {
 }
 
 fn main() -> Result<()> {
-    let filter = filter::Targets::new().with_target("remech2", Level::DEBUG);
+    let filter = filter::Targets::new().with_target("remech2", Level::TRACE);
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
         .with(filter)
