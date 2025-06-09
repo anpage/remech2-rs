@@ -4,16 +4,13 @@ use anyhow::Result;
 use retour::GenericDetour;
 use windows::{
     Win32::{
-        Foundation::{HANDLE, HWND, POINT, RECT},
+        Foundation::{HANDLE, HWND, POINT},
         Graphics::Gdi::{BITMAPINFO, ScreenToClient},
         Media::timeGetTime,
         System::Memory::{HEAP_FLAGS, HeapAlloc, HeapFree},
         UI::{
             Input::KeyboardAndMouse::{GetAsyncKeyState, VK_LBUTTON, VK_MBUTTON, VK_RBUTTON},
-            WindowsAndMessaging::{
-                AdjustWindowRect, GetCursorPos, GetSystemMetrics, HWND_TOP, SM_CXSCREEN,
-                SM_CYSCREEN, SWP_FRAMECHANGED, SWP_NOZORDER, SetWindowPos, WS_OVERLAPPEDWINDOW,
-            },
+            WindowsAndMessaging::GetCursorPos,
         },
     },
     core::BOOL,
@@ -455,21 +452,42 @@ pub unsafe extern "stdcall" fn bit_blt_rect(
     unsafe { blit_flip() }
 }
 
-pub unsafe extern "stdcall" fn stretch_blit(
-    x_src: i32,
-    y_src2: i32,
-    x_src2: i32,
-    y_src_inverted: i32,
-) -> i32 {
+pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) -> i32 {
     tracing::trace!(
-        "GdiStretchBlit called with x_src: {}, y_src2: {}, x_src2: {}, y_src_inverted: {}",
-        x_src,
-        y_src2,
-        x_src2,
-        y_src_inverted
+        "GdiStretchBlit called with (x1, y1): ({}, {}), (x2, y2): ({}, {})",
+        x1,
+        y1,
+        x2,
+        y2
     );
 
-    unsafe { blit_flip() }
+    let buffer_width = unsafe { (**G_CURRENT_PIXEL_BUFFER).width } + 1;
+    let buffer_height = unsafe { (**G_CURRENT_PIXEL_BUFFER).height };
+
+    let bits_to_blit = unsafe { *G_BITS_TO_BLIT };
+    let pixel_slice = unsafe {
+        std::slice::from_raw_parts(bits_to_blit, (buffer_width * buffer_height) as usize)
+    };
+
+    let rect_pixel_slice = pixel_slice
+        .chunks_exact(buffer_width as usize)
+        .skip(y1 as usize)
+        .take((y2 - y1) as usize)
+        .flat_map(|row| row[x1 as usize..x2 as usize].to_vec())
+        .collect::<Vec<u8>>();
+
+    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
+    if let Some(ref mut draw_mode) = *custom_draw_mode {
+        draw_mode.draw(
+            &rect_pixel_slice,
+            (x2 - x1) as usize,
+            (y2 - y1) as usize,
+            unsafe { WINDOW_WIDTH },
+            unsafe { WINDOW_HEIGHT },
+        );
+    }
+
+    0
 }
 
 pub unsafe extern "stdcall" fn set_palette(

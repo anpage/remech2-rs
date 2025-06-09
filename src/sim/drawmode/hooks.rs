@@ -3,13 +3,9 @@ use std::{ffi::c_void, sync::RwLock};
 use anyhow::Result;
 use retour::GenericDetour;
 use windows::Win32::{
-    Foundation::{HANDLE, HWND, RECT},
+    Foundation::{HANDLE, HWND},
     Graphics::Gdi::BITMAPINFO,
     System::Memory::{HEAP_FLAGS, HeapAlloc, HeapFree},
-    UI::WindowsAndMessaging::{
-        AdjustWindowRect, GetSystemMetrics, HWND_TOP, SM_CXSCREEN, SM_CYSCREEN, SWP_FRAMECHANGED,
-        SWP_NOZORDER, SetWindowPos, WS_OVERLAPPEDWINDOW,
-    },
 };
 
 use crate::{
