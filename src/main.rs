@@ -45,6 +45,7 @@ pub static mut WINDOW_HEIGHT: i32 = 480;
 
 extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     unsafe {
+        let mut wparam = wparam;
         match message {
             0x41E => {
                 PROCESS_TYPE = ProcessType::None;
@@ -65,6 +66,9 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
                     WINDOW_WIDTH = width;
                     WINDOW_HEIGHT = height;
                 }
+            }
+            WM_ACTIVATEAPP => {
+                wparam = WPARAM(1);
             }
             _ => {}
         }
