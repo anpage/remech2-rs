@@ -34,6 +34,29 @@ pub struct PixelBuffer {
     pub unknown: u32,
 }
 
+#[repr(C, packed(1))]
+#[derive(Debug)]
+pub struct MouseState {
+    pub unknown1: u32,
+    pub unknown2: u32,
+    pub unknown3: u32,
+    pub unknown4: u32,
+    pub left_pressed: BOOL,
+    pub right_pressed: BOOL,
+    pub middle_pressed: BOOL,
+    pub double_clicked: u8,
+    pub unknown5: u16,
+    pub last_clicked: u32,
+    pub unknown6: u32,
+    pub unknown7: u32,
+    pub pos_x: i32,
+    pub pos_y: i32,
+    pub left_down: BOOL,
+    pub right_down: BOOL,
+    pub middle_down: BOOL,
+    pub some_flag: u32,
+}
+
 type InitDrawModeFunc =
     unsafe extern "cdecl" fn(i32, i32, *mut PixelBuffer, i32, i32, BOOL) -> BOOL;
 static INIT_DRAW_MODE_HOOK: RwLock<Option<GenericDetour<InitDrawModeFunc>>> = RwLock::new(None);
@@ -43,6 +66,9 @@ static mut ADJUST_WINDOW_SIZE_HOOK: Option<GenericDetour<AdjustWindowSizeFunc>> 
 
 type ToggleFullscreenFunc = unsafe extern "stdcall" fn();
 static mut TOGGLE_FULLSCREEN_HOOK: Option<GenericDetour<ToggleFullscreenFunc>> = None;
+
+type ReadMouseStateFunc = unsafe extern "fastcall" fn(*mut MouseState);
+static mut READ_MOUSE_STATE_HOOK: Option<GenericDetour<ReadMouseStateFunc>> = None;
 
 // Draw Mode Functions
 type GdiBeginFunc = unsafe extern "stdcall" fn(*mut PixelBuffer, i32, i32) -> i32;
@@ -112,6 +138,11 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
         TOGGLE_FULLSCREEN_HOOK = {
             let target: ToggleFullscreenFunc = std::mem::transmute(base_address + 0x00011071);
             Some(hook_function(target, toggle_fullscreen)?)
+        };
+
+        READ_MOUSE_STATE_HOOK = {
+            let target: ReadMouseStateFunc = std::mem::transmute(base_address + 0x0003aac5);
+            Some(hook_function(target, read_mouse_state)?)
         };
 
         GDI_BEGIN_HOOK = {
@@ -200,6 +231,117 @@ pub unsafe extern "cdecl" fn adjust_window_size(_draw_mode_ext: *mut c_void) {
 
 pub unsafe extern "stdcall" fn toggle_fullscreen() {
     tracing::trace!("ToggleFullscreen called");
+}
+
+/// translates the cursor position from the client window to the shell's coordinate system
+fn cursor_window_to_shell(x: i32, y: i32, window_width: i32, window_height: i32) -> (i32, i32) {
+    const SHELL_LOGICAL_WIDTH: f32 = 640.;
+    const SHELL_LOGICAL_HEIGHT: f32 = 480.;
+
+    let aspect_ratio = 4.0 / 3.0;
+    let mut shell_width = window_width as f32;
+    let mut shell_height = window_height as f32;
+    if shell_width / shell_height > aspect_ratio {
+        shell_width = shell_height * aspect_ratio;
+    } else {
+        shell_height = shell_width / aspect_ratio;
+    }
+
+    let shell_x = (x as f32 - (window_width as f32 - shell_width) / 2.0)
+        / (shell_width as f32 / SHELL_LOGICAL_WIDTH);
+    let shell_y = (y as f32 - (window_height as f32 - shell_height) / 2.0)
+        / (shell_height as f32 / SHELL_LOGICAL_HEIGHT);
+
+    (shell_x as i32, shell_y as i32)
+}
+
+pub unsafe extern "fastcall" fn read_mouse_state(mouse_state: *mut MouseState) {
+    tracing::trace!("ReadMouseState called");
+
+    let state = unsafe { mouse_state.as_mut().expect("mouse_state to not be null") };
+
+    let left_down_previous = state.left_down;
+    let right_down_previous = state.right_down;
+    let middle_down_previous = state.middle_down;
+
+    let mut cursor_pos = POINT { x: 0, y: 0 };
+    if let Err(e) = unsafe { GetCursorPos(&mut cursor_pos) } {
+        tracing::error!("GetCursorPos failed: {:?}", e);
+        return;
+    }
+
+    let _ = unsafe { ScreenToClient(*G_WINDOW, &mut cursor_pos) };
+    let mut cursor_inside_window = true;
+    if cursor_pos.x < 0 || cursor_pos.x >= unsafe { WINDOW_WIDTH } {
+        cursor_inside_window = false;
+    } else if cursor_pos.y < 0 || cursor_pos.y >= unsafe { WINDOW_HEIGHT } {
+        cursor_inside_window = false;
+    }
+
+    if !cursor_inside_window {
+        return;
+    }
+
+    let mut left_down_current = BOOL(0);
+    let mut right_down_current = BOOL(0);
+    let mut middle_down_current = BOOL(0);
+
+    if state.some_flag != 0 {
+        (state.pos_x, state.pos_y) = cursor_window_to_shell(
+            cursor_pos.x,
+            cursor_pos.y,
+            unsafe { WINDOW_WIDTH },
+            unsafe { WINDOW_HEIGHT },
+        );
+
+        let key_state = unsafe { GetAsyncKeyState(VK_LBUTTON.0 as i32) as u16 };
+        if (key_state & 0x8000) != 0 {
+            state.left_down = BOOL(1);
+            left_down_current = BOOL(1);
+        } else {
+            state.left_down = BOOL(0);
+        }
+        let key_state = unsafe { GetAsyncKeyState(VK_RBUTTON.0 as i32) as u16 };
+        if (key_state & 0x8000) != 0 {
+            state.right_down = BOOL(1);
+            right_down_current = BOOL(1);
+        } else {
+            state.right_down = BOOL(0);
+        }
+        let key_state = unsafe { GetAsyncKeyState(VK_MBUTTON.0 as i32) as u16 };
+        if (key_state & 0x8000) != 0 {
+            state.middle_down = BOOL(1);
+            middle_down_current = BOOL(1);
+        } else {
+            state.middle_down = BOOL(0);
+        }
+    }
+
+    if left_down_current == BOOL(1) && left_down_previous == BOOL(0) {
+        state.left_pressed = BOOL(1);
+    } else {
+        state.left_pressed = BOOL(0);
+    }
+    if right_down_current == BOOL(1) && right_down_previous == BOOL(0) {
+        state.right_pressed = BOOL(1);
+    } else {
+        state.right_pressed = BOOL(0);
+    }
+    if middle_down_current == BOOL(1) && middle_down_previous == BOOL(0) {
+        state.middle_pressed = BOOL(1);
+    } else {
+        state.middle_pressed = BOOL(0);
+    }
+
+    state.double_clicked = 0;
+    if left_down_current == BOOL(1) && left_down_previous == BOOL(0) {
+        let current_time = unsafe { timeGetTime() };
+        if current_time - state.last_clicked < 201 {
+            state.double_clicked = 1;
+        } else {
+            state.last_clicked = unsafe { timeGetTime() };
+        }
+    }
 }
 
 pub unsafe extern "stdcall" fn begin(
@@ -291,28 +433,28 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
     let width = unsafe { (**G_CURRENT_PIXEL_BUFFER).width } + 1;
     let height = unsafe { (**G_CURRENT_PIXEL_BUFFER).height };
 
-        if width <= 0 || height <= 0 {
-            tracing::warn!(
-                "GdiBlitFlip called with invalid dimensions: {}x{}",
-                width,
-                height
-            );
-            return 0;
-        }
+    if width <= 0 || height <= 0 {
+        tracing::warn!(
+            "GdiBlitFlip called with invalid dimensions: {}x{}",
+            width,
+            height
+        );
+        return 0;
+    }
 
     let bits_to_blit = unsafe { *G_BITS_TO_BLIT };
     let pixel_slice =
         unsafe { std::slice::from_raw_parts(bits_to_blit, (width * height) as usize) };
 
-        let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-        if let Some(ref mut draw_mode) = *custom_draw_mode {
-            draw_mode.draw(
-                pixel_slice,
-                width as usize,
-                height as usize,
+    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
+    if let Some(ref mut draw_mode) = *custom_draw_mode {
+        draw_mode.draw(
+            pixel_slice,
+            width as usize,
+            height as usize,
             unsafe { WINDOW_WIDTH },
             unsafe { WINDOW_HEIGHT },
-            );
+        );
     }
 
     tracing::trace!("GdiBlitFlip finished");
