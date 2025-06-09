@@ -124,7 +124,7 @@ fn create_window(width: i32, height: i32) -> Result<(HWND, HINSTANCE)> {
             let display_width = GetSystemMetrics(SM_CXSCREEN);
             let display_height = GetSystemMetrics(SM_CYSCREEN);
             if width < display_width || height < display_height {
-                let style = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+                let style = WS_OVERLAPPEDWINDOW;
                 AdjustWindowRect(&mut window_rect, style, false)?;
                 window_rect.right -= window_rect.left;
                 window_rect.bottom -= window_rect.top;
