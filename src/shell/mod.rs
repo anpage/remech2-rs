@@ -348,8 +348,6 @@ impl Shell {
                     }
                 }
             }
-
-            dbg!(&(*G_MECH_VARIANT_FILENAMES));
         }
     }
 
