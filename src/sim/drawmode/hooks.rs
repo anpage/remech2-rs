@@ -170,30 +170,6 @@ pub unsafe extern "stdcall" fn begin(
         (*pixel_buffer).height = height;
         (*pixel_buffer).bitmap_info = G_GDI_BLIT_BITMAP_INFO;
 
-        let desktop_width = GetSystemMetrics(SM_CXSCREEN);
-        let desktop_height = GetSystemMetrics(SM_CYSCREEN);
-
-        let style = WS_OVERLAPPEDWINDOW;
-
-        let mut rect = RECT {
-            left: 0,
-            top: 0,
-            right: WINDOW_WIDTH,
-            bottom: WINDOW_HEIGHT,
-        };
-
-        let _ = AdjustWindowRect(&mut rect, style, false);
-
-        let _ = SetWindowPos(
-            *G_GAME_WINDOW,
-            Some(HWND_TOP),
-            (desktop_width - (rect.right - rect.left)) / 2,
-            (desktop_height - (rect.bottom - rect.top)) / 2,
-            rect.right - rect.left,
-            rect.bottom - rect.top,
-            SWP_FRAMECHANGED | SWP_NOZORDER,
-        );
-
         let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
         *custom_draw_mode = CustomDrawMode::new(*G_GAME_WINDOW, WINDOW_WIDTH, WINDOW_HEIGHT).ok();
 
