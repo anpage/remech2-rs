@@ -91,7 +91,7 @@ static RESOLUTION_LABEL_HOOK: RwLock<Option<GenericDetour<ResolutionLabelFunc>>>
     RwLock::new(None);
 
 type ResolutionToggleFunc = unsafe extern "cdecl" fn(*mut SomeSettingsStruct);
-static RESOLTUTION_TOGGLE_HOOK: RwLock<Option<GenericDetour<ResolutionToggleFunc>>> =
+static RESOLUTION_TOGGLE_HOOK: RwLock<Option<GenericDetour<ResolutionToggleFunc>>> =
     RwLock::new(None);
 
 type SomeSettingsWeirdFunc =
@@ -201,7 +201,7 @@ impl Shell {
                 Some(hook_function(resolution_label, Self::resolution_label)?)
             };
 
-            *RESOLTUTION_TOGGLE_HOOK.write().unwrap() = {
+            *RESOLUTION_TOGGLE_HOOK.write().unwrap() = {
                 let resolution_toggle: ResolutionToggleFunc =
                     std::mem::transmute(base_address + 0x00043703);
                 Some(hook_function(resolution_toggle, Self::resolution_toggle)?)
@@ -478,7 +478,7 @@ impl Drop for Shell {
             LOAD_MECH_VARIANT_LIST_HOOK.write().unwrap().take();
             GET_DB_ITEM_LZ_HOOK.write().unwrap().take();
             RESOLUTION_LABEL_HOOK.write().unwrap().take();
-            RESOLTUTION_TOGGLE_HOOK.write().unwrap().take();
+            RESOLUTION_TOGGLE_HOOK.write().unwrap().take();
             audio::unhook_functions();
             drawmode::unhook_functions();
             self.ail.unhook();
