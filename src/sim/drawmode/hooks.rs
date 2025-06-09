@@ -7,9 +7,8 @@ use windows::Win32::{
     Graphics::Gdi::BITMAPINFO,
     System::Memory::{HEAP_FLAGS, HeapAlloc, HeapFree},
     UI::WindowsAndMessaging::{
-        AdjustWindowRect, GWL_STYLE, GetSystemMetrics, HWND_TOP, SM_CXSCREEN, SM_CYSCREEN,
-        SWP_FRAMECHANGED, SWP_NOZORDER, SetWindowLongA, SetWindowPos, WS_CAPTION, WS_GROUP,
-        WS_MAXIMIZEBOX, WS_SIZEBOX, WS_SYSMENU,
+        AdjustWindowRect, GetSystemMetrics, HWND_TOP, SM_CXSCREEN, SM_CYSCREEN, SWP_FRAMECHANGED,
+        SWP_NOZORDER, SetWindowPos, WS_OVERLAPPEDWINDOW,
     },
 };
 
@@ -27,6 +26,9 @@ pub struct PixelBuffer {
     pub bitmap_info: *mut BITMAPINFO,
     pub unknown: u32,
 }
+
+type AdjustWindowSizeFunc = unsafe extern "cdecl" fn(*mut c_void);
+static mut ADJUST_WINDOW_SIZE_HOOK: Option<GenericDetour<AdjustWindowSizeFunc>> = None;
 
 // Draw Mode Functions
 type GdiBeginFunc = unsafe extern "stdcall" fn(*mut PixelBuffer, i32, i32) -> i32;
@@ -83,6 +85,11 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
         G_PALETTE_COLORS = (base_address + 0x000b1788) as *mut [PaletteColor; 256];
         G_PALETTE_COLORS_PRE_BRIGHTNESS = (base_address + 0x000e96a0) as *mut [PaletteColor; 256];
 
+        ADJUST_WINDOW_SIZE_HOOK = {
+            let target: AdjustWindowSizeFunc = std::mem::transmute(base_address + 0x0007762f);
+            Some(hook_function(target, adjust_window_size)?)
+        };
+
         GDI_BEGIN_HOOK = {
             let target: GdiBeginFunc = std::mem::transmute(base_address + 0x0006de70);
             Some(hook_function(target, begin)?)
@@ -135,8 +142,9 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
 
 static CUSTOM_DRAW_MODE: RwLock<Option<CustomDrawMode>> = RwLock::new(None);
 
-// pub const WINDOW_WIDTH: i32 = 1920;
-// pub const WINDOW_HEIGHT: i32 = 1080;
+pub unsafe extern "cdecl" fn adjust_window_size(_draw_mode_ext: *mut c_void) {
+    tracing::trace!("AdjustWindowSize called");
+}
 
 pub unsafe extern "stdcall" fn begin(
     pixel_buffer: *mut PixelBuffer,
@@ -165,10 +173,7 @@ pub unsafe extern "stdcall" fn begin(
         let desktop_width = GetSystemMetrics(SM_CXSCREEN);
         let desktop_height = GetSystemMetrics(SM_CYSCREEN);
 
-        // let style = WS_CAPTION | WS_SYSMENU | WS_GROUP;
-        let style = WS_CAPTION | WS_GROUP | WS_SYSMENU | WS_SIZEBOX | WS_MAXIMIZEBOX;
-
-        let _ = SetWindowLongA(*G_GAME_WINDOW, GWL_STYLE, style.0 as i32);
+        let style = WS_OVERLAPPEDWINDOW;
 
         let mut rect = RECT {
             left: 0,
@@ -178,7 +183,6 @@ pub unsafe extern "stdcall" fn begin(
         };
 
         let _ = AdjustWindowRect(&mut rect, style, false);
-        // let _ = AdjustWindowRect(&mut rect, WINDOW_STYLE(0x80000000), false);
 
         let _ = SetWindowPos(
             *G_GAME_WINDOW,
@@ -213,6 +217,8 @@ pub unsafe extern "stdcall" fn end() -> i32 {
         }
 
         (**G_CURRENT_PIXEL_BUFFER).data = std::ptr::null_mut();
+
+        CUSTOM_DRAW_MODE.write().unwrap().take();
     }
 
     0
@@ -358,6 +364,7 @@ pub unsafe extern "stdcall" fn swap_buffers() -> i32 {
 
 pub unsafe fn unhook_functions() {
     unsafe {
+        ADJUST_WINDOW_SIZE_HOOK = None;
         GDI_BEGIN_HOOK = None;
         GDI_END_HOOK = None;
         GDI_BLIT_FLIP_HOOK = None;
@@ -367,5 +374,6 @@ pub unsafe fn unhook_functions() {
         GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK = None;
         // GDI_BLEND_PALETTES_HOOK = None;
         GDI_SWAP_BUFFERS_HOOK = None;
+        CUSTOM_DRAW_MODE.write().unwrap().take();
     }
 }

@@ -9,7 +9,6 @@ use retour::{GenericDetour, RawDetour};
 use windows::{
     Win32::{
         Foundation::{FreeLibrary, HMODULE, HWND, WIN32_ERROR},
-        Graphics::Gdi::{BitBlt, HDC, SRCCOPY},
         Security::SECURITY_ATTRIBUTES,
         System::{
             LibraryLoader::{GetModuleHandleA, GetProcAddress, LoadLibraryA},
@@ -31,7 +30,7 @@ use windows_sys::Win32::{
 use crate::{
     WindowProc,
     ail::Ail,
-    common::{HeapFreeFunc, debug_log, fake_heap_free},
+    common::{HeapFreeFunc, SetMenuFunc, debug_log, fake_heap_free, fake_set_menu},
     hooker::hook_function,
 };
 
@@ -105,12 +104,6 @@ static mut G_MECH_VARIANT_FILENAME: *mut c_char = std::ptr::null_mut();
 static mut G_MECH_VARIANT_FILENAMES: *mut [[c_char; 13]; 200] = std::ptr::null_mut();
 static mut G_PRJ_OBJECT: *mut c_void = std::ptr::null_mut();
 
-static mut G_HDC: *mut HDC = std::ptr::null_mut();
-static mut G_HDC_SRC: *mut HDC = std::ptr::null_mut();
-static mut G_BIT_BLIT_WIDTH: *mut i32 = std::ptr::null_mut();
-static mut G_BIT_BLIT_HEIGHT: *mut i32 = std::ptr::null_mut();
-static mut G_BIT_BLIT_RESULT: *mut i32 = std::ptr::null_mut();
-
 static mut G_DATABASE_MW2: *mut *mut c_void = std::ptr::null_mut();
 
 static mut G_SOME_SETTINGS_WEIRD_GLOBAL: *mut *mut c_void = std::ptr::null_mut();
@@ -147,6 +140,9 @@ impl Shell {
             let create_file_thunk = (smack_base_address + 0x0000e150) as *mut CreateFileFunc;
             *create_file_thunk = Self::create_file;
 
+            // let set_menu_thunk = (base_address + 0x000995bc) as *mut SetMenuFunc;
+            // *set_menu_thunk = fake_set_menu;
+
             *G_LOAD_FILE_FROM_PRJ.write().unwrap() = Some(std::mem::transmute::<
                 usize,
                 LoadFileFromPrjFunc,
@@ -160,12 +156,6 @@ impl Shell {
             G_MECH_VARIANT_FILENAME = (base_address + 0x0007a800) as *mut c_char;
             G_MECH_VARIANT_FILENAMES = (base_address + 0x00079d80) as *mut [[c_char; 13]; 200];
             G_PRJ_OBJECT = (base_address + 0x00071230) as *mut c_void;
-
-            G_HDC = (base_address + 0x00066df8) as *mut HDC;
-            G_HDC_SRC = (base_address + 0x00067204) as *mut HDC;
-            G_BIT_BLIT_WIDTH = (base_address + 0x00096e8c) as *mut i32;
-            G_BIT_BLIT_HEIGHT = (base_address + 0x00096e90) as *mut i32;
-            G_BIT_BLIT_RESULT = (base_address + 0x000965f4) as *mut i32;
 
             G_DATABASE_MW2 = (base_address + 0x0007122c) as *mut *mut c_void;
 

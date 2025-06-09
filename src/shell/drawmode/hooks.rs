@@ -4,13 +4,16 @@ use anyhow::Result;
 use retour::GenericDetour;
 use windows::{
     Win32::{
-        Foundation::{HANDLE, HWND, RECT},
-        Graphics::Gdi::BITMAPINFO,
+        Foundation::{HANDLE, HWND, POINT, RECT},
+        Graphics::Gdi::{BITMAPINFO, ScreenToClient},
+        Media::timeGetTime,
         System::Memory::{HEAP_FLAGS, HeapAlloc, HeapFree},
-        UI::WindowsAndMessaging::{
-            AdjustWindowRect, GWL_STYLE, GetSystemMetrics, HWND_TOP, SM_CXSCREEN, SM_CYSCREEN,
-            SWP_FRAMECHANGED, SWP_NOZORDER, SetWindowLongA, SetWindowPos, WS_CAPTION, WS_GROUP,
-            WS_MAXIMIZEBOX, WS_SIZEBOX, WS_SYSMENU,
+        UI::{
+            Input::KeyboardAndMouse::{GetAsyncKeyState, VK_LBUTTON, VK_MBUTTON, VK_RBUTTON},
+            WindowsAndMessaging::{
+                AdjustWindowRect, GetCursorPos, GetSystemMetrics, HWND_TOP, SM_CXSCREEN,
+                SM_CYSCREEN, SWP_FRAMECHANGED, SWP_NOZORDER, SetWindowPos, WS_OVERLAPPEDWINDOW,
+            },
         },
     },
     core::BOOL,
@@ -34,6 +37,12 @@ pub struct PixelBuffer {
 type InitDrawModeFunc =
     unsafe extern "cdecl" fn(i32, i32, *mut PixelBuffer, i32, i32, BOOL) -> BOOL;
 static INIT_DRAW_MODE_HOOK: RwLock<Option<GenericDetour<InitDrawModeFunc>>> = RwLock::new(None);
+
+type AdjustWindowSizeFunc = unsafe extern "cdecl" fn(*mut c_void);
+static mut ADJUST_WINDOW_SIZE_HOOK: Option<GenericDetour<AdjustWindowSizeFunc>> = None;
+
+type ToggleFullscreenFunc = unsafe extern "stdcall" fn();
+static mut TOGGLE_FULLSCREEN_HOOK: Option<GenericDetour<ToggleFullscreenFunc>> = None;
 
 // Draw Mode Functions
 type GdiBeginFunc = unsafe extern "stdcall" fn(*mut PixelBuffer, i32, i32) -> i32;
@@ -93,6 +102,16 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
         *INIT_DRAW_MODE_HOOK.write().unwrap() = {
             let target: InitDrawModeFunc = std::mem::transmute(base_address + 0x00010a30);
             Some(hook_function(target, init_draw_mode)?)
+        };
+
+        ADJUST_WINDOW_SIZE_HOOK = {
+            let target: AdjustWindowSizeFunc = std::mem::transmute(base_address + 0x000112da);
+            Some(hook_function(target, adjust_window_size)?)
+        };
+
+        TOGGLE_FULLSCREEN_HOOK = {
+            let target: ToggleFullscreenFunc = std::mem::transmute(base_address + 0x00011071);
+            Some(hook_function(target, toggle_fullscreen)?)
         };
 
         GDI_BEGIN_HOOK = {
@@ -175,6 +194,14 @@ pub unsafe extern "cdecl" fn init_draw_mode(
     }
 }
 
+pub unsafe extern "cdecl" fn adjust_window_size(_draw_mode_ext: *mut c_void) {
+    tracing::trace!("AdjustWindowSize called");
+}
+
+pub unsafe extern "stdcall" fn toggle_fullscreen() {
+    tracing::trace!("ToggleFullscreen called");
+}
+
 pub unsafe extern "stdcall" fn begin(
     pixel_buffer: *mut PixelBuffer,
     width: i32,
@@ -207,10 +234,7 @@ pub unsafe extern "stdcall" fn begin(
         let desktop_width = GetSystemMetrics(SM_CXSCREEN);
         let desktop_height = GetSystemMetrics(SM_CYSCREEN);
 
-        // let style = WS_CAPTION | WS_SYSMENU | WS_GROUP;
-        let style = WS_CAPTION | WS_GROUP | WS_SYSMENU | WS_SIZEBOX | WS_MAXIMIZEBOX;
-
-        let _ = SetWindowLongA(*G_WINDOW, GWL_STYLE, style.0 as i32);
+        let style = WS_OVERLAPPEDWINDOW;
 
         let mut rect = RECT {
             left: 0,
@@ -220,7 +244,6 @@ pub unsafe extern "stdcall" fn begin(
         };
 
         let _ = AdjustWindowRect(&mut rect, style, false);
-        // let _ = AdjustWindowRect(&mut rect, WINDOW_STYLE(0x80000000), false);
 
         let _ = SetWindowPos(
             *G_WINDOW,
@@ -255,6 +278,8 @@ pub unsafe extern "stdcall" fn end() -> i32 {
         }
 
         (**G_CURRENT_PIXEL_BUFFER).data = std::ptr::null_mut();
+
+        CUSTOM_DRAW_MODE.write().unwrap().take();
     }
 
     0
@@ -290,6 +315,8 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
             );
     }
 
+    tracing::trace!("GdiBlitFlip finished");
+
     0
 }
 
@@ -323,7 +350,8 @@ pub unsafe extern "stdcall" fn stretch_blit(
         x_src2,
         y_src_inverted
     );
-    0
+
+    unsafe { blit_flip() }
 }
 
 pub unsafe extern "stdcall" fn set_palette(
@@ -407,6 +435,9 @@ pub unsafe extern "stdcall" fn swap_buffers() -> i32 {
 pub unsafe fn unhook_functions() {
     unsafe {
         *INIT_DRAW_MODE_HOOK.write().unwrap() = None;
+        ADJUST_WINDOW_SIZE_HOOK = None;
+        TOGGLE_FULLSCREEN_HOOK = None;
+        READ_MOUSE_STATE_HOOK = None;
         GDI_BEGIN_HOOK = None;
         GDI_END_HOOK = None;
         GDI_BLIT_FLIP_HOOK = None;
@@ -416,5 +447,6 @@ pub unsafe fn unhook_functions() {
         GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK = None;
         // GDI_BLEND_PALETTES_HOOK = None;
         GDI_SWAP_BUFFERS_HOOK = None;
+        CUSTOM_DRAW_MODE.write().unwrap().take();
     }
 }
