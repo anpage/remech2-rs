@@ -82,9 +82,6 @@ type LoadMechVariantListFunc = unsafe extern "cdecl" fn(*const c_char);
 static LOAD_MECH_VARIANT_LIST_HOOK: RwLock<Option<GenericDetour<LoadMechVariantListFunc>>> =
     RwLock::new(None);
 
-type CallsBitBlitFunc = unsafe extern "stdcall" fn() -> i32;
-static CALLS_BIT_BLIT_HOOK: RwLock<Option<GenericDetour<CallsBitBlitFunc>>> = RwLock::new(None);
-
 type GetDbItemLzFunc =
     unsafe extern "fastcall" fn(*mut c_void, *mut c_void, i32, *mut *mut u8, *mut usize) -> i32;
 static GET_DB_ITEM_LZ_HOOK: RwLock<Option<GenericDetour<GetDbItemLzFunc>>> = RwLock::new(None);
@@ -190,12 +187,6 @@ impl Shell {
                     load_mech_variant_list,
                     Self::load_mech_variant_list,
                 )?)
-            };
-
-            *CALLS_BIT_BLIT_HOOK.write().unwrap() = {
-                let calls_bit_blit: CallsBitBlitFunc =
-                    std::mem::transmute(base_address + 0x00030ef9);
-                Some(hook_function(calls_bit_blit, Self::calls_bit_blit)?)
             };
 
             *GET_DB_ITEM_LZ_HOOK.write().unwrap() = {
@@ -372,32 +363,6 @@ impl Shell {
         }
     }
 
-    /// This is the function that the shell uses to draw to the window with GDI's BitBlt function.
-    /// The original function incorrectly failed if the call didn't return the number of lines blitted.
-    unsafe extern "stdcall" fn calls_bit_blit() -> i32 {
-        unsafe {
-            let result = BitBlt(
-                *G_HDC,
-                0,
-                0,
-                *G_BIT_BLIT_WIDTH,
-                *G_BIT_BLIT_HEIGHT,
-                Some(*G_HDC_SRC),
-                0,
-                0,
-                SRCCOPY,
-            );
-
-            if let Ok(()) = result {
-                *G_BIT_BLIT_RESULT = 1;
-                0
-            } else {
-                *G_BIT_BLIT_RESULT = 0;
-                -1
-            }
-        }
-    }
-
     unsafe extern "system" fn reg_create_key_ex_a(
         h_key: HKEY,
         sub_key: PCSTR,
@@ -511,7 +476,6 @@ impl Drop for Shell {
             crate::SHELL_WINDOW_PROC = None;
             DEBUG_LOG_HOOK.write().unwrap().take();
             LOAD_MECH_VARIANT_LIST_HOOK.write().unwrap().take();
-            CALLS_BIT_BLIT_HOOK.write().unwrap().take();
             GET_DB_ITEM_LZ_HOOK.write().unwrap().take();
             RESOLUTION_LABEL_HOOK.write().unwrap().take();
             RESOLTUTION_TOGGLE_HOOK.write().unwrap().take();
