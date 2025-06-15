@@ -1,3 +1,4 @@
+use std::ffi::c_char;
 use std::{ffi::c_void, sync::RwLock};
 
 use anyhow::Result;
@@ -18,13 +19,14 @@ use windows::{
 
 use crate::{
     WINDOW_HEIGHT, WINDOW_WIDTH,
-    custom_drawmode::{CustomDrawMode, PaletteColor},
     hooker::hook_function,
+    shell::drawmode::custom_drawmode::{CustomDrawMode, PaletteColor},
 };
 
 #[repr(C, packed(2))]
+#[derive(Debug)]
 pub struct PixelBuffer {
-    pub data: *mut c_void,
+    pub data: *mut u8,
     pub width: i32,
     pub height: i32,
     pub bitmap_info: *mut BITMAPINFO,
@@ -54,6 +56,52 @@ pub struct MouseState {
     pub some_flag: u32,
 }
 
+pub struct OverlayMouseState {
+    pub pos_x: i32,
+    pub pos_y: i32,
+    pub left_down: bool,
+    pub right_down: bool,
+    pub middle_down: bool,
+}
+
+#[repr(C, packed(1))]
+pub struct VideoDriver {
+    pub unknown: [u8; 22],
+    pub collection_1: *mut *mut c_void,
+    pub collection_2: *mut *mut c_void,
+    pub should_set_palette: i32,
+    pub set_palette_unknown: u32,
+    pub unknown2: [u8; 8],
+    pub pixel_buffer: PixelBuffer,
+    pub back_buffer: *mut u8,
+    pub pix_buf_width: i32,
+    pub pix_buf_height: i32,
+    pub unknown3: [u8; 8],
+    pub p_pixel_buffer: *mut PixelBuffer,
+    pub other_x2: i32,
+    pub other_y2: i32,
+    pub other_x1: i32,
+    pub other_y1: i32,
+    pub p_back_buffer: *mut *mut c_char,
+    pub initial_other_x2: i32,
+    pub initial_other_y2: i32,
+    pub pixel_buffer_width: i32,
+    pub pixel_buffer_height: i32,
+    pub other_p_pixel_buffer: *mut *mut PixelBuffer,
+    pub x1: i32,
+    pub y1: i32,
+    pub x2: i32,
+    pub y2: i32,
+    pub palette: [PaletteColor; 256],
+    pub width: i32,
+    pub height: i32,
+    pub width_minus_one: i32,
+    pub height_minus_one: i32,
+    pub unknown4: u32,
+    pub unknown5: u32,
+    pub use_back_buffer: i32,
+}
+
 type InitDrawModeFunc =
     unsafe extern "cdecl" fn(i32, i32, *mut PixelBuffer, i32, i32, BOOL) -> BOOL;
 static INIT_DRAW_MODE_HOOK: RwLock<Option<GenericDetour<InitDrawModeFunc>>> = RwLock::new(None);
@@ -66,6 +114,9 @@ static mut TOGGLE_FULLSCREEN_HOOK: Option<GenericDetour<ToggleFullscreenFunc>> =
 
 type ReadMouseStateFunc = unsafe extern "fastcall" fn(*mut MouseState);
 static mut READ_MOUSE_STATE_HOOK: Option<GenericDetour<ReadMouseStateFunc>> = None;
+
+type VideoDriverDrawShellFunc = unsafe extern "fastcall" fn(*mut VideoDriver);
+static mut VIDEO_DRIVER_DRAW_SHELL_HOOK: Option<GenericDetour<VideoDriverDrawShellFunc>> = None;
 
 // Draw Mode Functions
 type GdiBeginFunc = unsafe extern "stdcall" fn(*mut PixelBuffer, i32, i32) -> i32;
@@ -84,7 +135,7 @@ type GdiStretchBlitFunc = unsafe extern "stdcall" fn(i32, i32, i32, i32) -> i32;
 static mut GDI_STRETCH_BLIT_HOOK: Option<GenericDetour<GdiStretchBlitFunc>> = None;
 
 // Draw Mode Extension Functions
-type GdiSetPaletteFunc = unsafe extern "stdcall" fn(i32, i32, *const PaletteColor) -> i32;
+type GdiSetPaletteFunc = unsafe extern "cdecl" fn(i32, i32, *const PaletteColor, u32) -> i32;
 static mut GDI_SET_PALETTE_HOOK: Option<GenericDetour<GdiSetPaletteFunc>> = None;
 
 type GdiSetPaletteWithBrightnessFunc = unsafe extern "stdcall" fn(*mut c_void) -> i32;
@@ -98,6 +149,13 @@ static mut GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK: Option<
 type GdiSwapBuffersFunc = unsafe extern "stdcall" fn() -> i32;
 static mut GDI_SWAP_BUFFERS_HOOK: Option<GenericDetour<GdiSwapBuffersFunc>> = None;
 
+type SomePaletteFunc = unsafe extern "stdcall" fn();
+static mut SOME_PALETTE_FUNC: Option<SomePaletteFunc> = None;
+
+type VideoDriverActivateFramebufferFunc = unsafe extern "thiscall" fn(*mut VideoDriver);
+static mut VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER_FUNC: Option<VideoDriverActivateFramebufferFunc> =
+    None;
+
 static mut G_CURRENT_DRAW_MODE_EXTENSION: *mut *mut c_void = std::ptr::null_mut();
 static mut G_PRIMARY_HEAP: *mut HANDLE = std::ptr::null_mut();
 static mut G_BITS_TO_BLIT: *mut *mut u8 = std::ptr::null_mut();
@@ -108,9 +166,16 @@ static mut G_DISPLAY_BRIGHTNESS: *mut u32 = std::ptr::null_mut();
 static mut G_GAMMA_TABLE: *mut [u8; 1024] = std::ptr::null_mut();
 static mut G_PALETTE_COLORS: *mut [PaletteColor; 256] = std::ptr::null_mut();
 static mut G_PALETTE_COLORS_PRE_BRIGHTNESS: *mut [PaletteColor; 256] = std::ptr::null_mut();
+static mut G_CURRENT_MOUSE_STATE: *mut *mut MouseState = std::ptr::null_mut();
+static mut G_VIDEO_DRIVER: *mut *mut VideoDriver = std::ptr::null_mut();
+static mut G_SOME_PALETTE_FLAG: *mut u32 = std::ptr::null_mut();
 
 pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
     unsafe {
+        SOME_PALETTE_FUNC = Some(std::mem::transmute(base_address + 0x00005eea));
+        VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER_FUNC =
+            Some(std::mem::transmute(base_address + 0x000077ea));
+
         G_CURRENT_DRAW_MODE_EXTENSION = (base_address + 0x00062cc8) as *mut *mut c_void;
         G_PRIMARY_HEAP = (base_address + 0x0006a9f4) as *mut HANDLE;
         G_BITS_TO_BLIT = (base_address + 0x00062fe0) as *mut *mut u8;
@@ -121,6 +186,9 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
         G_GAMMA_TABLE = (base_address + 0x000961d0) as *mut [u8; 1024];
         G_PALETTE_COLORS = (base_address + 0x00062ce0) as *mut [PaletteColor; 256];
         G_PALETTE_COLORS_PRE_BRIGHTNESS = (base_address + 0x00095ed0) as *mut [PaletteColor; 256];
+        G_CURRENT_MOUSE_STATE = (base_address + 0x00071204) as *mut *mut MouseState;
+        G_VIDEO_DRIVER = (base_address + 0x00071208) as *mut *mut VideoDriver;
+        G_SOME_PALETTE_FLAG = (base_address + 0x0005c2a4) as *mut u32;
 
         *INIT_DRAW_MODE_HOOK.write().unwrap() = {
             let target: InitDrawModeFunc = std::mem::transmute(base_address + 0x00010a30);
@@ -140,6 +208,11 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
         READ_MOUSE_STATE_HOOK = {
             let target: ReadMouseStateFunc = std::mem::transmute(base_address + 0x0003aac5);
             Some(hook_function(target, read_mouse_state)?)
+        };
+
+        VIDEO_DRIVER_DRAW_SHELL_HOOK = {
+            let target: VideoDriverDrawShellFunc = std::mem::transmute(base_address + 0x00006502);
+            Some(hook_function(target, video_driver_draw_shell)?)
         };
 
         GDI_BEGIN_HOOK = {
@@ -252,26 +325,46 @@ fn cursor_window_to_shell(x: i32, y: i32, window_width: i32, window_height: i32)
     (shell_x as i32, shell_y as i32)
 }
 
-pub unsafe extern "fastcall" fn read_mouse_state(mouse_state: *mut MouseState) {
-    tracing::trace!("ReadMouseState called");
+pub unsafe fn get_mouse_state() -> OverlayMouseState {
+    let mut cursor_pos = POINT { x: 0, y: 0 };
+    let _ = unsafe { GetCursorPos(&mut cursor_pos).unwrap() };
+    let _ = unsafe { ScreenToClient(*G_WINDOW, &mut cursor_pos) };
 
-    let state = unsafe { mouse_state.as_mut().expect("mouse_state to not be null") };
+    let key_state = unsafe { GetAsyncKeyState(VK_LBUTTON.0 as i32) as u16 };
+    let left_down = (key_state & 0x8000) != 0;
+
+    let key_state = unsafe { GetAsyncKeyState(VK_RBUTTON.0 as i32) as u16 };
+    let right_down = (key_state & 0x8000) != 0;
+
+    let key_state = unsafe { GetAsyncKeyState(VK_MBUTTON.0 as i32) as u16 };
+    let middle_down = (key_state & 0x8000) != 0;
+
+    OverlayMouseState {
+        pos_x: cursor_pos.x,
+        pos_y: cursor_pos.y,
+        left_down,
+        right_down,
+        middle_down,
+    }
+}
+
+pub fn update_global_mouse_state(mouse_state: &OverlayMouseState) {
+    let global_mouse_state = unsafe { G_CURRENT_MOUSE_STATE as *mut *mut MouseState };
+
+    let state = unsafe {
+        (*global_mouse_state)
+            .as_mut()
+            .expect("global_mouse_state to not be null")
+    };
 
     let left_down_previous = state.left_down;
     let right_down_previous = state.right_down;
     let middle_down_previous = state.middle_down;
 
-    let mut cursor_pos = POINT { x: 0, y: 0 };
-    if let Err(e) = unsafe { GetCursorPos(&mut cursor_pos) } {
-        tracing::error!("GetCursorPos failed: {:?}", e);
-        return;
-    }
-
-    let _ = unsafe { ScreenToClient(*G_WINDOW, &mut cursor_pos) };
     let mut cursor_inside_window = true;
-    if cursor_pos.x < 0 || cursor_pos.x >= unsafe { WINDOW_WIDTH } {
+    if mouse_state.pos_x < 0 || mouse_state.pos_x >= unsafe { WINDOW_WIDTH } {
         cursor_inside_window = false;
-    } else if cursor_pos.y < 0 || cursor_pos.y >= unsafe { WINDOW_HEIGHT } {
+    } else if mouse_state.pos_y < 0 || mouse_state.pos_y >= unsafe { WINDOW_HEIGHT } {
         cursor_inside_window = false;
     }
 
@@ -285,28 +378,25 @@ pub unsafe extern "fastcall" fn read_mouse_state(mouse_state: *mut MouseState) {
 
     if state.some_flag != 0 {
         (state.pos_x, state.pos_y) = cursor_window_to_shell(
-            cursor_pos.x,
-            cursor_pos.y,
+            mouse_state.pos_x,
+            mouse_state.pos_y,
             unsafe { WINDOW_WIDTH },
             unsafe { WINDOW_HEIGHT },
         );
 
-        let key_state = unsafe { GetAsyncKeyState(VK_LBUTTON.0 as i32) as u16 };
-        if (key_state & 0x8000) != 0 {
+        if mouse_state.left_down {
             state.left_down = BOOL(1);
             left_down_current = BOOL(1);
         } else {
             state.left_down = BOOL(0);
         }
-        let key_state = unsafe { GetAsyncKeyState(VK_RBUTTON.0 as i32) as u16 };
-        if (key_state & 0x8000) != 0 {
+        if mouse_state.right_down {
             state.right_down = BOOL(1);
             right_down_current = BOOL(1);
         } else {
             state.right_down = BOOL(0);
         }
-        let key_state = unsafe { GetAsyncKeyState(VK_MBUTTON.0 as i32) as u16 };
-        if (key_state & 0x8000) != 0 {
+        if mouse_state.middle_down {
             state.middle_down = BOOL(1);
             middle_down_current = BOOL(1);
         } else {
@@ -341,6 +431,102 @@ pub unsafe extern "fastcall" fn read_mouse_state(mouse_state: *mut MouseState) {
     }
 }
 
+/// Disable the game's own mouse state reading function to handle mouse state after egui draws.
+/// This allows us to intercept mouse events and update the global mouse state selectively.
+pub unsafe extern "fastcall" fn read_mouse_state(_mouse_state: *mut MouseState) {
+    tracing::trace!("ReadMouseState called");
+}
+
+/// This function is called to draw the shell, as opposed to FMVs.
+/// It's been modified to always draw the entire screen so that egui gets rendered every frame.
+pub unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) {
+    tracing::debug!("VideoDriverDrawShell called");
+
+    unsafe {
+        if (*this).x1 < (*this).other_x2 {
+            (*this).x1 = (*this).other_x2;
+        }
+        if (*this).y1 < (*this).other_y2 {
+            (*this).y1 = (*this).other_y2;
+        }
+        if (*this).x2 > (*this).other_x1 {
+            (*this).x2 = (*this).other_x1;
+        }
+        if (*this).y2 > (*this).other_y1 {
+            (*this).y2 = (*this).other_y1;
+        }
+
+        if (*this).should_set_palette == 0 {
+            bit_blt_rect((*this).x1, (*this).y1, (*this).x2, (*this).y2);
+        } else {
+            if (*this).set_palette_unknown == 0 {
+                if (*this).use_back_buffer == 0 {
+                    set_palette(
+                        0,
+                        256,
+                        &(*this).palette as *const _,
+                        (*this).set_palette_unknown,
+                    );
+                    bit_blt_rect(
+                        (*this).other_x2,
+                        (*this).other_y2,
+                        (*this).other_x1,
+                        (*this).other_y1,
+                    );
+                } else {
+                    (*this).back_buffer.copy_from(
+                        (*this).pixel_buffer.data,
+                        ((*this).width * (*this).height) as usize,
+                    );
+                    VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER_FUNC.unwrap()(this);
+                    set_palette(
+                        0,
+                        256,
+                        &(*this).palette as *const _,
+                        (*this).set_palette_unknown,
+                    );
+                    (*this).pixel_buffer.data.copy_from(
+                        (*this).back_buffer,
+                        ((*this).width * (*this).height) as usize,
+                    );
+                    blit_flip();
+                    (*this).use_back_buffer = 0;
+                }
+            } else if (*G_SOME_PALETTE_FLAG) == 0 {
+                VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER_FUNC.unwrap()(this);
+                set_palette(
+                    0,
+                    256,
+                    &(*this).palette as *const _,
+                    (*this).set_palette_unknown,
+                );
+                (*this).pixel_buffer.data.copy_from(
+                    (*this).back_buffer,
+                    ((*this).width * (*this).height) as usize,
+                );
+                blit_flip();
+            } else {
+                SOME_PALETTE_FUNC.unwrap()();
+                blit_flip();
+                set_palette(
+                    0,
+                    256,
+                    &(*this).palette as *const _,
+                    (*this).set_palette_unknown,
+                );
+                blit_flip();
+                (*G_SOME_PALETTE_FLAG) = 0;
+            }
+            (*this).should_set_palette = 0;
+        }
+
+        (*this).x1 = (*this).other_x1;
+        (*this).y1 = (*this).other_y1;
+        (*this).x2 = (*this).other_x2;
+        (*this).y2 = (*this).other_y2;
+    }
+}
+
 pub unsafe extern "stdcall" fn begin(
     pixel_buffer: *mut PixelBuffer,
     width: i32,
@@ -358,13 +544,13 @@ pub unsafe extern "stdcall" fn begin(
             *G_PRIMARY_HEAP,
             HEAP_FLAGS(9),
             (height * width * 2) as usize,
-        );
+        ) as *mut u8;
         (*pixel_buffer).data = pixel_buf;
         if pixel_buf.is_null() {
             return 2;
         }
 
-        G_BITS_TO_BLIT.write_volatile(pixel_buf as *mut u8);
+        G_BITS_TO_BLIT.write_volatile(pixel_buf);
 
         (*pixel_buffer).width = width;
         (*pixel_buffer).height = height;
@@ -441,7 +627,7 @@ pub unsafe extern "stdcall" fn bit_blt_rect(
     x2_dest: i32,
     y2_dest: i32,
 ) -> i32 {
-    tracing::trace!(
+    tracing::debug!(
         "GdiBitBltRect called with x_dest: {}, y_dest: {}, x2_dest: {}, y2_dest: {}",
         x_dest,
         y_dest,
@@ -490,10 +676,11 @@ pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) 
     0
 }
 
-pub unsafe extern "stdcall" fn set_palette(
+pub unsafe extern "cdecl" fn set_palette(
     start: i32,
     count: i32,
     palette_colors: *const PaletteColor,
+    _unknown: u32,
 ) -> i32 {
     tracing::trace!(
         "GdiSetPalette called with start: {}, count: {}, palette_colors: {:?}",
@@ -552,7 +739,7 @@ pub unsafe extern "stdcall" fn set_palette_with_brightness(palette_data: *mut c_
     }
 
     unsafe {
-        (**G_CURRENT_PIXEL_BUFFER).data = *G_BITS_TO_BLIT as *mut c_void;
+        (**G_CURRENT_PIXEL_BUFFER).data = *G_BITS_TO_BLIT;
     }
 
     0
@@ -562,7 +749,7 @@ pub unsafe extern "stdcall" fn swap_buffers() -> i32 {
     tracing::trace!("GdiSwapBuffers called");
 
     unsafe {
-        (**G_CURRENT_PIXEL_BUFFER).data = *G_BITS_TO_BLIT as *mut c_void;
+        (**G_CURRENT_PIXEL_BUFFER).data = *G_BITS_TO_BLIT;
     }
 
     0
@@ -574,6 +761,7 @@ pub unsafe fn unhook_functions() {
         ADJUST_WINDOW_SIZE_HOOK = None;
         TOGGLE_FULLSCREEN_HOOK = None;
         READ_MOUSE_STATE_HOOK = None;
+        VIDEO_DRIVER_DRAW_SHELL_HOOK = None;
         GDI_BEGIN_HOOK = None;
         GDI_END_HOOK = None;
         GDI_BLIT_FLIP_HOOK = None;

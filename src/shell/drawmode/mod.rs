@@ -1,5 +1,6 @@
 use anyhow::Result;
 
+mod custom_drawmode;
 mod hooks;
 
 pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
