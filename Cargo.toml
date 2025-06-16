@@ -5,8 +5,8 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.98"
-egui = { git = "https://github.com/emilk/egui/", rev = "12cd35f48c01b77a208a8ec45edb7a14bac7c9f9" }
-egui-wgpu = { git = "https://github.com/emilk/egui/", rev = "12cd35f48c01b77a208a8ec45edb7a14bac7c9f9" }
+egui = { git = "https://github.com/emilk/egui/", rev = "4c04996a72e6dbff67db5cca6bee3682952dfc3e" }
+egui-wgpu = { git = "https://github.com/emilk/egui/", rev = "4c04996a72e6dbff67db5cca6bee3682952dfc3e" }
 futures-util = { version = "0.3.28", default-features = false }
 hex-literal = "1.0.0"
 pollster = "0.4.0"

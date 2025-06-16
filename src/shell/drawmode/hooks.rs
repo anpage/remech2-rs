@@ -17,6 +17,7 @@ use windows::{
     core::BOOL,
 };
 
+use crate::shell::drawmode::custom_drawmode::OverlayMouseState;
 use crate::{
     WINDOW_HEIGHT, WINDOW_WIDTH,
     hooker::hook_function,
@@ -54,14 +55,6 @@ pub struct MouseState {
     pub right_down: BOOL,
     pub middle_down: BOOL,
     pub some_flag: u32,
-}
-
-pub struct OverlayMouseState {
-    pub pos_x: i32,
-    pub pos_y: i32,
-    pub left_down: bool,
-    pub right_down: bool,
-    pub middle_down: bool,
 }
 
 #[repr(C, packed(1))]

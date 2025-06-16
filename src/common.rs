@@ -2,7 +2,7 @@ use std::ffi::{CStr, c_char, c_int, c_void};
 
 use windows::{
     Win32::{
-        Foundation::{HANDLE, TRUE},
+        Foundation::{HANDLE, HWND, TRUE},
         System::Memory::HEAP_FLAGS,
     },
     core::BOOL,
@@ -18,6 +18,11 @@ pub unsafe extern "system" fn fake_heap_free(
     _dw_flags: HEAP_FLAGS,
     _lp_mem: *const c_void,
 ) -> BOOL {
+    TRUE
+}
+
+pub type SetMenuFunc = unsafe extern "system" fn(HWND, *mut c_void) -> BOOL;
+pub unsafe extern "system" fn fake_set_menu(_hwnd: HWND, _h_menu: *mut c_void) -> BOOL {
     TRUE
 }
 

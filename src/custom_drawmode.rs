@@ -61,7 +61,7 @@ impl CustomDrawMode {
             pollster::block_on(painter.set_window(ctx.viewport_id(), Some(&window)))?;
         }
 
-        let image = Arc::new(ColorImage::new([1024, 768], Color32::BLACK));
+        let image = Arc::new(ColorImage::new([1, 1], vec![Color32::BLACK]));
         let texture = ctx.load_texture("sim-framebuffer", Arc::clone(&image), Default::default());
 
         Ok(Self {
@@ -110,10 +110,7 @@ impl CustomDrawMode {
 
         // Update the texture with the current pixel data
         self.texture.set(
-            ColorImage {
-                size: [game_width, game_height],
-                pixels,
-            },
+            ColorImage::new([game_width, game_height], pixels),
             Default::default(),
         );
 

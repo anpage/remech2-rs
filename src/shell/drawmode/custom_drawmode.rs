@@ -27,6 +27,41 @@ pub struct PaletteColor {
     pub blue: u8,
 }
 
+#[derive(Clone, Debug)]
+pub struct OverlayMouseState {
+    pub pos_x: i32,
+    pub pos_y: i32,
+    pub left_down: bool,
+    pub right_down: bool,
+    pub middle_down: bool,
+}
+
+impl Default for OverlayMouseState {
+    fn default() -> Self {
+        Self {
+            pos_x: 0,
+            pos_y: 0,
+            left_down: false,
+            right_down: false,
+            middle_down: false,
+        }
+    }
+}
+
+struct UiState {
+    shell_hovered: bool,
+    menu_visible: bool,
+}
+
+impl Default for UiState {
+    fn default() -> Self {
+        Self {
+            shell_hovered: false,
+            menu_visible: false,
+        }
+    }
+}
+
 pub struct CustomDrawMode {
     ctx: Context,
     painter: Painter,
@@ -34,6 +69,8 @@ pub struct CustomDrawMode {
     palette: [[u8; 3]; 256],
     cached_width: i32,
     cached_height: i32,
+    cached_mouse_state: OverlayMouseState,
+    ui_state: UiState,
 }
 
 impl CustomDrawMode {
@@ -64,7 +101,7 @@ impl CustomDrawMode {
             pollster::block_on(painter.set_window(ctx.viewport_id(), Some(&window)))?;
         }
 
-        let image = Arc::new(ColorImage::new([1024, 768], Color32::BLACK));
+        let image = Arc::new(ColorImage::new([1, 1], vec![Color32::BLACK]));
         let texture = ctx.load_texture("sim-framebuffer", Arc::clone(&image), Default::default());
 
         Ok(Self {
@@ -74,6 +111,8 @@ impl CustomDrawMode {
             palette: [[0; 3]; 256],
             cached_width: window_width,
             cached_height: window_height,
+            cached_mouse_state: Default::default(),
+            ui_state: Default::default(),
         })
     }
 
@@ -95,7 +134,7 @@ impl CustomDrawMode {
             self.cached_height = window_height;
         }
 
-        let raw_input = RawInput {
+        let mut raw_input = RawInput {
             screen_rect: Some(egui::Rect {
                 min: egui::pos2(0.0, 0.0),
                 max: egui::pos2(window_width as f32, window_height as f32),
@@ -103,10 +142,75 @@ impl CustomDrawMode {
             ..Default::default()
         };
 
-        unsafe {
-            let mouse_state = get_mouse_state();
-            update_global_mouse_state(&mouse_state);
+        let mouse_state = unsafe { get_mouse_state() };
+
+        // Mouse moved
+        if mouse_state.pos_x != self.cached_mouse_state.pos_x
+            || mouse_state.pos_y != self.cached_mouse_state.pos_y
+        {
+            raw_input.events.push(egui::Event::PointerMoved(egui::pos2(
+                mouse_state.pos_x as f32,
+                mouse_state.pos_y as f32,
+            )));
         }
+
+        // Mouse button pressed
+        if mouse_state.left_down && !self.cached_mouse_state.left_down {
+            raw_input.events.push(egui::Event::PointerButton {
+                pos: egui::pos2(mouse_state.pos_x as f32, mouse_state.pos_y as f32),
+                button: egui::PointerButton::Primary,
+                pressed: true,
+                modifiers: Default::default(),
+            });
+        }
+
+        if mouse_state.right_down && !self.cached_mouse_state.right_down {
+            raw_input.events.push(egui::Event::PointerButton {
+                pos: egui::pos2(mouse_state.pos_x as f32, mouse_state.pos_y as f32),
+                button: egui::PointerButton::Secondary,
+                pressed: true,
+                modifiers: Default::default(),
+            });
+        }
+
+        if mouse_state.middle_down && !self.cached_mouse_state.middle_down {
+            raw_input.events.push(egui::Event::PointerButton {
+                pos: egui::pos2(mouse_state.pos_x as f32, mouse_state.pos_y as f32),
+                button: egui::PointerButton::Middle,
+                pressed: true,
+                modifiers: Default::default(),
+            });
+        }
+
+        // Mouse button released
+        if !mouse_state.left_down && self.cached_mouse_state.left_down {
+            raw_input.events.push(egui::Event::PointerButton {
+                pos: egui::pos2(mouse_state.pos_x as f32, mouse_state.pos_y as f32),
+                button: egui::PointerButton::Primary,
+                pressed: false,
+                modifiers: Default::default(),
+            });
+        }
+
+        if !mouse_state.right_down && self.cached_mouse_state.right_down {
+            raw_input.events.push(egui::Event::PointerButton {
+                pos: egui::pos2(mouse_state.pos_x as f32, mouse_state.pos_y as f32),
+                button: egui::PointerButton::Secondary,
+                pressed: false,
+                modifiers: Default::default(),
+            });
+        }
+
+        if !mouse_state.middle_down && self.cached_mouse_state.middle_down {
+            raw_input.events.push(egui::Event::PointerButton {
+                pos: egui::pos2(mouse_state.pos_x as f32, mouse_state.pos_y as f32),
+                button: egui::PointerButton::Middle,
+                pressed: false,
+                modifiers: Default::default(),
+            });
+        }
+
+        self.cached_mouse_state = mouse_state;
 
         let pixels = pixel_data
             .iter()
@@ -118,10 +222,7 @@ impl CustomDrawMode {
 
         // Update the texture with the current pixel data
         self.texture.set(
-            ColorImage {
-                size: [game_width, game_height],
-                pixels,
-            },
+            ColorImage::new([game_width, game_height], pixels),
             Default::default(),
         );
 
@@ -135,8 +236,12 @@ impl CustomDrawMode {
             height = width / aspect_ratio;
         }
 
+        let mut menu_open = false;
+
         let full_output = self.ctx.run(raw_input, |ctx| {
-            egui::CentralPanel::default()
+            // ctx.set_pixels_per_point(2.0);
+
+            let response = egui::CentralPanel::default()
                 .frame(Frame {
                     inner_margin: Margin::same(0),
                     ..Default::default()
@@ -148,11 +253,126 @@ impl CustomDrawMode {
                             ui.image(SizedTexture {
                                 id: self.texture.id(),
                                 size: Vec2::new(width, height),
-                            });
+                            })
                         },
                     )
+                })
+                .response;
+
+            if response.contains_pointer() {
+                self.ui_state.shell_hovered = true;
+            } else {
+                self.ui_state.shell_hovered = false;
+            }
+
+            if self.ui_state.menu_visible {
+                egui::Window::new("top_menu")
+                    .resizable(false)
+                    .collapsible(false)
+                    .movable(false)
+                    .title_bar(false)
+                    .fixed_pos(egui::pos2(window_width as f32 / 2. - width / 2., 0.0))
+                    .fixed_size(Vec2::new(width, 30.0))
+                    .show(ctx, |ui| {
+                        egui::containers::menu::Bar::new().ui(ui, |ui| {
+                            if ui
+                                .menu_button("Clan", |ui| {
+                                    if ui.button("New Allegiance").clicked() {}
+                                    if ui.button("Hall of Honor").clicked() {}
+                                    if ui.button("QuickTips").clicked() {}
+                                    ui.separator();
+                                    if ui.button("Flee to Desktop").clicked() {}
+                                })
+                                .inner
+                                .is_some()
+                            {
+                                menu_open = true;
+                            }
+                            if ui
+                                .menu_button("Options", |ui| {
+                                    if ui.button("Combat Variables...").clicked() {}
+                                    if ui.button("Cockpit Controls...").clicked() {}
+                                    if ui.button("Movie Playback...").clicked() {}
+                                })
+                                .inner
+                                .is_some()
+                            {
+                                menu_open = true;
+                            }
+                            if ui
+                                .menu_button("Help", |ui| {
+                                    if ui.button("Codes and Procedures").clicked() {}
+                                    if ui.button("Technical Help").clicked() {}
+                                    ui.separator();
+                                    if ui.button("The Keshik").clicked() {}
+                                })
+                                .inner
+                                .is_some()
+                            {
+                                menu_open = true;
+                            }
+                        });
+                    });
+            };
+            egui::Window::new("Mouse State")
+                .resizable(false)
+                .collapsible(false)
+                .default_pos(egui::pos2(10.0, 10.0))
+                .show(ctx, |ui| {
+                    ui.label(format!(
+                        "Mouse Position: ({}, {})",
+                        self.cached_mouse_state.pos_x, self.cached_mouse_state.pos_y
+                    ));
+                    ui.label(format!(
+                        "Window Size: {}x{}",
+                        self.cached_width, self.cached_height
+                    ));
+                    ui.label(format!(
+                        "Hovering Shell: {}",
+                        if self.ui_state.shell_hovered {
+                            "Yes"
+                        } else {
+                            "No"
+                        }
+                    ));
+                    ui.label(format!(
+                        "Left Button: {}",
+                        if self.cached_mouse_state.left_down {
+                            "Down"
+                        } else {
+                            "Up"
+                        }
+                    ));
+                    ui.label(format!(
+                        "Right Button: {}",
+                        if self.cached_mouse_state.right_down {
+                            "Down"
+                        } else {
+                            "Up"
+                        }
+                    ));
+                    ui.label(format!(
+                        "Middle Button: {}",
+                        if self.cached_mouse_state.middle_down {
+                            "Down"
+                        } else {
+                            "Up"
+                        }
+                    ));
                 });
         });
+
+        if self.cached_mouse_state.pos_y < 30 {
+            self.ui_state.menu_visible = true;
+        } else if self.ui_state.shell_hovered && !menu_open {
+            self.ui_state.menu_visible = false;
+        }
+
+        if self.ui_state.shell_hovered {
+            update_global_mouse_state(&self.cached_mouse_state);
+        } else {
+            update_global_mouse_state(&OverlayMouseState::default());
+        }
 
         let clipped_primitives = self
             .ctx

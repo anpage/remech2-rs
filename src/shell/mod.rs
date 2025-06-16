@@ -140,8 +140,8 @@ impl Shell {
             let create_file_thunk = (smack_base_address + 0x0000e150) as *mut CreateFileFunc;
             *create_file_thunk = Self::create_file;
 
-            // let set_menu_thunk = (base_address + 0x000995bc) as *mut SetMenuFunc;
-            // *set_menu_thunk = fake_set_menu;
+            let set_menu_thunk = (base_address + 0x000995bc) as *mut SetMenuFunc;
+            *set_menu_thunk = fake_set_menu;
 
             *G_LOAD_FILE_FROM_PRJ.write().unwrap() = Some(std::mem::transmute::<
                 usize,
