@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
-use egui::{Context, Frame, Margin, Order, TextureId, Vec2, load::SizedTexture};
+use egui::{
+    Context, FontFamily, Frame, Margin, Order, TextStyle, TextureId, Vec2, load::SizedTexture,
+};
 use windows::Win32::UI::WindowsAndMessaging::{CURSORINFO, GetCursorInfo, ShowCursor};
 
 use crate::shell::drawmode::{
@@ -51,10 +53,13 @@ impl OverlayUi {
         let aspect_ratio = const { 4.0 / 3.0 };
         let mut width = window_width;
         let mut height = window_height;
+        let scale_factor;
         if width / height > aspect_ratio {
             width = height * aspect_ratio;
+            scale_factor = width / 640.0;
         } else {
             height = width / aspect_ratio;
+            scale_factor = height / 480.0;
         }
 
         let mut menu_open = false;
@@ -96,8 +101,19 @@ impl OverlayUi {
                 .fixed_size(Vec2::new(width, 30.0))
                 .show(ctx, |ui| {
                     egui::containers::menu::Bar::new().ui(ui, |ui| {
+                        let set_font_size = |ui: &mut egui::Ui| {
+                            let style = ui.style_mut();
+                            style.text_styles.insert(
+                                egui::TextStyle::Button,
+                                egui::FontId::new(scale_factor * 10.0, FontFamily::Proportional),
+                            );
+                            style.override_text_style = Some(TextStyle::Button);
+                            style.spacing.item_spacing = Vec2::new(8.0 * scale_factor, 0.0);
+                        };
+                        set_font_size(ui);
                         if ui
                             .menu_button("CLAN", |ui| {
+                                set_font_size(ui);
                                 if ui.button("NEW ALLEGIANCE").clicked() {}
                                 if ui.button("HALL OF HONOR").clicked() {}
                                 if ui.button("QUICKTIPS").clicked() {}
@@ -111,6 +127,7 @@ impl OverlayUi {
                         }
                         if ui
                             .menu_button("OPTIONS", |ui| {
+                                set_font_size(ui);
                                 if ui.button("COMBAT VARIABLES...").clicked() {}
                                 if ui.button("COCKPIT CONTROLS...").clicked() {}
                                 if ui.button("MOVIE PLAYBACK...").clicked() {}
@@ -122,6 +139,7 @@ impl OverlayUi {
                         }
                         if ui
                             .menu_button("HELP", |ui| {
+                                set_font_size(ui);
                                 if ui.button("CODES AND PROCEDURES").clicked() {}
                                 if ui.button("TECHNICAL HELP").clicked() {}
                                 ui.separator();
@@ -194,7 +212,7 @@ impl OverlayUi {
             }
         }
 
-        if mouse_state.pos_y < 30 {
+        if (mouse_state.pos_y as f32) < 30.0 * scale_factor {
             self.menu_visible = true;
         } else if self.shell_hovered && !menu_open {
             self.menu_visible = false;
