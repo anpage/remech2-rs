@@ -197,8 +197,8 @@ impl OverlayUi {
             if self.show_cursor {
                 let cursor_pos_1 = egui::pos2(mouse_state.pos_x as f32, mouse_state.pos_y as f32);
                 let cursor_pos_2 = egui::pos2(
-                    mouse_state.pos_x as f32 + 29.0,
-                    mouse_state.pos_y as f32 + 25.0,
+                    mouse_state.pos_x as f32 + 29.0 * 1.5,
+                    mouse_state.pos_y as f32 + 25.0 * 1.5,
                 );
                 let cursor_image = egui::Shape::image(
                     cursor_texture,
