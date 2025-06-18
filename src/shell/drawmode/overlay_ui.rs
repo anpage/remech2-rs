@@ -1,4 +1,6 @@
-use egui::{Context, Frame, LayerId, Margin, Order, TextureId, Vec2, load::SizedTexture};
+use std::sync::Arc;
+
+use egui::{Context, Frame, Margin, Order, TextureId, Vec2, load::SizedTexture};
 use windows::Win32::UI::WindowsAndMessaging::{CURSORINFO, GetCursorInfo, ShowCursor};
 
 use crate::shell::drawmode::{
@@ -9,14 +11,28 @@ pub struct OverlayUi {
     shell_hovered: bool,
     menu_visible: bool,
     show_cursor: bool,
+    fonts: egui::FontDefinitions,
 }
 
 impl Default for OverlayUi {
     fn default() -> Self {
+        // Load the Science Gothic font
+        let font = egui::FontData::from_static(include_bytes!("../../../ScienceGothic-Md.ttf"));
+        let mut fonts = egui::FontDefinitions::default();
+        fonts
+            .font_data
+            .insert("ScienceGothic".to_owned(), Arc::new(font));
+        fonts
+            .families
+            .get_mut(&egui::FontFamily::Proportional)
+            .unwrap()
+            .insert(0, "ScienceGothic".to_owned());
+
         Self {
             shell_hovered: false,
             menu_visible: false,
             show_cursor: true,
+            fonts,
         }
     }
 }
@@ -44,6 +60,7 @@ impl OverlayUi {
         let mut menu_open = false;
 
         // ctx.set_pixels_per_point(2.0);
+        ctx.set_fonts(self.fonts.clone());
 
         let response = egui::CentralPanel::default()
             .frame(Frame {
@@ -80,12 +97,12 @@ impl OverlayUi {
                 .show(ctx, |ui| {
                     egui::containers::menu::Bar::new().ui(ui, |ui| {
                         if ui
-                            .menu_button("Clan", |ui| {
-                                if ui.button("New Allegiance").clicked() {}
-                                if ui.button("Hall of Honor").clicked() {}
-                                if ui.button("QuickTips").clicked() {}
+                            .menu_button("CLAN", |ui| {
+                                if ui.button("NEW ALLEGIANCE").clicked() {}
+                                if ui.button("HALL OF HONOR").clicked() {}
+                                if ui.button("QUICKTIPS").clicked() {}
                                 ui.separator();
-                                if ui.button("Flee to Desktop").clicked() {}
+                                if ui.button("FLEE TO DESKTOP").clicked() {}
                             })
                             .inner
                             .is_some()
@@ -93,10 +110,10 @@ impl OverlayUi {
                             menu_open = true;
                         }
                         if ui
-                            .menu_button("Options", |ui| {
-                                if ui.button("Combat Variables...").clicked() {}
-                                if ui.button("Cockpit Controls...").clicked() {}
-                                if ui.button("Movie Playback...").clicked() {}
+                            .menu_button("OPTIONS", |ui| {
+                                if ui.button("COMBAT VARIABLES...").clicked() {}
+                                if ui.button("COCKPIT CONTROLS...").clicked() {}
+                                if ui.button("MOVIE PLAYBACK...").clicked() {}
                             })
                             .inner
                             .is_some()
@@ -104,11 +121,11 @@ impl OverlayUi {
                             menu_open = true;
                         }
                         if ui
-                            .menu_button("Help", |ui| {
-                                if ui.button("Codes and Procedures").clicked() {}
-                                if ui.button("Technical Help").clicked() {}
+                            .menu_button("HELP", |ui| {
+                                if ui.button("CODES AND PROCEDURES").clicked() {}
+                                if ui.button("TECHNICAL HELP").clicked() {}
                                 ui.separator();
-                                if ui.button("The Keshik").clicked() {}
+                                if ui.button("THE KESHIK").clicked() {}
                             })
                             .inner
                             .is_some()
@@ -118,34 +135,34 @@ impl OverlayUi {
                     });
                 });
         };
-        egui::Window::new("Mouse State")
+        egui::Window::new("DEBUG")
             .resizable(false)
             .collapsible(false)
             .default_pos(egui::pos2(10.0, 10.0))
             .show(ctx, |ui| {
                 ui.label(format!(
-                    "Mouse Position: ({}, {})",
+                    "MOUSE POSITION: ({}, {})",
                     mouse_state.pos_x, mouse_state.pos_y
                 ));
-                ui.label(format!("Window Size: {}x{}", window_width, window_height));
+                ui.label(format!("WINDOW SIZE: {}x{}", window_width, window_height));
                 ui.label(format!(
-                    "Hovering Shell: {}",
-                    if self.shell_hovered { "Yes" } else { "No" }
+                    "HOVERING SHELL: {}",
+                    if self.shell_hovered { "YES" } else { "NO" }
                 ));
                 ui.label(format!(
-                    "Left Button: {}",
-                    if mouse_state.left_down { "Down" } else { "Up" }
+                    "LEFT BUTTON: {}",
+                    if mouse_state.left_down { "DOWN" } else { "UP" }
                 ));
                 ui.label(format!(
-                    "Right Button: {}",
-                    if mouse_state.right_down { "Down" } else { "Up" }
+                    "RIGHT BUTTON: {}",
+                    if mouse_state.right_down { "DOWN" } else { "UP" }
                 ));
                 ui.label(format!(
-                    "Middle Button: {}",
+                    "MIDDLE BUTTON: {}",
                     if mouse_state.middle_down {
-                        "Down"
+                        "DOWN"
                     } else {
-                        "Up"
+                        "UP"
                     }
                 ));
             });
