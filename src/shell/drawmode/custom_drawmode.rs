@@ -142,9 +142,8 @@ impl CustomDrawMode {
                         // Write same pixel value multiple times
                         if let Some(&pixel_value) = data.next() {
                             let count = (ctrl >> 1) as usize;
-                            let color_value = PALETTE.get(pixel_value as usize).copied().unwrap();
-                            let color = Color32::from_rgb(color_value, color_value, color_value);
-
+                            let color_value = PALETTE.get(pixel_value as usize).unwrap();
+                            let color = Color32::from_gray(*color_value);
                             (0..count).for_each(|_| {
                                 if position >= NUM_PIXELS {
                                     return;
@@ -161,10 +160,11 @@ impl CustomDrawMode {
                             if position >= NUM_PIXELS {
                                 return;
                             }
-                            let color_value = PALETTE.get(pixel_value as usize).copied().unwrap();
-                            pixels[position] =
-                                Color32::from_rgb(color_value, color_value, color_value);
-                            position += 1;
+                            let color_value = PALETTE.get(pixel_value as usize).unwrap();
+                            pixels[position] = Color32::from_gray(*color_value);
+                            if position % WIDTH < WIDTH - 1 {
+                                position += 1;
+                            }
                         });
                     }
                 }
