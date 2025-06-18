@@ -153,37 +153,39 @@ impl OverlayUi {
                     });
                 });
         };
-        egui::Window::new("DEBUG")
-            .resizable(false)
-            .collapsible(false)
-            .default_pos(egui::pos2(10.0, 10.0))
-            .show(ctx, |ui| {
-                ui.label(format!(
-                    "MOUSE POSITION: ({}, {})",
-                    mouse_state.pos_x, mouse_state.pos_y
-                ));
-                ui.label(format!("WINDOW SIZE: {}x{}", window_width, window_height));
-                ui.label(format!(
-                    "HOVERING SHELL: {}",
-                    if self.shell_hovered { "YES" } else { "NO" }
-                ));
-                ui.label(format!(
-                    "LEFT BUTTON: {}",
-                    if mouse_state.left_down { "DOWN" } else { "UP" }
-                ));
-                ui.label(format!(
-                    "RIGHT BUTTON: {}",
-                    if mouse_state.right_down { "DOWN" } else { "UP" }
-                ));
-                ui.label(format!(
-                    "MIDDLE BUTTON: {}",
-                    if mouse_state.middle_down {
-                        "DOWN"
-                    } else {
-                        "UP"
-                    }
-                ));
-            });
+        if false {
+            egui::Window::new("DEBUG")
+                .resizable(false)
+                .collapsible(false)
+                .default_pos(egui::pos2(10.0, 10.0))
+                .show(ctx, |ui| {
+                    ui.label(format!(
+                        "MOUSE POSITION: ({}, {})",
+                        mouse_state.pos_x, mouse_state.pos_y
+                    ));
+                    ui.label(format!("WINDOW SIZE: {}x{}", window_width, window_height));
+                    ui.label(format!(
+                        "HOVERING SHELL: {}",
+                        if self.shell_hovered { "YES" } else { "NO" }
+                    ));
+                    ui.label(format!(
+                        "LEFT BUTTON: {}",
+                        if mouse_state.left_down { "DOWN" } else { "UP" }
+                    ));
+                    ui.label(format!(
+                        "RIGHT BUTTON: {}",
+                        if mouse_state.right_down { "DOWN" } else { "UP" }
+                    ));
+                    ui.label(format!(
+                        "MIDDLE BUTTON: {}",
+                        if mouse_state.middle_down {
+                            "DOWN"
+                        } else {
+                            "UP"
+                        }
+                    ));
+                });
+        }
 
         if let Some(cursor_texture) = cursor_texture {
             let mut cursor_info = CURSORINFO::default();
