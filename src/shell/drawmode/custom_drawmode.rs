@@ -4,9 +4,7 @@ use std::{
 };
 
 use anyhow::Result;
-use egui::{
-    Color32, ColorImage, Context, Frame, Margin, RawInput, TextureHandle, Vec2, load::SizedTexture,
-};
+use egui::{Color32, ColorImage, Context, RawInput, TextureHandle};
 use egui_wgpu::{WgpuConfiguration, WgpuSetupCreateNew};
 use wgpu::InstanceDescriptor;
 use windows::Win32::{
@@ -16,7 +14,10 @@ use windows::Win32::{
 
 use crate::{
     launcher::painter::Painter,
-    shell::drawmode::hooks::{get_mouse_state, update_global_mouse_state},
+    shell::drawmode::{
+        hooks::{G_CURSOR_GRAPHIC, get_mouse_state},
+        overlay_ui::OverlayUi,
+    },
 };
 
 #[repr(C)]
@@ -48,29 +49,16 @@ impl Default for OverlayMouseState {
     }
 }
 
-struct UiState {
-    shell_hovered: bool,
-    menu_visible: bool,
-}
-
-impl Default for UiState {
-    fn default() -> Self {
-        Self {
-            shell_hovered: false,
-            menu_visible: false,
-        }
-    }
-}
-
 pub struct CustomDrawMode {
     ctx: Context,
     painter: Painter,
     texture: TextureHandle,
+    cursor_texture: Option<TextureHandle>,
     palette: [[u8; 3]; 256],
     cached_width: i32,
     cached_height: i32,
     cached_mouse_state: OverlayMouseState,
-    ui_state: UiState,
+    overlay_ui: OverlayUi,
 }
 
 impl CustomDrawMode {
@@ -108,12 +96,89 @@ impl CustomDrawMode {
             painter,
             ctx,
             texture,
+            cursor_texture: None,
             palette: [[0; 3]; 256],
             cached_width: window_width,
             cached_height: window_height,
             cached_mouse_state: Default::default(),
-            ui_state: Default::default(),
+            overlay_ui: Default::default(),
         })
+    }
+
+    pub fn load_cursor_texture(&mut self) {
+        if unsafe { G_CURSOR_GRAPHIC.is_null() } {
+            return;
+        }
+
+        let cursor_data = unsafe { **G_CURSOR_GRAPHIC };
+        let cursor_data = &cursor_data[0x28..0x1A7];
+        const WIDTH: usize = 29;
+        const HEIGHT: usize = 25;
+
+        const PALETTE: [u8; 15] = [
+            0, 255, 238, 221, 204, 187, 170, 153, 127, 102, 85, 68, 51, 34, 17,
+        ];
+
+        const NUM_PIXELS: usize = WIDTH * HEIGHT;
+        let mut pixels = vec![Color32::TRANSPARENT; NUM_PIXELS];
+        let mut position = 0usize; // Linear position in the pixel buffer
+        let mut data = cursor_data.iter();
+
+        while position < NUM_PIXELS {
+            if let Some(&ctrl) = data.next() {
+                match ctrl {
+                    0 => {
+                        // Move to next line
+                        let current_y = position / WIDTH;
+                        position = (current_y + 1) * WIDTH;
+                    }
+                    1 => {
+                        // Skip pixels
+                        if let Some(&skip_count) = data.next() {
+                            position = (position + skip_count as usize).min(NUM_PIXELS);
+                        }
+                    }
+                    ctrl if ctrl & 1 == 0 => {
+                        // Write same pixel value multiple times
+                        if let Some(&pixel_value) = data.next() {
+                            let count = (ctrl >> 1) as usize;
+                            let color_value = PALETTE.get(pixel_value as usize).copied().unwrap();
+                            let color = Color32::from_rgb(color_value, color_value, color_value);
+
+                            (0..count).for_each(|_| {
+                                if position >= NUM_PIXELS {
+                                    return;
+                                }
+                                pixels[position] = color;
+                                position += 1;
+                            });
+                        }
+                    }
+                    ctrl => {
+                        // Write multiple different pixel values
+                        let count = (ctrl >> 1) as usize;
+                        data.by_ref().take(count).for_each(|&pixel_value| {
+                            if position >= NUM_PIXELS {
+                                return;
+                            }
+                            let color_value = PALETTE.get(pixel_value as usize).copied().unwrap();
+                            pixels[position] =
+                                Color32::from_rgb(color_value, color_value, color_value);
+                            position += 1;
+                        });
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+
+        let cursor_image = Arc::new(ColorImage::new([WIDTH, HEIGHT], pixels));
+        let cursor_texture =
+            self.ctx
+                .load_texture("cursor", Arc::clone(&cursor_image), Default::default());
+
+        self.cursor_texture = Some(cursor_texture);
     }
 
     pub fn draw(
@@ -124,6 +189,10 @@ impl CustomDrawMode {
         window_width: i32,
         window_height: i32,
     ) {
+        if self.cursor_texture.is_none() {
+            self.load_cursor_texture();
+        }
+
         if self.cached_width != window_width || self.cached_height != window_height {
             self.painter.on_window_resized(
                 self.ctx.viewport_id(),
@@ -226,153 +295,16 @@ impl CustomDrawMode {
             Default::default(),
         );
 
-        // calculate width and height, preserving 4:3 aspect ratio
-        let aspect_ratio = 4.0 / 3.0;
-        let mut width = window_width as f32;
-        let mut height = window_height as f32;
-        if width / height > aspect_ratio {
-            width = height * aspect_ratio;
-        } else {
-            height = width / aspect_ratio;
-        }
-
-        let mut menu_open = false;
-
         let full_output = self.ctx.run(raw_input, |ctx| {
-            // ctx.set_pixels_per_point(2.0);
-
-            let response = egui::CentralPanel::default()
-                .frame(Frame {
-                    inner_margin: Margin::same(0),
-                    ..Default::default()
-                })
-                .show(ctx, |ui| {
-                    ui.with_layout(
-                        egui::Layout::centered_and_justified(egui::Direction::LeftToRight),
-                        |ui| {
-                            ui.image(SizedTexture {
-                                id: self.texture.id(),
-                                size: Vec2::new(width, height),
-                            })
-                        },
-                    )
-                })
-                .response;
-
-            if response.contains_pointer() {
-                self.ui_state.shell_hovered = true;
-            } else {
-                self.ui_state.shell_hovered = false;
-            }
-
-            if self.ui_state.menu_visible {
-                egui::Window::new("top_menu")
-                    .resizable(false)
-                    .collapsible(false)
-                    .movable(false)
-                    .title_bar(false)
-                    .fixed_pos(egui::pos2(window_width as f32 / 2. - width / 2., 0.0))
-                    .fixed_size(Vec2::new(width, 30.0))
-                    .show(ctx, |ui| {
-                        egui::containers::menu::Bar::new().ui(ui, |ui| {
-                            if ui
-                                .menu_button("Clan", |ui| {
-                                    if ui.button("New Allegiance").clicked() {}
-                                    if ui.button("Hall of Honor").clicked() {}
-                                    if ui.button("QuickTips").clicked() {}
-                                    ui.separator();
-                                    if ui.button("Flee to Desktop").clicked() {}
-                                })
-                                .inner
-                                .is_some()
-                            {
-                                menu_open = true;
-                            }
-                            if ui
-                                .menu_button("Options", |ui| {
-                                    if ui.button("Combat Variables...").clicked() {}
-                                    if ui.button("Cockpit Controls...").clicked() {}
-                                    if ui.button("Movie Playback...").clicked() {}
-                                })
-                                .inner
-                                .is_some()
-                            {
-                                menu_open = true;
-                            }
-                            if ui
-                                .menu_button("Help", |ui| {
-                                    if ui.button("Codes and Procedures").clicked() {}
-                                    if ui.button("Technical Help").clicked() {}
-                                    ui.separator();
-                                    if ui.button("The Keshik").clicked() {}
-                                })
-                                .inner
-                                .is_some()
-                            {
-                                menu_open = true;
-                            }
-                        });
-                    });
-            };
-            egui::Window::new("Mouse State")
-                .resizable(false)
-                .collapsible(false)
-                .default_pos(egui::pos2(10.0, 10.0))
-                .show(ctx, |ui| {
-                    ui.label(format!(
-                        "Mouse Position: ({}, {})",
-                        self.cached_mouse_state.pos_x, self.cached_mouse_state.pos_y
-                    ));
-                    ui.label(format!(
-                        "Window Size: {}x{}",
-                        self.cached_width, self.cached_height
-                    ));
-                    ui.label(format!(
-                        "Hovering Shell: {}",
-                        if self.ui_state.shell_hovered {
-                            "Yes"
-                        } else {
-                            "No"
-                        }
-                    ));
-                    ui.label(format!(
-                        "Left Button: {}",
-                        if self.cached_mouse_state.left_down {
-                            "Down"
-                        } else {
-                            "Up"
-                        }
-                    ));
-                    ui.label(format!(
-                        "Right Button: {}",
-                        if self.cached_mouse_state.right_down {
-                            "Down"
-                        } else {
-                            "Up"
-                        }
-                    ));
-                    ui.label(format!(
-                        "Middle Button: {}",
-                        if self.cached_mouse_state.middle_down {
-                            "Down"
-                        } else {
-                            "Up"
-                        }
-                    ));
-                });
+            self.overlay_ui.ui(
+                ctx,
+                self.texture.id(),
+                self.cursor_texture.as_ref().map(|t| t.id()),
+                window_width as f32,
+                window_height as f32,
+                &self.cached_mouse_state,
+            );
         });
-
-        if self.cached_mouse_state.pos_y < 30 {
-            self.ui_state.menu_visible = true;
-        } else if self.ui_state.shell_hovered && !menu_open {
-            self.ui_state.menu_visible = false;
-        }
-
-        if self.ui_state.shell_hovered {
-            update_global_mouse_state(&self.cached_mouse_state);
-        } else {
-            update_global_mouse_state(&OverlayMouseState::default());
-        }
 
         let clipped_primitives = self
             .ctx
@@ -396,5 +328,9 @@ impl CustomDrawMode {
             let color = palette_data[i];
             self.palette[i] = [color.red, color.green, color.blue];
         }
+    }
+
+    pub fn show_cursor(&mut self, show: bool) {
+        self.overlay_ui.show_cursor(show);
     }
 }

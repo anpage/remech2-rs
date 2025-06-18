@@ -17,6 +17,8 @@ use windows::{
     core::BOOL,
 };
 
+const CURSOR_GRAPHIC_SIZE: usize = 423;
+
 use crate::shell::drawmode::custom_drawmode::OverlayMouseState;
 use crate::{
     WINDOW_HEIGHT, WINDOW_WIDTH,
@@ -111,6 +113,8 @@ static mut READ_MOUSE_STATE_HOOK: Option<GenericDetour<ReadMouseStateFunc>> = No
 type VideoDriverDrawShellFunc = unsafe extern "fastcall" fn(*mut VideoDriver);
 static mut VIDEO_DRIVER_DRAW_SHELL_HOOK: Option<GenericDetour<VideoDriverDrawShellFunc>> = None;
 
+type ShowCursorFunc = unsafe extern "stdcall" fn(BOOL) -> i32;
+
 // Draw Mode Functions
 type GdiBeginFunc = unsafe extern "stdcall" fn(*mut PixelBuffer, i32, i32) -> i32;
 static mut GDI_BEGIN_HOOK: Option<GenericDetour<GdiBeginFunc>> = None;
@@ -162,6 +166,7 @@ static mut G_PALETTE_COLORS_PRE_BRIGHTNESS: *mut [PaletteColor; 256] = std::ptr:
 static mut G_CURRENT_MOUSE_STATE: *mut *mut MouseState = std::ptr::null_mut();
 static mut G_VIDEO_DRIVER: *mut *mut VideoDriver = std::ptr::null_mut();
 static mut G_SOME_PALETTE_FLAG: *mut u32 = std::ptr::null_mut();
+pub static mut G_CURSOR_GRAPHIC: *mut *mut [u8; CURSOR_GRAPHIC_SIZE] = std::ptr::null_mut();
 
 pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
     unsafe {
@@ -182,6 +187,7 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
         G_CURRENT_MOUSE_STATE = (base_address + 0x00071204) as *mut *mut MouseState;
         G_VIDEO_DRIVER = (base_address + 0x00071208) as *mut *mut VideoDriver;
         G_SOME_PALETTE_FLAG = (base_address + 0x0005c2a4) as *mut u32;
+        G_CURSOR_GRAPHIC = (base_address + 0x00071200) as *mut *mut [u8; CURSOR_GRAPHIC_SIZE];
 
         *INIT_DRAW_MODE_HOOK.write().unwrap() = {
             let target: InitDrawModeFunc = std::mem::transmute(base_address + 0x00010a30);
@@ -254,6 +260,9 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
             let target: GdiSwapBuffersFunc = std::mem::transmute(base_address + 0x00031948);
             Some(hook_function(target, swap_buffers)?)
         };
+
+        let show_cursor_thunk = (base_address + 0x000995d0) as *mut ShowCursorFunc;
+        *show_cursor_thunk = show_cursor;
     }
     Ok(())
 }
@@ -518,6 +527,17 @@ pub unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) 
         (*this).x2 = (*this).other_x2;
         (*this).y2 = (*this).other_y2;
     }
+}
+
+pub unsafe extern "stdcall" fn show_cursor(show: BOOL) -> i32 {
+    tracing::trace!("ShowCursor called with show: {}", show.0);
+
+    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
+    if let Some(ref mut draw_mode) = *custom_draw_mode {
+        draw_mode.show_cursor(show.0 != 0);
+    }
+
+    if show.0 == 0 { -1 } else { 1 }
 }
 
 pub unsafe extern "stdcall" fn begin(
