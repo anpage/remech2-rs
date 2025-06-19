@@ -44,6 +44,14 @@ pub static mut WINDOW_WIDTH: i32 = 640;
 pub static mut WINDOW_HEIGHT: i32 = 480;
 
 extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+    tracing::trace!(
+        "WndProc: window = {:?}, message = {}, wparam = {:?}, lparam = {:?}",
+        window,
+        message,
+        wparam,
+        lparam
+    );
+
     unsafe {
         let mut wparam = wparam;
         match message {
@@ -63,8 +71,8 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
                 tracing::debug!("Window resized: width = {}, height = {}", width, height);
 
                 if width != WINDOW_WIDTH || height != WINDOW_HEIGHT {
-                    WINDOW_WIDTH = width;
-                    WINDOW_HEIGHT = height;
+                    WINDOW_WIDTH = width.max(1);
+                    WINDOW_HEIGHT = height.max(1);
                 }
             }
             WM_ACTIVATEAPP => {
