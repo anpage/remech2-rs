@@ -3,6 +3,7 @@ use std::{ffi::c_void, sync::RwLock};
 
 use anyhow::Result;
 use retour::GenericDetour;
+use windows::Win32::UI::WindowsAndMessaging::IsWindow;
 use windows::{
     Win32::{
         Foundation::{HANDLE, HWND, POINT},
@@ -442,7 +443,7 @@ pub unsafe extern "fastcall" fn read_mouse_state(_mouse_state: *mut MouseState) 
 /// This function is called to draw the shell, as opposed to FMVs.
 /// It's been modified to always draw the entire screen so that egui gets rendered every frame.
 pub unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) {
-    tracing::debug!("VideoDriverDrawShell called");
+    tracing::trace!("VideoDriverDrawShell called");
 
     unsafe {
         if (*this).x1 < (*this).other_x2 {
@@ -602,6 +603,10 @@ pub unsafe extern "stdcall" fn end() -> i32 {
 pub unsafe extern "stdcall" fn blit_flip() -> i32 {
     tracing::trace!("GdiBlitFlip called");
 
+    if unsafe { G_WINDOW.is_null() || !IsWindow(Some(*G_WINDOW)).as_bool() } {
+        return 0;
+    }
+
     let width = unsafe { (**G_CURRENT_PIXEL_BUFFER).width } + 1;
     let height = unsafe { (**G_CURRENT_PIXEL_BUFFER).height };
 
@@ -640,7 +645,7 @@ pub unsafe extern "stdcall" fn bit_blt_rect(
     x2_dest: i32,
     y2_dest: i32,
 ) -> i32 {
-    tracing::debug!(
+    tracing::trace!(
         "GdiBitBltRect called with x_dest: {}, y_dest: {}, x2_dest: {}, y2_dest: {}",
         x_dest,
         y_dest,
@@ -659,6 +664,10 @@ pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) 
         x2,
         y2
     );
+
+    if unsafe { G_WINDOW.is_null() || !IsWindow(Some(*G_WINDOW)).as_bool() } {
+        return 0;
+    }
 
     let buffer_width = unsafe { (**G_CURRENT_PIXEL_BUFFER).width } + 1;
     let buffer_height = unsafe { (**G_CURRENT_PIXEL_BUFFER).height };

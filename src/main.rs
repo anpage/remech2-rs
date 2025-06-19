@@ -182,7 +182,7 @@ fn start_sim(window: HWND, cmd_line: &str) -> Result<i32> {
 }
 
 fn main() -> Result<()> {
-    let filter = filter::Targets::new().with_target("remech2", Level::TRACE);
+    let filter = filter::Targets::new().with_target("remech2", Level::DEBUG);
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
         .with(filter)
