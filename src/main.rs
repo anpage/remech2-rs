@@ -1,4 +1,3 @@
-#![feature(layout_for_ptr)]
 #![feature(c_variadic)]
 
 use anyhow::Result;

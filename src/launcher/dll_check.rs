@@ -79,7 +79,7 @@ impl DllCheck {
             hasher.finalize()
         };
 
-        if file_hash.as_slice() != hash {
+        if file_hash[..] != hash[..] {
             bail!("{} hash mismatch", file);
         }
 
@@ -145,7 +145,7 @@ impl DllCheck {
                     let mut hasher = Sha256::new();
                     hasher.update(&archive);
                     let file_hash = hasher.finalize();
-                    if file_hash.as_slice() != &MW2_PATCH_HASH {
+                    if file_hash[..] != MW2_PATCH_HASH[..] {
                         return Err("Downloaded file hash mismatch".to_string());
                     }
 
