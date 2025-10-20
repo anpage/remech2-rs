@@ -28,7 +28,7 @@ use windows::{
 use crate::{
     WindowProc,
     ail::Ail,
-    common::{HeapFreeFunc, debug_log, fake_heap_free},
+    common::{HeapFreeFunc, fake_heap_free},
     hooker::hook_function,
 };
 
@@ -118,7 +118,7 @@ impl From<CdAudioPosition> for u32 {
 }
 
 // Functions to hook
-static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
+// static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
 
 type GameTickTimerCallbackFunc = unsafe extern "stdcall" fn(u32);
 static GAME_TICK_TIMER_CALLBACK_HOOK: RwLock<Option<GenericDetour<GameTickTimerCallbackFunc>>> =
@@ -276,15 +276,6 @@ impl Sim {
 
             let heap_free_thunk = (base_address + 0x001834d0) as *mut HeapFreeFunc;
             *heap_free_thunk = fake_heap_free;
-
-            *DEBUG_LOG_HOOK.write().unwrap() = {
-                let hook = RawDetour::new(
-                    (base_address + 0x00017982) as *const (),
-                    debug_log as *const (),
-                )?;
-                hook.enable()?;
-                Some(hook)
-            };
 
             *GAME_TICK_TIMER_CALLBACK_HOOK.write().unwrap() = {
                 let target: GameTickTimerCallbackFunc =
@@ -856,7 +847,6 @@ impl Drop for Sim {
     fn drop(&mut self) {
         unsafe {
             crate::SIM_WINDOW_PROC = None;
-            DEBUG_LOG_HOOK.write().unwrap().take();
             GAME_TICK_TIMER_CALLBACK_HOOK.write().unwrap().take();
             SUP_ANIM_TIMER_CALLBACK_HOOK.write().unwrap().take();
             INTEGER_OVERFLOW_HAPPENS_HERE_HOOK.write().unwrap().take();
