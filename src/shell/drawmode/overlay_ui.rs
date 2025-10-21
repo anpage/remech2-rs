@@ -156,9 +156,6 @@ impl OverlayUi {
                                 if ui.button("COCKPIT CONTROLS...").clicked() {
                                     handle_menu_button(40011);
                                 }
-                                if ui.button("MOVIE PLAYBACK...").clicked() {
-                                    handle_menu_button(40086);
-                                }
                             })
                             .inner
                             .is_some()
