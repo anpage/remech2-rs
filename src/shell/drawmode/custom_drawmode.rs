@@ -188,6 +188,7 @@ impl CustomDrawMode {
         game_height: usize,
         window_width: i32,
         window_height: i32,
+        hwnd: HWND,
     ) {
         if self.cursor_texture.is_none() {
             self.load_cursor_texture();
@@ -303,6 +304,7 @@ impl CustomDrawMode {
                 window_width as f32,
                 window_height as f32,
                 &self.cached_mouse_state,
+                hwnd,
             );
         });
 

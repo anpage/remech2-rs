@@ -3,7 +3,10 @@ use std::sync::Arc;
 use egui::{
     Context, FontFamily, Frame, Margin, Order, TextStyle, TextureId, Vec2, load::SizedTexture,
 };
-use windows::Win32::UI::WindowsAndMessaging::{CURSORINFO, GetCursorInfo, ShowCursor};
+use windows::Win32::{
+    Foundation::{HWND, LPARAM, WPARAM},
+    UI::WindowsAndMessaging::{CURSORINFO, GetCursorInfo, SendMessageA, ShowCursor, WM_COMMAND},
+};
 
 use crate::shell::drawmode::{
     custom_drawmode::OverlayMouseState, hooks::update_global_mouse_state,
@@ -48,6 +51,7 @@ impl OverlayUi {
         window_width: f32,
         window_height: f32,
         mouse_state: &OverlayMouseState,
+        hwnd: HWND,
     ) {
         // calculate width and height, preserving 4:3 aspect ratio
         let aspect_ratio = const { 4.0 / 3.0 };
@@ -92,6 +96,13 @@ impl OverlayUi {
         }
 
         if self.menu_visible {
+            let handle_menu_button = |id: u16| {
+                let w_param: usize = id.into();
+                unsafe {
+                    SendMessageA(hwnd, WM_COMMAND, WPARAM(w_param), LPARAM(0));
+                }
+            };
+
             egui::Window::new("top_menu")
                 .resizable(false)
                 .collapsible(false)
@@ -114,11 +125,19 @@ impl OverlayUi {
                         if ui
                             .menu_button("CLAN", |ui| {
                                 set_font_size(ui);
-                                if ui.button("NEW ALLEGIANCE").clicked() {}
-                                if ui.button("HALL OF HONOR").clicked() {}
-                                if ui.button("QUICKTIPS").clicked() {}
+                                if ui.button("NEW ALLEGIANCE").clicked() {
+                                    handle_menu_button(40001);
+                                }
+                                if ui.button("HALL OF HONOR").clicked() {
+                                    handle_menu_button(40002);
+                                }
+                                if ui.button("QUICKTIPS").clicked() {
+                                    handle_menu_button(40050);
+                                }
                                 ui.separator();
-                                if ui.button("FLEE TO DESKTOP").clicked() {}
+                                if ui.button("FLEE TO DESKTOP").clicked() {
+                                    handle_menu_button(40003);
+                                }
                             })
                             .inner
                             .is_some()
@@ -128,9 +147,15 @@ impl OverlayUi {
                         if ui
                             .menu_button("OPTIONS", |ui| {
                                 set_font_size(ui);
-                                if ui.button("COMBAT VARIABLES...").clicked() {}
-                                if ui.button("COCKPIT CONTROLS...").clicked() {}
-                                if ui.button("MOVIE PLAYBACK...").clicked() {}
+                                if ui.button("COMBAT VARIABLES...").clicked() {
+                                    handle_menu_button(40084);
+                                }
+                                if ui.button("COCKPIT CONTROLS...").clicked() {
+                                    handle_menu_button(40011);
+                                }
+                                if ui.button("MOVIE PLAYBACK...").clicked() {
+                                    handle_menu_button(40086);
+                                }
                             })
                             .inner
                             .is_some()
@@ -140,10 +165,16 @@ impl OverlayUi {
                         if ui
                             .menu_button("HELP", |ui| {
                                 set_font_size(ui);
-                                if ui.button("CODES AND PROCEDURES").clicked() {}
-                                if ui.button("TECHNICAL HELP").clicked() {}
+                                if ui.button("CODES AND PROCEDURES").clicked() {
+                                    handle_menu_button(40012);
+                                }
+                                if ui.button("TECHNICAL HELP").clicked() {
+                                    handle_menu_button(40085);
+                                }
                                 ui.separator();
-                                if ui.button("THE KESHIK").clicked() {}
+                                if ui.button("THE KESHIK").clicked() {
+                                    handle_menu_button(40082);
+                                }
                             })
                             .inner
                             .is_some()

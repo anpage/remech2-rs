@@ -631,6 +631,7 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
             height as usize,
             unsafe { WINDOW_WIDTH },
             unsafe { WINDOW_HEIGHT },
+            unsafe { *G_WINDOW },
         );
     }
 
@@ -692,6 +693,7 @@ pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) 
             (y2 - y1) as usize,
             unsafe { WINDOW_WIDTH },
             unsafe { WINDOW_HEIGHT },
+            unsafe { *G_WINDOW },
         );
     }
 
