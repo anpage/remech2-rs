@@ -268,7 +268,7 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
     Ok(())
 }
 
-static CUSTOM_DRAW_MODE: RwLock<Option<CustomDrawMode>> = RwLock::new(None);
+static mut CUSTOM_DRAW_MODE: Option<CustomDrawMode> = None;
 
 pub unsafe extern "cdecl" fn init_draw_mode(
     draw_mode_index: i32,
@@ -533,9 +533,10 @@ pub unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) 
 pub unsafe extern "stdcall" fn show_cursor(show: BOOL) -> i32 {
     tracing::trace!("ShowCursor called with show: {}", show.0);
 
-    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-    if let Some(ref mut draw_mode) = *custom_draw_mode {
-        draw_mode.show_cursor(show.0 != 0);
+    unsafe {
+        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
+            draw_mode.show_cursor(show.0 != 0);
+        }
     }
 
     if show.0 == 0 { -1 } else { 1 }
@@ -570,8 +571,7 @@ pub unsafe extern "stdcall" fn begin(
         (*pixel_buffer).height = height;
         (*pixel_buffer).bitmap_info = G_GDI_BLIT_BITMAP_INFO;
 
-        let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-        *custom_draw_mode = CustomDrawMode::new(*G_WINDOW, WINDOW_WIDTH, WINDOW_HEIGHT).ok();
+        CUSTOM_DRAW_MODE = CustomDrawMode::new(*G_WINDOW, WINDOW_WIDTH, WINDOW_HEIGHT).ok();
 
         tracing::trace!("GdiBegin finish");
 
@@ -594,14 +594,25 @@ pub unsafe extern "stdcall" fn end() -> i32 {
 
         (**G_CURRENT_PIXEL_BUFFER).data = std::ptr::null_mut();
 
-        CUSTOM_DRAW_MODE.write().unwrap().take();
+        CUSTOM_DRAW_MODE = None;
     }
 
     0
 }
 
+static DRAW_CALLED: RwLock<bool> = RwLock::new(false);
+
 pub unsafe extern "stdcall" fn blit_flip() -> i32 {
     tracing::trace!("GdiBlitFlip called");
+
+    let called = { DRAW_CALLED.read().unwrap().clone() };
+    if called {
+        return 0;
+    }
+
+    {
+        *DRAW_CALLED.write().unwrap() = true;
+    }
 
     if unsafe { G_WINDOW.is_null() || !IsWindow(Some(*G_WINDOW)).as_bool() } {
         return 0;
@@ -623,16 +634,21 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
     let pixel_slice =
         unsafe { std::slice::from_raw_parts(bits_to_blit, (width * height) as usize) };
 
-    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-    if let Some(ref mut draw_mode) = *custom_draw_mode {
-        draw_mode.draw(
-            pixel_slice,
-            width as usize,
-            height as usize,
-            unsafe { WINDOW_WIDTH },
-            unsafe { WINDOW_HEIGHT },
-            unsafe { *G_WINDOW },
-        );
+    unsafe {
+        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
+            draw_mode.draw(
+                pixel_slice,
+                width as usize,
+                height as usize,
+                WINDOW_WIDTH,
+                WINDOW_HEIGHT,
+                *G_WINDOW,
+            );
+        }
+    }
+
+    {
+        *DRAW_CALLED.write().unwrap() = false;
     }
 
     tracing::trace!("GdiBlitFlip finished");
@@ -666,6 +682,15 @@ pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) 
         y2
     );
 
+    let called = { DRAW_CALLED.read().unwrap().clone() };
+    if called {
+        return 0;
+    }
+
+    {
+        *DRAW_CALLED.write().unwrap() = true;
+    }
+
     if unsafe { G_WINDOW.is_null() || !IsWindow(Some(*G_WINDOW)).as_bool() } {
         return 0;
     }
@@ -685,16 +710,21 @@ pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) 
         .flat_map(|row| row[x1 as usize..x2 as usize].to_vec())
         .collect::<Vec<u8>>();
 
-    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-    if let Some(ref mut draw_mode) = *custom_draw_mode {
-        draw_mode.draw(
-            &rect_pixel_slice,
-            (x2 - x1) as usize,
-            (y2 - y1) as usize,
-            unsafe { WINDOW_WIDTH },
-            unsafe { WINDOW_HEIGHT },
-            unsafe { *G_WINDOW },
-        );
+    unsafe {
+        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
+            draw_mode.draw(
+                &rect_pixel_slice,
+                (x2 - x1) as usize,
+                (y2 - y1) as usize,
+                WINDOW_WIDTH,
+                WINDOW_HEIGHT,
+                *G_WINDOW,
+            );
+        }
+    }
+
+    {
+        *DRAW_CALLED.write().unwrap() = false;
     }
 
     0
@@ -725,9 +755,10 @@ pub unsafe extern "cdecl" fn set_palette(
         }
     }
 
-    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-    if let Some(ref mut draw_mode) = *custom_draw_mode {
-        draw_mode.set_palette(unsafe { G_PALETTE_COLORS.as_ref().unwrap() });
+    unsafe {
+        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
+            draw_mode.set_palette(G_PALETTE_COLORS.as_ref().unwrap());
+        }
     }
 
     0
@@ -757,12 +788,10 @@ pub unsafe extern "stdcall" fn set_palette_with_brightness(palette_data: *mut c_
         }
     }
 
-    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-    if let Some(ref mut draw_mode) = *custom_draw_mode {
-        draw_mode.set_palette(unsafe { G_PALETTE_COLORS.as_ref().unwrap() });
-    }
-
     unsafe {
+        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
+            draw_mode.set_palette(G_PALETTE_COLORS.as_ref().unwrap());
+        }
         (**G_CURRENT_PIXEL_BUFFER).data = *G_BITS_TO_BLIT;
     }
 
@@ -795,6 +824,6 @@ pub unsafe fn unhook_functions() {
         GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK = None;
         // GDI_BLEND_PALETTES_HOOK = None;
         GDI_SWAP_BUFFERS_HOOK = None;
-        CUSTOM_DRAW_MODE.write().unwrap().take();
+        CUSTOM_DRAW_MODE = None;
     }
 }
