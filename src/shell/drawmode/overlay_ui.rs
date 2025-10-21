@@ -134,9 +134,6 @@ impl OverlayUi {
                                 if ui.button("HALL OF HONOR").clicked() {
                                     handle_menu_button(40002);
                                 }
-                                if ui.button("QUICKTIPS").clicked() {
-                                    handle_menu_button(40050);
-                                }
                                 ui.separator();
                                 if ui.button("FLEE TO DESKTOP").clicked() {
                                     self.exit_dialog_open = true;
