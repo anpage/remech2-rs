@@ -1,7 +1,8 @@
-use std::sync::Arc;
+use std::{process::exit, sync::Arc};
 
 use egui::{
-    Context, FontFamily, Frame, Margin, Order, TextStyle, TextureId, Vec2, load::SizedTexture,
+    Context, FontFamily, Frame, Margin, Order, RichText, TextStyle, TextureId, Vec2,
+    load::SizedTexture,
 };
 use windows::Win32::{
     Foundation::{HWND, LPARAM, WPARAM},
@@ -17,6 +18,7 @@ pub struct OverlayUi {
     menu_visible: bool,
     show_cursor: bool,
     fonts: egui::FontDefinitions,
+    exit_dialog_open: bool,
 }
 
 impl Default for OverlayUi {
@@ -38,6 +40,7 @@ impl Default for OverlayUi {
             menu_visible: false,
             show_cursor: true,
             fonts,
+            exit_dialog_open: false,
         }
     }
 }
@@ -136,7 +139,7 @@ impl OverlayUi {
                                 }
                                 ui.separator();
                                 if ui.button("FLEE TO DESKTOP").clicked() {
-                                    handle_menu_button(40003);
+                                    self.exit_dialog_open = true;
                                 }
                             })
                             .inner
@@ -184,6 +187,27 @@ impl OverlayUi {
                     });
                 });
         };
+
+        if self.exit_dialog_open {
+            egui::Window::new("Flee to Desktop")
+                .resizable(false)
+                .collapsible(false)
+                .pivot(egui::Align2::CENTER_CENTER)
+                .fixed_pos(ctx.screen_rect().center())
+                .show(ctx, |ui| {
+                    ui.label(RichText::new("Embrace Cowardice?").size(20.0));
+                    ui.add_space(10.0);
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
+                        if ui.button(RichText::new("Yes").size(20.0)).clicked() {
+                            exit(0);
+                        }
+                        if ui.button(RichText::new("No").size(20.0)).clicked() {
+                            self.exit_dialog_open = false;
+                        }
+                    });
+                });
+        }
+
         if false {
             egui::Window::new("DEBUG")
                 .resizable(false)
