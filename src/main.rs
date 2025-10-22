@@ -5,6 +5,7 @@ use std::{
     env,
     fs::File,
     io::{BufReader, Read, Seek, SeekFrom},
+    process::exit,
 };
 use tracing::Level;
 use tracing_subscriber::{filter, prelude::*};
@@ -76,6 +77,9 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
             }
             WM_ACTIVATEAPP => {
                 wparam = WPARAM(1);
+            }
+            WM_CLOSE => {
+                exit(0);
             }
             _ => {}
         }
