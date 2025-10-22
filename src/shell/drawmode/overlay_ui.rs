@@ -136,6 +136,7 @@ impl OverlayUi {
                                 }
                                 ui.separator();
                                 if ui.button("FLEE TO DESKTOP").clicked() {
+                                    // Originally menu item 40003
                                     self.exit_dialog_open = true;
                                 }
                             })
@@ -183,21 +184,23 @@ impl OverlayUi {
         };
 
         if self.exit_dialog_open {
-            egui::Window::new("Flee to Desktop")
+            egui::Window::new("EMBRACE COWARDICE?")
                 .resizable(false)
                 .collapsible(false)
                 .pivot(egui::Align2::CENTER_CENTER)
                 .fixed_pos(ctx.screen_rect().center())
                 .show(ctx, |ui| {
-                    ui.label(RichText::new("Embrace Cowardice?").size(20.0));
-                    ui.add_space(10.0);
-                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
-                        if ui.button(RichText::new("Yes").size(20.0)).clicked() {
-                            exit(0);
-                        }
-                        if ui.button(RichText::new("No").size(20.0)).clicked() {
-                            self.exit_dialog_open = false;
-                        }
+                    egui::Frame::new().inner_margin(20.0).show(ui, |ui| {
+                        ui.horizontal(|ui| {
+                            ui.add_space(42.0);
+                            if ui.button(RichText::new("YES").size(16.0)).clicked() {
+                                exit(0);
+                            }
+                            ui.add_space(42.0);
+                            if ui.button(RichText::new("NO").size(16.0)).clicked() {
+                                self.exit_dialog_open = false;
+                            }
+                        });
                     });
                 });
         }
