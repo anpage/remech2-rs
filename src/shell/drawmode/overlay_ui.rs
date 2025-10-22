@@ -163,13 +163,6 @@ impl OverlayUi {
                         if ui
                             .menu_button("HELP", |ui| {
                                 set_font_size(ui);
-                                if ui.button("CODES AND PROCEDURES").clicked() {
-                                    handle_menu_button(40012);
-                                }
-                                if ui.button("TECHNICAL HELP").clicked() {
-                                    handle_menu_button(40085);
-                                }
-                                ui.separator();
                                 if ui.button("THE KESHIK").clicked() {
                                     handle_menu_button(40082);
                                 }
