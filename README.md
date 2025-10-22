@@ -14,6 +14,38 @@ the game's code can be replaced to no longer need them.
 This is still a work-in-progress and things are very rough and hacky, but the
 game currently works well enough to play on Windows 11.
 
+## Features and Fixes
+
+The fixes from Chris Porter's [Windows XP patch](https://www.warp13.co.uk/mech2) are reimplemented:
+
+- Fixes crash when launching the shell
+- Fixes Mech Lab crash
+- Fixes many heap-related crashes during gameplay
+- Limits the framerate to 45 FPS to fix problems with physics and jump jet fuel recharging
+
+Additionally:
+
+- Adds a "launcher" that runs before the sim
+  - Checks the game's files
+  - Can install the game from CD
+  - Can download and install the required v1.1 patch
+
+- Fixes an issue where it was sometimes impossible to explode from overheating
+- Fixes stuttering when using a mouse with a high poll rate
+- Fixes the background music restarting when the game is paused
+- Fixes an error in Windows 11 that broke CD audio playback
+- Fixes freezing related to flawed multithreading
+- Fixes problems accessing registry keys without running as admin
+- Fixes an issue where the intro video could cause a freeze
+- Restores the 1024x768 in-game resolution option from the DOS version
+- Restores the custom cursor image from the DOS version
+- Replaces MIDI playback with an internal synthesizer
+- Replaces the audio subsystem of the shell with a modern library
+- Allows arbitrary window sizes and upscales the game with the correct aspect ratio
+- Replaces the Windows menu bar with one that's rendered on top of the shell
+
+There is more to come as reimplementation progresses.
+
 ## Running
 __ReMech 2 does not include any part of the original game data.__
 
