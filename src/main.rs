@@ -19,7 +19,6 @@ use windows::{
 
 mod ail;
 mod common;
-mod custom_drawmode;
 mod hooker;
 mod launcher;
 mod midi_source;

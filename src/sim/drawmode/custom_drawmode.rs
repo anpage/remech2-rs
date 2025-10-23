@@ -4,9 +4,7 @@ use std::{
 };
 
 use anyhow::Result;
-use egui::{
-    Color32, ColorImage, Context, Frame, Margin, RawInput, TextureHandle, Vec2, load::SizedTexture,
-};
+use egui::{Color32, ColorImage, Context, RawInput, TextureHandle};
 use egui_wgpu::{WgpuConfiguration, WgpuSetupCreateNew};
 use wgpu::InstanceDescriptor;
 use windows::Win32::{
@@ -14,7 +12,7 @@ use windows::Win32::{
     System::LibraryLoader::GetModuleHandleA,
 };
 
-use crate::launcher::painter::Painter;
+use crate::{launcher::painter::Painter, sim::drawmode::overlay_ui::OverlayUi};
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -31,6 +29,7 @@ pub struct CustomDrawMode {
     palette: [[u8; 3]; 256],
     cached_width: i32,
     cached_height: i32,
+    overlay_ui: OverlayUi,
 }
 
 impl CustomDrawMode {
@@ -71,6 +70,7 @@ impl CustomDrawMode {
             palette: [[0; 3]; 256],
             cached_width: window_width,
             cached_height: window_height,
+            overlay_ui: Default::default(),
         })
     }
 
@@ -114,33 +114,13 @@ impl CustomDrawMode {
             Default::default(),
         );
 
-        // calculate width and height, preserving 4:3 aspect ratio
-        let aspect_ratio = 4.0 / 3.0;
-        let mut width = window_width as f32;
-        let mut height = window_height as f32;
-        if width / height > aspect_ratio {
-            width = height * aspect_ratio;
-        } else {
-            height = width / aspect_ratio;
-        }
-
         let full_output = self.ctx.run(raw_input, |ctx| {
-            egui::CentralPanel::default()
-                .frame(Frame {
-                    inner_margin: Margin::same(0),
-                    ..Default::default()
-                })
-                .show(ctx, |ui| {
-                    ui.with_layout(
-                        egui::Layout::centered_and_justified(egui::Direction::LeftToRight),
-                        |ui| {
-                            ui.image(SizedTexture {
-                                id: self.texture.id(),
-                                size: Vec2::new(width, height),
-                            });
-                        },
-                    )
-                });
+            self.overlay_ui.ui(
+                ctx,
+                self.texture.id(),
+                window_width as f32,
+                window_height as f32,
+            );
         });
 
         let clipped_primitives = self

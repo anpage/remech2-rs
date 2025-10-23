@@ -10,8 +10,8 @@ use windows::Win32::{
 
 use crate::{
     WINDOW_HEIGHT, WINDOW_WIDTH,
-    custom_drawmode::{CustomDrawMode, PaletteColor},
     hooker::hook_function,
+    sim::drawmode::custom_drawmode::{CustomDrawMode, PaletteColor},
 };
 
 #[repr(C)]
