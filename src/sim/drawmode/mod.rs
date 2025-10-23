@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 mod custom_drawmode;
-mod hooks;
+pub mod hooks;
 mod overlay_ui;
 
 pub unsafe fn hook_functions(base_address: usize) -> Result<()> {

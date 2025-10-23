@@ -17,6 +17,8 @@ use windows::{
     core::{PCSTR, s},
 };
 
+use crate::sim::drawmode::hooks::G_MOUSE_NEEDS_CENTERING;
+
 mod ail;
 mod common;
 mod hooker;
@@ -75,6 +77,11 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
                 }
             }
             WM_ACTIVATEAPP => {
+                if wparam.0 == 1 && matches!(PROCESS_TYPE, ProcessType::Sim) {
+                    if !G_MOUSE_NEEDS_CENTERING.is_null() {
+                        *G_MOUSE_NEEDS_CENTERING = TRUE;
+                    }
+                }
                 wparam = WPARAM(1);
             }
             WM_CLOSE => {

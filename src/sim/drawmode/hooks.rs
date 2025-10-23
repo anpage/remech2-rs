@@ -2,10 +2,13 @@ use std::{ffi::c_void, sync::RwLock};
 
 use anyhow::Result;
 use retour::GenericDetour;
-use windows::Win32::{
-    Foundation::{HANDLE, HWND},
-    Graphics::Gdi::BITMAPINFO,
-    System::Memory::{HEAP_FLAGS, HeapAlloc, HeapFree},
+use windows::{
+    Win32::{
+        Foundation::{HANDLE, HWND},
+        Graphics::Gdi::BITMAPINFO,
+        System::Memory::{HEAP_FLAGS, HeapAlloc, HeapFree},
+    },
+    core::BOOL,
 };
 
 use crate::{
@@ -67,6 +70,8 @@ static mut G_DISPLAY_BRIGHTNESS: *mut u32 = std::ptr::null_mut();
 static mut G_GAMMA_TABLE: *mut [u8; 1024] = std::ptr::null_mut();
 static mut G_PALETTE_COLORS: *mut [PaletteColor; 256] = std::ptr::null_mut();
 static mut G_PALETTE_COLORS_PRE_BRIGHTNESS: *mut [PaletteColor; 256] = std::ptr::null_mut();
+pub static mut G_MOUSE_CAPTURED: *mut BOOL = std::ptr::null_mut();
+pub static mut G_MOUSE_NEEDS_CENTERING: *mut BOOL = std::ptr::null_mut();
 
 pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
     unsafe {
@@ -80,6 +85,8 @@ pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
         G_GAMMA_TABLE = (base_address + 0x000e99a0) as *mut [u8; 1024];
         G_PALETTE_COLORS = (base_address + 0x000b1788) as *mut [PaletteColor; 256];
         G_PALETTE_COLORS_PRE_BRIGHTNESS = (base_address + 0x000e96a0) as *mut [PaletteColor; 256];
+        G_MOUSE_CAPTURED = (base_address + 0x000ad244) as *mut BOOL;
+        G_MOUSE_NEEDS_CENTERING = (base_address + 0x000ad248) as *mut BOOL;
 
         ADJUST_WINDOW_SIZE_HOOK = {
             let target: AdjustWindowSizeFunc = std::mem::transmute(base_address + 0x0007762f);

@@ -32,7 +32,7 @@ use crate::{
     hooker::hook_function,
 };
 
-mod drawmode;
+pub mod drawmode;
 
 type SimMainProc = unsafe extern "stdcall" fn(
     HMODULE,

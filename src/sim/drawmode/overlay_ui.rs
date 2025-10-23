@@ -2,6 +2,11 @@ use std::sync::Arc;
 
 use egui::{Context, Frame, Margin, TextureId, Vec2, load::SizedTexture};
 
+use crate::sim::{
+    G_WINDOW_ACTIVE,
+    drawmode::hooks::{G_MOUSE_CAPTURED, G_MOUSE_NEEDS_CENTERING},
+};
+
 pub struct OverlayUi {
     fonts: egui::FontDefinitions,
 }
@@ -56,13 +61,23 @@ impl OverlayUi {
                 )
             });
 
-        egui::Window::new("DEBUG")
-            .resizable(false)
-            .collapsible(false)
-            .default_pos(egui::pos2(10.0, 10.0))
-            .show(ctx, |ui| {
-                ui.label(format!("DEBUG 1: ({}, {})", 1, 2));
-                ui.label(format!("WINDOW SIZE: {}x{}", window_width, window_height));
-            });
+        if cfg!(debug_assertions) {
+            egui::Window::new("DEBUG")
+                .resizable(false)
+                .collapsible(false)
+                .default_pos(egui::pos2(10.0, 10.0))
+                .show(ctx, |ui| {
+                    ui.label(format!("WINDOW SIZE: {}x{}", window_width, window_height));
+                    ui.label(format!("WINDOW ACTIVE: {}", unsafe {
+                        (*G_WINDOW_ACTIVE).0
+                    }));
+                    ui.label(format!("MOUSE CAPTURED: {}", unsafe {
+                        (*G_MOUSE_CAPTURED).0
+                    }));
+                    ui.label(format!("MOUSE NEEDS CENTERING: {}", unsafe {
+                        (*G_MOUSE_NEEDS_CENTERING).0
+                    }));
+                });
+        }
     }
 }
