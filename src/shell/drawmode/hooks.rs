@@ -438,6 +438,11 @@ pub fn update_global_mouse_state(mouse_state: &OverlayMouseState) {
 /// This allows us to intercept mouse events and update the global mouse state selectively.
 pub unsafe extern "fastcall" fn read_mouse_state(_mouse_state: *mut MouseState) {
     tracing::trace!("ReadMouseState called");
+    unsafe {
+        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
+            draw_mode.update_mouse_state();
+        }
+    }
 }
 
 /// This function is called to draw the shell, as opposed to FMVs.

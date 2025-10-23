@@ -335,4 +335,8 @@ impl CustomDrawMode {
     pub fn show_cursor(&mut self, show: bool) {
         self.overlay_ui.show_cursor(show);
     }
+
+    pub fn update_mouse_state(&self) {
+        self.overlay_ui.update_mouse_state();
+    }
 }

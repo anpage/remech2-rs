@@ -10,7 +10,8 @@ use windows::Win32::{
 };
 
 use crate::shell::drawmode::{
-    custom_drawmode::OverlayMouseState, hooks::update_global_mouse_state,
+    custom_drawmode::OverlayMouseState,
+    hooks::{get_mouse_state, update_global_mouse_state},
 };
 
 pub struct OverlayUi {
@@ -274,5 +275,14 @@ impl OverlayUi {
 
     pub fn show_cursor(&mut self, show_cursor: bool) {
         self.show_cursor = show_cursor;
+    }
+
+    pub fn update_mouse_state(&self) {
+        if self.shell_hovered {
+            let mouse_state = unsafe { get_mouse_state() };
+            update_global_mouse_state(&mouse_state);
+        } else {
+            update_global_mouse_state(&OverlayMouseState::default());
+        }
     }
 }
