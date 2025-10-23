@@ -108,7 +108,12 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
     }
 }
 
-fn create_window(width: i32, height: i32) -> Result<(HWND, HINSTANCE)> {
+enum WindowMode {
+    Fullscreen,
+    Windowed(i32, i32),
+}
+
+fn create_window(mode: WindowMode) -> Result<(HWND, HINSTANCE)> {
     unsafe {
         let instance: HINSTANCE = GetModuleHandleA(None)?.into();
 
@@ -130,26 +135,41 @@ fn create_window(width: i32, height: i32) -> Result<(HWND, HINSTANCE)> {
         let atom = RegisterClassA(&wc);
         debug_assert!(atom != 0);
 
-        let mut window_rect = RECT {
-            left: 0,
-            top: 0,
-            right: width,
-            bottom: height,
-        };
+        let (window_rect, style) = match mode {
+            WindowMode::Windowed(width, height) => {
+                let mut window_rect = RECT {
+                    left: 0,
+                    top: 0,
+                    right: width,
+                    bottom: height,
+                };
 
-        let style = {
-            let display_width = GetSystemMetrics(SM_CXSCREEN);
-            let display_height = GetSystemMetrics(SM_CYSCREEN);
-            if width < display_width || height < display_height {
                 let style = WS_OVERLAPPEDWINDOW;
+
+                let display_width = GetSystemMetrics(SM_CXSCREEN);
+                let display_height = GetSystemMetrics(SM_CYSCREEN);
+
                 AdjustWindowRect(&mut window_rect, style, false)?;
+
                 window_rect.right -= window_rect.left;
                 window_rect.bottom -= window_rect.top;
                 window_rect.top = (display_height - window_rect.bottom) / 2;
                 window_rect.left = (display_width - window_rect.right) / 2;
-                style
-            } else {
-                WS_POPUP
+
+                (window_rect, style)
+            }
+            WindowMode::Fullscreen => {
+                let display_width = GetSystemMetrics(SM_CXSCREEN);
+                let display_height = GetSystemMetrics(SM_CYSCREEN);
+
+                let window_rect = RECT {
+                    left: 0,
+                    top: 0,
+                    right: display_width,
+                    bottom: display_height,
+                };
+
+                (window_rect, WS_POPUP)
             }
         };
 
@@ -207,7 +227,11 @@ fn main() -> Result<()> {
 
     let args: Vec<String> = env::args().collect();
 
-    let (window, instance) = create_window(640, 480)?;
+    let (window, instance) = if cfg!(debug_assertions) {
+        create_window(WindowMode::Windowed(1024, 768))?
+    } else {
+        create_window(WindowMode::Fullscreen)?
+    };
 
     start_launcher(window, instance)?;
 
