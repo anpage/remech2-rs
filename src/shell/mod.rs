@@ -8,7 +8,7 @@ use anyhow::{Context, Result, bail};
 use retour::{GenericDetour, RawDetour};
 use windows::{
     Win32::{
-        Foundation::{FreeLibrary, HMODULE, HWND, WIN32_ERROR},
+        Foundation::{FreeLibrary, HMODULE, HWND, TRUE, WIN32_ERROR},
         Security::SECURITY_ATTRIBUTES,
         System::{
             LibraryLoader::{GetModuleHandleA, GetProcAddress, LoadLibraryA},
@@ -18,7 +18,7 @@ use windows::{
             },
         },
     },
-    core::{PCSTR, s},
+    core::{BOOL, PCSTR, s},
 };
 use windows_sys::Win32::{
     Foundation::HANDLE,
@@ -92,6 +92,11 @@ static RESOLUTION_LABEL_HOOK: RwLock<Option<GenericDetour<ResolutionLabelFunc>>>
 type ResolutionToggleFunc = unsafe extern "cdecl" fn(*mut SomeSettingsStruct);
 static RESOLUTION_TOGGLE_HOOK: RwLock<Option<GenericDetour<ResolutionToggleFunc>>> =
     RwLock::new(None);
+
+type LoadSettingsFromRegistryFunc = unsafe extern "cdecl" fn(*mut i32, *mut i32, *mut i32) -> BOOL;
+static LOAD_SETTINGS_FROM_REGISTRY_HOOK: RwLock<
+    Option<GenericDetour<LoadSettingsFromRegistryFunc>>,
+> = RwLock::new(None);
 
 type SomeSettingsWeirdFunc =
     unsafe extern "thiscall" fn(*mut c_void, i32, i32, *const c_char, u32) -> *mut *mut c_void;
@@ -195,6 +200,15 @@ impl Shell {
                 let resolution_toggle: ResolutionToggleFunc =
                     std::mem::transmute(base_address + 0x00043703);
                 Some(hook_function(resolution_toggle, Self::resolution_toggle)?)
+            };
+
+            *LOAD_SETTINGS_FROM_REGISTRY_HOOK.write().unwrap() = {
+                let load_settings_from_registry: LoadSettingsFromRegistryFunc =
+                    std::mem::transmute(base_address + 0x000103e2);
+                Some(hook_function(
+                    load_settings_from_registry,
+                    Self::load_settings_from_registry,
+                )?)
             };
 
             audio::hook_functions(base_address)?;
@@ -456,6 +470,19 @@ impl Shell {
             }
         }
     }
+
+    unsafe extern "cdecl" fn load_settings_from_registry(
+        quick_tips: *mut i32,
+        show_dialog: *mut i32,
+        little_movies: *mut i32,
+    ) -> BOOL {
+        unsafe {
+            *quick_tips = 0;
+            *show_dialog = 0;
+            *little_movies = 0;
+        }
+        TRUE
+    }
 }
 
 impl Drop for Shell {
@@ -467,6 +494,7 @@ impl Drop for Shell {
             GET_DB_ITEM_LZ_HOOK.write().unwrap().take();
             RESOLUTION_LABEL_HOOK.write().unwrap().take();
             RESOLUTION_TOGGLE_HOOK.write().unwrap().take();
+            LOAD_SETTINGS_FROM_REGISTRY_HOOK.write().unwrap().take();
             audio::unhook_functions();
             drawmode::unhook_functions();
             self.ail.unhook();
