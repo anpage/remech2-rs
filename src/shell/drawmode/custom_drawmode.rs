@@ -106,7 +106,7 @@ impl CustomDrawMode {
     }
 
     pub fn load_cursor_texture(&mut self) {
-        if unsafe { G_CURSOR_GRAPHIC.is_null() } {
+        if unsafe { G_CURSOR_GRAPHIC.is_null() || (*G_CURSOR_GRAPHIC).is_null() } {
             return;
         }
 

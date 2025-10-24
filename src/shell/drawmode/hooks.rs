@@ -352,6 +352,12 @@ pub unsafe fn get_mouse_state() -> OverlayMouseState {
 }
 
 pub fn update_global_mouse_state(mouse_state: &OverlayMouseState) {
+    unsafe {
+        if G_CURRENT_MOUSE_STATE.is_null() || (*G_CURRENT_MOUSE_STATE).is_null() {
+            return;
+        }
+    }
+
     let global_mouse_state = unsafe { G_CURRENT_MOUSE_STATE as *mut *mut MouseState };
 
     let state = unsafe {
