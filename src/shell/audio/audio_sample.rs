@@ -19,8 +19,7 @@ pub struct AudioSample {
 impl AudioSample {
     pub fn new(subsystem: *mut AudioSubsystem, data: &[u8]) -> Self {
         let source = Decoder::new(std::io::Cursor::new(data.to_vec())).unwrap();
-        let driver = unsafe { (*subsystem).get_digital_driver().unwrap() };
-        let sink = Sink::try_new(&driver).unwrap();
+        let sink = unsafe { (*subsystem).get_sink().unwrap() };
         sink.pause();
         sink.append(source);
 

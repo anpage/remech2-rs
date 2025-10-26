@@ -75,7 +75,7 @@ impl Iterator for MidiSource {
 }
 
 impl Source for MidiSource {
-    fn current_frame_len(&self) -> Option<usize> {
+    fn current_span_len(&self) -> Option<usize> {
         // We never change sample rate or channels, so frames are infinite.
         None
     }
@@ -99,13 +99,13 @@ impl Source for MidiSource {
 #[cfg(test)]
 mod tests {
     use crate::{midi_source::MidiSource, xmi::XmiFile};
-    use rodio::{OutputStream, Sink};
+    use rodio::{OutputStreamBuilder, Sink};
     use std::{fs::File, io::BufReader};
 
     #[test]
     fn test_midi() {
-        let (_stream, stream_handle) = OutputStream::try_default().unwrap();
-        let sink = Sink::try_new(&stream_handle).unwrap();
+        let stream_handle = OutputStreamBuilder::open_default_stream().unwrap();
+        let sink = Sink::connect_new(stream_handle.mixer());
 
         let midi_file = {
             // TODO: Get the test data from the DATABASE.MW2 file.

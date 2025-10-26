@@ -21,8 +21,7 @@ impl MidiSequence {
         };
 
         let source = MidiSource::new(&midi_file[..]).unwrap();
-        let driver = unsafe { (*subsystem).get_digital_driver().unwrap() };
-        let sink = Sink::try_new(&driver).unwrap();
+        let sink = unsafe { (*subsystem).get_sink().unwrap() };
         sink.pause();
         sink.append(source);
 

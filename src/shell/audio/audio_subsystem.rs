@@ -1,39 +1,36 @@
 use std::ptr::NonNull;
 
 use anyhow::Result;
-use rodio::{OutputStream, OutputStreamHandle};
+use rodio::{OutputStream, OutputStreamBuilder, Sink};
 
 use super::midi_sequence::MidiSequence;
 
 pub struct AudioSubsystem {
-    _stream: Option<OutputStream>,
-    stream_handle: Option<OutputStreamHandle>,
+    stream_handle: Option<OutputStream>,
     current_midi_sequence: Option<NonNull<MidiSequence>>,
 }
 
 impl AudioSubsystem {
     pub fn new() -> Self {
         Self {
-            _stream: None,
             stream_handle: None,
             current_midi_sequence: None,
         }
     }
 
-    pub fn get_digital_driver(&mut self) -> Result<OutputStreamHandle> {
+    pub fn get_sink(&mut self) -> Result<Sink> {
         if let Some(stream_handle) = &self.stream_handle {
-            Ok(stream_handle.clone())
+            Ok(Sink::connect_new(stream_handle.mixer()))
         } else {
-            let (_stream, stream_handle) = OutputStream::try_default()?;
-            self._stream = Some(_stream);
-            self.stream_handle = Some(stream_handle.clone());
-            Ok(stream_handle)
+            let stream_handle = OutputStreamBuilder::open_default_stream()?;
+            let sink = Sink::connect_new(stream_handle.mixer());
+            self.stream_handle = Some(stream_handle);
+            Ok(sink)
         }
     }
 
     pub fn close_digital_driver(&mut self) {
-        self.stream_handle = None;
-        self._stream = None;
+        self.stream_handle.take();
     }
 
     pub fn apply_midi_volume(&mut self) {
