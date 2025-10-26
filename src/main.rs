@@ -6,13 +6,16 @@ use std::{
     fs::File,
     io::{BufReader, Read, Seek, SeekFrom},
     process::exit,
+    sync::Mutex,
 };
 use tracing::Level;
 use tracing_subscriber::{filter, prelude::*};
 use windows::{
     Win32::{
-        Foundation::*, Graphics::Gdi::*, System::LibraryLoader::GetModuleHandleA,
-        UI::WindowsAndMessaging::*,
+        Foundation::*,
+        Graphics::Gdi::*,
+        System::LibraryLoader::GetModuleHandleA,
+        UI::{Input::KeyboardAndMouse::VK_RETURN, WindowsAndMessaging::*},
     },
     core::{PCSTR, s},
 };
@@ -88,6 +91,12 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
             WM_CLOSE => {
                 exit(0);
             }
+            WM_SYSKEYDOWN => {
+                if wparam.0 == VK_RETURN.0.into() {
+                    toggle_fullscreen(window);
+                    return LRESULT(1);
+                }
+            }
             _ => {}
         }
 
@@ -109,12 +118,100 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
     }
 }
 
+static SAVED_DIMENSIONS: Mutex<(i32, i32)> = Mutex::new((0, 0));
+
+fn toggle_fullscreen(window: HWND) {
+    let mode = { WINDOW_MODE.lock().unwrap().clone() };
+    match mode {
+        WindowMode::Fullscreen => {
+            SETTINGS.set_bool("video", "fullscreen", false);
+
+            let (width, height) = { SAVED_DIMENSIONS.lock().unwrap().clone() };
+
+            {
+                let mut window_mode = WINDOW_MODE.lock().unwrap();
+                *window_mode = WindowMode::Windowed(width, height);
+            }
+
+            let style = WS_OVERLAPPEDWINDOW;
+            unsafe { SetWindowLongA(window, GWL_STYLE, style.0 as i32) };
+
+            let mut window_rect = RECT {
+                left: 0,
+                top: 0,
+                right: width,
+                bottom: height,
+            };
+
+            let display_width = unsafe { GetSystemMetrics(SM_CXSCREEN) };
+            let display_height = unsafe { GetSystemMetrics(SM_CYSCREEN) };
+
+            let _ = unsafe { AdjustWindowRect(&mut window_rect, style, false) };
+
+            window_rect.right -= window_rect.left;
+            window_rect.bottom -= window_rect.top;
+            window_rect.top = (display_height - window_rect.bottom) / 2;
+            window_rect.left = (display_width - window_rect.right) / 2;
+
+            unsafe {
+                let _ = SetWindowPos(
+                    window,
+                    None,
+                    window_rect.top,
+                    window_rect.left,
+                    window_rect.right,
+                    window_rect.bottom,
+                    SWP_NOZORDER | SWP_FRAMECHANGED,
+                );
+            }
+        }
+        WindowMode::Windowed(width, height) => {
+            SETTINGS.set_bool("video", "fullscreen", true);
+
+            {
+                let mut window_mode = WINDOW_MODE.lock().unwrap();
+                *window_mode = WindowMode::Fullscreen;
+            }
+
+            {
+                let mut saved_dimensions = SAVED_DIMENSIONS.lock().unwrap();
+                *saved_dimensions = (width, height);
+            }
+
+            unsafe { SetWindowLongA(window, GWL_STYLE, WS_POPUP.0 as i32) };
+
+            let display_width = unsafe { GetSystemMetrics(SM_CXSCREEN) };
+            let display_height = unsafe { GetSystemMetrics(SM_CYSCREEN) };
+
+            unsafe {
+                let _ = SetWindowPos(
+                    window,
+                    None,
+                    0,
+                    0,
+                    display_width,
+                    display_height,
+                    SWP_NOZORDER | SWP_FRAMECHANGED,
+                );
+            }
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
 enum WindowMode {
     Fullscreen,
     Windowed(i32, i32),
 }
 
+static WINDOW_MODE: Mutex<WindowMode> = Mutex::new(WindowMode::Fullscreen);
+
 fn create_window(mode: WindowMode) -> Result<(HWND, HINSTANCE)> {
+    {
+        let mut window_mode = WINDOW_MODE.lock().unwrap();
+        *window_mode = mode;
+    }
+
     unsafe {
         let instance: HINSTANCE = GetModuleHandleA(None)?.into();
 
@@ -231,6 +328,11 @@ fn main() -> Result<()> {
     let fullscreen = SETTINGS.get_bool("video", "fullscreen", true);
     let width = SETTINGS.get_int("video", "width", 1024);
     let height = SETTINGS.get_int("video", "height", 768);
+
+    {
+        let mut saved_dimensions = SAVED_DIMENSIONS.lock().unwrap();
+        *saved_dimensions = (width, height);
+    }
 
     let (window, instance) = create_window(if fullscreen {
         WindowMode::Fullscreen

@@ -192,6 +192,10 @@ static HANDLE_MESSAGES_HOOK: RwLock<Option<GenericDetour<HandleMessagesFunc>>> =
 type RandomIntBelowFunc = unsafe extern "cdecl" fn(i32) -> i32;
 static RANDOM_INT_BELOW_HOOK: RwLock<Option<GenericDetour<RandomIntBelowFunc>>> = RwLock::new(None);
 
+type ToggleFullscreenFunc = unsafe extern "stdcall" fn();
+static TOGGLE_FULLSCREEN_HOOK: RwLock<Option<GenericDetour<ToggleFullscreenFunc>>> =
+    RwLock::new(None);
+
 // Global variables
 static mut G_TICKS_CHECK: *mut u32 = std::ptr::null_mut();
 static mut G_TICKS_1: *mut u32 = std::ptr::null_mut();
@@ -389,6 +393,11 @@ impl Sim {
             *RANDOM_INT_BELOW_HOOK.write().unwrap() = {
                 let target: RandomIntBelowFunc = std::mem::transmute(base_address + 0x000736b3);
                 Some(hook_function(target, Self::random_int_below)?)
+            };
+
+            *TOGGLE_FULLSCREEN_HOOK.write().unwrap() = {
+                let target: ToggleFullscreenFunc = std::mem::transmute(base_address + 0x00077392);
+                Some(hook_function(target, Self::toggle_fullscreen)?)
             };
 
             drawmode::hook_functions(base_address)?;
@@ -841,6 +850,10 @@ impl Sim {
     unsafe extern "cdecl" fn random_int_below(max: i32) -> i32 {
         rand::rng().random_range(0..max)
     }
+
+    unsafe extern "stdcall" fn toggle_fullscreen() {
+        // Do nothing because we handle this in the custom window proc
+    }
 }
 
 impl Drop for Sim {
@@ -868,6 +881,7 @@ impl Drop for Sim {
             CD_AUDIO_TOGGLE_PAUSED_HOOK.write().unwrap().take();
             HANDLE_MESSAGES_HOOK.write().unwrap().take();
             RANDOM_INT_BELOW_HOOK.write().unwrap().take();
+            TOGGLE_FULLSCREEN_HOOK.write().unwrap().take();
             drawmode::unhook_functions();
             self.ail.unhook();
             FreeLibrary(self.module).unwrap();

@@ -78,6 +78,14 @@ impl GlobalSettings {
         }
     }
 
+    pub fn set_bool<S, K>(&self, section: S, key: K, value: bool)
+    where
+        S: Into<String>,
+        K: Into<String>,
+    {
+        self.set(Some(section), key, if value { "true" } else { "false" });
+    }
+
     pub fn get_int<S, K>(&self, section: S, key: K, default: i32) -> i32
     where
         S: Into<String>,
