@@ -2,6 +2,7 @@
 name = "remech2"
 version = "0.1.0"
 edition = "2024"
+panic = "abort"
 
 [dependencies]
 anyhow = "1.0.98"
