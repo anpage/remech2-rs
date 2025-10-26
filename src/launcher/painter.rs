@@ -3,7 +3,7 @@
 use std::{ffi::c_void, num::NonZeroU32};
 
 use egui::{ViewportId, ViewportIdMap};
-use egui_wgpu::{RenderState, SurfaceErrorAction, WgpuConfiguration, WgpuError};
+use egui_wgpu::{RenderState, RendererOptions, SurfaceErrorAction, WgpuConfiguration, WgpuError};
 use raw_window_handle::WindowsDisplayHandle;
 use tracing::{debug, warn};
 use windows::Win32::{
@@ -23,10 +23,8 @@ struct SurfaceState {
 /// NOTE: all egui viewports share the same painter.
 pub struct Painter {
     configuration: WgpuConfiguration,
-    msaa_samples: u32,
+    options: RendererOptions,
     support_transparent_backbuffer: bool,
-    dithering: bool,
-    depth_format: Option<wgpu::TextureFormat>,
 
     surfaces: ViewportIdMap<SurfaceState>,
 
@@ -51,19 +49,15 @@ impl Painter {
     /// [`set_window()`](Self::set_window) once you have a valid window handle.
     pub async fn new(
         configuration: WgpuConfiguration,
-        msaa_samples: u32,
-        depth_format: Option<wgpu::TextureFormat>,
         support_transparent_backbuffer: bool,
-        dithering: bool,
+        options: RendererOptions,
     ) -> Self {
         let instance = configuration.wgpu_setup.new_instance().await;
 
         Self {
             configuration,
-            msaa_samples,
+            options,
             support_transparent_backbuffer,
-            dithering,
-            depth_format,
 
             instance,
             render_state: None,
@@ -150,9 +144,7 @@ impl Painter {
                 &self.configuration,
                 &self.instance,
                 Some(&surface),
-                self.depth_format,
-                self.msaa_samples,
-                self.dithering,
+                self.options,
             )
             .await?;
             self.render_state.get_or_insert(render_state)
@@ -212,7 +204,7 @@ impl Painter {
 
         Self::configure_surface(surface_state, render_state, &self.configuration);
 
-        if let Some(depth_format) = self.depth_format {
+        if let Some(depth_format) = self.options.depth_stencil_format {
             self.depth_texture_view.insert(
                 viewport_id,
                 render_state
@@ -225,7 +217,7 @@ impl Painter {
                             depth_or_array_layers: 1,
                         },
                         mip_level_count: 1,
-                        sample_count: self.msaa_samples,
+                        sample_count: self.options.msaa_samples,
                         dimension: wgpu::TextureDimension::D2,
                         format: depth_format,
                         usage: wgpu::TextureUsages::RENDER_ATTACHMENT
@@ -236,7 +228,7 @@ impl Painter {
             );
         }
 
-        if let Some(render_state) = (self.msaa_samples > 1)
+        if let Some(render_state) = (self.options.msaa_samples > 1)
             .then_some(self.render_state.as_ref())
             .flatten()
         {
@@ -253,7 +245,7 @@ impl Painter {
                             depth_or_array_layers: 1,
                         },
                         mip_level_count: 1,
-                        sample_count: self.msaa_samples,
+                        sample_count: self.options.msaa_samples,
                         dimension: wgpu::TextureDimension::D2,
                         format: texture_format,
                         usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -361,7 +353,7 @@ impl Painter {
                 .texture
                 .create_view(&wgpu::TextureViewDescriptor::default());
 
-            let (view, resolve_target) = (self.msaa_samples > 1)
+            let (view, resolve_target) = (self.options.msaa_samples > 1)
                 .then_some(self.msaa_texture_view.get(&viewport_id))
                 .flatten()
                 .map_or((&frame_view, None), |texture_view| {
@@ -382,6 +374,7 @@ impl Painter {
                         }),
                         store: wgpu::StoreOp::Store,
                     },
+                    depth_slice: None,
                 })],
                 depth_stencil_attachment: self.depth_texture_view.get(&viewport_id).map(|view| {
                     wgpu::RenderPassDepthStencilAttachment {

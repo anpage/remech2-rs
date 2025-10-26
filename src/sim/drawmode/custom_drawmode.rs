@@ -5,7 +5,7 @@ use std::{
 
 use anyhow::Result;
 use egui::{Color32, ColorImage, Context, RawInput, TextureHandle};
-use egui_wgpu::{WgpuConfiguration, WgpuSetupCreateNew};
+use egui_wgpu::{RendererOptions, WgpuConfiguration, WgpuSetupCreateNew};
 use wgpu::InstanceDescriptor;
 use windows::Win32::{
     Foundation::{HINSTANCE, HWND},
@@ -55,7 +55,16 @@ impl CustomDrawMode {
             .into(),
             ..Default::default()
         };
-        let mut painter = pollster::block_on(Painter::new(config, 2, None, false, false));
+        let mut painter = pollster::block_on(Painter::new(
+            config,
+            false,
+            RendererOptions {
+                msaa_samples: 0,
+                depth_stencil_format: None,
+                dithering: false,
+                predictable_texture_filtering: false,
+            },
+        ));
         unsafe {
             pollster::block_on(painter.set_window(ctx.viewport_id(), Some(&window)))?;
         }
