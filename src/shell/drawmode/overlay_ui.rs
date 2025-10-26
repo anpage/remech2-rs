@@ -25,7 +25,7 @@ pub struct OverlayUi {
 impl Default for OverlayUi {
     fn default() -> Self {
         // Load the Science Gothic font
-        let font = egui::FontData::from_static(include_bytes!("../../../ScienceGothic-Md.ttf"));
+        let font = egui::FontData::from_static(include_bytes!("../../../ScienceGothic-Reg.ttf"));
         let mut fonts = egui::FontDefinitions::default();
         fonts
             .font_data
