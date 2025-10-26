@@ -15,7 +15,10 @@ use windows::{
         Foundation::*,
         Graphics::Gdi::*,
         System::LibraryLoader::GetModuleHandleA,
-        UI::{Input::KeyboardAndMouse::VK_RETURN, WindowsAndMessaging::*},
+        UI::{
+            Input::KeyboardAndMouse::{SetFocus, VK_RETURN},
+            WindowsAndMessaging::*,
+        },
     },
     core::{PCSTR, s},
 };
@@ -122,6 +125,7 @@ static SAVED_DIMENSIONS: Mutex<(i32, i32)> = Mutex::new((0, 0));
 
 fn toggle_fullscreen(window: HWND) {
     let mode = { WINDOW_MODE.lock().unwrap().clone() };
+    let mut style = unsafe { GetWindowLongPtrA(window, GWL_STYLE) as u32 };
     match mode {
         WindowMode::Fullscreen => {
             SETTINGS.set_bool("video", "fullscreen", false);
@@ -133,8 +137,9 @@ fn toggle_fullscreen(window: HWND) {
                 *window_mode = WindowMode::Windowed(width, height);
             }
 
-            let style = WS_OVERLAPPEDWINDOW;
-            unsafe { SetWindowLongA(window, GWL_STYLE, style.0 as i32) };
+            style &= !WS_POPUP.0;
+            style |= WS_OVERLAPPEDWINDOW.0;
+            unsafe { SetWindowLongPtrA(window, GWL_STYLE, style as i32) };
 
             let mut window_rect = RECT {
                 left: 0,
@@ -146,7 +151,7 @@ fn toggle_fullscreen(window: HWND) {
             let display_width = unsafe { GetSystemMetrics(SM_CXSCREEN) };
             let display_height = unsafe { GetSystemMetrics(SM_CYSCREEN) };
 
-            let _ = unsafe { AdjustWindowRect(&mut window_rect, style, false) };
+            let _ = unsafe { AdjustWindowRect(&mut window_rect, WINDOW_STYLE(style), false) };
 
             window_rect.right -= window_rect.left;
             window_rect.bottom -= window_rect.top;
@@ -161,7 +166,7 @@ fn toggle_fullscreen(window: HWND) {
                     window_rect.left,
                     window_rect.right,
                     window_rect.bottom,
-                    SWP_NOZORDER | SWP_FRAMECHANGED,
+                    SWP_FRAMECHANGED | SWP_SHOWWINDOW,
                 );
             }
         }
@@ -178,7 +183,10 @@ fn toggle_fullscreen(window: HWND) {
                 *saved_dimensions = (width, height);
             }
 
-            unsafe { SetWindowLongA(window, GWL_STYLE, WS_POPUP.0 as i32) };
+            style &= !WS_OVERLAPPEDWINDOW.0;
+            style |= WS_POPUP.0;
+
+            unsafe { SetWindowLongPtrA(window, GWL_STYLE, style as i32) };
 
             let display_width = unsafe { GetSystemMetrics(SM_CXSCREEN) };
             let display_height = unsafe { GetSystemMetrics(SM_CYSCREEN) };
@@ -186,15 +194,19 @@ fn toggle_fullscreen(window: HWND) {
             unsafe {
                 let _ = SetWindowPos(
                     window,
-                    None,
+                    Some(HWND_TOP),
                     0,
                     0,
                     display_width,
                     display_height,
-                    SWP_NOZORDER | SWP_FRAMECHANGED,
+                    SWP_FRAMECHANGED | SWP_SHOWWINDOW,
                 );
             }
         }
+    }
+
+    unsafe {
+        let _ = SetFocus(Some(window));
     }
 }
 
