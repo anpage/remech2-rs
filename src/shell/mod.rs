@@ -8,8 +8,11 @@ use anyhow::{Context, Result, bail};
 use retour::{GenericDetour, RawDetour};
 use windows::{
     Win32::{
-        Foundation::{FreeLibrary, HMODULE, HWND, TRUE, WIN32_ERROR},
+        Foundation::{FreeLibrary, HANDLE, HMODULE, HWND, INVALID_HANDLE_VALUE, TRUE, WIN32_ERROR},
         Security::SECURITY_ATTRIBUTES,
+        Storage::FileSystem::{
+            CreateFileA, FILE_CREATION_DISPOSITION, FILE_FLAGS_AND_ATTRIBUTES, FILE_SHARE_MODE,
+        },
         System::{
             LibraryLoader::{GetModuleHandleA, GetProcAddress, LoadLibraryA},
             Registry::{
@@ -19,12 +22,6 @@ use windows::{
         },
     },
     core::{BOOL, PCSTR, s},
-};
-use windows_sys::Win32::{
-    Foundation::HANDLE,
-    Storage::FileSystem::{
-        CreateFileA, FILE_CREATION_DISPOSITION, FILE_FLAGS_AND_ATTRIBUTES, FILE_SHARE_MODE,
-    },
 };
 
 use crate::{
@@ -54,10 +51,10 @@ type RegOpenKeyExAFunc =
     unsafe extern "system" fn(HKEY, PCSTR, u32, REG_SAM_FLAGS, *mut HKEY) -> WIN32_ERROR;
 
 type CreateFileFunc = unsafe extern "system" fn(
-    lpfilename: windows_sys::core::PCSTR,
+    lpfilename: PCSTR,
     dwdesiredaccess: u32,
     dwsharemode: FILE_SHARE_MODE,
-    lpsecurityattributes: *const windows_sys::Win32::Security::SECURITY_ATTRIBUTES,
+    lpsecurityattributes: *const SECURITY_ATTRIBUTES,
     dwcreationdisposition: FILE_CREATION_DISPOSITION,
     dwflagsandattributes: FILE_FLAGS_AND_ATTRIBUTES,
     htemplatefile: HANDLE,
@@ -253,26 +250,43 @@ impl Shell {
     /// Patched to avoid a bug where Smacker would infinite loop as it failed to read the video file.
     /// It seems like reading a file without buffering has stricter requirements in modern WIndows.
     unsafe extern "system" fn create_file(
-        lpfilename: windows_sys::core::PCSTR,
+        lpfilename: PCSTR,
         dwdesiredaccess: u32,
         dwsharemode: FILE_SHARE_MODE,
-        lpsecurityattributes: *const windows_sys::Win32::Security::SECURITY_ATTRIBUTES,
+        lpsecurityattributes: *const SECURITY_ATTRIBUTES,
         dwcreationdisposition: FILE_CREATION_DISPOSITION,
         dwflagsandattributes: FILE_FLAGS_AND_ATTRIBUTES,
         htemplatefile: HANDLE,
     ) -> HANDLE {
         unsafe {
+            let lpsecurityattributes = if lpsecurityattributes.is_null() {
+                None
+            } else {
+                Some(lpsecurityattributes)
+            };
+
+            let htemplatefile = if htemplatefile.is_invalid() {
+                None
+            } else {
+                Some(htemplatefile)
+            };
+
             // Remove FILE_FLAG_NO_BUFFERING
-            let dwflagsandattributes = dwflagsandattributes & !0x2000_0000;
-            CreateFileA(
+            let dwflagsandattributes = dwflagsandattributes.0 & !0x2000_0000;
+
+            if let Ok(handle) = CreateFileA(
                 lpfilename,
                 dwdesiredaccess,
                 dwsharemode,
                 lpsecurityattributes,
                 dwcreationdisposition,
-                dwflagsandattributes,
+                FILE_FLAGS_AND_ATTRIBUTES(dwflagsandattributes),
                 htemplatefile,
-            )
+            ) {
+                handle
+            } else {
+                INVALID_HANDLE_VALUE
+            }
         }
     }
 

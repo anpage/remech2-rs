@@ -25,7 +25,7 @@ web-time = "1.1.0"
 wgpu = "25.0.0"
 
 [dependencies.windows]
-version = "0.61.1"
+version = "0.62.2"
 features = [
     "Win32_Graphics_Gdi",
     "Win32_System_LibraryLoader",
@@ -40,13 +40,4 @@ features = [
     "Win32_UI_Input_KeyboardAndMouse",
     "Win32_Storage_FileSystem",
     "Win32_System_IO",
-]
-
-[dependencies.windows-sys]
-version = "0.59.0"
-features = [
-    "Win32_Storage_FileSystem",
-    "Win32_System_IO",
-    "Win32_Foundation",
-    "Win32_Security",
 ]
