@@ -17,13 +17,14 @@ use windows::{
     core::{PCSTR, s},
 };
 
-use crate::sim::drawmode::hooks::G_MOUSE_NEEDS_CENTERING;
+use crate::{settings::SETTINGS, sim::drawmode::hooks::G_MOUSE_NEEDS_CENTERING};
 
 mod ail;
 mod common;
 mod hooker;
 mod launcher;
 mod midi_source;
+mod settings;
 mod shell;
 mod sim;
 mod xmi;
@@ -227,11 +228,15 @@ fn main() -> Result<()> {
 
     let args: Vec<String> = env::args().collect();
 
-    let (window, instance) = if cfg!(debug_assertions) {
-        create_window(WindowMode::Windowed(1024, 768))?
+    let fullscreen = SETTINGS.get_bool("video", "fullscreen", true);
+    let width = SETTINGS.get_int("video", "width", 1024);
+    let height = SETTINGS.get_int("video", "height", 768);
+
+    let (window, instance) = create_window(if fullscreen {
+        WindowMode::Fullscreen
     } else {
-        create_window(WindowMode::Fullscreen)?
-    };
+        WindowMode::Windowed(width, height)
+    })?;
 
     start_launcher(window, instance)?;
 
