@@ -115,7 +115,7 @@ impl OverlayUi {
                 .fixed_pos(egui::pos2(window_width as f32 / 2. - width / 2., 0.0))
                 .fixed_size(Vec2::new(width, 30.0))
                 .show(ctx, |ui| {
-                    egui::containers::menu::Bar::new().ui(ui, |ui| {
+                    egui::containers::menu::MenuBar::new().ui(ui, |ui| {
                         let set_font_size = |ui: &mut egui::Ui| {
                             let style = ui.style_mut();
                             style.text_styles.insert(
@@ -182,7 +182,7 @@ impl OverlayUi {
                 .resizable(false)
                 .collapsible(false)
                 .pivot(egui::Align2::CENTER_CENTER)
-                .fixed_pos(ctx.screen_rect().center())
+                .fixed_pos(ctx.content_rect().center())
                 .show(ctx, |ui| {
                     egui::Frame::new().inner_margin(20.0).show(ui, |ui| {
                         ui.horizontal(|ui| {

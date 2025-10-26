@@ -63,7 +63,7 @@ impl Stage for CdCheck {
             .resizable(false)
             .collapsible(false)
             .pivot(egui::Align2::CENTER_CENTER)
-            .fixed_pos(ctx.screen_rect().center())
+            .fixed_pos(ctx.content_rect().center())
             .show(ctx, |ui| {
                 ui.label("You must insert the game's CD into your CD-ROM drive.");
                 ui.add_space(10.0);

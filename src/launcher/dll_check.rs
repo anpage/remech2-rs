@@ -226,7 +226,7 @@ impl DllCheck {
             .resizable(false)
             .collapsible(false)
             .pivot(egui::Align2::CENTER_CENTER)
-            .fixed_pos(ctx.screen_rect().center())
+            .fixed_pos(ctx.content_rect().center())
             .show(ctx, |ui| {
                 ui.label(&self.downloading_error.as_ref().unwrap().error);
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
@@ -258,7 +258,7 @@ impl DllCheck {
                     .resizable(false)
                     .collapsible(false)
                     .pivot(egui::Align2::CENTER_CENTER)
-                    .fixed_pos(ctx.screen_rect().center())
+                    .fixed_pos(ctx.content_rect().center())
                     .show(ctx, |ui| {
                         ui.label("Downloading 1.1 patch...");
                         ui.add_space(10.0);
@@ -271,7 +271,7 @@ impl DllCheck {
                     .resizable(false)
                     .collapsible(false)
                     .pivot(egui::Align2::CENTER_CENTER)
-                    .fixed_pos(ctx.screen_rect().center())
+                    .fixed_pos(ctx.content_rect().center())
                     .show(ctx, |ui| {
                         ui.label("Extracting DLL files...");
                         ui.add_space(10.0);
@@ -315,7 +315,7 @@ impl Stage for DllCheck {
             .resizable(false)
             .collapsible(false)
             .pivot(egui::Align2::CENTER_CENTER)
-            .fixed_pos(ctx.screen_rect().center())
+            .fixed_pos(ctx.content_rect().center())
             .show(ctx, |ui| {
                 ui.label("These required game files are missing:");
                 ui.add_space(10.0);
