@@ -52,3 +52,10 @@ pub fn get_sample(handle: SampleHandle) -> Option<Sample> {
         .get(SampleKey(KeyData::from_ffi(handle.raw())))
         .cloned()
 }
+
+pub fn release_sample(handle: SampleHandle) {
+    SAMPLES
+        .lock()
+        .unwrap()
+        .remove(SampleKey(KeyData::from_ffi(handle.raw())));
+}
