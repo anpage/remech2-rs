@@ -12,7 +12,7 @@ type DriverSlotMap = SlotMap<DriverKey, Driver>;
 static DRIVERS: LazyLock<Mutex<DriverSlotMap>> = LazyLock::new(|| Mutex::new(SlotMap::with_key()));
 
 pub fn create_driver() -> DriverHandle {
-    let ffi_handle = DRIVERS.lock().unwrap().insert(Driver {}).0.as_ffi();
+    let ffi_handle = DRIVERS.lock().unwrap().insert(Driver::new()).0.as_ffi();
     DriverHandle::new(ffi_handle)
 }
 
@@ -21,6 +21,10 @@ pub fn driver_exists(handle: DriverHandle) -> bool {
         .lock()
         .unwrap()
         .contains_key(DriverKey(KeyData::from_ffi(handle.raw())))
+}
+
+pub fn get_driver(key: DriverKey) -> Option<Driver> {
+    DRIVERS.lock().unwrap().get(key).cloned()
 }
 
 new_key_type! { pub struct SampleKey; }
