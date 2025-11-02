@@ -740,7 +740,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c5e5ea60d70410161c8bf5da3fdfeaa1c72ed2c15f8bbb9d19fe3a4fad085f08"
 dependencies = [
  "js-sys",
- "slotmap",
+ "slotmap 1.0.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -1882,6 +1882,7 @@ dependencies = [
  "rust-ini",
  "rustysynth",
  "sha2",
+ "slotmap 1.0.7 (git+https://github.com/anpage/slotmap.git?branch=32bit)",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2219,6 +2220,14 @@ name = "slotmap"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dbff4acf519f630b3a3ddcfaea6c06b42174d9a44bc70c620e9ed1649d58b82a"
+dependencies = [
+ "version_check",
+]
+
+[[package]]
+name = "slotmap"
+version = "1.0.7"
+source = "git+https://github.com/anpage/slotmap.git?branch=32bit#cf4a60416e07e09d8f16fb7bfe0a70808c944843"
 dependencies = [
  "version_check",
 ]
