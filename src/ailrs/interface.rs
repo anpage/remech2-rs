@@ -1,7 +1,7 @@
 use std::{ffi::c_void, num::NonZero, slice};
 
 use tracing::{Level, instrument};
-use windows::Win32::Media::Audio::WAVEFORMATEX;
+use windows::Win32::Media::Audio::{WAVE_FORMAT_PCM, WAVEFORMATEX};
 
 use crate::ailrs::{
     sample::Buffer,
@@ -107,14 +107,14 @@ pub unsafe extern "stdcall" fn load_sample_buffer(
 
 #[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn register_eos_callback(
-    sample: SampleHandle,
+    sample_handle: SampleHandle,
     callback: unsafe extern "stdcall" fn(SampleHandle),
 ) {
     tracing::debug!("Called");
-    let Some(sample) = get_sample(sample) else {
+    let Some(sample) = get_sample(sample_handle) else {
         return;
     };
-    sample.register_eos_callback(|handle| unsafe { callback(handle) })
+    sample.register_eos_callback(Box::new(move || unsafe { callback(sample_handle) }))
 }
 
 #[instrument(level = Level::DEBUG)]
@@ -244,11 +244,25 @@ pub unsafe extern "stdcall" fn wave_out_open(
 ) -> i32 {
     tracing::debug!("Called");
 
-    if dig_driver_out.is_null() {
+    if dig_driver_out.is_null() || wave_format.is_null() {
         return -1;
     }
 
-    let driver = create_driver();
+    let wave_format = unsafe { *wave_format };
+
+    let WAVEFORMATEX {
+        wFormatTag,
+        nChannels,
+        nSamplesPerSec,
+        ..
+    } = wave_format;
+
+    if wFormatTag as u32 != WAVE_FORMAT_PCM {
+        tracing::error!("Unsupported wave format");
+        return -1;
+    }
+
+    let driver = create_driver(nChannels, nSamplesPerSec);
     unsafe {
         *dig_driver_out = driver;
     }

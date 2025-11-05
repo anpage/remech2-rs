@@ -3,7 +3,9 @@ use std::sync::{LazyLock, Mutex};
 use slotmap::{KeyData, SlotMap, new_key_type};
 
 use crate::ailrs::{
-    driver::Driver, interface::DriverHandle, interface::SampleHandle, sample::Sample,
+    driver::Driver,
+    interface::{DriverHandle, SampleHandle},
+    sample::Sample,
 };
 
 new_key_type! { pub struct DriverKey; }
@@ -11,8 +13,13 @@ new_key_type! { pub struct DriverKey; }
 type DriverSlotMap = SlotMap<DriverKey, Driver>;
 static DRIVERS: LazyLock<Mutex<DriverSlotMap>> = LazyLock::new(|| Mutex::new(SlotMap::with_key()));
 
-pub fn create_driver() -> DriverHandle {
-    let ffi_handle = DRIVERS.lock().unwrap().insert(Driver::new()).0.as_ffi();
+pub fn create_driver(channels: u16, sample_rate: u32) -> DriverHandle {
+    let ffi_handle = DRIVERS
+        .lock()
+        .unwrap()
+        .insert(Driver::new(channels, sample_rate))
+        .0
+        .as_ffi();
     DriverHandle::new(ffi_handle)
 }
 
@@ -62,4 +69,9 @@ pub fn release_sample(handle: SampleHandle) {
         .lock()
         .unwrap()
         .remove(SampleKey(KeyData::from_ffi(handle.raw())));
+}
+
+pub fn shutdown() {
+    SAMPLES.lock().unwrap().clear();
+    DRIVERS.lock().unwrap().clear();
 }

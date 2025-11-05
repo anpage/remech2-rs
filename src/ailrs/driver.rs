@@ -10,8 +10,13 @@ struct Inner {
 pub struct Driver(Arc<Mutex<Inner>>);
 
 impl Driver {
-    pub fn new() -> Self {
-        let stream = OutputStreamBuilder::open_default_stream().unwrap();
+    pub fn new(channels: u16, _sample_rate: u32) -> Self {
+        let stream = OutputStreamBuilder::from_default_device()
+            .unwrap()
+            .with_channels(channels)
+            // .with_sample_rate(48000)
+            .open_stream()
+            .unwrap();
         Driver(Arc::new(Mutex::new(Inner { stream })))
     }
 

@@ -1,14 +1,38 @@
 use std::{
     collections::HashMap,
+    io::Cursor,
     sync::{Arc, Mutex},
 };
 
-use rodio::Sink;
+use rodio::{
+    Decoder, Sink, Source, conversions::SampleTypeConverter, source::EmptyCallback,
+    static_buffer::StaticSamplesBuffer,
+};
 
 use crate::ailrs::{
     interface::SampleHandle,
+    pcm_source::PcmSource,
     storage::{DriverKey, get_driver},
 };
+
+pub trait EosCallback: Fn() + Send {
+    fn clone_box(&self) -> Box<dyn EosCallback>;
+}
+
+impl<T> EosCallback for T
+where
+    T: 'static + Fn() + Clone + Send,
+{
+    fn clone_box(&self) -> Box<dyn EosCallback> {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Box<dyn EosCallback> {
+    fn clone(&self) -> Self {
+        (**self).clone_box()
+    }
+}
 
 #[derive(Clone, Copy)]
 pub enum Buffer {
@@ -21,6 +45,9 @@ struct Inner {
     buffer_free: Buffer,
     sink: Option<Sink>,
     user_data: HashMap<u32, i32>,
+    first_buffer: Vec<u8>,
+    second_buffer: Vec<u8>,
+    eos_callback: Option<Box<dyn EosCallback>>,
 }
 
 #[derive(Clone)]
@@ -33,6 +60,9 @@ impl Sample {
             buffer_free: Buffer::First,
             sink: None,
             user_data: HashMap::new(),
+            first_buffer: vec![],
+            second_buffer: vec![],
+            eos_callback: None,
         })));
     }
 
@@ -49,14 +79,27 @@ impl Sample {
     }
 
     pub fn load_buffer(&self, buffer: Buffer, data: &[u8]) {
-        // TODO
+        let inner = self.0.lock().unwrap();
+        // let buffer = match buffer {
+        //     Buffer::First => &mut inner.first_buffer,
+        //     Buffer::Second => &mut inner.second_buffer,
+        // };
+        // buffer.clear();
+        // buffer.extend_from_slice(data);
+
+        let source = PcmSource::new(data);
+
+        if let Some(ref sink) = inner.sink {
+            sink.append(source.low_pass(5500));
+            if let Some(callback) = inner.eos_callback.clone() {
+                sink.append(EmptyCallback::new(callback));
+            }
+        }
     }
 
-    pub fn register_eos_callback<F>(&self, callback: F)
-    where
-        F: Fn(SampleHandle),
-    {
-        // TODO
+    pub fn register_eos_callback(&self, callback: Box<dyn EosCallback>) {
+        let mut inner = self.0.lock().unwrap();
+        inner.eos_callback = Some(callback);
     }
 
     pub fn resume(&self) {

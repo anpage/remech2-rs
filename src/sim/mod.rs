@@ -28,12 +28,15 @@ use windows::{
 use crate::{
     WindowProc,
     ail::Ail,
-    ailrs::interface::{
-        allocate_file_sample, allocate_sample_handle, end_sample, init_sample, load_sample_buffer,
-        register_eos_callback, release_sample_handle, resume_sample, sample_buffer_ready,
-        sample_user_data, set_preference, set_sample_loop_count, set_sample_pan,
-        set_sample_playback_rate, set_sample_type, set_sample_user_data, set_sample_volume,
-        start_sample, stop_sample, wave_out_open,
+    ailrs::{
+        self,
+        interface::{
+            allocate_file_sample, allocate_sample_handle, end_sample, init_sample,
+            load_sample_buffer, register_eos_callback, release_sample_handle, resume_sample,
+            sample_buffer_ready, sample_user_data, set_preference, set_sample_loop_count,
+            set_sample_pan, set_sample_playback_rate, set_sample_type, set_sample_user_data,
+            set_sample_volume, start_sample, stop_sample, wave_out_open,
+        },
     },
     common::{HeapFreeFunc, fake_heap_free},
     hooker::hook_function,
@@ -931,6 +934,7 @@ impl Sim {
 impl Drop for Sim {
     fn drop(&mut self) {
         unsafe {
+            ailrs::shutdown();
             crate::SIM_WINDOW_PROC = None;
             GAME_TICK_TIMER_CALLBACK_HOOK.write().unwrap().take();
             SUP_ANIM_TIMER_CALLBACK_HOOK.write().unwrap().take();
