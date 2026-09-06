@@ -1,6 +1,10 @@
 use std::sync::{Arc, Mutex};
 
-use rodio::{OutputStream, OutputStreamBuilder, mixer::Mixer};
+use rodio::{
+    OutputStream, OutputStreamBuilder, Source,
+    mixer::Mixer,
+    source::{LimitSettings, Zero},
+};
 
 struct Inner {
     // Keep stream alive inside the driver
@@ -19,7 +23,12 @@ impl Driver {
             .and_then(|b| b.with_channels(channels).open_stream())
             .inspect_err(|e| tracing::error!("failed to open audio stream: {e}"))
             .ok()?;
-        let mixer = stream.mixer().clone();
+        let out_rate = stream.config().sample_rate();
+        let (mixer, mix_source) = rodio::mixer::mixer(channels, out_rate);
+        let master = mix_source
+            .mix(Zero::new(channels, out_rate))
+            .limit(LimitSettings::gaming());
+        stream.mixer().add(master);
         Some(Driver(Arc::new(Mutex::new(Inner {
             stream,
             mixer,
