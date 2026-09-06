@@ -84,21 +84,20 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
                 }
             }
             WM_ACTIVATEAPP => {
-                if wparam.0 == 1 && matches!(PROCESS_TYPE, ProcessType::Sim) {
-                    if !G_MOUSE_NEEDS_CENTERING.is_null() {
-                        *G_MOUSE_NEEDS_CENTERING = TRUE;
-                    }
+                if wparam.0 == 1
+                    && matches!(PROCESS_TYPE, ProcessType::Sim)
+                    && !G_MOUSE_NEEDS_CENTERING.is_null()
+                {
+                    *G_MOUSE_NEEDS_CENTERING = TRUE;
                 }
                 wparam = WPARAM(1);
             }
             WM_CLOSE => {
                 exit(0);
             }
-            WM_SYSKEYDOWN => {
-                if wparam.0 == VK_RETURN.0.into() {
-                    toggle_fullscreen(window);
-                    return LRESULT(1);
-                }
+            WM_SYSKEYDOWN if wparam.0 == VK_RETURN.0.into() => {
+                toggle_fullscreen(window);
+                return LRESULT(1);
             }
             _ => {}
         }
@@ -124,13 +123,13 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
 static SAVED_DIMENSIONS: Mutex<(i32, i32)> = Mutex::new((0, 0));
 
 fn toggle_fullscreen(window: HWND) {
-    let mode = { WINDOW_MODE.lock().unwrap().clone() };
+    let mode = { *WINDOW_MODE.lock().unwrap() };
     let mut style = unsafe { GetWindowLongPtrA(window, GWL_STYLE) as u32 };
     match mode {
         WindowMode::Fullscreen => {
             SETTINGS.set_bool("video", "fullscreen", false);
 
-            let (width, height) = { SAVED_DIMENSIONS.lock().unwrap().clone() };
+            let (width, height) = { *SAVED_DIMENSIONS.lock().unwrap() };
 
             {
                 let mut window_mode = WINDOW_MODE.lock().unwrap();

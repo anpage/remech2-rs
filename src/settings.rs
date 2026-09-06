@@ -2,7 +2,7 @@ use std::sync::{LazyLock, Mutex};
 
 use ini::Ini;
 
-pub static SETTINGS: LazyLock<GlobalSettings> = LazyLock::new(|| GlobalSettings::load());
+pub static SETTINGS: LazyLock<GlobalSettings> = LazyLock::new(GlobalSettings::load);
 
 pub struct GlobalSettings {
     settings: Mutex<Ini>,

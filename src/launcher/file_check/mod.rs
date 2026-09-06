@@ -113,7 +113,7 @@ impl FileCheck {
                 ui.add_space(10.0);
                 ui.label(format!(
                     "Error copying {}:",
-                    &self.copying_error.as_ref().unwrap().file
+                    self.copying_error.as_ref().unwrap().file
                 ));
                 ui.label(&self.copying_error.as_ref().unwrap().error);
                 ui.add_space(10.0);

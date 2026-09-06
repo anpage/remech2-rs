@@ -150,8 +150,7 @@ impl CustomDrawMode {
             panic!("Palette data must be exactly 256 colors");
         }
 
-        for i in 0..256 {
-            let color = palette_data[i];
+        for (i, color) in palette_data.iter().enumerate().take(256) {
             self.palette[i] = [color.red, color.green, color.blue];
         }
     }

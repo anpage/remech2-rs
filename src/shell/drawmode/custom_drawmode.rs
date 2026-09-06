@@ -28,25 +28,13 @@ pub struct PaletteColor {
     pub blue: u8,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct OverlayMouseState {
     pub pos_x: i32,
     pub pos_y: i32,
     pub left_down: bool,
     pub right_down: bool,
     pub middle_down: bool,
-}
-
-impl Default for OverlayMouseState {
-    fn default() -> Self {
-        Self {
-            pos_x: 0,
-            pos_y: 0,
-            left_down: false,
-            right_down: false,
-            middle_down: false,
-        }
-    }
 }
 
 pub struct CustomDrawMode {

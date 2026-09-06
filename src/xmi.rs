@@ -300,7 +300,7 @@ impl XmiFile {
 
                 let mut active_notes_to_remove = Vec::new();
                 let mut time_added_by_note_off = 0;
-                active_notes.sort_by(|a, b| a.1.cmp(&b.1));
+                active_notes.sort_by_key(|a| a.1);
                 for (key, duration, channel) in active_notes.iter_mut() {
                     *duration -= time_added_by_note_off;
                     if *duration > delta {

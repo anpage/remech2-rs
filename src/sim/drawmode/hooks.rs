@@ -186,7 +186,7 @@ pub unsafe extern "stdcall" fn end() -> i32 {
     tracing::trace!("GdiEnd called");
 
     unsafe {
-        if *G_BITS_TO_BLIT != std::ptr::null_mut() {
+        if !(*G_BITS_TO_BLIT).is_null() {
             let _ = HeapFree(
                 *G_PRIMARY_HEAP,
                 HEAP_FLAGS(1),
@@ -280,7 +280,8 @@ pub unsafe extern "stdcall" fn set_palette(
         palette_colors
     );
 
-    if palette_colors.is_null() || start < 0 || start > 255 || count < 1 || (256 - start) < count {
+    if palette_colors.is_null() || !(0..=255).contains(&start) || count < 1 || (256 - start) < count
+    {
         return -1;
     }
 
@@ -307,10 +308,10 @@ pub unsafe extern "stdcall" fn set_palette_with_brightness(palette_data: *mut c_
 
     let brightness = unsafe { *G_DISPLAY_BRIGHTNESS } as usize;
 
-    for i in 0..256 {
+    for (i, color) in palette.iter().enumerate().take(256) {
         unsafe {
-            let PaletteColor { red, green, blue } = palette[i];
-            (*G_PALETTE_COLORS_PRE_BRIGHTNESS)[i] = PaletteColor { red, green, blue };
+            (*G_PALETTE_COLORS_PRE_BRIGHTNESS)[i] = *color;
+            let PaletteColor { red, green, blue } = *color;
             (*G_PALETTE_COLORS)[i] = PaletteColor {
                 red: (*G_GAMMA_TABLE)[red as usize + brightness * 64],
                 green: (*G_GAMMA_TABLE)[green as usize + brightness * 64],

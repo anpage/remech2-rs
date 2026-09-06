@@ -171,9 +171,13 @@ pub static mut G_CURSOR_GRAPHIC: *mut *mut [u8; CURSOR_GRAPHIC_SIZE] = std::ptr:
 
 pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
     unsafe {
-        SOME_PALETTE_FUNC = Some(std::mem::transmute(base_address + 0x00005eea));
-        VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER_FUNC =
-            Some(std::mem::transmute(base_address + 0x000077ea));
+        SOME_PALETTE_FUNC = Some(std::mem::transmute::<usize, SomePaletteFunc>(
+            base_address + 0x00005eea,
+        ));
+        VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER_FUNC = Some(std::mem::transmute::<
+            usize,
+            VideoDriverActivateFramebufferFunc,
+        >(base_address + 0x000077ea));
 
         G_CURRENT_DRAW_MODE_EXTENSION = (base_address + 0x00062cc8) as *mut *mut c_void;
         G_PRIMARY_HEAP = (base_address + 0x0006a9f4) as *mut HANDLE;
@@ -321,16 +325,16 @@ fn cursor_window_to_shell(x: i32, y: i32, window_width: i32, window_height: i32)
     }
 
     let shell_x = (x as f32 - (window_width as f32 - shell_width) / 2.0)
-        / (shell_width as f32 / SHELL_LOGICAL_WIDTH);
+        / (shell_width / SHELL_LOGICAL_WIDTH);
     let shell_y = (y as f32 - (window_height as f32 - shell_height) / 2.0)
-        / (shell_height as f32 / SHELL_LOGICAL_HEIGHT);
+        / (shell_height / SHELL_LOGICAL_HEIGHT);
 
     (shell_x as i32, shell_y as i32)
 }
 
 pub unsafe fn get_mouse_state() -> OverlayMouseState {
     let mut cursor_pos = POINT { x: 0, y: 0 };
-    let _ = unsafe { GetCursorPos(&mut cursor_pos).unwrap() };
+    unsafe { GetCursorPos(&mut cursor_pos).unwrap() };
     let _ = unsafe { ScreenToClient(*G_WINDOW, &mut cursor_pos) };
 
     let key_state = unsafe { GetAsyncKeyState(VK_LBUTTON.0 as i32) as u16 };
@@ -358,7 +362,7 @@ pub fn update_global_mouse_state(mouse_state: &OverlayMouseState) {
         }
     }
 
-    let global_mouse_state = unsafe { G_CURRENT_MOUSE_STATE as *mut *mut MouseState };
+    let global_mouse_state = unsafe { G_CURRENT_MOUSE_STATE };
 
     let state = unsafe {
         (*global_mouse_state)
@@ -371,9 +375,9 @@ pub fn update_global_mouse_state(mouse_state: &OverlayMouseState) {
     let middle_down_previous = state.middle_down;
 
     let mut cursor_inside_window = true;
-    if mouse_state.pos_x < 0 || mouse_state.pos_x >= unsafe { WINDOW_WIDTH } {
-        cursor_inside_window = false;
-    } else if mouse_state.pos_y < 0 || mouse_state.pos_y >= unsafe { WINDOW_HEIGHT } {
+    if (mouse_state.pos_x < 0 || mouse_state.pos_x >= unsafe { WINDOW_WIDTH })
+        || (mouse_state.pos_y < 0 || mouse_state.pos_y >= unsafe { WINDOW_HEIGHT })
+    {
         cursor_inside_window = false;
     }
 
@@ -594,7 +598,7 @@ pub unsafe extern "stdcall" fn end() -> i32 {
     tracing::trace!("GdiEnd called");
 
     unsafe {
-        if *G_BITS_TO_BLIT != std::ptr::null_mut() {
+        if !(*G_BITS_TO_BLIT).is_null() {
             let _ = HeapFree(
                 *G_PRIMARY_HEAP,
                 HEAP_FLAGS(1),
@@ -616,7 +620,7 @@ static DRAW_CALLED: RwLock<bool> = RwLock::new(false);
 pub unsafe extern "stdcall" fn blit_flip() -> i32 {
     tracing::trace!("GdiBlitFlip called");
 
-    let called = { DRAW_CALLED.read().unwrap().clone() };
+    let called = { *DRAW_CALLED.read().unwrap() };
     if called {
         return 0;
     }
@@ -693,7 +697,7 @@ pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) 
         y2
     );
 
-    let called = { DRAW_CALLED.read().unwrap().clone() };
+    let called = { *DRAW_CALLED.read().unwrap() };
     if called {
         return 0;
     }
@@ -754,7 +758,8 @@ pub unsafe extern "cdecl" fn set_palette(
         palette_colors
     );
 
-    if palette_colors.is_null() || start < 0 || start > 255 || count < 1 || (256 - start) < count {
+    if palette_colors.is_null() || !(0..=255).contains(&start) || count < 1 || (256 - start) < count
+    {
         return -1;
     }
 
@@ -787,10 +792,10 @@ pub unsafe extern "stdcall" fn set_palette_with_brightness(palette_data: *mut c_
 
     let brightness = unsafe { *G_DISPLAY_BRIGHTNESS } as usize;
 
-    for i in 0..256 {
+    for (i, color) in palette.iter().enumerate().take(256) {
         unsafe {
-            let PaletteColor { red, green, blue } = palette[i];
-            (*G_PALETTE_COLORS_PRE_BRIGHTNESS)[i] = PaletteColor { red, green, blue };
+            (*G_PALETTE_COLORS_PRE_BRIGHTNESS)[i] = *color;
+            let PaletteColor { red, green, blue } = *color;
             (*G_PALETTE_COLORS)[i] = PaletteColor {
                 red: (*G_GAMMA_TABLE)[red as usize + brightness * 64],
                 green: (*G_GAMMA_TABLE)[green as usize + brightness * 64],

@@ -455,13 +455,13 @@ impl Shell {
             };
 
             let weird_func = G_SOME_SETTINGS_WEIRD_FUNC.read().unwrap().unwrap();
-            return weird_func(
+            weird_func(
                 *G_SOME_SETTINGS_WEIRD_GLOBAL,
                 (*settings).unknown1 + (*settings).unknown3 / 2,
                 (*settings).unknown2,
                 CString::new(label).unwrap().as_ptr(),
                 0,
-            );
+            )
         }
     }
 

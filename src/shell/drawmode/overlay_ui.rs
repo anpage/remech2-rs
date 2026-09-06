@@ -61,14 +61,14 @@ impl OverlayUi {
         let aspect_ratio = const { 4.0 / 3.0 };
         let mut width = window_width;
         let mut height = window_height;
-        let scale_factor;
-        if width / height > aspect_ratio {
+        
+        let scale_factor = if width / height > aspect_ratio {
             width = height * aspect_ratio;
-            scale_factor = width / 640.0;
+            width / 640.0
         } else {
             height = width / aspect_ratio;
-            scale_factor = height / 480.0;
-        }
+            height / 480.0
+        };
 
         let mut menu_open = false;
 
@@ -93,11 +93,7 @@ impl OverlayUi {
             })
             .response;
 
-        if response.contains_pointer() {
-            self.shell_hovered = true;
-        } else {
-            self.shell_hovered = false;
-        }
+        self.shell_hovered = response.contains_pointer();
 
         if self.menu_visible {
             let handle_menu_button = |id: u16| {
@@ -112,7 +108,7 @@ impl OverlayUi {
                 .collapsible(false)
                 .movable(false)
                 .title_bar(false)
-                .fixed_pos(egui::pos2(window_width as f32 / 2. - width / 2., 0.0))
+                .fixed_pos(egui::pos2(window_width / 2. - width / 2., 0.0))
                 .fixed_size(Vec2::new(width, 30.0))
                 .show(ctx, |ui| {
                     egui::containers::menu::MenuBar::new().ui(ui, |ui| {
