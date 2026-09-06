@@ -847,6 +847,10 @@ impl Sim {
     ///
     /// TODO: This could break multiplayer. Look into another solution if it causes desync.
     unsafe extern "cdecl" fn random_int_below(max: i32) -> i32 {
+        if max <= 0 {
+            tracing::error!("random_int_below: max <= 0 (max={max})");
+            std::process::abort();
+        }
         rand::rng().random_range(0..max)
     }
 
