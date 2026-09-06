@@ -45,7 +45,10 @@ pub fn create_sample(driver_handle: DriverHandle) -> SampleHandle {
     if !DRIVERS.lock().unwrap().contains_key(driver) {
         return SampleHandle::new(0);
     }
-    let key = SAMPLES.lock().unwrap().insert(Sample::new(driver));
+    let Some(sample) = Sample::new(driver) else {
+        return SampleHandle::new(0);
+    };
+    let key = SAMPLES.lock().unwrap().insert(sample);
     SampleHandle::new(key.data().as_ffi())
 }
 
@@ -54,9 +57,24 @@ pub fn get_sample(handle: SampleHandle) -> Option<Sample> {
 }
 
 pub fn release_sample(handle: SampleHandle) {
-    if let Some(key) = sample_key(handle) {
-        SAMPLES.lock().unwrap().remove(key);
+    if let Some(key) = sample_key(handle)
+        && let Some(sample) = SAMPLES.lock().unwrap().remove(key)
+    {
+        sample.release();
     }
+}
+
+pub fn drain_pending_eos() -> Vec<(SampleHandle, unsafe extern "stdcall" fn(SampleHandle))> {
+    let samples: Vec<(SampleHandle, Sample)> = SAMPLES
+        .lock()
+        .unwrap()
+        .iter()
+        .map(|(key, sample)| (SampleHandle::new(key.data().as_ffi()), sample.clone()))
+        .collect();
+    samples
+        .into_iter()
+        .filter_map(|(handle, sample)| sample.take_pending_eos().map(|cb| (handle, cb)))
+        .collect()
 }
 
 pub fn shutdown() {

@@ -1,9 +1,13 @@
 use std::sync::{Arc, Mutex};
 
-use rodio::{OutputStream, OutputStreamBuilder, Sink};
+use rodio::{OutputStream, OutputStreamBuilder, mixer::Mixer};
 
 struct Inner {
+    // Keep stream alive inside the driver
+    #[allow(dead_code)]
     stream: OutputStream,
+    mixer: Mixer,
+    mono: bool,
 }
 
 #[derive(Clone)]
@@ -15,11 +19,19 @@ impl Driver {
             .and_then(|b| b.with_channels(channels).open_stream())
             .inspect_err(|e| tracing::error!("failed to open audio stream: {e}"))
             .ok()?;
-        Some(Driver(Arc::new(Mutex::new(Inner { stream }))))
+        let mixer = stream.mixer().clone();
+        Some(Driver(Arc::new(Mutex::new(Inner {
+            stream,
+            mixer,
+            mono: channels == 1,
+        }))))
     }
 
-    pub fn connect_new_sink(&self) -> Sink {
-        let stream_handle = &self.0.lock().unwrap().stream;
-        Sink::connect_new(stream_handle.mixer())
+    pub fn mixer(&self) -> Mixer {
+        self.0.lock().unwrap().mixer.clone()
+    }
+
+    pub fn is_mono(&self) -> bool {
+        self.0.lock().unwrap().mono
     }
 }

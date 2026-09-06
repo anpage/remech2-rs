@@ -33,7 +33,7 @@ use crate::{
         interface::{
             allocate_file_sample, allocate_sample_handle, end_sample, init_sample,
             load_sample_buffer, register_eos_callback, release_sample_handle, resume_sample,
-            sample_buffer_ready, sample_user_data, set_preference, set_sample_loop_count,
+            sample_buffer_ready, sample_user_data, serve, set_preference, set_sample_loop_count,
             set_sample_pan, set_sample_playback_rate, set_sample_type, set_sample_user_data,
             set_sample_volume, start_sample, stop_sample, wave_out_open,
         },
@@ -353,6 +353,9 @@ impl Sim {
 
             let ail_wave_out_open_thunk = (base_address + 0x001836b0) as *mut usize;
             *ail_wave_out_open_thunk = wave_out_open as usize;
+
+            let ail_serve_thunk = (base_address + 0x001836b4) as *mut usize;
+            *ail_serve_thunk = serve as usize;
 
             *GAME_TICK_TIMER_CALLBACK_HOOK.write().unwrap() = {
                 let target: GameTickTimerCallbackFunc =

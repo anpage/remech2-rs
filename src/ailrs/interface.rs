@@ -3,10 +3,7 @@ use std::{ffi::c_void, num::NonZero, slice};
 use tracing::{Level, instrument};
 use windows::Win32::Media::Audio::{WAVE_FORMAT_PCM, WAVEFORMATEX};
 
-use crate::ailrs::{
-    sample::Buffer,
-    storage::{create_driver, create_sample, get_sample, release_sample},
-};
+use crate::ailrs::storage::{create_driver, create_sample, get_sample, release_sample};
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug)]
@@ -78,35 +75,30 @@ pub unsafe extern "stdcall" fn load_sample_buffer(
     len: u32,
 ) {
     tracing::debug!("Called");
-    if buffer.is_null() || len == 0 {
+    if buff_num > 1 {
         return;
     }
-
-    let buff_num: Buffer = match buff_num {
-        0 => Buffer::First,
-        1 => Buffer::Second,
-        _ => return,
-    };
 
     let Some(sample) = get_sample(sample) else {
         return;
     };
 
-    let data = unsafe { slice::from_raw_parts(buffer, len as usize) };
+    let data = if buffer.is_null() {
+        &[]
+    } else {
+        unsafe { slice::from_raw_parts(buffer, len as usize) }
+    };
 
-    sample.load_buffer(buff_num, data)
+    sample.load_buffer(buff_num as usize, data)
 }
 
 #[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn register_eos_callback(
     sample_handle: SampleHandle,
-    callback: unsafe extern "stdcall" fn(SampleHandle),
-) {
+    callback: Option<unsafe extern "stdcall" fn(SampleHandle)>,
+) -> Option<unsafe extern "stdcall" fn(SampleHandle)> {
     tracing::debug!("Called");
-    let Some(sample) = get_sample(sample_handle) else {
-        return;
-    };
-    sample.register_eos_callback(Box::new(move || unsafe { callback(sample_handle) }))
+    get_sample(sample_handle)?.register_eos_callback(callback)
 }
 
 #[instrument(level = Level::DEBUG)]
@@ -130,10 +122,7 @@ pub unsafe extern "stdcall" fn sample_buffer_ready(sample: SampleHandle) -> i32 
     let Some(sample) = get_sample(sample) else {
         return -1;
     };
-    match sample.buffer_ready() {
-        Buffer::First => 0,
-        Buffer::Second => 1,
-    }
+    sample.buffer_ready()
 }
 
 #[instrument(level = Level::DEBUG)]
@@ -262,4 +251,12 @@ pub unsafe extern "stdcall" fn wave_out_open(
         return -1;
     }
     0
+}
+
+#[instrument(level = Level::DEBUG)]
+pub unsafe extern "stdcall" fn serve() {
+    tracing::debug!("Called");
+    for (handle, callback) in crate::ailrs::storage::drain_pending_eos() {
+        unsafe { callback(handle) };
+    }
 }

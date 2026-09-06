@@ -1,151 +1,113 @@
-use std::{
-    collections::HashMap,
-    io::Cursor,
-    sync::{Arc, Mutex},
-};
-
-use rodio::{
-    Decoder, Sink, Source, conversions::SampleTypeConverter, source::EmptyCallback,
-    static_buffer::StaticSamplesBuffer,
-};
+use std::sync::{Arc, Mutex};
 
 use crate::ailrs::{
     interface::SampleHandle,
-    pcm_source::PcmSource,
     storage::{DriverKey, get_driver},
+    voice::{Status, Voice, VoiceState},
 };
 
-pub trait EosCallback: Fn() + Send {
-    fn clone_box(&self) -> Box<dyn EosCallback>;
-}
-
-impl<T> EosCallback for T
-where
-    T: 'static + Fn() + Clone + Send,
-{
-    fn clone_box(&self) -> Box<dyn EosCallback> {
-        Box::new(self.clone())
-    }
-}
-
-impl Clone for Box<dyn EosCallback> {
-    fn clone(&self) -> Self {
-        (**self).clone_box()
-    }
-}
-
-#[derive(Clone, Copy)]
-pub enum Buffer {
-    First,
-    Second,
-}
-
-struct Inner {
-    driver: DriverKey,
-    buffer_free: Buffer,
-    sink: Option<Sink>,
-    user_data: HashMap<u32, i32>,
-    first_buffer: Vec<u8>,
-    second_buffer: Vec<u8>,
-    eos_callback: Option<Box<dyn EosCallback>>,
-}
-
 #[derive(Clone)]
-pub struct Sample(Arc<Mutex<Inner>>);
+pub struct Sample(Arc<Mutex<VoiceState>>);
 
 impl Sample {
-    pub fn new(driver: DriverKey) -> Self {
-        return Self(Arc::new(Mutex::new(Inner {
-            driver,
-            buffer_free: Buffer::First,
-            sink: None,
-            user_data: HashMap::new(),
-            first_buffer: vec![],
-            second_buffer: vec![],
-            eos_callback: None,
-        })));
-    }
-
-    pub fn end(&self) {
-        // TODO
+    pub fn new(driver: DriverKey) -> Option<Self> {
+        let driver = get_driver(driver)?;
+        let state = Arc::new(Mutex::new(VoiceState::new(driver.is_mono())));
+        driver.mixer().add(Voice::new(state.clone()));
+        Some(Self(state))
     }
 
     pub fn init(&self) {
-        let mut inner = self.0.lock().unwrap();
-        let Some(driver) = get_driver(inner.driver) else {
-            return;
-        };
-        (*inner).sink = Some(driver.connect_new_sink());
+        self.0.lock().unwrap().init();
     }
 
-    pub fn load_buffer(&self, buffer: Buffer, data: &[u8]) {
-        let inner = self.0.lock().unwrap();
-        // let buffer = match buffer {
-        //     Buffer::First => &mut inner.first_buffer,
-        //     Buffer::Second => &mut inner.second_buffer,
-        // };
-        // buffer.clear();
-        // buffer.extend_from_slice(data);
-
-        let source = PcmSource::new(data);
-
-        if let Some(ref sink) = inner.sink {
-            sink.append(source.low_pass(5500));
-            if let Some(callback) = inner.eos_callback.clone() {
-                sink.append(EmptyCallback::new(callback));
-            }
-        }
+    pub fn load_buffer(&self, slot: usize, data: &[u8]) {
+        self.0.lock().unwrap().load_buffer(slot, data);
     }
 
-    pub fn register_eos_callback(&self, callback: Box<dyn EosCallback>) {
-        let mut inner = self.0.lock().unwrap();
-        inner.eos_callback = Some(callback);
-    }
-
-    pub fn resume(&self) {
-        // TODO
-    }
-
-    pub fn buffer_ready(&self) -> Buffer {
-        let inner = self.0.lock().unwrap();
-        inner.buffer_free
-    }
-
-    pub fn user_data(&self, index: u32) -> i32 {
-        let inner = self.0.lock().unwrap();
-        inner.user_data.get(&index).copied().unwrap_or(0)
-    }
-
-    pub fn set_loop_count(&self, loop_count: u32) {
-        // TODO
-    }
-
-    pub fn set_pan(&self, pan: i32) {
-        // TODO
-    }
-
-    pub fn set_playback_rate(&self, playback_rate: i32) {
-        // TODO
-    }
-
-    pub fn set_type(&self, format: i32, flags: u32) {
-        // TODO
-    }
-
-    pub fn set_user_data(&self, index: u32, user_data: i32) {
-        let mut inner = self.0.lock().unwrap();
-        inner.user_data.insert(index, user_data);
-    }
-
-    pub fn set_volume(&self, volume: i32) {
-        // TODO
+    pub fn buffer_ready(&self) -> i32 {
+        self.0.lock().unwrap().buffer_ready()
     }
 
     pub fn start(&self) {
-        // TODO
+        let mut s = self.0.lock().unwrap();
+        s.status = Status::Playing;
     }
 
     pub fn stop(&self) {
-        // TODO
+        let mut s = self.0.lock().unwrap();
+        if s.status == Status::Playing {
+            s.status = Status::Stopped;
+        }
+    }
+
+    pub fn resume(&self) {
+        let mut s = self.0.lock().unwrap();
+        if s.status == Status::Stopped {
+            s.status = Status::Playing;
+        }
+    }
+
+    pub fn end(&self) {
+        let mut s = self.0.lock().unwrap();
+        s.status = Status::Done;
+    }
+
+    pub fn release(&self) {
+        self.0.lock().unwrap().alive = false;
+    }
+
+    pub fn user_data(&self, index: u32) -> i32 {
+        let s = self.0.lock().unwrap();
+        s.user_data.get(index as usize).copied().unwrap_or(0)
+    }
+
+    pub fn set_user_data(&self, index: u32, value: i32) {
+        let mut s = self.0.lock().unwrap();
+        if let Some(slot) = s.user_data.get_mut(index as usize) {
+            *slot = value;
+        }
+    }
+
+    pub fn set_loop_count(&self, loop_count: u32) {
+        self.0.lock().unwrap().loop_count = loop_count;
+    }
+
+    pub fn set_volume(&self, volume: i32) {
+        self.0.lock().unwrap().volume = volume.clamp(0, 127) as u8;
+    }
+
+    pub fn set_pan(&self, pan: i32) {
+        self.0.lock().unwrap().pan = pan.clamp(0, 127) as u8;
+    }
+
+    pub fn set_playback_rate(&self, rate: i32) {
+        self.0.lock().unwrap().rate = rate.max(1) as u32;
+    }
+
+    pub fn set_type(&self, format: i32, _flags: u32) {
+        // Mech2 only ever passes `DIG_F_MONO_8` (0)
+        if format != 0 {
+            tracing::error!("set_sample_type: unsupported format {format}, expected DIG_F_MONO_8");
+            panic!("unsupported sample format {format}");
+        }
+    }
+
+    pub fn register_eos_callback(
+        &self,
+        callback: Option<unsafe extern "stdcall" fn(SampleHandle)>,
+    ) -> Option<unsafe extern "stdcall" fn(SampleHandle)> {
+        let mut s = self.0.lock().unwrap();
+        std::mem::replace(&mut s.eos_callback, callback)
+    }
+
+    pub fn take_pending_eos(&self) -> Option<unsafe extern "stdcall" fn(SampleHandle)> {
+        let mut s = self.0.lock().unwrap();
+        if s.pending_eos {
+            s.pending_eos = false;
+            s.eos_callback
+        } else {
+            None
+        }
     }
 }

@@ -1,8 +1,8 @@
 mod driver;
 pub mod interface;
-mod pcm_source;
 mod sample;
 mod storage;
+mod voice;
 
 pub fn shutdown() {
     storage::shutdown();
