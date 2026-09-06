@@ -1,0 +1,11 @@
+{
+  "lsp": {
+    "rust-analyzer": {
+      "initialization_options": {
+        "files": {
+          "excludeDirs": ["wineprefix"]
+        }
+      }
+    }
+  }
+}

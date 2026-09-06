@@ -1,0 +1,37 @@
+[
+  {
+    "label": "build",
+    "command": "cargo",
+    "args": ["build", "-v", "--target=i686-pc-windows-gnu"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "hide": "on_success",
+  },
+  {
+    "label": "Run (Wine)",
+    "command": "/home/alex/.local/share/lutris/runners/wine/wine-10.17-amd64/bin/wine",
+    "args": ["$ZED_WORKTREE_ROOT/target/i686-pc-windows-gnu/debug/remech2.exe"],
+    "cwd": "$ZED_WORKTREE_ROOT/data",
+    "env": {
+      "WINEPREFIX": "$ZED_WORKTREE_ROOT/wineprefix",
+    },
+  },
+  {
+    "label": "Launch gdbserver (Wine)",
+    "command": "/home/alex/.local/share/lutris/runners/wine/wine-10.17-amd64/bin/wine",
+    "args": [
+      "Z:/usr/share/win32/gdbserver.exe",
+      "localhost:12345",
+      "$ZED_WORKTREE_ROOT/target/i686-pc-windows-gnu/debug/remech2.exe",
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT/data",
+    "env": {
+      "WINEPREFIX": "$ZED_WORKTREE_ROOT/wineprefix",
+    },
+  },
+  {
+    "label": "build and restart gdbserver",
+    "command": "cargo build -v --target=i686-pc-windows-gnu && (fuser -k 12345/tcp; sleep 1; cd \"$ZED_WORKTREE_ROOT/data\" && WINEPREFIX=\"$ZED_WORKTREE_ROOT/wineprefix\" setsid /home/alex/.local/share/lutris/runners/wine/wine-10.17-amd64/bin/wine Z:/usr/share/win32/gdbserver.exe localhost:12345 \"$ZED_WORKTREE_ROOT/target/i686-pc-windows-gnu/debug/remech2.exe\" < /dev/null > /tmp/remech2-gdbserver.log 2>&1 & sleep 3)",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "hide": "on_success",
+  },
+]
