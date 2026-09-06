@@ -1,5 +1,5 @@
 use std::{
-    ffi::{CString, c_char, c_void},
+    ffi::{CStr, CString, c_char, c_void},
     fs,
     sync::RwLock,
 };
@@ -315,65 +315,73 @@ impl Shell {
     /// Patched to avoid a bug where the game was using an older Win32 API
     unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) {
         unsafe {
-            // Create "MEK" folder if it doesn't exist
-            fs::create_dir_all("MEK").unwrap();
+            const SLOT_LEN: usize = 13;
 
-            let mech_type: &str = std::ffi::CStr::from_ptr(mech_type).to_str().unwrap();
+            let write_slot = |dst: *mut c_char, name: &[u8]| {
+                debug_assert!(name.len() < SLOT_LEN);
+                let dst = dst.cast::<u8>();
+                std::ptr::write_bytes(dst, 0, SLOT_LEN);
+                std::ptr::copy_nonoverlapping(name.as_ptr(), dst, name.len());
+            };
+
+            // Create "MEK" folder if it doesn't exist
+            if let Err(e) = fs::create_dir_all("MEK") {
+                tracing::warn!("load_mech_variant_list: cannot create MEK dir: {e}");
+            }
+
+            let Ok(mech_type) = CStr::from_ptr(mech_type).to_str() else {
+                tracing::warn!("load_mech_variant_list: non-UTF8 mech_type");
+                return;
+            };
 
             // Clear the list
-            (*G_MECH_VARIANT_FILENAMES).fill([0; 13]);
+            let filenames = &mut *G_MECH_VARIANT_FILENAMES;
+            filenames.fill([0; SLOT_LEN as _]);
 
             // Make sure we have at least the default variant
-            let default_variant = format!("{mech_type}00std");
-            std::ptr::copy_nonoverlapping(
-                default_variant.as_ptr(),
-                G_MECH_VARIANT_FILENAME.cast(),
-                13,
-            );
-            std::ptr::copy_nonoverlapping(
-                default_variant.as_ptr(),
-                (*G_MECH_VARIANT_FILENAMES)[0].as_mut_ptr().cast(),
-                13,
+            write_slot(
+                filenames[0].as_mut_ptr(),
+                format!("{mech_type}00std").as_bytes(),
             );
 
             // Load the built-in mech variants from the MW2.PRJ file into the next 99 indices
-            for i in 1..100 {
-                let variant = format!("{mech_type}{i:02}std");
-                std::ptr::copy_nonoverlapping(variant.as_ptr(), G_MECH_VARIANT_FILENAME.cast(), 13);
-
-                let variant = CString::new(variant).unwrap();
+            for (i, slot) in filenames[1..100].iter_mut().enumerate() {
+                let variant = format!("{mech_type}{:02}std", i + 1);
+                let c_variant = CString::new(variant.as_str()).expect("no interior NUL");
 
                 let result = G_LOAD_FILE_FROM_PRJ.read().unwrap().unwrap()(
                     G_PRJ_OBJECT,
-                    variant.as_ptr(),
+                    c_variant.as_ptr(),
                     6,
                 );
 
                 if result > -1 {
-                    std::ptr::copy_nonoverlapping(
-                        variant.as_ptr(),
-                        (*G_MECH_VARIANT_FILENAMES)[i].as_mut_ptr(),
-                        13,
-                    );
+                    write_slot(slot.as_mut_ptr(), variant.as_bytes());
                 }
             }
 
             // Find all user-defined mech variants from the filesystem and load their names into index 100 and higher
-            let files = fs::read_dir("mek").unwrap();
-            for file in files {
-                let path = file.unwrap().path();
-                let filename = path.file_name().unwrap().to_str().unwrap();
-                if &filename[..3] == mech_type && &filename[5..] == "usr.mek" {
-                    let variant = CString::new(filename[..8].to_string()).unwrap();
-                    let variant = variant.as_ptr();
-                    let i = 100 + filename[3..5].parse::<usize>().unwrap();
+            let Ok(files) = fs::read_dir("MEK") else {
+                return;
+            };
 
-                    std::ptr::copy_nonoverlapping(variant, G_MECH_VARIANT_FILENAME, 13);
+            for file in files.flatten() {
+                let Some(name) = file.file_name().to_str().map(str::to_owned) else {
+                    continue;
+                };
 
-                    if (*G_MECH_VARIANT_FILENAMES)[i][0] == 0 {
-                        std::ptr::copy_nonoverlapping(variant, G_MECH_VARIANT_FILENAME, 13);
-                        break;
-                    }
+                let is_match = name.len() == 11
+                    && name[..3].eq_ignore_ascii_case(mech_type)
+                    && name[3..5].bytes().all(|b| b.is_ascii_digit())
+                    && name[5..].eq_ignore_ascii_case("usr.mek");
+                if !is_match {
+                    continue;
+                }
+
+                let n: usize = name[3..5].parse().expect("two ASCII digits");
+                let i = 100 + n;
+                if let Some(slot) = filenames.get_mut(i) {
+                    write_slot(slot.as_mut_ptr(), &name.as_bytes()[..8]);
                 }
             }
         }
