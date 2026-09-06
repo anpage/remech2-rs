@@ -13,7 +13,9 @@ impl Sample {
     pub fn new(driver: DriverKey) -> Option<Self> {
         let driver = get_driver(driver)?;
         let state = Arc::new(Mutex::new(VoiceState::new(driver.is_mono())));
-        driver.mixer().add(Voice::new(state.clone()));
+        driver
+            .mixer()
+            .add(Voice::new(state.clone(), driver.sample_rate()));
         Some(Self(state))
     }
 

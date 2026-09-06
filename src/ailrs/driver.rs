@@ -34,4 +34,9 @@ impl Driver {
     pub fn is_mono(&self) -> bool {
         self.0.lock().unwrap().mono
     }
+
+    /// The device's actual output rate. Voices handle resampling to this.
+    pub fn sample_rate(&self) -> u32 {
+        self.0.lock().unwrap().stream.config().sample_rate()
+    }
 }

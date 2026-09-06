@@ -108,27 +108,77 @@ impl VoiceState {
             self.status = Status::Playing;
         }
     }
+
+    fn next_input(&mut self) -> Option<f32> {
+        loop {
+            if self.status != Status::Playing {
+                return None;
+            }
+
+            let cur = self.cur;
+
+            {
+                let slot = &mut self.slots[cur];
+                if slot.pos < slot.data.len() {
+                    let sample = (slot.data[slot.pos] as f32 - 128.0) / 128.0;
+                    slot.pos += 1;
+                    return Some(sample);
+                }
+            }
+
+            if self.slots[cur].data.is_empty() && self.loop_count != 1 {
+                return None;
+            }
+
+            match self.loop_count {
+                0 => self.slots[cur].pos = 0, // replay this buffer forever
+                1 => {
+                    let other = cur ^ 1;
+                    if self.slots[other].is_last {
+                        self.status = Status::Done;
+                        self.pending_eos = true; // drained by the hooked AIL_serve
+                        return None;
+                    }
+                    if self.slots[other].data.is_empty() || self.slots[other].pos != 0 {
+                        // Underrun
+                        return None;
+                    }
+                    self.cur = other;
+                    self.slots[other].pos = 0;
+                }
+                n => {
+                    self.loop_count = n - 1;
+                    self.slots[cur].pos = 0;
+                }
+            }
+        }
+    }
 }
 
-/// Samples rendered per lock acquisition.
-/// Also the value reported by `current_span_len`, which is what lets a mid-stream
-/// `set_sample_playback_rate` take effect: rodio's `UniformSourceIterator` re-reads
-/// rate and channels at every span boundary.
-/// Must stay even so a stereo frame is never split across spans.
+/// Output samples rendered per lock acquisition.
 const BLOCK: usize = 1024;
 
 pub struct Voice {
     state: Arc<Mutex<VoiceState>>,
+    out_rate: u32,
     buf: Vec<f32>,
     pos: usize,
+
+    phase: f64,
+    prev: f32,
+    next: f32,
 }
 
 impl Voice {
-    pub fn new(state: Arc<Mutex<VoiceState>>) -> Self {
+    pub fn new(state: Arc<Mutex<VoiceState>>, out_rate: u32) -> Self {
         Self {
             state,
+            out_rate,
             buf: vec![0.0; BLOCK],
             pos: BLOCK, // forces a render on the first poll
+            phase: 1.0, // forces prev/next to be primed on the first frame
+            prev: 0.0,
+            next: 0.0,
         }
     }
 
@@ -145,56 +195,20 @@ impl Voice {
         let gain_l = gain * (1.0 - pan);
         let gain_r = gain * pan;
 
-        let mut out = 0;
-        while out < BLOCK {
-            if state.status != Status::Playing {
-                break;
+        let step = state.rate.max(1) as f64 / self.out_rate as f64;
+
+        for frame in self.buf.chunks_exact_mut(2) {
+            while self.phase >= 1.0 {
+                self.prev = self.next;
+                self.next = state.next_input().unwrap_or(0.0);
+                self.phase -= 1.0;
             }
 
-            let cur = state.cur;
+            let sample = self.prev + (self.next - self.prev) * self.phase as f32;
+            self.phase += step;
 
-            {
-                let slot = &mut state.slots[cur];
-                if slot.pos < slot.data.len() {
-                    let sample = (slot.data[slot.pos] as f32 - 128.0) / 128.0;
-                    slot.pos += 1;
-                    self.buf[out] = sample * gain_l;
-                    self.buf[out + 1] = sample * gain_r;
-                    out += 2;
-                    continue;
-                }
-            }
-
-            if state.slots[cur].data.is_empty() && state.loop_count != 1 {
-                break;
-            }
-
-            match state.loop_count {
-                0 => state.slots[cur].pos = 0, // replay this buffer forever
-                1 => {
-                    let other = cur ^ 1;
-                    if state.slots[other].is_last {
-                        state.status = Status::Done;
-                        state.pending_eos = true; // drained by the hooked AIL_serve
-                        break;
-                    }
-                    if state.slots[other].data.is_empty() || state.slots[other].pos != 0 {
-                        // Underrun
-                        break;
-                    }
-                    state.cur = other;
-                    state.slots[other].pos = 0;
-                }
-                n => {
-                    state.loop_count = n - 1;
-                    state.slots[cur].pos = 0;
-                }
-            }
-        }
-
-        // Silence-fill on underrun and keep the voice registered
-        for sample in &mut self.buf[out..] {
-            *sample = 0.0;
+            frame[0] = sample * gain_l;
+            frame[1] = sample * gain_r;
         }
         true
     }
@@ -218,7 +232,7 @@ impl Iterator for Voice {
 
 impl Source for Voice {
     fn current_span_len(&self) -> Option<usize> {
-        Some(BLOCK)
+        None
     }
 
     fn channels(&self) -> u16 {
@@ -226,7 +240,7 @@ impl Source for Voice {
     }
 
     fn sample_rate(&self) -> u32 {
-        self.state.lock().unwrap().rate
+        self.out_rate
     }
 
     fn total_duration(&self) -> Option<std::time::Duration> {
