@@ -1,4 +1,4 @@
-use std::ffi::{CStr, c_char, c_int, c_void};
+use std::ffi::{CStr, VaList, c_char, c_int, c_void};
 
 use windows::{
     Win32::{
@@ -9,7 +9,7 @@ use windows::{
 };
 
 unsafe extern "C" {
-    fn sprintf(s: *mut c_char, format: *const c_char, ...) -> c_int;
+    fn vsprintf(s: *mut c_char, format: *const c_char, ap: VaList) -> c_int;
 }
 
 pub type HeapFreeFunc = unsafe extern "system" fn(HANDLE, HEAP_FLAGS, *const c_void) -> BOOL;
@@ -26,10 +26,13 @@ pub unsafe extern "system" fn fake_set_menu(_hwnd: HWND, _h_menu: *mut c_void) -
     TRUE
 }
 
-pub unsafe extern "C" fn debug_log(format: *const c_char, mut args: ...) {
+pub unsafe extern "C" fn debug_log(format: *const c_char, args: ...) {
     unsafe {
-        let mut buffer = [0; 256];
-        sprintf(buffer.as_mut_ptr(), format, args.as_va_list());
+        if format.is_null() {
+            return;
+        }
+        let mut buffer = [0i8; 1024];
+        vsprintf(buffer.as_mut_ptr(), format, args);
         let buffer = CStr::from_ptr(buffer.as_ptr());
         print!("{}", buffer.to_str().unwrap());
     }
