@@ -454,12 +454,12 @@ impl Shell {
     ) -> *mut *mut c_void {
         unsafe {
             let value = (*(*settings).value)[4];
-            let label = if value == 0x34 {
-                "~640x480"
-            } else if value == 0x37 {
-                "~1024x768"
+            let label = if value == b'4' as i8 {
+                c"~640x480"
+            } else if value == b'7' as i8 {
+                c"~1024x768"
             } else {
-                "~320x200"
+                c"~320x200"
             };
 
             let weird_func = G_SOME_SETTINGS_WEIRD_FUNC.read().unwrap().unwrap();
@@ -467,7 +467,7 @@ impl Shell {
                 *G_SOME_SETTINGS_WEIRD_GLOBAL,
                 (*settings).unknown1 + (*settings).unknown3 / 2,
                 (*settings).unknown2,
-                CString::new(label).unwrap().as_ptr(),
+                label.as_ptr(),
                 0,
             )
         }
@@ -475,13 +475,13 @@ impl Shell {
 
     unsafe extern "cdecl" fn resolution_toggle(settings: *mut SomeSettingsStruct) {
         unsafe {
-            if (*(*settings).value)[4] == 0x34 {
+            if (*(*settings).value)[4] == b'4' as i8 {
                 std::ptr::copy_nonoverlapping(
                     c"vesa768.dll".as_ptr(),
                     (*(*settings).value).as_mut_ptr(),
                     12,
                 );
-            } else if (*(*settings).value)[4] == 0x37 {
+            } else if (*(*settings).value)[4] == b'7' as i8 {
                 (*(*settings).value).fill(0);
             } else {
                 std::ptr::copy_nonoverlapping(
