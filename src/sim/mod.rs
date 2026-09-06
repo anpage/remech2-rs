@@ -108,12 +108,13 @@ struct CdAudioPosition {
     frame: u32,
 }
 
+// Convert into MCI TMSF packed format
 impl From<CdAudioPosition> for u32 {
     fn from(position: CdAudioPosition) -> u32 {
-        position.track
-            + ((position.minute & 0xFF) << 8)
-            + ((position.second & 0xFF) << 16)
-            + (position.frame << 24)
+        (position.track & 0xFF)
+            | ((position.minute & 0xFF) << 8)
+            | ((position.second & 0xFF) << 16)
+            | ((position.frame & 0xFF) << 24)
     }
 }
 
