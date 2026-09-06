@@ -485,14 +485,13 @@ impl Sim {
     }
 
     /// This function is used all over the game to perform ((a * b) / c).
-    /// It sometimes overflows and sometimes divides by zero, especially when the FPS is too high.
-    ///
-    /// TODO: Fix that, probably.
+    /// It would sometimes overflow and sometimes divide by zero, especially when the FPS is too high.
     unsafe extern "cdecl" fn integer_overflow_happens_here(a: i32, b: i32, c: i32) -> i32 {
-        let a = a as i64;
-        let b = b as i64;
-        let c = c as i64;
-        a.wrapping_mul(b).wrapping_div(c) as i32
+        if c == 0 {
+            tracing::error!("integer_overflow_happens_here: division by zero (a={a}, b={b})");
+            std::process::abort();
+        }
+        (a as i64 * b as i64 / c as i64) as i32
     }
 
     /// The game decides which resolution to use based on the DLL name passed to this function.
