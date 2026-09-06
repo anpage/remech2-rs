@@ -142,13 +142,16 @@ impl Ail {
         buffer: *mut c_void,
     ) -> *mut c_void {
         unsafe {
-            let mut allocated_blocks = ALLOCATED_BLOCKS.write().unwrap();
             let result = FILE_READ_HOOK
                 .read()
                 .unwrap()
                 .as_ref()
                 .unwrap()
                 .call(file_name, buffer);
+            if result.is_null() {
+                return result;
+            }
+            let mut allocated_blocks = ALLOCATED_BLOCKS.write().unwrap();
             if !allocated_blocks.contains(&(result as usize)) {
                 allocated_blocks.push(result as usize);
             }
@@ -159,6 +162,9 @@ impl Ail {
     /// Only try to free blocks that we know haven't been freed yet
     unsafe extern "stdcall" fn mem_free_lock(lp_mem: *mut c_void) {
         unsafe {
+            if lp_mem.is_null() {
+                return;
+            }
             let mut allocated_blocks = ALLOCATED_BLOCKS.write().unwrap();
             if allocated_blocks.contains(&(lp_mem as usize)) {
                 MEM_FREE_LOCK_HOOK
