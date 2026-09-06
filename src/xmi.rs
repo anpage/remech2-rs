@@ -580,7 +580,7 @@ mod tests {
             let xmi = XmiFile::new(BufReader::new(file)).unwrap();
             let smf = xmi.to_smf_file();
 
-            let filename = path.split('/').last().unwrap();
+            let filename = path.split('/').next_back().unwrap();
 
             std::fs::write(format!("{filename}.mid"), &smf).unwrap();
         }

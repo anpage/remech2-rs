@@ -295,67 +295,67 @@ impl Sim {
             // AIL replacement
 
             let ail_allocate_file_sample_thunk = (base_address + 0x001836e8) as *mut usize;
-            *ail_allocate_file_sample_thunk = allocate_file_sample as usize;
+            *ail_allocate_file_sample_thunk = allocate_file_sample as *const () as usize;
 
             let ail_allocate_sample_handle_thunk = (base_address + 0x00183654) as *mut usize;
-            *ail_allocate_sample_handle_thunk = allocate_sample_handle as usize;
+            *ail_allocate_sample_handle_thunk = allocate_sample_handle as *const () as usize;
 
             let ail_end_sample_thunk = (base_address + 0x00183674) as *mut usize;
-            *ail_end_sample_thunk = end_sample as usize;
+            *ail_end_sample_thunk = end_sample as *const () as usize;
 
             let ail_init_sample_thunk = (base_address + 0x001836dc) as *mut usize;
-            *ail_init_sample_thunk = init_sample as usize;
+            *ail_init_sample_thunk = init_sample as *const () as usize;
 
             let ail_load_sample_buffer_thunk = (base_address + 0x00183690) as *mut usize;
-            *ail_load_sample_buffer_thunk = load_sample_buffer as usize;
+            *ail_load_sample_buffer_thunk = load_sample_buffer as *const () as usize;
 
             let ail_register_eos_callback_thunk = (base_address + 0x001836d8) as *mut usize;
-            *ail_register_eos_callback_thunk = register_eos_callback as usize;
+            *ail_register_eos_callback_thunk = register_eos_callback as *const () as usize;
 
             let ail_release_sample_handle_thunk = (base_address + 0x001836ec) as *mut usize;
-            *ail_release_sample_handle_thunk = release_sample_handle as usize;
+            *ail_release_sample_handle_thunk = release_sample_handle as *const () as usize;
 
             let ail_resume_sample_thunk = (base_address + 0x0018366c) as *mut usize;
-            *ail_resume_sample_thunk = resume_sample as usize;
+            *ail_resume_sample_thunk = resume_sample as *const () as usize;
 
             let ail_sample_buffer_ready_thunk = (base_address + 0x00183650) as *mut usize;
-            *ail_sample_buffer_ready_thunk = sample_buffer_ready as usize;
+            *ail_sample_buffer_ready_thunk = sample_buffer_ready as *const () as usize;
 
             let ail_sample_user_data_thunk = (base_address + 0x00183664) as *mut usize;
-            *ail_sample_user_data_thunk = sample_user_data as usize;
+            *ail_sample_user_data_thunk = sample_user_data as *const () as usize;
 
             let ail_set_preference_thunk = (base_address + 0x00183698) as *mut usize;
-            *ail_set_preference_thunk = set_preference as usize;
+            *ail_set_preference_thunk = set_preference as *const () as usize;
 
             let ail_set_sample_loop_count_thunk = (base_address + 0x001836e4) as *mut usize;
-            *ail_set_sample_loop_count_thunk = set_sample_loop_count as usize;
+            *ail_set_sample_loop_count_thunk = set_sample_loop_count as *const () as usize;
 
             let ail_set_sample_pan_thunk = (base_address + 0x0018368c) as *mut usize;
-            *ail_set_sample_pan_thunk = set_sample_pan as usize;
+            *ail_set_sample_pan_thunk = set_sample_pan as *const () as usize;
 
             let ail_set_sample_playback_rate_thunk = (base_address + 0x001836d0) as *mut usize;
-            *ail_set_sample_playback_rate_thunk = set_sample_playback_rate as usize;
+            *ail_set_sample_playback_rate_thunk = set_sample_playback_rate as *const () as usize;
 
             let ail_set_sample_type_thunk = (base_address + 0x001836d4) as *mut usize;
-            *ail_set_sample_type_thunk = set_sample_type as usize;
+            *ail_set_sample_type_thunk = set_sample_type as *const () as usize;
 
             let ail_set_sample_user_data_thunk = (base_address + 0x00183678) as *mut usize;
-            *ail_set_sample_user_data_thunk = set_sample_user_data as usize;
+            *ail_set_sample_user_data_thunk = set_sample_user_data as *const () as usize;
 
             let ail_set_sample_volume_thunk = (base_address + 0x00183668) as *mut usize;
-            *ail_set_sample_volume_thunk = set_sample_volume as usize;
+            *ail_set_sample_volume_thunk = set_sample_volume as *const () as usize;
 
             let ail_start_sample_thunk = (base_address + 0x001836e0) as *mut usize;
-            *ail_start_sample_thunk = start_sample as usize;
+            *ail_start_sample_thunk = start_sample as *const () as usize;
 
             let ail_stop_sample_thunk = (base_address + 0x00183670) as *mut usize;
-            *ail_stop_sample_thunk = stop_sample as usize;
+            *ail_stop_sample_thunk = stop_sample as *const () as usize;
 
             let ail_wave_out_open_thunk = (base_address + 0x001836b0) as *mut usize;
-            *ail_wave_out_open_thunk = wave_out_open as usize;
+            *ail_wave_out_open_thunk = wave_out_open as *const () as usize;
 
             let ail_serve_thunk = (base_address + 0x001836b4) as *mut usize;
-            *ail_serve_thunk = serve as usize;
+            *ail_serve_thunk = serve as *const () as usize;
 
             *GAME_TICK_TIMER_CALLBACK_HOOK.write().unwrap() = {
                 let target: GameTickTimerCallbackFunc =
