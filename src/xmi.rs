@@ -170,7 +170,9 @@ impl XmiFile {
                     meta_data[2],
                     meta_data[3],
                 ),
-                0x59 => MetaMessage::KeySignature(meta_data[0] as i8, meta_data[1] != 0),
+                0x59 if meta_data.len() >= 2 => {
+                    MetaMessage::KeySignature(meta_data[0] as i8, meta_data[1] != 0)
+                }
                 0x7F => MetaMessage::SequencerSpecific(meta_data),
                 _ => MetaMessage::Unknown(meta_type, meta_data),
             };
