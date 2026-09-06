@@ -503,8 +503,7 @@ impl Sim {
             *G_GAME_WINDOW_HEIGHT = 200;
 
             let resolution = std::ffi::CStr::from_ptr(resolution)
-                .to_str()
-                .unwrap()
+                .to_string_lossy()
                 .to_uppercase();
             if resolution == "VESA480.DLL" {
                 *G_GAME_WINDOW_WIDTH = 640;
