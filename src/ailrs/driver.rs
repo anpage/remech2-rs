@@ -10,14 +10,12 @@ struct Inner {
 pub struct Driver(Arc<Mutex<Inner>>);
 
 impl Driver {
-    pub fn new(channels: u16, _sample_rate: u32) -> Self {
+    pub fn new(channels: u16, _sample_rate: u32) -> Option<Self> {
         let stream = OutputStreamBuilder::from_default_device()
-            .unwrap()
-            .with_channels(channels)
-            // .with_sample_rate(48000)
-            .open_stream()
-            .unwrap();
-        Driver(Arc::new(Mutex::new(Inner { stream })))
+            .and_then(|b| b.with_channels(channels).open_stream())
+            .inspect_err(|e| tracing::error!("failed to open audio stream: {e}"))
+            .ok()?;
+        Some(Driver(Arc::new(Mutex::new(Inner { stream }))))
     }
 
     pub fn connect_new_sink(&self) -> Sink {

@@ -113,11 +113,7 @@ impl Sample {
 
     pub fn user_data(&self, index: u32) -> i32 {
         let inner = self.0.lock().unwrap();
-        if let Some(user_data) = inner.user_data.get(&index) {
-            *user_data
-        } else {
-            -1
-        }
+        inner.user_data.get(&index).copied().unwrap_or(0)
     }
 
     pub fn set_loop_count(&self, loop_count: u32) {

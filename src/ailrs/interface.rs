@@ -17,12 +17,8 @@ impl DriverHandle {
         Self(NonZero::new(handle))
     }
 
-    pub fn raw(&self) -> u32 {
-        if let Some(raw) = self.0 {
-            return raw.get();
-        } else {
-            0
-        }
+    pub fn id(self) -> Option<NonZero<u32>> {
+        self.0
     }
 }
 
@@ -35,12 +31,8 @@ impl SampleHandle {
         Self(NonZero::new(handle))
     }
 
-    pub fn raw(&self) -> u32 {
-        if let Some(raw) = self.0 {
-            return raw.get();
-        } else {
-            0
-        }
+    pub fn id(self) -> Option<NonZero<u32>> {
+        self.0
     }
 }
 
@@ -51,7 +43,7 @@ pub unsafe extern "stdcall" fn allocate_file_sample(
     _: i32,
 ) -> SampleHandle {
     tracing::debug!("Called");
-    unimplemented!()
+    SampleHandle::new(0)
 }
 
 #[instrument(level = Level::DEBUG)]
@@ -148,7 +140,7 @@ pub unsafe extern "stdcall" fn sample_buffer_ready(sample: SampleHandle) -> i32 
 pub unsafe extern "stdcall" fn sample_user_data(sample: SampleHandle, index: u32) -> i32 {
     tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
-        return -1;
+        return 0;
     };
     sample.user_data(index)
 }
@@ -266,5 +258,8 @@ pub unsafe extern "stdcall" fn wave_out_open(
     unsafe {
         *dig_driver_out = driver;
     }
-    return 0;
+    if driver.id().is_none() {
+        return -1;
+    }
+    0
 }
