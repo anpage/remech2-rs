@@ -295,7 +295,7 @@ impl CustomDrawMode {
             .iter()
             .map(|&p| {
                 let color = self.palette[p as usize];
-                Color32::from_rgb(color[0] * 4, color[1] * 4, color[2] * 4)
+                Color32::from_rgb(color[0], color[1], color[2])
             })
             .collect::<Vec<_>>();
 
@@ -330,13 +330,16 @@ impl CustomDrawMode {
         );
     }
 
-    pub fn set_palette(&mut self, palette_data: &[PaletteColor; 256]) {
-        if palette_data.len() != 256 {
-            panic!("Palette data must be exactly 256 colors");
+    /// Pre-scale a 6-bit palette to 8-bit
+    pub fn set_palette_6bit(&mut self, palette_data: &[PaletteColor; 256]) {
+        let scale = |v: u8| (v.min(63) << 2) | (v.min(63) >> 4);
+        for (i, color) in palette_data.iter().enumerate() {
+            self.palette[i] = [scale(color.red), scale(color.green), scale(color.blue)];
         }
+    }
 
-        for i in 0..256 {
-            let color = palette_data[i];
+    pub fn set_palette(&mut self, palette_data: &[PaletteColor; 256]) {
+        for (i, color) in palette_data.iter().enumerate() {
             self.palette[i] = [color.red, color.green, color.blue];
         }
     }

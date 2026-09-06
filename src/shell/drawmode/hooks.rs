@@ -768,7 +768,7 @@ pub unsafe extern "cdecl" fn set_palette(
 
     unsafe {
         if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
-            draw_mode.set_palette(G_PALETTE_COLORS.as_ref().unwrap());
+            draw_mode.set_palette_6bit(G_PALETTE_COLORS.as_ref().unwrap());
         }
     }
 
