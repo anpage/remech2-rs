@@ -633,20 +633,24 @@ impl Sim {
                 CdSource::from_str(&SETTINGS.get(Some("audio"), "cd_source").unwrap_or_default());
 
             if source != CdSource::Mci {
-                let mut guard = CD_AUDIO_PLAYER.lock().unwrap();
-                if guard.is_none() {
-                    match CdAudioPlayer::new() {
-                        Ok(p) => *guard = Some(p),
-                        Err(e) => {
-                            if source == CdSource::Files {
-                                tracing::error!("cd_source=files but player init failed: {e}");
-                            } else {
-                                tracing::warn!("CD audio files unavailable, using MCI: {e}");
+                let have_player = {
+                    let mut guard = CD_AUDIO_PLAYER.lock().unwrap();
+                    if guard.is_none() {
+                        match CdAudioPlayer::new() {
+                            Ok(p) => *guard = Some(p),
+                            Err(e) => {
+                                if source == CdSource::Files {
+                                    tracing::error!("cd_source=files but player init failed: {e}");
+                                } else {
+                                    tracing::warn!("CD audio files unavailable, using MCI: {e}");
+                                }
                             }
                         }
                     }
-                }
-                if guard.is_some() {
+                    guard.is_some()
+                };
+
+                if have_player {
                     *G_CD_AUDIO_DEVICE = 1;
                     *G_CD_AUDIO_AUX_DEVICE = Self::get_cd_audio_aux_device();
                     *G_CD_AUDIO_INITIALIZED = 1;
