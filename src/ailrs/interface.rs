@@ -39,19 +39,16 @@ pub unsafe extern "stdcall" fn allocate_file_sample(
     data: *const u8,
     _: i32,
 ) -> SampleHandle {
-    tracing::debug!("Called");
     SampleHandle::new(0)
 }
 
 #[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn allocate_sample_handle(driver: DriverHandle) -> SampleHandle {
-    tracing::debug!("Called");
     create_sample(driver)
 }
 
 #[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn end_sample(sample: SampleHandle) {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
@@ -60,7 +57,6 @@ pub unsafe extern "stdcall" fn end_sample(sample: SampleHandle) {
 
 #[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn init_sample(sample: SampleHandle) {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
@@ -74,7 +70,6 @@ pub unsafe extern "stdcall" fn load_sample_buffer(
     buffer: *const u8,
     len: u32,
 ) {
-    tracing::debug!("Called");
     if buff_num > 1 {
         return;
     }
@@ -97,134 +92,106 @@ pub unsafe extern "stdcall" fn register_eos_callback(
     sample_handle: SampleHandle,
     callback: Option<unsafe extern "stdcall" fn(SampleHandle)>,
 ) -> Option<unsafe extern "stdcall" fn(SampleHandle)> {
-    tracing::debug!("Called");
     get_sample(sample_handle)?.register_eos_callback(callback)
 }
 
 #[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn release_sample_handle(sample: SampleHandle) {
-    tracing::debug!("Called");
     release_sample(sample);
 }
 
 #[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn resume_sample(sample: SampleHandle) {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
     sample.resume();
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn sample_buffer_ready(sample: SampleHandle) -> i32 {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return -1;
     };
     sample.buffer_ready()
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn sample_user_data(sample: SampleHandle, index: u32) -> i32 {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return 0;
     };
     sample.user_data(index)
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn set_preference(key: u32, value: u32) {
-    tracing::debug!("Called");
     // TODO: Figure out preferences and what they mean
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn set_sample_loop_count(sample: SampleHandle, loop_count: u32) {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
     sample.set_loop_count(loop_count);
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn set_sample_pan(sample: SampleHandle, pan: i32) {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
     sample.set_pan(pan);
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn set_sample_playback_rate(sample: SampleHandle, playback_rate: i32) {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
     sample.set_playback_rate(playback_rate);
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn set_sample_type(sample: SampleHandle, format: i32, flags: u32) {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
     sample.set_type(format, flags);
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn set_sample_user_data(
     sample: SampleHandle,
     index: u32,
     user_data: i32,
 ) {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
     sample.set_user_data(index, user_data);
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn set_sample_volume(sample: SampleHandle, volume: i32) {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
     sample.set_volume(volume);
 }
 
-#[instrument(level = Level::INFO)]
 pub unsafe extern "stdcall" fn start_sample(sample: SampleHandle) {
-    tracing::info!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
     sample.start();
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn stop_sample(sample: SampleHandle) {
-    tracing::debug!("Called");
     let Some(sample) = get_sample(sample) else {
         return;
     };
     sample.stop();
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn wave_out_open(
     dig_driver_out: *mut DriverHandle,
     _: *mut c_void,
     device_id: u32,
     wave_format: *const WAVEFORMATEX,
 ) -> i32 {
-    tracing::debug!("Called");
-
     if dig_driver_out.is_null() || wave_format.is_null() {
         return -1;
     }
@@ -253,9 +220,7 @@ pub unsafe extern "stdcall" fn wave_out_open(
     0
 }
 
-#[instrument(level = Level::DEBUG)]
 pub unsafe extern "stdcall" fn serve() {
-    tracing::debug!("Called");
     for (handle, callback) in crate::ailrs::storage::drain_pending_eos() {
         unsafe { callback(handle) };
     }
