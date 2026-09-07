@@ -1,6 +1,6 @@
 use std::{
     ffi::{CString, c_char, c_void},
-    sync::RwLock,
+    sync::{Mutex, RwLock},
     time::Instant,
 };
 
@@ -38,8 +38,10 @@ use crate::{
             set_sample_volume, start_sample, stop_sample, wave_out_open,
         },
     },
+    cd_audio::{AudioCdStatus, CdAudioPlayer, MAX_TRACK, source::CdSource, tmsf::CdAudioPosition},
     common::{HeapFreeFunc, fake_heap_free},
     hooker::hook_function,
+    settings::SETTINGS,
 };
 
 pub mod drawmode;
@@ -93,39 +95,10 @@ struct DrawMode {
 }
 
 #[repr(C)]
-enum AudioCdStatus {
-    _Unknown = 0,
-    _Open = 1,
-    Stopped = 2,
-    Playing = 3,
-    Paused = 4,
-    Error = 5,
-}
-
-#[repr(C)]
 struct CdAudioTracks {
     first_track: u32,
     number_of_tracks: u32,
     track_positions: *mut u32,
-}
-
-#[repr(C)]
-#[derive(Clone, Default)]
-struct CdAudioPosition {
-    track: u32,
-    minute: u32,
-    second: u32,
-    frame: u32,
-}
-
-// Convert into MCI TMSF packed format
-impl From<CdAudioPosition> for u32 {
-    fn from(position: CdAudioPosition) -> u32 {
-        (position.track & 0xFF)
-            | ((position.minute & 0xFF) << 8)
-            | ((position.second & 0xFF) << 16)
-            | ((position.frame & 0xFF) << 24)
-    }
 }
 
 // Functions to hook
@@ -159,6 +132,9 @@ static GET_CD_AUDIO_AUX_DEVICE_HOOK: RwLock<Option<GenericDetour<GetCdAudioAuxDe
 type CloseCdAudioFunc = unsafe extern "stdcall" fn() -> i32;
 static CLOSE_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<CloseCdAudioFunc>>> = RwLock::new(None);
 
+type StopCdAudioFunc = unsafe extern "stdcall" fn();
+static STOP_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<StopCdAudioFunc>>> = RwLock::new(None);
+
 type PlayCdAudioFunc = unsafe extern "cdecl" fn(u32, u32);
 static PLAY_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<PlayCdAudioFunc>>> = RwLock::new(None);
 
@@ -180,6 +156,10 @@ static GET_CD_AUDIO_TRACKS_HOOK: RwLock<Option<GenericDetour<GetCdAudioTracksFun
 
 type GetCdAudioPositionFunc = unsafe extern "cdecl" fn(*mut CdAudioPosition);
 static GET_CD_AUDIO_POSITION_HOOK: RwLock<Option<GenericDetour<GetCdAudioPositionFunc>>> =
+    RwLock::new(None);
+
+type GetCdAudioVolumeFunc = unsafe extern "cdecl" fn() -> i32;
+static GET_CD_AUDIO_VOLUME_HOOK: RwLock<Option<GenericDetour<GetCdAudioVolumeFunc>>> =
     RwLock::new(None);
 
 type SetCdAudioVolumeFunc = unsafe extern "cdecl" fn(i32) -> i32;
@@ -236,6 +216,9 @@ static mut G_SHOULD_QUIT: *mut BOOL = std::ptr::null_mut();
 /// Cache the CD audio device to reuse between sim launches.
 /// Windows 11 crashes if we try to close the CD audio device.
 static mut CD_AUDIO_DEVICE: u32 = u32::MAX;
+
+/// Our own CD audio player that actually plays tracks from files.
+static CD_AUDIO_PLAYER: Mutex<Option<CdAudioPlayer>> = Mutex::new(None);
 
 static mut LOADED: bool = false;
 
@@ -404,6 +387,11 @@ impl Sim {
                 Some(hook_function(target, Self::close_cd_audio)?)
             };
 
+            *STOP_CD_AUDIO_HOOK.write().unwrap() = {
+                let target: StopCdAudioFunc = std::mem::transmute(base_address + 0x0005aa94);
+                Some(hook_function(target, Self::stop_cd_audio)?)
+            };
+
             *PLAY_CD_AUDIO_HOOK.write().unwrap() = {
                 let target: PlayCdAudioFunc = std::mem::transmute(base_address + 0x0005aabe);
                 Some(hook_function(target, Self::play_cd_audio)?)
@@ -437,6 +425,11 @@ impl Sim {
             *GET_CD_AUDIO_POSITION_HOOK.write().unwrap() = {
                 let target: GetCdAudioPositionFunc = std::mem::transmute(base_address + 0x0005b61d);
                 Some(hook_function(target, Self::get_cd_audio_position)?)
+            };
+
+            *GET_CD_AUDIO_VOLUME_HOOK.write().unwrap() = {
+                let target: GetCdAudioVolumeFunc = std::mem::transmute(base_address + 0x0005b6e5);
+                Some(hook_function(target, Self::get_cd_audio_volume)?)
             };
 
             *SET_CD_AUDIO_VOLUME_HOOK.write().unwrap() = {
@@ -636,6 +629,35 @@ impl Sim {
     /// We hook it to work around bugs in modern Windows' MCI implementation.
     unsafe extern "stdcall" fn init_cd_audio() -> u32 {
         unsafe {
+            let source =
+                CdSource::from_str(&SETTINGS.get(Some("audio"), "cd_source").unwrap_or_default());
+
+            if source != CdSource::Mci {
+                let mut guard = CD_AUDIO_PLAYER.lock().unwrap();
+                if guard.is_none() {
+                    match CdAudioPlayer::new() {
+                        Ok(p) => *guard = Some(p),
+                        Err(e) => {
+                            if source == CdSource::Files {
+                                tracing::error!("cd_source=files but player init failed: {e}");
+                            } else {
+                                tracing::warn!("CD audio files unavailable, using MCI: {e}");
+                            }
+                        }
+                    }
+                }
+                if guard.is_some() {
+                    *G_CD_AUDIO_DEVICE = 1;
+                    *G_CD_AUDIO_AUX_DEVICE = Self::get_cd_audio_aux_device();
+                    *G_CD_AUDIO_INITIALIZED = 1;
+                    return 0;
+                }
+                if source == CdSource::Files {
+                    // files were explicitly requested but unavailable
+                    return 1;
+                }
+            }
+
             if CD_AUDIO_DEVICE != u32::MAX {
                 *G_CD_AUDIO_DEVICE = CD_AUDIO_DEVICE;
                 *G_CD_AUDIO_INITIALIZED = 1;
@@ -680,6 +702,10 @@ impl Sim {
 
     unsafe extern "stdcall" fn get_cd_audio_aux_device() -> i32 {
         unsafe {
+            if CD_AUDIO_PLAYER.lock().unwrap().is_some() {
+                return 0;
+            }
+
             GET_CD_AUDIO_AUX_DEVICE_HOOK
                 .read()
                 .unwrap()
@@ -691,12 +717,33 @@ impl Sim {
 
     /// Windows 11 was throwing an error if the CD device was closed.
     /// Now we just cache the device and re-use it between sim launches.
+    /// This doesn't apply if we're playing music from files.
     unsafe extern "stdcall" fn close_cd_audio() -> i32 {
+        if let Some(player) = CD_AUDIO_PLAYER.lock().unwrap().as_mut() {
+            player.stop();
+        }
         0
+    }
+
+    unsafe extern "stdcall" fn stop_cd_audio() {
+        unsafe {
+            if let Some(player) = CD_AUDIO_PLAYER.lock().unwrap().as_mut() {
+                player.stop();
+                return;
+            }
+            STOP_CD_AUDIO_HOOK.read().unwrap().as_ref().unwrap().call();
+        }
     }
 
     unsafe extern "cdecl" fn play_cd_audio(from: u32, to: u32) {
         unsafe {
+            if let Some(player) = CD_AUDIO_PLAYER.lock().unwrap().as_mut() {
+                if let Err(e) = player.play_tmsf(from, to) {
+                    tracing::error!("play_tmsf failed: {e}");
+                }
+                return;
+            }
+
             let mut flags = MCI_FROM;
 
             let mut mci_play_parms = MCI_PLAY_PARMS {
@@ -718,12 +765,20 @@ impl Sim {
 
     unsafe extern "stdcall" fn pause_cd_audio() {
         unsafe {
+            if let Some(player) = CD_AUDIO_PLAYER.lock().unwrap().as_mut() {
+                player.pause();
+                return;
+            }
             PAUSE_CD_AUDIO_HOOK.read().unwrap().as_ref().unwrap().call();
         }
     }
 
     unsafe extern "stdcall" fn resume_cd_audio() {
         unsafe {
+            if let Some(player) = CD_AUDIO_PLAYER.lock().unwrap().as_mut() {
+                player.resume();
+                return;
+            }
             RESUME_CD_AUDIO_HOOK
                 .read()
                 .unwrap()
@@ -771,6 +826,10 @@ impl Sim {
 
     unsafe extern "cdecl" fn get_cd_status() -> AudioCdStatus {
         unsafe {
+            if let Some(player) = CD_AUDIO_PLAYER.lock().unwrap().as_mut() {
+                return player.state();
+            }
+
             if *G_CD_AUDIO_INITIALIZED == 0 {
                 return AudioCdStatus::Error;
             }
@@ -801,7 +860,27 @@ impl Sim {
     }
 
     unsafe extern "cdecl" fn get_cd_audio_tracks(cd_audio_tracks: *mut CdAudioTracks) -> i32 {
+        static mut TRACK_POSITIONS: [u32; MAX_TRACK as usize + 1] = [0; MAX_TRACK as usize + 1];
+
         unsafe {
+            if let Some(player) = CD_AUDIO_PLAYER.lock().unwrap().as_mut() {
+                let out = &mut *cd_audio_tracks;
+                out.first_track = 1;
+                out.number_of_tracks = player.tracks().last().map_or_default(|t| t.number);
+
+                for track in out.first_track..=out.number_of_tracks + 1 {
+                    let pos = CdAudioPosition {
+                        track,
+                        ..Default::default()
+                    };
+                    (*std::ptr::addr_of_mut!(TRACK_POSITIONS))
+                        [(track - out.first_track) as usize] = pos.into();
+                }
+
+                out.track_positions = std::ptr::addr_of_mut!(TRACK_POSITIONS) as *mut u32;
+                return 0;
+            }
+
             GET_CD_AUDIO_TRACKS_HOOK
                 .read()
                 .unwrap()
@@ -813,6 +892,13 @@ impl Sim {
 
     unsafe extern "cdecl" fn get_cd_audio_position(cd_audio_position: *mut CdAudioPosition) {
         unsafe {
+            if let Some(player) = CD_AUDIO_PLAYER.lock().unwrap().as_mut() {
+                if !cd_audio_position.is_null() {
+                    *cd_audio_position = player.cd_position();
+                }
+                return;
+            }
+
             GET_CD_AUDIO_POSITION_HOOK
                 .read()
                 .unwrap()
@@ -822,8 +908,28 @@ impl Sim {
         }
     }
 
+    unsafe extern "cdecl" fn get_cd_audio_volume() -> i32 {
+        unsafe {
+            if let Some(player) = CD_AUDIO_PLAYER.lock().unwrap().as_ref() {
+                return player.volume();
+            }
+
+            GET_CD_AUDIO_VOLUME_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call()
+        }
+    }
+
     unsafe extern "cdecl" fn set_cd_audio_volume(volume: i32) -> i32 {
         unsafe {
+            if let Some(player) = CD_AUDIO_PLAYER.lock().unwrap().as_mut() {
+                player.set_volume(volume);
+                return 1;
+            }
+
             SET_CD_AUDIO_VOLUME_HOOK
                 .read()
                 .unwrap()
@@ -835,6 +941,11 @@ impl Sim {
 
     unsafe extern "stdcall" fn deinit_cd_audio() {
         unsafe {
+            if CD_AUDIO_PLAYER.lock().unwrap().take().is_some() {
+                *G_CD_AUDIO_INITIALIZED = 0;
+                return;
+            }
+
             DEINIT_CD_AUDIO_HOOK
                 .read()
                 .unwrap()
@@ -859,7 +970,7 @@ impl Sim {
                     Self::get_cd_audio_position(position);
                 }
                 AudioCdStatus::Paused => {
-                    *position = (*G_PAUSED_CD_AUDIO_POSITION).clone();
+                    *position = *G_PAUSED_CD_AUDIO_POSITION;
                 }
                 AudioCdStatus::Error | AudioCdStatus::_Unknown => {}
             }
@@ -878,7 +989,7 @@ impl Sim {
             match cd_status {
                 AudioCdStatus::_Open => {}
                 AudioCdStatus::Stopped => {
-                    let position = (*G_PAUSED_CD_AUDIO_POSITION).clone().into();
+                    let position = (*G_PAUSED_CD_AUDIO_POSITION).into();
                     Self::play_cd_audio(position, 0);
                 }
                 AudioCdStatus::Playing => {
@@ -947,6 +1058,7 @@ impl Drop for Sim {
             INIT_CD_AUDIO_HOOK.write().unwrap().take();
             GET_CD_AUDIO_AUX_DEVICE_HOOK.write().unwrap().take();
             CLOSE_CD_AUDIO_HOOK.write().unwrap().take();
+            STOP_CD_AUDIO_HOOK.write().unwrap().take();
             PLAY_CD_AUDIO_HOOK.write().unwrap().take();
             PAUSE_CD_AUDIO_HOOK.write().unwrap().take();
             RESUME_CD_AUDIO_HOOK.write().unwrap().take();
@@ -954,6 +1066,7 @@ impl Drop for Sim {
             GET_CD_STATUS_HOOK.write().unwrap().take();
             GET_CD_AUDIO_TRACKS_HOOK.write().unwrap().take();
             GET_CD_AUDIO_POSITION_HOOK.write().unwrap().take();
+            GET_CD_AUDIO_VOLUME_HOOK.write().unwrap().take();
             SET_CD_AUDIO_VOLUME_HOOK.write().unwrap().take();
             DEINIT_CD_AUDIO_HOOK.write().unwrap().take();
             UPDATE_CD_AUDIO_POSITION_HOOK.write().unwrap().take();
@@ -963,6 +1076,7 @@ impl Drop for Sim {
             TOGGLE_FULLSCREEN_HOOK.write().unwrap().take();
             drawmode::unhook_functions();
             self.ail.unhook();
+            CD_AUDIO_PLAYER.lock().unwrap().take();
             FreeLibrary(self.module).unwrap();
             LOADED = false;
         }

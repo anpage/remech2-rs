@@ -26,7 +26,10 @@ impl GlobalSettings {
             .set("fullscreen", "true")
             .set("width", "")
             .set("height", "");
-        settings.with_section(Some("audio"));
+        settings
+            .with_section(Some("audio"))
+            .set("music_path", "Music")
+            .set("cd_source", "auto");
         settings
             .write_to_file(Self::SETTINGS_FILE_NAME)
             .unwrap_or_else(|_| {
@@ -38,7 +41,7 @@ impl GlobalSettings {
         settings
     }
 
-    fn get<S, K>(&self, section: Option<S>, key: K) -> Option<String>
+    pub fn get<S, K>(&self, section: Option<S>, key: K) -> Option<String>
     where
         S: Into<String>,
         K: AsRef<str>,
