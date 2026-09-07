@@ -13,7 +13,6 @@ use windows::Win32::{
     },
 };
 
-mod cd_check;
 mod dll_check;
 mod file_check;
 pub mod painter;
@@ -78,7 +77,7 @@ impl Launcher {
             painter,
             ctx,
             window: wnd,
-            current_stage: Box::new(cd_check::CdCheck::new()),
+            current_stage: Box::new(file_check::FileCheck::new()),
         })
     }
 

@@ -1,9 +1,17 @@
 use std::{
+    fs::File,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
 };
 
 use anyhow::{Result, bail};
+use windows::{
+    Win32::{
+        Storage::FileSystem::{GetDriveTypeA, GetLogicalDriveStringsA},
+        System::WindowsProgramming::DRIVE_CDROM,
+    },
+    core::PCSTR,
+};
 
 use super::{Action, Stage, dll_check};
 
@@ -23,7 +31,7 @@ enum CopyStatus {
 }
 
 pub struct FileCheck {
-    cd_drive_path: PathBuf,
+    cd_drive_path: Option<PathBuf>,
     missing_files: Vec<MissingFile>,
     copying_files: bool,
     copying_status: Arc<Mutex<CopyStatus>>,
@@ -31,10 +39,14 @@ pub struct FileCheck {
 }
 
 impl FileCheck {
-    pub fn new<P: AsRef<Path>>(cd_drive_path: P) -> Self {
+    pub fn new() -> Self {
         let missing_files = check_files(".");
         Self {
-            cd_drive_path: cd_drive_path.as_ref().to_path_buf(),
+            cd_drive_path: if missing_files.is_empty() {
+                None
+            } else {
+                Self::cd_check()
+            },
             missing_files,
             copying_files: false,
             copying_status: Arc::new(Mutex::new(CopyStatus::Copying((None, 0.0)))),
@@ -42,11 +54,38 @@ impl FileCheck {
         }
     }
 
-    fn start_copy(&mut self) {
+    fn cd_check() -> Option<PathBuf> {
+        let mut drive_strings = [0u8; 128];
+        unsafe {
+            GetLogicalDriveStringsA(Some(&mut drive_strings));
+        }
+
+        for drive in drive_strings.split(|&c| c == 0) {
+            if drive.is_empty() {
+                continue;
+            }
+
+            let drive_type = unsafe { GetDriveTypeA(PCSTR(drive.as_ptr())) };
+
+            if drive_type != DRIVE_CDROM {
+                continue;
+            }
+
+            let drive_letter = *drive.first().unwrap() as char;
+            let path = format!("{}:\\OLD_HERC.DRV", drive_letter);
+            if File::open(&path).is_ok() {
+                let drive = format!("{}:\\", drive_letter);
+                return Some(PathBuf::from(drive));
+            }
+        }
+
+        None
+    }
+
+    fn start_copy(&mut self, cd_drive_path: PathBuf) {
         self.copying_error = None;
         self.copying_status = Arc::new(Mutex::new(CopyStatus::Copying((None, 0.0))));
 
-        let cd_drive_path = self.cd_drive_path.clone();
         let status = self.copying_status.clone();
         let missing_files = self.missing_files.clone();
 
@@ -72,6 +111,13 @@ impl FileCheck {
                             );
                             error = Some(format!("{}", e));
                         } else {
+                            // fs::copy preserves attributes and everything on a CD is read-only
+                            if let Ok(meta) = std::fs::metadata(&file.path) {
+                                let mut perms = meta.permissions();
+                                #[allow(clippy::permissions_set_readonly_false)]
+                                perms.set_readonly(false);
+                                let _ = std::fs::set_permissions(&file.path, perms);
+                            }
                             error = None;
                             break;
                         }
@@ -122,7 +168,15 @@ impl FileCheck {
                         quit = true;
                     }
                     if ui.button("Retry").clicked() {
-                        self.start_copy();
+                        self.cd_drive_path = Self::cd_check();
+                        match self.cd_drive_path.clone() {
+                            Some(cd_drive_path) => self.start_copy(cd_drive_path),
+                            None => {
+                                self.copying_files = false;
+                                self.copying_error = None;
+                                self.missing_files = check_files(".");
+                            }
+                        }
                     }
                 });
             });
@@ -177,25 +231,16 @@ impl FileCheck {
 
         Ok(Action::Nothing)
     }
-}
 
-impl Stage for FileCheck {
-    fn ui(&mut self, ctx: &egui::Context) -> Result<Action> {
-        if self.copying_files {
-            return self.copy_ui(ctx);
-        }
-
-        if self.missing_files.is_empty() {
-            return Ok(Action::Continue(Box::new(dll_check::DllCheck::new())));
-        }
-
+    fn missing_files_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
         enum Choice {
             Quit,
             Retry,
-            No,
-            Yes,
+            Skip,
+            Install,
         }
 
+        let has_cd = self.cd_drive_path.is_some();
         let mut choice = None;
         egui::Window::new("⚠ Missing Files")
             .resizable(false)
@@ -215,7 +260,13 @@ impl Stage for FileCheck {
                         }
                     });
                 ui.add_space(10.0);
-                ui.label("Would you like to install them from CD?");
+                if has_cd {
+                    ui.label("Would you like to install them from CD?");
+                } else {
+                    ui.label("Insert your MechWarrior 2 CD to install the missing files.");
+                }
+                ui.add_space(5.0);
+                ui.label("Continuing without them will likely crash.");
                 ui.add_space(10.0);
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
                     if ui.button("Quit").clicked() {
@@ -224,11 +275,11 @@ impl Stage for FileCheck {
                     if ui.button("Retry").clicked() {
                         choice = Some(Choice::Retry);
                     }
-                    if ui.button("No").clicked() {
-                        choice = Some(Choice::No);
+                    if ui.button("Continue").clicked() {
+                        choice = Some(Choice::Skip);
                     }
-                    if ui.button("Yes").clicked() {
-                        choice = Some(Choice::Yes);
+                    if has_cd && ui.button("Install").clicked() {
+                        choice = Some(Choice::Install);
                     }
                 });
             });
@@ -237,15 +288,32 @@ impl Stage for FileCheck {
             Some(Choice::Quit) => bail!("User chose to quit"),
             Some(Choice::Retry) => {
                 self.missing_files = check_files(".");
+                self.cd_drive_path = Self::cd_check();
                 Ok(Action::Nothing)
             }
-            Some(Choice::No) => Ok(Action::Continue(Box::new(dll_check::DllCheck::new()))),
-            Some(Choice::Yes) => {
-                self.start_copy();
-                Ok(super::Action::Nothing)
+            Some(Choice::Skip) => Ok(Action::Continue(Box::new(dll_check::DllCheck::new()))),
+            Some(Choice::Install) => {
+                if let Some(cd_drive_path) = self.cd_drive_path.clone() {
+                    self.start_copy(cd_drive_path);
+                }
+                Ok(Action::Nothing)
             }
-            None => Ok(super::Action::Nothing),
+            None => Ok(Action::Nothing),
         }
+    }
+}
+
+impl Stage for FileCheck {
+    fn ui(&mut self, ctx: &egui::Context) -> Result<Action> {
+        if self.copying_files {
+            return self.copy_ui(ctx);
+        }
+
+        if self.missing_files.is_empty() {
+            return Ok(Action::Continue(Box::new(dll_check::DllCheck::new())));
+        }
+
+        self.missing_files_ui(ctx)
     }
 }
 

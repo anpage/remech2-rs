@@ -56,12 +56,8 @@ DLL files contained in the
 [Windows 95 1.1 _patch_](https://archive.org/details/mw2patch), not the 1.1 CD.
 
 If you don't currently have the game installed, run Remech 2 from within its own
-(writable) folder with the CD mounted. It can pull all the necessary files
+(writable) folder with the CD inserted. It can pull all the necessary files
 from the CD and install the 1.1 patch from the internet automatically.
-
-You'll also need the game's CD inserted in order to play, but it can be any
-copy of the original Windows 95 software-rendered release. The game's
-copy-protection has not been removed.
 
 ### Music
 
