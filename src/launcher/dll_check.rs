@@ -16,6 +16,7 @@ use futures_util::StreamExt;
 use hex_literal::hex;
 use sha2::{Digest, Sha256};
 use tokio::runtime::Runtime;
+use tracing::error;
 use unarc_rs::arj::arj_archive::ArjArchieve as ArjArchive;
 
 use super::{Action, Stage};
@@ -104,6 +105,17 @@ impl DllCheck {
         missing_files
     }
 
+    /// Clears the read-only attribute before writing
+    fn write_file(path: &str, buffer: &[u8]) -> std::io::Result<()> {
+        if let Ok(meta) = fs::metadata(path) {
+            let mut perms = meta.permissions();
+            #[allow(clippy::permissions_set_readonly_false)]
+            perms.set_readonly(false);
+            let _ = fs::set_permissions(path, perms);
+        }
+        fs::write(path, buffer)
+    }
+
     fn start_download(&mut self) {
         self.downloading_error = None;
         self.downloading_status = Arc::new(Mutex::new(DownloadStatus::Downloading(0.0)));
@@ -116,8 +128,12 @@ impl DllCheck {
         std::thread::spawn(move || {
             rt.block_on(async {
                 let download_file = async |url: &str| -> Result<Vec<u8>, String> {
-                    let Ok(request) = reqwest::get(url).await else {
-                        return Err("Failed to download patch".to_string());
+                    let request = match reqwest::get(url).await {
+                        Ok(request) => request,
+                        Err(e) => {
+                            error!("Failed to download patch: {e:?}");
+                            return Err(format!("Failed to download patch: {e:?}"));
+                        }
                     };
 
                     let total_size = request.content_length().unwrap_or(1_001_315);
@@ -181,7 +197,7 @@ impl DllCheck {
                     let mut archive = ArjArchive::new(Cursor::new(&archive[0x1853..])).unwrap();
                     if let Ok(Some(header)) = archive.get_next_entry() {
                         let buffer = archive.read(&header).unwrap();
-                        if let Err(e) = fs::write("MW2SHELL.DLL", buffer) {
+                        if let Err(e) = Self::write_file("MW2SHELL.DLL", &buffer) {
                             let mut status = status.lock().unwrap();
                             *status = DownloadStatus::Error(DownloadError {
                                 error: format!("Failed to write MW2SHELL.DLL: {e}"),
@@ -200,7 +216,7 @@ impl DllCheck {
                     let mut archive = ArjArchive::new(Cursor::new(&archive[0x9E311..])).unwrap();
                     if let Ok(Some(header)) = archive.get_next_entry() {
                         let buffer = archive.read(&header).unwrap();
-                        if let Err(e) = fs::write("MW2.DLL", buffer) {
+                        if let Err(e) = Self::write_file("MW2.DLL", &buffer) {
                             let mut status = status.lock().unwrap();
                             *status = DownloadStatus::Error(DownloadError {
                                 error: format!("Failed to write MW2.DLL: {e}"),
