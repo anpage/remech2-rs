@@ -122,7 +122,7 @@ pub unsafe extern "stdcall" fn sample_user_data(sample: SampleHandle, index: u32
     sample.user_data(index)
 }
 
-pub unsafe extern "stdcall" fn set_preference(key: u32, value: u32) {
+pub unsafe extern "stdcall" fn set_preference(_key: u32, _value: u32) {
     // TODO: Figure out preferences and what they mean
 }
 
@@ -189,7 +189,7 @@ pub unsafe extern "stdcall" fn stop_sample(sample: SampleHandle) {
 pub unsafe extern "stdcall" fn wave_out_open(
     dig_driver_out: *mut DriverHandle,
     _: *mut c_void,
-    device_id: u32,
+    _device_id: u32,
     wave_format: *const WAVEFORMATEX,
 ) -> i32 {
     if dig_driver_out.is_null() || wave_format.is_null() {
