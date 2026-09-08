@@ -6,7 +6,9 @@ use egui::{
 };
 use windows::Win32::{
     Foundation::{HWND, LPARAM, WPARAM},
-    UI::WindowsAndMessaging::{CURSORINFO, GetCursorInfo, SendMessageA, ShowCursor, WM_COMMAND},
+    UI::WindowsAndMessaging::{
+        CURSOR_SHOWING, CURSORINFO, GetCursorInfo, SendMessageA, ShowCursor, WM_COMMAND,
+    },
 };
 
 use crate::about;
@@ -239,9 +241,13 @@ impl OverlayUi {
         }
 
         if let Some(cursor_texture) = cursor_texture {
-            let mut cursor_info = CURSORINFO::default();
-            let _ = unsafe { GetCursorInfo(&mut cursor_info) };
-            if cursor_info.flags.0 != 0 {
+            let mut cursor_info = CURSORINFO {
+                cbSize: size_of::<CURSORINFO>() as u32,
+                ..Default::default()
+            };
+            let showing = unsafe { GetCursorInfo(&mut cursor_info) }.is_ok()
+                && cursor_info.flags.0 & CURSOR_SHOWING.0 != 0;
+            if showing {
                 unsafe { ShowCursor(false) };
             }
 
