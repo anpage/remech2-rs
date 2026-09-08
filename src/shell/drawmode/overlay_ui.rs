@@ -9,6 +9,7 @@ use windows::Win32::{
     UI::WindowsAndMessaging::{CURSORINFO, GetCursorInfo, SendMessageA, ShowCursor, WM_COMMAND},
 };
 
+use crate::about;
 use crate::shell::drawmode::{
     custom_drawmode::OverlayMouseState,
     hooks::{get_mouse_state, update_global_mouse_state},
@@ -20,6 +21,7 @@ pub struct OverlayUi {
     show_cursor: bool,
     fonts: egui::FontDefinitions,
     exit_dialog_open: bool,
+    about_dialog_open: bool,
 }
 
 impl Default for OverlayUi {
@@ -42,6 +44,7 @@ impl Default for OverlayUi {
             show_cursor: true,
             fonts,
             exit_dialog_open: false,
+            about_dialog_open: false,
         }
     }
 }
@@ -61,7 +64,7 @@ impl OverlayUi {
         let aspect_ratio = const { 4.0 / 3.0 };
         let mut width = window_width;
         let mut height = window_height;
-        
+
         let scale_factor = if width / height > aspect_ratio {
             width = height * aspect_ratio;
             width / 640.0
@@ -163,6 +166,10 @@ impl OverlayUi {
                                 if ui.button("THE KESHIK").clicked() {
                                     handle_menu_button(40082);
                                 }
+                                ui.separator();
+                                if ui.button("ABOUT REMECH 2").clicked() {
+                                    self.about_dialog_open = true;
+                                }
                             })
                             .inner
                             .is_some()
@@ -194,6 +201,8 @@ impl OverlayUi {
                     });
                 });
         }
+
+        about::window(ctx, &mut self.about_dialog_open, scale_factor);
 
         if false {
             egui::Window::new("DEBUG")

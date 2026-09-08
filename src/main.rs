@@ -25,6 +25,7 @@ use windows::{
 
 use crate::{settings::SETTINGS, sim::drawmode::hooks::G_MOUSE_NEEDS_CENTERING};
 
+mod about;
 mod ail;
 mod ailrs;
 mod cd_audio;
