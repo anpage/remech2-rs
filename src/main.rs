@@ -53,6 +53,18 @@ static mut PROCESS_TYPE: ProcessType = ProcessType::None;
 pub static mut WINDOW_WIDTH: i32 = 640;
 pub static mut WINDOW_HEIGHT: i32 = 480;
 
+unsafe fn request_sim_mouse_centering(window: HWND) {
+    unsafe {
+        if IsIconic(window).as_bool() {
+            return;
+        }
+
+        if matches!(PROCESS_TYPE, ProcessType::Sim) && !G_MOUSE_NEEDS_CENTERING.is_null() {
+            *G_MOUSE_NEEDS_CENTERING = TRUE;
+        }
+    }
+}
+
 extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     tracing::trace!(
         "WndProc: window = {:?}, message = {}, wparam = {:?}, lparam = {:?}",
@@ -84,13 +96,15 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
                     WINDOW_WIDTH = width.max(1);
                     WINDOW_HEIGHT = height.max(1);
                 }
+
+                request_sim_mouse_centering(window);
+            }
+            WM_MOVE => {
+                request_sim_mouse_centering(window);
             }
             WM_ACTIVATEAPP => {
-                if wparam.0 == 1
-                    && matches!(PROCESS_TYPE, ProcessType::Sim)
-                    && !G_MOUSE_NEEDS_CENTERING.is_null()
-                {
-                    *G_MOUSE_NEEDS_CENTERING = TRUE;
+                if wparam.0 == 1 {
+                    request_sim_mouse_centering(window);
                 }
                 wparam = WPARAM(1);
             }
