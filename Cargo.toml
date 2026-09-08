@@ -3,11 +3,10 @@ name = "remech2"
 version = "0.1.0"
 edition = "2024"
 
-[profile.dev]
-panic = "abort"
-
 [profile.release]
 panic = "abort"
+# Include debug symbols in release builds for troubleshooting
+debug = true
 
 [dependencies]
 anyhow = "1.0.98"
