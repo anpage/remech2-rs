@@ -142,6 +142,11 @@ impl Shell {
             let create_file_thunk = (smack_base_address + 0x0000e150) as *mut CreateFileFunc;
             *create_file_thunk = Self::create_file;
 
+            // Make Smacker skip DirectSound and use its waveOut path instead.
+            // DirectSound was causing FMV audio to go missing on Windows.
+            let smack_use_direct_sound = (smack_base_address + 0x0000c610) as *mut usize;
+            *smack_use_direct_sound = 0;
+
             let set_menu_thunk = (base_address + 0x000995bc) as *mut SetMenuFunc;
             *set_menu_thunk = fake_set_menu;
 
