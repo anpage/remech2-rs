@@ -1,0 +1,37 @@
+name: CI (MSVC)
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          target: i686-pc-windows-msvc
+          toolchain: nightly
+          override: true
+
+      - name: Build Debug (MSVC)
+        run: cargo build --target i686-pc-windows-msvc
+
+      - name: Build Release (MSVC)
+        run: cargo build --release --target i686-pc-windows-msvc
+
+      - name: Archive Debug Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ReMech2-Debug
+          path: |
+            target/i686-pc-windows-msvc/debug/remech2.pdb
+            target/i686-pc-windows-msvc/debug/remech2.exe
+
+      - name: Archive Release Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ReMech2-Release
+          path: |
+            target/i686-pc-windows-msvc/release/remech2.exe

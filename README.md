@@ -92,7 +92,7 @@ music from CD if `music_path` is not present or has no usable tracks, and
 ### Requirements
 
 - [The Rust toolchain](https://rustup.rs/)
-- **Nightly**, Windows, MSVC
+- **Nightly**, Windows
 
 ### Steps
 
