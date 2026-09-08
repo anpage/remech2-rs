@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MinGW cross-compiler
+        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-i686
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: i686-pc-windows-gnu
+
+      - name: Build Release (GNU)
+        run: cargo build --release --target i686-pc-windows-gnu
+        env:
+          REMECH2_VERSION: ${{ github.ref_name }}
+
+      - name: Package
+        run: |
+          mkdir ReMech2
+          cp target/i686-pc-windows-gnu/release/remech2.exe ReMech2/
+          zip -r ReMech2.zip ReMech2
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ReMech2.zip
+          prerelease: true
+          generate_release_notes: true
