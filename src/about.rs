@@ -111,14 +111,16 @@ pub fn window(ctx: &Context, open: &mut bool, scale_factor: f32) {
 
             ui.vertical_centered(|ui| {
                 ui.label(RichText::new("ReMech 2").size(16.0 * scale_factor).strong());
-                ui.label(RichText::new(VERSION).size(6.0 * scale_factor));
+                ui.label(RichText::new(VERSION).size(8.0 * scale_factor));
                 ui.add_space(8.0 * scale_factor);
                 ui.label(
                     RichText::new(
-                        "An unofficial open-source project.\n\
-                        In no way associated with or endorsed by Activision Blizzard, Inc.",
+                        "ReMech 2 is an unofficial, fan-made project. It is not affiliated with, \
+                        endorsed by, or associated with Microsoft, Activision, or any of their \
+                        subsidiaries. MechWarrior is a trademark of its respective owner. No original \
+                        game content is distributed with this project.",
                     )
-                    .size(8.0 * scale_factor),
+                    .size(6.0 * scale_factor),
                 );
             });
 

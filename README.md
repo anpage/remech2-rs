@@ -118,5 +118,7 @@ The Science Gothic font embedded for the overlay UI is licensed under the SIL
 Open Font License, Version 1.1.
 See `LICENSE-ScienceGothic.txt` for more information.
 
-**ReMech2 is in no way associated with or endorsed by Activision Blizzard, Inc.
-or any other company.**
+**ReMech 2 is an unofficial, fan-made project. It is not affiliated with,
+endorsed by, or associated with Microsoft, Activision, or any of their
+subsidiaries. MechWarrior is a trademark of its respective owner. No original
+game content is distributed with this project.**
