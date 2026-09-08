@@ -5,8 +5,15 @@ edition = "2024"
 
 [profile.release]
 panic = "abort"
+opt-level = "z"
+lto = true
+codegen-units = 1
 # Include debug symbols in release builds for troubleshooting
 debug = true
+
+# Disable debug symbols for dependencies in release builds
+[profile.release.package."*"]
+debug = false
 
 [dependencies]
 anyhow = "1.0.98"
