@@ -111,8 +111,12 @@ The source code provided in this repository is licensed under the
 ReMech dynamically links with the proprietary code within the original game's
 DLL files in order to fill in the gaps until everything is 100% reimplemented.
 
-ReMech2 is in no way associated with or endorsed by Activision Blizzard, Inc. or
-any other company.
-
 GeneralUser GS by S. Christian Collins is included as the default soundfont.
-See `GUGS-LICENSE.txt` for more information.
+See `LICENSE-GUGS.txt` for more information.
+
+The Science Gothic font embedded for the overlay UI is licensed under the SIL
+Open Font License, Version 1.1.
+See `LICENSE-ScienceGothic.txt` for more information.
+
+**ReMech2 is in no way associated with or endorsed by Activision Blizzard, Inc.
+or any other company.**
