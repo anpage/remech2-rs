@@ -23,7 +23,10 @@ use windows::{
     core::{PCSTR, s},
 };
 
-use crate::{settings::SETTINGS, sim::drawmode::hooks::G_MOUSE_NEEDS_CENTERING};
+use crate::{
+    settings::SETTINGS,
+    sim::{G_WINDOW_ACTIVE, drawmode::hooks::G_MOUSE_NEEDS_CENTERING},
+};
 
 mod about;
 mod ail;
@@ -66,6 +69,39 @@ unsafe fn request_sim_mouse_centering(window: HWND) {
     }
 }
 
+/// Tell the sim it has lost activation and unclip the cursor.
+unsafe fn release_sim_mouse() {
+    unsafe {
+        if !matches!(PROCESS_TYPE, ProcessType::Sim) || G_WINDOW_ACTIVE.is_null() {
+            return;
+        }
+
+        *G_WINDOW_ACTIVE = FALSE;
+
+        let _ = ClipCursor(None);
+    }
+}
+
+unsafe fn dispatch(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+    unsafe {
+        match PROCESS_TYPE {
+            ProcessType::None => {}
+            ProcessType::Sim => {
+                if let Some(proc) = SIM_WINDOW_PROC {
+                    return proc(window, message, wparam, lparam);
+                }
+            }
+            ProcessType::Shell => {
+                if let Some(proc) = SHELL_WINDOW_PROC {
+                    return proc(window, message, wparam, lparam);
+                }
+            }
+        }
+
+        DefWindowProcA(window, message, wparam, lparam)
+    }
+}
+
 extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     tracing::trace!(
         "WndProc: window = {:?}, message = {}, wparam = {:?}, lparam = {:?}",
@@ -76,7 +112,6 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
     );
 
     unsafe {
-        let mut wparam = wparam;
         match message {
             0x41E => {
                 PROCESS_TYPE = ProcessType::None;
@@ -104,10 +139,18 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
                 request_sim_mouse_centering(window);
             }
             WM_ACTIVATEAPP => {
-                if wparam.0 == 1 {
+                let activating = wparam.0 != 0;
+                if activating {
                     request_sim_mouse_centering(window);
                 }
-                wparam = WPARAM(1);
+
+                let result = dispatch(window, message, WPARAM(1), lparam);
+
+                if !activating {
+                    release_sim_mouse();
+                }
+
+                return result;
             }
             WM_CLOSE => {
                 exit(0);
@@ -119,21 +162,7 @@ extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: 
             _ => {}
         }
 
-        match PROCESS_TYPE {
-            ProcessType::None => {}
-            ProcessType::Sim => {
-                if let Some(proc) = SIM_WINDOW_PROC {
-                    return proc(window, message, wparam, lparam);
-                }
-            }
-            ProcessType::Shell => {
-                if let Some(proc) = SHELL_WINDOW_PROC {
-                    return proc(window, message, wparam, lparam);
-                }
-            }
-        }
-
-        DefWindowProcA(window, message, wparam, lparam)
+        dispatch(window, message, wparam, lparam)
     }
 }
 
