@@ -25,7 +25,8 @@ impl GlobalSettings {
             .with_section(Some("video"))
             .set("fullscreen", "true")
             .set("width", "")
-            .set("height", "");
+            .set("height", "")
+            .set("widescreen", "false");
         settings
             .with_section(Some("audio"))
             .set("music_path", "Music")
