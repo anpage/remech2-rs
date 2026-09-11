@@ -9,8 +9,7 @@ use rand::Rng;
 use retour::{GenericDetour, RawDetour};
 use windows::{
     Win32::{
-        Foundation::{FALSE, FreeLibrary, HMODULE, HWND, RECT, TRUE},
-        Graphics::Gdi::BITMAPINFO,
+        Foundation::{FALSE, FreeLibrary, HMODULE, HWND, TRUE},
         Media::Multimedia::{
             MCI_FORMAT_TMSF, MCI_FROM, MCI_MODE_OPEN, MCI_MODE_PAUSE, MCI_MODE_PLAY, MCI_MODE_STOP,
             MCI_OPEN, MCI_OPEN_PARMSA, MCI_OPEN_TYPE, MCI_PLAY, MCI_PLAY_PARMS, MCI_SET,
@@ -42,6 +41,7 @@ use crate::{
     common::{HeapFreeFunc, fake_heap_free},
     hooker::hook_function,
     settings::SETTINGS,
+    sim::drawmode::hooks::PixelBuffer,
 };
 
 pub mod drawmode;
@@ -55,26 +55,31 @@ type SimMainProc = unsafe extern "stdcall" fn(
     HWND,
 ) -> i32;
 
-#[repr(C)]
-struct SomeDDrawStruct {
-    rect: *mut RECT,
-    unknown1: i32,
-    unknown2: i32,
-    bitmap_info: *mut *mut BITMAPINFO,
-    unknown3: u32,
-}
-
+/// A render context: the pixel buffer to draw into plus the rect within that buffer
+/// where all the drawing happens.
 #[repr(C)]
 #[derive(Clone)]
-struct WeirdRectStruct {
-    some_ddraw_struct: *mut SomeDDrawStruct,
-    x1: i32,
-    y2: i32,
-    x2: i32,
-    y1: i32,
+struct RenderTarget {
+    pixel_buffer: *mut PixelBuffer,
+    left: i32,
+    top: i32,
+    right: i32,
+    bottom: i32,
 }
 
-type DrawModeInitFunc = unsafe extern "cdecl" fn(*mut SomeDDrawStruct, i32, i32) -> i32;
+impl RenderTarget {
+    /// Widens the target rect to the whole framebuffer
+    fn cover_framebuffer(&mut self) {
+        unsafe {
+            self.left = 0;
+            self.top = 0;
+            self.right = (*G_GAME_WINDOW_WIDTH as i32 - 1).max(0);
+            self.bottom = (*G_GAME_WINDOW_HEIGHT as i32 - 1).max(0);
+        }
+    }
+}
+
+type DrawModeInitFunc = unsafe extern "cdecl" fn(*mut PixelBuffer, i32, i32) -> i32;
 type DrawModeDeInitFunc = unsafe extern "cdecl" fn() -> i32;
 type DrawModeBlitFlipFunc = unsafe extern "cdecl" fn() -> i32;
 type DrawModeBlitRectFunc = unsafe extern "cdecl" fn(i32, i32, i32, i32) -> i32;
@@ -101,6 +106,53 @@ struct CdAudioTracks {
     track_positions: *mut u32,
 }
 
+#[repr(C)]
+struct GameWindowGeometry {
+    width: i32,
+    height: i32,
+    unknown1: i32,
+    unknown2: i32,
+    unknown3: i32,
+    unknown4: i32,
+}
+
+/// The camera, which the game calls "Eyepoint"
+#[repr(C)]
+struct Eyepoint {
+    position: [i32; 3],
+    rotation: [i32; 3],
+    /// Horizontal FOV in 16.16, where `tan(fov / 2) == 1 / fov_x`
+    fov_x: i32,
+    unknown1: [i32; 4],
+    viewport_left: i32,
+    viewport_right: i32,
+    viewport_top: i32,
+    viewport_bottom: i32,
+    hither_clip_plane: i32,
+    yon_clip_plane: i32,
+    /// `pixel width / pixel height` in 16.16
+    pixel_aspect_ratio: i32,
+}
+
+/// The cockpit layout table passed to LoadCockpitLayout. It runs to at least
+/// index 0x22; only the entries the detour needs are named.
+#[repr(C)]
+struct CockpitLayout {
+    /// The cockpit's 3D viewport, in normalised 16.16 coordinates
+    viewport: *mut RenderTarget,
+    unknown1: *mut c_void,
+    /// Render target table slot the viewport is copied into
+    render_target_slot: i32,
+}
+
+/// A 2D point with normalised 16.16 components
+#[repr(C)]
+#[derive(Clone, Copy)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
 // Functions to hook
 // static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
 
@@ -118,6 +170,50 @@ static INTEGER_OVERFLOW_HAPPENS_HERE_HOOK: RwLock<
 type SetGameResolutionFunc = unsafe extern "cdecl" fn(*mut c_char);
 static SET_GAME_RESOLUTION_HOOK: RwLock<Option<GenericDetour<SetGameResolutionFunc>>> =
     RwLock::new(None);
+
+type InitGameWindowGeometryFunc = unsafe extern "cdecl" fn() -> i32;
+static INIT_GAME_WINDOW_GEOMETRY_HOOK: RwLock<Option<GenericDetour<InitGameWindowGeometryFunc>>> =
+    RwLock::new(None);
+
+type ScaleRectToScreenFunc = unsafe extern "cdecl" fn(
+    *mut PixelBuffer,
+    *mut RenderTarget,
+    *mut RenderTarget,
+) -> *mut RenderTarget;
+static SCALE_RECT_TO_SCREEN_HOOK: RwLock<Option<GenericDetour<ScaleRectToScreenFunc>>> =
+    RwLock::new(None);
+
+type ScalePointToScreenFunc =
+    unsafe extern "cdecl" fn(*mut PixelBuffer, *mut Point, *mut Point) -> *mut Point;
+static SCALE_POINT_TO_SCREEN_HOOK: RwLock<Option<GenericDetour<ScalePointToScreenFunc>>> =
+    RwLock::new(None);
+
+type CenterRectOnScreenFunc = unsafe extern "cdecl" fn(
+    *mut PixelBuffer,
+    *mut RenderTarget,
+    *mut RenderTarget,
+) -> *mut RenderTarget;
+static CENTER_RECT_ON_SCREEN_HOOK: RwLock<Option<GenericDetour<CenterRectOnScreenFunc>>> =
+    RwLock::new(None);
+
+type ApplyEyepointFovFunc = unsafe extern "cdecl" fn(i32);
+static APPLY_EYEPOINT_FOV_HOOK: RwLock<Option<GenericDetour<ApplyEyepointFovFunc>>> =
+    RwLock::new(None);
+
+type LoadCockpitLayoutFunc = unsafe extern "cdecl" fn(i32, *mut CockpitLayout);
+static LOAD_COCKPIT_LAYOUT_HOOK: RwLock<Option<GenericDetour<LoadCockpitLayoutFunc>>> =
+    RwLock::new(None);
+
+type SelectRenderTargetFunc = unsafe extern "cdecl" fn(i32);
+static SELECT_RENDER_TARGET_HOOK: RwLock<Option<GenericDetour<SelectRenderTargetFunc>>> =
+    RwLock::new(None);
+
+type SetupEyepointProjectionFunc = unsafe extern "cdecl" fn(*mut Eyepoint);
+static SETUP_EYEPOINT_PROJECTION_HOOK: RwLock<Option<GenericDetour<SetupEyepointProjectionFunc>>> =
+    RwLock::new(None);
+
+type SetResFunc = unsafe extern "cdecl" fn();
+static SET_RES_HOOK: RwLock<Option<GenericDetour<SetResFunc>>> = RwLock::new(None);
 
 type BlitFunc = unsafe extern "stdcall" fn();
 static BLIT_HOOK: RwLock<Option<GenericDetour<BlitFunc>>> = RwLock::new(None);
@@ -193,15 +289,45 @@ static mut G_TICKS_1: *mut u32 = std::ptr::null_mut();
 static mut G_TICKS_2: *mut u32 = std::ptr::null_mut();
 static mut G_GAME_WINDOW_WIDTH: *mut u32 = std::ptr::null_mut();
 static mut G_GAME_WINDOW_HEIGHT: *mut u32 = std::ptr::null_mut();
+static mut G_GAME_WINDOW_GEOMETRY: *mut *mut GameWindowGeometry = std::ptr::null_mut();
+static mut G_SCREEN_W_MINUS_1: *mut i32 = std::ptr::null_mut();
+static mut G_SCREEN_H_MINUS_1: *mut i32 = std::ptr::null_mut();
+const RENDER_TARGET_COUNT: usize = 11;
+static mut G_RENDER_TARGET_TABLE: *mut [RenderTarget; RENDER_TARGET_COUNT] = std::ptr::null_mut();
+
+/// a * b in 16.16 fixed-point
+fn fmul16(a: i32, b: i32) -> i32 {
+    ((a as i64 * b as i64 + 0x8000) >> 16) as i32
+}
+
+/// Offset to center the HUD box inside the framebuffer
+fn hud_origin() -> (i32, i32) {
+    unsafe {
+        let x0 = (*G_GAME_WINDOW_WIDTH as i32 - (**G_GAME_WINDOW_GEOMETRY).width) / 2;
+        let y0 = (*G_GAME_WINDOW_HEIGHT as i32 - (**G_GAME_WINDOW_GEOMETRY).height) / 2;
+        (x0, y0)
+    }
+}
+
+/// Slot `slot` of the game's render target table, if that slot exists
+fn render_target(slot: i32) -> Option<&'static mut RenderTarget> {
+    let slot = usize::try_from(slot).ok()?;
+    unsafe { G_RENDER_TARGET_TABLE.as_mut()?.get_mut(slot) }
+}
+
+/// The cockpit's 3D scene slot
+static mut SCENE_SLOT: i32 = -1;
+
 static mut G_BLIT_GLOBAL_1: *mut BOOL = std::ptr::null_mut();
 pub static mut G_WINDOW_ACTIVE: *mut BOOL = std::ptr::null_mut();
 static mut G_CURRENT_DRAW_MODE: *mut *mut DrawMode = std::ptr::null_mut();
-static mut G_STRETCH_BLIT_SOURCE_RECT: *mut WeirdRectStruct = std::ptr::null_mut();
-static mut G_STRETCH_BLIT_OTHER_SOURCE_RECT: *mut WeirdRectStruct = std::ptr::null_mut();
+static mut G_STRETCH_BLIT_SOURCE_RECT: *mut RenderTarget = std::ptr::null_mut();
+static mut G_STRETCH_BLIT_OTHER_SOURCE_RECT: *mut RenderTarget = std::ptr::null_mut();
 static mut G_BLIT_GLOBAL_2: *mut u32 = std::ptr::null_mut();
 static mut G_BLIT_GLOBAL_3: *mut u32 = std::ptr::null_mut();
 static mut G_WIDTH_SCALE: *mut i32 = std::ptr::null_mut();
-static mut G_SOME_POINTER: *mut *mut i32 = std::ptr::null_mut();
+static mut G_HORIZON_HAZE_THICKNESS: *mut i32 = std::ptr::null_mut();
+static mut G_EYEPOINT: *mut *mut Eyepoint = std::ptr::null_mut();
 static mut G_CD_AUDIO_DEVICE: *mut u32 = std::ptr::null_mut();
 static mut G_CD_AUDIO_AUX_DEVICE: *mut i32 = std::ptr::null_mut();
 static mut G_CD_AUDIO_GLOBAL_1: *mut u32 = std::ptr::null_mut();
@@ -252,15 +378,21 @@ impl Sim {
             G_TICKS_2 = (base_address + 0x000ad210) as *mut u32;
             G_GAME_WINDOW_WIDTH = (base_address + 0x000acb6c) as *mut u32;
             G_GAME_WINDOW_HEIGHT = (base_address + 0x000acb70) as *mut u32;
+            G_GAME_WINDOW_GEOMETRY = (base_address + 0x00176eb4) as *mut *mut GameWindowGeometry;
+            G_SCREEN_W_MINUS_1 = (base_address + 0x00176ee4) as *mut i32;
+            G_SCREEN_H_MINUS_1 = (base_address + 0x00176ec0) as *mut i32;
+            G_RENDER_TARGET_TABLE =
+                (base_address + 0x00181a60) as *mut [RenderTarget; RENDER_TARGET_COUNT];
             G_BLIT_GLOBAL_1 = (base_address + 0x00176ebc) as *mut BOOL;
             G_WINDOW_ACTIVE = (base_address + 0x000acb74) as *mut BOOL;
             G_CURRENT_DRAW_MODE = (base_address + 0x000b1774) as *mut *mut DrawMode;
-            G_STRETCH_BLIT_SOURCE_RECT = (base_address + 0x00176ed0) as *mut WeirdRectStruct;
-            G_STRETCH_BLIT_OTHER_SOURCE_RECT = (base_address + 0x000bdff8) as *mut WeirdRectStruct;
+            G_STRETCH_BLIT_SOURCE_RECT = (base_address + 0x00176ed0) as *mut RenderTarget;
+            G_STRETCH_BLIT_OTHER_SOURCE_RECT = (base_address + 0x000bdff8) as *mut RenderTarget;
             G_BLIT_GLOBAL_2 = (base_address + 0x000a5f18) as *mut u32;
             G_BLIT_GLOBAL_3 = (base_address + 0x000a5a24) as *mut u32;
             G_WIDTH_SCALE = (base_address + 0x000e9610) as *mut i32;
-            G_SOME_POINTER = (base_address + 0x000a6cc0) as *mut *mut i32;
+            G_HORIZON_HAZE_THICKNESS = (base_address + 0x000a6d30) as *mut i32;
+            G_EYEPOINT = (base_address + 0x000a6cc0) as *mut *mut Eyepoint;
             G_CD_AUDIO_DEVICE = (base_address + 0x000aa278) as *mut u32;
             G_CD_AUDIO_AUX_DEVICE = (base_address + 0x000aa27c) as *mut i32;
             G_CD_AUDIO_GLOBAL_1 = (base_address + 0x000beca8) as *mut u32;
@@ -364,6 +496,53 @@ impl Sim {
             *SET_GAME_RESOLUTION_HOOK.write().unwrap() = {
                 let target: SetGameResolutionFunc = std::mem::transmute(base_address + 0x00067e23);
                 Some(hook_function(target, Self::set_game_resolution)?)
+            };
+
+            *INIT_GAME_WINDOW_GEOMETRY_HOOK.write().unwrap() = {
+                let target: InitGameWindowGeometryFunc =
+                    std::mem::transmute(base_address + 0x00012720);
+                Some(hook_function(target, Self::init_game_window_geometry)?)
+            };
+
+            *SCALE_RECT_TO_SCREEN_HOOK.write().unwrap() = {
+                let target: ScaleRectToScreenFunc = std::mem::transmute(base_address + 0x00056920);
+                Some(hook_function(target, Self::scale_rect_to_screen)?)
+            };
+
+            *SCALE_POINT_TO_SCREEN_HOOK.write().unwrap() = {
+                let target: ScalePointToScreenFunc = std::mem::transmute(base_address + 0x00056ae4);
+                Some(hook_function(target, Self::scale_point_to_screen)?)
+            };
+
+            *CENTER_RECT_ON_SCREEN_HOOK.write().unwrap() = {
+                let target: CenterRectOnScreenFunc = std::mem::transmute(base_address + 0x00056e22);
+                Some(hook_function(target, Self::center_rect_on_screen)?)
+            };
+
+            *APPLY_EYEPOINT_FOV_HOOK.write().unwrap() = {
+                let target: ApplyEyepointFovFunc = std::mem::transmute(base_address + 0x00011455);
+                Some(hook_function(target, Self::apply_eyepoint_fov)?)
+            };
+
+            *LOAD_COCKPIT_LAYOUT_HOOK.write().unwrap() = {
+                let target: LoadCockpitLayoutFunc = std::mem::transmute(base_address + 0x0003dab0);
+                Some(hook_function(target, Self::load_cockpit_layout)?)
+            };
+
+            *SELECT_RENDER_TARGET_HOOK.write().unwrap() = {
+                let target: SelectRenderTargetFunc = std::mem::transmute(base_address + 0x0000242f);
+                Some(hook_function(target, Self::select_render_target)?)
+            };
+
+            *SETUP_EYEPOINT_PROJECTION_HOOK.write().unwrap() = {
+                let target: SetupEyepointProjectionFunc =
+                    std::mem::transmute(base_address + 0x0004bc2e);
+                Some(hook_function(target, Self::setup_eyepoint_projection)?)
+            };
+
+            *SET_RES_HOOK.write().unwrap() = {
+                let target: SetResFunc = std::mem::transmute(base_address + 0x0005d4d3);
+                Some(hook_function(target, Self::set_res)?)
             };
 
             *BLIT_HOOK.write().unwrap() = {
@@ -566,21 +745,222 @@ impl Sim {
     /// The game decides which resolution to use based on the DLL name passed to this function.
     /// This is presumably a leftover from the DOS version of the game, possibly to preserve config file compatibility.
     unsafe extern "cdecl" fn set_game_resolution(resolution: *mut c_char) {
+        let widescreen = SETTINGS.get_bool("video", "widescreen", false);
         unsafe {
             // "MCGA.DLL"
-            *G_GAME_WINDOW_WIDTH = 320;
-            *G_GAME_WINDOW_HEIGHT = 200;
+            if widescreen {
+                *G_GAME_WINDOW_WIDTH = 427;
+                *G_GAME_WINDOW_HEIGHT = 240;
+            } else {
+                *G_GAME_WINDOW_WIDTH = 320;
+                *G_GAME_WINDOW_HEIGHT = 240;
+            }
 
             let resolution = std::ffi::CStr::from_ptr(resolution)
                 .to_string_lossy()
                 .to_uppercase();
             if resolution == "VESA480.DLL" {
-                *G_GAME_WINDOW_WIDTH = 640;
+                *G_GAME_WINDOW_WIDTH = if widescreen { 854 } else { 640 };
                 *G_GAME_WINDOW_HEIGHT = 480;
             } else if resolution == "VESA768.DLL" {
-                *G_GAME_WINDOW_WIDTH = 1024;
+                *G_GAME_WINDOW_WIDTH = if widescreen { 1366 } else { 1024 };
                 *G_GAME_WINDOW_HEIGHT = 768;
             }
+        }
+    }
+
+    /// Allocates GameWindowGeometry and caches the W-1/H-1 scale globals used by every HUD-scaling function.
+    /// Depending on the configured resolution, we force the window size to match the HUD box.
+    unsafe extern "cdecl" fn init_game_window_geometry() -> i32 {
+        unsafe {
+            let (width, height) = match *G_GAME_WINDOW_HEIGHT {
+                480 => (640, 480),
+                768 => (1024, 768),
+                _ => (320, 240),
+            };
+
+            let ok = INIT_GAME_WINDOW_GEOMETRY_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call();
+            if ok != 0 && !G_GAME_WINDOW_GEOMETRY.is_null() && !(*G_GAME_WINDOW_GEOMETRY).is_null()
+            {
+                (**G_GAME_WINDOW_GEOMETRY).width = width;
+                (**G_GAME_WINDOW_GEOMETRY).height = height;
+                *G_SCREEN_W_MINUS_1 = width - 1;
+                *G_SCREEN_H_MINUS_1 = height - 1;
+            }
+            ok
+        }
+    }
+
+    /// Maps normalised 16.16 HUD coordinates onto [0, W-1].
+    /// Hooked to add the HUD origin to keep it centered in its own box.
+    /// `src` and `dst` are usually the same pointer, so read the whole rect before writing any of it back.
+    unsafe extern "cdecl" fn scale_rect_to_screen(
+        _pixel_buffer: *mut PixelBuffer,
+        src: *mut RenderTarget,
+        dst: *mut RenderTarget,
+    ) -> *mut RenderTarget {
+        if src.is_null() || dst.is_null() {
+            return dst;
+        }
+        let (x0, y0) = hud_origin();
+        let rect = unsafe { (*src).clone() };
+        unsafe {
+            (*dst).left = x0 + fmul16(*G_SCREEN_W_MINUS_1, rect.left);
+            (*dst).top = y0 + fmul16(*G_SCREEN_H_MINUS_1, rect.top);
+            (*dst).right = x0 + fmul16(*G_SCREEN_W_MINUS_1, rect.right);
+            (*dst).bottom = y0 + fmul16(*G_SCREEN_H_MINUS_1, rect.bottom);
+        }
+        dst
+    }
+
+    /// Same as `scale_rect_to_screen` but for a single point.
+    unsafe extern "cdecl" fn scale_point_to_screen(
+        _pixel_buffer: *mut PixelBuffer,
+        src: *mut Point,
+        dst: *mut Point,
+    ) -> *mut Point {
+        if src.is_null() || dst.is_null() {
+            return dst;
+        }
+        let (x0, y0) = hud_origin();
+        let point = unsafe { *src };
+        unsafe {
+            (*dst).x = x0 + fmul16(*G_SCREEN_W_MINUS_1, point.x);
+            (*dst).y = y0 + fmul16(*G_SCREEN_H_MINUS_1, point.y);
+        }
+        dst
+    }
+
+    /// Centers a fixed-size rect on screen
+    unsafe extern "cdecl" fn center_rect_on_screen(
+        _pixel_buffer: *mut PixelBuffer,
+        src: *mut RenderTarget,
+        dst: *mut RenderTarget,
+    ) -> *mut RenderTarget {
+        if src.is_null() || dst.is_null() {
+            return dst;
+        }
+        let (x0, y0) = hud_origin();
+        let rect = unsafe { (*src).clone() };
+        let width = rect.right - rect.left + 1;
+        let height = rect.bottom - rect.top + 1;
+        unsafe {
+            let left = x0 + (*G_SCREEN_W_MINUS_1 - width - 1) / 2;
+            let top = y0 + (*G_SCREEN_H_MINUS_1 - height - 1) / 2;
+            (*dst).left = left;
+            (*dst).top = top;
+            (*dst).right = left + width - 1;
+            (*dst).bottom = top + height - 1;
+        }
+        dst
+    }
+
+    /// Rewrites eyepoint->fovX every frame from the game's FOV globals.
+    /// We keep the game's raw value in a shadow so its internal logic always sees the original raw value,
+    /// then we always apply the Hor+ correction.
+    unsafe extern "cdecl" fn apply_eyepoint_fov(reset: i32) {
+        static mut LAST_RAW_FOV: i32 = 0x10000;
+        unsafe {
+            let cam = *G_EYEPOINT;
+            if cam.is_null() {
+                APPLY_EYEPOINT_FOV_HOOK
+                    .read()
+                    .unwrap()
+                    .as_ref()
+                    .unwrap()
+                    .call(reset);
+                return;
+            }
+            let correction = {
+                let width = *G_GAME_WINDOW_WIDTH as i64;
+                let height = *G_GAME_WINDOW_HEIGHT as i64;
+                if width <= 0 || height <= 0 {
+                    0x10000
+                } else {
+                    let aspect = (width << 16) / height;
+                    (((0x15555i64) << 16) / aspect) as i32
+                }
+            };
+            (*cam).fov_x = LAST_RAW_FOV;
+            APPLY_EYEPOINT_FOV_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(reset);
+            LAST_RAW_FOV = (*cam).fov_x;
+            (*cam).fov_x = ((LAST_RAW_FOV as i64 * correction as i64) >> 16) as i32;
+        }
+    }
+
+    /// Copies the cockpit's 3D viewport rect into render-target slot `layout.render_target_slot`.
+    /// We widen that slot to the full framebuffer so the 3D view covers the whole width behind the centered 4:3 HUD.
+    unsafe extern "cdecl" fn load_cockpit_layout(cockpit: i32, layout: *mut CockpitLayout) {
+        unsafe {
+            LOAD_COCKPIT_LAYOUT_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(cockpit, layout);
+            if layout.is_null() {
+                return;
+            }
+            let slot = (*layout).render_target_slot;
+            if let Some(target) = render_target(slot) {
+                SCENE_SLOT = slot;
+                target.cover_framebuffer();
+            }
+        }
+    }
+
+    /// Copies slot `slot` of the render-target table into StretchBlitSourceRect and the eyepoint.
+    /// We substitute the full-screen rect for scene slots only, just before they are consumed
+    unsafe extern "cdecl" fn select_render_target(slot: i32) {
+        unsafe {
+            if (slot == 0 || slot == SCENE_SLOT)
+                && let Some(target) = render_target(slot)
+            {
+                target.cover_framebuffer();
+            }
+            SELECT_RENDER_TARGET_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(slot);
+        }
+    }
+
+    /// Recomputes the projection from the eyepoint struct.
+    /// We force pixel_aspect_ratio to be square each time.
+    unsafe extern "cdecl" fn setup_eyepoint_projection(cam: *mut Eyepoint) {
+        unsafe {
+            if !cam.is_null() {
+                (*cam).pixel_aspect_ratio = 0x10000;
+            }
+            SETUP_EYEPOINT_PROJECTION_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(cam);
+        }
+    }
+
+    /// Rescales every 320x200-authored table for the current resolution.
+    /// We subtract the HUD origin offset from the horizon haze thickness to avoid stretching the sky vertically.
+    /// This is kind of a hack. We should probably reimplement this function entirely.
+    unsafe extern "cdecl" fn set_res() {
+        unsafe {
+            SET_RES_HOOK.read().unwrap().as_ref().unwrap().call();
+            let (x0, _) = hud_origin();
+            *G_HORIZON_HAZE_THICKNESS -= x0;
         }
     }
 
@@ -611,10 +991,10 @@ impl Sim {
                 }
             } else {
                 ((**G_CURRENT_DRAW_MODE).stretch_blit_func)(
-                    (*G_STRETCH_BLIT_SOURCE_RECT).x1 + 1,
-                    (*G_STRETCH_BLIT_SOURCE_RECT).y2 + 1,
-                    (*G_STRETCH_BLIT_SOURCE_RECT).x2,
-                    (*G_STRETCH_BLIT_SOURCE_RECT).y1,
+                    (*G_STRETCH_BLIT_SOURCE_RECT).left + 1,
+                    (*G_STRETCH_BLIT_SOURCE_RECT).top + 1,
+                    (*G_STRETCH_BLIT_SOURCE_RECT).right,
+                    (*G_STRETCH_BLIT_SOURCE_RECT).bottom,
                 );
 
                 *G_STRETCH_BLIT_SOURCE_RECT = (*G_STRETCH_BLIT_OTHER_SOURCE_RECT).clone();
@@ -1058,6 +1438,15 @@ impl Drop for Sim {
             SUP_ANIM_TIMER_CALLBACK_HOOK.write().unwrap().take();
             INTEGER_OVERFLOW_HAPPENS_HERE_HOOK.write().unwrap().take();
             SET_GAME_RESOLUTION_HOOK.write().unwrap().take();
+            INIT_GAME_WINDOW_GEOMETRY_HOOK.write().unwrap().take();
+            SCALE_RECT_TO_SCREEN_HOOK.write().unwrap().take();
+            SCALE_POINT_TO_SCREEN_HOOK.write().unwrap().take();
+            CENTER_RECT_ON_SCREEN_HOOK.write().unwrap().take();
+            APPLY_EYEPOINT_FOV_HOOK.write().unwrap().take();
+            LOAD_COCKPIT_LAYOUT_HOOK.write().unwrap().take();
+            SELECT_RENDER_TARGET_HOOK.write().unwrap().take();
+            SETUP_EYEPOINT_PROJECTION_HOOK.write().unwrap().take();
+            SET_RES_HOOK.write().unwrap().take();
             BLIT_HOOK.write().unwrap().take();
             INIT_CD_AUDIO_HOOK.write().unwrap().take();
             GET_CD_AUDIO_AUX_DEVICE_HOOK.write().unwrap().take();

@@ -169,8 +169,8 @@ pub unsafe extern "stdcall" fn begin(
 
         G_BITS_TO_BLIT.write_volatile(pixel_buf as *mut u8);
 
-        (*pixel_buffer).width = width;
-        (*pixel_buffer).height = height;
+        (*pixel_buffer).width = width - 1;
+        (*pixel_buffer).height = height - 1;
         (*pixel_buffer).bitmap_info = G_GDI_BLIT_BITMAP_INFO;
 
         let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
@@ -206,8 +206,8 @@ pub unsafe extern "stdcall" fn end() -> i32 {
 pub unsafe extern "stdcall" fn blit_flip() -> i32 {
     tracing::trace!("GdiBlitFlip called");
 
-    let width = unsafe { (**G_CURRENT_PIXEL_BUFFER).width } + 1;
-    let height = unsafe { (**G_CURRENT_PIXEL_BUFFER).height };
+    let width = unsafe { (**G_CURRENT_PIXEL_BUFFER).width + 1 };
+    let height = unsafe { (**G_CURRENT_PIXEL_BUFFER).height + 1 };
 
     if width <= 0 || height <= 0 {
         tracing::warn!(
