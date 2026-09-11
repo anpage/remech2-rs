@@ -2,13 +2,17 @@ use std::sync::Arc;
 
 use egui::{Context, Frame, Margin, TextureId, Vec2, load::SizedTexture};
 
-use crate::sim::{
-    G_WINDOW_ACTIVE,
-    drawmode::hooks::{G_MOUSE_CAPTURED, G_MOUSE_NEEDS_CENTERING},
+use crate::{
+    settings::SETTINGS,
+    sim::{
+        G_WINDOW_ACTIVE,
+        drawmode::hooks::{G_MOUSE_CAPTURED, G_MOUSE_NEEDS_CENTERING},
+    },
 };
 
 pub struct OverlayUi {
     fonts: egui::FontDefinitions,
+    widescreen: bool,
 }
 
 impl Default for OverlayUi {
@@ -25,14 +29,20 @@ impl Default for OverlayUi {
             .unwrap()
             .insert(0, "ScienceGothic".to_owned());
 
-        Self { fonts }
+        let widescreen = SETTINGS.get_bool("video", "widescreen", false);
+
+        Self { fonts, widescreen }
     }
 }
 
 impl OverlayUi {
     pub fn ui(&mut self, ctx: &Context, texture: TextureId, window_width: f32, window_height: f32) {
-        // calculate width and height, preserving 4:3 aspect ratio
-        let aspect_ratio = const { 4.0 / 3.0 };
+        // calculate width and height, preserving aspect ratio
+        let aspect_ratio = if self.widescreen {
+            const { 16.0 / 9.0 }
+        } else {
+            const { 4.0 / 3.0 }
+        };
         let mut width = window_width;
         let mut height = window_height;
         if width / height > aspect_ratio {
