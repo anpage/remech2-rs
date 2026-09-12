@@ -186,6 +186,41 @@ struct CockpitInput {
     jumpjet_held: u8,
 }
 
+/// One binding of a physical control onto a virtual input axis.
+#[repr(C, packed)]
+struct AxisBinding {
+    _unknown1: [u8; 0x14],
+    axis: *mut InputAxis,
+}
+
+/// A virtual input axis: throttle, steering, torso twist and so on.
+#[repr(C, packed)]
+struct InputAxis {
+    /// The variable this axis's mapped value is written to each frame
+    _output: *mut i32,
+    /// Ramp speed while a key is held, in axis units per ideal frame
+    rate: *mut i32,
+    _unknown1: [u8; 0xd],
+    /// Nonzero once something has driven this axis this frame
+    updated: u8,
+    _unknown2: [u8; 4],
+    /// Where the axis currently sits, `-0x10000..=0x10000`
+    position: i32,
+    /// Per-axis sensitivity, as a left shift on the ramp step
+    ramp_shift: u8,
+    _unknown3: [u8; 3],
+    /// Nonzero while the "increase" key is held
+    plus_held: *const u8,
+    /// Nonzero while the "decrease" key is held
+    minus_held: *const u8,
+}
+
+/// The ends of an axis's travel.
+const AXIS_POSITION_MAX: i32 = 65536;
+
+/// The fastest an axis may ramp, in units per ideal frame.
+const AXIS_RATE_MAX: i32 = 32768;
+
 /// A projectile in flight.
 #[repr(C, packed)]
 struct Shot {
@@ -198,7 +233,7 @@ struct Shot {
 
 /// Set when a guided missile is within 101 units of its lock.
 /// It makes the shot detonate on the locked target without running any collision test.
-const SHOT_PROXIMITY_FUSE: u32 = 0x8000;
+const SHOT_PROXIMITY_FUSE: u32 = 32768;
 
 /// A full jumpjet tank, in ticks.
 const JUMPJET_FUEL_MAX: i32 = 1810;
@@ -352,10 +387,6 @@ type FuncWithJumpjetCalcFunc = unsafe extern "cdecl" fn(*mut Player);
 static FUNC_WITH_JUMPJET_CALC_HOOK: RwLock<Option<GenericDetour<FuncWithJumpjetCalcFunc>>> =
     RwLock::new(None);
 
-/// Jumpjet fuel ticks the game truncated away. HashMap for tracking multiple players.
-static JUMPJET_FUEL_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
 type FixedDiv16Func = unsafe extern "cdecl" fn(u32, i32) -> u32;
 static FIXED_DIV_16_HOOK: RwLock<Option<GenericDetour<FixedDiv16Func>>> = RwLock::new(None);
 
@@ -365,6 +396,18 @@ static GUIDE_MISSILE_TO_TARGET_HOOK: RwLock<Option<GenericDetour<GuideMissileToT
 
 type UpdateAllShotsFunc = unsafe extern "cdecl" fn();
 static UPDATE_ALL_SHOTS_HOOK: RwLock<Option<GenericDetour<UpdateAllShotsFunc>>> = RwLock::new(None);
+
+type UpdateAxisFromKeysFunc = unsafe extern "cdecl" fn(*mut AxisBinding) -> i32;
+static UPDATE_AXIS_FROM_KEYS_HOOK: RwLock<Option<GenericDetour<UpdateAxisFromKeysFunc>>> =
+    RwLock::new(None);
+
+/// Jumpjet fuel ticks the game truncated away. HashMap for tracking multiple players.
+static JUMPJET_FUEL_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+/// Axis travel the ideal-frame scaling truncated away, keyed by axis address.
+static AXIS_POSITION_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
 
 // Global variables
 static mut G_TICKS_CHECK: *mut u32 = std::ptr::null_mut();
@@ -758,6 +801,11 @@ impl Sim {
             *UPDATE_ALL_SHOTS_HOOK.write().unwrap() = {
                 let target: UpdateAllShotsFunc = std::mem::transmute(base_address + 0x0006a486);
                 Some(hook_function(target, Self::update_all_shots)?)
+            };
+
+            *UPDATE_AXIS_FROM_KEYS_HOOK.write().unwrap() = {
+                let target: UpdateAxisFromKeysFunc = std::mem::transmute(base_address + 0x0007aecc);
+                Some(hook_function(target, Self::update_axis_from_keys)?)
             };
 
             drawmode::hook_functions(base_address)?;
@@ -1652,6 +1700,81 @@ impl Sim {
         let previous_age = age.saturating_sub(unsafe { *G_DELTA_TIME });
         age.div_euclid(TICKS_PER_IDEAL_FRAME) != previous_age.div_euclid(TICKS_PER_IDEAL_FRAME)
     }
+
+    /// Ramps a key-driven input axis (throttle, steering, torso twist) at the same rate
+    /// whatever the framerate.
+    ///
+    /// We hide two key pointers from the original so it skips its own integration, keeping
+    /// its handling of the centre and analog branches, then integrate against elapsed time here.
+    unsafe extern "cdecl" fn update_axis_from_keys(binding: *mut AxisBinding) -> i32 {
+        let axis = unsafe { (*binding).axis };
+        let (plus_held, minus_held) = unsafe { ((*axis).plus_held, (*axis).minus_held) };
+        // The original only looks at the keys if nothing else has driven the axis yet
+        let keys_apply = unsafe { (*axis).updated } == 0;
+        let rate = unsafe { *(*axis).rate };
+
+        unsafe {
+            (*axis).plus_held = std::ptr::null();
+            (*axis).minus_held = std::ptr::null();
+        }
+        let mut updated = unsafe {
+            UPDATE_AXIS_FROM_KEYS_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(binding)
+        };
+        unsafe {
+            (*axis).plus_held = plus_held;
+            (*axis).minus_held = minus_held;
+            *(*axis).rate = rate;
+        }
+
+        if keys_apply {
+            let held = |key: *const u8| unsafe { key.as_ref().is_some_and(|held| *held != 0) };
+            if held(plus_held) {
+                unsafe { Self::ramp_axis(axis, 1) };
+                updated = 1;
+            }
+            if held(minus_held) {
+                unsafe { Self::ramp_axis(axis, -1) };
+                updated = 1;
+            }
+            if updated == 0 {
+                unsafe { *(*axis).rate = 0 };
+                AXIS_POSITION_CARRY.lock().unwrap().remove(&(axis as usize));
+            }
+            unsafe { (*axis).updated = updated as u8 };
+        }
+
+        updated
+    }
+
+    /// One frame of an axis ramp, `direction` being 1 for the increase key and -1 for decrease.
+    unsafe fn ramp_axis(axis: *mut InputAxis, direction: i32) {
+        let delta_time = unsafe { *G_DELTA_TIME };
+        let step = (3 * delta_time).wrapping_shl(unsafe { (*axis).ramp_shift } as u32);
+
+        let rate_ptr = unsafe { (*axis).rate };
+        let mut rate = unsafe { *rate_ptr };
+        // Pressing the opposite key restarts the ramp from a standstill
+        if rate * direction < 0 {
+            rate = 0;
+        }
+        rate = (rate + direction * step).clamp(-AXIS_RATE_MAX, AXIS_RATE_MAX);
+        unsafe { *rate_ptr = rate };
+
+        // The rate is one ideal frame's worth of travel, so scale it to the frame we actually
+        // got and keep the remainder for the next one
+        let mut carries = AXIS_POSITION_CARRY.lock().unwrap();
+        let carry = carries.entry(axis as usize).or_insert(0);
+        let travel = rate * delta_time + *carry;
+        *carry = travel.rem_euclid(TICKS_PER_IDEAL_FRAME);
+
+        let position = unsafe { (*axis).position } + travel.div_euclid(TICKS_PER_IDEAL_FRAME);
+        unsafe { (*axis).position = position.clamp(-AXIS_POSITION_MAX, AXIS_POSITION_MAX) };
+    }
 }
 
 impl Drop for Sim {
@@ -1697,7 +1820,9 @@ impl Drop for Sim {
             FIXED_DIV_16_HOOK.write().unwrap().take();
             GUIDE_MISSILE_TO_TARGET_HOOK.write().unwrap().take();
             UPDATE_ALL_SHOTS_HOOK.write().unwrap().take();
+            UPDATE_AXIS_FROM_KEYS_HOOK.write().unwrap().take();
             JUMPJET_FUEL_CARRY.lock().unwrap().clear();
+            AXIS_POSITION_CARRY.lock().unwrap().clear();
             drawmode::unhook_functions();
             self.ail.unhook();
             CD_AUDIO_PLAYER.lock().unwrap().take();
