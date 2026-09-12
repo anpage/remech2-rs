@@ -1,6 +1,7 @@
 use std::{
+    collections::HashMap,
     ffi::{CString, c_char, c_void},
-    sync::{Mutex, RwLock},
+    sync::{LazyLock, Mutex, RwLock},
     time::Instant,
 };
 
@@ -153,6 +154,38 @@ struct Point {
     y: i32,
 }
 
+/// A player's mech.
+#[repr(C, packed)]
+struct Player {
+    game_object: *mut GameObject,
+    _unknown1: [u8; 0x9c],
+    /// The mech's power state. `2` is powered up and under the pilot's control.
+    shutdown_state: i32,
+    _unknown2: [u8; 0x1c],
+    /// Jumpjet fuel in ticks. Negative means this mech has no jumpjets at all.
+    jumpjet_fuel: i32,
+    _unknown3: [u8; 0x48],
+    overheat_flags: u16,
+}
+
+/// A player's entry in the sim's object list.
+#[repr(C, packed)]
+struct GameObject {
+    _unknown1: [u8; 0x4c],
+    input: *mut CockpitInput,
+}
+
+/// One frame's worth of cockpit input.
+#[repr(C, packed)]
+struct CockpitInput {
+    _unknown1: [u8; 0x1d],
+    /// Nonzero while the jumpjet key is held.
+    jumpjet_held: u8,
+}
+
+/// A full jumpjet tank, in ticks.
+const JUMPJET_FUEL_MAX: i32 = 1810;
+
 // Functions to hook
 // static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
 
@@ -285,6 +318,14 @@ static TOGGLE_FULLSCREEN_HOOK: RwLock<Option<GenericDetour<ToggleFullscreenFunc>
 
 type NextClockFunc = unsafe extern "stdcall" fn();
 static NEXT_CLOCK_HOOK: RwLock<Option<GenericDetour<NextClockFunc>>> = RwLock::new(None);
+
+type FuncWithJumpjetCalcFunc = unsafe extern "cdecl" fn(*mut Player);
+static FUNC_WITH_JUMPJET_CALC_HOOK: RwLock<Option<GenericDetour<FuncWithJumpjetCalcFunc>>> =
+    RwLock::new(None);
+
+/// Jumpjet fuel ticks the game truncated away. HashMap for tracking multiple players.
+static JUMPJET_FUEL_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
 
 // Global variables
 static mut G_TICKS_CHECK: *mut u32 = std::ptr::null_mut();
@@ -656,6 +697,12 @@ impl Sim {
             *NEXT_CLOCK_HOOK.write().unwrap() = {
                 let target: NextClockFunc = std::mem::transmute(base_address + 0x0007ce2c);
                 Some(hook_function(target, Self::next_clock)?)
+            };
+
+            *FUNC_WITH_JUMPJET_CALC_HOOK.write().unwrap() = {
+                let target: FuncWithJumpjetCalcFunc =
+                    std::mem::transmute(base_address + 0x000180cd);
+                Some(hook_function(target, Self::func_with_jumpjet_calc)?)
             };
 
             drawmode::hook_functions(base_address)?;
@@ -1439,6 +1486,57 @@ impl Sim {
             NEXT_CLOCK_HOOK.read().unwrap().as_ref().unwrap().call();
         }
     }
+
+    /// Recharges jumpjet fuel at the same rate whatever the framerate.
+    unsafe extern "cdecl" fn func_with_jumpjet_calc(player: *mut Player) {
+        let delta_time = unsafe { *G_DELTA_TIME };
+
+        let expected_fuel = unsafe { Self::jumpjet_recharge_result(&*player, delta_time) };
+
+        unsafe {
+            FUNC_WITH_JUMPJET_CALC_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(player);
+        }
+
+        let mut carries = JUMPJET_FUEL_CARRY.lock().unwrap();
+        let carry = carries.entry(player.addr()).or_insert(0);
+        let player = unsafe { &mut *player };
+
+        if expected_fuel != Some(player.jumpjet_fuel) {
+            *carry = 0;
+            return;
+        }
+
+        // Calculate the remainder of the fuel recharge calculation and apply it if it exceeds 4 ticks
+        *carry += unsafe { *G_DELTA_TIME } % 4;
+        if *carry >= 4 {
+            *carry -= 4;
+            if player.jumpjet_fuel < JUMPJET_FUEL_MAX {
+                player.jumpjet_fuel += 1;
+            }
+        }
+    }
+
+    /// The fuel value the recharge branch of `FuncWithJumpjetCalc` will leave behind, or `None` if it's not going to recharge.
+    unsafe fn jumpjet_recharge_result(player: &Player, delta_time: i32) -> Option<i32> {
+        if player.overheat_flags & 0x200 != 0 {
+            return None;
+        }
+        if player.jumpjet_fuel < 0 || player.jumpjet_fuel >= JUMPJET_FUEL_MAX {
+            return None;
+        }
+
+        let input = unsafe { player.game_object.as_ref()?.input.as_ref()? };
+        if input.jumpjet_held != 0 && player.shutdown_state == 2 {
+            return None;
+        }
+
+        Some(player.jumpjet_fuel + delta_time / 4)
+    }
 }
 
 impl Drop for Sim {
@@ -1480,6 +1578,8 @@ impl Drop for Sim {
             RANDOM_INT_BELOW_HOOK.write().unwrap().take();
             TOGGLE_FULLSCREEN_HOOK.write().unwrap().take();
             NEXT_CLOCK_HOOK.write().unwrap().take();
+            FUNC_WITH_JUMPJET_CALC_HOOK.write().unwrap().take();
+            JUMPJET_FUEL_CARRY.lock().unwrap().clear();
             drawmode::unhook_functions();
             self.ail.unhook();
             CD_AUDIO_PLAYER.lock().unwrap().take();
