@@ -1,7 +1,10 @@
 use std::{
     collections::HashMap,
     ffi::{CString, c_char, c_void},
-    sync::{LazyLock, Mutex, RwLock},
+    sync::{
+        LazyLock, Mutex, RwLock,
+        atomic::{AtomicU32, Ordering},
+    },
     time::Instant,
 };
 
@@ -183,8 +186,34 @@ struct CockpitInput {
     jumpjet_held: u8,
 }
 
+/// A projectile in flight.
+#[repr(C, packed)]
+struct Shot {
+    _unknown1: [u8; 0x20],
+    /// Ticks since launch
+    age: i32,
+    _unknown2: [u8; 0x14],
+    flags: u32,
+}
+
+/// Set when a guided missile is within 101 units of its lock.
+/// It makes the shot detonate on the locked target without running any collision test.
+const SHOT_PROXIMITY_FUSE: u32 = 0x8000;
+
 /// A full jumpjet tank, in ticks.
 const JUMPJET_FUEL_MAX: i32 = 1810;
+
+/// Ticks per frame at the ideal 45 FPS, which is what every sim system seems to be tuned for.
+const TICKS_PER_IDEAL_FRAME: i32 = 4;
+
+/// Calls into `FixedDiv16` with a zero divisor that we answered instead of letting crash.
+pub static ZERO_DIVISORS_SUPPRESSED: AtomicU32 = AtomicU32::new(0);
+
+/// Proximity fuses that armed on a frame the 45 FPS sim would never have sampled.
+pub static PROXIMITY_FUSES_SUPPRESSED: AtomicU32 = AtomicU32::new(0);
+
+/// Frames with `DeltaTime == 0` that we skipped the shot updater on.
+pub static ZERO_LENGTH_FRAMES_SKIPPED: AtomicU32 = AtomicU32::new(0);
 
 // Functions to hook
 // static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
@@ -326,6 +355,16 @@ static FUNC_WITH_JUMPJET_CALC_HOOK: RwLock<Option<GenericDetour<FuncWithJumpjetC
 /// Jumpjet fuel ticks the game truncated away. HashMap for tracking multiple players.
 static JUMPJET_FUEL_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
+
+type FixedDiv16Func = unsafe extern "cdecl" fn(u32, i32) -> u32;
+static FIXED_DIV_16_HOOK: RwLock<Option<GenericDetour<FixedDiv16Func>>> = RwLock::new(None);
+
+type GuideMissileToTargetFunc = unsafe extern "cdecl" fn(*mut Shot, i32, i32, i32);
+static GUIDE_MISSILE_TO_TARGET_HOOK: RwLock<Option<GenericDetour<GuideMissileToTargetFunc>>> =
+    RwLock::new(None);
+
+type UpdateAllShotsFunc = unsafe extern "cdecl" fn();
+static UPDATE_ALL_SHOTS_HOOK: RwLock<Option<GenericDetour<UpdateAllShotsFunc>>> = RwLock::new(None);
 
 // Global variables
 static mut G_TICKS_CHECK: *mut u32 = std::ptr::null_mut();
@@ -703,6 +742,22 @@ impl Sim {
                 let target: FuncWithJumpjetCalcFunc =
                     std::mem::transmute(base_address + 0x000180cd);
                 Some(hook_function(target, Self::func_with_jumpjet_calc)?)
+            };
+
+            *FIXED_DIV_16_HOOK.write().unwrap() = {
+                let target: FixedDiv16Func = std::mem::transmute(base_address + 0x00002c90);
+                Some(hook_function(target, Self::fixed_div_16)?)
+            };
+
+            *GUIDE_MISSILE_TO_TARGET_HOOK.write().unwrap() = {
+                let target: GuideMissileToTargetFunc =
+                    std::mem::transmute(base_address + 0x0006ae5a);
+                Some(hook_function(target, Self::guide_missile_to_target)?)
+            };
+
+            *UPDATE_ALL_SHOTS_HOOK.write().unwrap() = {
+                let target: UpdateAllShotsFunc = std::mem::transmute(base_address + 0x0006a486);
+                Some(hook_function(target, Self::update_all_shots)?)
             };
 
             drawmode::hook_functions(base_address)?;
@@ -1487,6 +1542,28 @@ impl Sim {
         }
     }
 
+    /// Advances every shot in flight.
+    /// Skipped entirely on a zero-length frame.
+    ///
+    /// Frames that finish inside a single 181 Hz tick result in `DeltaTime == 0`, and the shot updater
+    /// doesn't properly handle this condition. The zero elapsed time causes it to fall into a point test
+    /// that doesn't consider who shot the missile, so the missile detonates immediately on the mech who shot it.
+    unsafe extern "cdecl" fn update_all_shots() {
+        unsafe {
+            if *G_DELTA_TIME == 0 {
+                ZERO_LENGTH_FRAMES_SKIPPED.fetch_add(1, Ordering::Relaxed);
+                return;
+            }
+
+            UPDATE_ALL_SHOTS_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call();
+        }
+    }
+
     /// Recharges jumpjet fuel at the same rate whatever the framerate.
     unsafe extern "cdecl" fn func_with_jumpjet_calc(player: *mut Player) {
         let delta_time = unsafe { *G_DELTA_TIME };
@@ -1537,6 +1614,44 @@ impl Sim {
 
         Some(player.jumpjet_fuel + delta_time / 4)
     }
+
+    /// Divides two 16.16 fixed-point values.
+    /// The missile guidance code calls this with a zero divisor sometimes, so we suppress it.
+    unsafe extern "cdecl" fn fixed_div_16(value: u32, divisor: i32) -> u32 {
+        if divisor == 0 {
+            ZERO_DIVISORS_SUPPRESSED.fetch_add(1, Ordering::Relaxed);
+            return 0;
+        }
+        (((value as i32 as i64) << 16) / divisor as i64) as u32
+    }
+
+    /// Steers a guided missile toward its lock and arms its proximity fuse.
+    /// We keep the 45 FPS sampling density: let the fuse arm only on the frame where the
+    /// shot's age crosses a 4-tick boundary. At `DeltaTime >= 4` every frame crosses one,
+    /// which leaves the "ideal" 45 FPS framerate and anything below it untouched.
+    unsafe extern "cdecl" fn guide_missile_to_target(shot: *mut Shot, x: i32, y: i32, z: i32) {
+        unsafe {
+            GUIDE_MISSILE_TO_TARGET_HOOK
+                .read()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .call(shot, x, y, z);
+        }
+
+        let shot = unsafe { &mut *shot };
+        if shot.flags & SHOT_PROXIMITY_FUSE != 0 && !Self::crossed_ideal_frame_boundary(shot.age) {
+            shot.flags &= !SHOT_PROXIMITY_FUSE;
+            PROXIMITY_FUSES_SUPPRESSED.fetch_add(1, Ordering::Relaxed);
+        }
+    }
+
+    /// Whether a shot that has just aged to `age` ticks crossed a 4-tick boundary doing so.
+    /// Baiscally, whether a 45 FPS sim would have sampled it on this frame.
+    fn crossed_ideal_frame_boundary(age: i32) -> bool {
+        let previous_age = age.saturating_sub(unsafe { *G_DELTA_TIME });
+        age.div_euclid(TICKS_PER_IDEAL_FRAME) != previous_age.div_euclid(TICKS_PER_IDEAL_FRAME)
+    }
 }
 
 impl Drop for Sim {
@@ -1579,6 +1694,9 @@ impl Drop for Sim {
             TOGGLE_FULLSCREEN_HOOK.write().unwrap().take();
             NEXT_CLOCK_HOOK.write().unwrap().take();
             FUNC_WITH_JUMPJET_CALC_HOOK.write().unwrap().take();
+            FIXED_DIV_16_HOOK.write().unwrap().take();
+            GUIDE_MISSILE_TO_TARGET_HOOK.write().unwrap().take();
+            UPDATE_ALL_SHOTS_HOOK.write().unwrap().take();
             JUMPJET_FUEL_CARRY.lock().unwrap().clear();
             drawmode::unhook_functions();
             self.ail.unhook();

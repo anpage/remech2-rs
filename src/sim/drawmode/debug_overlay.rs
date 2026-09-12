@@ -1,11 +1,13 @@
-use std::sync::Arc;
+use std::sync::{Arc, atomic::Ordering};
 
 use egui::Vec2b;
 use egui::{Context, Response, Ui};
 
 use egui_plot::{Bar, BarChart, Legend, Plot};
 
-use crate::sim::G_DELTA_TIME;
+use crate::sim::{
+    G_DELTA_TIME, PROXIMITY_FUSES_SUPPRESSED, ZERO_DIVISORS_SUPPRESSED, ZERO_LENGTH_FRAMES_SKIPPED,
+};
 
 #[cfg(feature = "debug-overlay")]
 pub fn show_deltatime_plot(ui: &mut Ui, recent_deltatimes: [Option<i32>; 200]) -> Response {
@@ -91,6 +93,18 @@ impl DebugOverlay {
                             acc
                         }
                     })
+                ));
+                ui.label(format!(
+                    "ZERO DIVISORS: {}",
+                    ZERO_DIVISORS_SUPPRESSED.load(Ordering::Relaxed)
+                ));
+                ui.label(format!(
+                    "FUSES SUPPRESSED: {}",
+                    PROXIMITY_FUSES_SUPPRESSED.load(Ordering::Relaxed)
+                ));
+                ui.label(format!(
+                    "SHOT UPDATES SKIPPED: {}",
+                    ZERO_LENGTH_FRAMES_SKIPPED.load(Ordering::Relaxed)
                 ));
                 show_deltatime_plot(ui, self.recent_deltatimes);
             });
