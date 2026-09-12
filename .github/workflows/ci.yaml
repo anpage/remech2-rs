@@ -25,7 +25,7 @@ jobs:
         run: cargo build --target i686-pc-windows-gnu
 
       - name: Build Release
-        run: cargo build --release --target i686-pc-windows-gnu
+        run: cargo build --release --no-default-features --target i686-pc-windows-gnu
 
       - name: Archive Debug Build
         uses: actions/upload-artifact@v4

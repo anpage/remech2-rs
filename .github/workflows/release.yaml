@@ -20,7 +20,7 @@ jobs:
           targets: i686-pc-windows-gnu
 
       - name: Build Release (GNU)
-        run: cargo build --release --target i686-pc-windows-gnu
+        run: cargo build --release --no-default-features --target i686-pc-windows-gnu
         env:
           REMECH2_VERSION: ${{ github.ref_name }}
 

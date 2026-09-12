@@ -40,6 +40,7 @@ tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
 unarc-rs = "0.4.3"
 wgpu = { version = "27.0.1", default-features = false, features = ["dx12", "vulkan", "wgsl"] }
+egui_plot = { version = "0.34.1", optional = true }
 
 [dependencies.windows]
 version = "0.62.2"
@@ -57,3 +58,7 @@ features = [
     "Win32_UI_Input_KeyboardAndMouse",
     "Win32_System_IO",
 ]
+
+[features]
+default = ["debug-overlay"]
+debug-overlay = ["dep:egui_plot"]

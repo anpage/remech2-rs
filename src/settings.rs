@@ -26,7 +26,8 @@ impl GlobalSettings {
             .set("fullscreen", "true")
             .set("width", "")
             .set("height", "")
-            .set("widescreen", "false");
+            .set("widescreen", "false")
+            .set("framerate_limit", "45");
         settings
             .with_section(Some("audio"))
             .set("music_path", "Music")

@@ -283,6 +283,9 @@ type ToggleFullscreenFunc = unsafe extern "stdcall" fn();
 static TOGGLE_FULLSCREEN_HOOK: RwLock<Option<GenericDetour<ToggleFullscreenFunc>>> =
     RwLock::new(None);
 
+type NextClockFunc = unsafe extern "stdcall" fn();
+static NEXT_CLOCK_HOOK: RwLock<Option<GenericDetour<NextClockFunc>>> = RwLock::new(None);
+
 // Global variables
 static mut G_TICKS_CHECK: *mut u32 = std::ptr::null_mut();
 static mut G_TICKS_1: *mut u32 = std::ptr::null_mut();
@@ -338,6 +341,7 @@ static mut G_CD_AUDIO_TRACK_DATA: *mut CdAudioTracks = std::ptr::null_mut();
 static mut G_PAUSED_CD_AUDIO_POSITION: *mut CdAudioPosition = std::ptr::null_mut();
 static mut G_CD_AUDIO_VOLUME: *mut i32 = std::ptr::null_mut();
 static mut G_SHOULD_QUIT: *mut BOOL = std::ptr::null_mut();
+static mut G_DELTA_TIME: *mut i32 = std::ptr::null_mut();
 
 /// Cache the CD audio device to reuse between sim launches.
 /// Windows 11 crashes if we try to close the CD audio device.
@@ -403,6 +407,7 @@ impl Sim {
             G_PAUSED_CD_AUDIO_POSITION = (base_address + 0x000becb0) as *mut CdAudioPosition;
             G_CD_AUDIO_VOLUME = (base_address + 0x000a14a4) as *mut i32;
             G_SHOULD_QUIT = (base_address + 0x000acb18) as *mut BOOL;
+            G_DELTA_TIME = (base_address + 0x000ba550) as *mut i32;
 
             let heap_free_thunk = (base_address + 0x001834d0) as *mut HeapFreeFunc;
             *heap_free_thunk = fake_heap_free;
@@ -646,6 +651,11 @@ impl Sim {
             *TOGGLE_FULLSCREEN_HOOK.write().unwrap() = {
                 let target: ToggleFullscreenFunc = std::mem::transmute(base_address + 0x00077392);
                 Some(hook_function(target, Self::toggle_fullscreen)?)
+            };
+
+            *NEXT_CLOCK_HOOK.write().unwrap() = {
+                let target: NextClockFunc = std::mem::transmute(base_address + 0x0007ce2c);
+                Some(hook_function(target, Self::next_clock)?)
             };
 
             drawmode::hook_functions(base_address)?;
@@ -965,26 +975,8 @@ impl Sim {
     }
 
     /// This function is called every frame to draw the game.
-    /// For now, we hook it in order to limit the framerate to a resonable 45 FPS.
-    /// Any higher and your jumpjet fuel will not recharge reliably and if unconstrained, the game's physics will break.
     unsafe extern "stdcall" fn blit() {
         unsafe {
-            static LAST_INSTANT: RwLock<Option<Instant>> = RwLock::new(None);
-
-            {
-                let mut last_instant = LAST_INSTANT.write().unwrap();
-                if last_instant.is_none() {
-                    *last_instant = Some(Instant::now());
-                }
-
-                // Limit framerate to 45 FPS
-                // Spin until 1/45th of a second has passed
-                while last_instant.unwrap().elapsed().as_secs_f64() < 1.0 / 45.0 {
-                    std::thread::yield_now();
-                }
-                *last_instant = Some(Instant::now());
-            }
-
             if *G_BLIT_GLOBAL_1 == FALSE {
                 if *G_WINDOW_ACTIVE == TRUE {
                     ((**G_CURRENT_DRAW_MODE).blit_flip_func)();
@@ -1427,6 +1419,26 @@ impl Sim {
     unsafe extern "stdcall" fn toggle_fullscreen() {
         // Do nothing because we handle this in the custom window proc
     }
+
+    /// We hook this in order to limit the framerate to the configured value.
+    unsafe extern "stdcall" fn next_clock() {
+        let framerate_limit = SETTINGS.get_int("video", "framerate_limit", 45);
+
+        if framerate_limit > 0 {
+            static LAST_INSTANT: RwLock<Option<Instant>> = RwLock::new(None);
+            let frame_time = 1.0 / framerate_limit as f64;
+            let mut last_instant = LAST_INSTANT.write().unwrap();
+            let last = *last_instant.get_or_insert_with(Instant::now);
+            while last.elapsed().as_secs_f64() < frame_time {
+                std::thread::yield_now();
+            }
+            *last_instant = Some(Instant::now());
+        }
+
+        unsafe {
+            NEXT_CLOCK_HOOK.read().unwrap().as_ref().unwrap().call();
+        }
+    }
 }
 
 impl Drop for Sim {
@@ -1467,6 +1479,7 @@ impl Drop for Sim {
             HANDLE_MESSAGES_HOOK.write().unwrap().take();
             RANDOM_INT_BELOW_HOOK.write().unwrap().take();
             TOGGLE_FULLSCREEN_HOOK.write().unwrap().take();
+            NEXT_CLOCK_HOOK.write().unwrap().take();
             drawmode::unhook_functions();
             self.ail.unhook();
             CD_AUDIO_PLAYER.lock().unwrap().take();
