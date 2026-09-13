@@ -59,7 +59,7 @@ impl DebugOverlay {
         ctx.set_fonts(self.fonts.clone());
 
         // calculate recent deltatimes
-        let delta_time = unsafe { *G_DELTA_TIME };
+        let delta_time = unsafe { G_DELTA_TIME.get() };
         self.recent_deltatimes.rotate_left(1);
         self.recent_deltatimes[199] = Some(delta_time);
 

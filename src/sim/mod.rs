@@ -41,6 +41,7 @@ use crate::{
             set_sample_volume, start_sample, stop_sample, wave_out_open,
         },
     },
+    binding::{macros::globals, module::ModuleBase},
     cd_audio::{AudioCdStatus, CdAudioPlayer, MAX_TRACK, source::CdSource, tmsf::CdAudioPosition},
     common::{HeapFreeFunc, fake_heap_free},
     hooker::hook_function,
@@ -49,6 +50,8 @@ use crate::{
 };
 
 pub mod drawmode;
+
+pub static MODULE: ModuleBase = ModuleBase::new("MW2.DLL");
 
 type SimMainProc = unsafe extern "stdcall" fn(
     HMODULE,
@@ -77,8 +80,8 @@ impl RenderTarget {
         unsafe {
             self.left = 0;
             self.top = 0;
-            self.right = (*G_GAME_WINDOW_WIDTH as i32 - 1).max(0);
-            self.bottom = (*G_GAME_WINDOW_HEIGHT as i32 - 1).max(0);
+            self.right = (G_GAME_WINDOW_WIDTH.get() as i32 - 1).max(0);
+            self.bottom = (G_GAME_WINDOW_HEIGHT.get() as i32 - 1).max(0);
         }
     }
 }
@@ -410,16 +413,38 @@ static AXIS_POSITION_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 // Global variables
-static mut G_TICKS_CHECK: *mut u32 = std::ptr::null_mut();
-static mut G_TICKS_1: *mut u32 = std::ptr::null_mut();
-static mut G_TICKS_2: *mut u32 = std::ptr::null_mut();
-static mut G_GAME_WINDOW_WIDTH: *mut u32 = std::ptr::null_mut();
-static mut G_GAME_WINDOW_HEIGHT: *mut u32 = std::ptr::null_mut();
-static mut G_GAME_WINDOW_GEOMETRY: *mut *mut GameWindowGeometry = std::ptr::null_mut();
-static mut G_SCREEN_W_MINUS_1: *mut i32 = std::ptr::null_mut();
-static mut G_SCREEN_H_MINUS_1: *mut i32 = std::ptr::null_mut();
-const RENDER_TARGET_COUNT: usize = 11;
-static mut G_RENDER_TARGET_TABLE: *mut [RenderTarget; RENDER_TARGET_COUNT] = std::ptr::null_mut();
+globals!(
+    static G_TICKS_CHECK: u32 = 0x000ad008;
+    static G_TICKS_1: u32 = 0x000ad20c;
+    static G_TICKS_2: u32 = 0x000ad210;
+    pub(crate) static G_GAME_WINDOW_WIDTH: u32 = 0x000acb6c;
+    pub(crate) static G_GAME_WINDOW_HEIGHT: u32 = 0x000acb70;
+    static G_GAME_WINDOW_GEOMETRY: *mut GameWindowGeometry = 0x00176eb4;
+    static G_SCREEN_W_MINUS_1: i32 = 0x00176ee4;
+    static G_SCREEN_H_MINUS_1: i32 = 0x00176ec0;
+    static G_RENDER_TARGET_TABLE: [RenderTarget; RENDER_TARGET_COUNT] = 0x00181a60;
+    static G_BLIT_GLOBAL_1: BOOL = 0x00176ebc;
+    pub(crate) static G_WINDOW_ACTIVE: BOOL = 0x000acb74;
+    static G_CURRENT_DRAW_MODE: *mut DrawMode = 0x000b1774;
+    static G_STRETCH_BLIT_SOURCE_RECT: RenderTarget = 0x00176ed0;
+    static G_STRETCH_BLIT_OTHER_SOURCE_RECT: RenderTarget = 0x000bdff8;
+    static G_BLIT_GLOBAL_2: u32 = 0x000a5f18;
+    static G_BLIT_GLOBAL_3: u32 = 0x000a5a24;
+    // static G_WIDTH_SCALE: i32 = 0x000e9610;
+    static G_HORIZON_HAZE_THICKNESS: i32 = 0x000a6d30;
+    static G_EYEPOINT: *mut Eyepoint = 0x000a6cc0;
+    static G_CD_AUDIO_DEVICE: u32 = 0x000aa278;
+    static G_CD_AUDIO_AUX_DEVICE: i32 = 0x000aa27c;
+    static G_CD_AUDIO_GLOBAL_1: u32 = 0x000beca8;
+    static G_CD_AUDIO_GLOBAL_2: u32 = 0x000becac;
+    static G_CD_AUDIO_INITIALIZED: u32 = 0x000aa28c;
+    static G_AUDIO_CD_STATUS: AudioCdStatus = 0x000becc0;
+    static G_CD_AUDIO_TRACK_DATA: CdAudioTracks = 0x000aa280;
+    static G_PAUSED_CD_AUDIO_POSITION: CdAudioPosition = 0x000becb0;
+    static G_CD_AUDIO_VOLUME: i32 = 0x000a14a4;
+    static G_SHOULD_QUIT: BOOL = 0x000acb18;
+    static G_DELTA_TIME: i32 = 0x000ba550;
+);
 
 /// a * b in 16.16 fixed-point
 fn fmul16(a: i32, b: i32) -> i32 {
@@ -429,8 +454,8 @@ fn fmul16(a: i32, b: i32) -> i32 {
 /// Offset to center the HUD box inside the framebuffer
 fn hud_origin() -> (i32, i32) {
     unsafe {
-        let x0 = (*G_GAME_WINDOW_WIDTH as i32 - (**G_GAME_WINDOW_GEOMETRY).width) / 2;
-        let y0 = (*G_GAME_WINDOW_HEIGHT as i32 - (**G_GAME_WINDOW_GEOMETRY).height) / 2;
+        let x0 = (G_GAME_WINDOW_WIDTH.get() as i32 - (*(G_GAME_WINDOW_GEOMETRY.get())).width) / 2;
+        let y0 = (G_GAME_WINDOW_HEIGHT.get() as i32 - (*(G_GAME_WINDOW_GEOMETRY.get())).height) / 2;
         (x0, y0)
     }
 }
@@ -441,30 +466,10 @@ fn render_target(slot: i32) -> Option<&'static mut RenderTarget> {
     unsafe { G_RENDER_TARGET_TABLE.as_mut()?.get_mut(slot) }
 }
 
+const RENDER_TARGET_COUNT: usize = 11;
+
 /// The cockpit's 3D scene slot
 static mut SCENE_SLOT: i32 = -1;
-
-static mut G_BLIT_GLOBAL_1: *mut BOOL = std::ptr::null_mut();
-pub static mut G_WINDOW_ACTIVE: *mut BOOL = std::ptr::null_mut();
-static mut G_CURRENT_DRAW_MODE: *mut *mut DrawMode = std::ptr::null_mut();
-static mut G_STRETCH_BLIT_SOURCE_RECT: *mut RenderTarget = std::ptr::null_mut();
-static mut G_STRETCH_BLIT_OTHER_SOURCE_RECT: *mut RenderTarget = std::ptr::null_mut();
-static mut G_BLIT_GLOBAL_2: *mut u32 = std::ptr::null_mut();
-static mut G_BLIT_GLOBAL_3: *mut u32 = std::ptr::null_mut();
-static mut G_WIDTH_SCALE: *mut i32 = std::ptr::null_mut();
-static mut G_HORIZON_HAZE_THICKNESS: *mut i32 = std::ptr::null_mut();
-static mut G_EYEPOINT: *mut *mut Eyepoint = std::ptr::null_mut();
-static mut G_CD_AUDIO_DEVICE: *mut u32 = std::ptr::null_mut();
-static mut G_CD_AUDIO_AUX_DEVICE: *mut i32 = std::ptr::null_mut();
-static mut G_CD_AUDIO_GLOBAL_1: *mut u32 = std::ptr::null_mut();
-static mut G_CD_AUDIO_GLOBAL_2: *mut u32 = std::ptr::null_mut();
-static mut G_CD_AUDIO_INITIALIZED: *mut u32 = std::ptr::null_mut();
-static mut G_AUDIO_CD_STATUS: *mut AudioCdStatus = std::ptr::null_mut();
-static mut G_CD_AUDIO_TRACK_DATA: *mut CdAudioTracks = std::ptr::null_mut();
-static mut G_PAUSED_CD_AUDIO_POSITION: *mut CdAudioPosition = std::ptr::null_mut();
-static mut G_CD_AUDIO_VOLUME: *mut i32 = std::ptr::null_mut();
-static mut G_SHOULD_QUIT: *mut BOOL = std::ptr::null_mut();
-static mut G_DELTA_TIME: *mut i32 = std::ptr::null_mut();
 
 /// Cache the CD audio device to reuse between sim launches.
 /// Windows 11 crashes if we try to close the CD audio device.
@@ -489,6 +494,8 @@ impl Sim {
         let module = unsafe { LoadLibraryA(s!("MW2.DLL"))? };
         let base_address = module.0 as usize;
 
+        MODULE.set(base_address);
+
         let flee_option = (base_address + 0x000a1ad0) as *mut [u8; 7];
         unsafe {
             flee_option.write_volatile(*(b"Desktop"));
@@ -500,38 +507,6 @@ impl Sim {
         }
 
         unsafe {
-            G_TICKS_CHECK = (base_address + 0x000ad008) as *mut u32;
-            G_TICKS_1 = (base_address + 0x000ad20c) as *mut u32;
-            G_TICKS_2 = (base_address + 0x000ad210) as *mut u32;
-            G_GAME_WINDOW_WIDTH = (base_address + 0x000acb6c) as *mut u32;
-            G_GAME_WINDOW_HEIGHT = (base_address + 0x000acb70) as *mut u32;
-            G_GAME_WINDOW_GEOMETRY = (base_address + 0x00176eb4) as *mut *mut GameWindowGeometry;
-            G_SCREEN_W_MINUS_1 = (base_address + 0x00176ee4) as *mut i32;
-            G_SCREEN_H_MINUS_1 = (base_address + 0x00176ec0) as *mut i32;
-            G_RENDER_TARGET_TABLE =
-                (base_address + 0x00181a60) as *mut [RenderTarget; RENDER_TARGET_COUNT];
-            G_BLIT_GLOBAL_1 = (base_address + 0x00176ebc) as *mut BOOL;
-            G_WINDOW_ACTIVE = (base_address + 0x000acb74) as *mut BOOL;
-            G_CURRENT_DRAW_MODE = (base_address + 0x000b1774) as *mut *mut DrawMode;
-            G_STRETCH_BLIT_SOURCE_RECT = (base_address + 0x00176ed0) as *mut RenderTarget;
-            G_STRETCH_BLIT_OTHER_SOURCE_RECT = (base_address + 0x000bdff8) as *mut RenderTarget;
-            G_BLIT_GLOBAL_2 = (base_address + 0x000a5f18) as *mut u32;
-            G_BLIT_GLOBAL_3 = (base_address + 0x000a5a24) as *mut u32;
-            G_WIDTH_SCALE = (base_address + 0x000e9610) as *mut i32;
-            G_HORIZON_HAZE_THICKNESS = (base_address + 0x000a6d30) as *mut i32;
-            G_EYEPOINT = (base_address + 0x000a6cc0) as *mut *mut Eyepoint;
-            G_CD_AUDIO_DEVICE = (base_address + 0x000aa278) as *mut u32;
-            G_CD_AUDIO_AUX_DEVICE = (base_address + 0x000aa27c) as *mut i32;
-            G_CD_AUDIO_GLOBAL_1 = (base_address + 0x000beca8) as *mut u32;
-            G_CD_AUDIO_GLOBAL_2 = (base_address + 0x000becac) as *mut u32;
-            G_CD_AUDIO_INITIALIZED = (base_address + 0x000aa28c) as *mut u32;
-            G_AUDIO_CD_STATUS = (base_address + 0x000becc0) as *mut AudioCdStatus;
-            G_CD_AUDIO_TRACK_DATA = (base_address + 0x000aa280) as *mut CdAudioTracks;
-            G_PAUSED_CD_AUDIO_POSITION = (base_address + 0x000becb0) as *mut CdAudioPosition;
-            G_CD_AUDIO_VOLUME = (base_address + 0x000a14a4) as *mut i32;
-            G_SHOULD_QUIT = (base_address + 0x000acb18) as *mut BOOL;
-            G_DELTA_TIME = (base_address + 0x000ba550) as *mut i32;
-
             let heap_free_thunk = (base_address + 0x001834d0) as *mut HeapFreeFunc;
             *heap_free_thunk = fake_heap_free;
 
@@ -867,11 +842,11 @@ impl Sim {
     /// Replacing it with this freshly recompiled copy fixed the problem (for now?)
     unsafe extern "stdcall" fn game_tick_timer_callback(_: u32) {
         unsafe {
-            if *G_TICKS_CHECK & 0x200 == 0 {
-                *G_TICKS_1 += 1;
+            if G_TICKS_CHECK.get() & 0x200 == 0 {
+                G_TICKS_1.set(G_TICKS_1.get() + 1);
             }
-            if *G_TICKS_CHECK & 0x100 == 0 {
-                *G_TICKS_2 += 1;
+            if G_TICKS_CHECK.get() & 0x100 == 0 {
+                G_TICKS_2.set(G_TICKS_2.get() + 1);
             }
         }
     }
@@ -909,22 +884,22 @@ impl Sim {
         unsafe {
             // "MCGA.DLL"
             if widescreen {
-                *G_GAME_WINDOW_WIDTH = 427;
-                *G_GAME_WINDOW_HEIGHT = 240;
+                G_GAME_WINDOW_WIDTH.set(427);
+                G_GAME_WINDOW_HEIGHT.set(240);
             } else {
-                *G_GAME_WINDOW_WIDTH = 320;
-                *G_GAME_WINDOW_HEIGHT = 240;
+                G_GAME_WINDOW_WIDTH.set(320);
+                G_GAME_WINDOW_HEIGHT.set(240);
             }
 
             let resolution = std::ffi::CStr::from_ptr(resolution)
                 .to_string_lossy()
                 .to_uppercase();
             if resolution == "VESA480.DLL" {
-                *G_GAME_WINDOW_WIDTH = if widescreen { 854 } else { 640 };
-                *G_GAME_WINDOW_HEIGHT = 480;
+                G_GAME_WINDOW_WIDTH.set(if widescreen { 854 } else { 640 });
+                G_GAME_WINDOW_HEIGHT.set(480);
             } else if resolution == "VESA768.DLL" {
-                *G_GAME_WINDOW_WIDTH = if widescreen { 1366 } else { 1024 };
-                *G_GAME_WINDOW_HEIGHT = 768;
+                G_GAME_WINDOW_WIDTH.set(if widescreen { 1366 } else { 1024 });
+                G_GAME_WINDOW_HEIGHT.set(768);
             }
         }
     }
@@ -933,7 +908,7 @@ impl Sim {
     /// Depending on the configured resolution, we force the window size to match the HUD box.
     unsafe extern "cdecl" fn init_game_window_geometry() -> i32 {
         unsafe {
-            let (width, height) = match *G_GAME_WINDOW_HEIGHT {
+            let (width, height) = match G_GAME_WINDOW_HEIGHT.get() {
                 480 => (640, 480),
                 768 => (1024, 768),
                 _ => (320, 240),
@@ -945,12 +920,11 @@ impl Sim {
                 .as_ref()
                 .unwrap()
                 .call();
-            if ok != 0 && !G_GAME_WINDOW_GEOMETRY.is_null() && !(*G_GAME_WINDOW_GEOMETRY).is_null()
-            {
-                (**G_GAME_WINDOW_GEOMETRY).width = width;
-                (**G_GAME_WINDOW_GEOMETRY).height = height;
-                *G_SCREEN_W_MINUS_1 = width - 1;
-                *G_SCREEN_H_MINUS_1 = height - 1;
+            if ok != 0 && !G_GAME_WINDOW_GEOMETRY.get().is_null() {
+                (*(G_GAME_WINDOW_GEOMETRY).get()).width = width;
+                (*(G_GAME_WINDOW_GEOMETRY).get()).height = height;
+                G_SCREEN_W_MINUS_1.set(width - 1);
+                G_SCREEN_H_MINUS_1.set(height - 1);
             }
             ok
         }
@@ -970,10 +944,10 @@ impl Sim {
         let (x0, y0) = hud_origin();
         let rect = unsafe { (*src).clone() };
         unsafe {
-            (*dst).left = x0 + fmul16(*G_SCREEN_W_MINUS_1, rect.left);
-            (*dst).top = y0 + fmul16(*G_SCREEN_H_MINUS_1, rect.top);
-            (*dst).right = x0 + fmul16(*G_SCREEN_W_MINUS_1, rect.right);
-            (*dst).bottom = y0 + fmul16(*G_SCREEN_H_MINUS_1, rect.bottom);
+            (*dst).left = x0 + fmul16(G_SCREEN_W_MINUS_1.get(), rect.left);
+            (*dst).top = y0 + fmul16(G_SCREEN_H_MINUS_1.get(), rect.top);
+            (*dst).right = x0 + fmul16(G_SCREEN_W_MINUS_1.get(), rect.right);
+            (*dst).bottom = y0 + fmul16(G_SCREEN_H_MINUS_1.get(), rect.bottom);
         }
         dst
     }
@@ -990,8 +964,8 @@ impl Sim {
         let (x0, y0) = hud_origin();
         let point = unsafe { *src };
         unsafe {
-            (*dst).x = x0 + fmul16(*G_SCREEN_W_MINUS_1, point.x);
-            (*dst).y = y0 + fmul16(*G_SCREEN_H_MINUS_1, point.y);
+            (*dst).x = x0 + fmul16(G_SCREEN_W_MINUS_1.get(), point.x);
+            (*dst).y = y0 + fmul16(G_SCREEN_H_MINUS_1.get(), point.y);
         }
         dst
     }
@@ -1010,8 +984,8 @@ impl Sim {
         let width = rect.right - rect.left + 1;
         let height = rect.bottom - rect.top + 1;
         unsafe {
-            let left = x0 + (*G_SCREEN_W_MINUS_1 - width - 1) / 2;
-            let top = y0 + (*G_SCREEN_H_MINUS_1 - height - 1) / 2;
+            let left = x0 + (G_SCREEN_W_MINUS_1.get() - width - 1) / 2;
+            let top = y0 + (G_SCREEN_H_MINUS_1.get() - height - 1) / 2;
             (*dst).left = left;
             (*dst).top = top;
             (*dst).right = left + width - 1;
@@ -1026,7 +1000,7 @@ impl Sim {
     unsafe extern "cdecl" fn apply_eyepoint_fov(reset: i32) {
         static mut LAST_RAW_FOV: i32 = 0x10000;
         unsafe {
-            let cam = *G_EYEPOINT;
+            let cam = G_EYEPOINT.get();
             if cam.is_null() {
                 APPLY_EYEPOINT_FOV_HOOK
                     .read()
@@ -1037,8 +1011,8 @@ impl Sim {
                 return;
             }
             let correction = {
-                let width = *G_GAME_WINDOW_WIDTH as i64;
-                let height = *G_GAME_WINDOW_HEIGHT as i64;
+                let width = G_GAME_WINDOW_WIDTH.get() as i64;
+                let height = G_GAME_WINDOW_HEIGHT.get() as i64;
                 if width <= 0 || height <= 0 {
                     0x10000
                 } else {
@@ -1120,29 +1094,30 @@ impl Sim {
         unsafe {
             SET_RES_HOOK.read().unwrap().as_ref().unwrap().call();
             let (x0, _) = hud_origin();
-            *G_HORIZON_HAZE_THICKNESS -= x0;
+            G_HORIZON_HAZE_THICKNESS.set(G_HORIZON_HAZE_THICKNESS.get() - x0);
         }
     }
 
     /// This function is called every frame to draw the game.
     unsafe extern "stdcall" fn blit() {
         unsafe {
-            if *G_BLIT_GLOBAL_1 == FALSE {
-                if *G_WINDOW_ACTIVE == TRUE {
-                    ((**G_CURRENT_DRAW_MODE).blit_flip_func)();
+            if G_BLIT_GLOBAL_1.get() == FALSE {
+                if G_WINDOW_ACTIVE.get() == TRUE {
+                    ((*G_CURRENT_DRAW_MODE.get()).blit_flip_func)();
                 }
             } else {
-                ((**G_CURRENT_DRAW_MODE).stretch_blit_func)(
-                    (*G_STRETCH_BLIT_SOURCE_RECT).left + 1,
-                    (*G_STRETCH_BLIT_SOURCE_RECT).top + 1,
-                    (*G_STRETCH_BLIT_SOURCE_RECT).right,
-                    (*G_STRETCH_BLIT_SOURCE_RECT).bottom,
+                ((*G_CURRENT_DRAW_MODE.get()).stretch_blit_func)(
+                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).left + 1,
+                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).top + 1,
+                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).right,
+                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).bottom,
                 );
 
-                *G_STRETCH_BLIT_SOURCE_RECT = (*G_STRETCH_BLIT_OTHER_SOURCE_RECT).clone();
+                G_STRETCH_BLIT_SOURCE_RECT
+                    .set(G_STRETCH_BLIT_OTHER_SOURCE_RECT.as_ref().unwrap().clone());
 
-                *G_BLIT_GLOBAL_2 = *G_BLIT_GLOBAL_3;
-                *G_BLIT_GLOBAL_1 = FALSE;
+                G_BLIT_GLOBAL_2.set(G_BLIT_GLOBAL_3.get());
+                G_BLIT_GLOBAL_1.set(FALSE);
             }
         }
     }
@@ -1173,9 +1148,9 @@ impl Sim {
                 };
 
                 if have_player {
-                    *G_CD_AUDIO_DEVICE = 1;
-                    *G_CD_AUDIO_AUX_DEVICE = Self::get_cd_audio_aux_device();
-                    *G_CD_AUDIO_INITIALIZED = 1;
+                    G_CD_AUDIO_DEVICE.set(1);
+                    G_CD_AUDIO_AUX_DEVICE.set(Self::get_cd_audio_aux_device());
+                    G_CD_AUDIO_INITIALIZED.set(1);
                     return 0;
                 }
                 if source == CdSource::Files {
@@ -1185,8 +1160,8 @@ impl Sim {
             }
 
             if CD_AUDIO_DEVICE != u32::MAX {
-                *G_CD_AUDIO_DEVICE = CD_AUDIO_DEVICE;
-                *G_CD_AUDIO_INITIALIZED = 1;
+                G_CD_AUDIO_DEVICE.set(CD_AUDIO_DEVICE);
+                G_CD_AUDIO_INITIALIZED.set(1);
                 return 0;
             }
 
@@ -1204,15 +1179,15 @@ impl Sim {
                 return 1;
             }
 
-            *G_CD_AUDIO_DEVICE = mci_open_parms.wDeviceID;
-            CD_AUDIO_DEVICE = *G_CD_AUDIO_DEVICE;
+            G_CD_AUDIO_DEVICE.set(mci_open_parms.wDeviceID);
+            CD_AUDIO_DEVICE = G_CD_AUDIO_DEVICE.get();
 
             let mut mci_set_parms = MCI_SET_PARMS {
                 dwTimeFormat: MCI_FORMAT_TMSF,
                 ..Default::default()
             };
             let mci_set_error = mciSendCommandA(
-                *G_CD_AUDIO_DEVICE,
+                G_CD_AUDIO_DEVICE.get(),
                 MCI_SET,
                 Some(MCI_SET_TIME_FORMAT as usize),
                 Some(&mut mci_set_parms as *mut _ as usize),
@@ -1221,7 +1196,7 @@ impl Sim {
                 return 1;
             }
 
-            *G_CD_AUDIO_AUX_DEVICE = Self::get_cd_audio_aux_device();
+            G_CD_AUDIO_AUX_DEVICE.set(Self::get_cd_audio_aux_device());
             0
         }
     }
@@ -1281,7 +1256,7 @@ impl Sim {
                 mci_play_parms.dwTo = to;
             }
             let _ = mciSendCommandA(
-                *G_CD_AUDIO_DEVICE,
+                G_CD_AUDIO_DEVICE.get(),
                 MCI_PLAY,
                 Some(flags as usize),
                 Some(&mut mci_play_parms as *mut _ as usize),
@@ -1316,36 +1291,36 @@ impl Sim {
 
     unsafe extern "stdcall" fn start_cd_audio() -> i32 {
         unsafe {
-            *G_CD_AUDIO_GLOBAL_1 = 0;
-            *G_CD_AUDIO_GLOBAL_2 = 0;
+            G_CD_AUDIO_GLOBAL_1.set(0);
+            G_CD_AUDIO_GLOBAL_2.set(0);
 
             let init_cd_audio_result = Self::init_cd_audio();
             if init_cd_audio_result != 0 {
                 return 0;
             }
 
-            *G_CD_AUDIO_INITIALIZED = 1;
+            G_CD_AUDIO_INITIALIZED.set(1);
 
-            *G_AUDIO_CD_STATUS = Self::get_cd_status();
+            G_AUDIO_CD_STATUS.set(Self::get_cd_status());
 
-            match *G_AUDIO_CD_STATUS {
+            match G_AUDIO_CD_STATUS.get() {
                 AudioCdStatus::_Open => {
-                    *G_CD_AUDIO_INITIALIZED = 0;
+                    G_CD_AUDIO_INITIALIZED.set(0);
                 }
                 AudioCdStatus::Stopped => {
-                    Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA);
+                    Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA.ptr());
                 }
                 AudioCdStatus::Playing => {
-                    Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA);
+                    Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA.ptr());
                 }
                 AudioCdStatus::Paused => {
-                    Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA);
-                    Self::get_cd_audio_position(G_PAUSED_CD_AUDIO_POSITION);
+                    Self::get_cd_audio_tracks(G_CD_AUDIO_TRACK_DATA.ptr());
+                    Self::get_cd_audio_position(G_PAUSED_CD_AUDIO_POSITION.ptr());
                 }
                 AudioCdStatus::Error | AudioCdStatus::_Unknown => {}
             }
 
-            Self::set_cd_audio_volume(*G_CD_AUDIO_VOLUME);
+            Self::set_cd_audio_volume(G_CD_AUDIO_VOLUME.get());
             1
         }
     }
@@ -1356,7 +1331,7 @@ impl Sim {
                 return player.state();
             }
 
-            if *G_CD_AUDIO_INITIALIZED == 0 {
+            if G_CD_AUDIO_INITIALIZED.get() == 0 {
                 return AudioCdStatus::Error;
             }
 
@@ -1365,7 +1340,7 @@ impl Sim {
                 ..Default::default()
             };
             let mci_status_error = mciSendCommandA(
-                *G_CD_AUDIO_DEVICE,
+                G_CD_AUDIO_DEVICE.get(),
                 MCI_STATUS,
                 Some(MCI_STATUS_ITEM as usize),
                 Some(&mut mci_status_parms as *mut _ as usize),
@@ -1468,7 +1443,7 @@ impl Sim {
     unsafe extern "stdcall" fn deinit_cd_audio() {
         unsafe {
             if CD_AUDIO_PLAYER.lock().unwrap().take().is_some() {
-                *G_CD_AUDIO_INITIALIZED = 0;
+                G_CD_AUDIO_INITIALIZED.set(0);
                 return;
             }
 
@@ -1483,7 +1458,7 @@ impl Sim {
 
     unsafe extern "cdecl" fn update_cd_audio_position(position: *mut CdAudioPosition) {
         unsafe {
-            if *G_CD_AUDIO_INITIALIZED == 0 {
+            if G_CD_AUDIO_INITIALIZED.get() == 0 {
                 return;
             }
 
@@ -1496,7 +1471,7 @@ impl Sim {
                     Self::get_cd_audio_position(position);
                 }
                 AudioCdStatus::Paused => {
-                    *position = *G_PAUSED_CD_AUDIO_POSITION;
+                    *position = G_PAUSED_CD_AUDIO_POSITION.get();
                 }
                 AudioCdStatus::Error | AudioCdStatus::_Unknown => {}
             }
@@ -1507,7 +1482,7 @@ impl Sim {
     /// This starts playback again from the saved pause position instead;
     unsafe extern "stdcall" fn cd_audio_toggle_paused() {
         unsafe {
-            if *G_CD_AUDIO_INITIALIZED == 0 {
+            if G_CD_AUDIO_INITIALIZED.get() == 0 {
                 return;
             }
 
@@ -1515,11 +1490,11 @@ impl Sim {
             match cd_status {
                 AudioCdStatus::_Open => {}
                 AudioCdStatus::Stopped => {
-                    let position = (*G_PAUSED_CD_AUDIO_POSITION).into();
+                    let position = (G_PAUSED_CD_AUDIO_POSITION.get()).into();
                     Self::play_cd_audio(position, 0);
                 }
                 AudioCdStatus::Playing => {
-                    Self::update_cd_audio_position(G_PAUSED_CD_AUDIO_POSITION);
+                    Self::update_cd_audio_position(G_PAUSED_CD_AUDIO_POSITION.ptr());
                     Self::pause_cd_audio();
                 }
                 AudioCdStatus::Paused => {
@@ -1533,11 +1508,11 @@ impl Sim {
     /// The original function had a loop that was causing bad stuttering when the mouse was moved.
     unsafe extern "stdcall" fn handle_messages() {
         unsafe {
-            if *G_WINDOW_ACTIVE == FALSE {
+            if G_WINDOW_ACTIVE.get() == FALSE {
                 let _ = WaitMessage();
             }
 
-            if *G_SHOULD_QUIT == FALSE {
+            if G_SHOULD_QUIT.get() == FALSE {
                 let mut msg: MSG = MSG::default();
 
                 if PeekMessageA(&mut msg as *mut MSG, Some(HWND::default()), 0, 0, PM_REMOVE).into()
@@ -1546,7 +1521,7 @@ impl Sim {
                         let _ = TranslateMessage(&msg);
                         DispatchMessageA(&msg);
                     } else {
-                        *G_SHOULD_QUIT = TRUE;
+                        G_SHOULD_QUIT.set(TRUE);
                     }
                 }
             }
@@ -1598,7 +1573,7 @@ impl Sim {
     /// that doesn't consider who shot the missile, so the missile detonates immediately on the mech who shot it.
     unsafe extern "cdecl" fn update_all_shots() {
         unsafe {
-            if *G_DELTA_TIME == 0 {
+            if G_DELTA_TIME.get() == 0 {
                 ZERO_LENGTH_FRAMES_SKIPPED.fetch_add(1, Ordering::Relaxed);
                 return;
             }
@@ -1614,7 +1589,7 @@ impl Sim {
 
     /// Recharges jumpjet fuel at the same rate whatever the framerate.
     unsafe extern "cdecl" fn func_with_jumpjet_calc(player: *mut Player) {
-        let delta_time = unsafe { *G_DELTA_TIME };
+        let delta_time = unsafe { G_DELTA_TIME.get() };
 
         let expected_fuel = unsafe { Self::jumpjet_recharge_result(&*player, delta_time) };
 
@@ -1637,7 +1612,7 @@ impl Sim {
         }
 
         // Calculate the remainder of the fuel recharge calculation and apply it if it exceeds 4 ticks
-        *carry += unsafe { *G_DELTA_TIME } % 4;
+        *carry += unsafe { G_DELTA_TIME.get() } % 4;
         if *carry >= 4 {
             *carry -= 4;
             if player.jumpjet_fuel < JUMPJET_FUEL_MAX {
@@ -1697,7 +1672,7 @@ impl Sim {
     /// Whether a shot that has just aged to `age` ticks crossed a 4-tick boundary doing so.
     /// Baiscally, whether a 45 FPS sim would have sampled it on this frame.
     fn crossed_ideal_frame_boundary(age: i32) -> bool {
-        let previous_age = age.saturating_sub(unsafe { *G_DELTA_TIME });
+        let previous_age = age.saturating_sub(unsafe { G_DELTA_TIME.get() });
         age.div_euclid(TICKS_PER_IDEAL_FRAME) != previous_age.div_euclid(TICKS_PER_IDEAL_FRAME)
     }
 
@@ -1711,7 +1686,7 @@ impl Sim {
         let (plus_held, minus_held) = unsafe { ((*axis).plus_held, (*axis).minus_held) };
         // The original only looks at the keys if nothing else has driven the axis yet
         let keys_apply = unsafe { (*axis).updated } == 0;
-        let rate = unsafe { *(*axis).rate };
+        let rate = unsafe { std::ptr::read_unaligned((*axis).rate) };
 
         unsafe {
             (*axis).plus_held = std::ptr::null();
@@ -1728,7 +1703,7 @@ impl Sim {
         unsafe {
             (*axis).plus_held = plus_held;
             (*axis).minus_held = minus_held;
-            *(*axis).rate = rate;
+            std::ptr::write_unaligned((*axis).rate, rate);
         }
 
         if keys_apply {
@@ -1742,7 +1717,7 @@ impl Sim {
                 updated = 1;
             }
             if updated == 0 {
-                unsafe { *(*axis).rate = 0 };
+                unsafe { std::ptr::write_unaligned((*axis).rate, 0) };
                 AXIS_POSITION_CARRY.lock().unwrap().remove(&(axis as usize));
             }
             unsafe { (*axis).updated = updated as u8 };
@@ -1753,17 +1728,17 @@ impl Sim {
 
     /// One frame of an axis ramp, `direction` being 1 for the increase key and -1 for decrease.
     unsafe fn ramp_axis(axis: *mut InputAxis, direction: i32) {
-        let delta_time = unsafe { *G_DELTA_TIME };
+        let delta_time = unsafe { G_DELTA_TIME.get() };
         let step = (3 * delta_time).wrapping_shl(unsafe { (*axis).ramp_shift } as u32);
 
         let rate_ptr = unsafe { (*axis).rate };
-        let mut rate = unsafe { *rate_ptr };
+        let mut rate = unsafe { std::ptr::read_unaligned(rate_ptr) };
         // Pressing the opposite key restarts the ramp from a standstill
         if rate * direction < 0 {
             rate = 0;
         }
         rate = (rate + direction * step).clamp(-AXIS_RATE_MAX, AXIS_RATE_MAX);
-        unsafe { *rate_ptr = rate };
+        unsafe { std::ptr::write_unaligned(rate_ptr, rate) };
 
         // The rate is one ideal frame's worth of travel, so scale it to the frame we actually
         // got and keep the remainder for the next one
@@ -1780,6 +1755,7 @@ impl Sim {
 impl Drop for Sim {
     fn drop(&mut self) {
         unsafe {
+            MODULE.clear();
             ailrs::shutdown();
             crate::SIM_WINDOW_PROC = None;
             GAME_TICK_TIMER_CALLBACK_HOOK.write().unwrap().take();

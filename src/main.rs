@@ -74,11 +74,11 @@ unsafe fn request_sim_mouse_centering(window: HWND) {
 /// Tell the sim it has lost activation and unclip the cursor.
 unsafe fn release_sim_mouse() {
     unsafe {
-        if !matches!(PROCESS_TYPE, ProcessType::Sim) || G_WINDOW_ACTIVE.is_null() {
+        if !matches!(PROCESS_TYPE, ProcessType::Sim) {
             return;
         }
 
-        *G_WINDOW_ACTIVE = FALSE;
+        G_WINDOW_ACTIVE.set(FALSE);
 
         let _ = ClipCursor(None);
     }
