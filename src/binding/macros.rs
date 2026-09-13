@@ -5,8 +5,8 @@ macro_rules! globals {
         $vis:vis static $name:ident: $ty:ty = $rva:literal;
     )*) => {$(
         $(#[$attr])*
-        $vis static $name: $crate::binding::Global<$ty> =
-            $crate::binding::Global::new(&MODULE, $rva);
+        $vis static $name: $crate::binding::global::Global<$ty> =
+            $crate::binding::global::Global::new(&MODULE, $rva);
     )*};
 }
 pub(crate) use globals;
