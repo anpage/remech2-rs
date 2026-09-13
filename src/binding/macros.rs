@@ -56,10 +56,10 @@ macro_rules! hook {
         $(#[$attr])*
         $vis unsafe extern $abi fn $name($($arg: $arg_ty),*) $(-> $ret)? {
             /// Calls the function this hook replaced.
-            #[allow(dead_code)]
             unsafe fn original($($arg: $arg_ty),*) $(-> $ret)? {
                 unsafe { ($name::HOOK.original())($($arg),*) }
             }
+            let _ = original;
             $body
         }
     };
@@ -114,10 +114,10 @@ macro_rules! raw_hook {
         $(#[$attr])*
         $vis unsafe extern $abi fn $name($($arg: $arg_ty),*) $(-> $ret)? {
             /// Calls the code this hook displaced.
-            #[allow(dead_code)]
             unsafe fn original($($arg: $arg_ty),*) $(-> $ret)? {
                 unsafe { ($name::HOOK.original::<$name::Sig>())($($arg),*) }
             }
+            let _ = original;
             $body
         }
     };
