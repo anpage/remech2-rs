@@ -95,6 +95,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
+name = "binding"
+version = "0.1.0-alpha.1"
+dependencies = [
+ "anyhow",
+ "binding-macros",
+ "retour",
+]
+
+[[package]]
+name = "binding-macros"
+version = "0.1.0-alpha.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
 name = "bit-set"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1565,6 +1583,7 @@ name = "remech2"
 version = "0.1.0-alpha.1"
 dependencies = [
  "anyhow",
+ "binding",
  "egui",
  "egui-wgpu",
  "egui_plot",

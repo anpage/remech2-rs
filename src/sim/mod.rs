@@ -23,6 +23,12 @@ use windows::{
     core::{BOOL, s},
 };
 
+use binding::{
+    macros::globals,
+    module::ModuleBase,
+    patch::{Patch, apply_groups, revert_groups},
+};
+
 use crate::{
     WindowProc,
     ail::Ail,
@@ -35,11 +41,6 @@ use crate::{
             set_sample_pan, set_sample_playback_rate, set_sample_type, set_sample_user_data,
             set_sample_volume, start_sample, stop_sample, wave_out_open,
         },
-    },
-    binding::{
-        macros::globals,
-        module::ModuleBase,
-        patch::{Patch, apply_groups, revert_groups},
     },
     cd_audio::{AudioCdStatus, CdAudioPlayer, MAX_TRACK, source::CdSource, tmsf::CdAudioPosition},
     common::{HeapFreeFunc, fake_heap_free},

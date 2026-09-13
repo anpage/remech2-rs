@@ -24,10 +24,11 @@ use windows::{
     core::{BOOL, PCSTR, s},
 };
 
+use binding::{macros::globals, module::ModuleBase};
+
 use crate::{
     WindowProc,
     ail::Ail,
-    binding::{macros::globals, module::ModuleBase},
     common::{HeapFreeFunc, SetMenuFunc, debug_log, fake_heap_free, fake_set_menu},
     hooker::hook_function,
 };

@@ -6,11 +6,9 @@ use super::{
     G_CURRENT_DRAW_MODE, G_WINDOW_ACTIVE, MODULE, RenderTarget, drawmode::hooks::PixelBuffer,
 };
 
-use crate::{
-    binding::macros::{game_fns, globals, hook, patches},
-    settings::SETTINGS,
-    sim::drawmode::hooks::G_CURRENT_DRAW_MODE_EXTENSION,
-};
+use binding::macros::{game_fns, globals, hook, patches};
+
+use crate::{settings::SETTINGS, sim::drawmode::hooks::G_CURRENT_DRAW_MODE_EXTENSION};
 
 game_fns! {
     /// Fills the target's rect with a palette index.
@@ -44,88 +42,82 @@ globals! {
     pub(super) static G_DELTA_TIME: i32 = 0x000ba550;
 }
 
-hook! {
-    /// AIL's 181Hz tick, which the game uses as its clock.
-    #[rva(0x00067ed8)]
-    unsafe extern "stdcall" fn game_tick_timer_callback(_user: u32) {
-        unsafe {
-            if G_TICKS_CHECK.get() & 0x200 == 0 {
-                G_TICKS_1.set(G_TICKS_1.get() + 1);
-            }
-            if G_TICKS_CHECK.get() & 0x100 == 0 {
-                G_TICKS_2.set(G_TICKS_2.get() + 1);
-            }
+/// AIL's 181Hz tick, which the game uses as its clock.
+#[hook(rva = 0x00067ed8)]
+unsafe extern "stdcall" fn game_tick_timer_callback(_user: u32) {
+    unsafe {
+        if G_TICKS_CHECK.get() & 0x200 == 0 {
+            G_TICKS_1.set(G_TICKS_1.get() + 1);
+        }
+        if G_TICKS_CHECK.get() & 0x100 == 0 {
+            G_TICKS_2.set(G_TICKS_2.get() + 1);
         }
     }
 }
 
-hook! {
-    /// The dropship loading screen ("sup anim"), driven by an AIL timer at 330ms.
-    #[rva(0x00003f3d)]
-    unsafe extern "stdcall" fn sup_anim_timer_callback(_user: u32) {
-        unsafe {
-            if G_DISPLAY_READY.get() == 0
-                || G_SUP_ANIM_BACKDROP.get().is_null()
-                || G_SUP_ANIM_SHAPE.get().is_null()
-                || G_SUP_ANIM_FRAME_COUNT.get() <= 1
-            {
-                return;
-            }
-
-            // Nothing to draw into unless the window is up and the buffer locks.
-            if G_WINDOW_ACTIVE.get() != TRUE {
-                return;
-            }
-            let extension = *G_CURRENT_DRAW_MODE_EXTENSION;
-            if ((*extension).lock_display_buffer_func)() != 0 {
-                return;
-            }
-
-            // The main buffer flips, so the copy's data pointer is a tick stale.
-            (*G_SUP_ANIM_PIXEL_BUFFER.ptr()).data = (*G_MAIN_PIXEL_BUFFER.ptr()).data;
-
-            let target = G_SUP_ANIM_TARGET.ptr();
-            (FILL_RENDER_TARGET_RECT.get())(target, 0);
-            (DRAW_SHAPE_FRAME.get())(target, G_SUP_ANIM_BACKDROP.get(), 0, 0, 0);
-            (DRAW_SHAPE_FRAME.get())(
-                target,
-                G_SUP_ANIM_SHAPE.get(),
-                G_SUP_ANIM_FRAME.get(),
-                G_SUP_ANIM_X.get(),
-                G_SUP_ANIM_Y.get(),
-            );
-
-            // The game re-reads this here rather than reusing the check above, and
-            // it can have changed: this runs on the timer thread.
-            if G_WINDOW_ACTIVE.get() == TRUE {
-                ((*G_CURRENT_DRAW_MODE.get()).blit_flip_func)();
-            }
-
-            G_SUP_ANIM_FRAME.set((G_SUP_ANIM_FRAME.get() + 1) % G_SUP_ANIM_FRAME_COUNT.get());
+/// The dropship loading screen ("sup anim"), driven by an AIL timer at 330ms.
+#[hook(rva = 0x00003f3d)]
+unsafe extern "stdcall" fn sup_anim_timer_callback(_user: u32) {
+    unsafe {
+        if G_DISPLAY_READY.get() == 0
+            || G_SUP_ANIM_BACKDROP.get().is_null()
+            || G_SUP_ANIM_SHAPE.get().is_null()
+            || G_SUP_ANIM_FRAME_COUNT.get() <= 1
+        {
+            return;
         }
+
+        // Nothing to draw into unless the window is up and the buffer locks.
+        if G_WINDOW_ACTIVE.get() != TRUE {
+            return;
+        }
+        let extension = *G_CURRENT_DRAW_MODE_EXTENSION;
+        if ((*extension).lock_display_buffer_func)() != 0 {
+            return;
+        }
+
+        // The main buffer flips, so the copy's data pointer is a tick stale.
+        (*G_SUP_ANIM_PIXEL_BUFFER.ptr()).data = (*G_MAIN_PIXEL_BUFFER.ptr()).data;
+
+        let target = G_SUP_ANIM_TARGET.ptr();
+        (FILL_RENDER_TARGET_RECT.get())(target, 0);
+        (DRAW_SHAPE_FRAME.get())(target, G_SUP_ANIM_BACKDROP.get(), 0, 0, 0);
+        (DRAW_SHAPE_FRAME.get())(
+            target,
+            G_SUP_ANIM_SHAPE.get(),
+            G_SUP_ANIM_FRAME.get(),
+            G_SUP_ANIM_X.get(),
+            G_SUP_ANIM_Y.get(),
+        );
+
+        // The game re-reads this here rather than reusing the check above, and
+        // it can have changed: this runs on the timer thread.
+        if G_WINDOW_ACTIVE.get() == TRUE {
+            ((*G_CURRENT_DRAW_MODE.get()).blit_flip_func)();
+        }
+
+        G_SUP_ANIM_FRAME.set((G_SUP_ANIM_FRAME.get() + 1) % G_SUP_ANIM_FRAME_COUNT.get());
     }
 }
 
-hook! {
-    /// We hook this in order to limit the framerate to the configured value.
-    #[rva(0x0007ce2c)]
-    unsafe extern "stdcall" fn next_clock() {
-        let framerate_limit = SETTINGS.get_int("video", "framerate_limit", 45);
+/// We hook this in order to limit the framerate to the configured value.
+#[hook(rva = 0x0007ce2c)]
+unsafe extern "stdcall" fn next_clock() {
+    let framerate_limit = SETTINGS.get_int("video", "framerate_limit", 45);
 
-        if framerate_limit > 0 {
-            static LAST_INSTANT: RwLock<Option<Instant>> = RwLock::new(None);
-            let frame_time = 1.0 / framerate_limit as f64;
-            let mut last_instant = LAST_INSTANT.write().unwrap();
-            let last = *last_instant.get_or_insert_with(Instant::now);
-            while last.elapsed().as_secs_f64() < frame_time {
-                std::thread::yield_now();
-            }
-            *last_instant = Some(Instant::now());
+    if framerate_limit > 0 {
+        static LAST_INSTANT: RwLock<Option<Instant>> = RwLock::new(None);
+        let frame_time = 1.0 / framerate_limit as f64;
+        let mut last_instant = LAST_INSTANT.write().unwrap();
+        let last = *last_instant.get_or_insert_with(Instant::now);
+        while last.elapsed().as_secs_f64() < frame_time {
+            std::thread::yield_now();
         }
+        *last_instant = Some(Instant::now());
+    }
 
-        unsafe {
-            original();
-        }
+    unsafe {
+        original();
     }
 }
 

@@ -4,6 +4,15 @@ version = "0.1.0-alpha.1"
 edition = "2024"
 license = "MIT"
 
+[workspace]
+members = ["binding", "binding-macros"]
+
+# Shared so that `binding` and `remech2` can't drift onto two versions of
+# `retour`, which would make their `Hook<F>` types mutually unassignable.
+[workspace.dependencies]
+anyhow = "1.0.98"
+retour = "0.4.0-alpha.4"
+
 [profile.release]
 panic = "abort"
 opt-level = "z"
@@ -17,7 +26,8 @@ debug = true
 debug = false
 
 [dependencies]
-anyhow = "1.0.98"
+anyhow = { workspace = true }
+binding = { path = "binding" }
 egui = "0.33.0"
 egui-wgpu = "0.33.0"
 hex-literal = "1.0.0"
@@ -25,7 +35,7 @@ pollster = "0.4.0"
 rand = "0.9.1"
 raw-window-handle = "0.6.2"
 ureq = { version = "2.12", default-features = false, features = ["tls"] }
-retour = "0.4.0-alpha.4"
+retour = { workspace = true }
 rodio = { version = "0.21.1", default-features = false, features = [
     "mp3",
     "playback",

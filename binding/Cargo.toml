@@ -1,0 +1,10 @@
+[package]
+name = "binding"
+version = "0.1.0-alpha.1"
+edition = "2024"
+license = "MIT"
+
+[dependencies]
+anyhow = { workspace = true }
+binding-macros = { path = "../binding-macros" }
+retour = { workspace = true }

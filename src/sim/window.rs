@@ -8,10 +8,9 @@ use windows::{
     core::BOOL,
 };
 
-use crate::{
-    binding::macros::{globals, hook, patches},
-    settings::SETTINGS,
-};
+use binding::macros::{globals, hook, patches};
+
+use crate::settings::SETTINGS;
 
 use super::{G_CURRENT_DRAW_MODE, G_SHOULD_QUIT, MODULE, RenderTarget};
 
@@ -39,118 +38,107 @@ globals! {
     static G_BLIT_GLOBAL_3: u32 = 0x000a5a24;
 }
 
-hook! {
-    /// The game decides which resolution to use based on the DLL name passed to this function.
-    /// This is presumably a leftover from the DOS version of the game, possibly to preserve config file compatibility.
-    #[rva(0x00067e23)]
-    unsafe extern "cdecl" fn set_game_resolution(resolution: *mut std::ffi::c_char) {
-        let widescreen = SETTINGS.get_bool("video", "widescreen", false);
-        unsafe {
-            // "MCGA.DLL"
-            if widescreen {
-                G_GAME_WINDOW_WIDTH.set(427);
-                G_GAME_WINDOW_HEIGHT.set(240);
-            } else {
-                G_GAME_WINDOW_WIDTH.set(320);
-                G_GAME_WINDOW_HEIGHT.set(240);
-            }
+/// The game decides which resolution to use based on the DLL name passed to this function.
+/// This is presumably a leftover from the DOS version of the game, possibly to preserve config file compatibility.
+#[hook(rva = 0x00067e23)]
+unsafe extern "cdecl" fn set_game_resolution(resolution: *mut std::ffi::c_char) {
+    let widescreen = SETTINGS.get_bool("video", "widescreen", false);
+    unsafe {
+        // "MCGA.DLL"
+        if widescreen {
+            G_GAME_WINDOW_WIDTH.set(427);
+            G_GAME_WINDOW_HEIGHT.set(240);
+        } else {
+            G_GAME_WINDOW_WIDTH.set(320);
+            G_GAME_WINDOW_HEIGHT.set(240);
+        }
 
-            let resolution = std::ffi::CStr::from_ptr(resolution)
-                .to_string_lossy()
-                .to_uppercase();
-            if resolution == "VESA480.DLL" {
-                G_GAME_WINDOW_WIDTH.set(if widescreen { 854 } else { 640 });
-                G_GAME_WINDOW_HEIGHT.set(480);
-            } else if resolution == "VESA768.DLL" {
-                G_GAME_WINDOW_WIDTH.set(if widescreen { 1366 } else { 1024 });
-                G_GAME_WINDOW_HEIGHT.set(768);
-            }
+        let resolution = std::ffi::CStr::from_ptr(resolution)
+            .to_string_lossy()
+            .to_uppercase();
+        if resolution == "VESA480.DLL" {
+            G_GAME_WINDOW_WIDTH.set(if widescreen { 854 } else { 640 });
+            G_GAME_WINDOW_HEIGHT.set(480);
+        } else if resolution == "VESA768.DLL" {
+            G_GAME_WINDOW_WIDTH.set(if widescreen { 1366 } else { 1024 });
+            G_GAME_WINDOW_HEIGHT.set(768);
         }
     }
 }
 
-hook! {
-    /// Allocates GameWindowGeometry and caches the W-1/H-1 scale globals used by every HUD-scaling function.
-    /// Depending on the configured resolution, we force the window size to match the HUD box.
-    #[rva(0x00012720)]
-    unsafe extern "cdecl" fn init_game_window_geometry() -> i32 {
-        unsafe {
-            let (width, height) = match G_GAME_WINDOW_HEIGHT.get() {
-                480 => (640, 480),
-                768 => (1024, 768),
-                _ => (320, 240),
-            };
+/// Allocates GameWindowGeometry and caches the W-1/H-1 scale globals used by every HUD-scaling function.
+/// Depending on the configured resolution, we force the window size to match the HUD box.
+#[hook(rva = 0x00012720)]
+unsafe extern "cdecl" fn init_game_window_geometry() -> i32 {
+    unsafe {
+        let (width, height) = match G_GAME_WINDOW_HEIGHT.get() {
+            480 => (640, 480),
+            768 => (1024, 768),
+            _ => (320, 240),
+        };
 
-            let res = original();
-            if res != 0 && !G_GAME_WINDOW_GEOMETRY.get().is_null() {
-                (*(G_GAME_WINDOW_GEOMETRY).get()).width = width;
-                (*(G_GAME_WINDOW_GEOMETRY).get()).height = height;
-                G_SCREEN_W_MINUS_1.set(width - 1);
-                G_SCREEN_H_MINUS_1.set(height - 1);
+        let res = original();
+        if res != 0 && !G_GAME_WINDOW_GEOMETRY.get().is_null() {
+            (*(G_GAME_WINDOW_GEOMETRY).get()).width = width;
+            (*(G_GAME_WINDOW_GEOMETRY).get()).height = height;
+            G_SCREEN_W_MINUS_1.set(width - 1);
+            G_SCREEN_H_MINUS_1.set(height - 1);
+        }
+        res
+    }
+}
+
+/// This function is called every frame to draw the game.
+#[hook(rva = 0x00012e15)]
+unsafe extern "stdcall" fn blit() {
+    unsafe {
+        if G_BLIT_GLOBAL_1.get() == FALSE {
+            if G_WINDOW_ACTIVE.get() == TRUE {
+                ((*G_CURRENT_DRAW_MODE.get()).blit_flip_func)();
             }
-            res
+        } else {
+            ((*G_CURRENT_DRAW_MODE.get()).stretch_blit_func)(
+                (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).left + 1,
+                (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).top + 1,
+                (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).right,
+                (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).bottom,
+            );
+
+            G_STRETCH_BLIT_SOURCE_RECT
+                .set(G_STRETCH_BLIT_OTHER_SOURCE_RECT.as_ref().unwrap().clone());
+
+            G_BLIT_GLOBAL_2.set(G_BLIT_GLOBAL_3.get());
+            G_BLIT_GLOBAL_1.set(FALSE);
         }
     }
 }
 
-hook! {
-    /// This function is called every frame to draw the game.
-    #[rva(0x00012e15)]
-    unsafe extern "stdcall" fn blit() {
-        unsafe {
-            if G_BLIT_GLOBAL_1.get() == FALSE {
-                if G_WINDOW_ACTIVE.get() == TRUE {
-                    ((*G_CURRENT_DRAW_MODE.get()).blit_flip_func)();
-                }
-            } else {
-                ((*G_CURRENT_DRAW_MODE.get()).stretch_blit_func)(
-                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).left + 1,
-                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).top + 1,
-                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).right,
-                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).bottom,
-                );
-
-                G_STRETCH_BLIT_SOURCE_RECT
-                    .set(G_STRETCH_BLIT_OTHER_SOURCE_RECT.as_ref().unwrap().clone());
-
-                G_BLIT_GLOBAL_2.set(G_BLIT_GLOBAL_3.get());
-                G_BLIT_GLOBAL_1.set(FALSE);
-            }
+/// The original function had a loop that was causing bad stuttering when the mouse was moved.
+#[hook(rva = 0x00067bbc)]
+unsafe extern "stdcall" fn handle_messages() {
+    unsafe {
+        if G_WINDOW_ACTIVE.get() == FALSE {
+            let _ = WaitMessage();
         }
-    }
-}
 
-hook! {
-    /// The original function had a loop that was causing bad stuttering when the mouse was moved.
-    #[rva(0x00067bbc)]
-    unsafe extern "stdcall" fn handle_messages() {
-        unsafe {
-            if G_WINDOW_ACTIVE.get() == FALSE {
-                let _ = WaitMessage();
-            }
+        if G_SHOULD_QUIT.get() == FALSE {
+            let mut msg: MSG = MSG::default();
 
-            if G_SHOULD_QUIT.get() == FALSE {
-                let mut msg: MSG = MSG::default();
-
-                if PeekMessageA(&mut msg as *mut MSG, Some(HWND::default()), 0, 0, PM_REMOVE).into()
-                {
-                    if msg.hwnd == HWND::default() || msg.message != WM_QUIT {
-                        let _ = TranslateMessage(&msg);
-                        DispatchMessageA(&msg);
-                    } else {
-                        G_SHOULD_QUIT.set(TRUE);
-                    }
+            if PeekMessageA(&mut msg as *mut MSG, Some(HWND::default()), 0, 0, PM_REMOVE).into() {
+                if msg.hwnd == HWND::default() || msg.message != WM_QUIT {
+                    let _ = TranslateMessage(&msg);
+                    DispatchMessageA(&msg);
+                } else {
+                    G_SHOULD_QUIT.set(TRUE);
                 }
             }
         }
     }
 }
 
-hook! {
-    #[rva(0x00077392)]
-    unsafe extern "stdcall" fn toggle_fullscreen() {
-        // Do nothing because we handle this in the custom window proc
-    }
+#[hook(rva = 0x00077392)]
+unsafe extern "stdcall" fn toggle_fullscreen() {
+    // Do nothing because we handle this in the custom window proc
 }
 
 patches! {

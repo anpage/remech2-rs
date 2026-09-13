@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use anyhow::{Context as _, Result};
 
 /// Something we do to the game's memory when its DLL loads.
