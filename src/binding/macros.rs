@@ -17,8 +17,8 @@ macro_rules! game_fns {
         $vis:vis static $name:ident: $sig:ty = $rva:literal;
     )*) => {$(
         $(#[$attr])*
-        $vis static $name: $crate::binding::GameFn<$sig> =
-            $crate::binding::GameFn::new(&MODULE, $rva);
+        $vis static $name: $crate::binding::game_fn::GameFn<$sig> =
+            $crate::binding::game_fn::GameFn::new(&MODULE, $rva);
     )*};
 }
 pub(crate) use game_fns;
@@ -102,8 +102,8 @@ macro_rules! raw_hook {
             pub type Sig = unsafe extern $abi fn($($arg_ty),*) $(-> $ret)?;
             pub const RVA: usize = $rva;
 
-            pub static HOOK: $crate::binding::RawHook = $crate::binding::RawHook::new(
-                &$crate::binding::pick_module!($($module)?),
+            pub static HOOK: $crate::binding::hook::RawHook = $crate::binding::hook::RawHook::new(
+                &$crate::binding::macros::pick_module!($($module)?),
                 RVA,
                 stringify!($name),
                 super::$name as *const (),
@@ -124,16 +124,18 @@ macro_rules! raw_hook {
 }
 pub(crate) use raw_hook;
 
-/// Points an address at a detour that's defined elsewhere, with no way back to
-/// the original. For detours that can't implement `Function`, such as variadics.
+/// Points an address at a detour that's defined elsewhere. For detours [`hook!`]
+/// can't express: variadics, which can't implement `Function`, and detours whose
+/// signature differs from the original's. The latter reach the original through
+/// `RawHook::original`, naming the true signature at the call site.
 macro_rules! raw_detour {
     ($(
         $(#[$attr:meta])*
         $vis:vis static $name:ident at $rva:literal $(in $module:ident)? => $detour:path;
     )*) => {$(
         $(#[$attr])*
-        $vis static $name: $crate::binding::RawHook = $crate::binding::RawHook::new(
-            &$crate::binding::pick_module!($($module)?),
+        $vis static $name: $crate::binding::hook::RawHook = $crate::binding::hook::RawHook::new(
+            &$crate::binding::macros::pick_module!($($module)?),
             $rva,
             stringify!($name),
             $detour as *const (),

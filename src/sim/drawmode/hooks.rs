@@ -14,7 +14,10 @@ use windows::{
 use crate::{
     WINDOW_HEIGHT, WINDOW_WIDTH,
     hooker::hook_function,
-    sim::drawmode::custom_drawmode::{CustomDrawMode, PaletteColor},
+    sim::{
+        drawmode::custom_drawmode::{CustomDrawMode, PaletteColor},
+        types::DrawModeExtension,
+    },
 };
 
 #[repr(C)]
@@ -60,7 +63,8 @@ static mut GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK: Option<
 type GdiSwapBuffersFunc = unsafe extern "stdcall" fn() -> i32;
 static mut GDI_SWAP_BUFFERS_HOOK: Option<GenericDetour<GdiSwapBuffersFunc>> = None;
 
-static mut G_CURRENT_DRAW_MODE_EXTENSION: *mut *mut c_void = std::ptr::null_mut();
+pub(in crate::sim) static mut G_CURRENT_DRAW_MODE_EXTENSION: *mut *mut DrawModeExtension =
+    std::ptr::null_mut();
 static mut G_PRIMARY_HEAP: *mut HANDLE = std::ptr::null_mut();
 static mut G_BITS_TO_BLIT: *mut *mut u8 = std::ptr::null_mut();
 static mut G_GDI_BLIT_BITMAP_INFO: *mut BITMAPINFO = std::ptr::null_mut();
@@ -75,7 +79,7 @@ pub static mut G_MOUSE_NEEDS_CENTERING: *mut BOOL = std::ptr::null_mut();
 
 pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
     unsafe {
-        G_CURRENT_DRAW_MODE_EXTENSION = (base_address + 0x000b1770) as *mut *mut c_void;
+        G_CURRENT_DRAW_MODE_EXTENSION = (base_address + 0x000b1770) as *mut *mut DrawModeExtension;
         G_PRIMARY_HEAP = (base_address + 0x000acb68) as *mut HANDLE;
         G_BITS_TO_BLIT = (base_address + 0x000b1a88) as *mut *mut u8;
         G_GDI_BLIT_BITMAP_INFO = (base_address + 0x000c28a0) as *mut BITMAPINFO;

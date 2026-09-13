@@ -5,12 +5,11 @@ use std::{
         LazyLock, Mutex, RwLock,
         atomic::{AtomicU32, Ordering},
     },
-    time::Instant,
 };
 
 use anyhow::{Context, Result, bail};
 use rand::Rng;
-use retour::{GenericDetour, RawDetour};
+use retour::GenericDetour;
 use windows::{
     Win32::{
         Foundation::{FALSE, FreeLibrary, HMODULE, HWND, TRUE},
@@ -41,17 +40,29 @@ use crate::{
             set_sample_volume, start_sample, stop_sample, wave_out_open,
         },
     },
-    binding::{macros::globals, module::ModuleBase},
+    binding::{
+        macros::globals,
+        module::ModuleBase,
+        patch::{Patch, apply_groups, revert_groups},
+    },
     cd_audio::{AudioCdStatus, CdAudioPlayer, MAX_TRACK, source::CdSource, tmsf::CdAudioPosition},
     common::{HeapFreeFunc, fake_heap_free},
     hooker::hook_function,
     settings::SETTINGS,
-    sim::drawmode::hooks::PixelBuffer,
+    sim::{
+        drawmode::hooks::PixelBuffer,
+        timing::G_DELTA_TIME,
+        types::{CockpitLayout, DrawMode, Eyepoint, Point, RenderTarget, fmul16},
+    },
 };
 
 pub mod drawmode;
+mod timing;
+mod types;
 
 pub static MODULE: ModuleBase = ModuleBase::new("MW2.DLL");
+
+static PATCH_GROUPS: &[&[&'static dyn Patch]] = &[timing::PATCHES];
 
 type SimMainProc = unsafe extern "stdcall" fn(
     HMODULE,
@@ -62,49 +73,11 @@ type SimMainProc = unsafe extern "stdcall" fn(
     HWND,
 ) -> i32;
 
-/// A render context: the pixel buffer to draw into plus the rect within that buffer
-/// where all the drawing happens.
-#[repr(C)]
-#[derive(Clone)]
-struct RenderTarget {
-    pixel_buffer: *mut PixelBuffer,
-    left: i32,
-    top: i32,
-    right: i32,
-    bottom: i32,
-}
-
-impl RenderTarget {
-    /// Widens the target rect to the whole framebuffer
-    fn cover_framebuffer(&mut self) {
-        unsafe {
-            self.left = 0;
-            self.top = 0;
-            self.right = (G_GAME_WINDOW_WIDTH.get() as i32 - 1).max(0);
-            self.bottom = (G_GAME_WINDOW_HEIGHT.get() as i32 - 1).max(0);
-        }
-    }
-}
-
 type DrawModeInitFunc = unsafe extern "cdecl" fn(*mut PixelBuffer, i32, i32) -> i32;
 type DrawModeDeInitFunc = unsafe extern "cdecl" fn() -> i32;
 type DrawModeBlitFlipFunc = unsafe extern "cdecl" fn() -> i32;
 type DrawModeBlitRectFunc = unsafe extern "cdecl" fn(i32, i32, i32, i32) -> i32;
 type DrawModeStretchBlitFunc = unsafe extern "cdecl" fn(i32, i32, i32, i32) -> i32;
-
-#[repr(C)]
-struct DrawMode {
-    index: u32,
-    some_index_to_related_struct: i32,
-    initialized: i32,
-    unknown1: u32,
-    init_func: DrawModeInitFunc,
-    deinit_func: DrawModeDeInitFunc,
-    blit_flip_func: DrawModeBlitFlipFunc,
-    blit_rect_func: DrawModeBlitRectFunc,
-    stretch_blit_func: DrawModeStretchBlitFunc,
-    unknown2: u32,
-}
 
 #[repr(C)]
 struct CdAudioTracks {
@@ -121,43 +94,6 @@ struct GameWindowGeometry {
     unknown2: i32,
     unknown3: i32,
     unknown4: i32,
-}
-
-/// The camera, which the game calls "Eyepoint"
-#[repr(C)]
-struct Eyepoint {
-    position: [i32; 3],
-    rotation: [i32; 3],
-    /// Horizontal FOV in 16.16, where `tan(fov / 2) == 1 / fov_x`
-    fov_x: i32,
-    unknown1: [i32; 4],
-    viewport_left: i32,
-    viewport_right: i32,
-    viewport_top: i32,
-    viewport_bottom: i32,
-    hither_clip_plane: i32,
-    yon_clip_plane: i32,
-    /// `pixel width / pixel height` in 16.16
-    pixel_aspect_ratio: i32,
-}
-
-/// The cockpit layout table passed to LoadCockpitLayout. It runs to at least
-/// index 0x22; only the entries the detour needs are named.
-#[repr(C)]
-struct CockpitLayout {
-    /// The cockpit's 3D viewport, in normalised 16.16 coordinates
-    viewport: *mut RenderTarget,
-    unknown1: *mut c_void,
-    /// Render target table slot the viewport is copied into
-    render_target_slot: i32,
-}
-
-/// A 2D point with normalised 16.16 components
-#[repr(C)]
-#[derive(Clone, Copy)]
-struct Point {
-    x: i32,
-    y: i32,
 }
 
 /// A player's mech.
@@ -255,12 +191,6 @@ pub static ZERO_LENGTH_FRAMES_SKIPPED: AtomicU32 = AtomicU32::new(0);
 
 // Functions to hook
 // static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
-
-type GameTickTimerCallbackFunc = unsafe extern "stdcall" fn(u32);
-static GAME_TICK_TIMER_CALLBACK_HOOK: RwLock<Option<GenericDetour<GameTickTimerCallbackFunc>>> =
-    RwLock::new(None);
-
-static SUP_ANIM_TIMER_CALLBACK_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
 
 type IntegerOverflowHappensHereFunc = unsafe extern "cdecl" fn(i32, i32, i32) -> i32;
 static INTEGER_OVERFLOW_HAPPENS_HERE_HOOK: RwLock<
@@ -383,9 +313,6 @@ type ToggleFullscreenFunc = unsafe extern "stdcall" fn();
 static TOGGLE_FULLSCREEN_HOOK: RwLock<Option<GenericDetour<ToggleFullscreenFunc>>> =
     RwLock::new(None);
 
-type NextClockFunc = unsafe extern "stdcall" fn();
-static NEXT_CLOCK_HOOK: RwLock<Option<GenericDetour<NextClockFunc>>> = RwLock::new(None);
-
 type FuncWithJumpjetCalcFunc = unsafe extern "cdecl" fn(*mut Player);
 static FUNC_WITH_JUMPJET_CALC_HOOK: RwLock<Option<GenericDetour<FuncWithJumpjetCalcFunc>>> =
     RwLock::new(None);
@@ -414,9 +341,6 @@ static AXIS_POSITION_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
 
 // Global variables
 globals!(
-    static G_TICKS_CHECK: u32 = 0x000ad008;
-    static G_TICKS_1: u32 = 0x000ad20c;
-    static G_TICKS_2: u32 = 0x000ad210;
     pub(crate) static G_GAME_WINDOW_WIDTH: u32 = 0x000acb6c;
     pub(crate) static G_GAME_WINDOW_HEIGHT: u32 = 0x000acb70;
     static G_GAME_WINDOW_GEOMETRY: *mut GameWindowGeometry = 0x00176eb4;
@@ -443,13 +367,7 @@ globals!(
     static G_PAUSED_CD_AUDIO_POSITION: CdAudioPosition = 0x000becb0;
     static G_CD_AUDIO_VOLUME: i32 = 0x000a14a4;
     static G_SHOULD_QUIT: BOOL = 0x000acb18;
-    static G_DELTA_TIME: i32 = 0x000ba550;
 );
-
-/// a * b in 16.16 fixed-point
-fn fmul16(a: i32, b: i32) -> i32 {
-    ((a as i64 * b as i64 + 0x8000) >> 16) as i32
-}
 
 /// Offset to center the HUD box inside the framebuffer
 fn hud_origin() -> (i32, i32) {
@@ -478,8 +396,6 @@ static mut CD_AUDIO_DEVICE: u32 = u32::MAX;
 /// Our own CD audio player that actually plays tracks from files.
 static CD_AUDIO_PLAYER: Mutex<Option<CdAudioPlayer>> = Mutex::new(None);
 
-static mut LOADED: bool = false;
-
 pub struct Sim {
     ail: Ail,
     module: HMODULE,
@@ -487,7 +403,7 @@ pub struct Sim {
 
 impl Sim {
     pub fn new() -> Result<Self> {
-        if unsafe { LOADED } {
+        if MODULE.is_loaded() {
             bail!("Can't load shell more than once");
         }
 
@@ -495,6 +411,14 @@ impl Sim {
         let base_address = module.0 as usize;
 
         MODULE.set(base_address);
+
+        if let Err(e) = unsafe { apply_groups(PATCH_GROUPS) } {
+            MODULE.clear();
+            unsafe {
+                let _ = FreeLibrary(module);
+            }
+            return Err(e);
+        }
 
         let flee_option = (base_address + 0x000a1ad0) as *mut [u8; 7];
         unsafe {
@@ -574,21 +498,6 @@ impl Sim {
 
             let ail_serve_thunk = (base_address + 0x001836b4) as *mut usize;
             *ail_serve_thunk = serve as *const () as usize;
-
-            *GAME_TICK_TIMER_CALLBACK_HOOK.write().unwrap() = {
-                let target: GameTickTimerCallbackFunc =
-                    std::mem::transmute(base_address + 0x00067ed8);
-                Some(hook_function(target, Self::game_tick_timer_callback)?)
-            };
-
-            *SUP_ANIM_TIMER_CALLBACK_HOOK.write().unwrap() = {
-                let hook = RawDetour::new(
-                    (base_address + 0x00003f3d) as *const (),
-                    Self::sup_anim_timer_callback as *const (),
-                )?;
-                hook.enable()?;
-                Some(hook)
-            };
 
             *INTEGER_OVERFLOW_HAPPENS_HERE_HOOK.write().unwrap() = {
                 let target: IntegerOverflowHappensHereFunc =
@@ -751,11 +660,6 @@ impl Sim {
                 Some(hook_function(target, Self::toggle_fullscreen)?)
             };
 
-            *NEXT_CLOCK_HOOK.write().unwrap() = {
-                let target: NextClockFunc = std::mem::transmute(base_address + 0x0007ce2c);
-                Some(hook_function(target, Self::next_clock)?)
-            };
-
             *FUNC_WITH_JUMPJET_CALC_HOOK.write().unwrap() = {
                 let target: FuncWithJumpjetCalcFunc =
                     std::mem::transmute(base_address + 0x000180cd);
@@ -785,11 +689,10 @@ impl Sim {
 
             drawmode::hook_functions(base_address)?;
 
-            let ail = Ail::new()?;
-
-            LOADED = true;
-
-            Ok(Self { ail, module })
+            Ok(Self {
+                ail: Ail::new()?,
+                module,
+            })
         }
     }
 
@@ -833,37 +736,6 @@ impl Sim {
                 unsafe extern "system" fn() -> isize,
                 WindowProc,
             >(window_proc))
-        }
-    }
-
-    /// This is the callback executed by Miles Sound System (AIL) with a 181Hz timer to update the game's internal ticks.
-    /// The game uses these ticks to update the game state, including calculating delta time (ticks) between frames.
-    /// The original function was corrupting the stack with my custom AIL time_proc.
-    /// Replacing it with this freshly recompiled copy fixed the problem (for now?)
-    unsafe extern "stdcall" fn game_tick_timer_callback(_: u32) {
-        unsafe {
-            if G_TICKS_CHECK.get() & 0x200 == 0 {
-                G_TICKS_1.set(G_TICKS_1.get() + 1);
-            }
-            if G_TICKS_CHECK.get() & 0x100 == 0 {
-                G_TICKS_2.set(G_TICKS_2.get() + 1);
-            }
-        }
-    }
-
-    /// I'm not sure what exactly this does yet, but it's related to the loading screen with the dropship: "sup anim"
-    /// This is the same situation as the tick timer callback: Hooking it to avoid stack corruption.
-    unsafe extern "stdcall" fn sup_anim_timer_callback(_: u32) {
-        unsafe {
-            let original: unsafe extern "stdcall" fn() = std::mem::transmute(
-                SUP_ANIM_TIMER_CALLBACK_HOOK
-                    .read()
-                    .unwrap()
-                    .as_ref()
-                    .unwrap()
-                    .trampoline(),
-            );
-            original();
         }
     }
 
@@ -1545,26 +1417,6 @@ impl Sim {
         // Do nothing because we handle this in the custom window proc
     }
 
-    /// We hook this in order to limit the framerate to the configured value.
-    unsafe extern "stdcall" fn next_clock() {
-        let framerate_limit = SETTINGS.get_int("video", "framerate_limit", 45);
-
-        if framerate_limit > 0 {
-            static LAST_INSTANT: RwLock<Option<Instant>> = RwLock::new(None);
-            let frame_time = 1.0 / framerate_limit as f64;
-            let mut last_instant = LAST_INSTANT.write().unwrap();
-            let last = *last_instant.get_or_insert_with(Instant::now);
-            while last.elapsed().as_secs_f64() < frame_time {
-                std::thread::yield_now();
-            }
-            *last_instant = Some(Instant::now());
-        }
-
-        unsafe {
-            NEXT_CLOCK_HOOK.read().unwrap().as_ref().unwrap().call();
-        }
-    }
-
     /// Advances every shot in flight.
     /// Skipped entirely on a zero-length frame.
     ///
@@ -1755,11 +1607,9 @@ impl Sim {
 impl Drop for Sim {
     fn drop(&mut self) {
         unsafe {
-            MODULE.clear();
             ailrs::shutdown();
             crate::SIM_WINDOW_PROC = None;
-            GAME_TICK_TIMER_CALLBACK_HOOK.write().unwrap().take();
-            SUP_ANIM_TIMER_CALLBACK_HOOK.write().unwrap().take();
+            revert_groups(PATCH_GROUPS);
             INTEGER_OVERFLOW_HAPPENS_HERE_HOOK.write().unwrap().take();
             SET_GAME_RESOLUTION_HOOK.write().unwrap().take();
             INIT_GAME_WINDOW_GEOMETRY_HOOK.write().unwrap().take();
@@ -1791,7 +1641,6 @@ impl Drop for Sim {
             HANDLE_MESSAGES_HOOK.write().unwrap().take();
             RANDOM_INT_BELOW_HOOK.write().unwrap().take();
             TOGGLE_FULLSCREEN_HOOK.write().unwrap().take();
-            NEXT_CLOCK_HOOK.write().unwrap().take();
             FUNC_WITH_JUMPJET_CALC_HOOK.write().unwrap().take();
             FIXED_DIV_16_HOOK.write().unwrap().take();
             GUIDE_MISSILE_TO_TARGET_HOOK.write().unwrap().take();
@@ -1802,8 +1651,8 @@ impl Drop for Sim {
             drawmode::unhook_functions();
             self.ail.unhook();
             CD_AUDIO_PLAYER.lock().unwrap().take();
+            MODULE.clear();
             FreeLibrary(self.module).unwrap();
-            LOADED = false;
         }
     }
 }
