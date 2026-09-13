@@ -8,11 +8,10 @@ use std::{
 };
 
 use anyhow::{Context, Result, bail};
-use rand::Rng;
 use retour::GenericDetour;
 use windows::{
     Win32::{
-        Foundation::{FALSE, FreeLibrary, HMODULE, HWND, TRUE},
+        Foundation::{FreeLibrary, HMODULE, HWND},
         Media::Multimedia::{
             MCI_FORMAT_TMSF, MCI_FROM, MCI_MODE_OPEN, MCI_MODE_PAUSE, MCI_MODE_PLAY, MCI_MODE_STOP,
             MCI_OPEN, MCI_OPEN_PARMSA, MCI_OPEN_TYPE, MCI_PLAY, MCI_PLAY_PARMS, MCI_SET,
@@ -20,9 +19,6 @@ use windows::{
             MCI_STATUS_PARMS, MCI_TO, mciSendCommandA,
         },
         System::LibraryLoader::{GetProcAddress, LoadLibraryA},
-        UI::WindowsAndMessaging::{
-            DispatchMessageA, MSG, PM_REMOVE, PeekMessageA, TranslateMessage, WM_QUIT, WaitMessage,
-        },
     },
     core::{BOOL, s},
 };
@@ -53,16 +49,22 @@ use crate::{
         drawmode::hooks::PixelBuffer,
         timing::G_DELTA_TIME,
         types::{CockpitLayout, DrawMode, Eyepoint, Point, RenderTarget, fmul16},
+        window::{
+            G_GAME_WINDOW_GEOMETRY, G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH, G_SCREEN_H_MINUS_1,
+            G_SCREEN_W_MINUS_1, G_WINDOW_ACTIVE,
+        },
     },
 };
 
 pub mod drawmode;
+mod math;
 mod timing;
 mod types;
+pub mod window;
 
 pub static MODULE: ModuleBase = ModuleBase::new("MW2.DLL");
 
-static PATCH_GROUPS: &[&[&'static dyn Patch]] = &[timing::PATCHES];
+static PATCH_GROUPS: &[&[&'static dyn Patch]] = &[timing::PATCHES, math::PATCHES, window::PATCHES];
 
 type SimMainProc = unsafe extern "stdcall" fn(
     HMODULE,
@@ -84,16 +86,6 @@ struct CdAudioTracks {
     first_track: u32,
     number_of_tracks: u32,
     track_positions: *mut u32,
-}
-
-#[repr(C)]
-struct GameWindowGeometry {
-    width: i32,
-    height: i32,
-    unknown1: i32,
-    unknown2: i32,
-    unknown3: i32,
-    unknown4: i32,
 }
 
 /// A player's mech.
@@ -180,9 +172,6 @@ const JUMPJET_FUEL_MAX: i32 = 1810;
 /// Ticks per frame at the ideal 45 FPS, which is what every sim system seems to be tuned for.
 const TICKS_PER_IDEAL_FRAME: i32 = 4;
 
-/// Calls into `FixedDiv16` with a zero divisor that we answered instead of letting crash.
-pub static ZERO_DIVISORS_SUPPRESSED: AtomicU32 = AtomicU32::new(0);
-
 /// Proximity fuses that armed on a frame the 45 FPS sim would never have sampled.
 pub static PROXIMITY_FUSES_SUPPRESSED: AtomicU32 = AtomicU32::new(0);
 
@@ -191,19 +180,6 @@ pub static ZERO_LENGTH_FRAMES_SKIPPED: AtomicU32 = AtomicU32::new(0);
 
 // Functions to hook
 // static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
-
-type IntegerOverflowHappensHereFunc = unsafe extern "cdecl" fn(i32, i32, i32) -> i32;
-static INTEGER_OVERFLOW_HAPPENS_HERE_HOOK: RwLock<
-    Option<GenericDetour<IntegerOverflowHappensHereFunc>>,
-> = RwLock::new(None);
-
-type SetGameResolutionFunc = unsafe extern "cdecl" fn(*mut c_char);
-static SET_GAME_RESOLUTION_HOOK: RwLock<Option<GenericDetour<SetGameResolutionFunc>>> =
-    RwLock::new(None);
-
-type InitGameWindowGeometryFunc = unsafe extern "cdecl" fn() -> i32;
-static INIT_GAME_WINDOW_GEOMETRY_HOOK: RwLock<Option<GenericDetour<InitGameWindowGeometryFunc>>> =
-    RwLock::new(None);
 
 type ScaleRectToScreenFunc = unsafe extern "cdecl" fn(
     *mut PixelBuffer,
@@ -244,9 +220,6 @@ static SETUP_EYEPOINT_PROJECTION_HOOK: RwLock<Option<GenericDetour<SetupEyepoint
 
 type SetResFunc = unsafe extern "cdecl" fn();
 static SET_RES_HOOK: RwLock<Option<GenericDetour<SetResFunc>>> = RwLock::new(None);
-
-type BlitFunc = unsafe extern "stdcall" fn();
-static BLIT_HOOK: RwLock<Option<GenericDetour<BlitFunc>>> = RwLock::new(None);
 
 type InitCdAudioFunc = unsafe extern "stdcall" fn() -> u32;
 static INIT_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<InitCdAudioFunc>>> = RwLock::new(None);
@@ -303,22 +276,9 @@ type CdAudioTogglePausedFunc = unsafe extern "stdcall" fn();
 static CD_AUDIO_TOGGLE_PAUSED_HOOK: RwLock<Option<GenericDetour<CdAudioTogglePausedFunc>>> =
     RwLock::new(None);
 
-type HandleMessagesFunc = unsafe extern "stdcall" fn();
-static HANDLE_MESSAGES_HOOK: RwLock<Option<GenericDetour<HandleMessagesFunc>>> = RwLock::new(None);
-
-type RandomIntBelowFunc = unsafe extern "cdecl" fn(i32) -> i32;
-static RANDOM_INT_BELOW_HOOK: RwLock<Option<GenericDetour<RandomIntBelowFunc>>> = RwLock::new(None);
-
-type ToggleFullscreenFunc = unsafe extern "stdcall" fn();
-static TOGGLE_FULLSCREEN_HOOK: RwLock<Option<GenericDetour<ToggleFullscreenFunc>>> =
-    RwLock::new(None);
-
 type FuncWithJumpjetCalcFunc = unsafe extern "cdecl" fn(*mut Player);
 static FUNC_WITH_JUMPJET_CALC_HOOK: RwLock<Option<GenericDetour<FuncWithJumpjetCalcFunc>>> =
     RwLock::new(None);
-
-type FixedDiv16Func = unsafe extern "cdecl" fn(u32, i32) -> u32;
-static FIXED_DIV_16_HOOK: RwLock<Option<GenericDetour<FixedDiv16Func>>> = RwLock::new(None);
 
 type GuideMissileToTargetFunc = unsafe extern "cdecl" fn(*mut Shot, i32, i32, i32);
 static GUIDE_MISSILE_TO_TARGET_HOOK: RwLock<Option<GenericDetour<GuideMissileToTargetFunc>>> =
@@ -340,20 +300,9 @@ static AXIS_POSITION_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 // Global variables
-globals!(
-    pub(crate) static G_GAME_WINDOW_WIDTH: u32 = 0x000acb6c;
-    pub(crate) static G_GAME_WINDOW_HEIGHT: u32 = 0x000acb70;
-    static G_GAME_WINDOW_GEOMETRY: *mut GameWindowGeometry = 0x00176eb4;
-    static G_SCREEN_W_MINUS_1: i32 = 0x00176ee4;
-    static G_SCREEN_H_MINUS_1: i32 = 0x00176ec0;
+globals! {
     static G_RENDER_TARGET_TABLE: [RenderTarget; RENDER_TARGET_COUNT] = 0x00181a60;
-    static G_BLIT_GLOBAL_1: BOOL = 0x00176ebc;
-    pub(crate) static G_WINDOW_ACTIVE: BOOL = 0x000acb74;
     static G_CURRENT_DRAW_MODE: *mut DrawMode = 0x000b1774;
-    static G_STRETCH_BLIT_SOURCE_RECT: RenderTarget = 0x00176ed0;
-    static G_STRETCH_BLIT_OTHER_SOURCE_RECT: RenderTarget = 0x000bdff8;
-    static G_BLIT_GLOBAL_2: u32 = 0x000a5f18;
-    static G_BLIT_GLOBAL_3: u32 = 0x000a5a24;
     // static G_WIDTH_SCALE: i32 = 0x000e9610;
     static G_HORIZON_HAZE_THICKNESS: i32 = 0x000a6d30;
     static G_EYEPOINT: *mut Eyepoint = 0x000a6cc0;
@@ -367,7 +316,7 @@ globals!(
     static G_PAUSED_CD_AUDIO_POSITION: CdAudioPosition = 0x000becb0;
     static G_CD_AUDIO_VOLUME: i32 = 0x000a14a4;
     static G_SHOULD_QUIT: BOOL = 0x000acb18;
-);
+}
 
 /// Offset to center the HUD box inside the framebuffer
 fn hud_origin() -> (i32, i32) {
@@ -499,23 +448,6 @@ impl Sim {
             let ail_serve_thunk = (base_address + 0x001836b4) as *mut usize;
             *ail_serve_thunk = serve as *const () as usize;
 
-            *INTEGER_OVERFLOW_HAPPENS_HERE_HOOK.write().unwrap() = {
-                let target: IntegerOverflowHappensHereFunc =
-                    std::mem::transmute(base_address + 0x000035a0);
-                Some(hook_function(target, Self::integer_overflow_happens_here)?)
-            };
-
-            *SET_GAME_RESOLUTION_HOOK.write().unwrap() = {
-                let target: SetGameResolutionFunc = std::mem::transmute(base_address + 0x00067e23);
-                Some(hook_function(target, Self::set_game_resolution)?)
-            };
-
-            *INIT_GAME_WINDOW_GEOMETRY_HOOK.write().unwrap() = {
-                let target: InitGameWindowGeometryFunc =
-                    std::mem::transmute(base_address + 0x00012720);
-                Some(hook_function(target, Self::init_game_window_geometry)?)
-            };
-
             *SCALE_RECT_TO_SCREEN_HOOK.write().unwrap() = {
                 let target: ScaleRectToScreenFunc = std::mem::transmute(base_address + 0x00056920);
                 Some(hook_function(target, Self::scale_rect_to_screen)?)
@@ -555,11 +487,6 @@ impl Sim {
             *SET_RES_HOOK.write().unwrap() = {
                 let target: SetResFunc = std::mem::transmute(base_address + 0x0005d4d3);
                 Some(hook_function(target, Self::set_res)?)
-            };
-
-            *BLIT_HOOK.write().unwrap() = {
-                let target: BlitFunc = std::mem::transmute(base_address + 0x00012e15);
-                Some(hook_function(target, Self::blit)?)
             };
 
             *INIT_CD_AUDIO_HOOK.write().unwrap() = {
@@ -645,30 +572,10 @@ impl Sim {
                 Some(hook_function(target, Self::cd_audio_toggle_paused)?)
             };
 
-            *HANDLE_MESSAGES_HOOK.write().unwrap() = {
-                let target: HandleMessagesFunc = std::mem::transmute(base_address + 0x00067bbc);
-                Some(hook_function(target, Self::handle_messages)?)
-            };
-
-            *RANDOM_INT_BELOW_HOOK.write().unwrap() = {
-                let target: RandomIntBelowFunc = std::mem::transmute(base_address + 0x000736b3);
-                Some(hook_function(target, Self::random_int_below)?)
-            };
-
-            *TOGGLE_FULLSCREEN_HOOK.write().unwrap() = {
-                let target: ToggleFullscreenFunc = std::mem::transmute(base_address + 0x00077392);
-                Some(hook_function(target, Self::toggle_fullscreen)?)
-            };
-
             *FUNC_WITH_JUMPJET_CALC_HOOK.write().unwrap() = {
                 let target: FuncWithJumpjetCalcFunc =
                     std::mem::transmute(base_address + 0x000180cd);
                 Some(hook_function(target, Self::func_with_jumpjet_calc)?)
-            };
-
-            *FIXED_DIV_16_HOOK.write().unwrap() = {
-                let target: FixedDiv16Func = std::mem::transmute(base_address + 0x00002c90);
-                Some(hook_function(target, Self::fixed_div_16)?)
             };
 
             *GUIDE_MISSILE_TO_TARGET_HOOK.write().unwrap() = {
@@ -736,69 +643,6 @@ impl Sim {
                 unsafe extern "system" fn() -> isize,
                 WindowProc,
             >(window_proc))
-        }
-    }
-
-    /// This function is used all over the game to perform ((a * b) / c).
-    /// It would sometimes overflow and sometimes divide by zero, especially when the FPS is too high.
-    unsafe extern "cdecl" fn integer_overflow_happens_here(a: i32, b: i32, c: i32) -> i32 {
-        if c == 0 {
-            tracing::error!("integer_overflow_happens_here: division by zero (a={a}, b={b})");
-            std::process::abort();
-        }
-        (a as i64 * b as i64 / c as i64) as i32
-    }
-
-    /// The game decides which resolution to use based on the DLL name passed to this function.
-    /// This is presumably a leftover from the DOS version of the game, possibly to preserve config file compatibility.
-    unsafe extern "cdecl" fn set_game_resolution(resolution: *mut c_char) {
-        let widescreen = SETTINGS.get_bool("video", "widescreen", false);
-        unsafe {
-            // "MCGA.DLL"
-            if widescreen {
-                G_GAME_WINDOW_WIDTH.set(427);
-                G_GAME_WINDOW_HEIGHT.set(240);
-            } else {
-                G_GAME_WINDOW_WIDTH.set(320);
-                G_GAME_WINDOW_HEIGHT.set(240);
-            }
-
-            let resolution = std::ffi::CStr::from_ptr(resolution)
-                .to_string_lossy()
-                .to_uppercase();
-            if resolution == "VESA480.DLL" {
-                G_GAME_WINDOW_WIDTH.set(if widescreen { 854 } else { 640 });
-                G_GAME_WINDOW_HEIGHT.set(480);
-            } else if resolution == "VESA768.DLL" {
-                G_GAME_WINDOW_WIDTH.set(if widescreen { 1366 } else { 1024 });
-                G_GAME_WINDOW_HEIGHT.set(768);
-            }
-        }
-    }
-
-    /// Allocates GameWindowGeometry and caches the W-1/H-1 scale globals used by every HUD-scaling function.
-    /// Depending on the configured resolution, we force the window size to match the HUD box.
-    unsafe extern "cdecl" fn init_game_window_geometry() -> i32 {
-        unsafe {
-            let (width, height) = match G_GAME_WINDOW_HEIGHT.get() {
-                480 => (640, 480),
-                768 => (1024, 768),
-                _ => (320, 240),
-            };
-
-            let ok = INIT_GAME_WINDOW_GEOMETRY_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .call();
-            if ok != 0 && !G_GAME_WINDOW_GEOMETRY.get().is_null() {
-                (*(G_GAME_WINDOW_GEOMETRY).get()).width = width;
-                (*(G_GAME_WINDOW_GEOMETRY).get()).height = height;
-                G_SCREEN_W_MINUS_1.set(width - 1);
-                G_SCREEN_H_MINUS_1.set(height - 1);
-            }
-            ok
         }
     }
 
@@ -967,30 +811,6 @@ impl Sim {
             SET_RES_HOOK.read().unwrap().as_ref().unwrap().call();
             let (x0, _) = hud_origin();
             G_HORIZON_HAZE_THICKNESS.set(G_HORIZON_HAZE_THICKNESS.get() - x0);
-        }
-    }
-
-    /// This function is called every frame to draw the game.
-    unsafe extern "stdcall" fn blit() {
-        unsafe {
-            if G_BLIT_GLOBAL_1.get() == FALSE {
-                if G_WINDOW_ACTIVE.get() == TRUE {
-                    ((*G_CURRENT_DRAW_MODE.get()).blit_flip_func)();
-                }
-            } else {
-                ((*G_CURRENT_DRAW_MODE.get()).stretch_blit_func)(
-                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).left + 1,
-                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).top + 1,
-                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).right,
-                    (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).bottom,
-                );
-
-                G_STRETCH_BLIT_SOURCE_RECT
-                    .set(G_STRETCH_BLIT_OTHER_SOURCE_RECT.as_ref().unwrap().clone());
-
-                G_BLIT_GLOBAL_2.set(G_BLIT_GLOBAL_3.get());
-                G_BLIT_GLOBAL_1.set(FALSE);
-            }
         }
     }
 
@@ -1377,46 +1197,6 @@ impl Sim {
         }
     }
 
-    /// The original function had a loop that was causing bad stuttering when the mouse was moved.
-    unsafe extern "stdcall" fn handle_messages() {
-        unsafe {
-            if G_WINDOW_ACTIVE.get() == FALSE {
-                let _ = WaitMessage();
-            }
-
-            if G_SHOULD_QUIT.get() == FALSE {
-                let mut msg: MSG = MSG::default();
-
-                if PeekMessageA(&mut msg as *mut MSG, Some(HWND::default()), 0, 0, PM_REMOVE).into()
-                {
-                    if msg.hwnd == HWND::default() || msg.message != WM_QUIT {
-                        let _ = TranslateMessage(&msg);
-                        DispatchMessageA(&msg);
-                    } else {
-                        G_SHOULD_QUIT.set(TRUE);
-                    }
-                }
-            }
-        }
-    }
-
-    /// Returns a truly pseudorandom number instead of picking from the pregenerated table.
-    /// This fixes the chance to explode if you're overheating because the pregenerated random
-    /// numbers had a chance to never return a number < 3 when modulo with a fixed DeltaTime.
-    ///
-    /// TODO: This could break multiplayer. Look into another solution if it causes desync.
-    unsafe extern "cdecl" fn random_int_below(max: i32) -> i32 {
-        if max <= 0 {
-            tracing::error!("random_int_below: max <= 0 (max={max})");
-            std::process::abort();
-        }
-        rand::rng().random_range(0..max)
-    }
-
-    unsafe extern "stdcall" fn toggle_fullscreen() {
-        // Do nothing because we handle this in the custom window proc
-    }
-
     /// Advances every shot in flight.
     /// Skipped entirely on a zero-length frame.
     ///
@@ -1488,16 +1268,6 @@ impl Sim {
         }
 
         Some(player.jumpjet_fuel + delta_time / 4)
-    }
-
-    /// Divides two 16.16 fixed-point values.
-    /// The missile guidance code calls this with a zero divisor sometimes, so we suppress it.
-    unsafe extern "cdecl" fn fixed_div_16(value: u32, divisor: i32) -> u32 {
-        if divisor == 0 {
-            ZERO_DIVISORS_SUPPRESSED.fetch_add(1, Ordering::Relaxed);
-            return 0;
-        }
-        (((value as i32 as i64) << 16) / divisor as i64) as u32
     }
 
     /// Steers a guided missile toward its lock and arms its proximity fuse.
@@ -1610,9 +1380,6 @@ impl Drop for Sim {
             ailrs::shutdown();
             crate::SIM_WINDOW_PROC = None;
             revert_groups(PATCH_GROUPS);
-            INTEGER_OVERFLOW_HAPPENS_HERE_HOOK.write().unwrap().take();
-            SET_GAME_RESOLUTION_HOOK.write().unwrap().take();
-            INIT_GAME_WINDOW_GEOMETRY_HOOK.write().unwrap().take();
             SCALE_RECT_TO_SCREEN_HOOK.write().unwrap().take();
             SCALE_POINT_TO_SCREEN_HOOK.write().unwrap().take();
             CENTER_RECT_ON_SCREEN_HOOK.write().unwrap().take();
@@ -1621,7 +1388,6 @@ impl Drop for Sim {
             SELECT_RENDER_TARGET_HOOK.write().unwrap().take();
             SETUP_EYEPOINT_PROJECTION_HOOK.write().unwrap().take();
             SET_RES_HOOK.write().unwrap().take();
-            BLIT_HOOK.write().unwrap().take();
             INIT_CD_AUDIO_HOOK.write().unwrap().take();
             GET_CD_AUDIO_AUX_DEVICE_HOOK.write().unwrap().take();
             CLOSE_CD_AUDIO_HOOK.write().unwrap().take();
@@ -1638,11 +1404,7 @@ impl Drop for Sim {
             DEINIT_CD_AUDIO_HOOK.write().unwrap().take();
             UPDATE_CD_AUDIO_POSITION_HOOK.write().unwrap().take();
             CD_AUDIO_TOGGLE_PAUSED_HOOK.write().unwrap().take();
-            HANDLE_MESSAGES_HOOK.write().unwrap().take();
-            RANDOM_INT_BELOW_HOOK.write().unwrap().take();
-            TOGGLE_FULLSCREEN_HOOK.write().unwrap().take();
             FUNC_WITH_JUMPJET_CALC_HOOK.write().unwrap().take();
-            FIXED_DIV_16_HOOK.write().unwrap().take();
             GUIDE_MISSILE_TO_TARGET_HOOK.write().unwrap().take();
             UPDATE_ALL_SHOTS_HOOK.write().unwrap().take();
             UPDATE_AXIS_FROM_KEYS_HOOK.write().unwrap().take();

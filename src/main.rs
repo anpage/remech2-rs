@@ -25,8 +25,7 @@ use windows::{
 };
 
 use crate::{
-    settings::SETTINGS,
-    sim::{G_WINDOW_ACTIVE, drawmode::hooks::G_MOUSE_NEEDS_CENTERING},
+    settings::SETTINGS, sim::drawmode::hooks::G_MOUSE_NEEDS_CENTERING, sim::window::G_WINDOW_ACTIVE,
 };
 
 mod about;
