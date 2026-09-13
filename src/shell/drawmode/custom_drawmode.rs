@@ -298,8 +298,7 @@ impl CustomDrawMode {
                 ctx,
                 self.texture.id(),
                 self.cursor_texture.as_ref().map(|t| t.id()),
-                window_width as f32,
-                window_height as f32,
+                (window_width as f32, window_height as f32),
                 &self.cached_mouse_state,
                 hwnd,
             );

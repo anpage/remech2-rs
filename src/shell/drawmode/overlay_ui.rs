@@ -57,15 +57,13 @@ impl OverlayUi {
         ctx: &Context,
         texture: TextureId,
         cursor_texture: Option<TextureId>,
-        window_width: f32,
-        window_height: f32,
+        window_size: (f32, f32),
         mouse_state: &OverlayMouseState,
         hwnd: HWND,
     ) {
         // calculate width and height, preserving 4:3 aspect ratio
         let aspect_ratio = const { 4.0 / 3.0 };
-        let mut width = window_width;
-        let mut height = window_height;
+        let (mut width, mut height) = window_size;
 
         let scale_factor = if width / height > aspect_ratio {
             width = height * aspect_ratio;
@@ -113,7 +111,7 @@ impl OverlayUi {
                 .collapsible(false)
                 .movable(false)
                 .title_bar(false)
-                .fixed_pos(egui::pos2(window_width / 2. - width / 2., 0.0))
+                .fixed_pos(egui::pos2(window_size.0 / 2. - width / 2., 0.0))
                 .fixed_size(Vec2::new(width, 30.0))
                 .show(ctx, |ui| {
                     egui::containers::menu::MenuBar::new().ui(ui, |ui| {
@@ -216,7 +214,7 @@ impl OverlayUi {
                         "MOUSE POSITION: ({}, {})",
                         mouse_state.pos_x, mouse_state.pos_y
                     ));
-                    ui.label(format!("WINDOW SIZE: {}x{}", window_width, window_height));
+                    ui.label(format!("WINDOW SIZE: {}x{}", window_size.0, window_size.1));
                     ui.label(format!(
                         "HOVERING SHELL: {}",
                         if self.shell_hovered { "YES" } else { "NO" }
