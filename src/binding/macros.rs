@@ -48,8 +48,8 @@ macro_rules! hook {
             /// Offset into the module, as shown in Ghidra.
             pub const RVA: usize = $rva;
 
-            pub static HOOK: $crate::binding::Hook<Sig> =
-                $crate::binding::Hook::new(&$module, RVA, stringify!($name), super::$name);
+            pub static HOOK: $crate::binding::hook::Hook<Sig> =
+                $crate::binding::hook::Hook::new(&$module, RVA, stringify!($name), super::$name);
         }
 
         $(#[doc = $doc])*
@@ -73,7 +73,7 @@ macro_rules! hook {
             $($arg:ident: $arg_ty:ty),* $(,)?
         ) $(-> $ret:ty)? $body:block
     ) => {
-        $crate::binding::hook! {
+        $crate::binding::macros::hook! {
             $(#[doc = $doc])*
             #[rva($rva in MODULE)]
             $(#[$attr])*
@@ -211,8 +211,8 @@ macro_rules! patches {
         $vis:vis static $name:ident = [$($kind:ident $item:ident),* $(,)?];
     ) => {
         $(#[$attr])*
-        $vis static $name: &[&'static dyn $crate::binding::Patch] =
-            &[$($crate::binding::patch_ref!($kind $item)),*];
+        $vis static $name: &[&'static dyn $crate::binding::patch::Patch] =
+            &[$($crate::binding::macros::patch_ref!($kind $item)),*];
     };
 }
 pub(crate) use patches;
