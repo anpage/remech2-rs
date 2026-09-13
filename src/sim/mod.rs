@@ -10,8 +10,9 @@ use windows::{
 };
 
 use binding::{
+    macros::patch_groups,
     module::ModuleBase,
-    patch::{Patch, apply_groups, revert_groups},
+    patch::{apply_groups, revert_groups},
 };
 
 use crate::{
@@ -50,18 +51,20 @@ pub mod window;
 
 pub static MODULE: ModuleBase = ModuleBase::new("MW2.DLL");
 
-static PATCH_GROUPS: &[&[&'static dyn Patch]] = &[
-    camera::PATCHES,
-    cd_audio::PATCHES,
-    drawmode::hooks::PATCHES,
-    hud::PATCHES,
-    input::PATCHES,
-    jumpjets::PATCHES,
-    math::PATCHES,
-    shots::PATCHES,
-    timing::PATCHES,
-    window::PATCHES,
-];
+patch_groups! {
+    static PATCH_GROUPS = [
+        camera,
+        cd_audio,
+        drawmode::hooks,
+        hud,
+        input,
+        jumpjets,
+        math,
+        shots,
+        timing,
+        window,
+    ];
+}
 
 type SimMainProc = unsafe extern "stdcall" fn(
     HMODULE,

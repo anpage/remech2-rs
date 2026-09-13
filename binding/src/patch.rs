@@ -1,6 +1,35 @@
 #[allow(unused_imports)]
 use anyhow::{Context as _, Result};
 
+/// Implemented by [`patches!`] for every hook it registers.
+///
+/// `#[hook]` emits an assertion that its own marker implements this, so a hook
+/// that never reaches a `patches!` list fails to compile instead of quietly
+/// never being installed. The dead-code lint can't be relied on for this: a hook
+/// called from anywhere else is live whether or not it's registered.
+///
+/// [`patches!`]: crate::macros::patches
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is declared with `#[hook]` but never registered",
+    label = "not in any `patches!` list",
+    note = "add `hook <name>` to the `patches!` list at the bottom of this file"
+)]
+pub trait Registered {}
+
+/// Implemented by [`patch_groups!`] for every module whose patches it lists.
+///
+/// The counterpart to [`Registered`] one level up: a `patches!` list that no
+/// `patch_groups!` names is never applied, so every hook in that file compiles,
+/// registers, and silently does nothing.
+///
+/// [`patch_groups!`]: crate::macros::patch_groups
+#[diagnostic::on_unimplemented(
+    message = "this module's `patches!` list is never applied",
+    label = "not named by any `patch_groups!`",
+    note = "add this module to the `patch_groups!` list in its parent module"
+)]
+pub trait Grouped {}
+
 /// Something we do to the game's memory when its DLL loads.
 pub trait Patch: Sync {
     fn name(&self) -> &'static str;

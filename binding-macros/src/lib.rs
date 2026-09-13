@@ -12,7 +12,7 @@
 
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::{format_ident, quote};
+use quote::{format_ident, quote_spanned};
 use syn::{
     Error, FnArg, Ident, ItemFn, LitInt, LitStr, Token,
     parse::{Parse, ParseStream},
@@ -144,12 +144,17 @@ fn expand_hook(args: Args, func: ItemFn, kind: Kind) -> syn::Result<TokenStream2
     let name_str = LitStr::new(&name.to_string(), name.span());
     let Args { rva, module } = args;
 
+    // Taken from the caller's own source: tokens stamped with a synthetic span
+    // count as an external macro expansion, and rustc's dead-code pass won't
+    // report on those — so a hook missing from its `patches!` would go unnoticed.
+    let span = name.span();
+
     let declaration = match kind {
-        Kind::Function => quote! {
+        Kind::Function => quote_spanned! {span=>
             pub static HOOK: ::binding::hook::Hook<Sig> =
                 ::binding::hook::Hook::new(&#module, RVA, #name_str, super::#name);
         },
-        Kind::Raw => quote! {
+        Kind::Raw => quote_spanned! {span=>
             pub static HOOK: ::binding::hook::RawHook = ::binding::hook::RawHook::new(
                 &#module,
                 RVA,
@@ -160,11 +165,11 @@ fn expand_hook(args: Args, func: ItemFn, kind: Kind) -> syn::Result<TokenStream2
     };
 
     let original = match kind {
-        Kind::Function => quote! { #name::HOOK.original() },
-        Kind::Raw => quote! { #name::HOOK.original::<#name::Sig>() },
+        Kind::Function => quote_spanned! {span=> #name::HOOK.original() },
+        Kind::Raw => quote_spanned! {span=> #name::HOOK.original::<#name::Sig>() },
     };
 
-    Ok(quote! {
+    Ok(quote_spanned! {span=>
         #[doc(hidden)]
         #vis mod #name {
             use super::*;
@@ -175,8 +180,19 @@ fn expand_hook(args: Args, func: ItemFn, kind: Kind) -> syn::Result<TokenStream2
             /// Offset into the module, as shown in Ghidra.
             pub const RVA: usize = #rva;
 
+            /// Marker `patches!` implements `Registered` for.
+            pub struct Registration;
+
             #declaration
         }
+
+        // A hook that reaches no `patches!` list is never installed. The
+        // dead-code lint can't catch that on its own: calling the detour from
+        // anywhere makes `HOOK` live whether or not it's registered.
+        const _: () = {
+            const fn assert_registered<T: ::binding::patch::Registered>() {}
+            assert_registered::<#name::Registration>();
+        };
 
         #(#attrs)*
         #vis #sig {
@@ -184,9 +200,7 @@ fn expand_hook(args: Args, func: ItemFn, kind: Kind) -> syn::Result<TokenStream2
             unsafe fn original(#(#arg_names: #arg_types),*) #output {
                 unsafe { (#original)(#(#arg_names),*) }
             }
-            // Bodies that reimplement rather than wrap never call `original`. This
-            // keeps it used without `#[allow(dead_code)]`, which would seed it as a
-            // dead-code root and keep `HOOK` live even when no `patches!` names it.
+            // Bodies that reimplement rather than wrap never call `original`.
             let _ = original;
             #block
         }

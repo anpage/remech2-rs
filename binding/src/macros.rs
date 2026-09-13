@@ -125,12 +125,61 @@ macro_rules! patches {
         $(#[$attr:meta])*
         $vis:vis static $name:ident = [$($kind:ident $item:ident),* $(,)?];
     ) => {
+        $($crate::registration!($kind $item);)*
+
+        /// Marker `patch_groups!` implements `Grouped` for.
+        $vis struct PatchGroup;
+
+        const _: () = {
+            const fn assert_grouped<T: $crate::patch::Grouped>() {}
+            assert_grouped::<PatchGroup>();
+        };
+
         $(#[$attr])*
         $vis static $name: &[&'static dyn $crate::patch::Patch] =
             &[$($crate::patch_ref!($kind $item)),*];
     };
 }
 pub use crate::patches;
+
+/// Collects the modules whose [`patches!`] lists a parent module applies.
+///
+/// Naming a module here is what discharges the obligation its `patches!`
+/// carries, so a file whose patches never get applied is a compile error rather
+/// than a set of hooks that quietly never install.
+///
+/// ```ignore
+/// patch_groups! {
+///     static PATCH_GROUPS = [timing, math, drawmode::hooks];
+/// }
+/// ```
+#[macro_export]
+macro_rules! patch_groups {
+    (
+        $(#[$attr:meta])*
+        // Spelled out rather than `$module:path`, which can't be followed by `::`.
+        $vis:vis static $name:ident = [$($($module:ident)::+),* $(,)?];
+    ) => {
+        $(impl $crate::patch::Grouped for $($module)::+::PatchGroup {})*
+
+        $(#[$attr])*
+        $vis static $name: &[&[&'static dyn $crate::patch::Patch]] =
+            &[$($($module)::+::PATCHES),*];
+    };
+}
+pub use crate::patch_groups;
+
+/// Discharges the obligation `#[hook]` emits. Listing a hook twice is a
+/// conflicting-implementation error, which is also a bug worth catching.
+#[doc(hidden)]
+#[macro_export]
+macro_rules! registration {
+    (hook $name:ident) => {
+        impl $crate::patch::Registered for $name::Registration {}
+    };
+    (patch $name:ident) => {};
+}
+pub use crate::registration;
 
 #[doc(hidden)]
 #[macro_export]
