@@ -27,12 +27,15 @@ use windows::{
 use crate::{
     WindowProc,
     ail::Ail,
+    binding::{macros::globals, module::ModuleBase},
     common::{HeapFreeFunc, SetMenuFunc, debug_log, fake_heap_free, fake_set_menu},
     hooker::hook_function,
 };
 
 mod audio;
 mod drawmode;
+
+pub static MODULE: ModuleBase = ModuleBase::new("MW2SHELL.DLL");
 
 type ShellMainProc = unsafe extern "stdcall" fn(HMODULE, i32, *const c_char, i32, HWND) -> i32;
 
@@ -102,13 +105,12 @@ static G_SOME_SETTINGS_WEIRD_FUNC: RwLock<Option<SomeSettingsWeirdFunc>> = RwLoc
 type LoadFileFromPrjFunc = unsafe extern "thiscall" fn(*mut c_void, *const c_char, i32) -> i32;
 static G_LOAD_FILE_FROM_PRJ: RwLock<Option<LoadFileFromPrjFunc>> = RwLock::new(None);
 
-static mut G_MECH_VARIANT_FILENAME: *mut c_char = std::ptr::null_mut();
-static mut G_MECH_VARIANT_FILENAMES: *mut [[c_char; 13]; 200] = std::ptr::null_mut();
-static mut G_PRJ_OBJECT: *mut c_void = std::ptr::null_mut();
-
-static mut G_DATABASE_MW2: *mut *mut c_void = std::ptr::null_mut();
-
-static mut G_SOME_SETTINGS_WEIRD_GLOBAL: *mut *mut c_void = std::ptr::null_mut();
+globals!(
+    static G_MECH_VARIANT_FILENAMES: [[c_char; 13]; 200] = 0x00079d80;
+    static G_PRJ_OBJECT: c_void = 0x00071230;
+    // static G_DATABASE_MW2: *mut c_void = 0x0007122c;
+    static G_SOME_SETTINGS_WEIRD_GLOBAL: *mut c_void = 0x00071214;
+);
 
 static mut LOADED: bool = false;
 
@@ -125,6 +127,8 @@ impl Shell {
 
         let module = unsafe { LoadLibraryA(s!("MW2SHELL.DLL"))? };
         let base_address = module.0 as usize;
+
+        MODULE.set(base_address);
 
         let smack_module = unsafe { GetModuleHandleA(s!("SMACKW32.DLL"))? };
         let smack_base_address = smack_module.0 as usize;
@@ -159,14 +163,6 @@ impl Shell {
                 Some(std::mem::transmute::<usize, SomeSettingsWeirdFunc>(
                     base_address + 0x0000544e,
                 ));
-
-            G_MECH_VARIANT_FILENAME = (base_address + 0x0007a800) as *mut c_char;
-            G_MECH_VARIANT_FILENAMES = (base_address + 0x00079d80) as *mut [[c_char; 13]; 200];
-            G_PRJ_OBJECT = (base_address + 0x00071230) as *mut c_void;
-
-            G_DATABASE_MW2 = (base_address + 0x0007122c) as *mut *mut c_void;
-
-            G_SOME_SETTINGS_WEIRD_GLOBAL = (base_address + 0x00071214) as *mut *mut c_void;
 
             *DEBUG_LOG_HOOK.write().unwrap() = {
                 let hook = RawDetour::new(
@@ -340,7 +336,7 @@ impl Shell {
             };
 
             // Clear the list
-            let filenames = &mut *G_MECH_VARIANT_FILENAMES;
+            let filenames = &mut G_MECH_VARIANT_FILENAMES.get();
             filenames.fill([0; SLOT_LEN as _]);
 
             // Make sure we have at least the default variant
@@ -355,7 +351,7 @@ impl Shell {
                 let c_variant = CString::new(variant.as_str()).expect("no interior NUL");
 
                 let result = G_LOAD_FILE_FROM_PRJ.read().unwrap().unwrap()(
-                    G_PRJ_OBJECT,
+                    G_PRJ_OBJECT.ptr(),
                     c_variant.as_ptr(),
                     6,
                 );
@@ -469,7 +465,7 @@ impl Shell {
 
             let weird_func = G_SOME_SETTINGS_WEIRD_FUNC.read().unwrap().unwrap();
             weird_func(
-                *G_SOME_SETTINGS_WEIRD_GLOBAL,
+                G_SOME_SETTINGS_WEIRD_GLOBAL.get(),
                 (*settings).unknown1 + (*settings).unknown3 / 2,
                 (*settings).unknown2,
                 label.as_ptr(),
@@ -515,6 +511,7 @@ impl Shell {
 impl Drop for Shell {
     fn drop(&mut self) {
         unsafe {
+            MODULE.clear();
             crate::SHELL_WINDOW_PROC = None;
             DEBUG_LOG_HOOK.write().unwrap().take();
             LOAD_MECH_VARIANT_LIST_HOOK.write().unwrap().take();
