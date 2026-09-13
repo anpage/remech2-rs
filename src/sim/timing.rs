@@ -6,9 +6,9 @@ use windows::Win32::Foundation::TRUE;
 use crate::{
     settings::SETTINGS,
     sim::{
-        G_CURRENT_DRAW_MODE, RenderTarget,
+        RenderTarget,
         drawmode::hooks::{G_CURRENT_DRAW_MODE_EXTENSION, PixelBuffer},
-        window::G_WINDOW_ACTIVE,
+        window::{G_CURRENT_DRAW_MODE, G_WINDOW_ACTIVE},
     },
 };
 

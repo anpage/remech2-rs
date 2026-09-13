@@ -39,6 +39,7 @@ pub(super) struct CockpitLayout {
 }
 
 globals!(
+    // static G_PIXEL_ASPECT_RATIO: i32 = 0x000e9610;
     static G_EYEPOINT: *mut Eyepoint = 0x000a6cc0;
     static G_RENDER_TARGET_TABLE: [RenderTarget; 11] = 0x00181a60;
 );

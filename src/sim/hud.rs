@@ -44,13 +44,6 @@ unsafe extern "cdecl" fn scale_rect_to_screen(
         (*dst).top = y0 + fmul16(G_SCREEN_H_MINUS_1.get(), rect.top);
         (*dst).right = x0 + fmul16(G_SCREEN_W_MINUS_1.get(), rect.right);
         (*dst).bottom = y0 + fmul16(G_SCREEN_H_MINUS_1.get(), rect.bottom);
-        tracing::info!(
-            "scale_rect_to_screen: x0={x0}, y0={y0}, left={}, top={}, right={}, bottom={}",
-            (*dst).left,
-            (*dst).top,
-            (*dst).right,
-            (*dst).bottom
-        );
     }
     dst
 }

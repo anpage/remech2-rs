@@ -10,10 +10,7 @@ use windows::{
 
 use binding::macros::{globals, hook, patches};
 
-use crate::{
-    settings::SETTINGS,
-    sim::{G_CURRENT_DRAW_MODE, G_SHOULD_QUIT, RenderTarget},
-};
+use crate::{settings::SETTINGS, sim::types::DrawMode, sim::types::RenderTarget};
 
 use super::MODULE;
 
@@ -39,6 +36,8 @@ globals!(
     static G_BLIT_GLOBAL_1: BOOL = 0x00176ebc;
     static G_BLIT_GLOBAL_2: u32 = 0x000a5f18;
     static G_BLIT_GLOBAL_3: u32 = 0x000a5a24;
+    static G_SHOULD_QUIT: BOOL = 0x000acb18;
+    pub(super) static G_CURRENT_DRAW_MODE: *mut DrawMode = 0x000b1774;
 );
 
 /// The game decides which resolution to use based on the DLL name passed to this function.
