@@ -1,10 +1,6 @@
 use std::{
-    collections::HashMap,
     ffi::{CString, c_char, c_void},
-    sync::{
-        LazyLock, Mutex, RwLock,
-        atomic::{AtomicU32, Ordering},
-    },
+    sync::{Mutex, RwLock},
 };
 
 use anyhow::{Context, Result, bail};
@@ -47,25 +43,37 @@ use crate::{
     hooker::hook_function,
     settings::SETTINGS,
     sim::{
-        drawmode::hooks::PixelBuffer,
         timing::G_DELTA_TIME,
-        types::{CockpitLayout, DrawMode, Eyepoint, Point, RenderTarget, fmul16},
-        window::{
-            G_GAME_WINDOW_GEOMETRY, G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH, G_SCREEN_H_MINUS_1,
-            G_SCREEN_W_MINUS_1, G_WINDOW_ACTIVE,
-        },
+        types::{DrawMode, RenderTarget},
+        window::{G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH},
     },
 };
 
+mod camera;
 pub mod drawmode;
+mod hud;
+mod input;
+mod jumpjets;
 mod math;
+mod shots;
+mod stats;
 mod timing;
 mod types;
 pub mod window;
 
 pub static MODULE: ModuleBase = ModuleBase::new("MW2.DLL");
 
-static PATCH_GROUPS: &[&[&'static dyn Patch]] = &[timing::PATCHES, math::PATCHES, window::PATCHES];
+static PATCH_GROUPS: &[&[&'static dyn Patch]] = &[
+    camera::PATCHES,
+    drawmode::hooks::PATCHES,
+    hud::PATCHES,
+    input::PATCHES,
+    jumpjets::PATCHES,
+    math::PATCHES,
+    shots::PATCHES,
+    timing::PATCHES,
+    window::PATCHES,
+];
 
 type SimMainProc = unsafe extern "stdcall" fn(
     HMODULE,
@@ -76,12 +84,6 @@ type SimMainProc = unsafe extern "stdcall" fn(
     HWND,
 ) -> i32;
 
-type DrawModeInitFunc = unsafe extern "cdecl" fn(*mut PixelBuffer, i32, i32) -> i32;
-type DrawModeDeInitFunc = unsafe extern "cdecl" fn() -> i32;
-type DrawModeBlitFlipFunc = unsafe extern "cdecl" fn() -> i32;
-type DrawModeBlitRectFunc = unsafe extern "cdecl" fn(i32, i32, i32, i32) -> i32;
-type DrawModeStretchBlitFunc = unsafe extern "cdecl" fn(i32, i32, i32, i32) -> i32;
-
 #[repr(C)]
 struct CdAudioTracks {
     first_track: u32,
@@ -89,138 +91,8 @@ struct CdAudioTracks {
     track_positions: *mut u32,
 }
 
-/// A player's mech.
-#[repr(C, packed)]
-struct Player {
-    game_object: *mut GameObject,
-    _unknown1: [u8; 0x9c],
-    /// The mech's power state. `2` is powered up and under the pilot's control.
-    shutdown_state: i32,
-    _unknown2: [u8; 0x1c],
-    /// Jumpjet fuel in ticks. Negative means this mech has no jumpjets at all.
-    jumpjet_fuel: i32,
-    _unknown3: [u8; 0x48],
-    overheat_flags: u16,
-}
-
-/// A player's entry in the sim's object list.
-#[repr(C, packed)]
-struct GameObject {
-    _unknown1: [u8; 0x4c],
-    input: *mut CockpitInput,
-}
-
-/// One frame's worth of cockpit input.
-#[repr(C, packed)]
-struct CockpitInput {
-    _unknown1: [u8; 0x1d],
-    /// Nonzero while the jumpjet key is held.
-    jumpjet_held: u8,
-}
-
-/// One binding of a physical control onto a virtual input axis.
-#[repr(C, packed)]
-struct AxisBinding {
-    _unknown1: [u8; 0x14],
-    axis: *mut InputAxis,
-}
-
-/// A virtual input axis: throttle, steering, torso twist and so on.
-#[repr(C, packed)]
-struct InputAxis {
-    /// The variable this axis's mapped value is written to each frame
-    _output: *mut i32,
-    /// Ramp speed while a key is held, in axis units per ideal frame
-    rate: *mut i32,
-    _unknown1: [u8; 0xd],
-    /// Nonzero once something has driven this axis this frame
-    updated: u8,
-    _unknown2: [u8; 4],
-    /// Where the axis currently sits, `-0x10000..=0x10000`
-    position: i32,
-    /// Per-axis sensitivity, as a left shift on the ramp step
-    ramp_shift: u8,
-    _unknown3: [u8; 3],
-    /// Nonzero while the "increase" key is held
-    plus_held: *const u8,
-    /// Nonzero while the "decrease" key is held
-    minus_held: *const u8,
-}
-
-/// The ends of an axis's travel.
-const AXIS_POSITION_MAX: i32 = 65536;
-
-/// The fastest an axis may ramp, in units per ideal frame.
-const AXIS_RATE_MAX: i32 = 32768;
-
-/// A projectile in flight.
-#[repr(C, packed)]
-struct Shot {
-    _unknown1: [u8; 0x20],
-    /// Ticks since launch
-    age: i32,
-    _unknown2: [u8; 0x14],
-    flags: u32,
-}
-
-/// Set when a guided missile is within 101 units of its lock.
-/// It makes the shot detonate on the locked target without running any collision test.
-const SHOT_PROXIMITY_FUSE: u32 = 32768;
-
-/// A full jumpjet tank, in ticks.
-const JUMPJET_FUEL_MAX: i32 = 1810;
-
-/// Ticks per frame at the ideal 45 FPS, which is what every sim system seems to be tuned for.
-const TICKS_PER_IDEAL_FRAME: i32 = 4;
-
-/// Proximity fuses that armed on a frame the 45 FPS sim would never have sampled.
-pub static PROXIMITY_FUSES_SUPPRESSED: AtomicU32 = AtomicU32::new(0);
-
-/// Frames with `DeltaTime == 0` that we skipped the shot updater on.
-pub static ZERO_LENGTH_FRAMES_SKIPPED: AtomicU32 = AtomicU32::new(0);
-
 // Functions to hook
 // static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
-
-type ScaleRectToScreenFunc = unsafe extern "cdecl" fn(
-    *mut PixelBuffer,
-    *mut RenderTarget,
-    *mut RenderTarget,
-) -> *mut RenderTarget;
-static SCALE_RECT_TO_SCREEN_HOOK: RwLock<Option<GenericDetour<ScaleRectToScreenFunc>>> =
-    RwLock::new(None);
-
-type ScalePointToScreenFunc =
-    unsafe extern "cdecl" fn(*mut PixelBuffer, *mut Point, *mut Point) -> *mut Point;
-static SCALE_POINT_TO_SCREEN_HOOK: RwLock<Option<GenericDetour<ScalePointToScreenFunc>>> =
-    RwLock::new(None);
-
-type CenterRectOnScreenFunc = unsafe extern "cdecl" fn(
-    *mut PixelBuffer,
-    *mut RenderTarget,
-    *mut RenderTarget,
-) -> *mut RenderTarget;
-static CENTER_RECT_ON_SCREEN_HOOK: RwLock<Option<GenericDetour<CenterRectOnScreenFunc>>> =
-    RwLock::new(None);
-
-type ApplyEyepointFovFunc = unsafe extern "cdecl" fn(i32);
-static APPLY_EYEPOINT_FOV_HOOK: RwLock<Option<GenericDetour<ApplyEyepointFovFunc>>> =
-    RwLock::new(None);
-
-type LoadCockpitLayoutFunc = unsafe extern "cdecl" fn(i32, *mut CockpitLayout);
-static LOAD_COCKPIT_LAYOUT_HOOK: RwLock<Option<GenericDetour<LoadCockpitLayoutFunc>>> =
-    RwLock::new(None);
-
-type SelectRenderTargetFunc = unsafe extern "cdecl" fn(i32);
-static SELECT_RENDER_TARGET_HOOK: RwLock<Option<GenericDetour<SelectRenderTargetFunc>>> =
-    RwLock::new(None);
-
-type SetupEyepointProjectionFunc = unsafe extern "cdecl" fn(*mut Eyepoint);
-static SETUP_EYEPOINT_PROJECTION_HOOK: RwLock<Option<GenericDetour<SetupEyepointProjectionFunc>>> =
-    RwLock::new(None);
-
-type SetResFunc = unsafe extern "cdecl" fn();
-static SET_RES_HOOK: RwLock<Option<GenericDetour<SetResFunc>>> = RwLock::new(None);
 
 type InitCdAudioFunc = unsafe extern "stdcall" fn() -> u32;
 static INIT_CD_AUDIO_HOOK: RwLock<Option<GenericDetour<InitCdAudioFunc>>> = RwLock::new(None);
@@ -277,36 +149,11 @@ type CdAudioTogglePausedFunc = unsafe extern "stdcall" fn();
 static CD_AUDIO_TOGGLE_PAUSED_HOOK: RwLock<Option<GenericDetour<CdAudioTogglePausedFunc>>> =
     RwLock::new(None);
 
-type FuncWithJumpjetCalcFunc = unsafe extern "cdecl" fn(*mut Player);
-static FUNC_WITH_JUMPJET_CALC_HOOK: RwLock<Option<GenericDetour<FuncWithJumpjetCalcFunc>>> =
-    RwLock::new(None);
-
-type GuideMissileToTargetFunc = unsafe extern "cdecl" fn(*mut Shot, i32, i32, i32);
-static GUIDE_MISSILE_TO_TARGET_HOOK: RwLock<Option<GenericDetour<GuideMissileToTargetFunc>>> =
-    RwLock::new(None);
-
-type UpdateAllShotsFunc = unsafe extern "cdecl" fn();
-static UPDATE_ALL_SHOTS_HOOK: RwLock<Option<GenericDetour<UpdateAllShotsFunc>>> = RwLock::new(None);
-
-type UpdateAxisFromKeysFunc = unsafe extern "cdecl" fn(*mut AxisBinding) -> i32;
-static UPDATE_AXIS_FROM_KEYS_HOOK: RwLock<Option<GenericDetour<UpdateAxisFromKeysFunc>>> =
-    RwLock::new(None);
-
-/// Jumpjet fuel ticks the game truncated away. HashMap for tracking multiple players.
-static JUMPJET_FUEL_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-/// Axis travel the ideal-frame scaling truncated away, keyed by axis address.
-static AXIS_POSITION_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
 // Global variables
 globals! {
-    static G_RENDER_TARGET_TABLE: [RenderTarget; RENDER_TARGET_COUNT] = 0x00181a60;
     static G_CURRENT_DRAW_MODE: *mut DrawMode = 0x000b1774;
     // static G_WIDTH_SCALE: i32 = 0x000e9610;
-    static G_HORIZON_HAZE_THICKNESS: i32 = 0x000a6d30;
-    static G_EYEPOINT: *mut Eyepoint = 0x000a6cc0;
+
     static G_CD_AUDIO_DEVICE: u32 = 0x000aa278;
     static G_CD_AUDIO_AUX_DEVICE: i32 = 0x000aa27c;
     static G_CD_AUDIO_GLOBAL_1: u32 = 0x000beca8;
@@ -316,28 +163,9 @@ globals! {
     static G_CD_AUDIO_TRACK_DATA: CdAudioTracks = 0x000aa280;
     static G_PAUSED_CD_AUDIO_POSITION: CdAudioPosition = 0x000becb0;
     static G_CD_AUDIO_VOLUME: i32 = 0x000a14a4;
+
     static G_SHOULD_QUIT: BOOL = 0x000acb18;
 }
-
-/// Offset to center the HUD box inside the framebuffer
-fn hud_origin() -> (i32, i32) {
-    unsafe {
-        let x0 = (G_GAME_WINDOW_WIDTH.get() as i32 - (*(G_GAME_WINDOW_GEOMETRY.get())).width) / 2;
-        let y0 = (G_GAME_WINDOW_HEIGHT.get() as i32 - (*(G_GAME_WINDOW_GEOMETRY.get())).height) / 2;
-        (x0, y0)
-    }
-}
-
-/// Slot `slot` of the game's render target table, if that slot exists
-fn render_target(slot: i32) -> Option<&'static mut RenderTarget> {
-    let slot = usize::try_from(slot).ok()?;
-    unsafe { G_RENDER_TARGET_TABLE.as_mut()?.get_mut(slot) }
-}
-
-const RENDER_TARGET_COUNT: usize = 11;
-
-/// The cockpit's 3D scene slot
-static mut SCENE_SLOT: i32 = -1;
 
 /// Cache the CD audio device to reuse between sim launches.
 /// Windows 11 crashes if we try to close the CD audio device.
@@ -449,47 +277,6 @@ impl Sim {
             let ail_serve_thunk = (base_address + 0x001836b4) as *mut usize;
             *ail_serve_thunk = serve as *const () as usize;
 
-            *SCALE_RECT_TO_SCREEN_HOOK.write().unwrap() = {
-                let target: ScaleRectToScreenFunc = std::mem::transmute(base_address + 0x00056920);
-                Some(hook_function(target, Self::scale_rect_to_screen)?)
-            };
-
-            *SCALE_POINT_TO_SCREEN_HOOK.write().unwrap() = {
-                let target: ScalePointToScreenFunc = std::mem::transmute(base_address + 0x00056ae4);
-                Some(hook_function(target, Self::scale_point_to_screen)?)
-            };
-
-            *CENTER_RECT_ON_SCREEN_HOOK.write().unwrap() = {
-                let target: CenterRectOnScreenFunc = std::mem::transmute(base_address + 0x00056e22);
-                Some(hook_function(target, Self::center_rect_on_screen)?)
-            };
-
-            *APPLY_EYEPOINT_FOV_HOOK.write().unwrap() = {
-                let target: ApplyEyepointFovFunc = std::mem::transmute(base_address + 0x00011455);
-                Some(hook_function(target, Self::apply_eyepoint_fov)?)
-            };
-
-            *LOAD_COCKPIT_LAYOUT_HOOK.write().unwrap() = {
-                let target: LoadCockpitLayoutFunc = std::mem::transmute(base_address + 0x0003dab0);
-                Some(hook_function(target, Self::load_cockpit_layout)?)
-            };
-
-            *SELECT_RENDER_TARGET_HOOK.write().unwrap() = {
-                let target: SelectRenderTargetFunc = std::mem::transmute(base_address + 0x0000242f);
-                Some(hook_function(target, Self::select_render_target)?)
-            };
-
-            *SETUP_EYEPOINT_PROJECTION_HOOK.write().unwrap() = {
-                let target: SetupEyepointProjectionFunc =
-                    std::mem::transmute(base_address + 0x0004bc2e);
-                Some(hook_function(target, Self::setup_eyepoint_projection)?)
-            };
-
-            *SET_RES_HOOK.write().unwrap() = {
-                let target: SetResFunc = std::mem::transmute(base_address + 0x0005d4d3);
-                Some(hook_function(target, Self::set_res)?)
-            };
-
             *INIT_CD_AUDIO_HOOK.write().unwrap() = {
                 let target: InitCdAudioFunc = std::mem::transmute(base_address + 0x0005a8b5);
                 Some(hook_function(target, Self::init_cd_audio)?)
@@ -573,30 +360,6 @@ impl Sim {
                 Some(hook_function(target, Self::cd_audio_toggle_paused)?)
             };
 
-            *FUNC_WITH_JUMPJET_CALC_HOOK.write().unwrap() = {
-                let target: FuncWithJumpjetCalcFunc =
-                    std::mem::transmute(base_address + 0x000180cd);
-                Some(hook_function(target, Self::func_with_jumpjet_calc)?)
-            };
-
-            *GUIDE_MISSILE_TO_TARGET_HOOK.write().unwrap() = {
-                let target: GuideMissileToTargetFunc =
-                    std::mem::transmute(base_address + 0x0006ae5a);
-                Some(hook_function(target, Self::guide_missile_to_target)?)
-            };
-
-            *UPDATE_ALL_SHOTS_HOOK.write().unwrap() = {
-                let target: UpdateAllShotsFunc = std::mem::transmute(base_address + 0x0006a486);
-                Some(hook_function(target, Self::update_all_shots)?)
-            };
-
-            *UPDATE_AXIS_FROM_KEYS_HOOK.write().unwrap() = {
-                let target: UpdateAxisFromKeysFunc = std::mem::transmute(base_address + 0x0007aecc);
-                Some(hook_function(target, Self::update_axis_from_keys)?)
-            };
-
-            drawmode::hook_functions(base_address)?;
-
             Ok(Self {
                 ail: Ail::new()?,
                 module,
@@ -644,174 +407,6 @@ impl Sim {
                 unsafe extern "system" fn() -> isize,
                 WindowProc,
             >(window_proc))
-        }
-    }
-
-    /// Maps normalised 16.16 HUD coordinates onto [0, W-1].
-    /// Hooked to add the HUD origin to keep it centered in its own box.
-    /// `src` and `dst` are usually the same pointer, so read the whole rect before writing any of it back.
-    unsafe extern "cdecl" fn scale_rect_to_screen(
-        _pixel_buffer: *mut PixelBuffer,
-        src: *mut RenderTarget,
-        dst: *mut RenderTarget,
-    ) -> *mut RenderTarget {
-        if src.is_null() || dst.is_null() {
-            return dst;
-        }
-        let (x0, y0) = hud_origin();
-        let rect = unsafe { (*src).clone() };
-        unsafe {
-            (*dst).left = x0 + fmul16(G_SCREEN_W_MINUS_1.get(), rect.left);
-            (*dst).top = y0 + fmul16(G_SCREEN_H_MINUS_1.get(), rect.top);
-            (*dst).right = x0 + fmul16(G_SCREEN_W_MINUS_1.get(), rect.right);
-            (*dst).bottom = y0 + fmul16(G_SCREEN_H_MINUS_1.get(), rect.bottom);
-        }
-        dst
-    }
-
-    /// Same as `scale_rect_to_screen` but for a single point.
-    unsafe extern "cdecl" fn scale_point_to_screen(
-        _pixel_buffer: *mut PixelBuffer,
-        src: *mut Point,
-        dst: *mut Point,
-    ) -> *mut Point {
-        if src.is_null() || dst.is_null() {
-            return dst;
-        }
-        let (x0, y0) = hud_origin();
-        let point = unsafe { *src };
-        unsafe {
-            (*dst).x = x0 + fmul16(G_SCREEN_W_MINUS_1.get(), point.x);
-            (*dst).y = y0 + fmul16(G_SCREEN_H_MINUS_1.get(), point.y);
-        }
-        dst
-    }
-
-    /// Centers a fixed-size rect on screen
-    unsafe extern "cdecl" fn center_rect_on_screen(
-        _pixel_buffer: *mut PixelBuffer,
-        src: *mut RenderTarget,
-        dst: *mut RenderTarget,
-    ) -> *mut RenderTarget {
-        if src.is_null() || dst.is_null() {
-            return dst;
-        }
-        let (x0, y0) = hud_origin();
-        let rect = unsafe { (*src).clone() };
-        let width = rect.right - rect.left + 1;
-        let height = rect.bottom - rect.top + 1;
-        unsafe {
-            let left = x0 + (G_SCREEN_W_MINUS_1.get() - width - 1) / 2;
-            let top = y0 + (G_SCREEN_H_MINUS_1.get() - height - 1) / 2;
-            (*dst).left = left;
-            (*dst).top = top;
-            (*dst).right = left + width - 1;
-            (*dst).bottom = top + height - 1;
-        }
-        dst
-    }
-
-    /// Rewrites eyepoint->fovX every frame from the game's FOV globals.
-    /// We keep the game's raw value in a shadow so its internal logic always sees the original raw value,
-    /// then we always apply the Hor+ correction.
-    unsafe extern "cdecl" fn apply_eyepoint_fov(reset: i32) {
-        static mut LAST_RAW_FOV: i32 = 0x10000;
-        unsafe {
-            let cam = G_EYEPOINT.get();
-            if cam.is_null() {
-                APPLY_EYEPOINT_FOV_HOOK
-                    .read()
-                    .unwrap()
-                    .as_ref()
-                    .unwrap()
-                    .call(reset);
-                return;
-            }
-            let correction = {
-                let width = G_GAME_WINDOW_WIDTH.get() as i64;
-                let height = G_GAME_WINDOW_HEIGHT.get() as i64;
-                if width <= 0 || height <= 0 {
-                    0x10000
-                } else {
-                    let aspect = (width << 16) / height;
-                    (((0x15555i64) << 16) / aspect) as i32
-                }
-            };
-            (*cam).fov_x = LAST_RAW_FOV;
-            APPLY_EYEPOINT_FOV_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .call(reset);
-            LAST_RAW_FOV = (*cam).fov_x;
-            (*cam).fov_x = ((LAST_RAW_FOV as i64 * correction as i64) >> 16) as i32;
-        }
-    }
-
-    /// Copies the cockpit's 3D viewport rect into render-target slot `layout.render_target_slot`.
-    /// We widen that slot to the full framebuffer so the 3D view covers the whole width behind the centered 4:3 HUD.
-    unsafe extern "cdecl" fn load_cockpit_layout(cockpit: i32, layout: *mut CockpitLayout) {
-        unsafe {
-            LOAD_COCKPIT_LAYOUT_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .call(cockpit, layout);
-            if layout.is_null() {
-                return;
-            }
-            let slot = (*layout).render_target_slot;
-            if let Some(target) = render_target(slot) {
-                SCENE_SLOT = slot;
-                target.cover_framebuffer();
-            }
-        }
-    }
-
-    /// Copies slot `slot` of the render-target table into StretchBlitSourceRect and the eyepoint.
-    /// We substitute the full-screen rect for scene slots only, just before they are consumed
-    unsafe extern "cdecl" fn select_render_target(slot: i32) {
-        unsafe {
-            if (slot == 0 || slot == SCENE_SLOT)
-                && let Some(target) = render_target(slot)
-            {
-                target.cover_framebuffer();
-            }
-            SELECT_RENDER_TARGET_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .call(slot);
-        }
-    }
-
-    /// Recomputes the projection from the eyepoint struct.
-    /// We force pixel_aspect_ratio to be square each time.
-    unsafe extern "cdecl" fn setup_eyepoint_projection(cam: *mut Eyepoint) {
-        unsafe {
-            if !cam.is_null() {
-                (*cam).pixel_aspect_ratio = 0x10000;
-            }
-            SETUP_EYEPOINT_PROJECTION_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .call(cam);
-        }
-    }
-
-    /// Rescales every 320x200-authored table for the current resolution.
-    /// We subtract the HUD origin offset from the horizon haze thickness to avoid stretching the sky vertically.
-    /// This is kind of a hack. We should probably reimplement this function entirely.
-    unsafe extern "cdecl" fn set_res() {
-        unsafe {
-            SET_RES_HOOK.read().unwrap().as_ref().unwrap().call();
-            let (x0, _) = hud_origin();
-            G_HORIZON_HAZE_THICKNESS.set(G_HORIZON_HAZE_THICKNESS.get() - x0);
         }
     }
 
@@ -1197,182 +792,6 @@ impl Sim {
             }
         }
     }
-
-    /// Advances every shot in flight.
-    /// Skipped entirely on a zero-length frame.
-    ///
-    /// Frames that finish inside a single 181 Hz tick result in `DeltaTime == 0`, and the shot updater
-    /// doesn't properly handle this condition. The zero elapsed time causes it to fall into a point test
-    /// that doesn't consider who shot the missile, so the missile detonates immediately on the mech who shot it.
-    unsafe extern "cdecl" fn update_all_shots() {
-        unsafe {
-            if G_DELTA_TIME.get() == 0 {
-                ZERO_LENGTH_FRAMES_SKIPPED.fetch_add(1, Ordering::Relaxed);
-                return;
-            }
-
-            UPDATE_ALL_SHOTS_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .call();
-        }
-    }
-
-    /// Recharges jumpjet fuel at the same rate whatever the framerate.
-    unsafe extern "cdecl" fn func_with_jumpjet_calc(player: *mut Player) {
-        let delta_time = unsafe { G_DELTA_TIME.get() };
-
-        let expected_fuel = unsafe { Self::jumpjet_recharge_result(&*player, delta_time) };
-
-        unsafe {
-            FUNC_WITH_JUMPJET_CALC_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .call(player);
-        }
-
-        let mut carries = JUMPJET_FUEL_CARRY.lock().unwrap();
-        let carry = carries.entry(player.addr()).or_insert(0);
-        let player = unsafe { &mut *player };
-
-        if expected_fuel != Some(player.jumpjet_fuel) {
-            *carry = 0;
-            return;
-        }
-
-        // Calculate the remainder of the fuel recharge calculation and apply it if it exceeds 4 ticks
-        *carry += unsafe { G_DELTA_TIME.get() } % 4;
-        if *carry >= 4 {
-            *carry -= 4;
-            if player.jumpjet_fuel < JUMPJET_FUEL_MAX {
-                player.jumpjet_fuel += 1;
-            }
-        }
-    }
-
-    /// The fuel value the recharge branch of `FuncWithJumpjetCalc` will leave behind, or `None` if it's not going to recharge.
-    unsafe fn jumpjet_recharge_result(player: &Player, delta_time: i32) -> Option<i32> {
-        if player.overheat_flags & 0x200 != 0 {
-            return None;
-        }
-        if player.jumpjet_fuel < 0 || player.jumpjet_fuel >= JUMPJET_FUEL_MAX {
-            return None;
-        }
-
-        let input = unsafe { player.game_object.as_ref()?.input.as_ref()? };
-        if input.jumpjet_held != 0 && player.shutdown_state == 2 {
-            return None;
-        }
-
-        Some(player.jumpjet_fuel + delta_time / 4)
-    }
-
-    /// Steers a guided missile toward its lock and arms its proximity fuse.
-    /// We keep the 45 FPS sampling density: let the fuse arm only on the frame where the
-    /// shot's age crosses a 4-tick boundary. At `DeltaTime >= 4` every frame crosses one,
-    /// which leaves the "ideal" 45 FPS framerate and anything below it untouched.
-    unsafe extern "cdecl" fn guide_missile_to_target(shot: *mut Shot, x: i32, y: i32, z: i32) {
-        unsafe {
-            GUIDE_MISSILE_TO_TARGET_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .call(shot, x, y, z);
-        }
-
-        let shot = unsafe { &mut *shot };
-        if shot.flags & SHOT_PROXIMITY_FUSE != 0 && !Self::crossed_ideal_frame_boundary(shot.age) {
-            shot.flags &= !SHOT_PROXIMITY_FUSE;
-            PROXIMITY_FUSES_SUPPRESSED.fetch_add(1, Ordering::Relaxed);
-        }
-    }
-
-    /// Whether a shot that has just aged to `age` ticks crossed a 4-tick boundary doing so.
-    /// Baiscally, whether a 45 FPS sim would have sampled it on this frame.
-    fn crossed_ideal_frame_boundary(age: i32) -> bool {
-        let previous_age = age.saturating_sub(unsafe { G_DELTA_TIME.get() });
-        age.div_euclid(TICKS_PER_IDEAL_FRAME) != previous_age.div_euclid(TICKS_PER_IDEAL_FRAME)
-    }
-
-    /// Ramps a key-driven input axis (throttle, steering, torso twist) at the same rate
-    /// whatever the framerate.
-    ///
-    /// We hide two key pointers from the original so it skips its own integration, keeping
-    /// its handling of the centre and analog branches, then integrate against elapsed time here.
-    unsafe extern "cdecl" fn update_axis_from_keys(binding: *mut AxisBinding) -> i32 {
-        let axis = unsafe { (*binding).axis };
-        let (plus_held, minus_held) = unsafe { ((*axis).plus_held, (*axis).minus_held) };
-        // The original only looks at the keys if nothing else has driven the axis yet
-        let keys_apply = unsafe { (*axis).updated } == 0;
-        let rate = unsafe { std::ptr::read_unaligned((*axis).rate) };
-
-        unsafe {
-            (*axis).plus_held = std::ptr::null();
-            (*axis).minus_held = std::ptr::null();
-        }
-        let mut updated = unsafe {
-            UPDATE_AXIS_FROM_KEYS_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .call(binding)
-        };
-        unsafe {
-            (*axis).plus_held = plus_held;
-            (*axis).minus_held = minus_held;
-            std::ptr::write_unaligned((*axis).rate, rate);
-        }
-
-        if keys_apply {
-            let held = |key: *const u8| unsafe { key.as_ref().is_some_and(|held| *held != 0) };
-            if held(plus_held) {
-                unsafe { Self::ramp_axis(axis, 1) };
-                updated = 1;
-            }
-            if held(minus_held) {
-                unsafe { Self::ramp_axis(axis, -1) };
-                updated = 1;
-            }
-            if updated == 0 {
-                unsafe { std::ptr::write_unaligned((*axis).rate, 0) };
-                AXIS_POSITION_CARRY.lock().unwrap().remove(&(axis as usize));
-            }
-            unsafe { (*axis).updated = updated as u8 };
-        }
-
-        updated
-    }
-
-    /// One frame of an axis ramp, `direction` being 1 for the increase key and -1 for decrease.
-    unsafe fn ramp_axis(axis: *mut InputAxis, direction: i32) {
-        let delta_time = unsafe { G_DELTA_TIME.get() };
-        let step = (3 * delta_time).wrapping_shl(unsafe { (*axis).ramp_shift } as u32);
-
-        let rate_ptr = unsafe { (*axis).rate };
-        let mut rate = unsafe { std::ptr::read_unaligned(rate_ptr) };
-        // Pressing the opposite key restarts the ramp from a standstill
-        if rate * direction < 0 {
-            rate = 0;
-        }
-        rate = (rate + direction * step).clamp(-AXIS_RATE_MAX, AXIS_RATE_MAX);
-        unsafe { std::ptr::write_unaligned(rate_ptr, rate) };
-
-        // The rate is one ideal frame's worth of travel, so scale it to the frame we actually
-        // got and keep the remainder for the next one
-        let mut carries = AXIS_POSITION_CARRY.lock().unwrap();
-        let carry = carries.entry(axis as usize).or_insert(0);
-        let travel = rate * delta_time + *carry;
-        *carry = travel.rem_euclid(TICKS_PER_IDEAL_FRAME);
-
-        let position = unsafe { (*axis).position } + travel.div_euclid(TICKS_PER_IDEAL_FRAME);
-        unsafe { (*axis).position = position.clamp(-AXIS_POSITION_MAX, AXIS_POSITION_MAX) };
-    }
 }
 
 impl Drop for Sim {
@@ -1381,14 +800,7 @@ impl Drop for Sim {
             ailrs::shutdown();
             crate::SIM_WINDOW_PROC = None;
             revert_groups(PATCH_GROUPS);
-            SCALE_RECT_TO_SCREEN_HOOK.write().unwrap().take();
-            SCALE_POINT_TO_SCREEN_HOOK.write().unwrap().take();
-            CENTER_RECT_ON_SCREEN_HOOK.write().unwrap().take();
-            APPLY_EYEPOINT_FOV_HOOK.write().unwrap().take();
-            LOAD_COCKPIT_LAYOUT_HOOK.write().unwrap().take();
-            SELECT_RENDER_TARGET_HOOK.write().unwrap().take();
-            SETUP_EYEPOINT_PROJECTION_HOOK.write().unwrap().take();
-            SET_RES_HOOK.write().unwrap().take();
+
             INIT_CD_AUDIO_HOOK.write().unwrap().take();
             GET_CD_AUDIO_AUX_DEVICE_HOOK.write().unwrap().take();
             CLOSE_CD_AUDIO_HOOK.write().unwrap().take();
@@ -1405,13 +817,7 @@ impl Drop for Sim {
             DEINIT_CD_AUDIO_HOOK.write().unwrap().take();
             UPDATE_CD_AUDIO_POSITION_HOOK.write().unwrap().take();
             CD_AUDIO_TOGGLE_PAUSED_HOOK.write().unwrap().take();
-            FUNC_WITH_JUMPJET_CALC_HOOK.write().unwrap().take();
-            GUIDE_MISSILE_TO_TARGET_HOOK.write().unwrap().take();
-            UPDATE_ALL_SHOTS_HOOK.write().unwrap().take();
-            UPDATE_AXIS_FROM_KEYS_HOOK.write().unwrap().take();
-            JUMPJET_FUEL_CARRY.lock().unwrap().clear();
-            AXIS_POSITION_CARRY.lock().unwrap().clear();
-            drawmode::unhook_functions();
+
             self.ail.unhook();
             CD_AUDIO_PLAYER.lock().unwrap().take();
             MODULE.clear();

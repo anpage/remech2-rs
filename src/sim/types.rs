@@ -1,10 +1,6 @@
 use std::ffi::c_void;
 
-use super::{
-    DrawModeBlitFlipFunc, DrawModeBlitRectFunc, DrawModeDeInitFunc, DrawModeInitFunc,
-    DrawModeStretchBlitFunc, G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH,
-    drawmode::hooks::PixelBuffer,
-};
+use super::{G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH, drawmode::hooks::PixelBuffer};
 
 /// A render context: the pixel buffer to draw into plus the rect within that buffer
 /// where all the drawing happens.
@@ -30,23 +26,11 @@ impl RenderTarget {
     }
 }
 
-/// The camera, which the game calls "Eyepoint"
-#[repr(C)]
-pub(super) struct Eyepoint {
-    position: [i32; 3],
-    rotation: [i32; 3],
-    /// Horizontal FOV in 16.16, where `tan(fov / 2) == 1 / fov_x`
-    pub fov_x: i32,
-    unknown1: [i32; 4],
-    viewport_left: i32,
-    viewport_right: i32,
-    viewport_top: i32,
-    viewport_bottom: i32,
-    hither_clip_plane: i32,
-    yon_clip_plane: i32,
-    /// `pixel width / pixel height` in 16.16
-    pub pixel_aspect_ratio: i32,
-}
+type DrawModeInitFunc = unsafe extern "cdecl" fn(*mut PixelBuffer, i32, i32) -> i32;
+type DrawModeDeInitFunc = unsafe extern "cdecl" fn() -> i32;
+type DrawModeBlitFlipFunc = unsafe extern "cdecl" fn() -> i32;
+type DrawModeBlitRectFunc = unsafe extern "cdecl" fn(i32, i32, i32, i32) -> i32;
+type DrawModeStretchBlitFunc = unsafe extern "cdecl" fn(i32, i32, i32, i32) -> i32;
 
 #[repr(C)]
 pub(super) struct DrawMode {
@@ -76,17 +60,6 @@ pub(super) struct DrawModeExtension {
     /// implementation is the one `drawmode::hooks` replaces as `swap_buffers`.
     pub lock_display_buffer_func: unsafe extern "stdcall" fn() -> i32,
     unknown3: u32,
-}
-
-/// The cockpit layout table passed to LoadCockpitLayout. It runs to at least
-/// index 0x22; only the entries the detour needs are named.
-#[repr(C)]
-pub(super) struct CockpitLayout {
-    /// The cockpit's 3D viewport, in normalised 16.16 coordinates
-    viewport: *mut RenderTarget,
-    unknown1: *mut c_void,
-    /// Render target table slot the viewport is copied into
-    pub render_target_slot: i32,
 }
 
 /// A 2D point with normalised 16.16 components

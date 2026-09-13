@@ -1,7 +1,6 @@
 use std::{ffi::c_void, sync::RwLock};
 
-use anyhow::Result;
-use retour::GenericDetour;
+use binding::{globals, macros::hook, patches};
 use windows::{
     Win32::{
         Foundation::{HANDLE, HWND},
@@ -13,8 +12,8 @@ use windows::{
 
 use crate::{
     WINDOW_HEIGHT, WINDOW_WIDTH,
-    hooker::hook_function,
     sim::{
+        MODULE,
         drawmode::custom_drawmode::{CustomDrawMode, PaletteColor},
         types::DrawModeExtension,
     },
@@ -29,130 +28,29 @@ pub struct PixelBuffer {
     pub unknown: u32,
 }
 
-type AdjustWindowSizeFunc = unsafe extern "cdecl" fn(*mut c_void);
-static mut ADJUST_WINDOW_SIZE_HOOK: Option<GenericDetour<AdjustWindowSizeFunc>> = None;
-
-// Draw Mode Functions
-type GdiBeginFunc = unsafe extern "stdcall" fn(*mut PixelBuffer, i32, i32) -> i32;
-static mut GDI_BEGIN_HOOK: Option<GenericDetour<GdiBeginFunc>> = None;
-
-type GdiEndFunc = unsafe extern "stdcall" fn() -> i32;
-static mut GDI_END_HOOK: Option<GenericDetour<GdiEndFunc>> = None;
-
-type GdiBlitFlipFunc = unsafe extern "stdcall" fn() -> i32;
-static mut GDI_BLIT_FLIP_HOOK: Option<GenericDetour<GdiBlitFlipFunc>> = None;
-
-type GdiBitBltRectFunc = unsafe extern "stdcall" fn(i32, i32, i32, i32) -> i32;
-static mut GDI_BIT_BLT_RECT_HOOK: Option<GenericDetour<GdiBitBltRectFunc>> = None;
-
-type GdiStretchBlitFunc = unsafe extern "stdcall" fn(i32, i32, i32, i32) -> i32;
-static mut GDI_STRETCH_BLIT_HOOK: Option<GenericDetour<GdiStretchBlitFunc>> = None;
-
-// Draw Mode Extension Functions
-type GdiSetPaletteFunc = unsafe extern "stdcall" fn(i32, i32, *const PaletteColor) -> i32;
-static mut GDI_SET_PALETTE_HOOK: Option<GenericDetour<GdiSetPaletteFunc>> = None;
-
-type GdiSetPaletteWithBrightnessFunc = unsafe extern "stdcall" fn(*mut c_void) -> i32;
-static mut GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK: Option<
-    GenericDetour<GdiSetPaletteWithBrightnessFunc>,
-> = None;
-
-// type GdiBlendPalettesFunc = unsafe extern "stdcall" fn(*mut c_void, i32) -> i32;
-// static mut GDI_BLEND_PALETTES_HOOK: Option<GenericDetour<GdiBlendPalettesFunc>> = None;
-
-type GdiSwapBuffersFunc = unsafe extern "stdcall" fn() -> i32;
-static mut GDI_SWAP_BUFFERS_HOOK: Option<GenericDetour<GdiSwapBuffersFunc>> = None;
-
-pub(in crate::sim) static mut G_CURRENT_DRAW_MODE_EXTENSION: *mut *mut DrawModeExtension =
-    std::ptr::null_mut();
-static mut G_PRIMARY_HEAP: *mut HANDLE = std::ptr::null_mut();
-static mut G_BITS_TO_BLIT: *mut *mut u8 = std::ptr::null_mut();
-static mut G_GDI_BLIT_BITMAP_INFO: *mut BITMAPINFO = std::ptr::null_mut();
-static mut G_GAME_WINDOW: *mut HWND = std::ptr::null_mut();
-static mut G_CURRENT_PIXEL_BUFFER: *mut *mut PixelBuffer = std::ptr::null_mut();
-static mut G_DISPLAY_BRIGHTNESS: *mut u32 = std::ptr::null_mut();
-static mut G_GAMMA_TABLE: *mut [u8; 1024] = std::ptr::null_mut();
-static mut G_PALETTE_COLORS: *mut [PaletteColor; 256] = std::ptr::null_mut();
-static mut G_PALETTE_COLORS_PRE_BRIGHTNESS: *mut [PaletteColor; 256] = std::ptr::null_mut();
-pub static mut G_MOUSE_CAPTURED: *mut BOOL = std::ptr::null_mut();
-pub static mut G_MOUSE_NEEDS_CENTERING: *mut BOOL = std::ptr::null_mut();
-
-pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
-    unsafe {
-        G_CURRENT_DRAW_MODE_EXTENSION = (base_address + 0x000b1770) as *mut *mut DrawModeExtension;
-        G_PRIMARY_HEAP = (base_address + 0x000acb68) as *mut HANDLE;
-        G_BITS_TO_BLIT = (base_address + 0x000b1a88) as *mut *mut u8;
-        G_GDI_BLIT_BITMAP_INFO = (base_address + 0x000c28a0) as *mut BITMAPINFO;
-        G_GAME_WINDOW = (base_address + 0x000acb60) as *mut HWND;
-        G_CURRENT_PIXEL_BUFFER = (base_address + 0x000b1784) as *mut *mut PixelBuffer;
-        G_DISPLAY_BRIGHTNESS = (base_address + 0x000a9468) as *mut u32;
-        G_GAMMA_TABLE = (base_address + 0x000e99a0) as *mut [u8; 1024];
-        G_PALETTE_COLORS = (base_address + 0x000b1788) as *mut [PaletteColor; 256];
-        G_PALETTE_COLORS_PRE_BRIGHTNESS = (base_address + 0x000e96a0) as *mut [PaletteColor; 256];
-        G_MOUSE_CAPTURED = (base_address + 0x000ad244) as *mut BOOL;
-        G_MOUSE_NEEDS_CENTERING = (base_address + 0x000ad248) as *mut BOOL;
-
-        ADJUST_WINDOW_SIZE_HOOK = {
-            let target: AdjustWindowSizeFunc = std::mem::transmute(base_address + 0x0007762f);
-            Some(hook_function(target, adjust_window_size)?)
-        };
-
-        GDI_BEGIN_HOOK = {
-            let target: GdiBeginFunc = std::mem::transmute(base_address + 0x0006de70);
-            Some(hook_function(target, begin)?)
-        };
-
-        GDI_END_HOOK = {
-            let target: GdiEndFunc = std::mem::transmute(base_address + 0x0006dffe);
-            Some(hook_function(target, end)?)
-        };
-
-        GDI_BLIT_FLIP_HOOK = {
-            let target: GdiBlitFlipFunc = std::mem::transmute(base_address + 0x0006e197);
-            Some(hook_function(target, blit_flip)?)
-        };
-
-        GDI_BIT_BLT_RECT_HOOK = {
-            let target: GdiBitBltRectFunc = std::mem::transmute(base_address + 0x0006e21f);
-            Some(hook_function(target, bit_blt_rect)?)
-        };
-
-        GDI_STRETCH_BLIT_HOOK = {
-            let target: GdiStretchBlitFunc = std::mem::transmute(base_address + 0x0006e357);
-            Some(hook_function(target, stretch_blit)?)
-        };
-
-        GDI_SET_PALETTE_HOOK = {
-            let target: GdiSetPaletteFunc = std::mem::transmute(base_address + 0x0006e5d8);
-            Some(hook_function(target, set_palette)?)
-        };
-
-        GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK = {
-            let target: GdiSetPaletteWithBrightnessFunc =
-                std::mem::transmute(base_address + 0x0006e633);
-            Some(hook_function(target, set_palette_with_brightness)?)
-        };
-
-        // Leave this out for now because the vanilla function works fine
-        // GDI_BLEND_PALETTES_HOOK = {
-        //     let target: GdiBlendPalettesFunc = std::mem::transmute(base_address + 0x0006e6d0);
-        //     Some(hook_function(target, blend_palettes)?)
-        // };
-
-        GDI_SWAP_BUFFERS_HOOK = {
-            let target: GdiSwapBuffersFunc = std::mem::transmute(base_address + 0x0006e94f);
-            Some(hook_function(target, swap_buffers)?)
-        };
-    }
-    Ok(())
-}
+globals!(
+    pub(in crate::sim) static G_CURRENT_DRAW_MODE_EXTENSION: *mut DrawModeExtension = 0x000b1770;
+    static G_PRIMARY_HEAP: HANDLE = 0x000acb68;
+    static G_BITS_TO_BLIT: *mut u8 = 0x000b1a88;
+    static G_GDI_BLIT_BITMAP_INFO: BITMAPINFO = 0x000c28a0;
+    static G_GAME_WINDOW: HWND = 0x000acb60;
+    static G_CURRENT_PIXEL_BUFFER: *mut PixelBuffer = 0x000b1784;
+    static G_DISPLAY_BRIGHTNESS: u32 = 0x000a9468;
+    static G_GAMMA_TABLE: [u8; 1024] = 0x000e99a0;
+    static G_PALETTE_COLORS: [PaletteColor; 256] = 0x000b1788;
+    static G_PALETTE_COLORS_PRE_BRIGHTNESS: [PaletteColor; 256] = 0x000e96a0;
+    static G_MOUSE_CAPTURED: BOOL = 0x000ad244;
+    pub static G_MOUSE_NEEDS_CENTERING: BOOL = 0x000ad248;
+);
 
 static CUSTOM_DRAW_MODE: RwLock<Option<CustomDrawMode>> = RwLock::new(None);
 
+#[hook(rva = 0x0007762f)]
 pub unsafe extern "cdecl" fn adjust_window_size(_draw_mode_ext: *mut c_void) {
     tracing::trace!("AdjustWindowSize called");
 }
 
+#[hook(rva = 0x0006de70)]
 pub unsafe extern "stdcall" fn begin(
     pixel_buffer: *mut PixelBuffer,
     width: i32,
@@ -162,7 +60,7 @@ pub unsafe extern "stdcall" fn begin(
 
     unsafe {
         let pixel_buf = HeapAlloc(
-            *G_PRIMARY_HEAP,
+            G_PRIMARY_HEAP.get(),
             HEAP_FLAGS(9),
             (height * width * 2) as usize,
         );
@@ -171,14 +69,15 @@ pub unsafe extern "stdcall" fn begin(
             return 2;
         }
 
-        G_BITS_TO_BLIT.write_volatile(pixel_buf as *mut u8);
+        G_BITS_TO_BLIT.ptr().write_volatile(pixel_buf as *mut u8);
 
         (*pixel_buffer).width = width - 1;
         (*pixel_buffer).height = height - 1;
-        (*pixel_buffer).bitmap_info = G_GDI_BLIT_BITMAP_INFO;
+        (*pixel_buffer).bitmap_info = G_GDI_BLIT_BITMAP_INFO.ptr();
 
         let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-        *custom_draw_mode = CustomDrawMode::new(*G_GAME_WINDOW, WINDOW_WIDTH, WINDOW_HEIGHT).ok();
+        *custom_draw_mode =
+            CustomDrawMode::new(G_GAME_WINDOW.get(), WINDOW_WIDTH, WINDOW_HEIGHT).ok();
 
         tracing::trace!("GdiBegin finish");
 
@@ -186,20 +85,21 @@ pub unsafe extern "stdcall" fn begin(
     }
 }
 
+#[hook(rva = 0x0006dffe)]
 pub unsafe extern "stdcall" fn end() -> i32 {
     tracing::trace!("GdiEnd called");
 
     unsafe {
-        if !(*G_BITS_TO_BLIT).is_null() {
+        if !G_BITS_TO_BLIT.get().is_null() {
             let _ = HeapFree(
-                *G_PRIMARY_HEAP,
+                G_PRIMARY_HEAP.get(),
                 HEAP_FLAGS(1),
-                Some(*G_BITS_TO_BLIT as *mut c_void),
+                Some(G_BITS_TO_BLIT.get() as *mut c_void),
             );
-            G_BITS_TO_BLIT.write_volatile(std::ptr::null_mut());
+            G_BITS_TO_BLIT.ptr().write_volatile(std::ptr::null_mut());
         }
 
-        (**G_CURRENT_PIXEL_BUFFER).data = std::ptr::null_mut();
+        (*(G_CURRENT_PIXEL_BUFFER.get())).data = std::ptr::null_mut();
 
         CUSTOM_DRAW_MODE.write().unwrap().take();
     }
@@ -207,11 +107,12 @@ pub unsafe extern "stdcall" fn end() -> i32 {
     0
 }
 
+#[hook(rva = 0x0006e197)]
 pub unsafe extern "stdcall" fn blit_flip() -> i32 {
     tracing::trace!("GdiBlitFlip called");
 
-    let width = unsafe { (**G_CURRENT_PIXEL_BUFFER).width + 1 };
-    let height = unsafe { (**G_CURRENT_PIXEL_BUFFER).height + 1 };
+    let width = unsafe { (*(G_CURRENT_PIXEL_BUFFER.get())).width + 1 };
+    let height = unsafe { (*(G_CURRENT_PIXEL_BUFFER.get())).height + 1 };
 
     if width <= 0 || height <= 0 {
         tracing::warn!(
@@ -222,7 +123,7 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
         return 0;
     }
 
-    let bits_to_blit = unsafe { *G_BITS_TO_BLIT };
+    let bits_to_blit = unsafe { G_BITS_TO_BLIT.get() };
     let pixel_slice =
         unsafe { std::slice::from_raw_parts(bits_to_blit, (width * height) as usize) };
 
@@ -240,6 +141,7 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
     0
 }
 
+#[hook(rva = 0x0006e21f)]
 pub unsafe extern "stdcall" fn bit_blt_rect(
     x_dest: i32,
     y_dest: i32,
@@ -256,6 +158,7 @@ pub unsafe extern "stdcall" fn bit_blt_rect(
     0
 }
 
+#[hook(rva = 0x0006e357)]
 pub unsafe extern "stdcall" fn stretch_blit(
     x_src: i32,
     y_src2: i32,
@@ -272,6 +175,7 @@ pub unsafe extern "stdcall" fn stretch_blit(
     0
 }
 
+#[hook(rva = 0x0006e5d8)]
 pub unsafe extern "stdcall" fn set_palette(
     start: i32,
     count: i32,
@@ -293,13 +197,14 @@ pub unsafe extern "stdcall" fn set_palette(
         unsafe {
             let color = palette_colors.offset(i);
             let index = (start + i as i32) as usize;
-            (*G_PALETTE_COLORS)[index] = *color;
+            (*(G_PALETTE_COLORS.ptr()))[index] = *color;
         }
     }
 
     0
 }
 
+#[hook(rva = 0x0006e633)]
 pub unsafe extern "stdcall" fn set_palette_with_brightness(palette_data: *mut c_void) -> i32 {
     tracing::trace!(
         "GdiSetPaletteWithBrightness called with palette_data: {:?}",
@@ -310,16 +215,16 @@ pub unsafe extern "stdcall" fn set_palette_with_brightness(palette_data: *mut c_
         std::slice::from_raw_parts(palette_data as *const PaletteColor, 256) // 256 colors * 3 bytes each
     };
 
-    let brightness = unsafe { *G_DISPLAY_BRIGHTNESS } as usize;
+    let brightness = unsafe { G_DISPLAY_BRIGHTNESS.get() } as usize;
 
     for (i, color) in palette.iter().enumerate().take(256) {
         unsafe {
-            (*G_PALETTE_COLORS_PRE_BRIGHTNESS)[i] = *color;
+            (*(G_PALETTE_COLORS_PRE_BRIGHTNESS.ptr()))[i] = *color;
             let PaletteColor { red, green, blue } = *color;
-            (*G_PALETTE_COLORS)[i] = PaletteColor {
-                red: (*G_GAMMA_TABLE)[red as usize + brightness * 64],
-                green: (*G_GAMMA_TABLE)[green as usize + brightness * 64],
-                blue: (*G_GAMMA_TABLE)[blue as usize + brightness * 64],
+            (*(G_PALETTE_COLORS.ptr()))[i] = PaletteColor {
+                red: (*(G_GAMMA_TABLE.ptr()))[red as usize + brightness * 64],
+                green: (*(G_GAMMA_TABLE.ptr()))[green as usize + brightness * 64],
+                blue: (*(G_GAMMA_TABLE.ptr()))[blue as usize + brightness * 64],
             };
         }
     }
@@ -330,34 +235,37 @@ pub unsafe extern "stdcall" fn set_palette_with_brightness(palette_data: *mut c_
     }
 
     unsafe {
-        (**G_CURRENT_PIXEL_BUFFER).data = *G_BITS_TO_BLIT as *mut c_void;
+        (*(G_CURRENT_PIXEL_BUFFER.get())).data = G_BITS_TO_BLIT.get() as *mut c_void;
     }
 
     0
 }
 
+// Leave this out for now because the vanilla function works fine
+// #[hook(rva = 0x0006e6d0)]
+// unsafe extern "stdcall" fn(*mut c_void, i32) -> i32 {}
+
+#[hook(rva = 0x0006e94f)]
 pub unsafe extern "stdcall" fn swap_buffers() -> i32 {
     tracing::trace!("GdiSwapBuffers called");
 
     unsafe {
-        (**G_CURRENT_PIXEL_BUFFER).data = *G_BITS_TO_BLIT as *mut c_void;
+        (*(G_CURRENT_PIXEL_BUFFER.get())).data = G_BITS_TO_BLIT.get() as *mut c_void;
     }
 
     0
 }
 
-pub unsafe fn unhook_functions() {
-    unsafe {
-        ADJUST_WINDOW_SIZE_HOOK = None;
-        GDI_BEGIN_HOOK = None;
-        GDI_END_HOOK = None;
-        GDI_BLIT_FLIP_HOOK = None;
-        GDI_BIT_BLT_RECT_HOOK = None;
-        GDI_STRETCH_BLIT_HOOK = None;
-        GDI_SET_PALETTE_HOOK = None;
-        GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK = None;
-        // GDI_BLEND_PALETTES_HOOK = None;
-        GDI_SWAP_BUFFERS_HOOK = None;
-        CUSTOM_DRAW_MODE.write().unwrap().take();
-    }
-}
+patches!(
+    pub(in crate::sim) static PATCHES = [
+        hook adjust_window_size,
+        hook begin,
+        hook end,
+        hook blit_flip,
+        hook bit_blt_rect,
+        hook stretch_blit,
+        hook set_palette,
+        hook set_palette_with_brightness,
+        hook swap_buffers,
+    ];
+);

@@ -1,8 +1,10 @@
-use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::atomic::Ordering;
 
 use rand::Rng;
 
 use binding::macros::{hook, patches};
+
+use crate::sim::stats::ZERO_DIVISORS_SUPPRESSED;
 
 use super::MODULE;
 
@@ -16,9 +18,6 @@ unsafe extern "cdecl" fn mul_div_64(a: i32, b: i32, c: i32) -> i32 {
     }
     (a as i64 * b as i64 / c as i64) as i32
 }
-
-/// Calls into `FixedDiv16` with a zero divisor that we answered instead of letting crash.
-pub static ZERO_DIVISORS_SUPPRESSED: AtomicU32 = AtomicU32::new(0);
 
 /// Divides two 16.16 fixed-point values.
 /// The missile guidance code calls this with a zero divisor sometimes, so we suppress it.
@@ -45,10 +44,10 @@ unsafe extern "cdecl" fn random_int_below(max: i32) -> i32 {
     rand::rng().random_range(0..max)
 }
 
-patches! {
+patches!(
     pub(super) static PATCHES = [
         hook mul_div_64,
         hook fixed_div_16,
         hook random_int_below,
     ];
-}
+);

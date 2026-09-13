@@ -10,9 +10,12 @@ use windows::{
 
 use binding::macros::{globals, hook, patches};
 
-use crate::settings::SETTINGS;
+use crate::{
+    settings::SETTINGS,
+    sim::{G_CURRENT_DRAW_MODE, G_SHOULD_QUIT, RenderTarget},
+};
 
-use super::{G_CURRENT_DRAW_MODE, G_SHOULD_QUIT, MODULE, RenderTarget};
+use super::MODULE;
 
 #[repr(C)]
 pub struct GameWindowGeometry {
@@ -24,7 +27,7 @@ pub struct GameWindowGeometry {
     unknown4: i32,
 }
 
-globals! {
+globals!(
     pub(crate) static G_GAME_WINDOW_WIDTH: u32 = 0x000acb6c;
     pub(crate) static G_GAME_WINDOW_HEIGHT: u32 = 0x000acb70;
     pub(crate) static G_GAME_WINDOW_GEOMETRY: *mut GameWindowGeometry = 0x00176eb4;
@@ -36,7 +39,7 @@ globals! {
     static G_BLIT_GLOBAL_1: BOOL = 0x00176ebc;
     static G_BLIT_GLOBAL_2: u32 = 0x000a5f18;
     static G_BLIT_GLOBAL_3: u32 = 0x000a5a24;
-}
+);
 
 /// The game decides which resolution to use based on the DLL name passed to this function.
 /// This is presumably a leftover from the DOS version of the game, possibly to preserve config file compatibility.
@@ -141,7 +144,7 @@ unsafe extern "stdcall" fn toggle_fullscreen() {
     // Do nothing because we handle this in the custom window proc
 }
 
-patches! {
+patches!(
     pub(super) static PATCHES = [
         hook set_game_resolution,
         hook init_game_window_geometry,
@@ -149,4 +152,4 @@ patches! {
         hook handle_messages,
         hook toggle_fullscreen,
     ];
-}
+);

@@ -63,8 +63,8 @@ unsafe fn request_sim_mouse_centering(window: HWND) {
             return;
         }
 
-        if matches!(PROCESS_TYPE, ProcessType::Sim) && !G_MOUSE_NEEDS_CENTERING.is_null() {
-            *G_MOUSE_NEEDS_CENTERING = TRUE;
+        if matches!(PROCESS_TYPE, ProcessType::Sim) {
+            G_MOUSE_NEEDS_CENTERING.set(TRUE);
         }
     }
 }
@@ -374,7 +374,7 @@ fn start_sim(window: HWND, cmd_line: &str) -> Result<i32> {
 }
 
 fn main() -> Result<()> {
-    let filter = filter::Targets::new().with_target("remech2", Level::WARN);
+    let filter = filter::Targets::new().with_target("remech2", Level::INFO);
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
         .with(filter)

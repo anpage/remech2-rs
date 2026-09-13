@@ -1,25 +1,37 @@
 use std::{ffi::c_void, sync::RwLock, time::Instant};
 
+use binding::macros::{game_fns, globals, hook, patches};
 use windows::Win32::Foundation::TRUE;
 
-use super::{
-    G_CURRENT_DRAW_MODE, G_WINDOW_ACTIVE, MODULE, RenderTarget, drawmode::hooks::PixelBuffer,
+use crate::{
+    settings::SETTINGS,
+    sim::{
+        G_CURRENT_DRAW_MODE, RenderTarget,
+        drawmode::hooks::{G_CURRENT_DRAW_MODE_EXTENSION, PixelBuffer},
+        window::G_WINDOW_ACTIVE,
+    },
 };
 
-use binding::macros::{game_fns, globals, hook, patches};
+use super::MODULE;
 
-use crate::{settings::SETTINGS, sim::drawmode::hooks::G_CURRENT_DRAW_MODE_EXTENSION};
+/// Ticks per frame at the ideal 45 FPS, which is what every sim system seems to be tuned for.
+pub(super) const TICKS_PER_IDEAL_FRAME: i32 = 4;
 
-game_fns! {
+game_fns!(
     /// Fills the target's rect with a palette index.
-    static FILL_RENDER_TARGET_RECT: unsafe extern "cdecl" fn(*mut RenderTarget, u8) -> i32
-        = 0x000630b9;
+    static FILL_RENDER_TARGET_RECT: unsafe extern "cdecl" fn(*mut RenderTarget, u8) -> i32 =
+        0x000630b9;
     /// Draws one frame of an RLE shape into the target at (x, y).
-    static DRAW_SHAPE_FRAME: unsafe extern "cdecl" fn(*mut RenderTarget, *mut c_void, i32, i32, i32) -> i32
-        = 0x00061228;
-}
+    static DRAW_SHAPE_FRAME: unsafe extern "cdecl" fn(
+        *mut RenderTarget,
+        *mut c_void,
+        i32,
+        i32,
+        i32,
+    ) -> i32 = 0x00061228;
+);
 
-globals! {
+globals!(
     /// Set once InitDisplayGeometry has run, cleared when the display is torn down.
     static G_DISPLAY_READY: i32 = 0x000a2464;
     /// The loading screen's backdrop, loaded by StartSupAnim.
@@ -40,7 +52,7 @@ globals! {
     static G_TICKS_1: u32 = 0x000ad20c;
     static G_TICKS_2: u32 = 0x000ad210;
     pub(super) static G_DELTA_TIME: i32 = 0x000ba550;
-}
+);
 
 /// AIL's 181Hz tick, which the game uses as its clock.
 #[hook(rva = 0x00067ed8)]
@@ -71,7 +83,7 @@ unsafe extern "stdcall" fn sup_anim_timer_callback(_user: u32) {
         if G_WINDOW_ACTIVE.get() != TRUE {
             return;
         }
-        let extension = *G_CURRENT_DRAW_MODE_EXTENSION;
+        let extension = G_CURRENT_DRAW_MODE_EXTENSION.get();
         if ((*extension).lock_display_buffer_func)() != 0 {
             return;
         }
@@ -121,10 +133,10 @@ unsafe extern "stdcall" fn next_clock() {
     }
 }
 
-patches! {
+patches!(
     pub(super) static PATCHES = [
         hook game_tick_timer_callback,
         hook next_clock,
         hook sup_anim_timer_callback,
     ];
-}
+);

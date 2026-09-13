@@ -337,7 +337,7 @@ impl Shell {
             };
 
             // Clear the list
-            let filenames = &mut G_MECH_VARIANT_FILENAMES.get();
+            let filenames = &mut *(G_MECH_VARIANT_FILENAMES.ptr());
             filenames.fill([0; SLOT_LEN as _]);
 
             // Make sure we have at least the default variant

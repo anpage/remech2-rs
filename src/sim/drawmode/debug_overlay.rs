@@ -5,8 +5,10 @@ use egui::{Context, Response, Ui};
 
 use egui_plot::{Bar, BarChart, Legend, Plot};
 
-use crate::sim::math::ZERO_DIVISORS_SUPPRESSED;
-use crate::sim::{G_DELTA_TIME, PROXIMITY_FUSES_SUPPRESSED, ZERO_LENGTH_FRAMES_SKIPPED};
+use crate::sim::G_DELTA_TIME;
+use crate::sim::stats::{
+    PROXIMITY_FUSES_SUPPRESSED, ZERO_DIVISORS_SUPPRESSED, ZERO_LENGTH_FRAMES_SKIPPED,
+};
 
 #[cfg(feature = "debug-overlay")]
 pub fn show_deltatime_plot(ui: &mut Ui, recent_deltatimes: [Option<i32>; 200]) -> Response {
