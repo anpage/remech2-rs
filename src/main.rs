@@ -32,6 +32,7 @@ use crate::{
 mod about;
 mod ail;
 mod ailrs;
+mod binding;
 mod cd_audio;
 mod common;
 mod hooker;
