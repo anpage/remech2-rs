@@ -21,7 +21,6 @@ pub unsafe extern "system" fn fake_heap_free(
     TRUE
 }
 
-pub type SetMenuFunc = unsafe extern "system" fn(HWND, *mut c_void) -> BOOL;
 pub unsafe extern "system" fn fake_set_menu(_hwnd: HWND, _h_menu: *mut c_void) -> BOOL {
     TRUE
 }

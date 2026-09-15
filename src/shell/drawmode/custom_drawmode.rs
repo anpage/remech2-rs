@@ -103,11 +103,12 @@ impl CustomDrawMode {
     }
 
     pub fn load_cursor_texture(&mut self) {
-        if unsafe { G_CURSOR_GRAPHIC.is_null() || (*G_CURSOR_GRAPHIC).is_null() } {
+        let cursor_graphic = G_CURSOR_GRAPHIC.ptr();
+        if cursor_graphic.is_null() || unsafe { (*cursor_graphic).is_null() } {
             return;
         }
 
-        let cursor_data = unsafe { **G_CURSOR_GRAPHIC };
+        let cursor_data = unsafe { **cursor_graphic };
         let cursor_data = &cursor_data[0x28..0x1A7];
         const WIDTH: usize = 29;
         const HEIGHT: usize = 25;

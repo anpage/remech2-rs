@@ -11,7 +11,7 @@ members = ["binding", "binding-macros"]
 # `retour`, which would make their `Hook<F>` types mutually unassignable.
 [workspace.dependencies]
 anyhow = "1.0.98"
-retour = "0.4.0-alpha.4"
+retour = { version = "0.4.0-alpha.4", features = ["thiscall-abi"] }
 
 [profile.release]
 panic = "abort"

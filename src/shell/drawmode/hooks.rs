@@ -1,9 +1,9 @@
-use std::ffi::c_char;
-use std::{ffi::c_void, sync::RwLock};
+use std::{
+    ffi::{c_char, c_void},
+    sync::RwLock,
+};
 
-use anyhow::Result;
-use retour::GenericDetour;
-use windows::Win32::UI::WindowsAndMessaging::IsWindow;
+use binding::{game_fns, globals, macros::hook, patches, thunks};
 use windows::{
     Win32::{
         Foundation::{HANDLE, HWND, POINT},
@@ -12,20 +12,21 @@ use windows::{
         System::Memory::{HEAP_FLAGS, HeapAlloc, HeapFree},
         UI::{
             Input::KeyboardAndMouse::{GetAsyncKeyState, VK_LBUTTON, VK_MBUTTON, VK_RBUTTON},
-            WindowsAndMessaging::GetCursorPos,
+            WindowsAndMessaging::{GetCursorPos, IsWindow},
         },
     },
     core::BOOL,
 };
 
-const CURSOR_GRAPHIC_SIZE: usize = 423;
-
-use crate::shell::drawmode::custom_drawmode::OverlayMouseState;
 use crate::{
     WINDOW_HEIGHT, WINDOW_WIDTH,
-    hooker::hook_function,
-    shell::drawmode::custom_drawmode::{CustomDrawMode, PaletteColor},
+    shell::{
+        MODULE,
+        drawmode::custom_drawmode::{CustomDrawMode, OverlayMouseState, PaletteColor},
+    },
 };
+
+const CURSOR_GRAPHIC_SIZE: usize = 423;
 
 #[repr(C, packed(2))]
 #[derive(Debug)]
@@ -98,183 +99,46 @@ pub struct VideoDriver {
     pub use_back_buffer: i32,
 }
 
-type InitDrawModeFunc =
-    unsafe extern "cdecl" fn(i32, i32, *mut PixelBuffer, i32, i32, BOOL) -> BOOL;
-static INIT_DRAW_MODE_HOOK: RwLock<Option<GenericDetour<InitDrawModeFunc>>> = RwLock::new(None);
+globals!(
+    // static G_CURRENT_DRAW_MODE_EXTENSION: *mut c_void = 0x00062cc8;
+    // static G_VIDEO_DRIVER: *mut VideoDriver = 0x00071208;
+    static G_PRIMARY_HEAP: HANDLE = 0x0006a9f4;
+    static G_BITS_TO_BLIT: *mut u8 = 0x00062fe0;
+    static G_GDI_BLIT_BITMAP_INFO: BITMAPINFO = 0x00096a64;
+    static G_WINDOW: HWND = 0x000965ec;
+    static G_CURRENT_PIXEL_BUFFER: *mut PixelBuffer = 0x00062cdc;
+    static G_DISPLAY_BRIGHTNESS: u32 = 0x000717a4;
+    static G_GAMMA_TABLE: [u8; 1024] = 0x000961d0;
+    static G_PALETTE_COLORS: [PaletteColor; 256] = 0x00062ce0;
+    static G_PALETTE_COLORS_PRE_BRIGHTNESS: [PaletteColor; 256] = 0x00095ed0;
+    static G_CURRENT_MOUSE_STATE: *mut MouseState = 0x00071204;
+    static G_SOME_PALETTE_FLAG: u32 = 0x0005c2a4;
+    pub(in crate::shell) static G_CURSOR_GRAPHIC: *mut [u8; CURSOR_GRAPHIC_SIZE] = 0x00071200;
+);
 
-type AdjustWindowSizeFunc = unsafe extern "cdecl" fn(*mut c_void);
-static mut ADJUST_WINDOW_SIZE_HOOK: Option<GenericDetour<AdjustWindowSizeFunc>> = None;
+game_fns!(
+    static SOME_PALETTE_FUNC: unsafe extern "stdcall" fn() = 0x00005eea;
+    static VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER: unsafe extern "thiscall" fn(*mut VideoDriver) =
+        0x000077ea;
+);
 
-type ToggleFullscreenFunc = unsafe extern "stdcall" fn();
-static mut TOGGLE_FULLSCREEN_HOOK: Option<GenericDetour<ToggleFullscreenFunc>> = None;
-
-type ReadMouseStateFunc = unsafe extern "fastcall" fn(*mut MouseState);
-static mut READ_MOUSE_STATE_HOOK: Option<GenericDetour<ReadMouseStateFunc>> = None;
-
-type VideoDriverDrawShellFunc = unsafe extern "fastcall" fn(*mut VideoDriver);
-static mut VIDEO_DRIVER_DRAW_SHELL_HOOK: Option<GenericDetour<VideoDriverDrawShellFunc>> = None;
-
-type ShowCursorFunc = unsafe extern "stdcall" fn(BOOL) -> i32;
-
-// Draw Mode Functions
-type GdiBeginFunc = unsafe extern "stdcall" fn(*mut PixelBuffer, i32, i32) -> i32;
-static mut GDI_BEGIN_HOOK: Option<GenericDetour<GdiBeginFunc>> = None;
-
-type GdiEndFunc = unsafe extern "stdcall" fn() -> i32;
-static mut GDI_END_HOOK: Option<GenericDetour<GdiEndFunc>> = None;
-
-type GdiBlitFlipFunc = unsafe extern "stdcall" fn() -> i32;
-static mut GDI_BLIT_FLIP_HOOK: Option<GenericDetour<GdiBlitFlipFunc>> = None;
-
-type GdiBitBltRectFunc = unsafe extern "stdcall" fn(i32, i32, i32, i32) -> i32;
-static mut GDI_BIT_BLT_RECT_HOOK: Option<GenericDetour<GdiBitBltRectFunc>> = None;
-
-type GdiStretchBlitFunc = unsafe extern "stdcall" fn(i32, i32, i32, i32) -> i32;
-static mut GDI_STRETCH_BLIT_HOOK: Option<GenericDetour<GdiStretchBlitFunc>> = None;
-
-// Draw Mode Extension Functions
-type GdiSetPaletteFunc = unsafe extern "cdecl" fn(i32, i32, *const PaletteColor, u32) -> i32;
-static mut GDI_SET_PALETTE_HOOK: Option<GenericDetour<GdiSetPaletteFunc>> = None;
-
-type GdiSetPaletteWithBrightnessFunc = unsafe extern "stdcall" fn(*mut c_void) -> i32;
-static mut GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK: Option<
-    GenericDetour<GdiSetPaletteWithBrightnessFunc>,
-> = None;
-
-// type GdiBlendPalettesFunc = unsafe extern "stdcall" fn(*mut c_void, i32) -> i32;
-// static mut GDI_BLEND_PALETTES_HOOK: Option<GenericDetour<GdiBlendPalettesFunc>> = None;
-
-type GdiSwapBuffersFunc = unsafe extern "stdcall" fn() -> i32;
-static mut GDI_SWAP_BUFFERS_HOOK: Option<GenericDetour<GdiSwapBuffersFunc>> = None;
-
-type SomePaletteFunc = unsafe extern "stdcall" fn();
-static mut SOME_PALETTE_FUNC: Option<SomePaletteFunc> = None;
-
-type VideoDriverActivateFramebufferFunc = unsafe extern "thiscall" fn(*mut VideoDriver);
-static mut VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER_FUNC: Option<VideoDriverActivateFramebufferFunc> =
-    None;
-
-static mut G_CURRENT_DRAW_MODE_EXTENSION: *mut *mut c_void = std::ptr::null_mut();
-static mut G_PRIMARY_HEAP: *mut HANDLE = std::ptr::null_mut();
-static mut G_BITS_TO_BLIT: *mut *mut u8 = std::ptr::null_mut();
-static mut G_GDI_BLIT_BITMAP_INFO: *mut BITMAPINFO = std::ptr::null_mut();
-static mut G_WINDOW: *mut HWND = std::ptr::null_mut();
-static mut G_CURRENT_PIXEL_BUFFER: *mut *mut PixelBuffer = std::ptr::null_mut();
-static mut G_DISPLAY_BRIGHTNESS: *mut u32 = std::ptr::null_mut();
-static mut G_GAMMA_TABLE: *mut [u8; 1024] = std::ptr::null_mut();
-static mut G_PALETTE_COLORS: *mut [PaletteColor; 256] = std::ptr::null_mut();
-static mut G_PALETTE_COLORS_PRE_BRIGHTNESS: *mut [PaletteColor; 256] = std::ptr::null_mut();
-static mut G_CURRENT_MOUSE_STATE: *mut *mut MouseState = std::ptr::null_mut();
-static mut G_VIDEO_DRIVER: *mut *mut VideoDriver = std::ptr::null_mut();
-static mut G_SOME_PALETTE_FLAG: *mut u32 = std::ptr::null_mut();
-pub static mut G_CURSOR_GRAPHIC: *mut *mut [u8; CURSOR_GRAPHIC_SIZE] = std::ptr::null_mut();
-
-pub unsafe fn hook_functions(base_address: usize) -> Result<()> {
-    unsafe {
-        SOME_PALETTE_FUNC = Some(std::mem::transmute::<usize, SomePaletteFunc>(
-            base_address + 0x00005eea,
-        ));
-        VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER_FUNC = Some(std::mem::transmute::<
-            usize,
-            VideoDriverActivateFramebufferFunc,
-        >(base_address + 0x000077ea));
-
-        G_CURRENT_DRAW_MODE_EXTENSION = (base_address + 0x00062cc8) as *mut *mut c_void;
-        G_PRIMARY_HEAP = (base_address + 0x0006a9f4) as *mut HANDLE;
-        G_BITS_TO_BLIT = (base_address + 0x00062fe0) as *mut *mut u8;
-        G_GDI_BLIT_BITMAP_INFO = (base_address + 0x00096a64) as *mut BITMAPINFO;
-        G_WINDOW = (base_address + 0x000965ec) as *mut HWND;
-        G_CURRENT_PIXEL_BUFFER = (base_address + 0x00062cdc) as *mut *mut PixelBuffer;
-        G_DISPLAY_BRIGHTNESS = (base_address + 0x000717a4) as *mut u32;
-        G_GAMMA_TABLE = (base_address + 0x000961d0) as *mut [u8; 1024];
-        G_PALETTE_COLORS = (base_address + 0x00062ce0) as *mut [PaletteColor; 256];
-        G_PALETTE_COLORS_PRE_BRIGHTNESS = (base_address + 0x00095ed0) as *mut [PaletteColor; 256];
-        G_CURRENT_MOUSE_STATE = (base_address + 0x00071204) as *mut *mut MouseState;
-        G_VIDEO_DRIVER = (base_address + 0x00071208) as *mut *mut VideoDriver;
-        G_SOME_PALETTE_FLAG = (base_address + 0x0005c2a4) as *mut u32;
-        G_CURSOR_GRAPHIC = (base_address + 0x00071200) as *mut *mut [u8; CURSOR_GRAPHIC_SIZE];
-
-        *INIT_DRAW_MODE_HOOK.write().unwrap() = {
-            let target: InitDrawModeFunc = std::mem::transmute(base_address + 0x00010a30);
-            Some(hook_function(target, init_draw_mode)?)
-        };
-
-        ADJUST_WINDOW_SIZE_HOOK = {
-            let target: AdjustWindowSizeFunc = std::mem::transmute(base_address + 0x000112da);
-            Some(hook_function(target, adjust_window_size)?)
-        };
-
-        TOGGLE_FULLSCREEN_HOOK = {
-            let target: ToggleFullscreenFunc = std::mem::transmute(base_address + 0x00011071);
-            Some(hook_function(target, toggle_fullscreen)?)
-        };
-
-        READ_MOUSE_STATE_HOOK = {
-            let target: ReadMouseStateFunc = std::mem::transmute(base_address + 0x0003aac5);
-            Some(hook_function(target, read_mouse_state)?)
-        };
-
-        VIDEO_DRIVER_DRAW_SHELL_HOOK = {
-            let target: VideoDriverDrawShellFunc = std::mem::transmute(base_address + 0x00006502);
-            Some(hook_function(target, video_driver_draw_shell)?)
-        };
-
-        GDI_BEGIN_HOOK = {
-            let target: GdiBeginFunc = std::mem::transmute(base_address + 0x00030b90);
-            Some(hook_function(target, begin)?)
-        };
-
-        GDI_END_HOOK = {
-            let target: GdiEndFunc = std::mem::transmute(base_address + 0x00030d31);
-            Some(hook_function(target, end)?)
-        };
-
-        GDI_BLIT_FLIP_HOOK = {
-            let target: GdiBlitFlipFunc = std::mem::transmute(base_address + 0x00030ef9);
-            Some(hook_function(target, blit_flip)?)
-        };
-
-        GDI_BIT_BLT_RECT_HOOK = {
-            let target: GdiBitBltRectFunc = std::mem::transmute(base_address + 0x00030f77);
-            Some(hook_function(target, bit_blt_rect)?)
-        };
-
-        GDI_STRETCH_BLIT_HOOK = {
-            let target: GdiStretchBlitFunc = std::mem::transmute(base_address + 0x00031095);
-            Some(hook_function(target, stretch_blit)?)
-        };
-
-        GDI_SET_PALETTE_HOOK = {
-            let target: GdiSetPaletteFunc = std::mem::transmute(base_address + 0x00031591);
-            Some(hook_function(target, set_palette)?)
-        };
-
-        GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK = {
-            let target: GdiSetPaletteWithBrightnessFunc =
-                std::mem::transmute(base_address + 0x0003162c);
-            Some(hook_function(target, set_palette_with_brightness)?)
-        };
-
-        // Leave this out for now because the vanilla function works fine
-        // GDI_BLEND_PALETTES_HOOK = {
-        //     let target: GdiBlendPalettesFunc = std::mem::transmute(base_address + 0x000316c9);
-        //     Some(hook_function(target, blend_palettes)?)
-        // };
-
-        GDI_SWAP_BUFFERS_HOOK = {
-            let target: GdiSwapBuffersFunc = std::mem::transmute(base_address + 0x00031948);
-            Some(hook_function(target, swap_buffers)?)
-        };
-
-        let show_cursor_thunk = (base_address + 0x000995d0) as *mut ShowCursorFunc;
-        *show_cursor_thunk = show_cursor;
-    }
-    Ok(())
+thunks! {
+    /// `ShowCursor`, so the overlay draws the cursor instead of Windows.
+    static SHOW_CURSOR_THUNK = [
+        0x000995d0 => show_cursor,
+    ];
 }
 
-static mut CUSTOM_DRAW_MODE: Option<CustomDrawMode> = None;
+static CUSTOM_DRAW_MODE: RwLock<Option<CustomDrawMode>> = RwLock::new(None);
+static DRAW_CALLED: RwLock<bool> = RwLock::new(false);
 
-pub unsafe extern "cdecl" fn init_draw_mode(
+/// Drops the overlay's GPU resources when the shell unloads.
+pub(in crate::shell) fn shutdown() {
+    CUSTOM_DRAW_MODE.write().unwrap().take();
+}
+
+#[hook(rva = 0x00010a30)]
+unsafe extern "cdecl" fn init_draw_mode(
     draw_mode_index: i32,
     allow_fallback: i32,
     output_pixel_buffer: *mut PixelBuffer,
@@ -291,7 +155,7 @@ pub unsafe extern "cdecl" fn init_draw_mode(
         show_menu.0
     );
     unsafe {
-        INIT_DRAW_MODE_HOOK.read().unwrap().as_ref().unwrap().call(
+        original(
             5,
             allow_fallback,
             output_pixel_buffer,
@@ -302,11 +166,13 @@ pub unsafe extern "cdecl" fn init_draw_mode(
     }
 }
 
-pub unsafe extern "cdecl" fn adjust_window_size(_draw_mode_ext: *mut c_void) {
+#[hook(rva = 0x000112da)]
+unsafe extern "cdecl" fn adjust_window_size(_draw_mode_ext: *mut c_void) {
     tracing::trace!("AdjustWindowSize called");
 }
 
-pub unsafe extern "stdcall" fn toggle_fullscreen() {
+#[hook(rva = 0x00011071)]
+unsafe extern "stdcall" fn toggle_fullscreen() {
     tracing::trace!("ToggleFullscreen called");
 }
 
@@ -335,7 +201,7 @@ fn cursor_window_to_shell(x: i32, y: i32, window_width: i32, window_height: i32)
 pub unsafe fn get_mouse_state() -> OverlayMouseState {
     let mut cursor_pos = POINT { x: 0, y: 0 };
     unsafe { GetCursorPos(&mut cursor_pos).unwrap() };
-    let _ = unsafe { ScreenToClient(*G_WINDOW, &mut cursor_pos) };
+    let _ = unsafe { ScreenToClient(G_WINDOW.get(), &mut cursor_pos) };
 
     let key_state = unsafe { GetAsyncKeyState(VK_LBUTTON.0 as i32) as u16 };
     let left_down = (key_state & 0x8000) != 0;
@@ -356,18 +222,12 @@ pub unsafe fn get_mouse_state() -> OverlayMouseState {
 }
 
 pub fn update_global_mouse_state(mouse_state: &OverlayMouseState) {
-    unsafe {
-        if G_CURRENT_MOUSE_STATE.is_null() || (*G_CURRENT_MOUSE_STATE).is_null() {
-            return;
-        }
+    if G_CURRENT_MOUSE_STATE.ptr().is_null() {
+        return;
     }
 
-    let global_mouse_state = unsafe { G_CURRENT_MOUSE_STATE };
-
-    let state = unsafe {
-        (*global_mouse_state)
-            .as_mut()
-            .expect("global_mouse_state to not be null")
+    let Some(state) = (unsafe { G_CURRENT_MOUSE_STATE.get().as_mut() }) else {
+        return;
     };
 
     let left_down_previous = state.left_down;
@@ -446,18 +306,20 @@ pub fn update_global_mouse_state(mouse_state: &OverlayMouseState) {
 
 /// Disable the game's own mouse state reading function to handle mouse state after egui draws.
 /// This allows us to intercept mouse events and update the global mouse state selectively.
-pub unsafe extern "fastcall" fn read_mouse_state(_mouse_state: *mut MouseState) {
+#[hook(rva = 0x0003aac5)]
+unsafe extern "fastcall" fn read_mouse_state(_mouse_state: *mut MouseState) {
     tracing::trace!("ReadMouseState called");
-    unsafe {
-        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
-            draw_mode.update_mouse_state();
-        }
+
+    let custom_draw_mode = CUSTOM_DRAW_MODE.read().unwrap();
+    if let Some(ref draw_mode) = *custom_draw_mode {
+        draw_mode.update_mouse_state();
     }
 }
 
 /// This function is called to draw the shell, as opposed to FMVs.
 /// It's been modified to always draw the entire screen so that egui gets rendered every frame.
-pub unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) {
+#[hook(rva = 0x00006502)]
+unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) {
     tracing::trace!("VideoDriverDrawShell called");
 
     unsafe {
@@ -496,7 +358,7 @@ pub unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) 
                         (*this).pixel_buffer.data,
                         ((*this).width * (*this).height) as usize,
                     );
-                    VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER_FUNC.unwrap()(this);
+                    (VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER.get())(this);
                     set_palette(
                         0,
                         256,
@@ -510,8 +372,8 @@ pub unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) 
                     blit_flip();
                     (*this).use_back_buffer = 0;
                 }
-            } else if (*G_SOME_PALETTE_FLAG) == 0 {
-                VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER_FUNC.unwrap()(this);
+            } else if G_SOME_PALETTE_FLAG.get() == 0 {
+                (VIDEO_DRIVER_ACTIVATE_FRAMEBUFFER.get())(this);
                 set_palette(
                     0,
                     256,
@@ -524,7 +386,7 @@ pub unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) 
                 );
                 blit_flip();
             } else {
-                SOME_PALETTE_FUNC.unwrap()();
+                (SOME_PALETTE_FUNC.get())();
                 blit_flip();
                 set_palette(
                     0,
@@ -533,7 +395,7 @@ pub unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) 
                     (*this).set_palette_unknown,
                 );
                 blit_flip();
-                (*G_SOME_PALETTE_FLAG) = 0;
+                G_SOME_PALETTE_FLAG.set(0);
             }
             (*this).should_set_palette = 0;
         }
@@ -545,23 +407,19 @@ pub unsafe extern "fastcall" fn video_driver_draw_shell(this: *mut VideoDriver) 
     }
 }
 
-pub unsafe extern "stdcall" fn show_cursor(show: BOOL) -> i32 {
+unsafe extern "stdcall" fn show_cursor(show: BOOL) -> i32 {
     tracing::trace!("ShowCursor called with show: {}", show.0);
 
-    unsafe {
-        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
-            draw_mode.show_cursor(show.0 != 0);
-        }
+    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
+    if let Some(ref mut draw_mode) = *custom_draw_mode {
+        draw_mode.show_cursor(show.0 != 0);
     }
 
     if show.0 == 0 { -1 } else { 1 }
 }
 
-pub unsafe extern "stdcall" fn begin(
-    pixel_buffer: *mut PixelBuffer,
-    width: i32,
-    height: i32,
-) -> i32 {
+#[hook(rva = 0x00030b90)]
+unsafe extern "stdcall" fn begin(pixel_buffer: *mut PixelBuffer, width: i32, height: i32) -> i32 {
     tracing::trace!(
         "GdiBegin called with pixel_buffer: {:?}, width: {}, height: {}!",
         pixel_buffer,
@@ -571,7 +429,7 @@ pub unsafe extern "stdcall" fn begin(
 
     unsafe {
         let pixel_buf = HeapAlloc(
-            *G_PRIMARY_HEAP,
+            G_PRIMARY_HEAP.get(),
             HEAP_FLAGS(9),
             (height * width * 2) as usize,
         ) as *mut u8;
@@ -580,13 +438,14 @@ pub unsafe extern "stdcall" fn begin(
             return 2;
         }
 
-        G_BITS_TO_BLIT.write_volatile(pixel_buf);
+        G_BITS_TO_BLIT.ptr().write_volatile(pixel_buf);
 
         (*pixel_buffer).width = width;
         (*pixel_buffer).height = height;
-        (*pixel_buffer).bitmap_info = G_GDI_BLIT_BITMAP_INFO;
+        (*pixel_buffer).bitmap_info = G_GDI_BLIT_BITMAP_INFO.ptr();
 
-        CUSTOM_DRAW_MODE = CustomDrawMode::new(*G_WINDOW, WINDOW_WIDTH, WINDOW_HEIGHT).ok();
+        *CUSTOM_DRAW_MODE.write().unwrap() =
+            CustomDrawMode::new(G_WINDOW.get(), WINDOW_WIDTH, WINDOW_HEIGHT).ok();
 
         tracing::trace!("GdiBegin finish");
 
@@ -594,30 +453,30 @@ pub unsafe extern "stdcall" fn begin(
     }
 }
 
-pub unsafe extern "stdcall" fn end() -> i32 {
+#[hook(rva = 0x00030d31)]
+unsafe extern "stdcall" fn end() -> i32 {
     tracing::trace!("GdiEnd called");
 
     unsafe {
-        if !(*G_BITS_TO_BLIT).is_null() {
+        if !G_BITS_TO_BLIT.get().is_null() {
             let _ = HeapFree(
-                *G_PRIMARY_HEAP,
+                G_PRIMARY_HEAP.get(),
                 HEAP_FLAGS(1),
-                Some(*G_BITS_TO_BLIT as *mut c_void),
+                Some(G_BITS_TO_BLIT.get() as *mut c_void),
             );
-            G_BITS_TO_BLIT.write_volatile(std::ptr::null_mut());
+            G_BITS_TO_BLIT.ptr().write_volatile(std::ptr::null_mut());
         }
 
-        (**G_CURRENT_PIXEL_BUFFER).data = std::ptr::null_mut();
+        (*G_CURRENT_PIXEL_BUFFER.get()).data = std::ptr::null_mut();
 
-        CUSTOM_DRAW_MODE = None;
+        CUSTOM_DRAW_MODE.write().unwrap().take();
     }
 
     0
 }
 
-static DRAW_CALLED: RwLock<bool> = RwLock::new(false);
-
-pub unsafe extern "stdcall" fn blit_flip() -> i32 {
+#[hook(rva = 0x00030ef9)]
+unsafe extern "stdcall" fn blit_flip() -> i32 {
     tracing::trace!("GdiBlitFlip called");
 
     let called = { *DRAW_CALLED.read().unwrap() };
@@ -629,12 +488,12 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
         *DRAW_CALLED.write().unwrap() = true;
     }
 
-    if unsafe { G_WINDOW.is_null() || !IsWindow(Some(*G_WINDOW)).as_bool() } {
+    if G_WINDOW.ptr().is_null() || !unsafe { IsWindow(Some(G_WINDOW.get())) }.as_bool() {
         return 0;
     }
 
-    let width = unsafe { (**G_CURRENT_PIXEL_BUFFER).width } + 1;
-    let height = unsafe { (**G_CURRENT_PIXEL_BUFFER).height };
+    let width = unsafe { (*G_CURRENT_PIXEL_BUFFER.get()).width } + 1;
+    let height = unsafe { (*G_CURRENT_PIXEL_BUFFER.get()).height };
 
     if width <= 0 || height <= 0 {
         tracing::warn!(
@@ -645,19 +504,20 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
         return 0;
     }
 
-    let bits_to_blit = unsafe { *G_BITS_TO_BLIT };
+    let bits_to_blit = unsafe { G_BITS_TO_BLIT.get() };
     let pixel_slice =
         unsafe { std::slice::from_raw_parts(bits_to_blit, (width * height) as usize) };
 
-    unsafe {
-        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
+    {
+        let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
+        if let Some(ref mut draw_mode) = *custom_draw_mode {
             draw_mode.draw(
                 pixel_slice,
                 width as usize,
                 height as usize,
-                WINDOW_WIDTH,
-                WINDOW_HEIGHT,
-                *G_WINDOW,
+                unsafe { WINDOW_WIDTH },
+                unsafe { WINDOW_HEIGHT },
+                unsafe { G_WINDOW.get() },
             );
         }
     }
@@ -671,7 +531,8 @@ pub unsafe extern "stdcall" fn blit_flip() -> i32 {
     0
 }
 
-pub unsafe extern "stdcall" fn bit_blt_rect(
+#[hook(rva = 0x00030f77)]
+unsafe extern "stdcall" fn bit_blt_rect(
     x_dest: i32,
     y_dest: i32,
     x2_dest: i32,
@@ -688,7 +549,8 @@ pub unsafe extern "stdcall" fn bit_blt_rect(
     unsafe { blit_flip() }
 }
 
-pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) -> i32 {
+#[hook(rva = 0x00031095)]
+unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) -> i32 {
     tracing::trace!(
         "GdiStretchBlit called with (x1, y1): ({}, {}), (x2, y2): ({}, {})",
         x1,
@@ -706,14 +568,14 @@ pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) 
         *DRAW_CALLED.write().unwrap() = true;
     }
 
-    if unsafe { G_WINDOW.is_null() || !IsWindow(Some(*G_WINDOW)).as_bool() } {
+    if G_WINDOW.ptr().is_null() || !unsafe { IsWindow(Some(G_WINDOW.get())) }.as_bool() {
         return 0;
     }
 
-    let buffer_width = unsafe { (**G_CURRENT_PIXEL_BUFFER).width } + 1;
-    let buffer_height = unsafe { (**G_CURRENT_PIXEL_BUFFER).height };
+    let buffer_width = unsafe { (*G_CURRENT_PIXEL_BUFFER.get()).width } + 1;
+    let buffer_height = unsafe { (*G_CURRENT_PIXEL_BUFFER.get()).height };
 
-    let bits_to_blit = unsafe { *G_BITS_TO_BLIT };
+    let bits_to_blit = unsafe { G_BITS_TO_BLIT.get() };
     let pixel_slice = unsafe {
         std::slice::from_raw_parts(bits_to_blit, (buffer_width * buffer_height) as usize)
     };
@@ -725,15 +587,16 @@ pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) 
         .flat_map(|row| row[x1 as usize..x2 as usize].to_vec())
         .collect::<Vec<u8>>();
 
-    unsafe {
-        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
+    {
+        let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
+        if let Some(ref mut draw_mode) = *custom_draw_mode {
             draw_mode.draw(
                 &rect_pixel_slice,
                 (x2 - x1) as usize,
                 (y2 - y1) as usize,
-                WINDOW_WIDTH,
-                WINDOW_HEIGHT,
-                *G_WINDOW,
+                unsafe { WINDOW_WIDTH },
+                unsafe { WINDOW_HEIGHT },
+                unsafe { G_WINDOW.get() },
             );
         }
     }
@@ -745,7 +608,8 @@ pub unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) 
     0
 }
 
-pub unsafe extern "cdecl" fn set_palette(
+#[hook(rva = 0x00031591)]
+unsafe extern "cdecl" fn set_palette(
     start: i32,
     count: i32,
     palette_colors: *const PaletteColor,
@@ -767,20 +631,20 @@ pub unsafe extern "cdecl" fn set_palette(
         unsafe {
             let color = palette_colors.offset(i);
             let index = (start + i as i32) as usize;
-            (*G_PALETTE_COLORS)[index] = *color;
+            (*G_PALETTE_COLORS.ptr())[index] = *color;
         }
     }
 
-    unsafe {
-        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
-            draw_mode.set_palette_6bit(G_PALETTE_COLORS.as_ref().unwrap());
-        }
+    let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
+    if let Some(ref mut draw_mode) = *custom_draw_mode {
+        draw_mode.set_palette_6bit(unsafe { G_PALETTE_COLORS.as_ref() }.unwrap());
     }
 
     0
 }
 
-pub unsafe extern "stdcall" fn set_palette_with_brightness(palette_data: *mut c_void) -> i32 {
+#[hook(rva = 0x0003162c)]
+unsafe extern "stdcall" fn set_palette_with_brightness(palette_data: *mut c_void) -> i32 {
     tracing::trace!(
         "GdiSetPaletteWithBrightness called with palette_data: {:?}",
         palette_data
@@ -790,56 +654,64 @@ pub unsafe extern "stdcall" fn set_palette_with_brightness(palette_data: *mut c_
         std::slice::from_raw_parts(palette_data as *const PaletteColor, 256) // 256 colors * 3 bytes each
     };
 
-    let brightness = unsafe { *G_DISPLAY_BRIGHTNESS } as usize;
+    let brightness = unsafe { G_DISPLAY_BRIGHTNESS.get() } as usize;
 
     for (i, color) in palette.iter().enumerate().take(256) {
         unsafe {
-            (*G_PALETTE_COLORS_PRE_BRIGHTNESS)[i] = *color;
+            (*G_PALETTE_COLORS_PRE_BRIGHTNESS.ptr())[i] = *color;
             let PaletteColor { red, green, blue } = *color;
-            (*G_PALETTE_COLORS)[i] = PaletteColor {
-                red: (*G_GAMMA_TABLE)[red as usize + brightness * 64],
-                green: (*G_GAMMA_TABLE)[green as usize + brightness * 64],
-                blue: (*G_GAMMA_TABLE)[blue as usize + brightness * 64],
+            (*G_PALETTE_COLORS.ptr())[i] = PaletteColor {
+                red: (*G_GAMMA_TABLE.ptr())[red as usize + brightness * 64],
+                green: (*G_GAMMA_TABLE.ptr())[green as usize + brightness * 64],
+                blue: (*G_GAMMA_TABLE.ptr())[blue as usize + brightness * 64],
             };
         }
     }
 
-    unsafe {
-        if let Some(ref mut draw_mode) = CUSTOM_DRAW_MODE {
-            draw_mode.set_palette(G_PALETTE_COLORS.as_ref().unwrap());
+    {
+        let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
+        if let Some(ref mut draw_mode) = *custom_draw_mode {
+            draw_mode.set_palette(unsafe { G_PALETTE_COLORS.as_ref() }.unwrap());
         }
-        (**G_CURRENT_PIXEL_BUFFER).data = *G_BITS_TO_BLIT;
+    }
+
+    unsafe {
+        (*G_CURRENT_PIXEL_BUFFER.get()).data = G_BITS_TO_BLIT.get();
     }
 
     0
 }
 
-pub unsafe extern "stdcall" fn swap_buffers() -> i32 {
+// Leave this out for now because the vanilla function works fine
+// #[hook(rva = 0x000316c9)]
+// unsafe extern "stdcall" fn blend_palettes(_: *mut c_void, _: i32) -> i32 {}
+
+#[hook(rva = 0x00031948)]
+unsafe extern "stdcall" fn swap_buffers() -> i32 {
     tracing::trace!("GdiSwapBuffers called");
 
     unsafe {
-        (**G_CURRENT_PIXEL_BUFFER).data = *G_BITS_TO_BLIT;
+        (*G_CURRENT_PIXEL_BUFFER.get()).data = G_BITS_TO_BLIT.get();
     }
 
     0
 }
 
-pub unsafe fn unhook_functions() {
-    unsafe {
-        *INIT_DRAW_MODE_HOOK.write().unwrap() = None;
-        ADJUST_WINDOW_SIZE_HOOK = None;
-        TOGGLE_FULLSCREEN_HOOK = None;
-        READ_MOUSE_STATE_HOOK = None;
-        VIDEO_DRIVER_DRAW_SHELL_HOOK = None;
-        GDI_BEGIN_HOOK = None;
-        GDI_END_HOOK = None;
-        GDI_BLIT_FLIP_HOOK = None;
-        GDI_BIT_BLT_RECT_HOOK = None;
-        GDI_STRETCH_BLIT_HOOK = None;
-        GDI_SET_PALETTE_HOOK = None;
-        GDI_SET_PALETTE_WITH_BRIGHTNESS_HOOK = None;
-        // GDI_BLEND_PALETTES_HOOK = None;
-        GDI_SWAP_BUFFERS_HOOK = None;
-        CUSTOM_DRAW_MODE = None;
-    }
-}
+patches!(
+    pub(in crate::shell) static PATCHES = [
+        hook init_draw_mode,
+        hook adjust_window_size,
+        hook toggle_fullscreen,
+        hook read_mouse_state,
+        hook video_driver_draw_shell,
+        hook begin,
+        hook end,
+        hook blit_flip,
+        hook bit_blt_rect,
+        hook stretch_blit,
+        hook set_palette,
+        hook set_palette_with_brightness,
+        hook swap_buffers,
+        patch SHOW_CURSOR_THUNK,
+    ];
+);

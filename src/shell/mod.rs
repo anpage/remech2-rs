@@ -1,119 +1,54 @@
-use std::{
-    ffi::{CStr, CString, c_char, c_void},
-    fs,
-    sync::RwLock,
-};
+use std::ffi::{CString, c_char};
 
 use anyhow::{Context, Result, bail};
-use retour::{GenericDetour, RawDetour};
 use windows::{
     Win32::{
-        Foundation::{FreeLibrary, HANDLE, HMODULE, HWND, INVALID_HANDLE_VALUE, TRUE, WIN32_ERROR},
-        Security::SECURITY_ATTRIBUTES,
-        Storage::FileSystem::{
-            CreateFileA, FILE_CREATION_DISPOSITION, FILE_FLAGS_AND_ATTRIBUTES, FILE_SHARE_MODE,
-        },
-        System::{
-            LibraryLoader::{GetModuleHandleA, GetProcAddress, LoadLibraryA},
-            Registry::{
-                HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, REG_CREATE_KEY_DISPOSITION,
-                REG_OPEN_CREATE_OPTIONS, REG_SAM_FLAGS, RegCreateKeyExA, RegOpenKeyExA,
-            },
-        },
+        Foundation::{FreeLibrary, HMODULE, HWND},
+        System::LibraryLoader::{GetModuleHandleA, GetProcAddress, LoadLibraryA},
     },
-    core::{BOOL, PCSTR, s},
+    core::s,
 };
 
-use binding::{macros::globals, module::ModuleBase};
-
-use crate::{
-    WindowProc,
-    ail::Ail,
-    common::{HeapFreeFunc, SetMenuFunc, debug_log, fake_heap_free, fake_set_menu},
-    hooker::hook_function,
+use binding::{
+    macros::patch_groups,
+    module::ModuleBase,
+    patch::{apply_groups, revert_groups},
 };
+
+use crate::{WindowProc, ail::Ail};
 
 mod audio;
+mod database;
 mod drawmode;
+mod mechlab;
+mod registry;
+mod settings_ui;
+mod smacker;
+mod win32;
 
 pub static MODULE: ModuleBase = ModuleBase::new("MW2SHELL.DLL");
 
-type ShellMainProc = unsafe extern "stdcall" fn(HMODULE, i32, *const c_char, i32, HWND) -> i32;
-
-type RegCreateKeyExAFunc = unsafe extern "system" fn(
-    HKEY,
-    PCSTR,
-    u32,
-    PCSTR,
-    REG_OPEN_CREATE_OPTIONS,
-    REG_SAM_FLAGS,
-    *const SECURITY_ATTRIBUTES,
-    *mut HKEY,
-    *mut REG_CREATE_KEY_DISPOSITION,
-) -> WIN32_ERROR;
-type RegOpenKeyExAFunc =
-    unsafe extern "system" fn(HKEY, PCSTR, u32, REG_SAM_FLAGS, *mut HKEY) -> WIN32_ERROR;
-
-type CreateFileFunc = unsafe extern "system" fn(
-    lpfilename: PCSTR,
-    dwdesiredaccess: u32,
-    dwsharemode: FILE_SHARE_MODE,
-    lpsecurityattributes: *const SECURITY_ATTRIBUTES,
-    dwcreationdisposition: FILE_CREATION_DISPOSITION,
-    dwflagsandattributes: FILE_FLAGS_AND_ATTRIBUTES,
-    htemplatefile: HANDLE,
-) -> HANDLE;
-
-#[repr(C)]
-struct SomeSettingsStruct {
-    unknown1: i32,
-    unknown2: i32,
-    unknown3: i32,
-    unknown4: i32,
-    unknown5: [u8; 12],
-    label_func: ResolutionLabelFunc,
-    toggle_func: ResolutionToggleFunc,
-    value: *mut [c_char; 15],
+patch_groups! {
+    static PATCH_GROUPS = [
+        audio::hooks,
+        database,
+        drawmode::hooks,
+        mechlab,
+        registry,
+        settings_ui,
+        win32,
+    ];
 }
 
-static DEBUG_LOG_HOOK: RwLock<Option<RawDetour>> = RwLock::new(None);
+pub static SMACK_MODULE: ModuleBase = ModuleBase::new("SMACKW32.DLL");
 
-type LoadMechVariantListFunc = unsafe extern "cdecl" fn(*const c_char);
-static LOAD_MECH_VARIANT_LIST_HOOK: RwLock<Option<GenericDetour<LoadMechVariantListFunc>>> =
-    RwLock::new(None);
+patch_groups! {
+    static SMACK_PATCH_GROUPS = [
+        smacker,
+    ];
+}
 
-type GetDbItemLzFunc =
-    unsafe extern "fastcall" fn(*mut c_void, *mut c_void, i32, *mut *mut u8, *mut usize) -> i32;
-static GET_DB_ITEM_LZ_HOOK: RwLock<Option<GenericDetour<GetDbItemLzFunc>>> = RwLock::new(None);
-
-type ResolutionLabelFunc = unsafe extern "cdecl" fn(*mut SomeSettingsStruct) -> *mut *mut c_void;
-static RESOLUTION_LABEL_HOOK: RwLock<Option<GenericDetour<ResolutionLabelFunc>>> =
-    RwLock::new(None);
-
-type ResolutionToggleFunc = unsafe extern "cdecl" fn(*mut SomeSettingsStruct);
-static RESOLUTION_TOGGLE_HOOK: RwLock<Option<GenericDetour<ResolutionToggleFunc>>> =
-    RwLock::new(None);
-
-type LoadSettingsFromRegistryFunc = unsafe extern "cdecl" fn(*mut i32, *mut i32, *mut i32) -> BOOL;
-static LOAD_SETTINGS_FROM_REGISTRY_HOOK: RwLock<
-    Option<GenericDetour<LoadSettingsFromRegistryFunc>>,
-> = RwLock::new(None);
-
-type SomeSettingsWeirdFunc =
-    unsafe extern "thiscall" fn(*mut c_void, i32, i32, *const c_char, u32) -> *mut *mut c_void;
-static G_SOME_SETTINGS_WEIRD_FUNC: RwLock<Option<SomeSettingsWeirdFunc>> = RwLock::new(None);
-
-type LoadFileFromPrjFunc = unsafe extern "thiscall" fn(*mut c_void, *const c_char, i32) -> i32;
-static G_LOAD_FILE_FROM_PRJ: RwLock<Option<LoadFileFromPrjFunc>> = RwLock::new(None);
-
-globals!(
-    static G_MECH_VARIANT_FILENAMES: [[c_char; 13]; 200] = 0x00079d80;
-    static G_PRJ_OBJECT: c_void = 0x00071230;
-    // static G_DATABASE_MW2: *mut c_void = 0x0007122c;
-    static G_SOME_SETTINGS_WEIRD_GLOBAL: *mut c_void = 0x00071214;
-);
-
-static mut LOADED: bool = false;
+type ShellMainProc = unsafe extern "stdcall" fn(HMODULE, i32, *const c_char, i32, HWND) -> i32;
 
 pub struct Shell {
     ail: Ail,
@@ -122,103 +57,36 @@ pub struct Shell {
 
 impl Shell {
     pub fn new() -> Result<Self> {
-        if unsafe { LOADED } {
+        if MODULE.is_loaded() {
             bail!("Can't load shell more than once");
         }
 
         let module = unsafe { LoadLibraryA(s!("MW2SHELL.DLL"))? };
-        let base_address = module.0 as usize;
 
-        MODULE.set(base_address);
+        match unsafe { Self::install(module) } {
+            Ok(ail) => Ok(Self { ail, module }),
+            Err(e) => {
+                revert_groups(SMACK_PATCH_GROUPS);
+                revert_groups(PATCH_GROUPS);
+                SMACK_MODULE.clear();
+                MODULE.clear();
+                unsafe {
+                    let _ = FreeLibrary(module);
+                }
+                Err(e)
+            }
+        }
+    }
+
+    unsafe fn install(module: HMODULE) -> Result<Ail> {
+        MODULE.set(module.0 as usize);
+        unsafe { apply_groups(PATCH_GROUPS)? };
 
         let smack_module = unsafe { GetModuleHandleA(s!("SMACKW32.DLL"))? };
-        let smack_base_address = smack_module.0 as usize;
+        SMACK_MODULE.set(smack_module.0 as usize);
+        unsafe { apply_groups(SMACK_PATCH_GROUPS)? };
 
-        unsafe {
-            let heap_free_thunk = (base_address + 0x0009952c) as *mut HeapFreeFunc;
-            *heap_free_thunk = fake_heap_free;
-
-            let reg_create_key_ex_a_thunk = (base_address + 0x000993f0) as *mut RegCreateKeyExAFunc;
-            *reg_create_key_ex_a_thunk = Self::reg_create_key_ex_a;
-
-            let reg_open_key_ex_a_thunk = (base_address + 0x000993e8) as *mut RegOpenKeyExAFunc;
-            *reg_open_key_ex_a_thunk = Self::reg_open_key_ex_a;
-
-            let create_file_thunk = (smack_base_address + 0x0000e150) as *mut CreateFileFunc;
-            *create_file_thunk = Self::create_file;
-
-            // Make Smacker skip DirectSound and use its waveOut path instead.
-            // DirectSound was causing FMV audio to go missing on Windows.
-            let smack_use_direct_sound = (smack_base_address + 0x0000c610) as *mut usize;
-            *smack_use_direct_sound = 0;
-
-            let set_menu_thunk = (base_address + 0x000995bc) as *mut SetMenuFunc;
-            *set_menu_thunk = fake_set_menu;
-
-            *G_LOAD_FILE_FROM_PRJ.write().unwrap() = Some(std::mem::transmute::<
-                usize,
-                LoadFileFromPrjFunc,
-            >(base_address + 0x0002e346));
-
-            *G_SOME_SETTINGS_WEIRD_FUNC.write().unwrap() =
-                Some(std::mem::transmute::<usize, SomeSettingsWeirdFunc>(
-                    base_address + 0x0000544e,
-                ));
-
-            *DEBUG_LOG_HOOK.write().unwrap() = {
-                let hook = RawDetour::new(
-                    (base_address + 0x00017982) as *const (),
-                    debug_log as *const (),
-                )?;
-                hook.enable()?;
-                Some(hook)
-            };
-
-            *LOAD_MECH_VARIANT_LIST_HOOK.write().unwrap() = {
-                let load_mech_variant_list: LoadMechVariantListFunc =
-                    std::mem::transmute(base_address + 0x0000c8b8);
-                Some(hook_function(
-                    load_mech_variant_list,
-                    Self::load_mech_variant_list,
-                )?)
-            };
-
-            *GET_DB_ITEM_LZ_HOOK.write().unwrap() = {
-                let get_db_item_midi: GetDbItemLzFunc =
-                    std::mem::transmute(base_address + 0x0004813f);
-                Some(hook_function(get_db_item_midi, Self::get_db_item_lz)?)
-            };
-
-            *RESOLUTION_LABEL_HOOK.write().unwrap() = {
-                let resolution_label: ResolutionLabelFunc =
-                    std::mem::transmute(base_address + 0x000435e9);
-                Some(hook_function(resolution_label, Self::resolution_label)?)
-            };
-
-            *RESOLUTION_TOGGLE_HOOK.write().unwrap() = {
-                let resolution_toggle: ResolutionToggleFunc =
-                    std::mem::transmute(base_address + 0x00043703);
-                Some(hook_function(resolution_toggle, Self::resolution_toggle)?)
-            };
-
-            *LOAD_SETTINGS_FROM_REGISTRY_HOOK.write().unwrap() = {
-                let load_settings_from_registry: LoadSettingsFromRegistryFunc =
-                    std::mem::transmute(base_address + 0x000103e2);
-                Some(hook_function(
-                    load_settings_from_registry,
-                    Self::load_settings_from_registry,
-                )?)
-            };
-
-            audio::hook_functions(base_address)?;
-            drawmode::hook_functions(base_address)?;
-
-            let ail = Ail::new()?;
-
-            LOADED = true;
-
-            Ok(Self { ail, module })
-        }
+        Ail::new()
     }
 
     pub fn shell_main(&self, intro_or_sim: &str, window: HWND) -> Result<i32> {
@@ -248,283 +116,19 @@ impl Shell {
             >(window_proc))
         }
     }
-
-    /// Patched to avoid a bug where Smacker would infinite loop as it failed to read the video file.
-    /// It seems like reading a file without buffering has stricter requirements in modern WIndows.
-    unsafe extern "system" fn create_file(
-        lpfilename: PCSTR,
-        dwdesiredaccess: u32,
-        dwsharemode: FILE_SHARE_MODE,
-        lpsecurityattributes: *const SECURITY_ATTRIBUTES,
-        dwcreationdisposition: FILE_CREATION_DISPOSITION,
-        dwflagsandattributes: FILE_FLAGS_AND_ATTRIBUTES,
-        htemplatefile: HANDLE,
-    ) -> HANDLE {
-        unsafe {
-            let lpsecurityattributes = if lpsecurityattributes.is_null() {
-                None
-            } else {
-                Some(lpsecurityattributes)
-            };
-
-            let htemplatefile = if htemplatefile.is_invalid() {
-                None
-            } else {
-                Some(htemplatefile)
-            };
-
-            // Remove FILE_FLAG_NO_BUFFERING
-            let dwflagsandattributes = dwflagsandattributes.0 & !0x2000_0000;
-
-            if let Ok(handle) = CreateFileA(
-                lpfilename,
-                dwdesiredaccess,
-                dwsharemode,
-                lpsecurityattributes,
-                dwcreationdisposition,
-                FILE_FLAGS_AND_ATTRIBUTES(dwflagsandattributes),
-                htemplatefile,
-            ) {
-                handle
-            } else {
-                INVALID_HANDLE_VALUE
-            }
-        }
-    }
-
-    /// Called by the game to load a file from DATABASE.MW2 and LZ decompress it.
-    ///
-    /// Hooking it for now to allow for reimplementation later.
-    unsafe extern "fastcall" fn get_db_item_lz(
-        db: *mut c_void,
-        unused: *mut c_void,
-        index: i32,
-        midi_data: *mut *mut u8,
-        midi_data_size: *mut usize,
-    ) -> i32 {
-        unsafe {
-            GET_DB_ITEM_LZ_HOOK.read().unwrap().as_ref().unwrap().call(
-                db,
-                unused,
-                index,
-                midi_data,
-                midi_data_size,
-            )
-        }
-    }
-
-    /// Loads the list of mech variants from the MW2.PRJ file and any user variants from the filesystem.
-    /// Patched to avoid a bug where the game was using an older Win32 API
-    unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) {
-        unsafe {
-            const SLOT_LEN: usize = 13;
-
-            let write_slot = |dst: *mut c_char, name: &[u8]| {
-                debug_assert!(name.len() < SLOT_LEN);
-                let dst = dst.cast::<u8>();
-                std::ptr::write_bytes(dst, 0, SLOT_LEN);
-                std::ptr::copy_nonoverlapping(name.as_ptr(), dst, name.len());
-            };
-
-            // Create "MEK" folder if it doesn't exist
-            if let Err(e) = fs::create_dir_all("MEK") {
-                tracing::warn!("load_mech_variant_list: cannot create MEK dir: {e}");
-            }
-
-            let Ok(mech_type) = CStr::from_ptr(mech_type).to_str() else {
-                tracing::warn!("load_mech_variant_list: non-UTF8 mech_type");
-                return;
-            };
-
-            // Clear the list
-            let filenames = &mut *(G_MECH_VARIANT_FILENAMES.ptr());
-            filenames.fill([0; SLOT_LEN as _]);
-
-            // Make sure we have at least the default variant
-            write_slot(
-                filenames[0].as_mut_ptr(),
-                format!("{mech_type}00std").as_bytes(),
-            );
-
-            // Load the built-in mech variants from the MW2.PRJ file into the next 99 indices
-            for (i, slot) in filenames[1..100].iter_mut().enumerate() {
-                let variant = format!("{mech_type}{:02}std", i + 1);
-                let c_variant = CString::new(variant.as_str()).expect("no interior NUL");
-
-                let result = G_LOAD_FILE_FROM_PRJ.read().unwrap().unwrap()(
-                    G_PRJ_OBJECT.ptr(),
-                    c_variant.as_ptr(),
-                    6,
-                );
-
-                if result > -1 {
-                    write_slot(slot.as_mut_ptr(), variant.as_bytes());
-                }
-            }
-
-            // Find all user-defined mech variants from the filesystem and load their names into index 100 and higher
-            let Ok(files) = fs::read_dir("MEK") else {
-                return;
-            };
-
-            for file in files.flatten() {
-                let Some(name) = file.file_name().to_str().map(str::to_owned) else {
-                    continue;
-                };
-
-                let is_match = name.len() == 11
-                    && name[..3].eq_ignore_ascii_case(mech_type)
-                    && name[3..5].bytes().all(|b| b.is_ascii_digit())
-                    && name[5..].eq_ignore_ascii_case("usr.mek");
-                if !is_match {
-                    continue;
-                }
-
-                let n: usize = name[3..5].parse().expect("two ASCII digits");
-                let i = 100 + n;
-                if let Some(slot) = filenames.get_mut(i) {
-                    write_slot(slot.as_mut_ptr(), &name.as_bytes()[..8]);
-                }
-            }
-        }
-    }
-
-    unsafe extern "system" fn reg_create_key_ex_a(
-        h_key: HKEY,
-        sub_key: PCSTR,
-        reserved: u32,
-        class: PCSTR,
-        options: REG_OPEN_CREATE_OPTIONS,
-        sam: REG_SAM_FLAGS,
-        security_attributes: *const SECURITY_ATTRIBUTES,
-        result: *mut HKEY,
-        disposition: *mut REG_CREATE_KEY_DISPOSITION,
-    ) -> WIN32_ERROR {
-        unsafe {
-            let h_key = if h_key == HKEY_LOCAL_MACHINE {
-                HKEY_CURRENT_USER
-            } else {
-                h_key
-            };
-
-            let security_attributes = if security_attributes.is_null() {
-                None
-            } else {
-                Some(security_attributes)
-            };
-
-            let disposition = if disposition.is_null() {
-                None
-            } else {
-                Some(disposition)
-            };
-
-            RegCreateKeyExA(
-                h_key,
-                sub_key,
-                Some(reserved),
-                class,
-                options,
-                sam,
-                security_attributes,
-                result,
-                disposition,
-            )
-        }
-    }
-
-    unsafe extern "system" fn reg_open_key_ex_a(
-        h_key: HKEY,
-        sub_key: PCSTR,
-        reserved: u32,
-        sam: REG_SAM_FLAGS,
-        result: *mut HKEY,
-    ) -> WIN32_ERROR {
-        unsafe {
-            let h_key = if h_key == HKEY_LOCAL_MACHINE {
-                HKEY_CURRENT_USER
-            } else {
-                h_key
-            };
-
-            RegOpenKeyExA(h_key, sub_key, Some(reserved), sam, result)
-        }
-    }
-
-    unsafe extern "cdecl" fn resolution_label(
-        settings: *mut SomeSettingsStruct,
-    ) -> *mut *mut c_void {
-        unsafe {
-            let value = (*(*settings).value)[4];
-            let label = if value == b'4' as i8 {
-                c"~640x480"
-            } else if value == b'7' as i8 {
-                c"~1024x768"
-            } else {
-                c"~320x200"
-            };
-
-            let weird_func = G_SOME_SETTINGS_WEIRD_FUNC.read().unwrap().unwrap();
-            weird_func(
-                G_SOME_SETTINGS_WEIRD_GLOBAL.get(),
-                (*settings).unknown1 + (*settings).unknown3 / 2,
-                (*settings).unknown2,
-                label.as_ptr(),
-                0,
-            )
-        }
-    }
-
-    unsafe extern "cdecl" fn resolution_toggle(settings: *mut SomeSettingsStruct) {
-        unsafe {
-            if (*(*settings).value)[4] == b'4' as i8 {
-                std::ptr::copy_nonoverlapping(
-                    c"vesa768.dll".as_ptr(),
-                    (*(*settings).value).as_mut_ptr(),
-                    12,
-                );
-            } else if (*(*settings).value)[4] == b'7' as i8 {
-                (*(*settings).value).fill(0);
-            } else {
-                std::ptr::copy_nonoverlapping(
-                    c"vesa480.dll".as_ptr(),
-                    (*(*settings).value).as_mut_ptr(),
-                    12,
-                );
-            }
-        }
-    }
-
-    unsafe extern "cdecl" fn load_settings_from_registry(
-        quick_tips: *mut i32,
-        show_dialog: *mut i32,
-        little_movies: *mut i32,
-    ) -> BOOL {
-        unsafe {
-            *quick_tips = 0;
-            *show_dialog = 0;
-            *little_movies = 0;
-        }
-        TRUE
-    }
 }
 
 impl Drop for Shell {
     fn drop(&mut self) {
+        revert_groups(SMACK_PATCH_GROUPS);
+        revert_groups(PATCH_GROUPS);
+        drawmode::hooks::shutdown();
+
         unsafe {
-            MODULE.clear();
-            crate::SHELL_WINDOW_PROC = None;
-            DEBUG_LOG_HOOK.write().unwrap().take();
-            LOAD_MECH_VARIANT_LIST_HOOK.write().unwrap().take();
-            GET_DB_ITEM_LZ_HOOK.write().unwrap().take();
-            RESOLUTION_LABEL_HOOK.write().unwrap().take();
-            RESOLUTION_TOGGLE_HOOK.write().unwrap().take();
-            LOAD_SETTINGS_FROM_REGISTRY_HOOK.write().unwrap().take();
-            audio::unhook_functions();
-            drawmode::unhook_functions();
             self.ail.unhook();
+            SMACK_MODULE.clear();
+            MODULE.clear();
             FreeLibrary(self.module).unwrap();
-            LOADED = false;
         }
     }
 }

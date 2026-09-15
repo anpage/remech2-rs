@@ -67,12 +67,45 @@ macro_rules! pick_module {
 pub use crate::pick_module;
 
 /// Declares a table of import thunks to overwrite.
+///
+/// Two rules rather than an `$(in $module)?` suffix, because the module would
+/// then be an optional at depth 0 used inside the per-entry repetition, which
+/// `macro_rules!` rejects. Both forms hand off to [`thunks_in!`] with the module
+/// spelled out. [`data_patches!`] is split the same way.
 #[macro_export]
 macro_rules! thunks {
     (
         $(#[$attr:meta])*
-        $vis:vis static $name:ident $(in $module:ident)? = [
+        $vis:vis static $name:ident in $module:ident = [
             $($rva:literal => $replacement:path),* $(,)?
+        ];
+    ) => {
+        $crate::thunks_in! {
+            $(#[$attr])*
+            $vis static $name in $module = [$($rva => $replacement,)*];
+        }
+    };
+    (
+        $(#[$attr:meta])*
+        $vis:vis static $name:ident = [
+            $($rva:literal => $replacement:path),* $(,)?
+        ];
+    ) => {
+        $crate::thunks_in! {
+            $(#[$attr])*
+            $vis static $name in MODULE = [$($rva => $replacement,)*];
+        }
+    };
+}
+pub use crate::thunks;
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! thunks_in {
+    (
+        $(#[$attr:meta])*
+        $vis:vis static $name:ident in $module:ident = [
+            $($rva:literal => $replacement:path,)*
         ];
     ) => {
         $(#[$attr])*
@@ -80,7 +113,7 @@ macro_rules! thunks {
             $crate::patch::Table::new(
                 stringify!($name),
                 &[$($crate::thunk::Thunk::new(
-                    &$crate::pick_module!($($module)?),
+                    &$module,
                     $rva,
                     stringify!($replacement),
                     $replacement as *const (),
@@ -88,15 +121,43 @@ macro_rules! thunks {
             );
     };
 }
-pub use crate::thunks;
+pub use crate::thunks_in;
 
 /// Declares a table of raw byte writes into the game's data.
 #[macro_export]
 macro_rules! data_patches {
     (
         $(#[$attr:meta])*
-        $vis:vis static $name:ident $(in $module:ident)? = [
+        $vis:vis static $name:ident in $module:ident = [
             $($label:ident: $rva:literal => $bytes:expr),* $(,)?
+        ];
+    ) => {
+        $crate::data_patches_in! {
+            $(#[$attr])*
+            $vis static $name in $module = [$($label: $rva => $bytes,)*];
+        }
+    };
+    (
+        $(#[$attr:meta])*
+        $vis:vis static $name:ident = [
+            $($label:ident: $rva:literal => $bytes:expr),* $(,)?
+        ];
+    ) => {
+        $crate::data_patches_in! {
+            $(#[$attr])*
+            $vis static $name in MODULE = [$($label: $rva => $bytes,)*];
+        }
+    };
+}
+pub use crate::data_patches;
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! data_patches_in {
+    (
+        $(#[$attr:meta])*
+        $vis:vis static $name:ident in $module:ident = [
+            $($label:ident: $rva:literal => $bytes:expr,)*
         ];
     ) => {
         $(#[$attr])*
@@ -104,7 +165,7 @@ macro_rules! data_patches {
             $crate::patch::Table::new(
                 stringify!($name),
                 &[$($crate::thunk::DataPatch::new(
-                    &$crate::pick_module!($($module)?),
+                    &$module,
                     $rva,
                     stringify!($label),
                     $bytes,
@@ -112,7 +173,7 @@ macro_rules! data_patches {
             );
     };
 }
-pub use crate::data_patches;
+pub use crate::data_patches_in;
 
 /// Collects a file's bindings into the list its parent module registers.
 ///
