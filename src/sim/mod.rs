@@ -18,17 +18,7 @@ use binding::{
 use crate::{
     WindowProc,
     ail::Ail,
-    ailrs::{
-        self,
-        interface::{
-            allocate_file_sample, allocate_sample_handle, end_sample, init_sample,
-            load_sample_buffer, register_eos_callback, release_sample_handle, resume_sample,
-            sample_buffer_ready, sample_user_data, serve, set_preference, set_sample_loop_count,
-            set_sample_pan, set_sample_playback_rate, set_sample_type, set_sample_user_data,
-            set_sample_volume, start_sample, stop_sample, wave_out_open,
-        },
-    },
-    common::{HeapFreeFunc, fake_heap_free},
+    ailrs,
     sim::{
         timing::G_DELTA_TIME,
         types::RenderTarget,
@@ -36,6 +26,7 @@ use crate::{
     },
 };
 
+mod audio;
 mod camera;
 mod cd_audio;
 pub mod drawmode;
@@ -43,16 +34,19 @@ mod hud;
 mod input;
 mod jumpjets;
 mod math;
+mod menu;
 mod shots;
 mod stats;
 mod timing;
 mod types;
+mod win32;
 pub mod window;
 
 pub static MODULE: ModuleBase = ModuleBase::new("MW2.DLL");
 
 patch_groups! {
     static PATCH_GROUPS = [
+        audio,
         camera,
         cd_audio,
         drawmode::hooks,
@@ -60,8 +54,10 @@ patch_groups! {
         input,
         jumpjets,
         math,
+        menu,
         shots,
         timing,
+        win32,
         window,
     ];
 }
@@ -83,106 +79,29 @@ pub struct Sim {
 impl Sim {
     pub fn new() -> Result<Self> {
         if MODULE.is_loaded() {
-            bail!("Can't load shell more than once");
+            bail!("Can't load sim more than once");
         }
 
         let module = unsafe { LoadLibraryA(s!("MW2.DLL"))? };
-        let base_address = module.0 as usize;
 
-        MODULE.set(base_address);
-
-        if let Err(e) = unsafe { apply_groups(PATCH_GROUPS) } {
-            MODULE.clear();
-            unsafe {
-                let _ = FreeLibrary(module);
+        match unsafe { Self::install(module) } {
+            Ok(ail) => Ok(Self { ail, module }),
+            Err(e) => {
+                revert_groups(PATCH_GROUPS);
+                MODULE.clear();
+                unsafe {
+                    let _ = FreeLibrary(module);
+                }
+                Err(e)
             }
-            return Err(e);
         }
+    }
 
-        let flee_option = (base_address + 0x000a1ad0) as *mut [u8; 7];
-        unsafe {
-            flee_option.write_volatile(*(b"Desktop"));
-        }
+    unsafe fn install(module: HMODULE) -> Result<Ail> {
+        MODULE.set(module.0 as usize);
+        unsafe { apply_groups(PATCH_GROUPS)? };
 
-        let flee_title = (base_address + 0x000a1b08) as *mut [u8; 7];
-        unsafe {
-            flee_title.write_volatile(*(b"DESKTOP"));
-        }
-
-        unsafe {
-            let heap_free_thunk = (base_address + 0x001834d0) as *mut HeapFreeFunc;
-            *heap_free_thunk = fake_heap_free;
-
-            // AIL replacement
-
-            let ail_allocate_file_sample_thunk = (base_address + 0x001836e8) as *mut usize;
-            *ail_allocate_file_sample_thunk = allocate_file_sample as *const () as usize;
-
-            let ail_allocate_sample_handle_thunk = (base_address + 0x00183654) as *mut usize;
-            *ail_allocate_sample_handle_thunk = allocate_sample_handle as *const () as usize;
-
-            let ail_end_sample_thunk = (base_address + 0x00183674) as *mut usize;
-            *ail_end_sample_thunk = end_sample as *const () as usize;
-
-            let ail_init_sample_thunk = (base_address + 0x001836dc) as *mut usize;
-            *ail_init_sample_thunk = init_sample as *const () as usize;
-
-            let ail_load_sample_buffer_thunk = (base_address + 0x00183690) as *mut usize;
-            *ail_load_sample_buffer_thunk = load_sample_buffer as *const () as usize;
-
-            let ail_register_eos_callback_thunk = (base_address + 0x001836d8) as *mut usize;
-            *ail_register_eos_callback_thunk = register_eos_callback as *const () as usize;
-
-            let ail_release_sample_handle_thunk = (base_address + 0x001836ec) as *mut usize;
-            *ail_release_sample_handle_thunk = release_sample_handle as *const () as usize;
-
-            let ail_resume_sample_thunk = (base_address + 0x0018366c) as *mut usize;
-            *ail_resume_sample_thunk = resume_sample as *const () as usize;
-
-            let ail_sample_buffer_ready_thunk = (base_address + 0x00183650) as *mut usize;
-            *ail_sample_buffer_ready_thunk = sample_buffer_ready as *const () as usize;
-
-            let ail_sample_user_data_thunk = (base_address + 0x00183664) as *mut usize;
-            *ail_sample_user_data_thunk = sample_user_data as *const () as usize;
-
-            let ail_set_preference_thunk = (base_address + 0x00183698) as *mut usize;
-            *ail_set_preference_thunk = set_preference as *const () as usize;
-
-            let ail_set_sample_loop_count_thunk = (base_address + 0x001836e4) as *mut usize;
-            *ail_set_sample_loop_count_thunk = set_sample_loop_count as *const () as usize;
-
-            let ail_set_sample_pan_thunk = (base_address + 0x0018368c) as *mut usize;
-            *ail_set_sample_pan_thunk = set_sample_pan as *const () as usize;
-
-            let ail_set_sample_playback_rate_thunk = (base_address + 0x001836d0) as *mut usize;
-            *ail_set_sample_playback_rate_thunk = set_sample_playback_rate as *const () as usize;
-
-            let ail_set_sample_type_thunk = (base_address + 0x001836d4) as *mut usize;
-            *ail_set_sample_type_thunk = set_sample_type as *const () as usize;
-
-            let ail_set_sample_user_data_thunk = (base_address + 0x00183678) as *mut usize;
-            *ail_set_sample_user_data_thunk = set_sample_user_data as *const () as usize;
-
-            let ail_set_sample_volume_thunk = (base_address + 0x00183668) as *mut usize;
-            *ail_set_sample_volume_thunk = set_sample_volume as *const () as usize;
-
-            let ail_start_sample_thunk = (base_address + 0x001836e0) as *mut usize;
-            *ail_start_sample_thunk = start_sample as *const () as usize;
-
-            let ail_stop_sample_thunk = (base_address + 0x00183670) as *mut usize;
-            *ail_stop_sample_thunk = stop_sample as *const () as usize;
-
-            let ail_wave_out_open_thunk = (base_address + 0x001836b0) as *mut usize;
-            *ail_wave_out_open_thunk = wave_out_open as *const () as usize;
-
-            let ail_serve_thunk = (base_address + 0x001836b4) as *mut usize;
-            *ail_serve_thunk = serve as *const () as usize;
-
-            Ok(Self {
-                ail: Ail::new()?,
-                module,
-            })
-        }
+        Ail::new()
     }
 
     pub fn sim_main(

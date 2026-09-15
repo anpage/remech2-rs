@@ -12,7 +12,6 @@ unsafe extern "C" {
     fn vsprintf(s: *mut c_char, format: *const c_char, ap: VaList) -> c_int;
 }
 
-pub type HeapFreeFunc = unsafe extern "system" fn(HANDLE, HEAP_FLAGS, *const c_void) -> BOOL;
 pub unsafe extern "system" fn fake_heap_free(
     _h_heap: HANDLE,
     _dw_flags: HEAP_FLAGS,
