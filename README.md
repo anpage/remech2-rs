@@ -114,9 +114,9 @@ DLL files in order to fill in the gaps until everything is 100% reimplemented.
 GeneralUser GS by S. Christian Collins is included as the default soundfont.
 See `LICENSE-GUGS.txt` for more information.
 
-The Science Gothic font embedded for the overlay UI is licensed under the SIL
+The Squarish Sans font embedded for the overlay UI is licensed under the SIL
 Open Font License, Version 1.1.
-See `LICENSE-ScienceGothic.txt` for more information.
+See `LICENSE-SquarishSans.txt` for more information.
 
 **ReMech 2 is an unofficial, fan-made project. It is not affiliated with,
 endorsed by, or associated with Microsoft, Activision, or any of their

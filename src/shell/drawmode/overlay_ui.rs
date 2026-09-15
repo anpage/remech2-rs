@@ -28,17 +28,18 @@ pub struct OverlayUi {
 
 impl Default for OverlayUi {
     fn default() -> Self {
-        // Load the Science Gothic font
-        let font = egui::FontData::from_static(include_bytes!("../../../ScienceGothic-Reg.ttf"));
+        // Load the Squarish Sans font
+        let font =
+            egui::FontData::from_static(include_bytes!("../../../Squarish_Sans_CT_Regular_SC.ttf"));
         let mut fonts = egui::FontDefinitions::default();
         fonts
             .font_data
-            .insert("ScienceGothic".to_owned(), Arc::new(font));
+            .insert("SquarishSans".to_owned(), Arc::new(font));
         fonts
             .families
             .get_mut(&egui::FontFamily::Proportional)
             .unwrap()
-            .insert(0, "ScienceGothic".to_owned());
+            .insert(0, "SquarishSans".to_owned());
 
         Self {
             shell_hovered: false,
@@ -126,16 +127,16 @@ impl OverlayUi {
                         };
                         set_font_size(ui);
                         if ui
-                            .menu_button("CLAN", |ui| {
+                            .menu_button("Clan", |ui| {
                                 set_font_size(ui);
-                                if ui.button("NEW ALLEGIANCE").clicked() {
+                                if ui.button("New Alliance").clicked() {
                                     handle_menu_button(40001);
                                 }
-                                if ui.button("HALL OF HONOR").clicked() {
+                                if ui.button("Hall of Honor").clicked() {
                                     handle_menu_button(40002);
                                 }
                                 ui.separator();
-                                if ui.button("FLEE TO DESKTOP").clicked() {
+                                if ui.button("Flee to Desktop").clicked() {
                                     // Originally menu item 40003
                                     self.exit_dialog_open = true;
                                 }
@@ -146,12 +147,12 @@ impl OverlayUi {
                             menu_open = true;
                         }
                         if ui
-                            .menu_button("OPTIONS", |ui| {
+                            .menu_button("Options", |ui| {
                                 set_font_size(ui);
-                                if ui.button("COMBAT VARIABLES...").clicked() {
+                                if ui.button("Combat Variables...").clicked() {
                                     handle_menu_button(40084);
                                 }
-                                if ui.button("COCKPIT CONTROLS...").clicked() {
+                                if ui.button("Cockpit Controls...").clicked() {
                                     handle_menu_button(40011);
                                 }
                             })
@@ -161,13 +162,13 @@ impl OverlayUi {
                             menu_open = true;
                         }
                         if ui
-                            .menu_button("HELP", |ui| {
+                            .menu_button("Help", |ui| {
                                 set_font_size(ui);
-                                if ui.button("THE KESHIK").clicked() {
+                                if ui.button("The Keshik").clicked() {
                                     handle_menu_button(40082);
                                 }
                                 ui.separator();
-                                if ui.button("ABOUT REMECH 2").clicked() {
+                                if ui.button("About ReMech 2").clicked() {
                                     self.about_dialog_open = true;
                                 }
                             })
@@ -181,7 +182,7 @@ impl OverlayUi {
         };
 
         if self.exit_dialog_open {
-            egui::Window::new("EMBRACE COWARDICE?")
+            egui::Window::new("Embrace Cowardice?")
                 .resizable(false)
                 .collapsible(false)
                 .pivot(egui::Align2::CENTER_CENTER)
@@ -190,11 +191,11 @@ impl OverlayUi {
                     egui::Frame::new().inner_margin(20.0).show(ui, |ui| {
                         ui.horizontal(|ui| {
                             ui.add_space(42.0);
-                            if ui.button(RichText::new("YES").size(16.0)).clicked() {
+                            if ui.button(RichText::new("Yes").size(16.0)).clicked() {
                                 exit(0);
                             }
                             ui.add_space(42.0);
-                            if ui.button(RichText::new("NO").size(16.0)).clicked() {
+                            if ui.button(RichText::new("No").size(16.0)).clicked() {
                                 self.exit_dialog_open = false;
                             }
                         });

@@ -36,17 +36,18 @@ pub struct DebugOverlay {
 
 impl Default for DebugOverlay {
     fn default() -> Self {
-        // Load the Science Gothic font
-        let font = egui::FontData::from_static(include_bytes!("../../../ScienceGothic-Reg.ttf"));
+        // Load the Squarish Sans font
+        let font =
+            egui::FontData::from_static(include_bytes!("../../../Squarish_Sans_CT_Regular_SC.ttf"));
         let mut fonts = egui::FontDefinitions::default();
         fonts
             .font_data
-            .insert("ScienceGothic".to_owned(), Arc::new(font));
+            .insert("SquarishSans".to_owned(), Arc::new(font));
         fonts
             .families
             .get_mut(&egui::FontFamily::Proportional)
             .unwrap()
-            .insert(0, "ScienceGothic".to_owned());
+            .insert(0, "SquarishSans".to_owned());
 
         Self {
             fonts,
