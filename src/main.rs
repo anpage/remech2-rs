@@ -33,7 +33,6 @@ mod ail;
 mod ailrs;
 mod cd_audio;
 mod common;
-mod hooker;
 mod launcher;
 mod midi_source;
 mod settings;

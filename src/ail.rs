@@ -4,19 +4,22 @@ use std::{
 };
 
 use anyhow::Result;
-use retour::GenericDetour;
+use binding::{
+    globals,
+    macros::{hook, patch_groups, patches},
+    module::ModuleBase,
+    patch::{apply_groups, revert_groups},
+};
 use windows::{
     Win32::{
         Media::{
             Audio::{HWAVEOUT, WAVEHDR},
             MM_WOM_DONE,
         },
-        System::LibraryLoader::*,
+        System::LibraryLoader::GetModuleHandleA,
     },
     core::s,
 };
-
-use crate::hooker::hook_function;
 
 #[repr(C)]
 struct WaveHdrUser {
@@ -39,187 +42,154 @@ struct SomeTimerStruct {
     next_proc_time: i32,
 }
 
-type WaveOutProc = unsafe extern "stdcall" fn(HWAVEOUT, u32, usize, usize, usize);
-static WAVE_OUT_HOOK: RwLock<Option<GenericDetour<WaveOutProc>>> = RwLock::new(None);
+/// WAIL32.DLL gets loaded as a dependnecy of the sim and shell.
+/// We only ever attach to the copy they loaded.
+pub static MODULE: ModuleBase = ModuleBase::new("WAIL32.DLL");
 
-type FileReadFunc = unsafe extern "stdcall" fn(*const c_char, *mut c_void) -> *mut c_void;
-static FILE_READ_HOOK: RwLock<Option<GenericDetour<FileReadFunc>>> = RwLock::new(None);
-
-type MemFreeLockFunc = unsafe extern "stdcall" fn(*mut c_void);
-static MEM_FREE_LOCK_HOOK: RwLock<Option<GenericDetour<MemFreeLockFunc>>> = RwLock::new(None);
-
-type TimeProc = unsafe extern "stdcall" fn(u32, u32, *mut c_void, *mut c_void, *mut c_void);
-static TIME_HOOK: RwLock<Option<GenericDetour<TimeProc>>> = RwLock::new(None);
-
-static mut G_LAST_FINISHED_WAVE_HDR: *mut *mut WAVEHDR = std::ptr::null_mut();
-static mut G_LAST_FINISHED_WAVE_HDR_USER: *mut *mut WaveHdrUser = std::ptr::null_mut();
-static mut G_WAVE_OUT_PROC_GLOBAL_THING: *mut u32 = std::ptr::null_mut();
-
-static mut G_PERIOD: *mut i32 = std::ptr::null_mut();
-static mut G_COUNTER: *mut u32 = std::ptr::null_mut();
-static mut G_TIMERS: *mut *mut SomeTimerStruct = std::ptr::null_mut();
-static mut G_GLOBAL_3: *mut u32 = std::ptr::null_mut();
-static mut G_TIME_PROC_LOCKED: *mut i32 = std::ptr::null_mut();
-static mut G_GLOBAL_5: *mut u32 = std::ptr::null_mut();
-static mut G_NUM_TIMERS: *mut u32 = std::ptr::null_mut();
+globals!(
+    static G_LAST_FINISHED_WAVE_HDR: *mut WAVEHDR = 0x0001ba10;
+    static G_LAST_FINISHED_WAVE_HDR_USER: *mut WaveHdrUser = 0x0001ba0c;
+    static G_WAVE_OUT_PROC_GLOBAL_THING: u32 = 0x0001ba04;
+    static G_PERIOD: i32 = 0x0001b7fc;
+    static G_COUNTER: u32 = 0x0001b810;
+    static G_TIMERS: *mut SomeTimerStruct = 0x0001b7f8;
+    static G_GLOBAL_3: u32 = 0x0001b804;
+    static G_TIME_PROC_LOCKED: i32 = 0x00019030;
+    static G_GLOBAL_5: u32 = 0x0001c59c;
+    static G_NUM_TIMERS: u32 = 0x0001b800;
+);
 
 static ALLOCATED_BLOCKS: RwLock<Vec<usize>> = RwLock::new(Vec::<usize>::new());
+
+/// Replacement for AIL's waveOutOpen callback that doesn't try to suspend the main thread
+#[hook(rva = 0x00008e6d)]
+unsafe extern "stdcall" fn wave_out_proc(
+    _h_wave_out: HWAVEOUT,
+    u_msg: u32,
+    _dw_instance: usize,
+    dw_param1: usize,
+    _dw_param2: usize,
+) {
+    unsafe {
+        if u_msg == MM_WOM_DONE {
+            let wave_hdr = dw_param1 as *mut WAVEHDR;
+            G_LAST_FINISHED_WAVE_HDR.set(wave_hdr);
+            if (*wave_hdr).dwUser != 0 {
+                let user = *((*wave_hdr).dwUser as *mut *mut WaveHdrUser);
+                G_LAST_FINISHED_WAVE_HDR_USER.set(user);
+                if (*user).unknown6 != 0 {
+                    G_WAVE_OUT_PROC_GLOBAL_THING.set((*user).unknown4);
+                    let wave_hdrs = (*user).unknown3;
+                    *wave_hdrs.offset(G_WAVE_OUT_PROC_GLOBAL_THING.get() as isize) = wave_hdr;
+                    G_WAVE_OUT_PROC_GLOBAL_THING
+                        .set((G_WAVE_OUT_PROC_GLOBAL_THING.get() + 1) % (*user).unknown2);
+                    (*user).unknown4 = G_WAVE_OUT_PROC_GLOBAL_THING.get();
+                }
+            }
+        }
+    }
+}
+
+/// Hooked to keep track of the allocated blocks
+#[hook(rva = 0x0000845f)]
+unsafe extern "stdcall" fn file_read(file_name: *const c_char, buffer: *mut c_void) -> *mut c_void {
+    unsafe {
+        let result = original(file_name, buffer);
+        if result.is_null() {
+            return result;
+        }
+        let mut allocated_blocks = ALLOCATED_BLOCKS.write().unwrap();
+        if !allocated_blocks.contains(&(result as usize)) {
+            allocated_blocks.push(result as usize);
+        }
+        result
+    }
+}
+
+/// Only try to free blocks that we know haven't been freed yet
+#[hook(rva = 0x00001f14)]
+unsafe extern "stdcall" fn mem_free_lock(lp_mem: *mut c_void) {
+    unsafe {
+        if lp_mem.is_null() {
+            return;
+        }
+        let mut allocated_blocks = ALLOCATED_BLOCKS.write().unwrap();
+        if allocated_blocks.contains(&(lp_mem as usize)) {
+            original(lp_mem);
+            allocated_blocks.retain(|&x| x != lp_mem as usize);
+        }
+    }
+}
+
+/// Passed to timeSetEvent in AIL to handle timers.
+/// This also had calls to SuspendThread that needed to be removed.
+#[hook(rva = 0x000011c6)]
+unsafe extern "stdcall" fn time_proc(
+    _u_timer_id: u32,
+    _u_msg: u32,
+    _dw_user: *mut c_void,
+    _dw1: *mut c_void,
+    _dw2: *mut c_void,
+) {
+    unsafe {
+        if G_TIMERS.get().is_null() {
+            return;
+        }
+
+        let timers = std::slice::from_raw_parts_mut(G_TIMERS.get(), G_NUM_TIMERS.get() as usize);
+
+        G_COUNTER.set(G_COUNTER.get() + 1);
+
+        if G_GLOBAL_3.get() > 0 || G_TIME_PROC_LOCKED.get() == 1 {
+            return;
+        }
+
+        G_TIME_PROC_LOCKED.set(1);
+        G_GLOBAL_5.set(G_GLOBAL_5.get() + 1);
+        for timer in timers {
+            if timer.state == 2 {
+                timer.accumulated_time += G_PERIOD.get();
+                if timer.accumulated_time >= timer.next_proc_time {
+                    timer.accumulated_time -= timer.next_proc_time;
+                    (timer.callback)(timer.user);
+                }
+            }
+        }
+        G_GLOBAL_5.set(G_GLOBAL_5.get() - 1);
+        G_TIME_PROC_LOCKED.set(0);
+    }
+}
+
+patches!(
+    static PATCHES = [
+        hook wave_out_proc,
+        hook file_read,
+        hook mem_free_lock,
+        hook time_proc,
+    ];
+);
+
+patch_groups! {
+    static PATCH_GROUPS = [self];
+}
 
 pub struct Ail {}
 
 impl Ail {
     pub fn new() -> Result<Self> {
         let module = unsafe { GetModuleHandleA(s!("WAIL32.DLL"))? };
-        let base_address = module.0 as usize;
+        MODULE.set(module.0 as usize);
 
-        unsafe {
-            G_LAST_FINISHED_WAVE_HDR = (base_address + 0x0001ba10) as *mut *mut WAVEHDR;
-            G_LAST_FINISHED_WAVE_HDR_USER = (base_address + 0x0001ba0c) as *mut *mut WaveHdrUser;
-            G_WAVE_OUT_PROC_GLOBAL_THING = (base_address + 0x0001ba04) as *mut u32;
-
-            G_PERIOD = (base_address + 0x0001b7fc) as *mut i32;
-            G_COUNTER = (base_address + 0x0001b810) as *mut u32;
-            G_TIMERS = (base_address + 0x0001b7f8) as *mut *mut SomeTimerStruct;
-            G_GLOBAL_3 = (base_address + 0x0001b804) as *mut u32;
-            G_TIME_PROC_LOCKED = (base_address + 0x00019030) as *mut i32;
-            G_GLOBAL_5 = (base_address + 0x0001c59c) as *mut u32;
-            G_NUM_TIMERS = (base_address + 0x0001b800) as *mut u32;
-
-            *WAVE_OUT_HOOK.write().unwrap() = {
-                let wave_out: WaveOutProc = std::mem::transmute(base_address + 0x00008e6d);
-                Some(hook_function(wave_out, Self::wave_out_proc)?)
-            };
-
-            *FILE_READ_HOOK.write().unwrap() = {
-                let file_read: FileReadFunc = std::mem::transmute(base_address + 0x0000845f);
-                Some(hook_function(file_read, Self::file_read)?)
-            };
-
-            *MEM_FREE_LOCK_HOOK.write().unwrap() = {
-                let mem_free_lock: MemFreeLockFunc = std::mem::transmute(base_address + 0x00001f14);
-                Some(hook_function(mem_free_lock, Self::mem_free_lock)?)
-            };
-
-            *TIME_HOOK.write().unwrap() = {
-                let time_proc: TimeProc = std::mem::transmute(base_address + 0x000011c6);
-                Some(hook_function(time_proc, Self::time_proc)?)
-            };
+        if let Err(e) = unsafe { apply_groups(PATCH_GROUPS) } {
+            MODULE.clear();
+            return Err(e);
         }
 
         Ok(Self {})
     }
 
-    /// Replacement for AIL's waveOutOpen callback that doesn't try to suspend the main thread
-    unsafe extern "stdcall" fn wave_out_proc(
-        _h_wave_out: HWAVEOUT,
-        u_msg: u32,
-        _dw_instance: usize,
-        dw_param1: usize,
-        _dw_param2: usize,
-    ) {
-        unsafe {
-            if u_msg == MM_WOM_DONE {
-                let wave_hdr = dw_param1 as *mut WAVEHDR;
-                *G_LAST_FINISHED_WAVE_HDR = wave_hdr;
-                if (*wave_hdr).dwUser != 0 {
-                    *G_LAST_FINISHED_WAVE_HDR_USER = *((*wave_hdr).dwUser as *mut *mut WaveHdrUser);
-                    if (**G_LAST_FINISHED_WAVE_HDR_USER).unknown6 != 0 {
-                        *G_WAVE_OUT_PROC_GLOBAL_THING = (**G_LAST_FINISHED_WAVE_HDR_USER).unknown4;
-                        let wave_hdrs = (**G_LAST_FINISHED_WAVE_HDR_USER).unknown3;
-                        *wave_hdrs.offset((*G_WAVE_OUT_PROC_GLOBAL_THING) as isize) = wave_hdr;
-                        *G_WAVE_OUT_PROC_GLOBAL_THING = (*G_WAVE_OUT_PROC_GLOBAL_THING + 1)
-                            % (**G_LAST_FINISHED_WAVE_HDR_USER).unknown2;
-                        (**G_LAST_FINISHED_WAVE_HDR_USER).unknown4 = *G_WAVE_OUT_PROC_GLOBAL_THING;
-                    }
-                }
-            }
-        }
-    }
-
-    /// Hooked to keep track of the allocated blocks
-    unsafe extern "stdcall" fn file_read(
-        file_name: *const c_char,
-        buffer: *mut c_void,
-    ) -> *mut c_void {
-        unsafe {
-            let result = FILE_READ_HOOK
-                .read()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .call(file_name, buffer);
-            if result.is_null() {
-                return result;
-            }
-            let mut allocated_blocks = ALLOCATED_BLOCKS.write().unwrap();
-            if !allocated_blocks.contains(&(result as usize)) {
-                allocated_blocks.push(result as usize);
-            }
-            result
-        }
-    }
-
-    /// Only try to free blocks that we know haven't been freed yet
-    unsafe extern "stdcall" fn mem_free_lock(lp_mem: *mut c_void) {
-        unsafe {
-            if lp_mem.is_null() {
-                return;
-            }
-            let mut allocated_blocks = ALLOCATED_BLOCKS.write().unwrap();
-            if allocated_blocks.contains(&(lp_mem as usize)) {
-                MEM_FREE_LOCK_HOOK
-                    .read()
-                    .unwrap()
-                    .as_ref()
-                    .unwrap()
-                    .call(lp_mem);
-                allocated_blocks.retain(|&x| x != lp_mem as usize);
-            }
-        }
-    }
-
-    /// Passed to timeSetEvent in AIL to handle timers.
-    /// This also had calls to SuspendThread that needed to be removed.
-    unsafe extern "stdcall" fn time_proc(
-        _u_timer_id: u32,
-        _u_msg: u32,
-        _dw_user: *mut c_void,
-        _dw1: *mut c_void,
-        _dw2: *mut c_void,
-    ) {
-        unsafe {
-            if (*G_TIMERS).is_null() {
-                return;
-            }
-
-            let timers = std::slice::from_raw_parts_mut(*G_TIMERS, (*G_NUM_TIMERS) as usize);
-
-            *G_COUNTER += 1;
-
-            if *G_GLOBAL_3 > 0 || *G_TIME_PROC_LOCKED == 1 {
-                return;
-            }
-
-            *G_TIME_PROC_LOCKED = 1;
-            *G_GLOBAL_5 += 1;
-            for timer in timers {
-                if timer.state == 2 {
-                    timer.accumulated_time += *G_PERIOD;
-                    if timer.accumulated_time >= timer.next_proc_time {
-                        timer.accumulated_time -= timer.next_proc_time;
-                        (timer.callback)(timer.user);
-                    }
-                }
-            }
-            *G_GLOBAL_5 -= 1;
-            *G_TIME_PROC_LOCKED = 0;
-        }
-    }
-
     pub fn unhook(&mut self) {
-        WAVE_OUT_HOOK.write().unwrap().take();
-        FILE_READ_HOOK.write().unwrap().take();
-        MEM_FREE_LOCK_HOOK.write().unwrap().take();
-        TIME_HOOK.write().unwrap().take();
+        revert_groups(PATCH_GROUPS);
+        MODULE.clear();
     }
 }
