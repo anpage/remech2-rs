@@ -23,7 +23,7 @@ pub struct MidiSource {
 impl MidiSource {
     pub fn new<T: Read>(mut midi_file: T) -> Result<Self> {
         // TODO: Allow specifying a sound font file.
-        let sf2 = include_bytes!("../GeneralUser GS v1.471.sf2");
+        let sf2 = include_bytes!("../GeneralUser-GS-v2.0.3.sf2");
         let sound_font = Arc::new(SoundFont::new(&mut &sf2[..])?);
 
         // The "FinalFantasy" loop type is identical to XMI. Only one song (Clan Wolf's training screen) uses it.
