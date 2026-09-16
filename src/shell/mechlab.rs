@@ -74,7 +74,7 @@ unsafe extern "cdecl" fn load_mech_variant_list(mech_type: *const c_char) {
                 continue;
             };
 
-            let is_match = name.len() == 11
+            let is_match = name.len() == 12
                 && name[..3].eq_ignore_ascii_case(mech_type)
                 && name[3..5].bytes().all(|b| b.is_ascii_digit())
                 && name[5..].eq_ignore_ascii_case("usr.mek");
