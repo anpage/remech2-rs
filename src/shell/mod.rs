@@ -22,6 +22,7 @@ mod database;
 mod drawmode;
 mod mechlab;
 mod registry;
+mod screens;
 mod settings_ui;
 mod smacker;
 mod win32;
@@ -35,6 +36,7 @@ patch_groups! {
         drawmode::hooks,
         mechlab,
         registry,
+        screens::main_menu,
         settings_ui,
         win32,
     ];
