@@ -65,13 +65,16 @@ impl AudioSample {
         }
 
         self.max_fade -= 1;
+        if self.max_fade <= 0 {
+            return;
+        }
         self.fade_rate = self.initial_fade_rate;
 
-        if self.end_volume == self.start_volume {
+        if self.volume == self.end_volume {
             return;
         }
 
-        if self.end_volume > self.start_volume {
+        if self.volume < self.end_volume {
             self.set_volume(self.volume + 1);
         } else {
             self.set_volume(self.volume - 1);
