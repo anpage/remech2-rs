@@ -3,10 +3,11 @@ use std::{process::exit, sync::Arc};
 use egui::{
     Context, FontFamily, Frame, Margin, Order, TextStyle, TextureId, Vec2, load::SizedTexture,
 };
+use tracing::error;
 use windows::Win32::{
     Foundation::{HWND, LPARAM, WPARAM},
     UI::WindowsAndMessaging::{
-        CURSOR_SHOWING, CURSORINFO, GetCursorInfo, SendMessageA, ShowCursor, WM_COMMAND,
+        CURSOR_SHOWING, CURSORINFO, GetCursorInfo, PostMessageA, ShowCursor, WM_COMMAND,
     },
 };
 
@@ -103,7 +104,10 @@ impl OverlayUi {
             let handle_menu_button = |id: u16| {
                 let w_param: usize = id.into();
                 unsafe {
-                    SendMessageA(hwnd, WM_COMMAND, WPARAM(w_param), LPARAM(0));
+                    if let Err(e) = PostMessageA(Some(hwnd), WM_COMMAND, WPARAM(w_param), LPARAM(0))
+                    {
+                        error!("menu command {id} failed: {e}");
+                    }
                 }
             };
 
