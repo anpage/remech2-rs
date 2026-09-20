@@ -1,8 +1,7 @@
 use std::{process::exit, sync::Arc};
 
 use egui::{
-    Context, FontFamily, Frame, Margin, Order, RichText, TextStyle, TextureId, Vec2,
-    load::SizedTexture,
+    Context, FontFamily, Frame, Margin, Order, TextStyle, TextureId, Vec2, load::SizedTexture,
 };
 use windows::Win32::{
     Foundation::{HWND, LPARAM, WPARAM},
@@ -13,6 +12,7 @@ use windows::Win32::{
 
 use crate::about;
 use crate::shell::drawmode::{
+    confirm,
     custom_drawmode::OverlayMouseState,
     hooks::{get_mouse_state, update_global_mouse_state},
 };
@@ -182,28 +182,15 @@ impl OverlayUi {
         };
 
         if self.exit_dialog_open {
-            egui::Window::new("Embrace Cowardice?")
-                .resizable(false)
-                .collapsible(false)
-                .pivot(egui::Align2::CENTER_CENTER)
-                .fixed_pos(ctx.content_rect().center())
-                .show(ctx, |ui| {
-                    egui::Frame::new().inner_margin(20.0).show(ui, |ui| {
-                        ui.horizontal(|ui| {
-                            ui.add_space(42.0);
-                            if ui.button(RichText::new("Yes").size(16.0)).clicked() {
-                                exit(0);
-                            }
-                            ui.add_space(42.0);
-                            if ui.button(RichText::new("No").size(16.0)).clicked() {
-                                self.exit_dialog_open = false;
-                            }
-                        });
-                    });
-                });
+            match confirm::dialog(ctx, "Embrace Cowardice?", &[]) {
+                Some(true) => exit(0),
+                Some(false) => self.exit_dialog_open = false,
+                None => {}
+            }
         }
 
         about::window(ctx, &mut self.about_dialog_open, scale_factor);
+        confirm::window(ctx);
 
         if false {
             egui::Window::new("DEBUG")
