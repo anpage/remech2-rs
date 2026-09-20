@@ -7,9 +7,10 @@ use binding::{game_fns, globals, macros::hook, patches};
 
 use super::{
     ALLOCATE, DEALLOCATE, FREE_ANIMATIONS, G_MOUSE_STATE, GET_DB_ITEM, Screen, ScreenArgs,
-    ShellMsg, ShellState, run,
+    ShellMsg, Campaign, run,
 };
 use crate::shell::MODULE;
+use crate::shell::screens::{BUTTONS_DROP, BUTTONS_HIT_TEST};
 
 globals!(
     static G_BUTTONS: *mut c_void = 0x0006ae74;
@@ -33,8 +34,6 @@ game_fns!(
         0x0003d561;
     static AUDIO_SAMPLE_DO_FADE: unsafe extern "thiscall" fn(*mut c_void) = 0x0003d5ca;
     static AUDIO_SAMPLE_IS_PLAYING: unsafe extern "thiscall" fn(*mut c_void) -> u32 = 0x0003d77e;
-    static BUTTONS_HIT_TEST: unsafe extern "thiscall" fn(*mut c_void, i32, i32) -> i32 = 0x000489e9;
-    static BUTTONS_DROP: unsafe extern "fastcall" fn(*mut c_void) = 0x0004883e;
 );
 
 const AMBIENT_FIRE_DB_ITEM: i32 = 74;
@@ -63,15 +62,15 @@ impl Screen for MainMenu {
             // TODO: Bring it back?
             match hit {
                 0 => {
-                    args.set_shell_state(ShellState::Trial);
+                    args.set_campaign(Campaign::TrialsOfGrievance);
                     Some(ShellMsg::TRIAL_SETUP)
                 }
                 1 => {
-                    args.set_shell_state(ShellState::Wolf);
+                    args.set_campaign(Campaign::Wolf);
                     Some(ShellMsg::LANDING)
                 }
                 2 => {
-                    args.set_shell_state(ShellState::JadeFalcon);
+                    args.set_campaign(Campaign::JadeFalcon);
                     Some(ShellMsg::LANDING)
                 }
                 _ => None,
@@ -150,9 +149,9 @@ static STATE: Mutex<Option<MainMenu>> = Mutex::new(None);
 #[hook(rva = 0x0003dd89)]
 unsafe extern "cdecl" fn main_menu(
     db: *mut c_void,
-    shell_state: *mut i32,
-    state_byte: *mut u8,
-    state_word: *mut *mut c_char,
+    campaign: *mut i32,
+    pilot_chosen: *mut u8,
+    scenario: *mut *mut c_char,
     msg: u32,
 ) {
     unsafe {
@@ -160,9 +159,9 @@ unsafe extern "cdecl" fn main_menu(
             &STATE,
             ScreenArgs {
                 db,
-                shell_state,
-                state_byte,
-                state_word,
+                campaign,
+                pilot_chosen,
+                scenario,
             },
             msg,
         );

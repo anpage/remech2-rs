@@ -12,6 +12,8 @@ use crate::shell::drawmode::hooks::MouseState;
 
 use super::MODULE;
 
+pub mod debrief;
+pub mod debug;
 pub mod main_menu;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -41,18 +43,19 @@ impl ShellMsg {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
-pub enum ShellState {
+pub enum Campaign {
     Wolf = 0,
     JadeFalcon = 1,
-    Trial = 2,
+    /// Not to be confused with the trial missions inside each clan's campaign
+    TrialsOfGrievance = 2,
 }
 
-impl ShellState {
+impl Campaign {
     pub fn from_raw(raw: i32) -> Option<Self> {
         match raw {
             0 => Some(Self::Wolf),
             1 => Some(Self::JadeFalcon),
-            2 => Some(Self::Trial),
+            2 => Some(Self::TrialsOfGrievance),
             _ => None,
         }
     }
@@ -61,18 +64,18 @@ impl ShellState {
 /// The args that get passed to every screen callback.
 pub struct ScreenArgs {
     pub db: *mut c_void,
-    pub shell_state: *mut i32,
-    pub state_byte: *mut u8,
-    pub state_word: *mut *mut c_char,
+    pub campaign: *mut i32,
+    pub pilot_chosen: *mut u8,
+    pub scenario: *mut *mut c_char,
 }
 
 impl ScreenArgs {
-    pub unsafe fn shell_state(&self) -> Option<ShellState> {
-        ShellState::from_raw(unsafe { *self.shell_state })
+    pub unsafe fn campaign(&self) -> Option<Campaign> {
+        Campaign::from_raw(unsafe { *self.campaign })
     }
 
-    pub unsafe fn set_shell_state(&mut self, state: ShellState) {
-        unsafe { *self.shell_state = state as i32 };
+    pub unsafe fn set_campaign(&mut self, campaign: Campaign) {
+        unsafe { *self.campaign = campaign as i32 };
     }
 }
 
@@ -89,10 +92,67 @@ pub trait Screen: Default {
     fn teardown(&mut self, args: &mut ScreenArgs);
 }
 
+/// The result of a single objective as the sim reported it
+#[repr(C)]
+pub struct Objective {
+    /// `0` failed, `1` successful
+    pub status: i32,
+    /// `0` default, `1` primary, `2` secondary, `4` tertiary, `8` return
+    pub kind: i32,
+    unknown1: i32,
+    /// Seconds, or negative when the objective was never reached
+    pub time: i32,
+    unknown2: i32,
+    pub name: [c_char; 32],
+}
+
+/// `MW2MSN.CFG`, written by the sim and read by the debrief screen's entry function.
+#[repr(C)]
+pub struct MissionResults {
+    /// `MW2M`
+    pub magic: [c_char; 4],
+    /// How many `objectives` the sim filled in.
+    pub objective_count: i32,
+    unknown: [i32; 2],
+    pub outcome: i32,
+    pub objectives: [Objective; 48],
+}
+
+impl MissionResults {
+    pub const SUCCESS: i32 = 2;
+    pub const FAILED: i32 = 3;
+}
+
+/// The whole file
+const _: () = assert!(size_of::<MissionResults>() == 0x9d4);
+
+/// One of the 20 pilot records in `MW2REG.CFG`.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct Pilot {
+    /// `1` once the slot holds a pilot
+    pub in_use: i32,
+    /// The pilot the roster resumes with
+    pub is_active: i32,
+    pub clan: i32,
+    pub mission: i32,
+    /// Capped at 8
+    pub rank: i32,
+    pub honor: i32,
+    unknown: [i32; 4],
+    pub callsign: [c_char; 20],
+}
+
+const _: () = assert!(size_of::<Pilot>() == 0x3c);
+
 globals!(
     static G_SHELL_CALLBACK: *mut c_void = 0x00062978;
     static G_WND: HWND = 0x000965ec;
     pub static G_MOUSE_STATE: *mut MouseState = 0x00071204;
+    /// The active pilot, or null when none is selected
+    pub static G_PILOT: *mut Pilot = 0x00071370;
+    /// Zeroed when there's no `MW2MSN.CFG`
+    pub static G_MISSION_RESULTS: MissionResults = 0x000780e0;
 );
 
 game_fns!(
@@ -106,6 +166,8 @@ game_fns!(
         *mut i32,
     ) -> i32 = 0x00048051;
     pub static FREE_ANIMATIONS: unsafe extern "cdecl" fn() = 0x00016f45;
+    static BUTTONS_HIT_TEST: unsafe extern "thiscall" fn(*mut c_void, i32, i32) -> i32 = 0x000489e9;
+    static BUTTONS_DROP: unsafe extern "fastcall" fn(*mut c_void) = 0x0004883e;
 );
 
 pub unsafe fn run<S: Screen>(state: &Mutex<Option<S>>, mut args: ScreenArgs, msg: u32) {

@@ -27,6 +27,8 @@ mod settings_ui;
 mod smacker;
 mod win32;
 
+pub use screens::debug::{JUMP_TO_SCREEN as DEBUG_JUMP, jump as debug_jump};
+
 pub static MODULE: ModuleBase = ModuleBase::new("MW2SHELL.DLL");
 
 patch_groups! {
@@ -36,6 +38,8 @@ patch_groups! {
         drawmode::hooks,
         mechlab,
         registry,
+        screens::debrief,
+        screens::debug,
         screens::main_menu,
         settings_ui,
         win32,

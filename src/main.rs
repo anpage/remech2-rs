@@ -91,6 +91,10 @@ unsafe fn dispatch(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -
                 }
             }
             ProcessType::Shell => {
+                if message == shell::DEBUG_JUMP {
+                    shell::debug_jump(wparam.0 as u32);
+                    return LRESULT(0);
+                }
                 if let Some(proc) = SHELL_WINDOW_PROC {
                     return proc(window, message, wparam, lparam);
                 }

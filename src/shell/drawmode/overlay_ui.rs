@@ -11,12 +11,12 @@ use windows::Win32::{
     },
 };
 
-use crate::about;
 use crate::shell::drawmode::{
     confirm,
     custom_drawmode::OverlayMouseState,
     hooks::{get_mouse_state, update_global_mouse_state},
 };
+use crate::{about, shell::screens};
 
 pub struct OverlayUi {
     shell_hovered: bool,
@@ -178,6 +178,17 @@ impl OverlayUi {
                             })
                             .inner
                             .is_some()
+                        {
+                            menu_open = true;
+                        }
+                        if cfg!(debug_assertions)
+                            && ui
+                                .menu_button("Debug", |ui| {
+                                    set_font_size(ui);
+                                    screens::debug::menu(ui);
+                                })
+                                .inner
+                                .is_some()
                         {
                             menu_open = true;
                         }
