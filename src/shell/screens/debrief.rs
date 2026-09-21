@@ -10,6 +10,7 @@ use super::{
 };
 use crate::shell::MODULE;
 use crate::shell::drawmode::confirm;
+use crate::shell::screens::{CAMPAIGN_LENGTH, G_CAMPAIGN_MISSIONS, SAVE_PILOTS};
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -37,18 +38,6 @@ struct ScreenButton {
     label: *const c_char,
 }
 
-/// One row of a clan's campaign table.
-#[repr(C, packed(1))]
-#[derive(Clone, Copy)]
-struct Mission {
-    /// e.g. `yellSCN1`. Handed to mission select through `scenario`
-    scenario: *mut c_char,
-    /// Set for the campaigns' Trials of Position
-    is_trial: u8,
-    /// e.g. `Pyre Light`.
-    title: *const c_char,
-}
-
 globals!(
     static G_BUTTONS: *mut c_void = 0x0005b040;
     /// The first page of the report
@@ -59,7 +48,6 @@ globals!(
     static G_AFTERMATH: *mut c_void = 0x0005b04c;
     static G_DEBRIEF_LAYOUTS: [ScreenLayout; 3] = 0x0006ff00;
     static G_AFTERMATH_LAYOUTS: [ScreenLayout; 3] = 0x0006ff30;
-    static G_CAMPAIGN_MISSIONS: [*const Mission; 2] = 0x0006fdd0;
     static G_VIDEO_DRIVER: *mut c_void = 0x00071208;
     static G_SHELL_SELECTED: *mut c_void = 0x0007120c;
     static G_SHELL_INACTIVE: *mut c_void = 0x00071224;
@@ -97,11 +85,8 @@ game_fns!(
     static ARCHIVE_VIEWER_DROP: unsafe extern "thiscall" fn(*mut c_void) = 0x0002a7b0;
     /// Empties both sprite lists. `1` frees the sprites, `0` only stops them.
     static VIDEO_DRIVER_CLEAR_SPRITES: unsafe extern "thiscall" fn(*mut c_void, u8) = 0x000077b4;
-    /// Writes `MW2REG.CFG`
-    static SAVE_PILOTS: unsafe extern "cdecl" fn() = 0x0002dbec;
 );
 
-const CAMPAIGN_LENGTH: i32 = 16;
 /// The viewer's tick returns this to stay open. It's the archives screen's id.
 const VIEWER_STAY: i32 = 0x40b;
 

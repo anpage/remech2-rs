@@ -6,11 +6,11 @@ use std::time::{Duration, Instant};
 use binding::{game_fns, globals, macros::hook, patches};
 
 use super::{
-    ALLOCATE, DEALLOCATE, FREE_ANIMATIONS, G_MOUSE_STATE, GET_DB_ITEM, Screen, ScreenArgs,
-    ShellMsg, Campaign, run,
+    ALLOCATE, Campaign, DEALLOCATE, FREE_ANIMATIONS, G_MOUSE_STATE, GET_DB_ITEM, Screen,
+    ScreenArgs, ShellMsg, run,
 };
 use crate::shell::MODULE;
-use crate::shell::screens::{BUTTONS_DROP, BUTTONS_HIT_TEST};
+use crate::shell::screens::{AUDIO_SAMPLE_DROP, BUTTONS_DROP, BUTTONS_HIT_TEST};
 
 globals!(
     static G_BUTTONS: *mut c_void = 0x0006ae74;
@@ -27,7 +27,6 @@ game_fns!(
         *mut c_void,
         i32,
     ) -> *mut c_void = 0x0003d419;
-    static AUDIO_SAMPLE_DROP: unsafe extern "thiscall" fn(*mut c_void) = 0x0003d50f;
     static AUDIO_SAMPLE_START: unsafe extern "thiscall" fn(*mut c_void) = 0x0003d6bb;
     static AUDIO_SAMPLE_ENABLE_LOOP: unsafe extern "thiscall" fn(*mut c_void) = 0x0003d67f;
     static AUDIO_SAMPLE_SET_FADE: unsafe extern "thiscall" fn(*mut c_void, i32, i32, i32, i32) =

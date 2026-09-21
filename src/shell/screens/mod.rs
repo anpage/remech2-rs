@@ -140,10 +140,29 @@ pub struct Pilot {
     pub rank: i32,
     pub honor: i32,
     unknown: [i32; 4],
-    pub callsign: [c_char; 20],
+    /// Up to 14 characters, typed in on the roster screen
+    pub callsign: [c_char; 16],
+    /// The roster's label graphic for `callsign`, live only while the roster is up.
+    /// `SavePilotRoster` writes it to `MW2REG.CFG` as junk and `LoadPilotRoster` zeroes it again.
+    label: *mut c_void,
 }
 
 const _: () = assert!(size_of::<Pilot>() == 0x3c);
+
+/// One row of a clan's campaign table.
+#[repr(C, packed(1))]
+#[derive(Clone, Copy)]
+struct Mission {
+    /// e.g. `yellSCN1`. Handed to mission select through `scenario`
+    scenario: *mut c_char,
+    /// Set for the campaigns' Trials of Position
+    is_trial: u8,
+    /// e.g. `Pyre Light`.
+    title: *const c_char,
+}
+
+/// Missions in each clan's campaign.
+const CAMPAIGN_LENGTH: i32 = 16;
 
 globals!(
     static G_SHELL_CALLBACK: *mut c_void = 0x00062978;
@@ -153,6 +172,7 @@ globals!(
     pub static G_PILOT: *mut Pilot = 0x00071370;
     /// Zeroed when there's no `MW2MSN.CFG`
     pub static G_MISSION_RESULTS: MissionResults = 0x000780e0;
+    static G_CAMPAIGN_MISSIONS: [*const Mission; 2] = 0x0006fdd0;
 );
 
 game_fns!(
@@ -168,6 +188,9 @@ game_fns!(
     pub static FREE_ANIMATIONS: unsafe extern "cdecl" fn() = 0x00016f45;
     static BUTTONS_HIT_TEST: unsafe extern "thiscall" fn(*mut c_void, i32, i32) -> i32 = 0x000489e9;
     static BUTTONS_DROP: unsafe extern "fastcall" fn(*mut c_void) = 0x0004883e;
+    static AUDIO_SAMPLE_DROP: unsafe extern "thiscall" fn(*mut c_void) = 0x0003d50f;
+    /// Writes `MW2REG.CFG`
+    static SAVE_PILOTS: unsafe extern "cdecl" fn() = 0x0002dbec;
 );
 
 pub unsafe fn run<S: Screen>(state: &Mutex<Option<S>>, mut args: ScreenArgs, msg: u32) {
