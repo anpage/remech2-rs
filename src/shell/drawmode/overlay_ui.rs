@@ -203,7 +203,7 @@ impl OverlayUi {
         };
 
         if self.exit_dialog_open {
-            match confirm::dialog(ctx, "Embrace Cowardice?", &[]) {
+            match confirm::dialog(ctx, &["Embrace Cowardice?"], scale_factor) {
                 Some(true) => exit(0),
                 Some(false) => self.exit_dialog_open = false,
                 None => {}
@@ -211,7 +211,7 @@ impl OverlayUi {
         }
 
         about::window(ctx, &mut self.about_dialog_open, scale_factor);
-        confirm::window(ctx);
+        confirm::window(ctx, scale_factor);
 
         if false {
             egui::Window::new("DEBUG")

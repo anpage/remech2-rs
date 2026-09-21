@@ -136,7 +136,7 @@ impl Screen for Debrief {
                     if outcome() != MissionResults::SUCCESS {
                         return Some(ShellMsg::MISSION_BRIEFING);
                     }
-                    confirm::open("Are you Sure?", &[]);
+                    confirm::open(&["Are you Sure?"]);
                     self.confirm_pending = true;
                     None
                 }

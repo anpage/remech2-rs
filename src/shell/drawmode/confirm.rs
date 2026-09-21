@@ -1,25 +1,50 @@
 use std::sync::Mutex;
 
-use egui::{Align, Button, Color32, Context, FontId, Layout, RichText, TextStyle, Vec2};
+use egui::{Align, Button, Color32, Context, FontId, Layout, RichText, Vec2};
 
 const BUTTON_WIDTH: f32 = 64.0;
 const BUTTON_GAP: f32 = 42.0;
 const TEXT_SIZE: f32 = 16.0;
-const TITLE_BAR_PADDING: f32 = 24.0;
+const MARGIN: f32 = 20.0;
 
 struct Prompt {
-    title: String,
-    body: Vec<String>,
+    lines: Vec<String>,
+    buttons: Buttons,
     answer: Option<bool>,
+}
+
+#[derive(Clone, Copy)]
+enum Buttons {
+    YesNo,
+    Ok,
+}
+
+impl Buttons {
+    fn labels(self) -> &'static [&'static str] {
+        match self {
+            Self::YesNo => &["Yes", "No"],
+            Self::Ok => &["Ok"],
+        }
+    }
 }
 
 static PROMPT: Mutex<Option<Prompt>> = Mutex::new(None);
 
-/// Opens a prompt, replacing any open one.
-pub fn open(title: &str, body: &[&str]) {
+/// Opens a Yes/No prompt, replacing any open one.
+pub fn open(lines: &[&str]) {
+    set(lines, Buttons::YesNo);
+}
+
+/// Opens a message with a single `Ok`, replacing any open prompt.
+/// [`answer`] reports `Some(true)` once it's acknowledged.
+pub fn alert(lines: &[&str]) {
+    set(lines, Buttons::Ok);
+}
+
+fn set(lines: &[&str], buttons: Buttons) {
     *PROMPT.lock().unwrap() = Some(Prompt {
-        title: (*title).to_owned(),
-        body: body.iter().map(|&line| line.to_owned()).collect(),
+        lines: lines.iter().map(|&line| line.to_owned()).collect(),
+        buttons,
         answer: None,
     });
 }
@@ -38,12 +63,12 @@ pub fn close() {
 }
 
 /// Draws the open prompt until it's answered.
-pub(super) fn window(ctx: &Context) {
+pub(super) fn window(ctx: &Context, scale: f32) {
     let mut prompt = PROMPT.lock().unwrap();
     let Some(prompt) = prompt.as_mut().filter(|prompt| prompt.answer.is_none()) else {
         return;
     };
-    prompt.answer = dialog(ctx, &prompt.title, &prompt.body);
+    prompt.answer = render(ctx, &prompt.lines, prompt.buttons, scale);
 }
 
 /// Width of one line of text, for sizing the window to its contents.
@@ -57,46 +82,54 @@ fn text_width(ctx: &Context, text: &str, font: FontId) -> f32 {
 }
 
 /// A Yes/No dialog. Returns the button clicked this frame.
-pub(super) fn dialog(ctx: &Context, title: &str, body: &[String]) -> Option<bool> {
-    let row_width = 2.0 * BUTTON_WIDTH + BUTTON_GAP;
+pub(super) fn dialog(ctx: &Context, lines: &[&str], scale: f32) -> Option<bool> {
+    render(ctx, lines, Buttons::YesNo, scale)
+}
 
-    let body_font = FontId::proportional(TEXT_SIZE);
-    let title_font = TextStyle::Heading.resolve(&ctx.style());
-    let content_width = body
+/// Draws a dialog sized to its contents. Returns `true` for the leftmost button.
+fn render<S: AsRef<str>>(ctx: &Context, lines: &[S], buttons: Buttons, scale: f32) -> Option<bool> {
+    let button_width = BUTTON_WIDTH * scale;
+    let button_gap = BUTTON_GAP * scale;
+    let text_size = TEXT_SIZE * scale;
+    let margin = MARGIN * scale;
+
+    let labels = buttons.labels();
+    let gaps = labels.len().saturating_sub(1) as f32;
+    let row_width = labels.len() as f32 * button_width + gaps * button_gap;
+
+    let font = FontId::proportional(text_size);
+    let content_width = lines
         .iter()
-        .map(|line| text_width(ctx, line, body_font.clone()))
-        .chain([
-            row_width,
-            text_width(ctx, title, title_font) + TITLE_BAR_PADDING,
-        ])
+        .map(|line| text_width(ctx, line.as_ref(), font.clone()))
+        .chain([row_width])
         .fold(0.0, f32::max);
 
     let mut answer = None;
-    egui::Window::new(title)
+    egui::Window::new("shell_dialog")
+        .title_bar(false)
         .resizable(false)
         .collapsible(false)
+        .movable(false)
         .pivot(egui::Align2::CENTER_CENTER)
         .fixed_pos(ctx.content_rect().center())
         .show(ctx, |ui| {
-            egui::Frame::new().inner_margin(20.0).show(ui, |ui| {
+            egui::Frame::new().inner_margin(margin).show(ui, |ui| {
                 ui.set_width(content_width);
                 ui.vertical_centered(|ui| {
-                    for line in body {
-                        ui.label(RichText::new(line).size(TEXT_SIZE));
+                    for line in lines {
+                        ui.label(RichText::new(line.as_ref()).size(text_size));
                     }
+                    ui.add_space(text_size);
 
                     let row = Vec2::new(row_width, ui.spacing().interact_size.y);
                     ui.allocate_ui_with_layout(row, Layout::left_to_right(Align::Center), |ui| {
-                        ui.spacing_mut().item_spacing.x = BUTTON_GAP;
-                        let button = |text| {
-                            Button::new(RichText::new(text).size(TEXT_SIZE))
-                                .min_size(Vec2::new(BUTTON_WIDTH, 0.0))
-                        };
-                        if ui.add(button("Yes")).clicked() {
-                            answer = Some(true);
-                        }
-                        if ui.add(button("No")).clicked() {
-                            answer = Some(false);
+                        ui.spacing_mut().item_spacing.x = button_gap;
+                        for (i, label) in labels.iter().enumerate() {
+                            let button = Button::new(RichText::new(*label).size(text_size))
+                                .min_size(Vec2::new(button_width, 0.0));
+                            if ui.add(button).clicked() {
+                                answer = Some(i == 0);
+                            }
                         }
                     });
                 });

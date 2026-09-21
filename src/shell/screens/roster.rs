@@ -162,7 +162,7 @@ impl Screen for Roster {
                     }
                     BTN_TERMINATE => {
                         if !G_PILOT.get().is_null() {
-                            confirm::open("Terminate MechWarrior?", &[]);
+                            confirm::open(&["Terminate MechWarrior?"]);
                             self.confirm_pending = true;
                         }
                     }
