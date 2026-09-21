@@ -19,12 +19,14 @@ use crate::{WindowProc, ail::Ail};
 
 mod audio;
 mod database;
+mod dialog;
 mod drawmode;
 mod registry;
 mod screens;
 mod smacker;
 mod win32;
 
+pub use dialog::park_transition;
 pub use screens::debug::{JUMP_TO_SCREEN as DEBUG_JUMP, jump as debug_jump};
 
 pub static MODULE: ModuleBase = ModuleBase::new("MW2SHELL.DLL");
@@ -33,6 +35,7 @@ patch_groups! {
     static PATCH_GROUPS = [
         audio::hooks,
         database,
+        dialog,
         drawmode::hooks,
         registry,
         screens::debrief,

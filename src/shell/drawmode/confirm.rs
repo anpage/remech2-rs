@@ -1,6 +1,9 @@
+use std::collections::VecDeque;
 use std::sync::Mutex;
 
 use egui::{Align, Button, Color32, Context, FontId, Layout, RichText, Vec2};
+
+use super::menu::{self, MenuLock};
 
 const BUTTON_WIDTH: f32 = 64.0;
 const BUTTON_GAP: f32 = 42.0;
@@ -11,6 +14,20 @@ struct Prompt {
     lines: Vec<String>,
     buttons: Buttons,
     answer: Option<bool>,
+    unattended: bool,
+    _menu: MenuLock,
+}
+
+impl Prompt {
+    fn new(lines: Vec<String>, buttons: Buttons, unattended: bool) -> Self {
+        Self {
+            lines,
+            buttons,
+            answer: None,
+            unattended,
+            _menu: menu::lock(),
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -29,24 +46,36 @@ impl Buttons {
 }
 
 static PROMPT: Mutex<Option<Prompt>> = Mutex::new(None);
+static QUEUED: Mutex<VecDeque<Vec<String>>> = Mutex::new(VecDeque::new());
 
 /// Opens a Yes/No prompt, replacing any open one.
 pub fn open(lines: &[&str]) {
-    set(lines, Buttons::YesNo);
+    *PROMPT.lock().unwrap() = Some(Prompt::new(owned(lines), Buttons::YesNo, false));
 }
 
 /// Opens a message with a single `Ok`, replacing any open prompt.
 /// [`answer`] reports `Some(true)` once it's acknowledged.
 pub fn alert(lines: &[&str]) {
-    set(lines, Buttons::Ok);
+    *PROMPT.lock().unwrap() = Some(Prompt::new(owned(lines), Buttons::Ok, false));
 }
 
-fn set(lines: &[&str], buttons: Buttons) {
-    *PROMPT.lock().unwrap() = Some(Prompt {
-        lines: lines.iter().map(|&line| line.to_owned()).collect(),
-        buttons,
-        answer: None,
-    });
+/// Shows a message with a single `Ok` that isn't polled
+pub fn notify(lines: &[&str]) {
+    let mut prompt = PROMPT.lock().unwrap();
+    match *prompt {
+        Some(_) => QUEUED.lock().unwrap().push_back(owned(lines)),
+        None => *prompt = Some(Prompt::new(owned(lines), Buttons::Ok, true)),
+    }
+}
+
+fn owned(lines: &[&str]) -> Vec<String> {
+    lines.iter().map(|&line| line.to_owned()).collect()
+}
+
+/// The next queued message, if any
+fn pop_queued() -> Option<Prompt> {
+    let lines = QUEUED.lock().unwrap().pop_front()?;
+    Some(Prompt::new(lines, Buttons::Ok, true))
 }
 
 /// `Some(true)` for Yes, `Some(false)` for No. `None` while unanswered, or if nothing is open.
@@ -58,17 +87,25 @@ pub fn answer() -> Option<bool> {
         .and_then(|prompt| prompt.answer)
 }
 
+pub fn is_open() -> bool {
+    PROMPT.lock().unwrap().is_some()
+}
+
 pub fn close() {
-    *PROMPT.lock().unwrap() = None;
+    let mut prompt = PROMPT.lock().unwrap();
+    *prompt = pop_queued();
 }
 
 /// Draws the open prompt until it's answered.
 pub(super) fn window(ctx: &Context, scale: f32) {
-    let mut prompt = PROMPT.lock().unwrap();
-    let Some(prompt) = prompt.as_mut().filter(|prompt| prompt.answer.is_none()) else {
+    let mut guard = PROMPT.lock().unwrap();
+    let Some(prompt) = guard.as_mut().filter(|prompt| prompt.answer.is_none()) else {
         return;
     };
     prompt.answer = render(ctx, &prompt.lines, prompt.buttons, scale);
+    if prompt.answer.is_some() && prompt.unattended {
+        *guard = pop_queued();
+    }
 }
 
 /// Width of one line of text, for sizing the window to its contents.

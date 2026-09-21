@@ -11,6 +11,7 @@ use windows::Win32::{
     },
 };
 
+use crate::shell::dialog;
 use crate::shell::drawmode::{
     confirm,
     custom_drawmode::OverlayMouseState,
@@ -212,6 +213,7 @@ impl OverlayUi {
 
         about::window(ctx, &mut self.about_dialog_open, scale_factor);
         confirm::window(ctx, scale_factor);
+        dialog::replay_transition(hwnd);
 
         if false {
             egui::Window::new("DEBUG")
@@ -286,7 +288,7 @@ impl OverlayUi {
             }
         }
 
-        if self.shell_hovered {
+        if self.shell_hovered && !confirm::is_open() {
             update_global_mouse_state(mouse_state);
         } else {
             update_global_mouse_state(&OverlayMouseState::default());
@@ -298,7 +300,7 @@ impl OverlayUi {
     }
 
     pub fn update_mouse_state(&self) {
-        if self.shell_hovered {
+        if self.shell_hovered && !confirm::is_open() {
             let mouse_state = unsafe { get_mouse_state() };
             update_global_mouse_state(&mouse_state);
         } else {

@@ -95,6 +95,10 @@ unsafe fn dispatch(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -
                     shell::debug_jump(wparam.0 as u32);
                     return LRESULT(0);
                 }
+                // Held until the prompt over it is acknowledged, then re-posted.
+                if shell::park_transition(message, wparam) {
+                    return LRESULT(0);
+                }
                 if let Some(proc) = SHELL_WINDOW_PROC {
                     return proc(window, message, wparam, lparam);
                 }
