@@ -5,38 +5,15 @@ use std::sync::Mutex;
 use binding::{game_fns, globals, macros::hook, patches};
 
 use super::{
-    ALLOCATE, BUTTONS_DROP, BUTTONS_HIT_TEST, Campaign, DEALLOCATE, G_MISSION_RESULTS,
-    G_MOUSE_STATE, G_PILOT, MissionResults, Pilot, Screen, ScreenArgs, ShellMsg, run,
+    ALLOCATE, BUTTONS_DROP, BUTTONS_HIT_TEST, Campaign, DEALLOCATE, G_MISSION_RESULTS, G_PILOT,
+    MissionResults, Pilot, Screen, ScreenArgs, ShellMsg, run,
 };
 use crate::shell::MODULE;
 use crate::shell::drawmode::confirm;
-use crate::shell::screens::{CAMPAIGN_LENGTH, G_CAMPAIGN_MISSIONS, SAVE_PILOTS};
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-struct ScreenLayout {
-    table: *const ScreenButton,
-    count: i32,
-    /// LZ-compressed backdrop, drawn with its own palette
-    backdrop_item: i32,
-    unknown: i32,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-struct ScreenButton {
-    left: i32,
-    top: i32,
-    right: i32,
-    bottom: i32,
-    label_x: i32,
-    label_y: i32,
-    /// A leading `<` tells the button manager to build a label graphic.
-    /// Without one nothing is drawn, as on the main menu, where the text is part of the backdrop.
-    ///
-    /// A `~` after the `<` centers the label on `label_x` rather than starting there.
-    label: *const c_char,
-}
+use crate::shell::drawmode::hooks::G_CURRENT_MOUSE_STATE;
+use crate::shell::screens::{
+    CAMPAIGN_LENGTH, G_CAMPAIGN_MISSIONS, SAVE_PILOTS, ScreenButton, ScreenLayout,
+};
 
 globals!(
     static G_BUTTONS: *mut c_void = 0x0005b040;
@@ -139,7 +116,7 @@ impl Screen for Debrief {
                 return Some(ShellMsg::MISSION_BRIEFING);
             }
 
-            let mouse = G_MOUSE_STATE.get().as_ref()?;
+            let mouse = G_CURRENT_MOUSE_STATE.get().as_ref()?;
 
             let hit = (BUTTONS_HIT_TEST.get())(G_BUTTONS.get(), mouse.pos_x, mouse.pos_y);
             if mouse.left_pressed.0 != 1 {

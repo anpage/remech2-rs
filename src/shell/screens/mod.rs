@@ -4,17 +4,18 @@ use std::sync::Mutex;
 use binding::{game_fns, globals};
 use tracing::error;
 use windows::Win32::{
-    Foundation::{HWND, LPARAM, WPARAM},
+    Foundation::{LPARAM, WPARAM},
     UI::WindowsAndMessaging::PostMessageA,
 };
 
-use crate::shell::drawmode::hooks::MouseState;
+use crate::shell::drawmode::hooks::G_WINDOW;
 
 use super::MODULE;
 
 pub mod debrief;
 pub mod debug;
 pub mod main_menu;
+pub mod settings;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ShellMsg(pub u32);
@@ -164,15 +165,84 @@ struct Mission {
 /// Missions in each clan's campaign.
 const CAMPAIGN_LENGTH: i32 = 16;
 
+/// A screen's button table, one per clan.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct ScreenLayout {
+    pub table: *const ScreenButton,
+    pub count: i32,
+    /// LZ-compressed backdrop, drawn with its own palette
+    pub backdrop_item: i32,
+    unknown: i32,
+}
+
+/// One row of a [`ScreenLayout`]'s table, which the button manager turns into a button.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct ScreenButton {
+    left: i32,
+    top: i32,
+    right: i32,
+    bottom: i32,
+    label_x: i32,
+    label_y: i32,
+    /// A leading `<` tells the button manager to build a label graphic.
+    /// Without one nothing is drawn, as on the main menu, where the text is part of the backdrop.
+    ///
+    /// A `~` after the `<` centers the label on `label_x` rather than starting there.
+    label: *const c_char,
+}
+
+/// One row of a clickable group: a rect, the graphic drawn in it, a builder, a click handler and a
+/// payload. A group is an array of these, running to a row with a negative `left`. The layout pass
+/// writes back into the array, so it's both the table and the live state.
+///
+/// Not to be confused with [`ScreenButton`], which is the button manager's read-only table row.
+/// The settings screen's options are `Clickable`s too: its `resolution_label` is a `build` and its
+/// `resolution_toggle` an `on_click`.
+#[repr(C)]
+pub struct Clickable {
+    pub left: i32,
+    /// Negative for a row placed relative to the one above it
+    pub top: i32,
+    pub width: i32,
+    pub height: i32,
+    unknown: [u8; 8],
+    /// What `build` made, freed when the group is hidden
+    graphic: *mut c_void,
+    /// Builds `graphic` from the row
+    build: *mut c_void,
+    /// Runs when the row is clicked, and null on display-only rows, which the hit test skips. The
+    /// roster's mission rows park an empty stub here just to be clickable.
+    on_click: *mut c_void,
+    /// Per-group payload; read it through [`Clickable::index`] or [`Clickable::buffer`]
+    value: *mut c_void,
+    unknown2: u32,
+}
+
+const _: () = assert!(size_of::<Clickable>() == 0x2c);
+
+impl Clickable {
+    /// The payload as an index, e.g. the mission a roster list row replays.
+    pub fn index(&self) -> i32 {
+        self.value as usize as i32
+    }
+
+    /// The payload as a pointer to what the row edits, e.g. a settings value buffer.
+    pub fn buffer<T>(&self) -> *mut T {
+        self.value.cast()
+    }
+}
+
 globals!(
     static G_SHELL_CALLBACK: *mut c_void = 0x00062978;
-    static G_WND: HWND = 0x000965ec;
-    pub static G_MOUSE_STATE: *mut MouseState = 0x00071204;
     /// The active pilot, or null when none is selected
     pub static G_PILOT: *mut Pilot = 0x00071370;
     /// Zeroed when there's no `MW2MSN.CFG`
     pub static G_MISSION_RESULTS: MissionResults = 0x000780e0;
     static G_CAMPAIGN_MISSIONS: [*const Mission; 2] = 0x0006fdd0;
+    /// The style text graphics are built with
+    pub static G_SHELL_BUTTON1: *mut c_void = 0x00071214;
 );
 
 game_fns!(
@@ -188,9 +258,26 @@ game_fns!(
     pub static FREE_ANIMATIONS: unsafe extern "cdecl" fn() = 0x00016f45;
     static BUTTONS_HIT_TEST: unsafe extern "thiscall" fn(*mut c_void, i32, i32) -> i32 = 0x000489e9;
     static BUTTONS_DROP: unsafe extern "fastcall" fn(*mut c_void) = 0x0004883e;
-    static AUDIO_SAMPLE_DROP: unsafe extern "thiscall" fn(*mut c_void) = 0x0003d50f;
     /// Writes `MW2REG.CFG`
     static SAVE_PILOTS: unsafe extern "cdecl" fn() = 0x0002dbec;
+    /// Frees a clickable group's label graphics
+    pub static CLICKABLES_HIDE: unsafe extern "cdecl" fn(*mut Clickable) = 0x00007ac8;
+    /// Lays a clickable group out and builds its label graphics
+    pub static CLICKABLES_SHOW: unsafe extern "cdecl" fn(*mut Clickable) = 0x000078cd;
+    /// The clickable row under the cursor, or null. Skips rows without an `on_click`.
+    pub static CLICKABLES_HIT_TEST: unsafe extern "cdecl" fn(
+        *mut Clickable,
+        i32,
+        i32,
+    ) -> *mut Clickable = 0x0000b5ed;
+    /// Builds a text graphic and hands it to the video driver's `collection_2`
+    pub static SHELL_LABEL_NEW: unsafe extern "thiscall" fn(
+        *mut c_void,
+        i32,
+        i32,
+        *const c_char,
+        u32,
+    ) -> *mut *mut c_void = 0x0000544e;
 );
 
 pub unsafe fn run<S: Screen>(state: &Mutex<Option<S>>, mut args: ScreenArgs, msg: u32) {
@@ -215,7 +302,7 @@ pub unsafe fn run<S: Screen>(state: &Mutex<Option<S>>, mut args: ScreenArgs, msg
 
         unsafe {
             if let Err(e) = PostMessageA(
-                Some(G_WND.get()),
+                Some(G_WINDOW.get()),
                 msg.0,
                 WPARAM(S::ID.0 as usize),
                 LPARAM(0),

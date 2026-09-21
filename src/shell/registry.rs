@@ -1,16 +1,16 @@
 use windows::{
     Win32::{
-        Foundation::WIN32_ERROR,
+        Foundation::{TRUE, WIN32_ERROR},
         Security::SECURITY_ATTRIBUTES,
         System::Registry::{
             HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, REG_CREATE_KEY_DISPOSITION,
             REG_OPEN_CREATE_OPTIONS, REG_SAM_FLAGS, RegCreateKeyExA, RegOpenKeyExA,
         },
     },
-    core::PCSTR,
+    core::{BOOL, PCSTR},
 };
 
-use binding::{patches, thunks};
+use binding::{macros::hook, patches, thunks};
 
 use super::MODULE;
 
@@ -84,8 +84,23 @@ unsafe extern "system" fn reg_open_key_ex_a(
     }
 }
 
+#[hook(rva = 0x000103e2)]
+unsafe extern "cdecl" fn load_settings_from_registry(
+    quick_tips: *mut i32,
+    show_dialog: *mut i32,
+    little_movies: *mut i32,
+) -> BOOL {
+    unsafe {
+        *quick_tips = 0;
+        *show_dialog = 0;
+        *little_movies = 0;
+    }
+    TRUE
+}
+
 patches!(
     pub(super) static PATCHES = [
         patch REGISTRY_THUNKS,
+        hook load_settings_from_registry,
     ];
 );

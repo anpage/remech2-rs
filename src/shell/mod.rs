@@ -23,7 +23,6 @@ mod drawmode;
 mod mechlab;
 mod registry;
 mod screens;
-mod settings_ui;
 mod smacker;
 mod win32;
 
@@ -41,7 +40,7 @@ patch_groups! {
         screens::debrief,
         screens::debug,
         screens::main_menu,
-        settings_ui,
+        screens::settings,
         win32,
     ];
 }

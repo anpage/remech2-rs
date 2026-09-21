@@ -105,13 +105,13 @@ globals!(
     static G_PRIMARY_HEAP: HANDLE = 0x0006a9f4;
     static G_BITS_TO_BLIT: *mut u8 = 0x00062fe0;
     static G_GDI_BLIT_BITMAP_INFO: BITMAPINFO = 0x00096a64;
-    static G_WINDOW: HWND = 0x000965ec;
+    pub(in crate::shell) static G_WINDOW: HWND = 0x000965ec;
     static G_CURRENT_PIXEL_BUFFER: *mut PixelBuffer = 0x00062cdc;
     static G_DISPLAY_BRIGHTNESS: u32 = 0x000717a4;
     static G_GAMMA_TABLE: [u8; 1024] = 0x000961d0;
     static G_PALETTE_COLORS: [PaletteColor; 256] = 0x00062ce0;
     static G_PALETTE_COLORS_PRE_BRIGHTNESS: [PaletteColor; 256] = 0x00095ed0;
-    static G_CURRENT_MOUSE_STATE: *mut MouseState = 0x00071204;
+    pub(in crate::shell) static G_CURRENT_MOUSE_STATE: *mut MouseState = 0x00071204;
     static G_SOME_PALETTE_FLAG: u32 = 0x0005c2a4;
     pub(in crate::shell) static G_CURSOR_GRAPHIC: *mut [u8; CURSOR_GRAPHIC_SIZE] = 0x00071200;
 );

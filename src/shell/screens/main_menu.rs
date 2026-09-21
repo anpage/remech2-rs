@@ -3,14 +3,18 @@ use std::ptr::null_mut;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
-use binding::{game_fns, globals, macros::hook, patches};
+use binding::{globals, macros::hook, patches};
 
 use super::{
-    ALLOCATE, Campaign, DEALLOCATE, FREE_ANIMATIONS, G_MOUSE_STATE, GET_DB_ITEM, Screen,
-    ScreenArgs, ShellMsg, run,
+    ALLOCATE, Campaign, DEALLOCATE, FREE_ANIMATIONS, GET_DB_ITEM, Screen, ScreenArgs, ShellMsg, run,
 };
 use crate::shell::MODULE;
-use crate::shell::screens::{AUDIO_SAMPLE_DROP, BUTTONS_DROP, BUTTONS_HIT_TEST};
+use crate::shell::audio::{
+    AUDIO_SAMPLE_DO_FADE, AUDIO_SAMPLE_DROP, AUDIO_SAMPLE_ENABLE_LOOP, AUDIO_SAMPLE_IS_PLAYING,
+    AUDIO_SAMPLE_NEW, AUDIO_SAMPLE_SET_FADE, AUDIO_SAMPLE_START,
+};
+use crate::shell::drawmode::hooks::G_CURRENT_MOUSE_STATE;
+use crate::shell::screens::{BUTTONS_DROP, BUTTONS_HIT_TEST};
 
 globals!(
     static G_BUTTONS: *mut c_void = 0x0006ae74;
@@ -18,21 +22,6 @@ globals!(
     static G_MECHWARRIOR_SAMPLE: *mut c_void = 0x0006ae7c;
     static G_AMBIENT_STARTED: i32 = 0x0006ae80;
     static G_AUDIO_SUBSYSTEM: *mut c_void = 0x000711fc;
-);
-
-game_fns!(
-    static AUDIO_SAMPLE_NEW: unsafe extern "thiscall" fn(
-        *mut c_void,
-        *mut c_void,
-        *mut c_void,
-        i32,
-    ) -> *mut c_void = 0x0003d419;
-    static AUDIO_SAMPLE_START: unsafe extern "thiscall" fn(*mut c_void) = 0x0003d6bb;
-    static AUDIO_SAMPLE_ENABLE_LOOP: unsafe extern "thiscall" fn(*mut c_void) = 0x0003d67f;
-    static AUDIO_SAMPLE_SET_FADE: unsafe extern "thiscall" fn(*mut c_void, i32, i32, i32, i32) =
-        0x0003d561;
-    static AUDIO_SAMPLE_DO_FADE: unsafe extern "thiscall" fn(*mut c_void) = 0x0003d5ca;
-    static AUDIO_SAMPLE_IS_PLAYING: unsafe extern "thiscall" fn(*mut c_void) -> u32 = 0x0003d77e;
 );
 
 const AMBIENT_FIRE_DB_ITEM: i32 = 74;
@@ -50,7 +39,7 @@ impl Screen for MainMenu {
         unsafe {
             self.update_ambient(args.db);
 
-            let mouse = G_MOUSE_STATE.get().as_ref()?;
+            let mouse = G_CURRENT_MOUSE_STATE.get().as_ref()?;
 
             let hit = (BUTTONS_HIT_TEST.get())(G_BUTTONS.get(), mouse.pos_x, mouse.pos_y);
             if mouse.left_pressed.0 != 1 {
