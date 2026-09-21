@@ -15,6 +15,7 @@ use super::MODULE;
 pub mod debrief;
 pub mod debug;
 pub mod main_menu;
+pub mod mechlab;
 pub mod roster;
 pub mod settings;
 
@@ -233,6 +234,14 @@ impl Clickable {
     pub fn buffer<T>(&self) -> *mut T {
         self.value.cast()
     }
+
+    /// Runs the row's handler. The hit test only ever hands back rows that have one.
+    pub unsafe fn click(&mut self) {
+        debug_assert!(!self.on_click.is_null());
+        let on_click: unsafe extern "cdecl" fn(*mut Clickable) =
+            unsafe { std::mem::transmute(self.on_click) };
+        unsafe { on_click(self) };
+    }
 }
 
 globals!(
@@ -271,6 +280,16 @@ game_fns!(
         i32,
         i32,
     ) -> *mut Clickable = 0x0000b5ed;
+    /// Rebuilds a group's label graphics in place, without laying it out again
+    pub static CLICKABLES_REBUILD: unsafe extern "cdecl" fn(*mut Clickable) = 0x000079f8;
+    pub static BUTTON_ENABLE: unsafe extern "thiscall" fn(*mut c_void, i32) = 0x00048cc1;
+    pub static BUTTON_DISABLE: unsafe extern "thiscall" fn(*mut c_void, i32) = 0x00048d65;
+    /// `(slot, filename, name)`. Returns `0` when the 'Mech is over the mission's tonnage limit.
+    pub static REGISTER_MECH_VARIANT: unsafe extern "cdecl" fn(
+        i32,
+        *const c_char,
+        *const c_char,
+    ) -> i32 = 0x00002de7;
     /// Builds a text graphic and hands it to the video driver's `collection_2`
     pub static SHELL_LABEL_NEW: unsafe extern "thiscall" fn(
         *mut c_void,

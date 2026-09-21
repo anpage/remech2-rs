@@ -5,9 +5,10 @@ use std::sync::Mutex;
 use binding::{game_fns, globals, macros::hook, patches};
 
 use super::{
-    BUTTONS_DROP, BUTTONS_HIT_TEST, CLICKABLES_HIDE, CLICKABLES_HIT_TEST, CLICKABLES_SHOW,
-    Campaign, Clickable, DEALLOCATE, G_CAMPAIGN_MISSIONS, G_PILOT, G_SHELL_BUTTON1, Pilot,
-    SAVE_PILOTS, Screen, ScreenArgs, ShellMsg, run,
+    BUTTON_DISABLE, BUTTON_ENABLE, BUTTONS_DROP, BUTTONS_HIT_TEST, CLICKABLES_HIDE,
+    CLICKABLES_HIT_TEST, CLICKABLES_SHOW, Campaign, Clickable, DEALLOCATE, G_CAMPAIGN_MISSIONS,
+    G_PILOT, G_SHELL_BUTTON1, Pilot, REGISTER_MECH_VARIANT, SAVE_PILOTS, Screen, ScreenArgs,
+    ShellMsg, run,
 };
 use crate::shell::MODULE;
 use crate::shell::audio::AUDIO_SAMPLE_DROP;
@@ -31,8 +32,6 @@ globals!(
 );
 
 game_fns!(
-    static BUTTON_ENABLE: unsafe extern "thiscall" fn(*mut c_void, i32) = 0x00048cc1;
-    static BUTTON_DISABLE: unsafe extern "thiscall" fn(*mut c_void, i32) = 0x00048d65;
     /// Clears every slot's active flag, then sets this pilot's
     static SET_ACTIVE_PILOT: unsafe extern "cdecl" fn(*mut Pilot) = 0x00014d3e;
     /// Frees the slot: clears `in_use` and the callsign, and drops the row's label
@@ -61,12 +60,6 @@ game_fns!(
     /// Loads the scenario's project data: the mission filename, and with `lances` set, the two starting lances.
     /// `briefing` also plays the plan video.
     static LOAD_SCENARIO: unsafe extern "cdecl" fn(*const c_char, i32, i32) = 0x00037cf7;
-    /// `(slot, filename, name)`. The roster only ever sets the name.
-    static REGISTER_MECH_VARIANT: unsafe extern "cdecl" fn(
-        i32,
-        *const c_char,
-        *const c_char,
-    ) -> i32 = 0x00002de7;
     /// The shell's CRT `rand`, seeded by the entry function
     static RAND: unsafe extern "cdecl" fn() -> i32 = 0x0004aaf0;
 );

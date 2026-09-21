@@ -20,7 +20,6 @@ use crate::{WindowProc, ail::Ail};
 mod audio;
 mod database;
 mod drawmode;
-mod mechlab;
 mod registry;
 mod screens;
 mod smacker;
@@ -35,11 +34,11 @@ patch_groups! {
         audio::hooks,
         database,
         drawmode::hooks,
-        mechlab,
         registry,
         screens::debrief,
         screens::debug,
         screens::main_menu,
+        screens::mechlab,
         screens::roster,
         screens::settings,
         win32,
