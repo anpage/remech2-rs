@@ -15,6 +15,7 @@ use super::MODULE;
 pub mod debrief;
 pub mod debug;
 pub mod main_menu;
+pub mod roster;
 pub mod settings;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

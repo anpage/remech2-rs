@@ -40,6 +40,7 @@ patch_groups! {
         screens::debrief,
         screens::debug,
         screens::main_menu,
+        screens::roster,
         screens::settings,
         win32,
     ];
