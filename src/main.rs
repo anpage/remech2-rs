@@ -376,8 +376,26 @@ fn start_sim(window: HWND, cmd_line: &str) -> Result<i32> {
     Ok(result)
 }
 
+fn str_to_level(loglevel: &str) -> Level {
+    match loglevel {
+        "trace" => Level::TRACE,
+        "debug" => Level::DEBUG,
+        "info" => Level::INFO,
+        "warn" => Level::WARN,
+        "error" => Level::ERROR,
+        _ => Level::WARN,
+    }
+}
+
 fn main() -> Result<()> {
-    let filter = filter::Targets::new().with_target("remech2", Level::WARN);
+    let loglevel = SETTINGS
+        .get(Some("debug"), "loglevel")
+        .unwrap_or("warn".to_string())
+        .to_ascii_lowercase();
+
+    let loglevel = str_to_level(&loglevel);
+
+    let filter = filter::Targets::new().with_target("remech2", loglevel);
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
         .with(filter)
