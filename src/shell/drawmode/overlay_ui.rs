@@ -15,6 +15,7 @@ use crate::shell::drawmode::{
     confirm,
     custom_drawmode::OverlayMouseState,
     hooks::{get_mouse_state, update_global_mouse_state},
+    menu,
 };
 use crate::{about, shell::screens};
 
@@ -76,6 +77,11 @@ impl OverlayUi {
         };
 
         let mut menu_open = false;
+
+        let menu_locked = menu::locked();
+        if menu_locked {
+            self.menu_visible = false;
+        }
 
         // ctx.set_pixels_per_point(2.0);
         ctx.set_fonts(self.fonts.clone());
@@ -272,10 +278,12 @@ impl OverlayUi {
             }
         }
 
-        if (mouse_state.pos_y as f32) < 30.0 * scale_factor {
-            self.menu_visible = true;
-        } else if self.shell_hovered && !menu_open {
-            self.menu_visible = false;
+        if !menu_locked {
+            if (mouse_state.pos_y as f32) < 30.0 * scale_factor {
+                self.menu_visible = true;
+            } else if self.shell_hovered && !menu_open {
+                self.menu_visible = false;
+            }
         }
 
         if self.shell_hovered {
