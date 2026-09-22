@@ -11,6 +11,10 @@ pub struct AudioSample {
     /// Volume in the range 0..128
     volume: i32,
 
+    /// AIL's loop count.
+    /// 0 loops forever and anything else plays once
+    loop_count: i32,
+
     initial_fade_rate: i32,
     fade_rate: i32,
     max_fade: i32,
@@ -29,6 +33,7 @@ impl AudioSample {
             data: data.to_vec(),
             sink,
             volume: 0,
+            loop_count: 1,
             initial_fade_rate: 0,
             fade_rate: 0,
             max_fade: 0,
@@ -38,8 +43,21 @@ impl AudioSample {
     }
 
     pub fn start(&mut self) {
+        if !self.sink.empty() {
+            self.sink.clear();
+        }
+        self.queue_source();
         self.apply_volume();
         self.sink.play();
+    }
+
+    fn queue_source(&mut self) {
+        let source = Decoder::new(std::io::Cursor::new(self.data.clone())).unwrap();
+        if self.loop_count == 0 {
+            self.sink.append(source.repeat_infinite());
+        } else {
+            self.sink.append(source);
+        }
     }
 
     pub fn is_playing(&self) -> bool {
@@ -94,8 +112,8 @@ impl AudioSample {
     }
 
     pub fn enable_loop(&mut self) {
+        self.loop_count = 0;
         self.sink.clear();
-        let source = Decoder::new(std::io::Cursor::new(self.data.clone())).unwrap();
-        self.sink.append(source.repeat_infinite());
+        self.queue_source();
     }
 }
