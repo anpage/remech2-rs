@@ -2,9 +2,8 @@ use std::num::NonZeroIsize;
 
 use anyhow::{Result, bail};
 use egui::{Modifiers, MouseWheelUnit, RawInput};
-use egui_wgpu::{RendererOptions, WgpuConfiguration, WgpuSetupCreateNew};
+use egui_wgpu::{RendererOptions, WgpuConfiguration};
 use painter::Painter;
-use wgpu::InstanceDescriptor;
 use windows::Win32::{
     Foundation::{HINSTANCE, HWND},
     UI::WindowsAndMessaging::{
@@ -49,19 +48,8 @@ impl Launcher {
             wnd
         };
         let ctx = egui::Context::default();
-        let config = WgpuConfiguration {
-            wgpu_setup: WgpuSetupCreateNew {
-                instance_descriptor: InstanceDescriptor {
-                    backends: wgpu::Backends::GL,
-                    ..Default::default()
-                },
-                ..Default::default()
-            }
-            .into(),
-            ..Default::default()
-        };
         let mut painter = pollster::block_on(Painter::new(
-            config,
+            WgpuConfiguration::default(),
             false,
             RendererOptions {
                 msaa_samples: 0,

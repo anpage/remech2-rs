@@ -6,8 +6,7 @@ use std::num::{NonZero, NonZeroIsize};
 
 use anyhow::Result;
 use egui::{Color32, Context, Event, Frame, Margin, Rect, Response, Sense, Vec2, pos2, vec2};
-use egui_wgpu::{RendererOptions, WgpuConfiguration, WgpuSetupCreateNew};
-use wgpu::InstanceDescriptor;
+use egui_wgpu::{RendererOptions, WgpuConfiguration};
 use windows::Win32::{
     Foundation::{HINSTANCE, HWND},
     System::LibraryLoader::GetModuleHandleA,
@@ -47,19 +46,8 @@ impl Framebuffer {
             wnd
         };
         let ctx = egui::Context::default();
-        let config = WgpuConfiguration {
-            wgpu_setup: WgpuSetupCreateNew {
-                instance_descriptor: InstanceDescriptor {
-                    backends: wgpu::Backends::GL,
-                    ..Default::default()
-                },
-                ..Default::default()
-            }
-            .into(),
-            ..Default::default()
-        };
         let mut painter = pollster::block_on(Painter::new(
-            config,
+            WgpuConfiguration::default(),
             false,
             RendererOptions {
                 msaa_samples: 0,
