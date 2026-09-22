@@ -17,7 +17,7 @@ globals!(
 );
 
 /// Offset to center the HUD box inside the framebuffer
-fn hud_origin() -> (i32, i32) {
+pub(super) fn hud_origin() -> (i32, i32) {
     unsafe {
         let x0 = (G_GAME_WINDOW_WIDTH.get() as i32 - (*(G_GAME_WINDOW_GEOMETRY.get())).width) / 2;
         let y0 = (G_GAME_WINDOW_HEIGHT.get() as i32 - (*(G_GAME_WINDOW_GEOMETRY.get())).height) / 2;

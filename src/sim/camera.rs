@@ -4,7 +4,7 @@ use binding::{globals, macros::hook, patches};
 
 use crate::sim::{
     RenderTarget,
-    window::{G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH},
+    window::{G_GAME_WINDOW_GEOMETRY, G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH},
 };
 
 use super::MODULE;
@@ -43,6 +43,8 @@ globals!(
     static G_EYEPOINT: *mut Eyepoint = 0x000a6cc0;
     static G_RENDER_TARGET_TABLE: [RenderTarget; 11] = 0x00181a60;
 );
+
+const SATELLITE_LAYOUT: i32 = 4;
 
 /// Rewrites eyepoint->fovX every frame from the game's FOV globals.
 /// We keep the game's raw value in a shadow so its internal logic always sees the original raw value,
@@ -91,7 +93,7 @@ fn render_target(slot: i32) -> Option<&'static mut RenderTarget> {
     unsafe { G_RENDER_TARGET_TABLE.as_mut()?.get_mut(slot) }
 }
 
-/// The cockpit's 3D scene slot
+/// The satellite view's 3D scene slot
 static mut SCENE_SLOT: i32 = -1;
 
 /// Copies the cockpit's 3D viewport rect into render-target slot `layout.render_target_slot`.
@@ -105,8 +107,13 @@ unsafe extern "cdecl" fn load_cockpit_layout(cockpit: i32, layout: *mut CockpitL
         }
         let slot = (*layout).render_target_slot;
         if let Some(target) = render_target(slot) {
-            SCENE_SLOT = slot;
             target.cover_framebuffer();
+        }
+        if cockpit == SATELLITE_LAYOUT {
+            SCENE_SLOT = slot;
+            if let Some(viewport) = (*layout).viewport.as_mut() {
+                viewport.cover_framebuffer();
+            }
         }
     }
 }
@@ -125,11 +132,58 @@ unsafe extern "cdecl" fn select_render_target(slot: i32) {
     }
 }
 
+/// Sets up the map projection for the satellite view.
+/// We adjust the world span to match the game window's width, so the map covers the full width.
+#[hook(rva = 0x00041fa0)]
+unsafe extern "cdecl" fn setup_map_projection(
+    eyepoint: *mut c_void,
+    slot: i32,
+    world_span: i32,
+    far_plane: i32,
+) {
+    unsafe {
+        let mut world_span = world_span;
+        if slot == SCENE_SLOT
+            && let Some(geometry) = G_GAME_WINDOW_GEOMETRY.get().as_ref()
+            && geometry.width > 0
+        {
+            let width = G_GAME_WINDOW_WIDTH.get() as i64;
+            world_span = (world_span as i64 * width / geometry.width as i64) as i32;
+        }
+        original(eyepoint, slot, world_span, far_plane);
+    }
+}
+
+/// Draws the satellite view's readouts.
+/// We widened the satellite view's HUD box to cover the full width,
+/// so here we narrow it again for the text in the top left.
+#[hook(rva = 0x0003ec35)]
+unsafe extern "cdecl" fn draw_map_view_text(layout: *mut CockpitLayout) {
+    unsafe {
+        if layout.is_null() || (*layout).render_target_slot != SCENE_SLOT {
+            original(layout);
+            return;
+        }
+        let viewport = (*layout).viewport;
+        if viewport.is_null() {
+            original(layout);
+            return;
+        }
+
+        let scene_rect = (*viewport).clone();
+        (*viewport).cover_hud_box();
+        original(layout);
+        *viewport = scene_rect;
+    }
+}
+
 patches!(
     pub(super) static PATCHES = [
         hook apply_eyepoint_fov,
         hook setup_eyepoint_projection,
         hook load_cockpit_layout,
         hook select_render_target,
+        hook setup_map_projection,
+        hook draw_map_view_text,
     ];
 );

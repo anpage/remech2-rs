@@ -1,5 +1,7 @@
 use std::ffi::c_void;
 
+use crate::sim::{hud::hud_origin, window::G_GAME_WINDOW_GEOMETRY};
+
 use super::{G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH, drawmode::hooks::PixelBuffer};
 
 /// A render context: the pixel buffer to draw into plus the rect within that buffer
@@ -22,6 +24,21 @@ impl RenderTarget {
             self.top = 0;
             self.right = (G_GAME_WINDOW_WIDTH.get() as i32 - 1).max(0);
             self.bottom = (G_GAME_WINDOW_HEIGHT.get() as i32 - 1).max(0);
+        }
+    }
+
+    /// Shrinks the target rect to the centered 4:3 HUD box
+    pub fn cover_hud_box(&mut self) {
+        unsafe {
+            let geometry = G_GAME_WINDOW_GEOMETRY.get();
+            if geometry.is_null() {
+                return;
+            }
+            let (x0, y0) = hud_origin();
+            self.left = x0;
+            self.top = y0;
+            self.right = x0 + (*geometry).width - 1;
+            self.bottom = y0 + (*geometry).height - 1;
         }
     }
 }
