@@ -1,6 +1,9 @@
 use std::{
     ffi::{c_char, c_void},
-    sync::RwLock,
+    sync::{
+        RwLock,
+        atomic::{AtomicBool, Ordering},
+    },
 };
 
 use binding::{game_fns, globals, macros::hook, patches, thunks};
@@ -131,7 +134,15 @@ thunks! {
 }
 
 static CUSTOM_DRAW_MODE: RwLock<Option<CustomDrawMode>> = RwLock::new(None);
-static DRAW_CALLED: RwLock<bool> = RwLock::new(false);
+static DRAW_CALLED: AtomicBool = AtomicBool::new(false);
+
+struct DrawGuard;
+
+impl Drop for DrawGuard {
+    fn drop(&mut self) {
+        DRAW_CALLED.store(false, Ordering::Release);
+    }
+}
 
 /// Drops the overlay's GPU resources when the shell unloads.
 pub(in crate::shell) fn shutdown() {
@@ -480,14 +491,10 @@ unsafe extern "stdcall" fn end() -> i32 {
 unsafe extern "stdcall" fn blit_flip() -> i32 {
     tracing::trace!("GdiBlitFlip called");
 
-    let called = { *DRAW_CALLED.read().unwrap() };
-    if called {
+    if DRAW_CALLED.swap(true, Ordering::AcqRel) {
         return 0;
     }
-
-    {
-        *DRAW_CALLED.write().unwrap() = true;
-    }
+    let _guard = DrawGuard;
 
     if G_WINDOW.ptr().is_null() || !unsafe { IsWindow(Some(G_WINDOW.get())) }.as_bool() {
         return 0;
@@ -523,10 +530,6 @@ unsafe extern "stdcall" fn blit_flip() -> i32 {
         }
     }
 
-    {
-        *DRAW_CALLED.write().unwrap() = false;
-    }
-
     tracing::trace!("GdiBlitFlip finished");
 
     0
@@ -560,14 +563,10 @@ unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) -> i
         y2
     );
 
-    let called = { *DRAW_CALLED.read().unwrap() };
-    if called {
+    if DRAW_CALLED.swap(true, Ordering::AcqRel) {
         return 0;
     }
-
-    {
-        *DRAW_CALLED.write().unwrap() = true;
-    }
+    let _guard = DrawGuard;
 
     if G_WINDOW.ptr().is_null() || !unsafe { IsWindow(Some(G_WINDOW.get())) }.as_bool() {
         return 0;
@@ -575,6 +574,24 @@ unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) -> i
 
     let buffer_width = unsafe { (*G_CURRENT_PIXEL_BUFFER.get()).width } + 1;
     let buffer_height = unsafe { (*G_CURRENT_PIXEL_BUFFER.get()).height };
+
+    if buffer_width <= 0 || buffer_height <= 0 {
+        tracing::warn!(
+            "GdiStretchBlit called with invalid buffer dimensions: {}x{}",
+            buffer_width,
+            buffer_height
+        );
+        return 0;
+    }
+
+    let x1 = x1.clamp(0, buffer_width);
+    let x2 = x2.clamp(x1, buffer_width);
+    let y1 = y1.clamp(0, buffer_height);
+    let y2 = y2.clamp(y1, buffer_height);
+
+    if x2 == x1 || y2 == y1 {
+        return 0;
+    }
 
     let bits_to_blit = unsafe { G_BITS_TO_BLIT.get() };
     let pixel_slice = unsafe {
@@ -585,7 +602,7 @@ unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) -> i
         .chunks_exact(buffer_width as usize)
         .skip(y1 as usize)
         .take((y2 - y1) as usize)
-        .flat_map(|row| row[x1 as usize..x2 as usize].to_vec())
+        .flat_map(|row| row[x1 as usize..x2 as usize].iter().copied())
         .collect::<Vec<u8>>();
 
     {
@@ -600,10 +617,6 @@ unsafe extern "stdcall" fn stretch_blit(x1: i32, y1: i32, x2: i32, y2: i32) -> i
                 unsafe { G_WINDOW.get() },
             );
         }
-    }
-
-    {
-        *DRAW_CALLED.write().unwrap() = false;
     }
 
     0
