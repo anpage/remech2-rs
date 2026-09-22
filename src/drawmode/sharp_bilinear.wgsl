@@ -6,9 +6,13 @@ struct Params {
     opts: vec4<f32>,
 };
 
+struct Palette {
+    colors: array<vec4<f32>, 256>,
+};
+
 @group(0) @binding(0) var<uniform> params: Params;
-@group(0) @binding(1) var src: texture_2d<f32>;
-@group(0) @binding(2) var src_sampler: sampler;
+@group(0) @binding(1) var indexed: texture_2d<u32>;
+@group(0) @binding(2) var<uniform> palette: Palette;
 
 struct VsOut {
     @builtin(position) pos: vec4<f32>,
@@ -44,6 +48,30 @@ fn sharp_bilinear_uv(uv: vec2<f32>) -> vec2<f32> {
     return (floor(texel) + f) / source_size;
 }
 
+fn tap(coord: vec2<i32>, max_coord: vec2<i32>) -> vec4<f32> {
+    let index = textureLoad(indexed, clamp(coord, vec2<i32>(0), max_coord), 0).r;
+    return palette.colors[index];
+}
+
+fn sample_framebuffer(uv: vec2<f32>) -> vec4<f32> {
+    let source_size = params.sizes.xy;
+    let max_coord = vec2<i32>(source_size) - vec2<i32>(1);
+
+    let point = sharp_bilinear_uv(uv) * source_size - 0.5;
+    let base = floor(point);
+    let weight = point - base;
+    let coord = vec2<i32>(base);
+
+    let top_left = tap(coord, max_coord);
+    let top_right = tap(coord + vec2<i32>(1, 0), max_coord);
+    let bottom_left = tap(coord + vec2<i32>(0, 1), max_coord);
+    let bottom_right = tap(coord + vec2<i32>(1, 1), max_coord);
+
+    let top = mix(top_left, top_right, weight.x);
+    let bottom = mix(bottom_left, bottom_right, weight.x);
+    return mix(top, bottom, weight.y);
+}
+
 fn linear_from_gamma_rgb(srgb: vec3<f32>) -> vec3<f32> {
     let cutoff = srgb < vec3<f32>(0.04045);
     let lower = srgb / vec3<f32>(12.92);
@@ -53,11 +81,11 @@ fn linear_from_gamma_rgb(srgb: vec3<f32>) -> vec3<f32> {
 
 @fragment
 fn fs_gamma_target(in: VsOut) -> @location(0) vec4<f32> {
-    return textureSample(src, src_sampler, sharp_bilinear_uv(in.uv));
+    return sample_framebuffer(in.uv);
 }
 
 @fragment
 fn fs_srgb_target(in: VsOut) -> @location(0) vec4<f32> {
-    let color = textureSample(src, src_sampler, sharp_bilinear_uv(in.uv));
+    let color = sample_framebuffer(in.uv);
     return vec4<f32>(linear_from_gamma_rgb(color.rgb), color.a);
 }

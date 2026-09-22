@@ -1,6 +1,6 @@
 use std::num::NonZeroU64;
 
-use egui::{Color32, PaintCallbackInfo};
+use egui::PaintCallbackInfo;
 use egui_wgpu::{CallbackResources, CallbackTrait, RenderState, ScreenDescriptor};
 
 use crate::settings::SETTINGS;
@@ -57,6 +57,9 @@ struct Params {
     opts: [f32; 4],
 }
 
+/// 256 gamma-space RGBA colors, as the shader's uniform expects them
+pub type PaletteData = [[f32; 4]; 256];
+
 struct Target {
     texture: wgpu::Texture,
     bind_group: wgpu::BindGroup,
@@ -67,8 +70,8 @@ struct Target {
 pub struct Scaler {
     pipeline: wgpu::RenderPipeline,
     bind_group_layout: wgpu::BindGroupLayout,
-    sampler: wgpu::Sampler,
     params: wgpu::Buffer,
+    palette: wgpu::Buffer,
     target: Option<Target>,
 }
 
@@ -95,7 +98,7 @@ impl Scaler {
                     binding: 1,
                     visibility: wgpu::ShaderStages::FRAGMENT,
                     ty: wgpu::BindingType::Texture {
-                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        sample_type: wgpu::TextureSampleType::Uint,
                         view_dimension: wgpu::TextureViewDimension::D2,
                         multisampled: false,
                     },
@@ -104,7 +107,11 @@ impl Scaler {
                 wgpu::BindGroupLayoutEntry {
                     binding: 2,
                     visibility: wgpu::ShaderStages::FRAGMENT,
-                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: NonZeroU64::new(size_of::<PaletteData>() as u64),
+                    },
                     count: None,
                 },
             ],
@@ -151,17 +158,6 @@ impl Scaler {
             cache: None,
         });
 
-        let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
-            label: Some("sharp_bilinear_sampler"),
-            address_mode_u: wgpu::AddressMode::ClampToEdge,
-            address_mode_v: wgpu::AddressMode::ClampToEdge,
-            address_mode_w: wgpu::AddressMode::ClampToEdge,
-            mag_filter: wgpu::FilterMode::Linear,
-            min_filter: wgpu::FilterMode::Linear,
-            mipmap_filter: wgpu::FilterMode::Nearest,
-            ..Default::default()
-        });
-
         let params = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("sharp_bilinear_params"),
             size: size_of::<Params>() as u64,
@@ -169,17 +165,39 @@ impl Scaler {
             mapped_at_creation: false,
         });
 
+        let palette = device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("sharp_bilinear_palette"),
+            size: size_of::<PaletteData>() as u64,
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
+        });
+
         Self {
             pipeline,
             bind_group_layout,
-            sampler,
             params,
+            palette,
             target: None,
         }
     }
 
-    /// Copies this frame's pixels into the framebuffer texture, reallocating it only when the game changes resolution.
-    pub fn upload(&mut self, render_state: &RenderState, pixels: &[Color32], size: [usize; 2]) {
+    pub fn upload_palette(&self, render_state: &RenderState, palette: &PaletteData) {
+        render_state
+            .queue
+            .write_buffer(&self.palette, 0, bytemuck::cast_slice(palette));
+    }
+
+    /// Copies this frame's palette indices into the framebuffer texture, reallocating it only when the game changes resolution.
+    pub fn upload(&mut self, render_state: &RenderState, indices: &[u8], size: [usize; 2]) {
+        let Some(indices) = indices.get(..size[0] * size[1]) else {
+            tracing::warn!(
+                "framebuffer is {} bytes, expected {}x{}",
+                indices.len(),
+                size[0],
+                size[1]
+            );
+            return;
+        };
         let size = [size[0] as u32, size[1] as u32];
         if size[0] == 0 || size[1] == 0 {
             return;
@@ -198,10 +216,10 @@ impl Scaler {
 
         render_state.queue.write_texture(
             target.texture.as_image_copy(),
-            bytemuck::cast_slice(pixels),
+            indices,
             wgpu::TexelCopyBufferLayout {
                 offset: 0,
-                bytes_per_row: Some(4 * size[0]),
+                bytes_per_row: Some(size[0]),
                 rows_per_image: Some(size[1]),
             },
             wgpu::Extent3d {
@@ -223,7 +241,7 @@ impl Scaler {
             mip_level_count: 1,
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::Rgba8Unorm,
+            format: wgpu::TextureFormat::R8Uint,
             usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
             view_formats: &[],
         });
@@ -243,7 +261,7 @@ impl Scaler {
                 },
                 wgpu::BindGroupEntry {
                     binding: 2,
-                    resource: wgpu::BindingResource::Sampler(&self.sampler),
+                    resource: self.palette.as_entire_binding(),
                 },
             ],
         });

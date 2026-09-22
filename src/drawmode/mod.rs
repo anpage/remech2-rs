@@ -5,7 +5,7 @@ pub use scaler::ScalingMode;
 use std::num::{NonZero, NonZeroIsize};
 
 use anyhow::Result;
-use egui::{Color32, Context, Event, Frame, Margin, Rect, Response, Sense, Vec2, pos2, vec2};
+use egui::{Context, Event, Frame, Margin, Rect, Response, Sense, Vec2, pos2, vec2};
 use egui_wgpu::{RendererOptions, WgpuConfiguration};
 use windows::Win32::{
     Foundation::{HINSTANCE, HWND},
@@ -13,7 +13,7 @@ use windows::Win32::{
 };
 
 use crate::{
-    drawmode::scaler::{Scaler, SharpBilinear},
+    drawmode::scaler::{PaletteData, Scaler, SharpBilinear},
     launcher::painter::Painter,
 };
 
@@ -28,8 +28,8 @@ pub struct PaletteColor {
 pub struct Framebuffer {
     ctx: Context,
     painter: Painter,
-    palette: [Color32; 256],
-    pixels: Vec<Color32>,
+    palette: PaletteData,
+    palette_dirty: bool,
     cached_width: i32,
     cached_height: i32,
 }
@@ -63,8 +63,8 @@ impl Framebuffer {
         Ok(Self {
             ctx,
             painter,
-            palette: [Color32::BLACK; 256],
-            pixels: Vec::new(),
+            palette: [[0.0, 0.0, 0.0, 1.0]; 256],
+            palette_dirty: true,
             cached_width: window_width,
             cached_height: window_height,
         })
@@ -78,15 +78,16 @@ impl Framebuffer {
     pub fn set_palette_6bit(&mut self, palette_data: &[PaletteColor; 256]) {
         let scale = |v: u8| (v.min(63) << 2) | (v.min(63) >> 4);
         for (i, color) in palette_data.iter().enumerate() {
-            self.palette[i] =
-                Color32::from_rgb(scale(color.red), scale(color.green), scale(color.blue));
+            self.palette[i] = to_gpu_color(scale(color.red), scale(color.green), scale(color.blue));
         }
+        self.palette_dirty = true;
     }
 
     pub fn set_palette(&mut self, palette_data: &[PaletteColor; 256]) {
         for (i, color) in palette_data.iter().enumerate() {
-            self.palette[i] = Color32::from_rgb(color.red, color.green, color.blue);
+            self.palette[i] = to_gpu_color(color.red, color.green, color.blue);
         }
+        self.palette_dirty = true;
     }
 
     pub fn draw(
@@ -97,13 +98,7 @@ impl Framebuffer {
         events: Vec<Event>,
         ui: impl FnMut(&Context),
     ) {
-        let [game_width, game_height] = game_size;
         let [window_width, window_height] = window_size;
-
-        self.pixels.resize(game_width * game_height, Color32::BLACK);
-        for (dst, &idx) in self.pixels.iter_mut().zip(pixel_data) {
-            *dst = self.palette[idx as usize];
-        }
 
         if self.cached_width != window_width || self.cached_height != window_height {
             self.painter.on_window_resized(
@@ -130,7 +125,11 @@ impl Framebuffer {
                 .callback_resources
                 .entry::<Scaler>()
                 .or_insert_with(|| Scaler::new(render_state));
-            scaler.upload(render_state, &self.pixels, game_size);
+            if self.palette_dirty {
+                scaler.upload_palette(render_state, &self.palette);
+                self.palette_dirty = false;
+            }
+            scaler.upload(render_state, pixel_data, game_size);
         }
 
         let full_output = self.ctx.run(raw_input, ui);
@@ -147,6 +146,15 @@ impl Framebuffer {
             &full_output.textures_delta,
         );
     }
+}
+
+fn to_gpu_color(red: u8, green: u8, blue: u8) -> [f32; 4] {
+    [
+        red as f32 / 255.0,
+        green as f32 / 255.0,
+        blue as f32 / 255.0,
+        1.0,
+    ]
 }
 
 /// The largest rect with the given aspect ratio that fits in the window
