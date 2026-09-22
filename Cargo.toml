@@ -5,7 +5,7 @@ edition = "2024"
 license = "MIT"
 
 [workspace]
-members = ["crates/binding", "crates/binding-macros"]
+members = ["crates/binding", "crates/binding-macros", "crates/smacker"]
 
 # Shared so that `binding` and `remech2` can't drift onto two versions of
 # `retour`, which would make their `Hook<F>` types mutually unassignable.
@@ -20,6 +20,10 @@ lto = true
 codegen-units = 1
 # Include debug symbols in release builds for troubleshooting
 debug = true
+
+# Keep the smacker decoder optimized even in debug builds
+[profile.dev.package.smacker]
+opt-level = 3
 
 # Disable debug symbols for dependencies in release builds
 [profile.release.package."*"]
@@ -46,6 +50,7 @@ rodio = { version = "0.21.1", default-features = false, features = [
 rust-ini = "0.21.3"
 rustysynth = "1.3.1"
 sha2 = "0.10.9"
+smacker = { path = "crates/smacker" }
 slotmap = { git = "https://github.com/anpage/slotmap.git", rev = "cf4a60416e07e09d8f16fb7bfe0a70808c944843" }
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"

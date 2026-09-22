@@ -4,7 +4,7 @@ use anyhow::{Context, Result, bail};
 use windows::{
     Win32::{
         Foundation::{FreeLibrary, HMODULE, HWND},
-        System::LibraryLoader::{GetModuleHandleA, GetProcAddress, LoadLibraryA},
+        System::LibraryLoader::{GetProcAddress, LoadLibraryA},
     },
     core::s,
 };
@@ -44,15 +44,8 @@ patch_groups! {
         screens::mechlab,
         screens::roster,
         screens::settings,
-        win32,
-    ];
-}
-
-pub static SMACK_MODULE: ModuleBase = ModuleBase::new("SMACKW32.DLL");
-
-patch_groups! {
-    static SMACK_PATCH_GROUPS = [
         smacker,
+        win32,
     ];
 }
 
@@ -74,9 +67,7 @@ impl Shell {
         match unsafe { Self::install(module) } {
             Ok(ail) => Ok(Self { ail, module }),
             Err(e) => {
-                revert_groups(SMACK_PATCH_GROUPS);
                 revert_groups(PATCH_GROUPS);
-                SMACK_MODULE.clear();
                 MODULE.clear();
                 unsafe {
                     let _ = FreeLibrary(module);
@@ -89,10 +80,6 @@ impl Shell {
     unsafe fn install(module: HMODULE) -> Result<Ail> {
         MODULE.set(module.0 as usize);
         unsafe { apply_groups(PATCH_GROUPS)? };
-
-        let smack_module = unsafe { GetModuleHandleA(s!("SMACKW32.DLL"))? };
-        SMACK_MODULE.set(smack_module.0 as usize);
-        unsafe { apply_groups(SMACK_PATCH_GROUPS)? };
 
         Ail::new()
     }
@@ -128,13 +115,11 @@ impl Shell {
 
 impl Drop for Shell {
     fn drop(&mut self) {
-        revert_groups(SMACK_PATCH_GROUPS);
         revert_groups(PATCH_GROUPS);
         drawmode::hooks::shutdown();
 
         unsafe {
             self.ail.unhook();
-            SMACK_MODULE.clear();
             MODULE.clear();
             FreeLibrary(self.module).unwrap();
         }

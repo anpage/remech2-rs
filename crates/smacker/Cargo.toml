@@ -1,0 +1,18 @@
+[package]
+name = "smacker"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Smacker (SMK2) FMV decoder for ReMech 2"
+
+[features]
+default = ["audio", "std"]
+std = []
+audio = []
+
+[dependencies]
+
+# Corpus validation harness: the acceptance gate, not part of the public API.
+[[example]]
+name = "validate"
+required-features = ["std", "audio"]
