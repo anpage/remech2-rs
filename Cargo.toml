@@ -28,6 +28,7 @@ debug = false
 [dependencies]
 anyhow = { workspace = true }
 binding = { path = "crates/binding" }
+bytemuck = { version = "1.25", features = ["derive"] }
 egui = "0.33.0"
 egui-wgpu = "0.33.0"
 hex-literal = "1.0.0"

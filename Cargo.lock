@@ -1584,6 +1584,7 @@ version = "0.1.0-alpha.1"
 dependencies = [
  "anyhow",
  "binding",
+ "bytemuck",
  "egui",
  "egui-wgpu",
  "egui_plot",

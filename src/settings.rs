@@ -27,7 +27,8 @@ impl GlobalSettings {
             .set("width", "")
             .set("height", "")
             .set("widescreen", "false")
-            .set("framerate_limit", "45");
+            .set("framerate_limit", "45")
+            .set("scaling", "sharp-bilinear");
         settings
             .with_section(Some("audio"))
             .set("music_path", "Music")

@@ -1,58 +1,43 @@
-use egui::{Context, Frame, Margin, TextureId, Vec2, load::SizedTexture};
+use egui::Context;
 
+use crate::drawmode::{ScalingMode, fit_to_window, show_framebuffer};
 use crate::settings::SETTINGS;
 #[cfg(feature = "debug-overlay")]
 use crate::sim::drawmode::debug_overlay::DebugOverlay;
 
 pub struct OverlayUi {
     widescreen: bool,
+    scaling: ScalingMode,
     #[cfg(feature = "debug-overlay")]
     debug_overlay: DebugOverlay,
 }
 
-impl Default for OverlayUi {
-    fn default() -> Self {
+impl OverlayUi {
+    pub fn new(ctx: &Context) -> Self {
         let widescreen = SETTINGS.get_bool("video", "widescreen", false);
         Self {
             widescreen,
+            scaling: ScalingMode::from_settings(),
             #[cfg(feature = "debug-overlay")]
-            debug_overlay: Default::default(),
+            debug_overlay: DebugOverlay::new(ctx),
         }
     }
-}
 
-impl OverlayUi {
-    pub fn ui(&mut self, ctx: &Context, texture: TextureId, window_width: f32, window_height: f32) {
-        // calculate width and height, preserving aspect ratio
+    pub fn ui(
+        &mut self,
+        ctx: &Context,
+        source_size: [f32; 2],
+        window_width: f32,
+        window_height: f32,
+    ) {
         let aspect_ratio = if self.widescreen {
             const { 16.0 / 9.0 }
         } else {
             const { 4.0 / 3.0 }
         };
-        let mut width = window_width;
-        let mut height = window_height;
-        if width / height > aspect_ratio {
-            width = height * aspect_ratio;
-        } else {
-            height = width / aspect_ratio;
-        }
+        let size = fit_to_window(window_width, window_height, aspect_ratio);
 
-        egui::CentralPanel::default()
-            .frame(Frame {
-                inner_margin: Margin::same(0),
-                ..Default::default()
-            })
-            .show(ctx, |ui| {
-                ui.with_layout(
-                    egui::Layout::centered_and_justified(egui::Direction::LeftToRight),
-                    |ui| {
-                        ui.image(SizedTexture {
-                            id: texture,
-                            size: Vec2::new(width, height),
-                        })
-                    },
-                )
-            });
+        show_framebuffer(ctx, source_size, size, self.scaling);
 
         #[cfg(feature = "debug-overlay")]
         self.debug_overlay.draw(ctx, window_width, window_height);

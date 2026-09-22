@@ -256,6 +256,10 @@ impl Painter {
         };
     }
 
+    pub fn render_state(&self) -> Option<&RenderState> {
+        self.render_state.as_ref()
+    }
+
     pub fn on_window_resized(
         &mut self,
         viewport_id: ViewportId,

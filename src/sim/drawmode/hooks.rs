@@ -12,11 +12,8 @@ use windows::{
 
 use crate::{
     WINDOW_HEIGHT, WINDOW_WIDTH,
-    sim::{
-        MODULE,
-        drawmode::custom_drawmode::{CustomDrawMode, PaletteColor},
-        types::DrawModeExtension,
-    },
+    drawmode::PaletteColor,
+    sim::{MODULE, drawmode::custom_drawmode::CustomDrawMode, types::DrawModeExtension},
 };
 
 #[repr(C)]

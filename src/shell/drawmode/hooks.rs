@@ -20,9 +20,10 @@ use windows::{
 
 use crate::{
     WINDOW_HEIGHT, WINDOW_WIDTH,
+    drawmode::PaletteColor,
     shell::{
         MODULE,
-        drawmode::custom_drawmode::{CustomDrawMode, OverlayMouseState, PaletteColor},
+        drawmode::custom_drawmode::{CustomDrawMode, OverlayMouseState},
     },
 };
 

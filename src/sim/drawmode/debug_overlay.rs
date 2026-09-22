@@ -30,12 +30,11 @@ pub fn show_deltatime_plot(ui: &mut Ui, recent_deltatimes: [Option<i32>; 200]) -
 }
 
 pub struct DebugOverlay {
-    fonts: egui::FontDefinitions,
     recent_deltatimes: [Option<i32>; 200],
 }
 
-impl Default for DebugOverlay {
-    fn default() -> Self {
+impl DebugOverlay {
+    pub fn new(ctx: &Context) -> Self {
         // Load the Squarish Sans font
         let font =
             egui::FontData::from_static(include_bytes!("../../../Squarish_Sans_CT_Regular_SC.ttf"));
@@ -49,17 +48,14 @@ impl Default for DebugOverlay {
             .unwrap()
             .insert(0, "SquarishSans".to_owned());
 
+        ctx.set_fonts(fonts);
+
         Self {
-            fonts,
             recent_deltatimes: [None; 200],
         }
     }
-}
 
-impl DebugOverlay {
     pub fn draw(&mut self, ctx: &Context, window_width: f32, window_height: f32) {
-        ctx.set_fonts(self.fonts.clone());
-
         // calculate recent deltatimes
         let delta_time = unsafe { G_DELTA_TIME.get() };
         self.recent_deltatimes.rotate_left(1);

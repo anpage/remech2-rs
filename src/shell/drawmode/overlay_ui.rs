@@ -1,8 +1,6 @@
 use std::{process::exit, sync::Arc};
 
-use egui::{
-    Context, FontFamily, Frame, Margin, Order, TextStyle, TextureId, Vec2, load::SizedTexture,
-};
+use egui::{Context, FontFamily, Order, TextStyle, TextureId, Vec2};
 use tracing::error;
 use windows::Win32::{
     Foundation::{HWND, LPARAM, WPARAM},
@@ -11,6 +9,7 @@ use windows::Win32::{
     },
 };
 
+use crate::drawmode::{ScalingMode, fit_to_window, show_framebuffer};
 use crate::shell::dialog;
 use crate::shell::drawmode::{
     confirm,
@@ -24,13 +23,13 @@ pub struct OverlayUi {
     shell_hovered: bool,
     menu_visible: bool,
     show_cursor: bool,
-    fonts: egui::FontDefinitions,
+    scaling: ScalingMode,
     exit_dialog_open: bool,
     about_dialog_open: bool,
 }
 
-impl Default for OverlayUi {
-    fn default() -> Self {
+impl OverlayUi {
+    pub fn new(ctx: &Context) -> Self {
         // Load the Squarish Sans font
         let font =
             egui::FontData::from_static(include_bytes!("../../../Squarish_Sans_CT_Regular_SC.ttf"));
@@ -44,38 +43,29 @@ impl Default for OverlayUi {
             .unwrap()
             .insert(0, "SquarishSans".to_owned());
 
+        ctx.set_fonts(fonts);
+
         Self {
             shell_hovered: false,
             menu_visible: false,
             show_cursor: true,
-            fonts,
+            scaling: ScalingMode::from_settings(),
             exit_dialog_open: false,
             about_dialog_open: false,
         }
     }
-}
 
-impl OverlayUi {
     pub fn ui(
         &mut self,
         ctx: &Context,
-        texture: TextureId,
+        source_size: [f32; 2],
         cursor_texture: Option<TextureId>,
         window_size: (f32, f32),
         mouse_state: &OverlayMouseState,
         hwnd: HWND,
     ) {
-        // calculate width and height, preserving 4:3 aspect ratio
-        let aspect_ratio = const { 4.0 / 3.0 };
-        let (mut width, mut height) = window_size;
-
-        let scale_factor = if width / height > aspect_ratio {
-            width = height * aspect_ratio;
-            width / 640.0
-        } else {
-            height = width / aspect_ratio;
-            height / 480.0
-        };
+        let size = fit_to_window(window_size.0, window_size.1, const { 4.0 / 3.0 });
+        let scale_factor = size.x / 640.0;
 
         let mut menu_open = false;
 
@@ -84,26 +74,7 @@ impl OverlayUi {
             self.menu_visible = false;
         }
 
-        // ctx.set_pixels_per_point(2.0);
-        ctx.set_fonts(self.fonts.clone());
-
-        let response = egui::CentralPanel::default()
-            .frame(Frame {
-                inner_margin: Margin::same(0),
-                ..Default::default()
-            })
-            .show(ctx, |ui| {
-                ui.with_layout(
-                    egui::Layout::centered_and_justified(egui::Direction::LeftToRight),
-                    |ui| {
-                        ui.image(SizedTexture {
-                            id: texture,
-                            size: Vec2::new(width, height),
-                        })
-                    },
-                )
-            })
-            .response;
+        let response = show_framebuffer(ctx, source_size, size, self.scaling);
 
         self.shell_hovered = response.contains_pointer();
 
@@ -123,8 +94,8 @@ impl OverlayUi {
                 .collapsible(false)
                 .movable(false)
                 .title_bar(false)
-                .fixed_pos(egui::pos2(window_size.0 / 2. - width / 2., 0.0))
-                .fixed_size(Vec2::new(width, 30.0))
+                .fixed_pos(egui::pos2(window_size.0 / 2. - size.x / 2., 0.0))
+                .fixed_size(Vec2::new(size.x, 30.0))
                 .show(ctx, |ui| {
                     egui::containers::menu::MenuBar::new().ui(ui, |ui| {
                         let set_font_size = |ui: &mut egui::Ui| {
