@@ -1,6 +1,6 @@
 use std::ffi::c_void;
 
-use binding::game_fns;
+use binding::{game_fns, globals};
 
 use crate::shell::MODULE;
 
@@ -39,4 +39,11 @@ game_fns!(
     pub(in crate::shell) static AUDIO_SAMPLE_IS_PLAYING: unsafe extern "thiscall" fn(
         *mut c_void,
     ) -> u32 = 0x0003d77e;
+);
+
+globals!(
+    /// Master SFX volume, 0..=0x10000
+    static G_EFFECTS_VOLUME: i32 = 0x0007167c;
+    /// Master MIDI volume, 0..=0x10000
+    static G_MIDI_VOLUME: i32 = 0x00071684;
 );

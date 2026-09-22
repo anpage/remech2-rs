@@ -1,5 +1,7 @@
 use rodio::{Decoder, Sink, Source};
 
+use crate::shell::audio::G_EFFECTS_VOLUME;
+
 use super::audio_subsystem::AudioSubsystem;
 
 pub struct AudioSample {
@@ -82,13 +84,13 @@ impl AudioSample {
     }
 
     pub fn set_volume(&mut self, volume: i32) {
-        let volume = volume.clamp(0, 127);
-        self.volume = volume;
-        self.sink.set_volume(volume as f32 / 127.0);
+        self.volume = volume.clamp(0, 127);
+        self.apply_volume();
     }
 
     pub fn apply_volume(&mut self) {
-        self.set_volume(self.volume);
+        let scaled = unsafe { (G_EFFECTS_VOLUME.get() as i64 * self.volume as i64) >> 16 };
+        self.sink.set_volume(scaled.clamp(0, 127) as f32 / 127.0);
     }
 
     pub fn enable_loop(&mut self) {
