@@ -23,13 +23,13 @@ pub mod settings;
 pub struct ShellMsg(pub u32);
 
 impl ShellMsg {
-    pub const HELP_EXIT: Self = Self(0x401);
+    pub const _HELP_EXIT: Self = Self(0x401);
     pub const EXIT_TO_DESKTOP: Self = Self(0x402);
     pub const TICK: Self = Self(0x404);
     pub const MISSION_BRIEFING: Self = Self(0x406);
     pub const CLAN_HALL: Self = Self(0x407);
     pub const MISSION_DEBRIEF: Self = Self(0x409);
-    pub const ARCHIVES: Self = Self(0x40b);
+    pub const _ARCHIVES: Self = Self(0x40b);
     pub const TRIAL_SETUP: Self = Self(0x40d);
     pub const MAIN_MENU: Self = Self(0x40e);
     pub const MECHBAY: Self = Self(0x40f);
@@ -37,11 +37,11 @@ impl ShellMsg {
     pub const MISSION_SELECT: Self = Self(0x411);
     pub const PILOT_ROSTER: Self = Self(0x412);
     pub const MECH_CONFIG: Self = Self(0x413);
-    pub const TRAINING: Self = Self(0x414);
+    pub const _TRAINING: Self = Self(0x414);
     pub const LANDING: Self = Self(0x415);
     pub const FINALE: Self = Self(0x416);
-    pub const SHUTDOWN: Self = Self(0x41e);
-    pub const INITIAL_KICK: Self = Self(0x420);
+    pub const _SHUTDOWN: Self = Self(0x41e);
+    pub const _INITIAL_KICK: Self = Self(0x420);
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
