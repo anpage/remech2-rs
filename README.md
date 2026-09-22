@@ -41,8 +41,12 @@ Additionally:
 - Restores the custom cursor image from the DOS version
 - Replaces MIDI playback with an internal synthesizer
 - Replaces Miles Sound System (WAIL32.DLL) with a modern library
-- Allows arbitrary window sizes and upscales the game with the correct aspect ratio
+- Allows arbitrary window sizes
+- Upscales the game with the correct aspect ratio using a configurable sharp-bilinear shader
 - Replaces the Windows menu bar with one that's rendered on top of the shell
+- Replaces Win32 dialog boxes with custom egui dialogs
+- Optionally allows framerates up to 181 FPS with experimental fixes
+- Optionally allows 16:9 widescreen versions of the internal video modes, preserving the HUD and FoV
 
 There is more to come as reimplementation progresses.
 
@@ -102,6 +106,25 @@ Nothing special for a Rust project. Just:
 
 Until the dependency on the original game's DLLs is lifted, a 32-bit build
 target is required.
+
+## AI Disclaimer
+
+The vast majority of the Rust code included in this project is written by hand,
+but starting in 2006, the reverse engineering is assisted by LLMs operating a
+Ghidra MCP. Everything before then was reverse engineered manually.
+
+The only exceptions to this are the crates in the `crates/` folder, which are
+mostly LLM-generated. I've isolated them to keep them separate from the rest of
+the project, and they only contain either boilerplate or the SMK2 decoder.
+
+The SMK2 decoder was outside of the scope of my goal to learn how the game
+works, but I needed one to replace the proprietary DLL and other existing
+options had licenses that made static linking them while also linking the games'
+DLLs a problem.
+
+Outside of those crates, this README and other documentation is written by hand.
+I have a hard time reading AI-generated documentation because it tends to give
+insufficient or irrelevant context in a very verbose way.
 
 ## License
 
