@@ -13,6 +13,7 @@ mod midi_sequence;
 //
 // We already have hooks for these, but we're calling them through their original addresses for now.
 game_fns!(
+    pub(in crate::shell) static LOAD_SOUND_CONFIG: unsafe extern "cdecl" fn() = 0x00043926;
     /// `(this, subsystem, data, data_size)`
     pub(in crate::shell) static AUDIO_SAMPLE_NEW: unsafe extern "thiscall" fn(
         *mut c_void,

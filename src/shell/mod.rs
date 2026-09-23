@@ -92,6 +92,10 @@ impl Shell {
         };
 
         let intro_or_sim = CString::new(intro_or_sim).context("CString::new failed")?;
+
+        // Load the saved volumes up front instead of waiting for the settings screen
+        unsafe { (audio::LOAD_SOUND_CONFIG.get())() };
+
         let result = unsafe { shell_main(self.module, 0, intro_or_sim.as_ptr(), 1, window) };
 
         if result == -1 {
