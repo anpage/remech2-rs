@@ -4,6 +4,8 @@ use anyhow::Result;
 use rodio::{OutputStream, OutputStreamBuilder, Sink, buffer::SamplesBuffer};
 use smacker::AudioInfo;
 
+use crate::shell::audio::G_EFFECTS_VOLUME;
+
 pub struct Sound {
     _stream: OutputStream,
     sink: Sink,
@@ -16,6 +18,12 @@ impl Sound {
         let samples = to_f32(pcm, info.bits);
         let stream = OutputStreamBuilder::open_default_stream()?;
         let sink = Sink::connect_new(stream.mixer());
+
+        // Set volume based on the global effects volume
+        // The original game didn't do this and FMVs were always full volume
+        let volume = unsafe { G_EFFECTS_VOLUME.get() }.clamp(0, 0x10000) as f32 / 65536.0;
+        sink.set_volume(volume);
+
         sink.append(SamplesBuffer::new(
             u16::from(info.channels.max(1)),
             info.rate.max(1),

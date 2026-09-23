@@ -44,7 +44,7 @@ game_fns!(
 
 globals!(
     /// Master SFX volume, 0..=0x10000
-    static G_EFFECTS_VOLUME: i32 = 0x0007167c;
+    pub(in crate::shell) static G_EFFECTS_VOLUME: i32 = 0x0007167c;
     /// Master MIDI volume, 0..=0x10000
     static G_MIDI_VOLUME: i32 = 0x00071684;
 );
