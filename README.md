@@ -110,7 +110,7 @@ target is required.
 ## AI Disclaimer
 
 The vast majority of the Rust code included in this project is written by hand,
-but starting in 2006, the reverse engineering is assisted by LLMs operating a
+but starting in 2026, the reverse engineering is assisted by LLMs operating a
 Ghidra MCP. Everything before then was reverse engineered manually.
 
 The only exceptions to this are the crates in the `crates/` folder, which are
