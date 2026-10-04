@@ -6,6 +6,13 @@
 #include <dplay.h>
 #include <windows.h>
 
+#ifndef DPSEND_TRYONCE
+#define DPSEND_GUARANTEE 0x00000001
+#define DPSEND_TRYONCE 0x00000004
+#define DPOPEN_OPENSESSION 0x00000001
+#define DPOPEN_CREATESESSION 0x00000002
+#endif
+
 // The functions and globals of netio.c that other units use.
 #ifdef __cplusplus
 extern "C"
