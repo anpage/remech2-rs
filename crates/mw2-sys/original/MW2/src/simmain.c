@@ -2,6 +2,7 @@
 
 #include "ai.h"
 #include "animation.h"
+#include "app.h"
 #include "audio.h"
 #include "brightness.h"
 #include "callbacks.h"
@@ -31,6 +32,7 @@
 #include "loadres.h"
 #include "mainmenu.h"
 #include "menu.h"
+#include "messages.h"
 #include "missionaudio.h"
 #include "mss.h"
 #include "mw2log.h"
@@ -100,9 +102,6 @@ MechS32 g_startOnAutopilot = 0;
 // GLOBAL: MW2 0x100acb60
 HWND g_gameWindow = NULL;
 
-// GLOBAL: MW2 0x100acb64
-HINSTANCE g_simModule = NULL;
-
 // GLOBAL: MW2 0x100acb68
 MechHeap* g_primaryHeap = NULL;
 
@@ -133,21 +132,16 @@ MechS32 g_goLaunch = 0;
 // GLOBAL: MW2 0x1012b7c0
 VideoDriverChoice g_videoDriverChoice;
 
+static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+
 // Matches except for the stack slots of seven locals (a consistent permutation; the original
 // assigns them in declaration order, which VC++ 4.1 doesn't reproduce from this source). The
 // operand order of the DoFirstObjtv loop test and of the network start test follows the unit's
 // symbol table: both have flipped back and forth as declarations moved between units.
 // FUNCTION: MW2 0x10066a50
-int __stdcall SimMain(
-	HINSTANCE p_module,
-	undefined4 p_unk0x0c,
-	LPSTR p_cmdLine,
-	NetLaunchInfo* p_netLaunch,
-	undefined4 p_isNetGameUnused,
-	HWND p_hWnd
-)
+int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 {
-	MSG msg;
+	MechMessage msg;
 	int result;
 	MechS32 i;
 	char missionName[64];
@@ -158,8 +152,6 @@ int __stdcall SimMain(
 
 	quitLatched = 0;
 	seed = 0;
-	g_gameWindow = p_hWnd;
-	g_simModule = p_module;
 	g_primaryHeap = MechHeapCreate();
 	if (g_primaryHeap == NULL) {
 		Error(9, "Insufficient memory available.");
@@ -210,8 +202,12 @@ int __stdcall SimMain(
 	}
 
 	InitRefreshMode(5, 0, &g_mainPixelBuffer, 640, 480, 0);
-	SendMessage(g_gameWindow, 0x41f, 0, 0);
-	SendMessage(g_gameWindow, WM_ACTIVATEAPP, TRUE, 0);
+	// The original sent the launcher's window 0x41f, to have it pass its messages to SimWindowProc,
+	// and then told itself the window was active.
+	while (MechPeekMessage(&msg, 0, 0, TRUE)) {
+	}
+	MechSetMessageHandler(SimHandleMessage);
+	MechSendMessage(c_mechMsgActivateApp, MechAppActive(), 0);
 	if (!InitDisplayGeometry()) {
 		Error(0x50, NULL);
 	}
@@ -431,10 +427,11 @@ int __stdcall SimMain(
 
 		DebugPrint("Calling Blit()\n");
 		Blit();
-		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+		while (MechPeekMessage(&msg, 0, 0, TRUE)) {
 		}
 
-		SendMessage(g_gameWindow, 0x41e, 0, 0);
+		// The original sent the launcher's window 0x41e, to have it handle its own messages again.
+		MechSetMessageHandler(NULL);
 		SaveCareerRecord();
 		ShutdownAllPlayers();
 		ShutdownNetwork();
@@ -454,7 +451,7 @@ int __stdcall SimMain(
 	}
 	__finally {
 		if (AbnormalTermination() && g_ticksTimerInitialized) {
-			SendMessage(g_gameWindow, 0x41e, 0, 0);
+			MechSetMessageHandler(NULL);
 			MessageBox(NULL, "Attempting to shutdown from an unknown fatal error.", "MECHWARRIOR 2", MB_ICONHAND);
 			AIL_shutdown();
 		}
@@ -469,21 +466,17 @@ int __stdcall SimMain(
 	return result;
 }
 
-// Operand order: the timer test's time > g_windowedSwitchDeadline loads g_windowedSwitchDeadline
-// first in the original. The test's comparisons follow the unit's symbol table: the other two flipped when
-// the shell's Miles declarations joined mss.h and back when the unit's declarations moved into
-// headers.
+// The simulator's message handler, originally its window procedure (SimWindowProc).
 // FUNCTION: MW2 0x10067757
-LRESULT CALLBACK SimWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
+static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
-
-	if (p_msg >= WM_KEYFIRST && p_msg <= WM_KEYLAST) {
+	if (p_msg >= c_mechMsgKeyFirst && p_msg <= c_mechMsgKeyLast) {
 		HandleKeyboardMessages(p_msg, p_wParam, p_lParam);
 		return 0;
 	}
 
 	switch (p_msg) {
-	case WM_ACTIVATEAPP:
+	case c_mechMsgActivateApp:
 		if (g_shouldQuit) {
 			break;
 		}
@@ -500,23 +493,17 @@ LRESULT CALLBACK SimWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM 
 			g_currentDisplayBackend->m_setPalette(0, 0x100, g_paletteColors, 1);
 		}
 		return 0;
-	case WM_PAINT:
+	case c_mechMsgPaint:
 		if (g_drawModeReady && g_windowMode == c_windowModeWindowed) {
 			g_currentRefreshMode->m_flip();
-			ValidateRect(p_hWnd, NULL);
 			return 0;
 		}
 		else {
 			break;
 		}
-	case WM_NCMOUSEMOVE:
-		if (g_mouseOutsideClientWindow == FALSE && g_windowMode == c_windowModeWindowed) {
-			while (ShowCursor(TRUE) < 0) {
-			}
-			g_mouseOutsideClientWindow = TRUE;
-		}
-		break;
-	case WM_MOUSEMOVE:
+	// On WM_NCMOUSEMOVE in a window the original showed the cursor and set
+	// g_mouseOutsideClientWindow.
+	case c_mechMsgMouseMove:
 		if (g_mouseOutsideClientWindow) {
 			if (!g_simPaused || GetMenuSlotState(4) == 1) {
 				while (ShowCursor(FALSE) >= 0) {
@@ -527,47 +514,46 @@ LRESULT CALLBACK SimWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM 
 		return 0;
 	// For three seconds after DirectDraw switched to a window, the original's WM_WINDOWPOSCHANGING
 	// held the window at its windowed position and size.
-	case WM_QUERYNEWPALETTE:
-		if (g_currentDisplayBackend) {
-			g_currentDisplayBackend->m_setPalette(0, 0x100, g_paletteColors, 1);
-			return 1;
-		}
-		else {
-			return 0;
-		}
-	case WM_CLOSE:
+	// On WM_QUERYNEWPALETTE the original reloaded the palette.
+	case c_mechMsgClose:
 		g_shouldQuit = TRUE;
 		g_quitStage += 2;
 		return 0;
-	case WM_DESTROY:
-		PostQuitMessage(0);
+	case c_mechMsgDestroy:
+		MechPostMessage(c_mechMsgQuit, 0, 0);
 		return 0;
 		break;
 	}
 
-	return DefWindowProc(p_hWnd, p_msg, p_wParam, p_lParam);
+	return 0;
 }
 
 // FUNCTION: MW2 0x10067bbc
 void HandleMessages(void)
 {
-	MSG msg;
+	MechMessage msg;
 
 	if (!g_windowActive) {
-		WaitMessage();
+		MechAppWait();
+	}
+	else {
+		MechAppPump();
 	}
 
-	if (!g_shouldQuit && PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-		while (!g_mouseOutsideClientWindow && msg.message >= WM_MOUSEFIRST && msg.message <= WM_MBUTTONDBLCLK) {
-			PeekMessage(&msg, NULL, 0, 0, PM_REMOVE);
+	if (!g_shouldQuit && MechPeekMessage(&msg, 0, 0, TRUE)) {
+		// The original skipped every mouse message here, and without looking at whether there was
+		// another message to take.
+		while (!g_mouseOutsideClientWindow && msg.m_message == c_mechMsgMouseMove) {
+			if (!MechPeekMessage(&msg, 0, 0, TRUE)) {
+				return;
+			}
 		}
 
-		if (msg.hwnd != NULL && msg.message == WM_QUIT) {
+		if (msg.m_message == c_mechMsgQuit) {
 			g_shouldQuit = TRUE;
 		}
 		else {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			MechSendMessage(msg.m_message, msg.m_wParam, msg.m_lParam);
 		}
 	}
 }

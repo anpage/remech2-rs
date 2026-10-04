@@ -35,14 +35,7 @@ extern "C"
 	extern MechS32 g_mouseOutsideClientWindow;
 	extern HWND g_gameWindow;
 
-	int __stdcall SimMain(
-		HINSTANCE p_module,
-		undefined4 p_unk0x0c,
-		LPSTR p_cmdLine,
-		struct NetLaunchInfo* p_netLaunch,
-		undefined4 p_isNetGameUnused,
-		HWND p_hWnd
-	);
+	int SimMain(char* p_cmdLine, struct NetLaunchInfo* p_netLaunch);
 	void HandleMessages(void);
 	void UpdatePauseState(void);
 	void SetGameResolution(char* p_driverName);

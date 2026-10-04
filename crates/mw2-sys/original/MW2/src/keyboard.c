@@ -6,6 +6,7 @@
 #include "decomp.h"
 #include "inputdeviceinfo.h"
 #include "inputdriver.h"
+#include "messages.h"
 #include "types.h"
 
 #include <ctype.h>
@@ -228,10 +229,10 @@ MechS32 KeyboardReadKeyCode(MechS16* p_keyCode)
 // FUNCTION: MW2 0x10042909
 MechS32 KeyboardFlushKeyCodes(void)
 {
-	MSG msg;
+	MechMessage msg;
 
-	if (PeekMessage(&msg, NULL, WM_KEYFIRST, WM_KEYLAST, PM_REMOVE)) {
-		HandleKeyboardMessages(msg.message, msg.wParam, msg.lParam);
+	if (MechPeekMessage(&msg, c_mechMsgKeyFirst, c_mechMsgKeyLast, TRUE)) {
+		HandleKeyboardMessages(msg.m_message, msg.m_wParam, msg.m_lParam);
 	}
 
 	g_keyCodeReadIndex = g_keyCodeWriteIndex = 0;
@@ -242,32 +243,29 @@ MechS32 KeyboardFlushKeyCodes(void)
 // FUNCTION: MW2 0x10042966
 void HandleKeyboardMessages(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 {
-	MSG msg;
+	MechMessage msg;
 	BOOL done;
 
 	done = FALSE;
 	do {
 		switch (p_msg) {
-		case WM_KEYDOWN:
-		case WM_SYSKEYDOWN:
+		case c_mechMsgKeyDown:
+		case c_mechMsgSysKeyDown:
 			KeyboardRecordKeyState(p_wParam, p_lParam, TRUE);
 			break;
-		case WM_KEYUP:
-		case WM_SYSKEYUP:
+		case c_mechMsgKeyUp:
+		case c_mechMsgSysKeyUp:
 			KeyboardQueueKeyCode(p_wParam, p_lParam);
 			KeyboardRecordKeyState(p_wParam, p_lParam, FALSE);
 			break;
 		}
 
-		if (p_msg >= WM_SYSKEYDOWN) {
-			DefWindowProc(msg.hwnd, msg.message, msg.wParam, msg.lParam);
-		}
-
-		if (PeekMessage(&msg, NULL, WM_KEYFIRST, WM_KEYLAST, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			p_msg = msg.message;
-			p_wParam = msg.wParam;
-			p_lParam = msg.lParam;
+		// The original passed system key messages on to DefWindowProc, and the next message through
+		// TranslateMessage.
+		if (MechPeekMessage(&msg, c_mechMsgKeyFirst, c_mechMsgKeyLast, TRUE)) {
+			p_msg = msg.m_message;
+			p_wParam = msg.m_wParam;
+			p_lParam = msg.m_lParam;
 		}
 		else {
 			done = TRUE;
@@ -375,12 +373,12 @@ void KeyboardClearKeyStates(void)
 // FUNCTION: MW2 0x10042d8f
 MechS16 KeyboardPollKeyCode(void)
 {
-	MSG msg;
+	MechMessage msg;
 	MechS16 keyCode;
 
 	KeyboardReadKeyCode(&keyCode);
-	if (keyCode == 0 && PeekMessage(&msg, NULL, WM_KEYFIRST, WM_KEYLAST, PM_REMOVE)) {
-		HandleKeyboardMessages(msg.message, msg.wParam, msg.lParam);
+	if (keyCode == 0 && MechPeekMessage(&msg, c_mechMsgKeyFirst, c_mechMsgKeyLast, TRUE)) {
+		HandleKeyboardMessages(msg.m_message, msg.m_wParam, msg.m_lParam);
 		KeyboardReadKeyCode(&keyCode);
 	}
 
