@@ -100,7 +100,6 @@ void CloseMenuFunction();
 static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
 	MechU32 msg;
-	MechS32 mouseY;
 
 	if (p_msg >= c_mechMsgKeyFirst && p_msg <= c_mechMsgKeyLast) {
 		HandleKeyboardMessages(p_msg, p_wParam, p_lParam);
@@ -151,19 +150,8 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 			g_cursorHidden = TRUE;
 		}
 
-		mouseY = ((MechU32) p_lParam >> 16) & 0xffff;
-		if (g_menuVisible && g_windowMode == 1 && mouseY > 2) {
-			SetMenu(g_gameWindow, NULL);
-			g_menuVisible = FALSE;
-		}
-		else if (
-			g_windowMode == 1 && !g_menuVisible && !IsFullscreenVideoPlaying() && GetSystemMetrics(SM_CYMENU) >= mouseY
-		) {
-			SetMenu(g_gameWindow, g_windowMenu);
-			g_menuVisible = TRUE;
-			g_videoDriver->ExpandRect(0, 0, 640, 480);
-			g_videoDriver->DrawShell();
-		}
+		// Full screen, the original showed the window's menu bar while the cursor was at the top of
+		// the screen. The Rust side shows its own.
 		return 0;
 	case c_mechMsgDestroy:
 		MechPostMessage(c_mechMsgQuit, 0, 0);
@@ -185,12 +173,11 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 			break;
 		case c_menuHallOfHonor:
 			CloseMenuFunction();
-			EnableMenuItem(g_windowMenu, c_menuHallOfHonor, MF_GRAYED);
+			EnableShellMenuCommand(c_menuHallOfHonor, FALSE);
 			DrawHallOfHonor();
 			g_menuDialogOpen = TRUE;
 			break;
 		case c_menuQuickTips:
-			CheckMenuItem(g_windowMenu, p_wParam, ~GetMenuState(g_windowMenu, p_wParam, MF_BYCOMMAND) & MF_CHECKED);
 			g_quickTips = 1 - g_quickTips;
 			break;
 		case c_menuFleeToWindows:
@@ -209,13 +196,13 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 			break;
 		case c_menuCombatVariables:
 			CloseMenuFunction();
-			EnableMenuItem(g_windowMenu, c_menuCombatVariables, MF_GRAYED);
+			EnableShellMenuCommand(c_menuCombatVariables, FALSE);
 			DrawOptions();
 			g_menuDialogOpen = TRUE;
 			break;
 		case c_menuCockpitControls:
 			CloseMenuFunction();
-			EnableMenuItem(g_windowMenu, c_menuCockpitControls, MF_GRAYED);
+			EnableShellMenuCommand(c_menuCockpitControls, FALSE);
 			OpenCockpitControls();
 			g_menuDialogOpen = TRUE;
 			break;
@@ -224,7 +211,7 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 			break;
 		case c_menuKeshik:
 			CloseMenuFunction();
-			EnableMenuItem(g_windowMenu, c_menuKeshik, MF_GRAYED);
+			EnableShellMenuCommand(c_menuKeshik, FALSE);
 			DrawCredits();
 			g_menuDialogOpen = TRUE;
 			break;
@@ -407,10 +394,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 	g_windowHeight = 480;
 	g_videoDriver = new VideoDriver();
 
-	g_windowMenu = LoadMenu(g_module, MAKEINTRESOURCE(0x68));
-	if (g_windowMode != 1) {
-		SetMenu(g_gameWindow, g_windowMenu);
-	}
+	// The original loaded the window's menu (menu 104) here, and showed it unless full screen.
 
 	if (!fromSim) {
 		PlayFullscreenVideo("mintro", c_msgMainMenu, c_msgMainMenu);
@@ -444,7 +428,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 	MechMouseGrab(FALSE);
 
 	if (fromSim) {
-		EnableShellMenu(g_windowMenu);
+		EnableShellMenu();
 		MechMouseShowCursor(TRUE);
 		g_cursorHidden = FALSE;
 	}
@@ -485,7 +469,6 @@ extern "C" int ShellMain(char* p_cmdLine)
 	// The original sent the launcher's window c_msgActivateLauncher, to have it handle its own
 	// messages again.
 	MechSetMessageHandler(NULL);
-	SetMenu(g_gameWindow, NULL);
 	g_videoDriver->ActivateFramebuffer();
 
 	if (g_menuFunction) {
@@ -640,37 +623,58 @@ void ParseCommandLineFlags(char* p_cmdLine)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1001023c
-void EnableShellMenu(HMENU p_menu)
-{
-	MechS32 result;
+// The commands EnableShellMenu and DisableShellMenu switch, and whether each is enabled. The
+// original kept this in the window's menu, where the shell grayed the items; the Rust side draws
+// its menu bar from it.
+static const MechS32 g_menuCommands[] = {
+	c_menuNewAllegiance,
+	c_menuHallOfHonor,
+	c_menuQuickTips,
+	c_menuCombatVariables,
+	c_menuCockpitControls,
+	c_menuMoviePlayback,
+	c_menuKeshik,
+};
 
-	result = EnableMenuItem(p_menu, 1, MF_BYPOSITION | MF_ENABLED);
-	result = EnableMenuItem(p_menu, c_menuNewAllegiance, MF_ENABLED);
-	result = EnableMenuItem(p_menu, c_menuHallOfHonor, MF_ENABLED);
-	result = EnableMenuItem(p_menu, c_menuQuickTips, MF_ENABLED);
-	CheckMenuItem(p_menu, c_menuQuickTips, g_quickTips ? MF_CHECKED : MF_UNCHECKED);
-	result = EnableMenuItem(p_menu, c_menuCombatVariables, MF_ENABLED);
-	result = EnableMenuItem(p_menu, c_menuCockpitControls, MF_ENABLED);
-	result = EnableMenuItem(p_menu, c_menuMoviePlayback, MF_ENABLED);
-	result = EnableMenuItem(p_menu, c_menuKeshik, MF_ENABLED);
-	result = DrawMenuBar(g_gameWindow);
+static MechU8 g_menuCommandEnabled[sizeof(g_menuCommands) / sizeof(g_menuCommands[0])] = {1, 1, 1, 1, 1, 1, 1};
+
+// Whether a menu command can be chosen. The commands that are never grayed always can.
+extern "C" MechS32 IsShellMenuCommandEnabled(MechS32 p_command)
+{
+	MechU32 i;
+
+	for (i = 0; i < sizeof(g_menuCommands) / sizeof(g_menuCommands[0]); i++) {
+		if (g_menuCommands[i] == p_command) {
+			return g_menuCommandEnabled[i];
+		}
+	}
+
+	return TRUE;
+}
+
+// Originally EnableMenuItem on the window's menu.
+void EnableShellMenuCommand(MechS32 p_command, MechS32 p_enabled)
+{
+	MechU32 i;
+
+	for (i = 0; i < sizeof(g_menuCommands) / sizeof(g_menuCommands[0]); i++) {
+		if (g_menuCommands[i] == p_command) {
+			g_menuCommandEnabled[i] = p_enabled != 0;
+		}
+	}
+}
+
+// The original also enabled the Options menu itself, and checked Quick Tips to match g_quickTips.
+// FUNCTION: MW2SHELL 0x1001023c
+void EnableShellMenu()
+{
+	memset(g_menuCommandEnabled, 1, sizeof(g_menuCommandEnabled));
 }
 
 // FUNCTION: MW2SHELL 0x10010320
-void DisableShellMenu(HMENU p_menu)
+void DisableShellMenu()
 {
-	MechS32 result;
-
-	result = EnableMenuItem(p_menu, 1, MF_BYPOSITION | MF_GRAYED);
-	result = EnableMenuItem(p_menu, c_menuNewAllegiance, MF_GRAYED);
-	result = EnableMenuItem(p_menu, c_menuHallOfHonor, MF_GRAYED);
-	result = EnableMenuItem(p_menu, c_menuQuickTips, MF_GRAYED);
-	result = EnableMenuItem(p_menu, c_menuCombatVariables, MF_GRAYED);
-	result = EnableMenuItem(p_menu, c_menuCockpitControls, MF_GRAYED);
-	result = EnableMenuItem(p_menu, c_menuMoviePlayback, MF_GRAYED);
-	result = EnableMenuItem(p_menu, c_menuKeshik, MF_GRAYED);
-	result = DrawMenuBar(g_gameWindow);
+	memset(g_menuCommandEnabled, 0, sizeof(g_menuCommandEnabled));
 }
 
 // FUNCTION: MW2SHELL 0x1001067f

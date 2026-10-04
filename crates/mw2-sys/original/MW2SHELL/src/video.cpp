@@ -115,7 +115,7 @@ MechS32 PlayFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam)
 		return 0;
 	}
 
-	DisableShellMenu(g_windowMenu);
+	DisableShellMenu();
 	g_drawFmv = TRUE;
 	return 1;
 }
@@ -563,7 +563,7 @@ void CloseVideo(MechS32 p_index)
 	}
 
 	if (g_fmvSlots[p_index].m_flags & 0x1000) {
-		EnableShellMenu(g_windowMenu);
+		EnableShellMenu();
 	}
 
 	if (g_fmvSlots[p_index].m_smack != NULL) {

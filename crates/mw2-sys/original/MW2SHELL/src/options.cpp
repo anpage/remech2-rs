@@ -400,7 +400,7 @@ void OptionsCallback(MechS32 p_active)
 
 	if (!p_active || g_mouseState->GetRightPressed() == 1 || g_keyboardInput->PollKey()) {
 		UnregisterMenuFunction(OptionsCallback);
-		EnableMenuItem(g_windowMenu, c_menuCombatVariables, MF_ENABLED);
+		EnableShellMenuCommand(c_menuCombatVariables, TRUE);
 		g_menuDialogOpen = 0;
 		HideFields(g_optionFields);
 		SaveSoundConfig();

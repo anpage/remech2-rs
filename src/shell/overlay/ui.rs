@@ -26,6 +26,11 @@ pub(super) fn show_cursor(show: bool) {
     SHOW_CURSOR.store(show, Ordering::Relaxed);
 }
 
+fn menu_button(ui: &mut egui::Ui, text: &str, command: u16) -> bool {
+    let enabled = unsafe { mw2_sys::shell::IsShellMenuCommandEnabled(command.into()) } != 0;
+    ui.add_enabled(enabled, egui::Button::new(text)).clicked()
+}
+
 pub struct OverlayUi {
     shell_hovered: bool,
     menu_visible: bool,
@@ -192,10 +197,10 @@ impl OverlayUi {
                         if ui
                             .menu_button("Clan", |ui| {
                                 set_font_size(ui);
-                                if ui.button("New Alliance").clicked() {
+                                if menu_button(ui, "New Alliance", 40001) {
                                     handle_menu_button(40001);
                                 }
-                                if ui.button("Hall of Honor").clicked() {
+                                if menu_button(ui, "Hall of Honor", 40002) {
                                     handle_menu_button(40002);
                                 }
                                 ui.separator();
@@ -212,10 +217,10 @@ impl OverlayUi {
                         if ui
                             .menu_button("Options", |ui| {
                                 set_font_size(ui);
-                                if ui.button("Combat Variables...").clicked() {
+                                if menu_button(ui, "Combat Variables...", 40084) {
                                     handle_menu_button(40084);
                                 }
-                                if ui.button("Cockpit Controls...").clicked() {
+                                if menu_button(ui, "Cockpit Controls...", 40011) {
                                     handle_menu_button(40011);
                                 }
                             })
@@ -227,7 +232,7 @@ impl OverlayUi {
                         if ui
                             .menu_button("Help", |ui| {
                                 set_font_size(ui);
-                                if ui.button("The Keshik").clicked() {
+                                if menu_button(ui, "The Keshik", 40082) {
                                     handle_menu_button(40082);
                                 }
                                 ui.separator();

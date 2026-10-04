@@ -136,7 +136,7 @@ void HallOfHonorCallback(MechS32 p_active)
 	if (!p_active || g_mouseState->GetRightPressed() == 1 || g_mouseState->GetLeftPressed() == 1 ||
 		g_keyboardInput->PollKey() != 0) {
 		UnregisterMenuFunction(HallOfHonorCallback);
-		EnableMenuItem(g_windowMenu, c_menuHallOfHonor, MF_ENABLED);
+		EnableShellMenuCommand(c_menuHallOfHonor, TRUE);
 		g_menuDialogOpen = FALSE;
 		if (g_hallOfHonorMovie != NULL) {
 			delete g_hallOfHonorMovie;

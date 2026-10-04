@@ -2331,7 +2331,7 @@ void CpcScreenTick(MechS32 p_active)
 	if (!p_active || g_cpcConfigured || g_keyboardInput->PollKey() == 3 ||
 		(!g_cpcBindingsPage && g_mouseState->GetRightPressed() == 1)) {
 		UnregisterMenuFunction(CpcScreenTick);
-		EnableMenuItem(g_windowMenu, c_menuCockpitControls, MF_ENABLED);
+		EnableShellMenuCommand(c_menuCockpitControls, TRUE);
 		g_menuDialogOpen = 0;
 		HideFields(g_cpcBindingsPage ? g_cpcBindingsFields : g_cpcDevicesFields);
 		if (g_cpcLogoMovie) {

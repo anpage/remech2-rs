@@ -27,9 +27,6 @@ MechU32 g_quickTips = 0;
 // GLOBAL: MW2SHELL 0x1006a9e0
 MechS32 g_showDialog = 0;
 
-// GLOBAL: MW2SHELL 0x1006a9e4
-MechS32 g_menuVisible = 0;
-
 // GLOBAL: MW2SHELL 0x1006a9ec
 MechS32 g_menuDialogOpen = 0;
 
@@ -47,9 +44,6 @@ MechS32 g_windowWidth;
 
 // GLOBAL: MW2SHELL 0x100965e0
 HINSTANCE g_module;
-
-// GLOBAL: MW2SHELL 0x100965f0
-HMENU g_windowMenu;
 
 // Always 0. Where the simulator's copy of AdjustWindowSize calls this, it asks for a field of
 // the entry for id 4 of its menu list. That field has no name yet, so this keeps its placeholder.

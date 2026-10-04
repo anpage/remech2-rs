@@ -47,8 +47,10 @@ enum ShellMenuCommand {
 // The functions and globals of shellmain.cpp that other units use.
 extern "C" int ShellMain(char* p_cmdLine);
 MechS32 PumpMessage();
-void EnableShellMenu(HMENU p_menu);
-void DisableShellMenu(HMENU p_menu);
+extern "C" MechS32 IsShellMenuCommandEnabled(MechS32 p_command);
+void EnableShellMenuCommand(MechS32 p_command, MechS32 p_enabled);
+void EnableShellMenu();
+void DisableShellMenu();
 BOOL CALLBACK OkDialogProc(HWND p_hDlg, UINT p_msg, WPARAM p_wParam, LPARAM);
 void RegisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32));
 void UnregisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32));

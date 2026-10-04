@@ -563,11 +563,9 @@ BOOL CALLBACK QuickTipsDialogProc(HWND p_hDlg, UINT p_msg, WPARAM p_wParam, LPAR
 
 		if (IsDlgButtonChecked(p_hDlg, 0x3e8) == 1) {
 			g_quickTips = 1;
-			CheckMenuItem(g_windowMenu, c_menuQuickTips, MF_CHECKED);
 		}
 		else {
 			g_quickTips = 0;
-			CheckMenuItem(g_windowMenu, c_menuQuickTips, MF_UNCHECKED);
 		}
 		return TRUE;
 	}
