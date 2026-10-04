@@ -4,7 +4,5 @@
 
 // FUNCTION: MW2 0x1000a9b0
 void DebugBreakpoint(void){
-#if defined(_MSC_VER) && defined(_M_IX86)
-	__asm int 3
-#endif
+    // nope
 }

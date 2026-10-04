@@ -383,59 +383,6 @@ void* AllocateMemory(undefined4 p_size)
 	return calloc(p_size, 1);
 }
 
-// CopyMemoryFast and FillMemoryFast (both unused) are memcpy and memset written as inline __asm: rep movsd/stosd
-// for the dwords, then rep movsb/stosb for the rest. Modern compilers (COMPAT_MODE) call the CRT.
-
-// FUNCTION: MW2SHELL 0x10013fc7
-void* CopyMemoryFast(void* p_destination, void* p_source, MechU32 p_size)
-{
-#ifdef COMPAT_MODE
-	memcpy(p_destination, p_source, p_size);
-#else
-	__asm {
-		mov eax, p_size
-		mov edi, p_destination
-		mov esi, p_source
-		mov ecx, eax
-		shr ecx, 2
-		rep movsd
-		mov ecx, eax
-		and ecx, 3
-		rep movsb
-	}
-#endif
-
-	return p_destination;
-}
-
-// FUNCTION: MW2SHELL 0x10013ff1
-void* FillMemoryFast(void* p_destination, MechS32 p_value, MechU32 p_size)
-{
-#ifdef COMPAT_MODE
-	memset(p_destination, p_value, p_size);
-#else
-	__asm {
-		mov edx, p_size
-		mov eax, p_value
-		mov cl, al
-		mov ch, cl
-		mov cl, al
-		mov eax, ecx
-		shl eax, 16
-		mov ax, cx
-		mov edi, p_destination
-		mov ecx, edx
-		shr ecx, 2
-		rep stosd
-		mov ecx, edx
-		and ecx, 3
-		rep stosb
-	}
-#endif
-
-	return p_destination;
-}
-
 // Unused.
 // FUNCTION: MW2SHELL 0x10014029
 void FreeMemory(void* p_buffer)
