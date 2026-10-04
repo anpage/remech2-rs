@@ -1,5 +1,7 @@
 #include "readfile.h"
 
+#include "files.h"
+
 #include <stdio.h>
 
 void* MechReadFile(MechHeap* p_heap, const char* p_path)
@@ -8,7 +10,7 @@ void* MechReadFile(MechHeap* p_heap, const char* p_path)
 	long size;
 	void* data;
 
-	file = fopen(p_path, "rb");
+	file = MechFopen(p_path, "rb");
 	if (file == NULL) {
 		return NULL;
 	}
