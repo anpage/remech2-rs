@@ -67,20 +67,6 @@ game_fns!(
 /// The viewer's tick returns this to stay open. It's the archives screen's id.
 const VIEWER_STAY: i32 = 0x40b;
 
-/// Returns the scenario of the mission the pilot is on so that the debug menu can jump to this screen.
-pub(super) unsafe fn current_scenario(campaign: Campaign) -> Option<*mut c_char> {
-    unsafe {
-        // Trials of Grievance mode has no campaign and never reaches the debrief.
-        let missions = match campaign {
-            Campaign::Wolf | Campaign::JadeFalcon => G_CAMPAIGN_MISSIONS.get()[campaign as usize],
-            Campaign::TrialsOfGrievance => return None,
-        };
-        let pilot = G_PILOT.get().as_ref()?;
-        let mission = pilot.mission.clamp(0, CAMPAIGN_LENGTH - 1) as usize;
-        Some((*missions.add(mission)).scenario)
-    }
-}
-
 unsafe fn outcome() -> i32 {
     unsafe { (*G_MISSION_RESULTS.ptr()).outcome }
 }

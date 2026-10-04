@@ -165,22 +165,9 @@ TextGlyph* DrawHighLowToggle(ScreenField* p_option)
 	);
 }
 
-// FUNCTION: MW2SHELL 0x100435e9
-TextGlyph* DrawResolutionOption(ScreenField* p_option)
-{
-	MechChar* value;
-	MechChar* label;
-
-	value = (MechChar*) p_option->m_data;
-	if (*value == '\0') {
-		label = "~320x200";
-	}
-	else {
-		label = "~640x480";
-	}
-
-	return g_titleFont->AddText(p_option->m_left + p_option->m_width / 2, p_option->m_top, label, NULL);
-}
+// DrawResolutionOption and ToggleVesaDriver are implemented on the Rust side
+// (src/shell/screens/settings.rs). The original only offered 320x200 and 640x480: 1024x768, which
+// the DOS version had and the simulator still took (VESA768.DLL), was left out of the Win95 port.
 
 // FUNCTION: MW2SHELL 0x10043651
 void CycleByteOption(ScreenField* p_option)
@@ -219,18 +206,6 @@ void ToggleByteOption(ScreenField* p_option)
 	}
 	else {
 		*value = 1;
-	}
-}
-
-// FUNCTION: MW2SHELL 0x10043703
-void ToggleVesaDriver(ScreenField* p_option)
-{
-	MechChar* value = (MechChar*) p_option->m_data;
-	if (*value == '\0') {
-		strncpy(value, "vesa480.dll", 0xf);
-	}
-	else {
-		strncpy(value, "", 0xf);
 	}
 }
 

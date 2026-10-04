@@ -12,7 +12,7 @@ class VideoDriver;
 // SIZE 0x43
 class MouseState {
 public:
-	MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_unk0x00);
+	MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_cursorShape);
 	~MouseState();
 
 	void MoveCursorTo(MechS32 p_x, MechS32 p_y);
@@ -26,7 +26,7 @@ public:
 	void ReadMouseState();
 
 private:
-	void* m_unk0x00;             // 0x00 — the constructor's third argument (database item 0x19), never read
+	void* m_cursorShape;         // 0x00 — g_cursorShape, never read
 	VideoDriver* m_videoDriver;  // 0x04
 	Font* m_font;                // 0x08
 	MechS32 m_positionTextWidth; // 0x0c — DrawCursorPosition's, restored before the next

@@ -24,10 +24,10 @@ KeyboardInput* g_keyboardInput = NULL;
 // GLOBAL: MW2SHELL 0x100711fc
 AudioSubsystem* g_audioSubsystem = NULL;
 
-// Database item 0x19. ShellMain loads it and passes it to MouseState, which stores it
-// (m_unk0x00) and never reads it. Perhaps the cursor's image; nothing confirms it.
+// The mouse cursor's shape, 29 by 25: database item 0x19. ShellMain loads it and passes it to
+// MouseState, which stores it and never reads it. The overlay draws it (src/shell/overlay/ui.rs).
 // GLOBAL: MW2SHELL 0x10071200
-void* g_unk0x10071200 = NULL;
+void* g_cursorShape = NULL;
 
 // GLOBAL: MW2SHELL 0x10071204
 MouseState* g_mouseState = NULL;

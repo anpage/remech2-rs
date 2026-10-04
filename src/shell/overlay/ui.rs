@@ -4,18 +4,20 @@ use egui::{
     Color32, ColorImage, Context, CursorIcon, FontFamily, Order, PointerButton, Rect, TextStyle,
     TextureHandle, Vec2,
 };
-use mw2_sys::shared::c_mechMsgCommand;
+use mw2_sys::{shared::c_mechMsgCommand, shell};
 
 use crate::drawmode::fit_to_window;
 use crate::shell::dialog;
 use crate::shell::overlay::{
     confirm, menu,
-    mouse::{G_CURSOR_GRAPHIC, OverlayMouseState},
+    mouse::OverlayMouseState,
 };
 use crate::{about, app, messages, shell::screens};
 
+const CURSOR_GRAPHIC_SIZE: usize = 423;
+
 fn menu_button(ui: &mut egui::Ui, text: &str, command: u16) -> bool {
-    let enabled = unsafe { mw2_sys::shell::IsShellMenuCommandEnabled(command.into()) } != 0;
+    let enabled = unsafe { shell::IsShellMenuCommandEnabled(command.into()) } != 0;
     ui.add_enabled(enabled, egui::Button::new(text)).clicked()
 }
 
@@ -54,12 +56,12 @@ impl OverlayUi {
     }
 
     fn load_cursor_texture(&mut self, ctx: &Context) {
-        let cursor_graphic = G_CURSOR_GRAPHIC.ptr();
-        if cursor_graphic.is_null() || unsafe { (*cursor_graphic).is_null() } {
+        let cursor_graphic = unsafe { shell::g_cursorShape }.cast::<[u8; CURSOR_GRAPHIC_SIZE]>();
+        if cursor_graphic.is_null() {
             return;
         }
 
-        let cursor_data = unsafe { **cursor_graphic };
+        let cursor_data = unsafe { *cursor_graphic };
         let cursor_data = &cursor_data[0x28..0x1A7];
         const WIDTH: usize = 29;
         const HEIGHT: usize = 25;

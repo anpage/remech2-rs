@@ -1,12 +1,18 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#include "screenfield.h"
+#include "textglyph.h"
 #include "types.h"
 
 // The functions and globals of options.cpp that other units use.
 void LoadSoundConfig();
 void LoadDifficultyConfig();
 void DrawOptions();
+// The resolution row's ScreenField functions, implemented on the Rust side
+// (src/shell/screens/settings.rs)
+extern "C" TextGlyph* DrawResolutionOption(ScreenField* p_option);
+extern "C" void ToggleVesaDriver(ScreenField* p_option);
 
 // Shows a message box, implemented on the Rust side (src/shell/dialog.rs). p_text holds the lines
 // separated by '|', then after a '#' the buttons, also separated by '|'. With two buttons it waits

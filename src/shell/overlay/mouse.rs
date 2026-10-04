@@ -3,8 +3,6 @@ use windows::core::BOOL;
 
 use crate::shell::MODULE;
 
-const CURSOR_GRAPHIC_SIZE: usize = 423;
-
 #[repr(C, packed(1))]
 #[derive(Debug)]
 pub struct MouseState {
@@ -39,5 +37,4 @@ pub struct OverlayMouseState {
 
 globals!(
     pub(in crate::shell) static G_CURRENT_MOUSE_STATE: *mut MouseState = 0x00071204;
-    pub(in crate::shell) static G_CURSOR_GRAPHIC: *mut [u8; CURSOR_GRAPHIC_SIZE] = 0x00071200;
 );

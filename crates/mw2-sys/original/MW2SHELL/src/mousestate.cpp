@@ -32,11 +32,11 @@ inline MechS32 IsInsideWindow(MechPoint& p_point)
 }
 
 // FUNCTION: MW2SHELL 0x1003a790
-MouseState::MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_unk0x00)
+MouseState::MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_cursorShape)
 {
 	m_videoDriver = p_videoDriver;
 	m_font = p_font;
-	m_unk0x00 = p_unk0x00;
+	m_cursorShape = p_cursorShape;
 
 	m_leftDown = m_leftPressed = 0;
 	m_rightDown = m_rightPressed = 0;

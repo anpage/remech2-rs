@@ -95,8 +95,10 @@ void RunScreenFrame();
 void CloseMenuFunction();
 
 // The shell's message handler, originally its window procedure (ShellWindowProc).
+// ShellHandleMessage on the Rust side (src/shell/screens/debug.rs) wraps it, for the debug menu's
+// jumps between screens and to hold back the landing and ending videos while a prompt is up.
 // FUNCTION: MW2SHELL 0x1000e670
-static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
+MECH_INTPTR ShellHandleMessageC(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
 	MechU32 msg;
 
@@ -410,8 +412,8 @@ extern "C" int ShellMain(char* p_cmdLine)
 	g_textFont = g_bodyFont;
 	g_defaultFont = g_textFont;
 
-	g_mw2Database->GetDBItem(0x19, &g_unk0x10071200, &itemSize);
-	g_mouseState = new MouseState(g_videoDriver, g_defaultFont, g_unk0x10071200);
+	g_mw2Database->GetDBItem(0x19, &g_cursorShape, &itemSize);
+	g_mouseState = new MouseState(g_videoDriver, g_defaultFont, g_cursorShape);
 	g_keyboardInput = new KeyboardInput();
 	g_projectArchive = new ProjectArchive("MW2.PRJ");
 

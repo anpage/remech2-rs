@@ -4,6 +4,8 @@
 #include "tmpackdatabase.h"
 #include "types.h"
 
+#include <stddef.h>
+
 // The shell's messages. Its message handler opens the screen of each; the screen functions get
 // them as p_msg (c_msgScreenFrame on every frame) and the screen they come from as p_wParam.
 enum ShellMessage {
@@ -41,7 +43,16 @@ enum ShellMenuCommand {
 };
 
 // The functions and globals of shellmain.cpp that other units use.
+extern void (*g_screenFunction)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32);
+extern char* g_scenario;
+extern MechS32 g_selectedCampaign;
+extern MechU8 g_pilotChosen;
+
 extern "C" int ShellMain(char* p_cmdLine);
+// Implemented on the Rust side (src/shell/screens/debug.rs), around ShellHandleMessageC
+extern "C" MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+MECH_INTPTR ShellHandleMessageC(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+void CloseMenuFunction();
 MechS32 PumpMessage();
 extern "C" MechS32 IsShellMenuCommandEnabled(MechS32 p_command);
 void EnableShellMenuCommand(MechS32 p_command, MechS32 p_enabled);

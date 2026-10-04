@@ -2,7 +2,6 @@ use std::ffi::{CStr, c_char, c_int};
 use std::sync::Mutex;
 
 use tracing::warn;
-use windows::Win32::Foundation::WPARAM;
 
 use crate::messages;
 use crate::shell::overlay::confirm;
@@ -55,7 +54,7 @@ pub unsafe extern "C" fn show_dialog(message: *const c_char, _confirm: c_int) ->
 static PARKED: Mutex<Option<(u32, usize)>> = Mutex::new(None);
 
 /// Blocks the landing and finale transitions while a prompt is on screen
-pub fn park_transition(message: u32, wparam: WPARAM) -> bool {
+pub fn park_transition(message: u32, wparam: usize) -> bool {
     let message = ShellMsg(message);
     if (message != ShellMsg::LANDING && message != ShellMsg::FINALE) || !confirm::is_open() {
         return false;
@@ -68,7 +67,7 @@ pub fn park_transition(message: u32, wparam: WPARAM) -> bool {
             message.0
         );
     }
-    *parked = Some((message.0, wparam.0));
+    *parked = Some((message.0, wparam));
     true
 }
 

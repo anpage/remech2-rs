@@ -18,7 +18,7 @@
 // The functions and globals of shellglobals.cpp that other units use.
 extern KeyboardInput* g_keyboardInput;
 extern AudioSubsystem* g_audioSubsystem;
-extern void* g_unk0x10071200;
+extern void* g_cursorShape;
 extern MouseState* g_mouseState;
 extern VideoDriver* g_videoDriver;
 extern Font* g_defaultFont;
