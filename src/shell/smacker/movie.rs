@@ -7,10 +7,16 @@ use std::{
 };
 
 use anyhow::{Context, Result, bail};
-use smacker::{AudioInfo, Decoder, TRACK_COUNT};
+use smk::{FrameStatus, Smk};
 use tracing::warn;
 
-use super::sound::Sound;
+use super::sound::{AudioFormat, Sound};
+
+/// Number of audio tracks a Smacker file can carry
+const TRACK_COUNT: usize = 7;
+
+/// `Smk::enable_all` mask bit for the video
+const ENABLE_VIDEO: u8 = 0x80;
 
 /// Size in bytes of the file header the `Smack` structure starts with
 const HEADER_LEN: usize = 104;
@@ -54,8 +60,9 @@ pub struct Movie {
 }
 
 struct State {
-    /// Declared before `data` because it's borrowed here
-    decoder: Decoder<'static>,
+    decoder: Smk,
+    /// Whether loading the current frame changed the palette
+    palette_changed: bool,
     dest: Option<Destination>,
     sound_track: Option<usize>,
     sound: Option<Sound>,
@@ -63,21 +70,19 @@ struct State {
     audio_deadline: Duration,
     deadline: Option<Instant>,
     frame_released: bool,
-    /// The whole file. `decoder` holds slices into it, so it must not move
-    #[allow(dead_code)]
-    data: Box<[u8]>,
     path: PathBuf,
 }
 
 impl Movie {
     /// Read and open `path`
     pub fn open(path: &str, flags: u32) -> Result<Box<Self>> {
-        let data: Box<[u8]> = std::fs::read(path)
-            .with_context(|| format!("couldn't read {path}"))?
-            .into_boxed_slice();
+        let data = std::fs::read(path).with_context(|| format!("couldn't read {path}"))?;
 
-        let src: &'static [u8] = unsafe { std::slice::from_raw_parts(data.as_ptr(), data.len()) };
-        let decoder = Decoder::open(src).map_err(|e| anyhow::anyhow!("{path}: {e}"))?;
+        let mut decoder = Smk::open_memory(&data).map_err(|e| anyhow::anyhow!("{path}: {e}"))?;
+        decoder.enable_all(ENABLE_VIDEO | decoder.info_audio().track_mask);
+        decoder
+            .first_frame()
+            .map_err(|e| anyhow::anyhow!("{path}: {e}"))?;
 
         let Some(header) = data.get(..HEADER_LEN) else {
             bail!("{path}: header truncated");
@@ -86,7 +91,7 @@ impl Movie {
         header_bytes.copy_from_slice(header);
 
         let sound_track = (0..TRACK_COUNT)
-            .find(|&t| flags & (TRACK_FLAG_BASE << t) != 0 && decoder.audio_track(t).is_some());
+            .find(|&t| flags & (TRACK_FLAG_BASE << t) != 0 && audio_format(&decoder, t).is_some());
         let mut movie = Box::new(Self {
             public: Smack {
                 header: header_bytes,
@@ -100,6 +105,7 @@ impl Movie {
             },
             state: State {
                 decoder,
+                palette_changed: true,
                 dest: None,
                 sound_track,
                 sound: None,
@@ -107,7 +113,6 @@ impl Movie {
                 audio_deadline: Duration::ZERO,
                 deadline: None,
                 frame_released: false,
-                data,
                 path: PathBuf::from(path),
             },
         });
@@ -146,7 +151,7 @@ impl Movie {
             bail!("destination buffer is null");
         }
 
-        let info = self.state.decoder.video_info();
+        let info = self.state.decoder.info_video();
         let (width, height) = (info.width as usize, info.height as usize);
         let pitch = dest.pitch as usize;
         let (left, top) = (dest.left as usize, dest.top as usize);
@@ -171,37 +176,73 @@ impl Movie {
             .context("destination span overflows")?;
 
         let dst = unsafe { std::slice::from_raw_parts_mut(dest.buf.add(start), len) };
-        self.state
-            .decoder
-            .decode_frame(dst, pitch, dest.flip)
-            .map_err(|e| anyhow::anyhow!("frame {}: {e}", self.public.frame_num))?;
+        let rows = self.state.decoder.video_data().chunks_exact(width);
+        for (row, src) in rows.take(height).enumerate() {
+            let at = if dest.flip { height - 1 - row } else { row } * pitch;
+            dst[at..at + width].copy_from_slice(src);
+        }
         Ok(())
     }
 
     /// Advance to the next frame and apply its palette record.
     pub fn next_frame(&mut self) -> Result<()> {
-        self.state
-            .decoder
-            .next_frame()
-            .map_err(|e| anyhow::anyhow!("{e}"))?;
+        let before = *self.state.decoder.palette();
+        let advanced = self.advance();
+        self.state.palette_changed = before != *self.state.decoder.palette();
         self.publish_frame_state();
+        advanced
+    }
+
+    /// Load the following frame, wrapping to the first after the last
+    fn advance(&mut self) -> Result<()> {
+        let decoder = &mut self.state.decoder;
+        if decoder.next_frame().map_err(|e| anyhow::anyhow!("{e}"))? == FrameStatus::Done {
+            decoder.first_frame().map_err(|e| anyhow::anyhow!("{e}"))?;
+        }
         Ok(())
     }
 
     /// Seeks to the given frame
     pub fn goto(&mut self, frame: u32) -> Result<()> {
         let target = if frame == 0 {
-            self.state.decoder.frame_index()
+            self.frame_index()
         } else {
             frame - 1
         };
-        self.state
-            .decoder
+        let before = *self.state.decoder.palette();
+        let sought = self
             .seek(target)
-            .map_err(|e| anyhow::anyhow!("seek to frame {target}: {e}"))?;
-        self.resync_audio(target);
+            .with_context(|| format!("seek to frame {target}"));
+        self.state.palette_changed = before != *self.state.decoder.palette();
+        self.resync_audio(self.frame_index());
         self.publish_frame_state();
+        sought
+    }
+
+    /// Make `target` current. The files have no keyframes, so anything but the
+    /// current frame is reached by replaying, from the start when going back.
+    fn seek(&mut self, target: u32) -> Result<()> {
+        if target >= self.state.decoder.info().frame_count {
+            bail!("past the end of the movie");
+        }
+        if target < self.frame_index() {
+            self.state
+                .decoder
+                .first_frame()
+                .map_err(|e| anyhow::anyhow!("{e}"))?;
+        }
+        while self.frame_index() < target {
+            let status = self.state.decoder.next_frame();
+            if status.map_err(|e| anyhow::anyhow!("{e}"))? == FrameStatus::Done {
+                bail!("ran out of frames");
+            }
+        }
         Ok(())
+    }
+
+    /// Index of the frame currently loaded
+    fn frame_index(&self) -> u32 {
+        self.state.decoder.info().current_frame
     }
 
     /// Jumps the audio to the target frame
@@ -215,7 +256,7 @@ impl Movie {
 
     /// How long one frame is on screen
     fn frame_duration(&self) -> Duration {
-        Duration::from_micros(u64::from(self.state.decoder.frame_time_10us()) * 10)
+        Duration::from_secs_f64(self.state.decoder.info().microseconds_per_frame / 1e6)
     }
 
     /// Waits for the current frame's display time to finish
@@ -273,7 +314,8 @@ impl Movie {
     /// Whether any track selected by `trackflags` exists in this file
     pub fn sound_in_track(&self, trackflags: u32) -> bool {
         (0..TRACK_COUNT).any(|t| {
-            trackflags & (TRACK_FLAG_BASE << t) != 0 && self.state.decoder.audio_track(t).is_some()
+            trackflags & (TRACK_FLAG_BASE << t) != 0
+                && audio_format(&self.state.decoder, t).is_some()
         })
     }
 
@@ -284,25 +326,19 @@ impl Movie {
             return Ok(0);
         };
 
-        let Some(info) = self.state.decoder.audio_track(track) else {
+        if audio_format(&self.state.decoder, track).is_none() {
             return Ok(0);
-        };
+        }
 
         if dst.is_null() {
             bail!("track data destination is null");
         }
 
-        let out = unsafe {
-            std::slice::from_raw_parts_mut(dst.cast::<u8>(), info.max_unpacked_size as usize)
-        };
+        // Never more than the track's largest chunk, which is what the game sizes its buffer by
+        let data = self.state.decoder.audio_data(track as u8).unwrap_or(&[]);
+        unsafe { std::ptr::copy_nonoverlapping(data.as_ptr(), dst.cast::<u8>(), data.len()) };
 
-        let written = self
-            .state
-            .decoder
-            .audio_data(track, out)
-            .map_err(|e| anyhow::anyhow!("{e}"))?;
-
-        Ok(u32::try_from(written).unwrap_or(u32::MAX))
+        Ok(u32::try_from(data.len()).unwrap_or(u32::MAX))
     }
 
     /// Start audio on the first paced frame.
@@ -316,14 +352,14 @@ impl Movie {
             return;
         };
 
-        let Some(info) = self.state.decoder.audio_track(track) else {
+        let Some(format) = audio_format(&self.state.decoder, track) else {
             return;
         };
 
         let path = self.state.path.clone();
         let (tx, rx) = mpsc::channel();
         thread::spawn(move || {
-            let _ = tx.send(load_sound(&path, track, info));
+            let _ = tx.send(load_sound(&path, track, format));
         });
 
         self.state.sound_rx = Some(rx);
@@ -348,9 +384,7 @@ impl Movie {
             return;
         };
 
-        let at = self
-            .frame_duration()
-            .saturating_mul(self.state.decoder.frame_index());
+        let at = self.frame_duration().saturating_mul(self.frame_index());
 
         self.state.audio_deadline = if sound.seek(at) { at } else { sound.position() };
         self.state.sound = Some(sound);
@@ -358,18 +392,19 @@ impl Movie {
 
     /// Copy the decoder's per-frame state into the structure the game reads
     fn publish_frame_state(&mut self) {
-        self.public.frame_num = self.state.decoder.frame_index();
+        self.public.frame_num = self.frame_index();
         self.state.frame_released = false;
 
-        if !self.state.decoder.palette_changed() {
+        if !self.state.palette_changed {
             self.public.new_palette = 0;
             return;
         }
 
+        // The decoder expands the palette to 8 bits, the game wants the file's 6
         let mut flat = [0u8; PALETTE_LEN];
         let (triplets, _) = flat.as_chunks_mut::<3>();
         for (out, entry) in triplets.iter_mut().zip(self.state.decoder.palette()) {
-            *out = *entry;
+            *out = entry.map(|c| c >> 2);
         }
 
         if self.public.pal_type == 1 {
@@ -384,27 +419,40 @@ impl Movie {
     }
 }
 
+/// The format of audio track `track`, if the file has one
+fn audio_format(decoder: &Smk, track: usize) -> Option<AudioFormat> {
+    let info = decoder.info_audio();
+    (info.track_mask & (1 << track) != 0).then(|| AudioFormat {
+        rate: info.rate[track],
+        bits: info.bitdepth[track],
+        channels: info.channels[track],
+    })
+}
+
 /// The audio worker thread.
 /// Decoding the whole track and opening the device are too slow for the game thread.
-fn load_sound(path: &std::path::Path, track: usize, info: AudioInfo) -> Option<Sound> {
-    let start = || -> Result<Option<Sound>> {
-        let data =
-            std::fs::read(path).with_context(|| format!("couldn't read {}", path.display()))?;
+fn load_sound(path: &std::path::Path, track: usize, format: AudioFormat) -> Option<Sound> {
+    let start = || -> Result<Sound> {
+        let mut decoder =
+            Smk::open_file(path, true).map_err(|e| anyhow::anyhow!("{}: {e}", path.display()))?;
+        decoder.enable_all(1 << track);
 
-        let decoder =
-            Decoder::open(&data).map_err(|e| anyhow::anyhow!("{}: {e}", path.display()))?;
+        // Counted rather than run until the decoder is done, which a looping movie never is
+        let mut pcm = Vec::new();
+        for frame in 0..decoder.info().frame_count {
+            let status = if frame == 0 {
+                decoder.first_frame()
+            } else {
+                decoder.next_frame()
+            };
+            status.map_err(|e| anyhow::anyhow!("{}: {e}", path.display()))?;
+            pcm.extend_from_slice(decoder.audio_data(track as u8).unwrap_or(&[]));
+        }
 
-        let Some(pcm) = decoder
-            .decode_track(track)
-            .map_err(|e| anyhow::anyhow!("{}: {e}", path.display()))?
-        else {
-            return Ok(None);
-        };
-
-        Sound::start(&pcm, info).map(Some)
+        Sound::start(&pcm, format)
     };
     match start() {
-        Ok(sound) => sound,
+        Ok(sound) => Some(sound),
         Err(e) => {
             warn!("smacker: couldn't start FMV audio: {e:#}");
             None

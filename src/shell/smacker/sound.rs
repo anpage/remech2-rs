@@ -2,9 +2,16 @@ use std::time::Duration;
 
 use anyhow::Result;
 use rodio::{OutputStream, OutputStreamBuilder, Sink, buffer::SamplesBuffer};
-use smacker::AudioInfo;
 
 use crate::shell::audio::G_EFFECTS_VOLUME;
+
+/// How an audio track's samples are laid out
+#[derive(Clone, Copy)]
+pub struct AudioFormat {
+    pub rate: u32,
+    pub bits: u8,
+    pub channels: u8,
+}
 
 pub struct Sound {
     _stream: OutputStream,
@@ -14,8 +21,8 @@ pub struct Sound {
 impl Sound {
     /// Open a stream and play `pcm`.
     /// Interleaved unsigned 8-bit or signed little-endian 16-bit samples, depending on the track's format.
-    pub fn start(pcm: &[u8], info: AudioInfo) -> Result<Self> {
-        let samples = to_f32(pcm, info.bits);
+    pub fn start(pcm: &[u8], format: AudioFormat) -> Result<Self> {
+        let samples = to_f32(pcm, format.bits);
         let stream = OutputStreamBuilder::open_default_stream()?;
         let sink = Sink::connect_new(stream.mixer());
 
@@ -25,8 +32,8 @@ impl Sound {
         sink.set_volume(volume);
 
         sink.append(SamplesBuffer::new(
-            u16::from(info.channels.max(1)),
-            info.rate.max(1),
+            u16::from(format.channels.max(1)),
+            format.rate.max(1),
             samples,
         ));
         sink.play();

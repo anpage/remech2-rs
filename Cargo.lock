@@ -1744,7 +1744,7 @@ dependencies = [
  "rustysynth",
  "sha2",
  "slotmap 1.0.7",
- "smacker",
+ "smk",
  "tracing",
  "tracing-subscriber",
  "unarc-rs",
@@ -1977,14 +1977,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "smacker"
-version = "0.1.0"
-
-[[package]]
 name = "smallvec"
 version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9be42f50aa861c555654aa3a37f52f4b1074bacf4e48fe0ef7fa584e80f1f0f"
+
+[[package]]
+name = "smk"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "206125ea6519083d366404d5b1b7150d476e7c54db9171aa3aaf3f25ecec1349"
+dependencies = [
+ "log",
+]
 
 [[package]]
 name = "spirv"

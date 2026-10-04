@@ -15,7 +15,8 @@ unsafe fn movie<'a>(smk: *mut c_void) -> Option<&'a mut Movie> {
 
 /// Opens a `.smk` file or returns null.
 /// We read the entire file, so we ignore `extrabuf`
-pub unsafe extern "cdecl" fn open(name: *const c_char, flags: u32, _extrabuf: u32) -> *mut c_void {
+#[unsafe(export_name = "SmackOpen")]
+pub unsafe extern "C" fn open(name: *const c_char, flags: u32, _extrabuf: u32) -> *mut c_void {
     if name.is_null() {
         return std::ptr::null_mut();
     }
@@ -35,7 +36,8 @@ pub unsafe extern "cdecl" fn open(name: *const c_char, flags: u32, _extrabuf: u3
 }
 
 /// Closes a handle and frees everything it owned
-pub unsafe extern "cdecl" fn close(smk: *mut c_void) {
+#[unsafe(export_name = "SmackClose")]
+pub unsafe extern "C" fn close(smk: *mut c_void) {
     if smk.is_null() {
         return;
     }
@@ -44,7 +46,8 @@ pub unsafe extern "cdecl" fn close(smk: *mut c_void) {
 }
 
 /// Decodes the current frame into the registered destination
-pub unsafe extern "cdecl" fn do_frame(smk: *mut c_void) -> u32 {
+#[unsafe(export_name = "SmackDoFrame")]
+pub unsafe extern "C" fn do_frame(smk: *mut c_void) -> u32 {
     let Some(movie) = (unsafe { movie(smk) }) else {
         return 0;
     };
@@ -57,7 +60,8 @@ pub unsafe extern "cdecl" fn do_frame(smk: *mut c_void) -> u32 {
 }
 
 /// Advances to the next frame and applies its palette record
-pub unsafe extern "cdecl" fn next_frame(smk: *mut c_void) {
+#[unsafe(export_name = "SmackNextFrame")]
+pub unsafe extern "C" fn next_frame(smk: *mut c_void) {
     let Some(movie) = (unsafe { movie(smk) }) else {
         return;
     };
@@ -69,7 +73,8 @@ pub unsafe extern "cdecl" fn next_frame(smk: *mut c_void) {
 
 /// Makes frame `frame - 1` current.
 /// 0 re-primes the current one
-pub unsafe extern "cdecl" fn goto(smk: *mut c_void, frame: u32) {
+#[unsafe(export_name = "SmackGoto")]
+pub unsafe extern "C" fn goto(smk: *mut c_void, frame: u32) {
     let Some(movie) = (unsafe { movie(smk) }) else {
         return;
     };
@@ -80,7 +85,8 @@ pub unsafe extern "cdecl" fn goto(smk: *mut c_void, frame: u32) {
 }
 
 /// Non-zero until the current frame's display time has elapsed
-pub unsafe extern "cdecl" fn wait(smk: *mut c_void) -> u32 {
+#[unsafe(export_name = "SmackWait")]
+pub unsafe extern "C" fn wait(smk: *mut c_void) -> u32 {
     let Some(movie) = (unsafe { movie(smk) }) else {
         return 0;
     };
@@ -89,7 +95,8 @@ pub unsafe extern "cdecl" fn wait(smk: *mut c_void) -> u32 {
 }
 
 /// Registers the destination for decoded frames
-pub unsafe extern "cdecl" fn to_buffer(
+#[unsafe(export_name = "SmackToBuffer")]
+pub unsafe extern "C" fn to_buffer(
     smk: *mut c_void,
     left: u32,
     top: u32,
@@ -106,7 +113,8 @@ pub unsafe extern "cdecl" fn to_buffer(
 }
 
 /// Returns 1 when any track selected by `trackflags` exists
-pub unsafe extern "cdecl" fn sound_in_track(smk: *mut c_void, trackflags: u32) -> u32 {
+#[unsafe(export_name = "SmackSoundInTrack")]
+pub unsafe extern "C" fn sound_in_track(smk: *mut c_void, trackflags: u32) -> u32 {
     let Some(movie) = (unsafe { movie(smk) }) else {
         return 0;
     };
@@ -115,7 +123,8 @@ pub unsafe extern "cdecl" fn sound_in_track(smk: *mut c_void, trackflags: u32) -
 }
 
 /// Decodes the current frame's audio into `dest`, returning the byte count
-pub unsafe extern "cdecl" fn get_track_data(
+#[unsafe(export_name = "SmackGetTrackData")]
+pub unsafe extern "C" fn get_track_data(
     smk: *mut c_void,
     dest: *mut c_void,
     trackflags: u32,
