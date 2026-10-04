@@ -1,17 +1,10 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#include "dplay.h"
 #include "types.h"
 
-#include <dplay.h>
 #include <windows.h>
-
-#ifndef DPSEND_TRYONCE
-#define DPSEND_GUARANTEE 0x00000001
-#define DPSEND_TRYONCE 0x00000004
-#define DPOPEN_OPENSESSION 0x00000001
-#define DPOPEN_CREATESESSION 0x00000002
-#endif
 
 struct NetLaunchInfo;
 

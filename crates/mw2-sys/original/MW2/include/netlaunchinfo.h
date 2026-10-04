@@ -2,9 +2,9 @@
 #define NETLAUNCHINFO_H
 
 #include "decomp.h"
+#include "dplay.h"
 #include "types.h"
 
-#include <dplay.h>
 #include <windows.h>
 
 // What the shell hands SimMain for a network game: its DirectPlay session, the local player's
