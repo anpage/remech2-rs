@@ -1,0 +1,8 @@
+[package]
+name = "mw2-sys"
+version = "0.1.0"
+edition = "2024"
+
+[build-dependencies]
+bindgen = "0.73.2"
+cc = "1.6.0"

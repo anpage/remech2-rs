@@ -5,7 +5,7 @@ edition = "2024"
 license = "MIT"
 
 [workspace]
-members = ["crates/binding", "crates/binding-macros", "crates/smacker"]
+members = ["crates/binding", "crates/binding-macros", "crates/mw2-sys", "crates/smacker"]
 
 # Shared so that `binding` and `remech2` can't drift onto two versions of
 # `retour`, which would make their `Hook<F>` types mutually unassignable.
