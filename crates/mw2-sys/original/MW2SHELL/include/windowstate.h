@@ -23,7 +23,6 @@ extern "C"
 	extern MechU32 g_quickTips;
 	extern MechS32 g_showDialog;
 	extern MechS32 g_menuVisible;
-	extern MechS32 g_helpRegistered;
 	extern MechS32 g_menuDialogOpen;
 	extern MechS32 g_littleMovies;
 	extern MechHeap* g_primaryHeap;

@@ -30,9 +30,6 @@ MechS32 g_showDialog = 0;
 // GLOBAL: MW2SHELL 0x1006a9e4
 MechS32 g_menuVisible = 0;
 
-// GLOBAL: MW2SHELL 0x1006a9e8
-MechS32 g_helpRegistered = 0;
-
 // GLOBAL: MW2SHELL 0x1006a9ec
 MechS32 g_menuDialogOpen = 0;
 

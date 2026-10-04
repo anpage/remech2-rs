@@ -92,11 +92,9 @@ BOOL CALLBACK LittleMoviesDialogProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, L
 void RunScreenFrame();
 void CloseMenuFunction();
 
-// Matches except for the stack slots of helpFile, msg and mouseY (a consistent permutation).
 // FUNCTION: MW2SHELL 0x1000e670
 extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 {
-	char helpFile[32];
 	UINT msg;
 	MechS32 mouseY;
 	PAINTSTRUCT paint;
@@ -257,18 +255,8 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 			g_menuDialogOpen = TRUE;
 			break;
 		case c_menuHelpContents:
-			sprintf(helpFile, "%s", "mw2help.hlp");
-
-			if (WinHelp(g_gameWindow, helpFile, HELP_CONTENTS, 0)) {
-				g_helpRegistered = TRUE;
-			}
-			break;
 		case c_menuTechnicalHelp:
-			sprintf(helpFile, "%s", "tech.hlp");
-
-			if (WinHelp(g_gameWindow, helpFile, HELP_CONTENTS, 0)) {
-				g_helpRegistered = TRUE;
-			}
+			// The original opened mw2help.hlp and tech.hlp in WinHelp. They do nothing for now.
 			break;
 		}
 		return 0;
@@ -548,10 +536,6 @@ extern "C" int __stdcall ShellMain(
 	delete g_keyboardInput;
 	delete g_videoDriver;
 	delete g_audioSubsystem;
-
-	if (g_helpRegistered) {
-		WinHelp(g_gameWindow, NULL, HELP_QUIT, 0);
-	}
 
 	MechHeapDestroy(g_primaryHeap);
 	g_primaryHeap = NULL;

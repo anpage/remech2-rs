@@ -1475,29 +1475,11 @@ void CpcShowBindingsPage(ScreenField*)
 	g_cpcConfigured = 0;
 }
 
-// Open the Windows joystick control panel.
-// Stack-slot permutation: created and processInfo.
+// The original opened the Windows joystick control panel (control.exe joy.cpl). Does nothing
+// for now.
 // FUNCTION: MW2SHELL 0x10040cc7
 void CpcOpenJoystickControlPanel(ScreenField*)
 {
-	STARTUPINFO startupInfo;
-	BOOL created;
-	PROCESS_INFORMATION processInfo;
-	MechChar* commandLine;
-
-	memset(&startupInfo, 0, sizeof(startupInfo));
-	startupInfo.cb = sizeof(startupInfo);
-	commandLine = (MechChar*) MechHeapAlloc(g_primaryHeap, MAX_PATH);
-	if (commandLine != NULL) {
-		GetWindowsDirectory(commandLine, MAX_PATH);
-		strcat(commandLine, "\\control.exe joy.cpl");
-		created = CreateProcess(NULL, commandLine, NULL, NULL, FALSE, 0, NULL, NULL, &startupInfo, &processInfo);
-		if (!created) {
-			DebugPrint("CreateProcess failed: %d\n", GetLastError());
-		}
-
-		MechHeapFree(g_primaryHeap, commandLine);
-	}
 }
 
 // Write a binding's modifier keys to input.map: pressed for bits 0-2, released for bits 4-6.
