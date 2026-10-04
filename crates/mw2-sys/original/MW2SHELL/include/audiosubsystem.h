@@ -24,7 +24,6 @@ public:
 	void StopMidiSequence();
 
 	friend class MidiSequence;
-	friend class VideoSound;
 
 private:
 	MechU8 m_milesStarted;               // 0x00
@@ -32,7 +31,7 @@ private:
 	HDIGDRIVER m_digitalDriver;          // 0x05
 	AILWAVEOUT* m_waveOut;               // 0x09
 	MidiSequence* m_currentMidiSequence; // 0x0d
-	undefined4 m_playbackRate;           // 0x11 — VideoSound passes it to AIL_minimum_sample_buffer_size
+	undefined4 m_playbackRate;           // 0x11
 };
 #pragma pack()
 

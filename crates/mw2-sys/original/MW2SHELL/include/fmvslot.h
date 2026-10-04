@@ -4,17 +4,13 @@
 #include "decomp.h"
 #include "smackw32.h"
 #include "types.h"
-#include "videosound.h"
 
-// SIZE 0x4c
+// SIZE 0x4c in the original, whose offsets the fields are marked with: it had four more fields
+// at 0x04-0x10 for a VideoSound stream that no slot ever used.
 // One FMV playback slot; the shell keeps 32 of them in g_fmvSlots. Flags at 0x1c: 0x80 places the
 // video by its bottom center, 0x1000 disables the menu for this video, 0x80000000 marks the slot in use.
 struct FmvSlot {
 	Smack* m_smack;            // 0x00 — Smacker handle
-	VideoSound* m_sound;       // 0x04 — per-video sound object
-	void* m_soundBuffer;       // 0x08 — sound buffer being filled
-	MechS32 m_soundSize;       // 0x0c — its size
-	undefined4 m_soundPending; // 0x10 — set while the sound track has data to stream
 	void* m_shp;               // 0x14 — an SHP animation's data, instead of m_smack
 	void* m_frameBuffer;       // 0x18 — the Smacker frame, when not decoded in place
 	MechS32 m_flags;           // 0x1c — flags, see above

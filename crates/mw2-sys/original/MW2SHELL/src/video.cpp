@@ -279,27 +279,12 @@ MechS32 IsVideoFrameDue(FmvSlot* p_video, MechU32 p_time)
 	}
 }
 
-// The largest sound chunk streamed so far.
-// GLOBAL: MW2SHELL 0x10064b34
-MechS32 g_largestSoundChunk = 0;
-
-// Streams the next chunk of a video's sound track to its sound object once it wants one.
+// The original also streamed the video's sound track to a VideoSound object here, but no slot
+// ever had one: Smacker plays the sound itself.
 // FUNCTION: MW2SHELL 0x1001643e
 void StreamVideoSound(FmvSlot* p_video)
 {
 	AIL_serve();
-	if (p_video->m_sound != NULL && p_video->m_soundPending) {
-		if (p_video->m_sound->IsBufferReady()) {
-			p_video->m_soundBuffer = p_video->m_sound->GetReadyBuffer();
-			p_video->m_soundSize = SmackGetTrackData(p_video->m_smack, p_video->m_soundBuffer, 0x200);
-			if (p_video->m_soundSize > g_largestSoundChunk) {
-				g_largestSoundChunk = p_video->m_soundSize;
-			}
-
-			p_video->m_sound->LoadBuffer(p_video->m_soundBuffer, p_video->m_soundSize);
-			p_video->m_soundPending = 0;
-		}
-	}
 }
 
 // Plays the next frame of the full-screen video in slot 0, closing it after the last.
@@ -616,10 +601,6 @@ void CloseVideo(MechS32 p_index)
 		SmackClose(g_fmvSlots[p_index].m_smack);
 	}
 
-	if (g_fmvSlots[p_index].m_sound != NULL) {
-		delete g_fmvSlots[p_index].m_sound;
-	}
-
 	if (g_fmvSlots[p_index].m_shp != NULL) {
 		MechHeapFree(g_primaryHeap, g_fmvSlots[p_index].m_shp);
 	}
@@ -629,7 +610,6 @@ void CloseVideo(MechS32 p_index)
 	}
 
 	g_fmvSlots[p_index].m_smack = NULL;
-	g_fmvSlots[p_index].m_sound = NULL;
 	g_fmvSlots[p_index].m_shp = NULL;
 	ZeroMemory(&g_fmvSlots[p_index].m_flags, 4);
 	g_fmvSlots[p_index].m_frameBuffer = NULL;
@@ -728,10 +708,6 @@ BOOL LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 			);
 		}
 		else {
-			if (p_slot->m_sound) {
-				delete p_slot->m_sound;
-			}
-			p_slot->m_sound = NULL;
 			SmackClose(p_slot->m_smack);
 			return FALSE;
 		}

@@ -38,7 +38,6 @@ extern "C"
 		void* p_buffer,
 		unsigned int p_flags
 	);
-	unsigned int SmackGetTrackData(Smack* p_smack, void* p_buffer, unsigned int p_track);
 
 #ifdef __cplusplus
 }

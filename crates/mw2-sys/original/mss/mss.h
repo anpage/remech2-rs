@@ -116,7 +116,6 @@ extern "C"
 	AILIMPORT void AILCALL AIL_start_timer(HTIMER p_timer);
 	AILIMPORT void AILCALL AIL_release_timer_handle(HTIMER p_timer);
 
-	AILIMPORT int AILCALL AIL_minimum_sample_buffer_size(HDIGDRIVER p_driver, int p_rate, int p_format);
 	AILIMPORT void AILCALL AIL_set_sample_type(HSAMPLE p_sample, int p_format, unsigned int p_flags);
 	AILIMPORT int AILCALL AIL_sample_buffer_ready(HSAMPLE p_sample);
 	AILIMPORT void AILCALL

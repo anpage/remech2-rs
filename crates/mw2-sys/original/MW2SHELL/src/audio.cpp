@@ -4,18 +4,9 @@
 #include "mss.h"
 #include "shellglobals.h"
 #include "soundconfig.h"
-#include "videosound.h"
 #include "windowstate.h"
 
 #include <windows.h>
-
-// Miles sample formats (DIG_F_*).
-enum {
-	c_formatMono8 = 0,
-	c_formatMono16 = 1,
-	c_formatStereo8 = 2,
-	c_formatStereo16 = 3
-};
 
 DECOMP_SIZE_ASSERT(AudioSubsystem, 0x15)
 DECOMP_SIZE_ASSERT(AudioSample, 0x2c)
@@ -387,132 +378,5 @@ void AudioSample::SetLoopCount(MechS32 p_loopCount)
 	m_loopCount = p_loopCount;
 	if (m_sample) {
 		AIL_set_sample_loop_count(m_sample, m_loopCount);
-	}
-}
-
-// Allocates a Miles sample for streaming stereo or mono, 16-bit (p_wide) or 8-bit samples, with two buffers of at least
-// p_size samples. Without a digital driver, a sample or the buffers, it stays silent.
-// Not 100%: the stack slots of minimum and format are permuted.
-// FUNCTION: MW2SHELL 0x1003d884
-VideoSound::VideoSound(AudioSubsystem* p_subsystem, MechS32 p_stereo, MechS32 p_wide, MechS32 p_size)
-{
-	MechS32 minimum;
-	MechS32 format;
-
-	m_subsystem = p_subsystem;
-	m_sample = NULL;
-	m_buffer0 = NULL;
-	m_buffer1 = NULL;
-	m_readyBuffer = -1;
-
-	if (!m_subsystem->m_digitalDriver) {
-		return;
-	}
-
-	m_sample = AIL_allocate_sample_handle(m_subsystem->m_digitalDriver);
-	if (!m_sample) {
-		return;
-	}
-
-	if (p_stereo) {
-		if (p_wide) {
-			format = c_formatStereo16;
-		}
-		else {
-			format = c_formatStereo8;
-		}
-	}
-	else if (p_wide) {
-		format = c_formatMono16;
-	}
-	else {
-		format = c_formatMono8;
-	}
-
-	minimum = AIL_minimum_sample_buffer_size(m_subsystem->m_digitalDriver, m_subsystem->m_playbackRate, format);
-	if (minimum <= p_size) {
-		if (format == c_formatStereo16) {
-			p_size <<= 2;
-		}
-		else if (format != c_formatMono8) {
-			p_size <<= 1;
-		}
-
-		m_buffer0 = MechHeapAlloc(g_primaryHeap, p_size);
-		m_buffer1 = MechHeapAlloc(g_primaryHeap, p_size);
-	}
-
-	if (!m_buffer0 || !m_buffer1) {
-		if (m_buffer0) {
-			MechHeapFree(g_primaryHeap, m_buffer0);
-		}
-		AIL_release_sample_handle(m_sample);
-		if (!m_sample) {
-			// Both branches are empty in the original.
-		}
-		else {
-		}
-		return;
-	}
-
-	AIL_init_sample(m_sample);
-	AIL_set_sample_type(m_sample, format, p_wide != 0);
-}
-
-// FUNCTION: MW2SHELL 0x1003da54
-VideoSound::~VideoSound()
-{
-	if (m_sample != NULL) {
-		AIL_end_sample(m_sample);
-		AIL_release_sample_handle(m_sample);
-		if (m_buffer0 != NULL) {
-			MechHeapFree(g_primaryHeap, m_buffer0);
-		}
-		if (m_buffer1 != NULL) {
-			MechHeapFree(g_primaryHeap, m_buffer1);
-		}
-	}
-}
-
-// FUNCTION: MW2SHELL 0x1003dad5
-undefined4 VideoSound::IsBufferReady()
-{
-	if (m_sample) {
-		if (m_readyBuffer == -1) {
-			m_readyBuffer = AIL_sample_buffer_ready(m_sample);
-		}
-		if (m_readyBuffer != -1) {
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
-
-// FUNCTION: MW2SHELL 0x1003db31
-void* VideoSound::GetReadyBuffer()
-{
-	if (m_sample) {
-		if (m_readyBuffer == -1) {
-			m_readyBuffer = AIL_sample_buffer_ready(m_sample);
-		}
-		if (m_readyBuffer != -1) {
-			return (&m_buffer0)[m_readyBuffer];
-		}
-	}
-
-	return NULL;
-}
-
-// FUNCTION: MW2SHELL 0x1003db95
-void VideoSound::LoadBuffer(void* p_buffer, MechU32 p_size)
-{
-	// The two adjacent buffer fields are selected by Miles' ready-buffer index.
-	if (m_sample) {
-		if (m_readyBuffer == -1 || (&m_buffer0)[m_readyBuffer] != p_buffer) {
-			return;
-		}
-		AIL_load_sample_buffer(m_sample, m_readyBuffer, p_buffer, p_size);
-		m_readyBuffer = -1;
 	}
 }
