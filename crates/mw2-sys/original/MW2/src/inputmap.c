@@ -1364,7 +1364,7 @@ void UpdateInputs(void)
 	}
 
 	if (keyCode == 0x40d) {
-		ToggleFullScreen();
+		// Alt+Enter. The original called ToggleFullScreen; the Rust side handles the key now.
 	}
 	else {
 		g_localSteering.m_keyCode = keyCode;

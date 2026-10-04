@@ -34,12 +34,6 @@ extern "C"
 	extern MechS32 g_pauseRequested;
 	extern MechS32 g_mouseOutsideClientWindow;
 	extern HWND g_gameWindow;
-	extern undefined4 g_windowedSwitchPending;
-	extern undefined4 g_shouldToggleFullscreen;
-	extern MechS32 g_desktopWidth;
-	extern MechS32 g_desktopHeight;
-	extern MechU32 g_windowedSwitchTime;
-	extern MechU32 g_windowedSwitchDeadline;
 
 	int __stdcall SimMain(
 		HINSTANCE p_module,

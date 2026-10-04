@@ -16,8 +16,6 @@
 #include "debris.h"
 #include "debugprint.h"
 #include "decomp.h"
-#include "directdraw.h"
-#include "dispdibmode.h"
 #include "displaybackend.h"
 #include "dorcs.h"
 #include "effectinfo.h"
@@ -26,7 +24,6 @@
 #include "eyepoint.h"
 #include "fadepal.h"
 #include "gamekeys.h"
-#include "gdi.h"
 #include "geocache.h"
 #include "gpanim.h"
 #include "inputmap.h"
@@ -121,35 +118,17 @@ MechS32 g_windowActive = 0;
 // GLOBAL: MW2 0x100acb78
 MechS32 g_drawModeReady = 0;
 
-// GLOBAL: MW2 0x100acb7c
-undefined4 g_shouldToggleFullscreen = 0;
-
-// GLOBAL: MW2 0x100acb80
-MechS32 g_desktopWidth = 0;
-
-// GLOBAL: MW2 0x100acb84
-MechS32 g_desktopHeight = 0;
-
 // GLOBAL: MW2 0x100acb88
 MechS32 g_simPaused = 0;
 
 // GLOBAL: MW2 0x100acb8c
 MechS32 g_pauseRequested = 0;
 
-// GLOBAL: MW2 0x100acb90
-undefined4 g_windowedSwitchPending = 0;
-
 // GLOBAL: MW2 0x100acb94
 MechS32 g_mouseOutsideClientWindow = 0;
 
 // GLOBAL: MW2 0x100acb98
 MechS32 g_goLaunch = 0;
-
-// GLOBAL: MW2 0x100e9240
-MechU32 g_windowedSwitchTime;
-
-// GLOBAL: MW2 0x100e933c
-MechU32 g_windowedSwitchDeadline;
 
 // GLOBAL: MW2 0x1012b7c0
 VideoDriverChoice g_videoDriverChoice;
@@ -169,8 +148,6 @@ int __stdcall SimMain(
 )
 {
 	MSG msg;
-	void* palette;
-	MechS32 hasPalette;
 	int result;
 	MechS32 i;
 	char missionName[64];
@@ -183,8 +160,6 @@ int __stdcall SimMain(
 	seed = 0;
 	g_gameWindow = p_hWnd;
 	g_simModule = p_module;
-	g_desktopWidth = GetSystemMetrics(SM_CXSCREEN);
-	g_desktopHeight = GetSystemMetrics(SM_CYSCREEN);
 	g_primaryHeap = MechHeapCreate();
 	if (g_primaryHeap == NULL) {
 		Error(9, "Insufficient memory available.");
@@ -265,7 +240,9 @@ int __stdcall SimMain(
 	__try {
 		FirstClock();
 		DebugPrint("StartSupAnim()\n");
-		StartSupAnim(GetDeviceCaps(GetDC(g_gameWindow), NUMCOLORS) == -1 || g_windowMode == c_windowModeFullscreen);
+		// The original passed whether the desktop had more than 256 colors or the game was full
+		// screen.
+		StartSupAnim(TRUE);
 		DebugPrint("FirstResource()\n");
 		FirstResource();
 		DebugPrint("InitStaticMem()\n");
@@ -347,19 +324,9 @@ int __stdcall SimMain(
 
 		DebugPrint("StopSupAnim()\n");
 		StopSupAnim();
-		if (GetDeviceCaps(GetDC(g_gameWindow), NUMCOLORS) == -1 || g_windowMode == c_windowModeFullscreen) {
-			DebugPrint("StartPalettes()\n");
-			StartPalettes(0);
-		}
-		else {
-			hasPalette = g_paletteResourceIds[0x10] != -1;
-			if (hasPalette) {
-				palette = LoadCachedResource(g_mw2PrjHandle, hasPalette, g_resourceTypeTags[c_resTagPal], 0);
-				if (palette) {
-					g_currentDisplayBackend->m_setPalette(0, 0x100, palette, 1);
-				}
-			}
-		}
+		// On a 256-color desktop in a window the original only loaded the mission's palette here.
+		DebugPrint("StartPalettes()\n");
+		StartPalettes(0);
 
 		g_drawModeReady = 1;
 		DebugPrint("InitDrawMode()\n");
@@ -378,9 +345,8 @@ int __stdcall SimMain(
 		}
 
 		g_mouseOutsideClientWindow = 0;
-		if (!g_refreshModeFallback) {
-			g_goLaunch |= 2;
-		}
+		// The original waited here for the refresh modes to be profiled.
+		g_goLaunch |= 2;
 
 		g_careerRecord.m_outcome = 1;
 		g_careerRecord.m_winner = -1;
@@ -419,25 +385,8 @@ int __stdcall SimMain(
 			UpdateLocalPlayer();
 			LateUpdateAllPlayers();
 			UpdateDebris();
-			if (g_refreshModeFallback) {
-				while (g_refreshModeFallback) {
-					if (g_currentDisplayBackend->m_id == 0) {
-						DdrawFill(0, 0, g_gameWindowWidth, g_gameWindowHeight, g_groundColor);
-					}
-
-					if ((g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1) == 0) {
-						g_renderSettings.m_frameDrawCallback();
-						DrawLocalPlayer();
-						UpdateMenus();
-						DrawTimedOverlays();
-						DrawDebugOverlays();
-					}
-
-					Blit();
-					ProfileRefreshModes();
-				}
-			}
-
+			// While the refresh modes were being profiled the original drew and timed frames here
+			// (ProfileRefreshModes).
 			if (g_goLaunch & 0x80000000) {
 				UpdateGeoCache();
 			}
@@ -445,10 +394,6 @@ int __stdcall SimMain(
 			AdvanceAnimations();
 			UpdatePaletteFade();
 			ApplyPendingPalette();
-			if (g_windowActive && g_currentDisplayBackend->m_id == 0) {
-				DdrawFill(0, 0, g_gameWindowWidth, g_gameWindowHeight, g_groundColor);
-			}
-
 			if ((g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1) == 0) {
 				g_renderSettings.m_frameDrawCallback();
 				DrawLocalPlayer();
@@ -531,7 +476,6 @@ int __stdcall SimMain(
 // FUNCTION: MW2 0x10067757
 LRESULT CALLBACK SimWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 {
-	WINDOWPOS* windowPos;
 
 	if (p_msg >= WM_KEYFIRST && p_msg <= WM_KEYLAST) {
 		HandleKeyboardMessages(p_msg, p_wParam, p_lParam);
@@ -547,41 +491,11 @@ LRESULT CALLBACK SimWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM 
 		g_windowActive = p_wParam;
 		if (g_windowActive == TRUE) {
 			KeyboardClearKeyStates();
-			if (g_desktopWidth <= 640 && g_desktopHeight <= 480) {
-				if (g_shouldToggleFullscreen == TRUE) {
-					ToggleFullScreen();
-					g_shouldToggleFullscreen = FALSE;
-					ShowWindow(g_gameWindow, SW_RESTORE);
-				}
-				else if (g_currentDisplayBackend && g_currentDisplayBackend->m_id == 1) {
-					ShowWindow(g_gameWindow, SW_SHOWNOACTIVATE);
-				}
-			}
-			else {
-				if (g_windowMode == c_windowModeFullscreen) {
-					ShowWindow(g_gameWindow, SW_RESTORE);
-				}
-			}
-		}
-		else {
-			if (g_desktopWidth <= 640 && g_desktopHeight <= 480) {
-				if (g_currentDisplayBackend && g_currentDisplayBackend->m_id == 0 &&
-					g_shouldToggleFullscreen == FALSE) {
-					ShowWindow(g_gameWindow, SW_MINIMIZE);
-					g_shouldToggleFullscreen = TRUE;
-					ToggleFullScreen();
-				}
-				else if (g_currentDisplayBackend && g_currentDisplayBackend->m_id == 1) {
-					ShowWindow(g_gameWindow, SW_HIDE);
-				}
-			}
-			else {
-				if (g_windowMode == c_windowModeFullscreen) {
-					ShowWindow(g_gameWindow, SW_MINIMIZE);
-				}
-			}
 		}
 
+		// The original also restored or minimized the window here when it was full screen, and on a
+		// 640x480 desktop left and returned to DirectDraw's full screen mode or showed and hid
+		// DisplayDib's window.
 		if (g_currentDisplayBackend) {
 			g_currentDisplayBackend->m_setPalette(0, 0x100, g_paletteColors, 1);
 		}
@@ -611,27 +525,8 @@ LRESULT CALLBACK SimWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM 
 			}
 		}
 		return 0;
-	case WM_WINDOWPOSCHANGING:
-		windowPos = (WINDOWPOS*) p_lParam;
-		if (g_windowedSwitchPending) {
-			LONG time;
-
-			time = GetMessageTime();
-			if (time > g_windowedSwitchDeadline &&
-				(g_windowedSwitchDeadline > g_windowedSwitchTime || time < g_windowedSwitchTime)) {
-				g_windowedSwitchPending = FALSE;
-			}
-			else {
-				windowPos->x = g_windowedRect.left;
-				windowPos->y = g_windowedRect.top;
-				windowPos->cx = g_windowedRect.right;
-				windowPos->cy = g_windowedRect.bottom;
-			}
-			return 0;
-		}
-		else {
-			break;
-		}
+	// For three seconds after DirectDraw switched to a window, the original's WM_WINDOWPOSCHANGING
+	// held the window at its windowed position and size.
 	case WM_QUERYNEWPALETTE:
 		if (g_currentDisplayBackend) {
 			g_currentDisplayBackend->m_setPalette(0, 0x100, g_paletteColors, 1);

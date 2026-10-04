@@ -254,14 +254,12 @@ void SecondRender(void)
 }
 
 // Draws the 3D view, the normal frame draw callback: clears the frame first when drawing to
-// another pane, updates the eyepoint, draws the scene (without the extra pass on the
-// DirectDraw backend), then the objects of the shapes of kinds 0x90 and 0xa0 with their own clip
-// distances, the scene's objects, and the animations.
+// another pane, updates the eyepoint, draws the scene, then the objects of the shapes of kinds
+// 0x90 and 0xa0 with their own clip distances, the scene's objects, and the animations.
 // FUNCTION: MW2 0x10012afe
 void DrawScene(void)
 {
 	MechS32 saved;
-	MechS32 pass;
 
 	if (g_framePane) {
 		memset(g_mainPixelBuffer.m_buffer, g_backgroundColor, g_refreshModePixelCount);
@@ -284,15 +282,9 @@ void DrawScene(void)
 		VFX_pane_wipe(&g_currentPane, g_backgroundColor);
 	}
 	else if (g_renderSettings.m_drawSky || g_renderSettings.m_drawGround) {
-		if (g_currentDisplayBackend->m_id == c_displayBackendDirectDraw) {
-			pass = g_renderSettings.m_drawGround;
-			g_renderSettings.m_drawGround = 0;
-			DrawSkyAndGround(g_eyepoint);
-			g_renderSettings.m_drawGround = pass;
-		}
-		else {
-			DrawSkyAndGround(g_eyepoint);
-		}
+		// On the DirectDraw back end the original left the ground out here: SimMain had filled
+		// the frame with the ground color.
+		DrawSkyAndGround(g_eyepoint);
 	}
 
 	if (g_hasLightObject && g_lightFollowsObject && g_lightObject != -1) {
