@@ -1,0 +1,54 @@
+; Import library for WAIL32.DLL (Miles Sound System): the functions MW2.DLL and
+; MW2SHELL.DLL import. The originals import the __stdcall-decorated names
+; (_AIL_startup@0 ...); LIB takes the decorations from wail32.c.
+LIBRARY wail32
+EXPORTS
+    _AIL_active_sample_count@4
+    _AIL_active_sequence_count@4
+    _AIL_allocate_file_sample@12
+    _AIL_allocate_sample_handle@4
+    _AIL_allocate_sequence_handle@4
+    _AIL_end_sample@4
+    _AIL_init_sample@4
+    _AIL_init_sequence@12
+    _AIL_load_sample_buffer@16
+    _AIL_lock_channel@4
+    _AIL_midiOutOpen@12
+    _AIL_minimum_sample_buffer_size@12
+    _AIL_register_EOS_callback@8
+    _AIL_register_timer@4
+    _AIL_release_channel@8
+    _AIL_release_sample_handle@4
+    _AIL_release_sequence_handle@4
+    _AIL_release_timer_handle@4
+    _AIL_resume_sample@4
+    _AIL_resume_sequence@4
+    _AIL_sample_buffer_ready@4
+    _AIL_sample_status@4
+    _AIL_sample_user_data@8
+    _AIL_send_channel_voice_message@20
+    _AIL_sequence_status@4
+    _AIL_serve@0
+    _AIL_set_preference@8
+    _AIL_set_sample_file@12
+    _AIL_set_sample_loop_count@8
+    _AIL_set_sample_pan@8
+    _AIL_set_sample_playback_rate@8
+    _AIL_set_sample_type@12
+    _AIL_set_sample_user_data@12
+    _AIL_set_sample_volume@8
+    _AIL_set_sequence_loop_count@8
+    _AIL_set_sequence_volume@12
+    _AIL_set_timer_divisor@8
+    _AIL_set_timer_period@8
+    _AIL_shutdown@0
+    _AIL_start_sample@4
+    _AIL_start_sequence@4
+    _AIL_start_timer@4
+    _AIL_startup@0
+    _AIL_stop_sample@4
+    _AIL_stop_sequence@4
+    _AIL_waveOutClose@4
+    _AIL_waveOutOpen@16
+    _FILE_read@8
+    _MEM_free_lock@4

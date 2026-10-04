@@ -1,0 +1,110 @@
+/* Miles Sound System (WAIL32.DLL) declarations: only what the game calls, with the types its
+   matched callers prove. There is no SDK in the tree; add functions here as callers are
+   decompiled. The import library is generated from wail32.def. */
+#ifndef MSS_H
+#define MSS_H
+
+#include <windows.h>
+// windows.h first: mmsystem.h depends on it
+#include <mmsystem.h>
+
+// The sample user data: 32-bit in this Miles, pointer-sized (SINTa) from later versions on. The game
+// keeps pointers there, so it is pointer-sized where pointers are wider than 32 bits.
+#if defined(_MSC_VER) && _MSC_VER < 1200
+#define SINTa int
+#else
+#include <stdint.h>
+#define SINTa intptr_t
+#endif
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#define AILCALL __stdcall
+#define AILIMPORT __declspec(dllimport)
+
+	typedef struct _MDI_DRIVER* HMDIDRIVER;
+	typedef struct _SEQUENCE* HSEQUENCE;
+	typedef struct _SAMPLE* HSAMPLE;
+	typedef struct _DIG_DRIVER* HDIGDRIVER;
+	typedef long HTIMER;
+
+#define SMP_PLAYING 4
+
+#define SEQ_DONE 2
+#define SEQ_PLAYING 4
+#define SEQ_STOPPED 8
+
+#define AILCALLBACK __stdcall
+	typedef void(AILCALLBACK* AILSAMPLECB)(HSAMPLE p_sample);
+	typedef void (*AILTIMERCB)(unsigned int p_user);
+
+	AILIMPORT void AILCALL AIL_startup(void);
+	AILIMPORT void AILCALL AIL_shutdown(void);
+
+	AILIMPORT int AILCALL AIL_midiOutOpen(HMDIDRIVER* p_driver, LPHMIDIOUT* p_midiOut, int p_deviceId);
+	AILIMPORT int AILCALL AIL_active_sequence_count(HMDIDRIVER p_driver);
+	AILIMPORT int AILCALL AIL_set_preference(unsigned int p_number, int p_value);
+	AILIMPORT int AILCALL AIL_lock_channel(HMDIDRIVER p_driver);
+	AILIMPORT void AILCALL AIL_release_channel(HMDIDRIVER p_driver, int p_channel);
+	AILIMPORT void AILCALL
+	AIL_send_channel_voice_message(HMDIDRIVER p_driver, HSEQUENCE p_sequence, int p_status, int p_data1, int p_data2);
+
+	AILIMPORT int AILCALL
+	AIL_waveOutOpen(HDIGDRIVER* p_driver, LPHWAVEOUT* p_waveOut, int p_deviceId, LPWAVEFORMAT p_format);
+	AILIMPORT void AILCALL AIL_waveOutClose(HDIGDRIVER p_driver);
+	AILIMPORT int AILCALL AIL_active_sample_count(HDIGDRIVER p_driver);
+
+	AILIMPORT HSEQUENCE AILCALL AIL_allocate_sequence_handle(HMDIDRIVER p_driver);
+	AILIMPORT void AILCALL AIL_release_sequence_handle(HSEQUENCE p_sequence);
+	AILIMPORT int AILCALL AIL_init_sequence(HSEQUENCE p_sequence, void* p_start, int p_sequenceNum);
+	AILIMPORT void AILCALL AIL_start_sequence(HSEQUENCE p_sequence);
+	AILIMPORT void AILCALL AIL_stop_sequence(HSEQUENCE p_sequence);
+	AILIMPORT void AILCALL AIL_resume_sequence(HSEQUENCE p_sequence);
+	AILIMPORT int AILCALL AIL_sequence_status(HSEQUENCE p_sequence);
+	AILIMPORT void AILCALL AIL_set_sequence_volume(HSEQUENCE p_sequence, int p_volume, int p_milliseconds);
+	AILIMPORT void AILCALL AIL_set_sequence_loop_count(HSEQUENCE p_sequence, int p_loopCount);
+
+	AILIMPORT HSAMPLE AILCALL AIL_allocate_sample_handle(HDIGDRIVER p_driver);
+	AILIMPORT void AILCALL AIL_release_sample_handle(HSAMPLE p_sample);
+	AILIMPORT void AILCALL AIL_init_sample(HSAMPLE p_sample);
+	AILIMPORT int AILCALL AIL_set_sample_file(HSAMPLE p_sample, void* p_fileImage, int p_block);
+	AILIMPORT void AILCALL AIL_start_sample(HSAMPLE p_sample);
+	AILIMPORT void AILCALL AIL_stop_sample(HSAMPLE p_sample);
+	AILIMPORT void AILCALL AIL_resume_sample(HSAMPLE p_sample);
+	AILIMPORT void AILCALL AIL_end_sample(HSAMPLE p_sample);
+	AILIMPORT unsigned int AILCALL AIL_sample_status(HSAMPLE p_sample);
+	AILIMPORT void AILCALL AIL_set_sample_volume(HSAMPLE p_sample, int p_volume);
+	AILIMPORT void AILCALL AIL_set_sample_loop_count(HSAMPLE p_sample, int p_loopCount);
+	AILIMPORT void AILCALL AIL_set_sample_pan(HSAMPLE p_sample, int p_pan);
+	AILIMPORT void AILCALL AIL_set_sample_playback_rate(HSAMPLE p_sample, int p_rate);
+	AILIMPORT void AILCALL AIL_set_sample_user_data(HSAMPLE p_sample, unsigned int p_index, SINTa p_value);
+	AILIMPORT SINTa AILCALL AIL_sample_user_data(HSAMPLE p_sample, unsigned int p_index);
+	AILIMPORT AILSAMPLECB AILCALL AIL_register_EOS_callback(HSAMPLE p_sample, AILSAMPLECB p_callback);
+	AILIMPORT HSAMPLE AILCALL AIL_allocate_file_sample(HDIGDRIVER p_driver, void* p_fileImage, int p_block);
+
+	AILIMPORT void AILCALL AIL_serve(void);
+
+	AILIMPORT HTIMER AILCALL AIL_register_timer(AILTIMERCB p_callback);
+	AILIMPORT void AILCALL AIL_set_timer_divisor(HTIMER p_timer, unsigned int p_divisor);
+	AILIMPORT void AILCALL AIL_set_timer_period(HTIMER p_timer, unsigned int p_microseconds);
+	AILIMPORT void AILCALL AIL_start_timer(HTIMER p_timer);
+	AILIMPORT void AILCALL AIL_release_timer_handle(HTIMER p_timer);
+
+	AILIMPORT int AILCALL AIL_minimum_sample_buffer_size(HDIGDRIVER p_driver, int p_rate, int p_format);
+	AILIMPORT void AILCALL AIL_set_sample_type(HSAMPLE p_sample, int p_format, unsigned int p_flags);
+	AILIMPORT int AILCALL AIL_sample_buffer_ready(HSAMPLE p_sample);
+	AILIMPORT void AILCALL
+	AIL_load_sample_buffer(HSAMPLE p_sample, unsigned int p_bufferNum, void* p_buffer, unsigned int p_size);
+
+	/* The original imports it under its Miles name (wail32.def: _MEM_free_lock@4). */
+	AILIMPORT void AILCALL MEM_free_lock(void* p_block);
+	AILIMPORT void* AILCALL FILE_read(const char* p_filename, void* p_dest);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* MSS_H */

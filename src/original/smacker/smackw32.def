@@ -1,0 +1,13 @@
+; Import library for SMACKW32.DLL (Smacker): the functions MW2SHELL.DLL imports. The original
+; imports them by ordinal; the ordinals and __cdecl names are those of SMACKW32.DLL's export table.
+LIBRARY smackw32
+EXPORTS
+    SmackClose @14 NONAME
+    SmackDoFrame @17 NONAME
+    SmackGetTrackData @19 NONAME
+    SmackGoto @20 NONAME
+    SmackNextFrame @21 NONAME
+    SmackOpen @22 NONAME
+    SmackSoundInTrack @25 NONAME
+    SmackToBuffer @28 NONAME
+    SmackWait @32 NONAME
