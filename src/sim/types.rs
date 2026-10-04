@@ -82,8 +82,7 @@ pub(super) struct DrawModeExtension {
     set_palette_func: *mut c_void,
     unknown1: *mut c_void,
     unknown2: *mut c_void,
-    /// Locks the display buffer for drawing; 0 on success. The GDI mode's
-    /// implementation is the one `drawmode::hooks` replaces as `swap_buffers`.
+    /// Locks the display buffer for drawing; 0 on success.
     pub lock_display_buffer_func: unsafe extern "stdcall" fn() -> i32,
     unknown3: u32,
 }

@@ -1,7 +1,7 @@
 use egui::Context;
 
 #[cfg(feature = "debug-overlay")]
-use crate::sim::drawmode::debug_overlay::DebugOverlay;
+use crate::sim::overlay::debug_overlay::DebugOverlay;
 
 pub struct OverlayUi {
     #[cfg(feature = "debug-overlay")]

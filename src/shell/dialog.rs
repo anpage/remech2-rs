@@ -9,7 +9,7 @@ use windows::Win32::{
 };
 
 use super::MODULE;
-use crate::shell::drawmode::confirm;
+use crate::shell::overlay::confirm;
 use crate::shell::screens::ShellMsg;
 
 const DECLINED: i32 = 1;

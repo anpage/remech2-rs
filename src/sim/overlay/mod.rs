@@ -1,5 +1,5 @@
 #[cfg(feature = "debug-overlay")]
 mod debug_overlay;
-mod overlay_ui;
+mod ui;
 
-pub use overlay_ui::OverlayUi;
+pub use ui::OverlayUi;

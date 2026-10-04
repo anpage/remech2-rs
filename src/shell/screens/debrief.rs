@@ -9,8 +9,8 @@ use super::{
     MissionResults, Pilot, Screen, ScreenArgs, ShellMsg, run,
 };
 use crate::shell::MODULE;
-use crate::shell::drawmode::confirm;
-use crate::shell::drawmode::mouse::G_CURRENT_MOUSE_STATE;
+use crate::shell::overlay::confirm;
+use crate::shell::overlay::mouse::G_CURRENT_MOUSE_STATE;
 use crate::shell::screens::{
     CAMPAIGN_LENGTH, G_CAMPAIGN_MISSIONS, SAVE_PILOTS, ScreenButton, ScreenLayout,
 };

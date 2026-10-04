@@ -20,12 +20,12 @@ use crate::ail::Ail;
 mod audio;
 mod database;
 mod dialog;
-mod drawmode;
+mod overlay;
 mod screens;
 mod smacker;
 mod win32;
 
-pub use drawmode::OverlayUi;
+pub use overlay::OverlayUi;
 
 pub static MODULE: ModuleBase = ModuleBase::new("MW2SHELL.DLL");
 
@@ -33,7 +33,7 @@ patch_groups! {
     static PATCH_GROUPS = [
         database,
         dialog,
-        drawmode::mouse,
+        overlay::mouse,
         screens::debrief,
         screens::debug,
         screens::main_menu,

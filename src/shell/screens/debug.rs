@@ -11,7 +11,7 @@ use windows::Win32::{
 
 use super::{Campaign, G_PILOT, G_SHELL_CALLBACK, MissionResults, ShellMsg};
 use crate::shell::MODULE;
-use crate::shell::drawmode::mouse::G_WINDOW;
+use crate::shell::overlay::mouse::G_WINDOW;
 use crate::shell::screens::debrief;
 
 pub const JUMP_TO_SCREEN: u32 = WM_APP + 0x100;

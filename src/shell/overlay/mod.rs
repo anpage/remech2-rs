@@ -1,6 +1,6 @@
 pub mod confirm;
 pub mod menu;
 pub mod mouse;
-mod overlay_ui;
+mod ui;
 
-pub use overlay_ui::OverlayUi;
+pub use ui::OverlayUi;

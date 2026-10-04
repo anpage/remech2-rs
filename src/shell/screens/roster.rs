@@ -12,8 +12,8 @@ use super::{
 };
 use crate::shell::MODULE;
 use crate::shell::audio::AUDIO_SAMPLE_DROP;
-use crate::shell::drawmode::mouse::G_CURRENT_MOUSE_STATE;
-use crate::shell::drawmode::{confirm, menu};
+use crate::shell::overlay::mouse::G_CURRENT_MOUSE_STATE;
+use crate::shell::overlay::{confirm, menu};
 
 globals!(
     /// The selected pilot's stats

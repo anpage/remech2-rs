@@ -18,7 +18,7 @@ use windows::Win32::{
 
 use crate::drawmode::fit_to_window;
 use crate::shell::dialog;
-use crate::shell::drawmode::{
+use crate::shell::overlay::{
     confirm, menu,
     mouse::{G_CURSOR_GRAPHIC, G_WINDOW, OverlayMouseState, update_global_mouse_state},
 };

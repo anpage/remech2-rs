@@ -28,12 +28,12 @@ use crate::{
 mod audio;
 mod camera;
 mod cd_audio;
-pub mod drawmode;
 mod hud;
 mod input;
 mod jumpjets;
 mod math;
 mod menu;
+mod overlay;
 mod shots;
 mod stats;
 mod ticks;
@@ -42,7 +42,7 @@ mod types;
 mod win32;
 pub mod window;
 
-pub use drawmode::OverlayUi;
+pub use overlay::OverlayUi;
 
 pub static MODULE: ModuleBase = ModuleBase::new("MW2.DLL");
 

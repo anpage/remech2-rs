@@ -4,7 +4,7 @@ use windows::{
     core::BOOL,
 };
 
-use crate::shell::{MODULE, drawmode::overlay_ui};
+use crate::shell::{MODULE, overlay::ui};
 
 const CURSOR_GRAPHIC_SIZE: usize = 423;
 
@@ -169,7 +169,7 @@ unsafe extern "fastcall" fn read_mouse_state(_mouse_state: *mut MouseState) {
 unsafe extern "stdcall" fn show_cursor(show: BOOL) -> i32 {
     tracing::trace!("ShowCursor called with show: {}", show.0);
 
-    overlay_ui::show_cursor(show.0 != 0);
+    ui::show_cursor(show.0 != 0);
 
     if show.0 == 0 { -1 } else { 1 }
 }
