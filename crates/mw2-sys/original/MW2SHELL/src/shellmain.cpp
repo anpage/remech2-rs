@@ -89,8 +89,6 @@ MechU8 g_pilotChosen;
 
 void PlayMidiSong(UINT p_msg, MechS32 p_campaign);
 void ParseCommandLineFlags(char* p_cmdLine);
-MechS32 LoadSettingsFromRegistry(MechU32* p_quickTips, MechS32* p_showDialog, MechS32* p_littleMovies);
-MechS32 SaveSettingsToRegistry(MechS32 p_quickTips, MechS32 p_showDialog, MechS32 p_littleMovies);
 BOOL CALLBACK LittleMoviesDialogProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
 void RunScreenFrame();
 void CloseMenuFunction();
@@ -474,7 +472,6 @@ extern "C" int __stdcall ShellMain(
 		SetMenu(g_gameWindow, g_windowMenu);
 	}
 
-	LoadSettingsFromRegistry(&g_quickTips, &g_showDialog, &g_littleMovies);
 	if (!fromSim) {
 		PlayFullscreenVideo("mintro", c_msgMainMenu, c_msgMainMenu);
 	}
@@ -544,7 +541,6 @@ extern "C" int __stdcall ShellMain(
 
 	SendMessage(g_gameWindow, c_msgActivateLauncher, 0, 0);
 	SetMenu(g_gameWindow, NULL);
-	SaveSettingsToRegistry(g_quickTips, g_showDialog, g_littleMovies);
 	g_videoDriver->ActivateFramebuffer();
 
 	if (g_menuFunction) {
@@ -732,105 +728,6 @@ void DisableShellMenu(HMENU p_menu)
 	result = EnableMenuItem(p_menu, c_menuMoviePlayback, MF_GRAYED);
 	result = EnableMenuItem(p_menu, c_menuKeshik, MF_GRAYED);
 	result = DrawMenuBar(g_gameWindow);
-}
-
-// Stack-slot permutation: value and result swap [ebp-N] slots with the original.
-// FUNCTION: MW2SHELL 0x100103e2
-MechS32 LoadSettingsFromRegistry(MechU32* p_quickTips, MechS32* p_showDialog, MechS32* p_littleMovies)
-{
-	DWORD size;
-	MechS32 value;
-	MechS32 result;
-	HKEY key;
-	DWORD type;
-
-	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Activision\\MechWarrior 2\\1.0", 0, KEY_QUERY_VALUE, &key);
-	if (result != 0) {
-		DebugPrint("Could not open registry MechWarrior2 key: %d\n", result);
-		return 0;
-	}
-
-	size = 4;
-	type = 4;
-	result = RegQueryValueEx(key, "QuickTips", NULL, &type, (LPBYTE) &value, &size);
-	if (result == 0) {
-		*p_quickTips = value;
-	}
-	else {
-		*p_quickTips = 1;
-	}
-
-	size = 4;
-	type = 4;
-	result = RegQueryValueEx(key, "ShowDialog", NULL, &type, (LPBYTE) &value, &size);
-	if (result == 0) {
-		*p_showDialog = value;
-	}
-	else {
-		*p_showDialog = 1;
-	}
-
-	size = 4;
-	type = 4;
-	result = RegQueryValueEx(key, "LittleMovies", NULL, &type, (LPBYTE) &value, &size);
-	if (result == 0 && value != -1) {
-		*p_littleMovies = value;
-	}
-	else {
-		*p_littleMovies = 1;
-	}
-
-	RegCloseKey(key);
-	return (MechU8) (result == 0);
-}
-
-// Stack-slot permutation: value and result swap [ebp-N] slots with the original.
-// FUNCTION: MW2SHELL 0x1001053e
-MechS32 SaveSettingsToRegistry(MechS32 p_quickTips, MechS32 p_showDialog, MechS32 p_littleMovies)
-{
-	MechS32 result;
-	MechS32 value;
-	HKEY key;
-
-	result = RegCreateKeyEx(
-		HKEY_LOCAL_MACHINE,
-		"Software\\Activision\\MechWarrior 2\\1.0",
-		0,
-		NULL,
-		0,
-		KEY_ALL_ACCESS,
-		NULL,
-		&key,
-		(LPDWORD) &value
-	);
-	if (result != 0) {
-		DebugPrint("Could not open registry MechWarrior2 key: %d\n", result);
-		return 0;
-	}
-
-	value = p_quickTips;
-	result = RegSetValueEx(key, "QuickTips", 0, REG_DWORD, (const BYTE*) &value, 4);
-	if (result != 0) {
-		DebugPrint("Could not save quickTips registry MechWarrior2 key: %d\n", result);
-		return 0;
-	}
-
-	value = p_showDialog;
-	result = RegSetValueEx(key, "ShowDialog", 0, REG_DWORD, (const BYTE*) &value, 4);
-	if (result != 0) {
-		DebugPrint("Could not save showDialog registry MechWarrior2 key: %d\n", result);
-		return 0;
-	}
-
-	value = p_littleMovies;
-	result = RegSetValueEx(key, "LittleMovies", 0, REG_DWORD, (const BYTE*) &value, 4);
-	if (result != 0) {
-		DebugPrint("Could not save littleMovies registry MechWarrior2 key: %d\n", result);
-		return 0;
-	}
-
-	RegCloseKey(key);
-	return (MechU8) (result == 0);
 }
 
 // FUNCTION: MW2SHELL 0x1001067f

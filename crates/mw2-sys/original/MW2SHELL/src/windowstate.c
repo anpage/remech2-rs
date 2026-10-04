@@ -22,10 +22,10 @@ MechS32 g_windowActive = 1;
 MechS32 g_paused = 0;
 
 // GLOBAL: MW2SHELL 0x1006a9dc
-MechU32 g_quickTips = 1;
+MechU32 g_quickTips = 0;
 
 // GLOBAL: MW2SHELL 0x1006a9e0
-MechS32 g_showDialog = 1;
+MechS32 g_showDialog = 0;
 
 // GLOBAL: MW2SHELL 0x1006a9e4
 MechS32 g_menuVisible = 0;

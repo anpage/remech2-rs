@@ -66,8 +66,6 @@ features = [
     "Win32_System_LibraryLoader",
     "Win32_UI_WindowsAndMessaging",
     "Win32_Media_Audio",
-    "Win32_System_Registry",
-    "Win32_Security",
     "Win32_System_Memory",
     "Win32_Media_Multimedia",
     "Win32_Storage_FileSystem",

@@ -21,7 +21,6 @@ mod audio;
 mod database;
 mod dialog;
 mod drawmode;
-mod registry;
 mod screens;
 mod smacker;
 mod win32;
@@ -36,7 +35,6 @@ patch_groups! {
         database,
         dialog,
         drawmode::hooks,
-        registry,
         screens::debrief,
         screens::debug,
         screens::main_menu,
