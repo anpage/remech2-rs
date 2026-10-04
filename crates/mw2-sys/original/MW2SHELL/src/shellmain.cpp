@@ -13,6 +13,7 @@
 #include "decomp.h"
 #include "font.h"
 #include "formation.h"
+#include "app.h"
 #include "hallofhonor.h"
 #include "keyboard.h"
 #include "keyboardinput.h"
@@ -20,6 +21,7 @@
 #include "mechbay.h"
 #include "mechvariant.h"
 #include "menudata.h"
+#include "messages.h"
 #include "midisequence.h"
 #include "missionui.h"
 #include "mousestate.h"
@@ -92,20 +94,20 @@ BOOL CALLBACK LittleMoviesDialogProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, L
 void RunScreenFrame();
 void CloseMenuFunction();
 
+// The shell's message handler, originally its window procedure (ShellWindowProc).
 // FUNCTION: MW2SHELL 0x1000e670
-extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
+static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
-	UINT msg;
+	MechU32 msg;
 	MechS32 mouseY;
-	PAINTSTRUCT paint;
 
-	if (p_msg >= WM_KEYFIRST && p_msg <= WM_KEYLAST) {
+	if (p_msg >= c_mechMsgKeyFirst && p_msg <= c_mechMsgKeyLast) {
 		HandleKeyboardMessages(p_msg, p_wParam, p_lParam);
 		return 0;
 	}
 
 	switch (p_msg) {
-	case WM_ACTIVATEAPP:
+	case c_mechMsgActivateApp:
 		g_windowActive = p_wParam;
 		if (g_windowActive) {
 			if (IsFullscreenVideoPlaying()) {
@@ -115,8 +117,6 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 			if (g_midiBackgroundMusic) {
 				g_midiBackgroundMusic->Start();
 			}
-
-			SetFocus(g_gameWindow);
 		}
 		else {
 			if (IsFullscreenVideoPlaying()) {
@@ -128,49 +128,23 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 			}
 		}
 		return 0;
-	case WM_PALETTECHANGED:
-		if (g_gameWindow == p_hWnd) {
-			return 0;
-		}
-	case WM_QUERYNEWPALETTE:
-		if (g_videoDriver) {
-			g_videoDriver->UpdatePalette();
-			if (g_drawFmv) {
-				g_videoDriver->ExpandRectBySize(0, 0, 320, 200);
-				g_videoDriver->DrawFmv();
-			}
-			else {
-				g_videoDriver->ExpandRectBySize(0, 0, 640, 480);
-				g_videoDriver->DrawShell();
-			}
-			return 1;
-		}
-		else {
-			return 0;
-		}
-	case WM_PAINT:
-		BeginPaint(p_hWnd, &paint);
+	// On WM_PALETTECHANGED and WM_QUERYNEWPALETTE the original reloaded the palette and redrew
+	// the whole screen.
+	case c_mechMsgPaint:
+		// The original redrew only the rectangle Windows asked for.
 		if (g_videoDriver) {
 			if (g_drawFmv) {
 				g_videoDriver->ExpandRectBySize(0, 0, 320, 200);
 				g_videoDriver->DrawFmv();
 			}
 			else {
-				g_videoDriver
-					->ExpandRect(paint.rcPaint.left, paint.rcPaint.top, paint.rcPaint.right, paint.rcPaint.bottom);
+				g_videoDriver->ExpandRect(0, 0, 640, 480);
 				g_videoDriver->DrawShell();
 			}
 		}
-		EndPaint(p_hWnd, &paint);
 		return 0;
-	case WM_NCMOUSEMOVE:
-		if (g_cursorHidden) {
-			while (ShowCursor(TRUE) < 0)
-				;
-			g_cursorHidden = FALSE;
-		}
-		return 0;
-	case WM_MOUSEMOVE:
+	// On WM_NCMOUSEMOVE the original showed the cursor again if a movie had hidden it.
+	case c_mechMsgMouseMove:
 		if (IsFullscreenVideoPlaying() && !g_cursorHidden) {
 			while (ShowCursor(FALSE) >= 0)
 				;
@@ -179,22 +153,22 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 
 		mouseY = ((MechU32) p_lParam >> 16) & 0xffff;
 		if (g_menuVisible && g_windowMode == 1 && mouseY > 2) {
-			SetMenu(p_hWnd, NULL);
+			SetMenu(g_gameWindow, NULL);
 			g_menuVisible = FALSE;
 		}
 		else if (
 			g_windowMode == 1 && !g_menuVisible && !IsFullscreenVideoPlaying() && GetSystemMetrics(SM_CYMENU) >= mouseY
 		) {
-			SetMenu(p_hWnd, g_windowMenu);
+			SetMenu(g_gameWindow, g_windowMenu);
 			g_menuVisible = TRUE;
 			g_videoDriver->ExpandRect(0, 0, 640, 480);
 			g_videoDriver->DrawShell();
 		}
 		return 0;
-	case WM_DESTROY:
-		PostQuitMessage(0);
+	case c_mechMsgDestroy:
+		MechPostMessage(c_mechMsgQuit, 0, 0);
 		return 0;
-	case WM_COMMAND:
+	case c_mechMsgCommand:
 		if (IsFullscreenVideoPlaying()) {
 			CloseVideo(0);
 		}
@@ -206,7 +180,7 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 				g_screenFunction(g_mw2Database, &g_selectedCampaign, &g_pilotChosen, &g_scenario, c_msgMainMenu);
 			}
 			else {
-				PostMessage(g_gameWindow, c_msgMainMenu, c_msgMainMenu, 0);
+				MechPostMessage(c_msgMainMenu, c_msgMainMenu, 0);
 			}
 			break;
 		case c_menuHallOfHonor:
@@ -228,7 +202,7 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 					g_screenFunction(g_mw2Database, &g_selectedCampaign, &g_pilotChosen, &g_scenario, c_msgQuit);
 				}
 				else {
-					PostMessage(g_gameWindow, c_msgQuit, 0, 0);
+					MechPostMessage(c_msgQuit, 0, 0);
 				}
 				g_menuDialogOpen = TRUE;
 			}
@@ -337,11 +311,11 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 
 		if (g_runSim) {
 			WriteSimHandoff(msg, g_selectedCampaign, g_pilotChosen, g_scenario);
-			PostQuitMessage(c_msgQuitToSim);
+			MechPostMessage(c_mechMsgQuit, c_msgQuitToSim, 0);
 			return 0;
 		}
 		else {
-			PostMessage(p_hWnd, msg, c_msgLaunchSim, 0);
+			MechPostMessage(msg, c_msgLaunchSim, 0);
 		}
 		break;
 	case c_msgDebrief:
@@ -385,10 +359,10 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 		break;
 	case c_msgQuit:
 		WriteSimHandoff(c_msgQuit, g_selectedCampaign, g_pilotChosen, "exittos");
-		PostQuitMessage(c_msgQuit);
+		MechPostMessage(c_mechMsgQuit, c_msgQuit, 0);
 		return 0;
 	default:
-		return DefWindowProc(p_hWnd, p_msg, p_wParam, p_lParam);
+		return 0;
 	}
 
 	if (g_midiAudio) {
@@ -400,19 +374,14 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 
 // Matches except for the stack slots of itemData, unk0x14 and itemSize (a consistent
 // permutation that VC++ 4.1 doesn't reproduce from this source).
+// The original was WinMain-shaped, with the module, the command line and the launcher's window.
 // FUNCTION: MW2SHELL 0x1000f35e
-extern "C" int __stdcall ShellMain(
-	HINSTANCE p_hInstance,
-	HINSTANCE p_hPrevInstance,
-	char* p_cmdLine,
-	int p_cmdShow,
-	HWND p_hWnd
-)
+extern "C" int ShellMain(char* p_cmdLine)
 {
 	void* itemData = NULL;
 	MechS32 unk0x14 = c_msgQuit;
 	MechS32 itemSize;
-	MSG msg;
+	MechMessage msg;
 	BOOL fromSim = FALSE;
 
 	g_primaryHeap = MechHeapCreate();
@@ -420,9 +389,6 @@ extern "C" int __stdcall ShellMain(
 		MessageBox(NULL, "Insufficient memory available.", g_windowClassName, MB_ICONEXCLAMATION);
 		return 0xff;
 	}
-
-	g_module = p_hInstance;
-	g_gameWindow = p_hWnd;
 
 	if (*p_cmdLine == '\0') {
 		g_digitalAudio = 0;
@@ -492,16 +458,21 @@ extern "C" int __stdcall ShellMain(
 		g_cursorHidden = TRUE;
 	}
 
-	SendMessage(g_gameWindow, c_msgActivateShell, 0, 0);
+	// The original sent the launcher's window c_msgActivateShell, to have it pass its messages to
+	// ShellWindowProc. Windows then told it whether the window was active.
+	while (MechPeekMessage(&msg, 0, 0, TRUE)) {
+	}
+	MechSetMessageHandler(ShellHandleMessage);
+	MechSendMessage(c_mechMsgActivateApp, MechAppActive(), 0);
 
 	for (;;) {
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			if (msg.message == WM_QUIT) {
+		MechAppPump();
+		if (MechPeekMessage(&msg, 0, 0, TRUE)) {
+			if (msg.m_message == c_mechMsgQuit) {
 				break;
 			}
 
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			MechSendMessage(msg.m_message, msg.m_wParam, msg.m_lParam);
 		}
 
 		if (g_windowActive) {
@@ -516,7 +487,9 @@ extern "C" int __stdcall ShellMain(
 		}
 	}
 
-	SendMessage(g_gameWindow, c_msgActivateLauncher, 0, 0);
+	// The original sent the launcher's window c_msgActivateLauncher, to have it handle its own
+	// messages again.
+	MechSetMessageHandler(NULL);
 	SetMenu(g_gameWindow, NULL);
 	g_videoDriver->ActivateFramebuffer();
 
@@ -540,7 +513,7 @@ extern "C" int __stdcall ShellMain(
 	MechHeapDestroy(g_primaryHeap);
 	g_primaryHeap = NULL;
 
-	if (msg.wParam == c_msgQuitToSim) {
+	if (msg.m_wParam == c_msgQuitToSim) {
 		return 3;
 	}
 	else {
@@ -549,24 +522,26 @@ extern "C" int __stdcall ShellMain(
 }
 
 // Handles one pending message, waiting for one while the window is inactive. Returns 0 on
-// WM_QUIT (posting it again), 1 otherwise.
+// c_mechMsgQuit (posting it again), 1 otherwise.
 // FUNCTION: MW2SHELL 0x1000fe0d
 MechS32 PumpMessage()
 {
-	MSG msg;
+	MechMessage msg;
 
 	if (!g_windowActive) {
-		WaitMessage();
+		MechAppWait();
+	}
+	else {
+		MechAppPump();
 	}
 
-	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-		if (msg.message == WM_QUIT) {
-			PostQuitMessage(msg.wParam);
+	if (MechPeekMessage(&msg, 0, 0, TRUE)) {
+		if (msg.m_message == c_mechMsgQuit) {
+			MechPostMessage(c_mechMsgQuit, msg.m_wParam, 0);
 			return 0;
 		}
 		else {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			MechSendMessage(msg.m_message, msg.m_wParam, msg.m_lParam);
 		}
 	}
 

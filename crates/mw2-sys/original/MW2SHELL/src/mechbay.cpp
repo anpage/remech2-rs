@@ -13,6 +13,7 @@
 #include "mechvariant.h"
 #include "menudata.h"
 #include "menuscreen.h"
+#include "messages.h"
 #include "missionui.h"
 #include "mousestate.h"
 #include "options.h"
@@ -3994,7 +3995,7 @@ done:
 		delete g_acceptSound;
 		delete g_variantSound;
 		delete g_mechBayMenu;
-		PostMessage(g_gameWindow, p_msg, c_msgMechBay, 0);
+		MechPostMessage(p_msg, c_msgMechBay, 0);
 		UnregisterScreenFunction(MechBayCallback);
 	}
 }

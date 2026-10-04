@@ -9,6 +9,7 @@
 #include "mainmenubutton.h"
 #include "menudata.h"
 #include "menuscreen.h"
+#include "messages.h"
 #include "mousestate.h"
 #include "page.h"
 #include "pilotrecord.h"
@@ -111,7 +112,7 @@ void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, MechS32 p_campai
 
 	g_briefingPage = (Page*) CollectionGet(g_briefingPages, 0);
 	if (!g_briefingPage) {
-		PostMessage(g_gameWindow, c_msgLaunchSim, c_msgBriefing, 0);
+		MechPostMessage(c_msgLaunchSim, c_msgBriefing, 0);
 		return;
 	}
 
@@ -222,7 +223,7 @@ done:
 		g_situationReader = NULL;
 		delete g_briefingPage;
 		delete g_briefingMenu;
-		PostMessage(g_gameWindow, p_msg, c_msgBriefing, 0);
+		MechPostMessage(p_msg, c_msgBriefing, 0);
 		UnregisterScreenFunction(BriefingCallback);
 	}
 }

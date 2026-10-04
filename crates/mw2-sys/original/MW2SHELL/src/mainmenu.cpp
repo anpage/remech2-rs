@@ -10,6 +10,7 @@
 #include "mechvariant.h"
 #include "menudata.h"
 #include "menuscreen.h"
+#include "messages.h"
 #include "mousestate.h"
 #include "mss.h"
 #include "options.h"
@@ -142,7 +143,7 @@ done:
 		delete g_mainMenuIntro;
 		g_mainMenuIntro = NULL;
 		g_mainMenuMusicStarted = 0;
-		PostMessage(g_gameWindow, p_msg, c_msgMainMenu, 0);
+		MechPostMessage(p_msg, c_msgMainMenu, 0);
 		UnregisterScreenFunction(MainMenuCallback);
 	}
 }

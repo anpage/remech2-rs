@@ -1,6 +1,6 @@
 mod renderer;
 
-use std::{cell::RefCell, sync::Arc, thread, time::Duration};
+use std::{cell::RefCell, ffi::c_int, process::exit, sync::Arc, thread, time::Duration};
 
 use anyhow::{Result, bail};
 use winit::{
@@ -13,7 +13,9 @@ use winit::{
     window::{Fullscreen, Window, WindowId},
 };
 
-use crate::settings::SETTINGS;
+use mw2_sys::shared::c_mechMsgActivateApp;
+
+use crate::{messages, settings::SETTINGS};
 
 pub use renderer::Frame;
 use renderer::Renderer;
@@ -63,9 +65,16 @@ impl App {
     /// Handles the window events that are waiting, without blocking.
     /// Returns whether the window was closed and the caller should quit.
     pub fn pump(&mut self) -> bool {
-        let status = self
-            .event_loop
-            .pump_app_events(Some(Duration::ZERO), &mut self.state);
+        self.pump_events(Some(Duration::ZERO))
+    }
+
+    /// Like `pump`, but waits for an event first
+    pub fn wait(&mut self) -> bool {
+        self.pump_events(None)
+    }
+
+    fn pump_events(&mut self, timeout: Option<Duration>) -> bool {
+        let status = self.event_loop.pump_app_events(timeout, &mut self.state);
         if matches!(status, PumpStatus::Exit(_)) {
             self.state.quit = true;
         }
@@ -88,6 +97,7 @@ struct State {
     egui_ctx: egui::Context,
     egui_input: Option<egui_winit::State>,
     modifiers: ModifiersState,
+    focused: bool,
     quit: bool,
     error: Option<anyhow::Error>,
 }
@@ -100,6 +110,7 @@ impl State {
             egui_ctx: egui::Context::default(),
             egui_input: None,
             modifiers: ModifiersState::empty(),
+            focused: false,
             quit: false,
             error: None,
         }
@@ -193,6 +204,10 @@ impl ApplicationHandler for State {
 
         match event {
             WindowEvent::CloseRequested => self.quit = true,
+            WindowEvent::Focused(focused) => {
+                self.focused = focused;
+                messages::post(c_mechMsgActivateApp as u32, focused.into(), 0);
+            }
             WindowEvent::Resized(size) => {
                 if let Some(renderer) = &mut self.renderer {
                     renderer.resize(size.width, size.height);
@@ -212,4 +227,23 @@ impl ApplicationHandler for State {
             _ => {}
         }
     }
+}
+
+#[unsafe(export_name = "MechAppPump")]
+pub extern "C" fn pump() {
+    if with(App::pump) == Some(true) {
+        exit(0);
+    }
+}
+
+#[unsafe(export_name = "MechAppWait")]
+pub extern "C" fn wait() {
+    if with(App::wait) == Some(true) {
+        exit(0);
+    }
+}
+
+#[unsafe(export_name = "MechAppActive")]
+pub extern "C" fn active() -> c_int {
+    with(|app| app.state.focused).unwrap_or(false).into()
 }

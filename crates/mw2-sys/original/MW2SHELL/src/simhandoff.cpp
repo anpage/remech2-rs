@@ -3,6 +3,7 @@
 #include "decomp.h"
 #include "files.h"
 #include "mechvariant.h"
+#include "messages.h"
 #include "pilotrecord.h"
 #include "refreshmode.h"
 #include "shellglobals.h"
@@ -60,7 +61,7 @@ void ReadSimHandoff(BOOL p_fromSim, MechS32* p_campaign, MechU8* p_pilotChosen, 
 	RestoreStars();
 
 	if (p_fromSim) {
-		PostMessage(g_gameWindow, g_simHandoff.m_msg, c_msgLaunchSim, 0);
+		MechPostMessage(g_simHandoff.m_msg, c_msgLaunchSim, 0);
 	}
 	else {
 		*p_campaign = 2;

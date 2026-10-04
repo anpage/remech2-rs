@@ -7,6 +7,7 @@
 #include "mainmenubutton.h"
 #include "menudata.h"
 #include "menuscreen.h"
+#include "messages.h"
 #include "missionui.h"
 #include "mousestate.h"
 #include "refreshmode.h"
@@ -182,7 +183,7 @@ done:
 		g_trainerTake = 0;
 		g_trainerIdleCountdown = -1;
 		g_trainingButtonsShown = 0;
-		PostMessage(g_gameWindow, p_msg, c_msgCadetTraining, 0);
+		MechPostMessage(p_msg, c_msgCadetTraining, 0);
 		UnregisterScreenFunction(CadetTrainingCallback);
 	}
 }

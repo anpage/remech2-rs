@@ -11,6 +11,7 @@
 #include "mechchassis.h"
 #include "mechvariant.h"
 #include "menudata.h"
+#include "messages.h"
 #include "mousestate.h"
 #include "projectarchive.h"
 #include "refreshmode.h"
@@ -660,7 +661,7 @@ done:
 		g_videoDriver->ClearGlyphs(TRUE);
 		g_simHandoff.m_briefingMission = g_briefingMission;
 		g_briefingTipsShown = 0;
-		PostMessage(g_gameWindow, p_msg, c_msgTrials, 0);
+		MechPostMessage(p_msg, c_msgTrials, 0);
 		UnregisterScreenFunction(MissionBriefingCallback);
 	}
 }

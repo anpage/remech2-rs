@@ -11,6 +11,7 @@
 #include "mechchassis.h"
 #include "menudata.h"
 #include "menuscreen.h"
+#include "messages.h"
 #include "mousestate.h"
 #include "pilotrecord.h"
 #include "projectarchive.h"
@@ -826,7 +827,7 @@ done:
 		CloseAllVideos();
 		g_videoDriver->ClearGlyphs(TRUE);
 		g_starTipShown = 0;
-		PostMessage(g_gameWindow, p_msg, c_msgStarConfig, 0);
+		MechPostMessage(p_msg, c_msgStarConfig, 0);
 		UnregisterScreenFunction(StarConfigCallback);
 	}
 }

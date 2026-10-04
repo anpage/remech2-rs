@@ -12,6 +12,7 @@
 #include "mechvariant.h"
 #include "menudata.h"
 #include "menuscreen.h"
+#include "messages.h"
 #include "missionui.h"
 #include "mousestate.h"
 #include "options.h"
@@ -506,7 +507,7 @@ done:
 		delete g_rosterMenu;
 		delete g_rosterSound;
 		HidePilotCallsigns();
-		PostMessage(g_gameWindow, p_msg, c_msgPilotRoster, 0);
+		MechPostMessage(p_msg, c_msgPilotRoster, 0);
 		UnregisterScreenFunction(PilotRosterCallback);
 	}
 }

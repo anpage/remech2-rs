@@ -12,6 +12,7 @@
 #include "mechvariant.h"
 #include "menudata.h"
 #include "menuscreen.h"
+#include "messages.h"
 #include "missionui.h"
 #include "mousestate.h"
 #include "options.h"
@@ -253,7 +254,7 @@ done:
 		}
 		g_readyRoomSound = NULL;
 		g_readyRoomTipsShown = 0;
-		PostMessage(g_gameWindow, p_msg, c_msgReadyRoom, 0);
+		MechPostMessage(p_msg, c_msgReadyRoom, 0);
 		UnregisterScreenFunction(ReadyRoomCallback);
 	}
 }

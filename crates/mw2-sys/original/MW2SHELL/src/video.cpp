@@ -7,6 +7,7 @@
 #include "fmvslot.h"
 #include "keyboardinput.h"
 #include "loopingmovie.h"
+#include "messages.h"
 #include "mousestate.h"
 #include "mss.h"
 #include "readfile.h"
@@ -80,7 +81,7 @@ void FullscreenVideoCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32
 			msg = p_msg;
 		}
 
-		PostMessage(g_gameWindow, msg, g_fullscreenVideoWParam, 0);
+		MechPostMessage(msg, g_fullscreenVideoWParam, 0);
 		g_fullscreenVideoMsg = g_fullscreenVideoWParam = c_msgScreenFrame;
 		g_drawFmv = FALSE;
 	}
@@ -94,7 +95,7 @@ MechS32 BeginFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam
 	CloseAllVideos();
 	result = PlayVideo(0, p_name, 0, 0, 0x1000, 0);
 	if (result == -1) {
-		PostMessage(g_gameWindow, p_msg, p_wParam, 0);
+		MechPostMessage(p_msg, p_wParam, 0);
 		return 0;
 	}
 

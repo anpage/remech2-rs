@@ -6,7 +6,7 @@
 
 #include <windows.h>
 
-// The shell's window messages. ShellWindowProc opens the screen of each; the screen functions get
+// The shell's messages. Its message handler opens the screen of each; the screen functions get
 // them as p_msg (c_msgScreenFrame on every frame) and the screen they come from as p_wParam.
 enum ShellMessage {
 	c_msgQuitToSim = 0x401,   // ShellMain's exit code: run the simulator
@@ -27,9 +27,7 @@ enum ShellMessage {
 	c_msgStarConfig = 0x413,
 	c_msgCadetTraining = 0x414,
 	c_msgLandingVideo = 0x415,     // a clan's landing video, before its clan hall
-	c_msgEndingVideo = 0x416,      // the campaign's ending video
-	c_msgActivateLauncher = 0x41e, // hands the window back to MECH2.EXE
-	c_msgActivateShell = 0x420     // routes the window's messages to ShellWindowProc
+	c_msgEndingVideo = 0x416       // the campaign's ending video
 };
 
 // The shell menu's commands (menu 104)
@@ -47,7 +45,7 @@ enum ShellMenuCommand {
 };
 
 // The functions and globals of shellmain.cpp that other units use.
-extern "C" int __stdcall ShellMain(HINSTANCE p_hInstance, HINSTANCE p_hPrevInstance, char* p_cmdLine, int p_cmdShow, HWND p_hWnd);
+extern "C" int ShellMain(char* p_cmdLine);
 MechS32 PumpMessage();
 void EnableShellMenu(HMENU p_menu);
 void DisableShellMenu(HMENU p_menu);

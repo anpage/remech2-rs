@@ -15,6 +15,7 @@
 #include "mechvariant.h"
 #include "menudata.h"
 #include "menuscreen.h"
+#include "messages.h"
 #include "mousestate.h"
 #include "options.h"
 #include "page.h"
@@ -863,7 +864,7 @@ done:
 		}
 		g_aftermathReader = NULL;
 		g_videoDriver->ClearGlyphs(TRUE);
-		PostMessage(g_gameWindow, p_msg, c_msgDebrief, 0);
+		MechPostMessage(p_msg, c_msgDebrief, 0);
 		UnregisterScreenFunction(MissionDebriefCallback);
 	}
 }

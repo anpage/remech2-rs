@@ -9,6 +9,7 @@
 #include "mainmenubutton.h"
 #include "menudata.h"
 #include "menuscreen.h"
+#include "messages.h"
 #include "mousestate.h"
 #include "page.h"
 #include "refreshmode.h"
@@ -105,13 +106,13 @@ void ArchiveCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg)
 		g_archiveSound = NULL;
 
 		if (p_msg == c_msgQuit) {
-			PostMessage(g_gameWindow, c_msgQuit, c_msgArchive, 0);
+			MechPostMessage(c_msgQuit, c_msgArchive, 0);
 		}
 		else if (p_msg == c_msgReaderBack || p_msg == c_msgReaderExit) {
-			PostMessage(g_gameWindow, g_archiveReturnMessage, c_msgArchive, 0);
+			MechPostMessage(g_archiveReturnMessage, c_msgArchive, 0);
 		}
 		else {
-			PostMessage(g_gameWindow, p_msg, c_msgArchive, 0);
+			MechPostMessage(p_msg, c_msgArchive, 0);
 		}
 		UnregisterScreenFunction(ArchiveCallback);
 	}

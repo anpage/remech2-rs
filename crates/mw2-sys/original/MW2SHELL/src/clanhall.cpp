@@ -9,6 +9,7 @@
 #include "mechvariant.h"
 #include "menudata.h"
 #include "menuscreen.h"
+#include "messages.h"
 #include "mousestate.h"
 #include "options.h"
 #include "pilotrecord.h"
@@ -265,7 +266,7 @@ done:
 			}
 		}
 		else {
-			PostMessage(g_gameWindow, p_msg, c_msgClanHall, 0);
+			MechPostMessage(p_msg, c_msgClanHall, 0);
 		}
 	}
 }
