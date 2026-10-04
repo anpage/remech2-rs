@@ -3,10 +3,25 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use bindgen::callbacks::{ItemInfo, ParseCallbacks};
+
 const SYSTEM_TYPES: &str = "HWND|HWND__|HINSTANCE|HINSTANCE__|HANDLE|BITMAPINFOHEADER|tagBITMAPINFOHEADER|\
                            RGBQUAD|tagRGBQUAD|FILE|_iobuf|BOOL|BYTE|WORD|DWORD|LONG|LONG_PTR|UINT|UINT_PTR|\
                            WPARAM|LPARAM";
 const SHARED_FILES: &str = ".*/original/(util|common|mss|smacker)/.*";
+
+const NAMES_PREFIX: &str = "Sim_";
+
+/// Drops [`NAMES_PREFIX`] from the bindings, which have a Rust module per game module to keep the names apart.
+/// The items still link against the prefixed symbols.
+#[derive(Debug)]
+struct StripNamesPrefix;
+
+impl ParseCallbacks for StripNamesPrefix {
+    fn item_name(&self, item: ItemInfo) -> Option<String> {
+        item.name.strip_prefix(NAMES_PREFIX).map(str::to_owned)
+    }
+}
 
 fn main() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("original");
@@ -42,12 +57,15 @@ fn main() {
 fn shared_bindings(common: &[PathBuf]) {
     let out = PathBuf::from(env::var("OUT_DIR").unwrap());
     let wrapper = out.join("shared.h");
-    let headers: String = std::iter::once("#include <stdio.h>\n".to_owned()).chain(common
-        .iter()
-        .flat_map(|dir| fs::read_dir(dir).unwrap())
-        .map(|e| e.unwrap().path())
-        .filter(|p| p.extension().is_some_and(|e| e == "h"))
-        .map(|p| format!("#include \"{}\"\n", p.display())))
+    let headers: String = std::iter::once("#include <stdio.h>\n".to_owned())
+        .chain(
+            common
+                .iter()
+                .flat_map(|dir| fs::read_dir(dir).unwrap())
+                .map(|e| e.unwrap().path())
+                .filter(|p| p.extension().is_some_and(|e| e == "h"))
+                .map(|p| format!("#include \"{}\"\n", p.display())),
+        )
         .collect();
     fs::write(&wrapper, headers).unwrap();
 
@@ -95,13 +113,18 @@ fn module(
         .wrap_unsafe_ops(true)
         .clang_arg("--target=i686-pc-windows-gnu")
         .clang_args(includes.iter().map(|p| format!("-I{}", p.display())))
-        .allowlist_file(format!(".*/original/{}/.*", dir.file_name().unwrap().to_str().unwrap()))
+        .allowlist_file(format!(
+            ".*/original/{}/.*",
+            dir.file_name().unwrap().to_str().unwrap()
+        ))
         .blocklist_file(SHARED_FILES)
         .blocklist_type(SYSTEM_TYPES)
         .raw_line("use super::shared::*;")
         .derive_default(true);
     if let Some(forced) = &forced {
-        bindings = bindings.clang_args(["-include", forced.to_str().unwrap()]);
+        bindings = bindings
+            .clang_args(["-include", forced.to_str().unwrap()])
+            .parse_callbacks(Box::new(StripNamesPrefix));
     }
     if cpp {
         bindings = bindings.clang_args(["-x", "c++"]);
