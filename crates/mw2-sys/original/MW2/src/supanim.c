@@ -5,6 +5,7 @@
 #include "displaybackend.h"
 #include "gamecd.h"
 #include "mss.h"
+#include "readfile.h"
 #include "network.h"
 #include "palettecolor.h"
 #include "refreshmode.h"
@@ -114,7 +115,7 @@ void StartSupAnim(MechS32 p_slowFade)
 		sprintf(shapePath, "%c:%s\\%s6.%s", drive, "launch", g_supAnimShapeName, "shp");
 	}
 
-	g_supAnimBackdrop = FILE_read(backdropPath, NULL);
+	g_supAnimBackdrop = MechReadFile(g_primaryHeap, backdropPath);
 	if (g_supAnimBackdrop == NULL) {
 		drive = FindGameCdDrive();
 		if (!drive) {
@@ -122,7 +123,7 @@ void StartSupAnim(MechS32 p_slowFade)
 		}
 
 		backdropPath[0] = shapePath[0] = drive;
-		g_supAnimBackdrop = FILE_read(backdropPath, NULL);
+		g_supAnimBackdrop = MechReadFile(g_primaryHeap, backdropPath);
 		if (g_supAnimBackdrop == NULL) {
 			return;
 		}
@@ -165,7 +166,7 @@ void StartSupAnim(MechS32 p_slowFade)
 	}
 
 	MechHeapFree(g_primaryHeap, palette);
-	g_supAnimShape = FILE_read(shapePath, NULL);
+	g_supAnimShape = MechReadFile(g_primaryHeap, shapePath);
 	if (g_supAnimShape == NULL) {
 		return;
 	}
@@ -221,12 +222,12 @@ void StopSupAnim(void)
 	}
 
 	if (g_supAnimBackdrop) {
-		MEM_free_lock(g_supAnimBackdrop);
+		MechHeapFree(g_primaryHeap, g_supAnimBackdrop);
 		g_supAnimBackdrop = NULL;
 	}
 
 	if (g_supAnimShape) {
-		MEM_free_lock(g_supAnimShape);
+		MechHeapFree(g_primaryHeap, g_supAnimShape);
 		g_supAnimShape = NULL;
 		g_supAnimFrameCount = 0;
 	}

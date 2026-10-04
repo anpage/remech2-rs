@@ -8,6 +8,7 @@
 #include "loopingmovie.h"
 #include "mousestate.h"
 #include "mss.h"
+#include "readfile.h"
 #include "refreshmode.h"
 #include "shellglobals.h"
 #include "shellmain.h"
@@ -620,11 +621,11 @@ void CloseVideo(MechS32 p_index)
 	}
 
 	if (g_fmvSlots[p_index].m_shp != NULL) {
-		MEM_free_lock(g_fmvSlots[p_index].m_shp);
+		MechHeapFree(g_primaryHeap, g_fmvSlots[p_index].m_shp);
 	}
 
 	if (g_fmvSlots[p_index].m_frameBuffer != NULL) {
-		MEM_free_lock(g_fmvSlots[p_index].m_frameBuffer);
+		MechHeapFree(g_primaryHeap, g_fmvSlots[p_index].m_frameBuffer);
 	}
 
 	g_fmvSlots[p_index].m_smack = NULL;
@@ -760,7 +761,7 @@ BOOL LoadShpFile(FmvSlot* p_slot, const MechChar* p_name)
 {
 	MechS32 size;
 
-	p_slot->m_shp = FILE_read(GetPathToShp(p_name), NULL);
+	p_slot->m_shp = MechReadFile(g_primaryHeap, GetPathToShp(p_name));
 	if (!p_slot->m_shp) {
 		return FALSE;
 	}

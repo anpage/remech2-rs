@@ -13,7 +13,7 @@
 #include "menucontrols.h"
 #include "menupage.h"
 #include "menutextbox.h"
-#include "mss.h"
+#include "readfile.h"
 #include "palette.h"
 #include "palettecolor.h"
 #include "players.h"
@@ -611,7 +611,7 @@ void* ReadVfxBin(MechChar* p_name)
 	MechChar path[256];
 
 	sprintf(path, "%s/%s.%s", "vfx", p_name, "bin");
-	data = FILE_read(path, NULL);
+	data = MechReadFile(g_primaryHeap, path);
 	return data;
 }
 
@@ -784,7 +784,7 @@ void UpdateDorcs(void)
 		}
 		else {
 			if (g_dorcsGif) {
-				MEM_free_lock(g_dorcsGif);
+				MechHeapFree(g_primaryHeap, g_dorcsGif);
 			}
 
 			g_dorcsGif = ReadVfxBin("vfxhd");
@@ -856,7 +856,7 @@ void UpdateDorcs(void)
 
 			ApplyPaletteResource(g_currentPalette);
 			if (g_dorcsGif) {
-				MEM_free_lock(g_dorcsGif);
+				MechHeapFree(g_primaryHeap, g_dorcsGif);
 			}
 
 			g_dorcsGif = NULL;

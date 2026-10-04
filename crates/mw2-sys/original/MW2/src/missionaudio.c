@@ -5,8 +5,9 @@
 #include "decomp.h"
 #include "error.h"
 #include "gamecd.h"
-#include "mss.h"
 #include "namehash.h"
+#include "readfile.h"
+#include "simmain.h"
 #include "types.h"
 
 #include <stdio.h>
@@ -136,5 +137,5 @@ void* ReadSoundFile(MechChar* p_name)
 	strcpy(path, g_soundFileDir);
 	strcat(path, "\\");
 	strcat(path, name);
-	return FILE_read(path, NULL);
+	return MechReadFile(g_primaryHeap, path);
 }

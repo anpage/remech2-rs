@@ -123,10 +123,6 @@ extern "C"
 	AILIMPORT void AILCALL
 	AIL_load_sample_buffer(HSAMPLE p_sample, unsigned int p_bufferNum, void* p_buffer, unsigned int p_size);
 
-	/* The original imports it under its Miles name (_MEM_free_lock@4). */
-	AILIMPORT void AILCALL MEM_free_lock(void* p_block);
-	AILIMPORT void* AILCALL FILE_read(const char* p_filename, void* p_dest);
-
 #ifdef __cplusplus
 }
 #endif

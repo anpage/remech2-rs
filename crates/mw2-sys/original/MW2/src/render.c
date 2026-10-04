@@ -12,7 +12,7 @@
 #include "fixedmul.h"
 #include "geocache.h"
 #include "hud.h"
-#include "mss.h"
+#include "readfile.h"
 #include "muldiv14.h"
 #include "object.h"
 #include "objectanim.h"
@@ -421,7 +421,7 @@ void ShowBanner(void)
 		strcat(path, "gif");
 	}
 
-	gif = FILE_read(path, NULL);
+	gif = MechReadFile(g_primaryHeap, path);
 	if (gif) {
 		state = MechHeapAlloc(g_primaryHeap, 0x502e);
 		if (state) {
