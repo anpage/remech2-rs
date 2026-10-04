@@ -5,6 +5,7 @@
 #include "clock.h"
 #include "config.h"
 #include "decomp.h"
+#include "files.h"
 #include "gamekeys.h"
 #include "gamething.h"
 #include "geocache.h"
@@ -969,7 +970,7 @@ MechS32 EndTheMission2(void)
 	}
 
 	result.m_count = count;
-	file = fopen("mw2msn.cfg", "wb");
+	file = MechFopen("mw2msn.cfg", "wb");
 	if (!file) {
 		return FALSE;
 	}

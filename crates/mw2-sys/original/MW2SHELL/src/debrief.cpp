@@ -6,6 +6,7 @@
 #include "collection.h"
 #include "customstar.h"
 #include "decomp.h"
+#include "files.h"
 #include "font.h"
 #include "keyboardinput.h"
 #include "mainmenubutton.h"
@@ -577,7 +578,7 @@ void ReadMissionResults(void* p_results)
 {
 	FILE* file = NULL;
 
-	file = fopen("MW2MSN.CFG", "rb");
+	file = MechFopen("MW2MSN.CFG", "rb");
 	if (file == NULL) {
 		return;
 	}
@@ -700,7 +701,7 @@ void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p
 	}
 
 	LoadPilotRoster();
-	file = fopen("MW2CAR.CFG", "rb");
+	file = MechFopen("MW2CAR.CFG", "rb");
 	if (file) {
 		fread(&career, 0x50, 1, file);
 		fclose(file);

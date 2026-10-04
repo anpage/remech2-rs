@@ -16,8 +16,15 @@ extern "C"
 
 	// fopen
 	FILE* MechFopen(const char* p_path, const char* p_mode);
-	// open, with the C library's flags and permissions (0 when not creating). Returns -1 on failure.
-	int MechOpen(const char* p_path, int p_flags, int p_permissions);
+	// How MechOpen opens a file: always as binary
+	enum {
+		c_mechOpenRead,      // to read
+		c_mechOpenReadWrite, // to read and write
+		c_mechOpenCreate     // to write, creating it if it isn't there, without truncating it
+	};
+
+	// open, for the C library's read, write and close. Returns -1 on failure.
+	int MechOpen(const char* p_path, int p_mode);
 	// remove, rename and mkdir. Return 0, or -1 on failure.
 	int MechRemove(const char* p_path);
 	int MechRename(const char* p_from, const char* p_to);

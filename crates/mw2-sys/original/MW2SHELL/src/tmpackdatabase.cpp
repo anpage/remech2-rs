@@ -1,3 +1,4 @@
+#include "files.h"
 #include "tmpackdatabase.h"
 
 #include "windowstate.h"
@@ -53,7 +54,7 @@ TMPackDataBase::TMPackDataBase(char* p_name)
 	undefined4 offset;
 
 	strcpy(m_name, p_name);
-	m_file = fopen(m_name, "rb");
+	m_file = MechFopen(m_name, "rb");
 	if (m_file == NULL) {
 		fprintf(stderr, "Could not open mpack DB: %s\n", m_name);
 		fflush(stderr);

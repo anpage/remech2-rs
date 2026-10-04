@@ -1,6 +1,7 @@
 #include "simhandoff.h"
 
 #include "decomp.h"
+#include "files.h"
 #include "mechvariant.h"
 #include "pilotrecord.h"
 #include "refreshmode.h"
@@ -32,7 +33,7 @@ void ReadSimHandoff(BOOL p_fromSim, MechS32* p_campaign, MechU8* p_pilotChosen, 
 	MechS32 i;
 	FILE* file;
 
-	file = fopen("mw2prm.cfg", "rb");
+	file = MechFopen("mw2prm.cfg", "rb");
 	if (!file) {
 		return;
 	}
@@ -95,7 +96,7 @@ void WriteSimHandoff(UINT p_msg, MechS32 p_campaign, MechU8 p_pilotChosen, const
 		WriteStarFiles();
 	}
 
-	file = fopen("mw2prm.cfg", "wb");
+	file = MechFopen("mw2prm.cfg", "wb");
 	if (!file) {
 		return;
 	}

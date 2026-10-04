@@ -2,6 +2,7 @@
 
 #include "debugprint.h"
 #include "decomp.h"
+#include "files.h"
 #include "font.h"
 #include "input.h"
 #include "inputdevice.h"
@@ -1746,7 +1747,7 @@ MechS32 CpcCheckControlCount()
 		}
 	}
 
-	file = fopen("temp.map", "w");
+	file = MechFopen("temp.map", "w");
 	g_cpcAnalogCount = 0;
 	g_cpcDiscreteCount = 0;
 	if (file) {
@@ -2022,7 +2023,7 @@ void CpcLoadDeviceFile(ScreenField* p_tab)
 	}
 
 	sprintf(path, "giddi\\%s.cpc", InputGetDevice(g_curInputDeviceIdx)->m_info.m_matchName);
-	file = fopen(path, "rb");
+	file = MechFopen(path, "rb");
 	if (file == NULL) {
 		return;
 	}
@@ -2086,7 +2087,7 @@ void CpcLoadConfigSlot(ScreenField* p_tab)
 	}
 
 	sprintf(path, "giddi\\config%02d.cpc", slot);
-	file = fopen(path, "rb");
+	file = MechFopen(path, "rb");
 	if (file == NULL) {
 		return;
 	}
@@ -2128,7 +2129,7 @@ void CpcSaveConfigSlot(ScreenField* p_tab)
 		}
 	}
 
-	file = fopen(g_cpcSlotText, "wb");
+	file = MechFopen(g_cpcSlotText, "wb");
 	if (file != NULL) {
 		fwrite(g_cpcConfigName, sizeof(g_cpcConfigName), 1, file);
 		fwrite(g_cpcDeviceSlots, sizeof(CpcDeviceSlot), c_deviceSlotCount, file);
@@ -2176,9 +2177,9 @@ void CpcAcceptAndCommit(ScreenField* p_tab)
 		return;
 	}
 
-	remove("input.bak");
-	rename("input.map", "input.bak");
-	rename("temp.map", "input.map");
+	MechRemove("input.bak");
+	MechRename("input.map", "input.bak");
+	MechRename("temp.map", "input.map");
 	CpcSaveConfigSlot(NULL);
 	ShowDialog("Cockpit Control Configured.#Ok", 0);
 	g_cpcConfigured = 1;
@@ -2222,7 +2223,7 @@ void CpcSaveDeviceFile(ScreenField* p_tab)
 	}
 
 	sprintf(path, "giddi\\%s.cpc", InputGetDevice(g_curInputDeviceIdx)->m_info.m_shortName);
-	file = fopen(path, "wb");
+	file = MechFopen(path, "wb");
 	if (file != NULL) {
 		fwrite(g_cpcConfigName, sizeof(g_cpcConfigName), 1, file);
 		fwrite(g_cpcDeviceSlots, sizeof(CpcDeviceSlot), c_deviceSlotCount, file);

@@ -12,6 +12,7 @@
 #include "environment.h"
 #include "eyepoint.h"
 #include "fadepal.h"
+#include "files.h"
 #include "gamekeys.h"
 #include "hud.h"
 #include "loadres.h"
@@ -56,10 +57,6 @@
 DECOMP_SIZE_ASSERT(DifficultyCfg, 0x17)
 DECOMP_SIZE_ASSERT(Reel, 0x14)
 DECOMP_SIZE_ASSERT(CockpitFrame, 0x8)
-
-enum FilePermission {
-	c_permissionWrite = 0x80 // _S_IWRITE (sys/stat.h)
-};
 
 // The 26 cockpit panels' rectangles, in 320x200 screen coordinates (ScaleCockpitLayout scales them to the
 // screen).
@@ -792,7 +789,7 @@ MechS32 LoadMgdFile(
 		NULL
 	);
 	if (!data) {
-		file = fopen("symlog.txt", "a");
+		file = MechFopen("symlog.txt", "a");
 		if (file) {
 			fprintf(file, "Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagMgeo]);
 			fclose(file);
@@ -857,7 +854,7 @@ MechS32 LoadReels(ResourceRef* p_ref)
 		&g_staticPoolTags[6]
 	);
 	if (!data) {
-		file = fopen("symlog.txt", "a");
+		file = MechFopen("symlog.txt", "a");
 		if (file) {
 			fprintf(file, "Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagAnim]);
 		}
@@ -939,7 +936,7 @@ MechS32 LoadHudFile(ResourceRef* p_ref)
 		NULL
 	);
 	if (!data) {
-		file = fopen("symlog.txt", "a");
+		file = MechFopen("symlog.txt", "a");
 		if (file) {
 			fprintf(file, "Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagHud]);
 		}
@@ -1018,7 +1015,7 @@ MechS32 LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels, Point* p
 		NULL
 	);
 	if (!data) {
-		file = fopen("symlog.txt", "a");
+		file = MechFopen("symlog.txt", "a");
 		if (file) {
 			fprintf(file, "Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagCpit]);
 		}
@@ -1074,7 +1071,7 @@ MechS32 WriteScreenPicture(MechChar* p_path, void* p_palette)
 	undefined* pixels;
 
 	header = NULL;
-	file = open(p_path, _O_BINARY | _O_CREAT | _O_WRONLY, c_permissionWrite);
+	file = MechOpen(p_path, c_mechOpenCreate);
 	if (file == -1) {
 		return FALSE;
 	}
@@ -1103,9 +1100,9 @@ MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_po
 	FILE* log;
 	MechS32 file;
 
-	file = open(p_path, _O_BINARY);
+	file = MechOpen(p_path, c_mechOpenRead);
 	if (file == -1) {
-		log = fopen("symlog.txt", "a");
+		log = MechFopen("symlog.txt", "a");
 		if (log) {
 			fprintf(log, "Couldn't load ID=%s\n", p_path);
 		}
@@ -1162,7 +1159,7 @@ MechS32 WriteCareerRecordFile(MechChar* p_name, void* p_data)
 	MechS32 file;
 	MechS32 result;
 
-	file = open(BuildGamePath(p_name), _O_BINARY | _O_CREAT | _O_WRONLY, c_permissionWrite);
+	file = MechOpen(BuildGamePath(p_name), c_mechOpenCreate);
 	if (file != -1) {
 		write(file, p_data, 0xd6);
 		close(file);
@@ -1222,7 +1219,7 @@ MechS32 SaveDifficultyCfg(MechChar* p_name, DifficultyCfg* p_cfg)
 	MechS32 file;
 	MechS32 result;
 
-	file = open(BuildGamePath(p_name), _O_BINARY | _O_CREAT | _O_WRONLY, c_permissionWrite);
+	file = MechOpen(BuildGamePath(p_name), c_mechOpenCreate);
 	if (file != -1) {
 		write(file, p_cfg, sizeof(DifficultyCfg));
 		close(file);
@@ -1263,7 +1260,7 @@ MechS32 SaveSndCfg(MechChar* p_name, SoundConfig* p_cfg)
 	MechS32 file;
 	MechS32 result;
 
-	file = open(BuildGamePath(p_name), _O_BINARY | _O_CREAT | _O_WRONLY, c_permissionWrite);
+	file = MechOpen(BuildGamePath(p_name), c_mechOpenCreate);
 	if (file != -1) {
 		write(file, p_cfg, sizeof(SoundConfig));
 		close(file);

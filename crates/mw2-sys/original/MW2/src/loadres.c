@@ -6,6 +6,7 @@
 #include "compat.h"
 #include "decomp.h"
 #include "error.h"
+#include "files.h"
 #include "gamekeys.h"
 #include "prjfile.h"
 #include "simmain.h"
@@ -236,7 +237,7 @@ void DumpResourceCache(void)
 	MechChar name[100];
 
 	sprintf(name, "dbugcch%d.log", g_cacheDumpNumber++);
-	file = fopen(name, "w");
+	file = MechFopen(name, "w");
 	type[4] = '\0';
 	fprintf(file, "Cache table\n-----------------------\n");
 	for (i = 0; i < 0x3f1; i++) {
@@ -331,7 +332,7 @@ void* LoadCachedResource(MechS32 p_file, MechS32 p_id, const char* p_type, undef
 
 	size = GetPrjResourceSize(p_file, p_type, p_id);
 	if (size <= 0) {
-		file = fopen("symlog.txt", "a");
+		file = MechFopen("symlog.txt", "a");
 		if (file) {
 			fprintf(file, "Couldn't load ID=%d Type=%s\n", p_id, p_type);
 			fclose(file);
@@ -357,7 +358,7 @@ void* LoadCachedResource(MechS32 p_file, MechS32 p_id, const char* p_type, undef
 	}
 
 	if (ReadPrjResource(p_file, p_type, p_id, item + 1) == -1) {
-		file2 = fopen("symlog.txt", "a");
+		file2 = MechFopen("symlog.txt", "a");
 		if (file2) {
 			fprintf(file2, "Couldn't load ID=%d Type=%s\n", p_id, p_type);
 			fclose(file2);

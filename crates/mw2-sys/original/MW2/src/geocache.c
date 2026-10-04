@@ -8,6 +8,7 @@
 #include "debris.h"
 #include "decomp.h"
 #include "error.h"
+#include "files.h"
 #include "gamething.h"
 #include "loadres.h"
 #include "mw2prj.h"
@@ -1084,7 +1085,7 @@ MechS32 ToggleBlockBoxes(void)
 			}
 		}
 		else {
-			file = fopen("symlog.txt", "a");
+			file = MechFopen("symlog.txt", "a");
 			if (file) {
 				fprintf(file, "Couldn't load ID=%s Type=%s\n", ref->m_name, g_resourceTypeTags[c_resTagPoly]);
 			}
@@ -1133,7 +1134,7 @@ void ShowQuadtreeBoxes(QuadtreeNode* p_root)
 		}
 	}
 	else {
-		file = fopen("symlog.txt", "a");
+		file = MechFopen("symlog.txt", "a");
 		if (file) {
 			fprintf(file, "Couldn't load ID=%s Type=%s\n", ref->m_name, g_resourceTypeTags[c_resTagPoly]);
 		}

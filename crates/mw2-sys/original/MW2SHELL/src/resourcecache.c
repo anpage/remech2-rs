@@ -2,6 +2,7 @@
 
 #include "compat.h"
 #include "decomp.h"
+#include "files.h"
 #include "prjfile.h"
 #include "types.h"
 
@@ -224,7 +225,7 @@ void DumpResourceCache(void)
 	FILE* file;
 
 	sprintf(name, "dbugcch%d.log", g_cacheDumpNumber++);
-	file = fopen(name, "w");
+	file = MechFopen(name, "w");
 	type[4] = '\0';
 	fprintf(file, "Cache table\n-----------------------\n");
 	for (i = 0; i < 0x3f1; i++) {
@@ -295,7 +296,7 @@ void* LoadCachedResource(MechS32 p_handle, MechS32 p_id, char* p_type, MechS32 p
 
 	size = GetArchiveItemSize(p_handle, p_type, p_id);
 	if (size <= 0) {
-		log = fopen("symlog.txt", "a");
+		log = MechFopen("symlog.txt", "a");
 		if (log != NULL) {
 			fprintf(log, "Couldn't load ID=%d Type=%s\n", p_id, p_type);
 		}
@@ -313,7 +314,7 @@ void* LoadCachedResource(MechS32 p_handle, MechS32 p_id, char* p_type, MechS32 p
 	}
 
 	if (ReadArchiveItem(p_handle, p_type, p_id, block + 1) == -1) {
-		file = fopen("symlog.txt", "a");
+		file = MechFopen("symlog.txt", "a");
 		if (file != NULL) {
 			fprintf(file, "Couldn't load ID=%d Type=%s\n", p_id, p_type);
 		}

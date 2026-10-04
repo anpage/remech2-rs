@@ -1,6 +1,7 @@
 #include "inifile.h"
 
 #include "decomp.h"
+#include "files.h"
 #include "types.h"
 
 #include <ctype.h>
@@ -26,7 +27,7 @@ MechS32 FindIniSection(MechChar* p_section)
 	MechChar buffer[0x85];
 
 	g_iniSectionOffset = -1;
-	file = fopen("mw2.ini", "rt");
+	file = MechFopen("mw2.ini", "rt");
 	if (!file) {
 		return 0x36;
 	}
@@ -70,7 +71,7 @@ MechChar* GetIniValue(MechChar* p_key)
 	size_t length;
 	MechChar* line;
 
-	if (g_iniSectionOffset == -1 || !(file = fopen("mw2.ini", "rt"))) {
+	if (g_iniSectionOffset == -1 || !(file = MechFopen("mw2.ini", "rt"))) {
 		return "";
 	}
 

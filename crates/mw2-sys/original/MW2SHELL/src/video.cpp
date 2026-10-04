@@ -3,6 +3,7 @@
 #include "audiosubsystem.h"
 #include "decomp.h"
 #include "displaybackend.h"
+#include "files.h"
 #include "fmvslot.h"
 #include "keyboardinput.h"
 #include "loopingmovie.h"
@@ -56,7 +57,7 @@ MechChar* GetPathToShp(const MechChar* p_name)
 // FUNCTION: MW2SHELL 0x10015e12
 BOOL CheckVideoExists(const MechChar* p_name)
 {
-	return GetFileAttributes(GetPathToVideo(p_name)) != 0xffffffff;
+	return MechFileExists(GetPathToVideo(p_name));
 }
 
 // The screen callback while a full-screen video plays: a click, a key or any other message ends

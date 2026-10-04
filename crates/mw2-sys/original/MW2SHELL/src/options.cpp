@@ -4,6 +4,7 @@
 #include "audiosubsystem.h"
 #include "decomp.h"
 #include "difficultyconfig.h"
+#include "files.h"
 #include "font.h"
 #include "keyboardinput.h"
 #include "loopingmovie.h"
@@ -308,7 +309,7 @@ void LoadSoundConfig()
 {
 	FILE* file;
 
-	file = fopen("MW2SND.CFG", "rb");
+	file = MechFopen("MW2SND.CFG", "rb");
 	if (file != NULL) {
 		fread(&g_soundConfig, sizeof(g_soundConfig), 1, file);
 		fclose(file);
@@ -320,7 +321,7 @@ void LoadDifficultyConfig()
 {
 	FILE* file;
 
-	file = fopen("MW2DIF.CFG", "rb");
+	file = MechFopen("MW2DIF.CFG", "rb");
 	if (file != NULL) {
 		fread(&g_difficultyConfig, sizeof(g_difficultyConfig), 1, file);
 		fclose(file);
@@ -332,7 +333,7 @@ void SaveDifficultyConfig()
 {
 	FILE* file;
 
-	file = fopen("MW2DIF.CFG", "wb");
+	file = MechFopen("MW2DIF.CFG", "wb");
 	if (file != NULL) {
 		fwrite(&g_difficultyConfig, sizeof(g_difficultyConfig), 1, file);
 		fclose(file);
@@ -344,7 +345,7 @@ void SaveSoundConfig()
 {
 	FILE* file;
 
-	file = fopen("MW2SND.CFG", "wb");
+	file = MechFopen("MW2SND.CFG", "wb");
 	if (file != NULL) {
 		fwrite(&g_soundConfig, sizeof(g_soundConfig), 1, file);
 		fclose(file);

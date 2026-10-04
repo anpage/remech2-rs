@@ -1,6 +1,7 @@
 #include "input.h"
 
 #include "decomp.h"
+#include "files.h"
 #include "inputdevice.h"
 #include "types.h"
 #include "windowstate.h"
@@ -249,7 +250,7 @@ void InputOpenMap(void)
 		return;
 	}
 
-	g_inputMapFile = fopen("INPUT.MAP", "w");
+	g_inputMapFile = MechFopen("INPUT.MAP", "w");
 }
 
 // Write one control's binding to INPUT.MAP.

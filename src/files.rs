@@ -162,15 +162,41 @@ unsafe fn c_fopen(path: &Path, mode: &CStr) -> *mut c_void {
     }
 }
 
+/// `MechOpen`'s modes
+const OPEN_READ: c_int = 0;
+const OPEN_READ_WRITE: c_int = 1;
+const OPEN_CREATE: c_int = 2;
+
+// The C library's flags for `open`
+const O_RDONLY: c_int = 0;
+const O_WRONLY: c_int = 1;
+const O_RDWR: c_int = 2;
 #[cfg(windows)]
-unsafe fn c_open(path: &Path, flags: c_int, permissions: c_int) -> c_int {
-    unsafe { _wopen(wide(path.as_os_str()).as_ptr(), flags, permissions) }
+const O_CREAT: c_int = 0x100;
+#[cfg(target_os = "linux")]
+const O_CREAT: c_int = 0o100;
+#[cfg(not(any(windows, target_os = "linux")))]
+const O_CREAT: c_int = 0x200;
+/// Only Windows tells text files from binary ones
+#[cfg(windows)]
+const O_BINARY: c_int = 0x8000;
+#[cfg(not(windows))]
+const O_BINARY: c_int = 0;
+
+#[cfg(windows)]
+const CREATE_PERMISSIONS: c_int = 0x180;
+#[cfg(not(windows))]
+const CREATE_PERMISSIONS: c_int = 0o644;
+
+#[cfg(windows)]
+unsafe fn c_open(path: &Path, flags: c_int) -> c_int {
+    unsafe { _wopen(wide(path.as_os_str()).as_ptr(), flags, CREATE_PERMISSIONS) }
 }
 
 #[cfg(not(windows))]
-unsafe fn c_open(path: &Path, flags: c_int, permissions: c_int) -> c_int {
+unsafe fn c_open(path: &Path, flags: c_int) -> c_int {
     match narrow(path) {
-        Some(path) => unsafe { open(path.as_ptr(), flags, permissions) },
+        Some(path) => unsafe { open(path.as_ptr(), flags, CREATE_PERMISSIONS) },
         None => -1,
     }
 }
@@ -199,12 +225,18 @@ pub unsafe extern "C" fn mech_fopen(path: *const c_char, mode: *const c_char) ->
 }
 
 #[unsafe(export_name = "MechOpen")]
-pub unsafe extern "C" fn mech_open(path: *const c_char, flags: c_int, permissions: c_int) -> c_int {
+pub unsafe extern "C" fn mech_open(path: *const c_char, mode: c_int) -> c_int {
+    let flags = match mode {
+        OPEN_READ => O_RDONLY,
+        OPEN_READ_WRITE => O_RDWR,
+        OPEN_CREATE => O_WRONLY | O_CREAT,
+        _ => return -1,
+    };
     let Some(path) = (unsafe { game_path(path) }) else {
         return -1;
     };
 
-    unsafe { c_open(&path, flags, permissions) }
+    unsafe { c_open(&path, flags | O_BINARY) }
 }
 
 #[unsafe(export_name = "MechRemove")]

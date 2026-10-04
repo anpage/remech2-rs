@@ -1,6 +1,7 @@
 #include "prjfile.h"
 
 #include "decomp.h"
+#include "files.h"
 #include "types.h"
 
 #include <io.h>
@@ -112,7 +113,7 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 	}
 
 	if (p_mode == 2) {
-		fd = _open(p_name, 0x8002);
+		fd = MechOpen(p_name, c_mechOpenReadWrite);
 		if (fd == -1) {
 			return -1;
 		}
@@ -129,7 +130,7 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 		}
 	}
 	else if (p_mode == 0) {
-		fd = _open(p_name, 0x8000);
+		fd = MechOpen(p_name, c_mechOpenRead);
 		if (fd == -1) {
 			return -1;
 		}

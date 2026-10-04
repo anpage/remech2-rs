@@ -1,6 +1,7 @@
 #include "prjfile.h"
 
 #include "decomp.h"
+#include "files.h"
 #include "types.h"
 
 #include <fcntl.h>
@@ -141,7 +142,7 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 	}
 
 	if (p_mode == 2) {
-		fd = _open(p_name, _O_RDWR | _O_BINARY);
+		fd = MechOpen(p_name, c_mechOpenReadWrite);
 		if (fd == -1) {
 			return -1;
 		}
@@ -158,7 +159,7 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 		}
 	}
 	else if (p_mode == 0) {
-		fd = _open(p_name, _O_RDONLY | _O_BINARY);
+		fd = MechOpen(p_name, c_mechOpenRead);
 		if (fd == -1) {
 			return -1;
 		}

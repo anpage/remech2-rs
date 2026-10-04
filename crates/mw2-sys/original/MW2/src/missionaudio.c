@@ -4,6 +4,7 @@
 
 #include "decomp.h"
 #include "error.h"
+#include "files.h"
 #include "namehash.h"
 #include "readfile.h"
 #include "simmain.h"
@@ -72,29 +73,28 @@ ProjectFileEntry* FindSoundFile(MechChar* p_name, MechS32 p_add)
 // FUNCTION: MW2 0x10007252
 void CollectMissionAudio(void)
 {
-	HANDLE find;
-	WIN32_FIND_DATA data;
+	MechFileList* files;
+	const char* name;
+	size_t count;
+	size_t i;
 
 	sprintf(g_soundFileDir, "%s\\*.sfl", "keating");
-	find = FindFirstFile(g_soundFileDir, &data);
-	if (find == INVALID_HANDLE_VALUE) {
+	files = MechFindFiles(g_soundFileDir);
+	count = MechFileListCount(files);
+	if (count == 0) {
+		MechFileListFree(files);
 		return;
 	}
 
-	for (;;) {
-		if (!data.cAlternateFileName[0]) {
-			FindSoundFile(data.cFileName, 1);
-		}
-		else {
-			FindSoundFile(data.cAlternateFileName, 1);
-		}
-
-		if (!FindNextFile(find, &data)) {
-			break;
+	for (i = 0; i < count; i++) {
+		// The original listed the files' short (8.3) names, which always fit an entry
+		name = MechFileListName(files, i);
+		if (strlen(name) < sizeof(g_soundFileEntries[0].m_name)) {
+			FindSoundFile((MechChar*) name, 1);
 		}
 	}
 
-	FindClose(find);
+	MechFileListFree(files);
 	sprintf(g_soundFileDir, "%s", "keating");
 }
 

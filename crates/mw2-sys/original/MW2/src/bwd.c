@@ -5,6 +5,7 @@
 #include "config.h"
 #include "decomp.h"
 #include "error.h"
+#include "files.h"
 #include "loadres.h"
 #include "mw2prj.h"
 #include "overlay.h"
@@ -193,7 +194,7 @@ void LogDebugLine(MechChar* p_text)
 {
 	FILE* file;
 
-	file = fopen("mw2debug.txt", "a");
+	file = MechFopen("mw2debug.txt", "a");
 	if (file) {
 		fprintf(file, "%s", p_text);
 	}

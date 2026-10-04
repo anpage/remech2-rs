@@ -2,6 +2,7 @@
 
 #include "debugprint.h"
 #include "decomp.h"
+#include "files.h"
 #include "pilotrecord.h"
 #include "shellglobals.h"
 #include "types.h"
@@ -17,7 +18,7 @@ void LoadPilotRoster()
 	FILE* file;
 	MechS32 i;
 
-	file = fopen("MW2REG.CFG", "rb");
+	file = MechFopen("MW2REG.CFG", "rb");
 	if (file == NULL) {
 		for (i = 0; i < 20; i++) {
 			pilot = &g_pilotRoster[i];
@@ -55,7 +56,7 @@ void SavePilotRoster()
 {
 	FILE* file;
 
-	file = fopen("MW2REG.CFG", "wb");
+	file = MechFopen("MW2REG.CFG", "wb");
 	if (file == NULL) {
 		ShowMessage("Error Writing Career File\n");
 		return;

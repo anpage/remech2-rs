@@ -1,3 +1,4 @@
+#include "files.h"
 #include "gifsave.h"
 
 #include "types.h"
@@ -207,7 +208,7 @@ MechS32 GifCreate(
 // FUNCTION: MW2 0x10074ae9
 static MechS32 GifOpenFile(const MechChar* p_filename)
 {
-	if ((g_outFile = fopen(p_filename, "wb")) == NULL) {
+	if ((g_outFile = MechFopen(p_filename, "wb")) == NULL) {
 		return c_gifErrCreate;
 	}
 

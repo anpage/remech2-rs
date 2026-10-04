@@ -2,6 +2,7 @@
 
 #include "decomp.h"
 #include "difficultyconfig.h"
+#include "files.h"
 #include "mechbay.h"
 #include "mechchassis.h"
 #include "mw2prj.h"
@@ -363,7 +364,7 @@ void BwdWriteRegistry(char* p_fileName)
 	FILE* file;
 
 	g_bwdTemplateRegistry[1] = g_bwdRegistrySize;
-	file = fopen(p_fileName, "wb");
+	file = MechFopen(p_fileName, "wb");
 	if (file == NULL) {
 		return;
 	}
@@ -466,7 +467,7 @@ void PrjWriteStarTemplates(MechS32 p_count, StarMech* p_mechs, MechS32 p_enemyCo
 	BwdWriteRegistry("userstar.bwd");
 
 	difficulty = g_enemyStarDifficulty - 2;
-	file = fopen("MW2DIF.CFG", "rb");
+	file = MechFopen("MW2DIF.CFG", "rb");
 	if (file != NULL) {
 		fread(&settings, sizeof(settings), 1, file);
 		fclose(file);

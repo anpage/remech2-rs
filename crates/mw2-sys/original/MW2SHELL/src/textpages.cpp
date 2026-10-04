@@ -2,6 +2,7 @@
 
 #include "collection.h"
 #include "decomp.h"
+#include "files.h"
 #include "font.h"
 #include "page.h"
 #include "pilotrecord.h"
@@ -116,7 +117,7 @@ MechChar* ExpandTextEscapes(MechChar* p_text, MechChar* p_quote)
 	}
 
 	g_expandedText[length] = '\0';
-	file = fopen("tmp.out", "wb");
+	file = MechFopen("tmp.out", "wb");
 	fwrite(p_text, 1, strlen(p_text), file);
 	fclose(file);
 	return AllocateString(g_expandedText);

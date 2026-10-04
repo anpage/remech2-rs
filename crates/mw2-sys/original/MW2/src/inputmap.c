@@ -7,6 +7,7 @@
 #include "decomp.h"
 #include "discretebinding.h"
 #include "error.h"
+#include "files.h"
 #include "gamekeymodifier.h"
 #include "gamekeyname.h"
 #include "inputaxis.h"
@@ -1048,7 +1049,7 @@ MechS32 LoadInputMap(void)
 	MechS32 i;
 	FILE* file;
 
-	file = fopen("input.map", "r");
+	file = MechFopen("input.map", "r");
 	if (!file) {
 		Error(0x11, "Can't open input mapping file", 0);
 		return FALSE;
@@ -1066,7 +1067,7 @@ MechS32 LoadInputMap(void)
 			}
 
 			strcat(name, ".std");
-			file = fopen(name, "r");
+			file = MechFopen(name, "r");
 			if (file) {
 				ParseInputMap(file);
 				fclose(file);
@@ -1094,7 +1095,7 @@ MechS32 LoadGamekeyMap(void)
 	g_gameKeyByKeyCode[0x20] = 0x4f;
 	g_gameKeyByKeyCode[0x171] = 0x59;
 	g_inputMapLine = 0;
-	file = fopen("gamekey.map", "r");
+	file = MechFopen("gamekey.map", "r");
 	if (!file) {
 		Error(0x11, "Can't open gamekey mapping file", 0);
 		return FALSE;

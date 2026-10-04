@@ -1,6 +1,7 @@
 #include "mw2log.h"
 
 #include "decomp.h"
+#include "files.h"
 #include "types.h"
 
 #include <stdio.h>
@@ -22,7 +23,7 @@ MechS32 OpenMw2Log(void)
 	time_t now;
 	MechChar line[80];
 
-	file = fopen("mw2.log", "wt");
+	file = MechFopen("mw2.log", "wt");
 	if (file) {
 		g_mw2Log = file;
 		now = time(NULL);

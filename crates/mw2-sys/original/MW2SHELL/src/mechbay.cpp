@@ -5,6 +5,7 @@
 #include "customstar.h"
 #include "debugprint.h"
 #include "decomp.h"
+#include "files.h"
 #include "font.h"
 #include "keyboardinput.h"
 #include "mainmenubutton.h"
@@ -2573,16 +2574,16 @@ MechS32 SaveMekFile(MechChar* p_name)
 	strcpy(g_mekVariantName, g_variant.m_variantName);
 
 	sprintf(g_mekPath, "mek\\%s", p_name);
-	file = fopen(g_mekPath, "wb");
+	file = MechFopen(g_mekPath, "wb");
 	if (file == NULL) {
 		sprintf(g_mekPath, "mek\\");
-		if (!CreateDirectory(g_mekPath, NULL)) {
-			DebugPrint("CreateDirectory mek failed: %d\n", GetLastError());
+		if (MechMakeDir(g_mekPath) != 0) {
+			DebugPrint("Creating the mek directory failed\n");
 			return 0;
 		}
 
 		sprintf(g_mekPath, "mek\\%s", p_name);
-		file = fopen(g_mekPath, "wb");
+		file = MechFopen(g_mekPath, "wb");
 		if (file == NULL) {
 			return 0;
 		}
@@ -2612,7 +2613,7 @@ void* LoadMekImage(MechChar* p_name)
 			strcat(path, ".mek");
 		}
 
-		file = fopen(path, "rb");
+		file = MechFopen(path, "rb");
 		if (file == NULL) {
 			return NULL;
 		}
@@ -2884,8 +2885,10 @@ void LoadMekFile(MechChar* p_name)
 void LoadMechBuildList(MechChar* p_prefix)
 {
 	MechS32 i;
-	HANDLE findFile;
-	WIN32_FIND_DATA findData;
+	MechFileList* files;
+	size_t count;
+	size_t file;
+	const char* name;
 
 	memset(g_variantFiles, 0, sizeof(g_variantFiles));
 	sprintf(g_variantFileName, "%s%02dstd", p_prefix, 0);
@@ -2899,21 +2902,16 @@ void LoadMechBuildList(MechChar* p_prefix)
 	}
 
 	sprintf(g_variantFileName, "mek\\%s??usr.mek", p_prefix);
-	findFile = FindFirstFile(g_variantFileName, &findData);
-	if (findFile == INVALID_HANDLE_VALUE) {
-		return;
-	}
-
-	for (;;) {
-		i = (findData.cAlternateFileName[3] - '0') * 10 + findData.cAlternateFileName[4] - '0' + 100;
-		strncpy(g_variantFiles[i], findData.cAlternateFileName, 8);
+	files = MechFindFiles(g_variantFileName);
+	count = MechFileListCount(files);
+	for (file = 0; file < count; file++) {
+		name = MechFileListName(files, file);
+		i = (name[3] - '0') * 10 + name[4] - '0' + 100;
+		strncpy(g_variantFiles[i], name, 8);
 		g_variantFiles[i][8] = '\0';
-		if (!FindNextFile(findFile, &findData)) {
-			break;
-		}
 	}
 
-	FindClose(findFile);
+	MechFileListFree(files);
 }
 
 // FUNCTION: MW2SHELL 0x1000ca74
@@ -3875,7 +3873,7 @@ void MechBayCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, 
 			break;
 		}
 		sprintf(g_tempBuffer, "mek\\%s.mek", g_variantFiles[g_selectedVariant]);
-		remove(g_tempBuffer);
+		MechRemove(g_tempBuffer);
 		g_variantFiles[g_selectedVariant][0] = '\0';
 		NextVariant();
 		if (g_selectedVariant < 100) {

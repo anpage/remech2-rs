@@ -1,6 +1,7 @@
 #include "resourcefile.h"
 
 #include "decomp.h"
+#include "files.h"
 #include "types.h"
 
 #include <fcntl.h>
@@ -27,9 +28,9 @@ MechS32 LoadFile(MechChar* p_name, MechS32* p_size, void** p_data, MechS32 p_pre
 	MechS32 handle;
 	FILE* log;
 
-	handle = _open(p_name, _O_BINARY);
+	handle = MechOpen(p_name, c_mechOpenRead);
 	if (handle == -1) {
-		log = fopen("symlog.txt", "a");
+		log = MechFopen("symlog.txt", "a");
 		if (log != NULL) {
 			fprintf(log, "Couldn't load ID=%s\n", p_name);
 		}

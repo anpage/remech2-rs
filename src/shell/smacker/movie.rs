@@ -10,6 +10,8 @@ use anyhow::{Context, Result, bail};
 use smk::{FrameStatus, Smk};
 use tracing::warn;
 
+use crate::files;
+
 use super::sound::{AudioFormat, Sound};
 
 /// Number of audio tracks a Smacker file can carry
@@ -76,7 +78,8 @@ struct State {
 impl Movie {
     /// Read and open `path`
     pub fn open(path: &str, flags: u32) -> Result<Box<Self>> {
-        let data = std::fs::read(path).with_context(|| format!("couldn't read {path}"))?;
+        let file = files::resolve(path);
+        let data = std::fs::read(&file).with_context(|| format!("couldn't read {path}"))?;
 
         let mut decoder = Smk::open_memory(&data).map_err(|e| anyhow::anyhow!("{path}: {e}"))?;
         decoder.enable_all(ENABLE_VIDEO | decoder.info_audio().track_mask);
@@ -113,7 +116,7 @@ impl Movie {
                 audio_deadline: Duration::ZERO,
                 deadline: None,
                 frame_released: false,
-                path: PathBuf::from(path),
+                path: file,
             },
         });
 

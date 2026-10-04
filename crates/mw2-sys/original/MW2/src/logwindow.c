@@ -1,6 +1,7 @@
 #include "logwindow.h"
 
 #include "decomp.h"
+#include "files.h"
 #include "types.h"
 
 #include <stdarg.h>
@@ -91,14 +92,14 @@ void PrintMono(MechChar* p_text)
 // FUNCTION: MW2 0x1003a2e6
 void CreateDebugLog(void)
 {
-	g_debugLogFile = fopen(g_debugLogName, "wt");
+	g_debugLogFile = MechFopen(g_debugLogName, "wt");
 }
 
 // FUNCTION: MW2 0x1003a308
 void AppendDebugLog(MechChar* p_text)
 {
 	if (g_debugLogFile == NULL) {
-		g_debugLogFile = fopen(g_debugLogName, "at");
+		g_debugLogFile = MechFopen(g_debugLogName, "at");
 	}
 
 	if (g_debugLogFile != NULL) {
