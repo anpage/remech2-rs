@@ -2,20 +2,9 @@ use std::{ffi::CString, ptr};
 
 use anyhow::{Context, Result};
 
-use binding::{macros::patch_groups, module::ModuleBase};
+use crate::{ailrs, sim::timing::G_DELTA_TIME};
 
-use crate::{
-    ailrs,
-    sim::{
-        timing::G_DELTA_TIME,
-        types::RenderTarget,
-        window::{G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH},
-    },
-};
-
-mod camera;
 mod cd_audio;
-mod hud;
 mod input;
 mod jumpjets;
 mod math;
@@ -24,20 +13,9 @@ mod shots;
 mod stats;
 mod ticks;
 mod timing;
-mod types;
-pub mod window;
+mod window;
 
 pub use overlay::OverlayUi;
-
-pub static MODULE: ModuleBase = ModuleBase::new("MW2.DLL");
-
-patch_groups! {
-    static PATCH_GROUPS = [
-        camera,
-        hud,
-        window,
-    ];
-}
 
 /// Runs a mission.
 /// Returns the sim's exit code: 255 to leave the game, anything else to go back to the shell.

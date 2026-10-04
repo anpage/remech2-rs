@@ -35,6 +35,7 @@ extern "C"
 	int SimMain(char* p_cmdLine, struct NetLaunchInfo* p_netLaunch);
 	void HandleMessages(void);
 	void UpdatePauseState(void);
+	// Implemented on the Rust side (src/sim/window.rs)
 	void SetGameResolution(char* p_driverName);
 
 #ifdef __cplusplus

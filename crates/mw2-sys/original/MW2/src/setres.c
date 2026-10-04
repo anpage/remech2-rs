@@ -40,24 +40,8 @@ void SetPixelAspect(GameWindowGeometry* p_geometry)
 		MulDiv64(p_geometry->m_height << 16, 0x15555, p_geometry->m_width << 16);
 }
 
-// Picks the art resolution (g_artResolution) closest to the window's.
-// FUNCTION: MW2 0x1005d44e
-void ChooseArtResolution(GameWindowGeometry* p_geometry)
-{
-	MechS32 best;
-	MechS32 distance;
-	MechS32 i;
-
-	best = 7;
-	for (i = 0; i < 3; i++) {
-		distance = abs(g_artResolutionSizes[i].m_y - (p_geometry->m_height - 1)) +
-				   abs(g_artResolutionSizes[i].m_x - (p_geometry->m_width - 1));
-		if (distance < best) {
-			best = distance;
-			g_artResolution = i;
-		}
-	}
-}
+// ChooseArtResolution is implemented on the Rust side (src/sim/window.rs). The original only
+// took a resolution within 7 of the window's size, which 320x240 never is.
 
 // Rescales the tables authored in 320x200 coordinates to the screen, and sets up what depends on
 // the resolution.

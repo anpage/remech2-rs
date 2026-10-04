@@ -17,6 +17,7 @@ extern "C"
 	extern MechS32 g_pixelAspect;
 
 	void SetPixelAspect(GameWindowGeometry* p_geometry);
+	// Implemented on the Rust side (src/sim/window.rs)
 	void ChooseArtResolution(GameWindowGeometry* p_geometry);
 	void SetRes(void);
 

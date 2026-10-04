@@ -599,23 +599,5 @@ void UpdatePauseState(void)
 	}
 }
 
-// FUNCTION: MW2 0x10067e23
-void SetGameResolution(char* p_driverName)
-{
-	if (_strcmpi(p_driverName, "MCGA.DLL") == 0) {
-		g_gameWindowWidth = 320;
-		g_gameWindowHeight = 200;
-	}
-	else if (_strcmpi(p_driverName, "VESA480.DLL") == 0) {
-		g_gameWindowWidth = 640;
-		g_gameWindowHeight = 480;
-	}
-	else if (_strcmpi(p_driverName, "VESA768.DLL") == 0) {
-		g_gameWindowWidth = 1024;
-		g_gameWindowHeight = 768;
-	}
-	else {
-		g_gameWindowWidth = 320;
-		g_gameWindowHeight = 200;
-	}
-}
+// SetGameResolution is implemented on the Rust side (src/sim/window.rs). The original's low
+// resolution was 320x200, shown at 4:3 with tall pixels.
