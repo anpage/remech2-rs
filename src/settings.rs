@@ -31,8 +31,7 @@ impl GlobalSettings {
             .set("scaling", "sharp-bilinear");
         settings
             .with_section(Some("audio"))
-            .set("music_path", "Music")
-            .set("cd_source", "auto");
+            .set("music_path", "Music");
         settings
             .write_to_file(Self::SETTINGS_FILE_NAME)
             .unwrap_or_else(|_| {

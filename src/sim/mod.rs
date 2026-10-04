@@ -49,7 +49,6 @@ patch_groups! {
     static PATCH_GROUPS = [
         audio,
         camera,
-        cd_audio,
         drawmode::hooks,
         hud,
         input,

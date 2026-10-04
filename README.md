@@ -65,31 +65,25 @@ from the CD and install the 1.1 patch from the internet automatically.
 
 ### Music
 
-ReMech 2 can play the game's background music from files instead of from the CD.
+ReMech 2 plays the game's background music from files rather than from the CD.
 Put them in a `Music` folder in the game's working directory, named `track02.wav`
 through `track99.wav`. The numbering matches the CD's original track numbers,
 which is why it starts at 2. Track 1 on the disc is always game data. OGG and
 MP3 files work as well and file names are matched case-insensitively.
 
 If the folder is missing, or contains no files matching that pattern, the game
-falls back to playing music from the CD.
+has no music.
 
-Both defaults can be overridden in the `remech2.ini` that is created in the
-working directory the first time the game is run.
+The folder can be changed in the `remech2.ini` that is created in the working
+directory the first time the game is run.
 
 ```toml
 [audio]
 music_path="Music"
-cd_source="auto"
 ```
 
 `music_path` can either be relative to the working directory or an absolute
 path.
-
-`cd_source` can be either `"auto"` (default), `"files"`, or `"mci"`. `"files"`
-will play music from files at `music_path`, `"auto"` will fall back to playing
-music from CD if `music_path` is not present or has no usable tracks, and
-`"mci"` will only play music from CD and ignore `music_path`.
 
 ## Building
 

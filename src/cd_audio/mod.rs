@@ -1,22 +1,17 @@
-use std::{fs, path::PathBuf, time::Duration};
+use std::{fs, path::PathBuf};
 
 use anyhow::{Result, bail};
 use rodio::{Decoder, OutputStream, OutputStreamBuilder, Sink};
-use tracing::{debug, error, info, warn};
+use tracing::{error, info, warn};
 
-use crate::{cd_audio::tmsf::CdAudioPosition, settings::SETTINGS};
-
-pub mod source;
-pub mod tmsf;
+use crate::settings::SETTINGS;
 
 const MAX_CD_VOLUME: i32 = 65535;
-pub const MAX_TRACK: u32 = 99;
+const MAX_TRACK: i32 = 99;
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum AudioCdStatus {
-    _Unknown = 0,
-    _Open = 1,
     #[default]
     Stopped = 2,
     Playing = 3,
@@ -25,7 +20,7 @@ pub enum AudioCdStatus {
 }
 
 pub struct TrackInfo {
-    pub number: u32,
+    pub number: i32,
     pub path: PathBuf,
 }
 
@@ -34,7 +29,6 @@ pub struct CdAudioPlayer {
     sink: Sink,
     tracks: Vec<TrackInfo>,
     state: AudioCdStatus,
-    current_track: Option<u32>,
     volume: i32,
 }
 
@@ -51,7 +45,6 @@ impl CdAudioPlayer {
             sink,
             tracks,
             state: Default::default(),
-            current_track: None,
             volume: MAX_CD_VOLUME,
         })
     }
@@ -85,7 +78,7 @@ impl CdAudioPlayer {
                 continue;
             }
 
-            let track_number: Option<u32> =
+            let track_number: Option<i32> =
                 path.file_stem().and_then(|s| s.to_str()).and_then(|stem| {
                     stem.get(..5)
                         .filter(|prefix| prefix.eq_ignore_ascii_case("track"))
@@ -126,7 +119,12 @@ impl CdAudioPlayer {
         Ok(tracks)
     }
 
-    pub fn play_from(&mut self, track_number: u32, position: Duration) -> Result<()> {
+    pub fn has_track(&self, track_number: i32) -> bool {
+        self.tracks.iter().any(|t| t.number == track_number)
+    }
+
+    /// Plays a track from start to finish
+    pub fn play(&mut self, track_number: i32) -> Result<()> {
         let Some(track) = self.tracks.iter().find(|t| t.number == track_number) else {
             bail!("track not found: {}", track_number);
         };
@@ -137,15 +135,8 @@ impl CdAudioPlayer {
         self.sink = Sink::connect_new(self.stream.mixer());
         self.sink.set_volume(self.sink_volume());
         self.sink.append(decoder);
-        if !position.is_zero()
-            && let Err(e) = self.sink.try_seek(position)
-        {
-            warn!("seek failed: {e}")
-        }
-
         self.sink.play();
         self.state = AudioCdStatus::Playing;
-        self.current_track = Some(track_number);
 
         Ok(())
     }
@@ -166,18 +157,6 @@ impl CdAudioPlayer {
         self.state = AudioCdStatus::Playing;
     }
 
-    pub fn position(&mut self) -> Duration {
-        if self.sink.empty() {
-            self.state = AudioCdStatus::Stopped;
-            return Duration::ZERO;
-        }
-        self.sink.get_pos()
-    }
-
-    pub fn volume(&self) -> i32 {
-        self.volume
-    }
-
     pub fn set_volume(&mut self, volume: i32) {
         self.volume = volume.clamp(0, MAX_CD_VOLUME);
         self.sink.set_volume(self.sink_volume());
@@ -195,43 +174,8 @@ impl CdAudioPlayer {
         self.state
     }
 
-    pub fn tracks(&self) -> &[TrackInfo] {
-        &self.tracks
-    }
-
-    pub fn cd_position(&mut self) -> CdAudioPosition {
-        let Some(track) = self.current_track else {
-            return CdAudioPosition::default();
-        };
-        if self.state() == AudioCdStatus::Stopped {
-            return CdAudioPosition::default();
-        }
-        let pos = self.position();
-        CdAudioPosition::from_track_offset(track, pos)
-    }
-
-    pub fn play_tmsf(&mut self, from: u32, to: u32) -> Result<()> {
-        let from = CdAudioPosition::from(from);
-        let to = (to != 0).then(|| CdAudioPosition::from(to));
-
-        if let Some(to) = to {
-            if to.track == from.track + 1 && to.minute == 0 && to.second == 0 && to.frame == 0 {
-                // "play to end of track"
-            } else if to.track == from.track {
-                debug!("same-track end position ignored");
-            } else {
-                warn!("cross-track play range not supported");
-            }
-        }
-
-        self.play_from(from.track, from.track_offset())?;
-
-        Ok(())
-    }
-
     pub fn stop(&mut self) {
         self.sink.stop();
         self.state = AudioCdStatus::Stopped;
-        self.current_track = None;
     }
 }
