@@ -37,6 +37,7 @@ mod math;
 mod menu;
 mod shots;
 mod stats;
+mod ticks;
 mod timing;
 mod types;
 mod win32;

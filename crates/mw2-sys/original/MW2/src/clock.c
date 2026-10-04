@@ -10,7 +10,7 @@
 
 #include <math.h>
 
-// The game clock, in ticks of the 181 Hz Miles timer FirstClock registers.
+// The game clock, in the 181 Hz ticks of ticks.h, which FirstClock starts.
 
 // GLOBAL: MW2 0x100ba548
 MechS32 g_currentClock = 0;
@@ -28,9 +28,6 @@ MechS32 g_clockMode = 0;
 
 // GLOBAL: MW2 0x100ba558
 MechS32 g_clockPaused = 0;
-
-// GLOBAL: MW2 0x100ba55c
-HTIMER g_ticksTimer = -1;
 
 // GLOBAL: MW2 0x100ba560
 MechS32 g_timeCompressionEnabled = 0;
@@ -188,9 +185,7 @@ void ScaleVectorToLength(MechS32 p_length, MechS32* p_x, MechS32* p_y, MechS32* 
 void FirstClock(void)
 {
 	if (!g_ticksTimerInitialized) {
-		g_ticksTimer = AIL_register_timer((AILTIMERCB) GameTickTimerCallback);
-		AIL_set_timer_divisor(g_ticksTimer, 6556);
-		AIL_start_timer(g_ticksTimer);
+		StartTicks();
 		g_realClockHandle = AllocTicks(0x100);
 		g_clockHandle = AllocTicks(0x80);
 		g_syncTicksHandle = AllocTicks(0x80);
@@ -265,8 +260,7 @@ void StopTimers(void)
 		FreeTicks(g_syncTicksHandle);
 		FreeTicks(g_clockHandle);
 		FreeTicks(g_realClockHandle);
-		AIL_release_timer_handle(g_ticksTimer);
-		g_ticksTimer = -1;
+		StopTicks();
 		AIL_shutdown();
 		g_ticksTimerInitialized = FALSE;
 	}
