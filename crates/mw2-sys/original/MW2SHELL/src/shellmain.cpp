@@ -405,6 +405,8 @@ extern "C" int ShellMain(char* p_cmdLine)
 	InitTextColorMaps();
 
 	g_mw2Database = new TMPackDataBase(g_databaseName);
+	// The original left the saved volumes unread until the options screen was opened.
+	LoadSoundConfig();
 	g_audioSubsystem = new AudioSubsystem();
 	g_windowWidth = 640;
 	g_windowHeight = 480;

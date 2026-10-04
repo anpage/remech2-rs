@@ -9,12 +9,10 @@ use std::{
 };
 use tracing::Level;
 use tracing_subscriber::{filter, prelude::*};
-use windows::Win32::Foundation::{FALSE, HWND};
 
 use crate::{display::Overlay, settings::SETTINGS};
 
 mod about;
-mod ail;
 mod ailrs;
 mod app;
 mod cd_audio;
@@ -31,22 +29,20 @@ mod shell;
 mod sim;
 mod xmi;
 
-fn start_shell(window: HWND, intro_or_sim: &str) -> Result<i32> {
-    let shell = shell::Shell::new()?;
+fn start_shell(intro_or_sim: &str) -> Result<i32> {
     display::set_overlay(app::with(|app| {
         Overlay::Shell(shell::OverlayUi::new(app.egui_ctx()))
     }));
-    let result = shell.shell_main(intro_or_sim, window);
+    let result = shell::run(intro_or_sim);
     display::set_overlay(None);
     result
 }
 
-fn start_sim(window: HWND, cmd_line: &str) -> Result<i32> {
-    let sim = sim::Sim::new()?;
+fn start_sim(cmd_line: &str) -> Result<i32> {
     display::set_overlay(app::with(|app| {
         Overlay::Sim(sim::OverlayUi::new(app.egui_ctx()))
     }));
-    let result = sim.sim_main(cmd_line, std::ptr::null(), FALSE, window);
+    let result = sim::run(cmd_line);
     display::set_overlay(None);
     result
 }
@@ -87,15 +83,13 @@ fn main() -> Result<()> {
 
     app::install(app);
 
-    let window = HWND::default();
-
     if args.len() > 1 {
         // launch the sim with the given cmdline
-        start_sim(window, &args[1..].join(" "))?;
+        start_sim(&args[1..].join(" "))?;
         return Ok(());
     }
 
-    let mut result = start_shell(window, "intro")?;
+    let mut result = start_shell("intro")?;
 
     loop {
         if result == 255 {
@@ -117,12 +111,12 @@ fn main() -> Result<()> {
             format!("{} {}", cmd_line, "/V=5")
         };
 
-        result = start_sim(window, &cmd_line)?;
+        result = start_sim(&cmd_line)?;
 
         if result == 255 {
             return Ok(());
         }
 
-        result = start_shell(window, "sim")?;
+        result = start_shell("sim")?;
     }
 }

@@ -1,22 +1,10 @@
-use std::ffi::{CString, c_char, c_void};
+use std::{ffi::CString, ptr};
 
-use anyhow::{Context, Result, bail};
-use windows::{
-    Win32::{
-        Foundation::{FreeLibrary, HMODULE, HWND},
-        System::LibraryLoader::{GetProcAddress, LoadLibraryA},
-    },
-    core::{BOOL, s},
-};
+use anyhow::{Context, Result};
 
-use binding::{
-    macros::patch_groups,
-    module::ModuleBase,
-    patch::{apply_groups, revert_groups},
-};
+use binding::{macros::patch_groups, module::ModuleBase};
 
 use crate::{
-    ail::Ail,
     ailrs,
     sim::{
         timing::G_DELTA_TIME,
@@ -62,89 +50,11 @@ patch_groups! {
     ];
 }
 
-type SimMainProc = unsafe extern "stdcall" fn(
-    HMODULE,
-    u32,
-    *const c_char,
-    *const *const c_void,
-    BOOL,
-    HWND,
-) -> i32;
-
-pub struct Sim {
-    ail: Ail,
-    module: HMODULE,
-}
-
-impl Sim {
-    pub fn new() -> Result<Self> {
-        if MODULE.is_loaded() {
-            bail!("Can't load sim more than once");
-        }
-
-        let module = unsafe { LoadLibraryA(s!("MW2.DLL"))? };
-
-        match unsafe { Self::install(module) } {
-            Ok(ail) => Ok(Self { ail, module }),
-            Err(e) => {
-                revert_groups(PATCH_GROUPS);
-                MODULE.clear();
-                unsafe {
-                    let _ = FreeLibrary(module);
-                }
-                Err(e)
-            }
-        }
-    }
-
-    unsafe fn install(module: HMODULE) -> Result<Ail> {
-        MODULE.set(module.0 as usize);
-        unsafe { apply_groups(PATCH_GROUPS)? };
-
-        Ail::new()
-    }
-
-    pub fn sim_main(
-        &self,
-        cmd_line: &str,
-        unknown: *const *const c_void,
-        is_net_game: BOOL,
-        window: HWND,
-    ) -> Result<i32> {
-        let sim_main = unsafe {
-            let sim_main =
-                GetProcAddress(self.module, s!("SimMain")).context("Couldn't find SimMain")?;
-            std::mem::transmute::<*const (), SimMainProc>(sim_main as *const ())
-        };
-
-        let cmd_line = CString::new(cmd_line).context("CString::new failed")?;
-        let result = unsafe {
-            sim_main(
-                self.module,
-                0,
-                cmd_line.as_ptr(),
-                unknown,
-                is_net_game,
-                window,
-            )
-        };
-
-        if result == -1 {
-            bail!("REMECH 2 is unable to locate necessary program components.");
-        }
-
-        Ok(result)
-    }
-}
-
-impl Drop for Sim {
-    fn drop(&mut self) {
-        unsafe {
-            ailrs::shutdown();
-            revert_groups(PATCH_GROUPS);
-            self.ail.unhook();
-            MODULE.clear();
-            FreeLibrary(self.module).unwrap();
-        }
-    }
+/// Runs a mission.
+/// Returns the sim's exit code: 255 to leave the game, anything else to go back to the shell.
+pub fn run(cmd_line: &str) -> Result<i32> {
+    let cmd_line = CString::new(cmd_line).context("CString::new failed")?;
+    let result = unsafe { mw2_sys::sim::SimMain(cmd_line.as_ptr().cast_mut(), ptr::null_mut()) };
+    ailrs::shutdown();
+    Ok(result)
 }
