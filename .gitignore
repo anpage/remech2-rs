@@ -1,3 +1,4 @@
 /target
 /data*
 /wineprefix
+/crates/mw2-sys/original/.cache

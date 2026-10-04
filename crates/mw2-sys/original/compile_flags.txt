@@ -1,0 +1,8 @@
+--target=i686-w64-mingw32
+-fms-extensions
+-fwrapv
+-fno-strict-aliasing
+-Iutil
+-Icommon/include
+-Imss
+-Ismacker

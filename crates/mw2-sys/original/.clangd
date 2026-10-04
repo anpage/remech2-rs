@@ -1,0 +1,19 @@
+If:
+  PathMatch: MW2/.*
+CompileFlags:
+  Add: [-IMW2/include, -include, MW2/sim_names.h]
+---
+If:
+  PathMatch: MW2SHELL/.*
+CompileFlags:
+  Add: [-IMW2SHELL/include]
+---
+If:
+  PathMatch: MW2SHELL/.*\.(cpp|h)
+CompileFlags:
+  Add: [-xc++]
+---
+Diagnostics:
+  Suppress:
+    - writable-strings
+    - deprecated-non-prototype

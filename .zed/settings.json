@@ -1,11 +1,19 @@
 {
+  "file_types": {
+    "C++": ["**/MW2SHELL/include/*.h"],
+  },
   "lsp": {
+    "clangd": {
+      "binary": {
+        "arguments": ["--header-insertion=never"],
+      },
+    },
     "rust-analyzer": {
       "initialization_options": {
         "files": {
-          "excludeDirs": ["wineprefix"]
-        }
-      }
-    }
-  }
+          "excludeDirs": ["wineprefix"],
+        },
+      },
+    },
+  },
 }
