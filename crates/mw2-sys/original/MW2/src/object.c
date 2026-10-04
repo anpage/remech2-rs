@@ -41,7 +41,7 @@ SceneObject* CreateObj(SceneObject* p_parent, MechU32 p_flags)
 		obj->m_flags = c_objectPooled;
 	}
 	else if (p_flags & 4) {
-		obj = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(SceneObject));
+		obj = MechHeapAlloc(g_primaryHeap, sizeof(SceneObject));
 		if (obj == NULL) {
 			return NULL;
 		}
@@ -570,7 +570,7 @@ void DestroyObjTree(SceneObject* p_obj, ShapeCallback p_callback)
 	}
 
 	if (p_obj->m_flags & c_objectHeap) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_obj);
+		MechHeapFree(g_primaryHeap, p_obj);
 	}
 }
 

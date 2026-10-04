@@ -20,7 +20,7 @@ Font::Font(void* p_data, VideoDriver* p_videoDriver)
 // FUNCTION: MW2SHELL 0x10005394
 Font::~Font()
 {
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_data);
+	MechHeapFree(g_primaryHeap, m_data);
 }
 
 // FUNCTION: MW2SHELL 0x100053be

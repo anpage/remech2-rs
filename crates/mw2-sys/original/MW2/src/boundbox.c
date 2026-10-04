@@ -17,7 +17,7 @@ BoundBox* CreateBoundBox(void)
 {
 	BoundBox* box;
 
-	box = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(BoundBox));
+	box = MechHeapAlloc(g_primaryHeap, sizeof(BoundBox));
 	if (box) {
 		box->m_minX = box->m_minY = box->m_minZ = 0;
 		box->m_maxX = box->m_maxY = box->m_maxZ = 0;
@@ -58,7 +58,7 @@ BoundBox* CreateShapeBoundBox(Shape* p_shape)
 {
 	BoundBox* box;
 
-	box = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, 0x78);
+	box = MechHeapAlloc(g_primaryHeap, 0x78);
 	if (box) {
 		memset(box, 0, 0x78);
 		ComputeModelBounds(p_shape, &box->m_minX, &box->m_maxX, &box->m_minY, &box->m_maxY, &box->m_minZ, &box->m_maxZ);
@@ -171,7 +171,7 @@ void FreeBoundBox(Shape* p_shape)
 
 	switch (p_shape->m_collisionType) {
 	case 0:
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, data);
+		MechHeapFree(g_primaryHeap, data);
 		break;
 	case 5:
 		FreeQuadtree(data);

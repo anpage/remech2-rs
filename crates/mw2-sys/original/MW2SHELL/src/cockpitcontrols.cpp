@@ -1486,7 +1486,7 @@ void CpcOpenJoystickControlPanel(ScreenField*)
 
 	memset(&startupInfo, 0, sizeof(startupInfo));
 	startupInfo.cb = sizeof(startupInfo);
-	commandLine = (MechChar*) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, MAX_PATH);
+	commandLine = (MechChar*) MechHeapAlloc(g_primaryHeap, MAX_PATH);
 	if (commandLine != NULL) {
 		GetWindowsDirectory(commandLine, MAX_PATH);
 		strcat(commandLine, "\\control.exe joy.cpl");
@@ -1495,7 +1495,7 @@ void CpcOpenJoystickControlPanel(ScreenField*)
 			DebugPrint("CreateProcess failed: %d\n", GetLastError());
 		}
 
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, commandLine);
+		MechHeapFree(g_primaryHeap, commandLine);
 	}
 }
 

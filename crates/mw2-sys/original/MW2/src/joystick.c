@@ -140,19 +140,19 @@ MechS32 FillJoystickDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info)
 	}
 
 	p_info->m_axisNames = axisNames =
-		HeapAlloc(g_primaryHeap, HEAP_ZERO_MEMORY | HEAP_NO_SERIALIZE, 6 * sizeof(MechChar*));
+		MechHeapAllocZeroed(g_primaryHeap, 6 * sizeof(MechChar*));
 	p_info->m_axisShortNames = axisShortNames =
-		HeapAlloc(g_primaryHeap, HEAP_ZERO_MEMORY | HEAP_NO_SERIALIZE, 6 * sizeof(MechChar*));
+		MechHeapAllocZeroed(g_primaryHeap, 6 * sizeof(MechChar*));
 	p_info->m_buttonNames = buttonNames =
-		HeapAlloc(g_primaryHeap, HEAP_ZERO_MEMORY | HEAP_NO_SERIALIZE, 36 * sizeof(MechChar*));
+		MechHeapAllocZeroed(g_primaryHeap, 36 * sizeof(MechChar*));
 	p_info->m_buttonShortNames = buttonShortNames =
-		HeapAlloc(g_primaryHeap, HEAP_ZERO_MEMORY | HEAP_NO_SERIALIZE, 36 * sizeof(MechChar*));
+		MechHeapAllocZeroed(g_primaryHeap, 36 * sizeof(MechChar*));
 	if (!axisNames || !axisShortNames || !buttonNames || !buttonShortNames) {
 		JoystickCloseDevice(p_info);
 		return 1;
 	}
 
-	data = HeapAlloc(g_primaryHeap, HEAP_ZERO_MEMORY | HEAP_NO_SERIALIZE, sizeof(JoystickData));
+	data = MechHeapAllocZeroed(g_primaryHeap, sizeof(JoystickData));
 	if (!data) {
 		return 1;
 	}
@@ -204,8 +204,8 @@ MechS32 FillJoystickDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info)
 	}
 
 	p_info->m_axisCount = i;
-	buttonNames[0] = HeapAlloc(g_primaryHeap, HEAP_ZERO_MEMORY | HEAP_NO_SERIALIZE, 32 * 12);
-	buttonShortNames[0] = HeapAlloc(g_primaryHeap, HEAP_ZERO_MEMORY | HEAP_NO_SERIALIZE, 32 * 12);
+	buttonNames[0] = MechHeapAllocZeroed(g_primaryHeap, 32 * 12);
+	buttonShortNames[0] = MechHeapAllocZeroed(g_primaryHeap, 32 * 12);
 	if (!buttonNames[0] || !buttonShortNames[0]) {
 		JoystickCloseDevice(p_info);
 		return 1;
@@ -359,31 +359,31 @@ MechS32 JoystickCloseDevice(InputDeviceInfo* p_info)
 {
 	if (p_info) {
 		if (p_info->m_axisNames) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_info->m_axisNames);
+			MechHeapFree(g_primaryHeap, p_info->m_axisNames);
 		}
 
 		if (p_info->m_axisShortNames) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_info->m_axisShortNames);
+			MechHeapFree(g_primaryHeap, p_info->m_axisShortNames);
 		}
 
 		if (p_info->m_buttonNames) {
 			if (*p_info->m_buttonNames) {
-				HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, *p_info->m_buttonNames);
+				MechHeapFree(g_primaryHeap, *p_info->m_buttonNames);
 			}
 
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_info->m_buttonNames);
+			MechHeapFree(g_primaryHeap, p_info->m_buttonNames);
 		}
 
 		if (p_info->m_buttonShortNames) {
 			if (*p_info->m_buttonShortNames) {
-				HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, *p_info->m_buttonShortNames);
+				MechHeapFree(g_primaryHeap, *p_info->m_buttonShortNames);
 			}
 
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_info->m_buttonShortNames);
+			MechHeapFree(g_primaryHeap, p_info->m_buttonShortNames);
 		}
 
 		if (p_info->m_driverData) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_info->m_driverData);
+			MechHeapFree(g_primaryHeap, p_info->m_driverData);
 		}
 	}
 

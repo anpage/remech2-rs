@@ -188,7 +188,7 @@ MechSegment* SaveMechSegments(SceneObject* p_obj)
 		return NULL;
 	}
 
-	segment = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(MechSegment));
+	segment = MechHeapAlloc(g_primaryHeap, sizeof(MechSegment));
 	if (!segment) {
 		return NULL;
 	}

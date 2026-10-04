@@ -228,7 +228,7 @@ MechS32 StartPaletteFade(MechS32 p_palette, MechS32 p_duration, MechS32 p_mode)
 		}
 
 		if (fromSlot == -1) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, from);
+			MechHeapFree(g_primaryHeap, from);
 		}
 		else {
 			UnlockCachedResource(g_paletteResourceIds[fromSlot], g_resourceTypeTags[c_resTagPal]);
@@ -343,7 +343,7 @@ void StartPalettes(MechS32 p_dissolve)
 				g_currentDisplayBackend->m_setPaletteWithBrightness((PaletteColor*) palette);
 			}
 			else {
-				pixels = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, g_refreshModePixelCount);
+				pixels = MechHeapAllocZeroed(g_primaryHeap, g_refreshModePixelCount);
 				if (pixels) {
 					target = g_currentPane;
 					target.m_window = &buffer;
@@ -370,7 +370,7 @@ void StartPalettes(MechS32 p_dissolve)
 					}
 
 					g_currentDisplayBackend->m_setPaletteWithBrightness((PaletteColor*) palette);
-					HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, pixels);
+					MechHeapFree(g_primaryHeap, pixels);
 					FreeTicks(handle);
 				}
 			}

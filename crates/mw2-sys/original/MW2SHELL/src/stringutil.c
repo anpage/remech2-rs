@@ -20,7 +20,7 @@ MechChar* AllocateString(MechChar* p_string)
 		return NULL;
 	}
 
-	copy = (MechChar*) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, strlen(p_string) + 1);
+	copy = (MechChar*) MechHeapAlloc(g_primaryHeap, strlen(p_string) + 1);
 	if (copy == NULL) {
 		fprintf(stderr, "Out of memory in allocate string\n");
 		fflush(stderr);

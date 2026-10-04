@@ -215,27 +215,27 @@ Shape* FindClassById(MechS32 p_id)
 void FreeGeoTables(void)
 {
 	if (g_classes) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_classes);
+		MechHeapFree(g_primaryHeap, g_classes);
 		g_classes = NULL;
 	}
 
 	if (g_starIndices) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_starIndices);
+		MechHeapFree(g_primaryHeap, g_starIndices);
 		g_starIndices = NULL;
 	}
 
 	if (g_thingIndices) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_thingIndices);
+		MechHeapFree(g_primaryHeap, g_thingIndices);
 		g_thingIndices = NULL;
 	}
 
 	if (g_starIds) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_starIds);
+		MechHeapFree(g_primaryHeap, g_starIds);
 		g_starIds = NULL;
 	}
 
 	if (g_thingIds) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_thingIds);
+		MechHeapFree(g_primaryHeap, g_thingIds);
 		g_thingIds = NULL;
 	}
 
@@ -1077,7 +1077,7 @@ MechS32 ToggleBlockBoxes(void)
 			}
 
 			if (ref->m_id == -1) {
-				HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, data);
+				MechHeapFree(g_primaryHeap, data);
 			}
 			else {
 				UnlockCachedResource(ref->m_id, g_resourceTypeTags[c_resTagPoly]);
@@ -1126,7 +1126,7 @@ void ShowQuadtreeBoxes(QuadtreeNode* p_root)
 	if (data) {
 		LoadQuadtreeBoxes(p_root, data, size);
 		if (ref->m_id == -1) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, data);
+			MechHeapFree(g_primaryHeap, data);
 		}
 		else {
 			UnlockCachedResource(ref->m_id, g_resourceTypeTags[c_resTagPoly]);

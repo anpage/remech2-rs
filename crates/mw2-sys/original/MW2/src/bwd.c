@@ -159,7 +159,7 @@ void UnloadResource(BwdStream* p_stream)
 {
 	if (p_stream) {
 		if (p_stream->m_fromResource == 0) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_stream->m_data);
+			MechHeapFree(g_primaryHeap, p_stream->m_data);
 		}
 		else {
 			FreeCachedResource(p_stream->m_id, g_resourceTypeTags[c_resTagBwd]);

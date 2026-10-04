@@ -399,7 +399,7 @@ void ShutdownAudio(void)
 	ShutdownMidi();
 	ShutdownDigitalAudio();
 	SaveSndCfg("mw2snd.cfg", g_mw2SndCfgData);
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_mw2SndCfgData);
+	MechHeapFree(g_primaryHeap, g_mw2SndCfgData);
 }
 
 // FUNCTION: MW2 0x10007040

@@ -747,7 +747,7 @@ BOOL LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 		);
 	}
 	else {
-		p_slot->m_frameBuffer = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, p_slot->m_width * p_slot->m_height);
+		p_slot->m_frameBuffer = MechHeapAlloc(g_primaryHeap, p_slot->m_width * p_slot->m_height);
 		SmackToBuffer(p_slot->m_smack, 0, 0, p_slot->m_width, p_slot->m_height, p_slot->m_frameBuffer, 0);
 	}
 

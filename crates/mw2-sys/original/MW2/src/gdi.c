@@ -135,7 +135,7 @@ MechS32 GdiBegin(WINDOW* p_buffer, MechS32 p_width, MechS32 p_height)
 		return -1;
 	}
 
-	p_buffer->m_buffer = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, p_width * p_height);
+	p_buffer->m_buffer = MechHeapAllocZeroed(g_primaryHeap, p_width * p_height);
 	if (p_buffer->m_buffer == NULL) {
 		return 2;
 	}
@@ -166,7 +166,7 @@ MechS32 GdiEnd(void)
 		}
 
 		if (g_dibBits) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_dibBits);
+			MechHeapFree(g_primaryHeap, g_dibBits);
 		}
 
 		ReleaseDC(g_gameWindow, g_gdiWindowDc);

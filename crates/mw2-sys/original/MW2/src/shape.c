@@ -91,7 +91,7 @@ Model* AddModel(
 	vertexBytes = p_vertexCount * sizeof(Vertex);
 	faceBytes = p_faceCount * sizeof(Face);
 	size = p_extra + vertexBytes + faceBytes + 0x18;
-	memory = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, size);
+	memory = MechHeapAlloc(g_primaryHeap, size);
 	if (!memory) {
 		return NULL;
 	}
@@ -205,7 +205,7 @@ Shape* CreateShape(MechS32 p_vertexCount, MechS32 p_faceCount, MechS32 p_extra, 
 {
 	Shape* shape;
 
-	shape = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(Shape));
+	shape = MechHeapAlloc(g_primaryHeap, sizeof(Shape));
 	if (!shape) {
 		return NULL;
 	}
@@ -214,7 +214,7 @@ Shape* CreateShape(MechS32 p_vertexCount, MechS32 p_faceCount, MechS32 p_extra, 
 	shape->m_object = NULL;
 	shape->m_model = shape->m_models = NULL;
 	if (!AddModel(shape, 0, p_vertexCount, p_faceCount, p_extra, p_extraData)) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, shape);
+		MechHeapFree(g_primaryHeap, shape);
 		return NULL;
 	}
 
@@ -297,7 +297,7 @@ void FreeModel(Model* p_model)
 		return;
 	}
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_model);
+	MechHeapFree(g_primaryHeap, p_model);
 }
 
 // Removes the selected model from the shape's list and frees it.
@@ -348,7 +348,7 @@ void FreeShape(Shape* p_shape)
 	}
 
 	FreeBoundBox(p_shape);
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_shape);
+	MechHeapFree(g_primaryHeap, p_shape);
 }
 
 // FUNCTION: MW2 0x1003acbe

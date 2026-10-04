@@ -128,7 +128,7 @@ void StartSupAnim(MechS32 p_slowFade)
 		}
 	}
 
-	palette = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, 0x100 * sizeof(PaletteColor));
+	palette = MechHeapAllocZeroed(g_primaryHeap, 0x100 * sizeof(PaletteColor));
 	if (palette == NULL) {
 		return;
 	}
@@ -164,7 +164,7 @@ void StartSupAnim(MechS32 p_slowFade)
 		g_currentDisplayBackend->m_setPalette(0, 16, g_supAnimPalette, 1);
 	}
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, palette);
+	MechHeapFree(g_primaryHeap, palette);
 	g_supAnimShape = FILE_read(shapePath, NULL);
 	if (g_supAnimShape == NULL) {
 		return;

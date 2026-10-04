@@ -2,6 +2,7 @@
 #define SIMMAIN_H
 
 #include "decomp.h"
+#include "heap.h"
 #include "types.h"
 
 #include <windows.h>
@@ -25,7 +26,7 @@ extern "C"
 	extern MechS32 g_localPlayerId;
 	extern MechS32 g_startOnAutopilot;
 	extern struct VideoDriverChoice g_videoDriverChoice;
-	extern HANDLE g_primaryHeap;
+	extern MechHeap* g_primaryHeap;
 	extern MechS32 g_gameWindowWidth;
 	extern MechS32 g_gameWindowHeight;
 	extern MechS32 g_windowActive;

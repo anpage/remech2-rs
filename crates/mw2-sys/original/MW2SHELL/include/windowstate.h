@@ -2,6 +2,7 @@
 #define WINDOWSTATE_H
 
 #include "decomp.h"
+#include "heap.h"
 #include "types.h"
 
 #include <windows.h>
@@ -25,7 +26,7 @@ extern "C"
 	extern MechS32 g_helpRegistered;
 	extern MechS32 g_menuDialogOpen;
 	extern MechS32 g_littleMovies;
-	extern HANDLE g_primaryHeap;
+	extern MechHeap* g_primaryHeap;
 
 	undefined4 FUN_1003bf90(MechS32 p_unk0x00);
 

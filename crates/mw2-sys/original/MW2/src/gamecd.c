@@ -27,7 +27,7 @@ MechChar FindGameCdDrive(void)
 		return g_gameCdDrive;
 	}
 
-	drives = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, 0x69);
+	drives = MechHeapAllocZeroed(g_primaryHeap, 0x69);
 	GetLogicalDriveStrings(0x69, drives);
 	sprintf(path, " :\\OLD_HERC.DRV");
 	drive = drives;
@@ -53,7 +53,7 @@ MechChar FindGameCdDrive(void)
 		g_gameCdNumber = 0;
 	}
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, drives);
+	MechHeapFree(g_primaryHeap, drives);
 	return g_gameCdDrive;
 }
 

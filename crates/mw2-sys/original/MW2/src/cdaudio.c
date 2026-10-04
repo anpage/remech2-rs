@@ -579,7 +579,7 @@ MechS32 GetCdAudioTracks(CdAudioTracks* p_tracks)
 	count = parms.dwReturn;
 	p_tracks->m_firstTrack = 1;
 	p_tracks->m_numberOfTracks = count;
-	p_tracks->m_trackPositions = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, (count + 1) * 4);
+	p_tracks->m_trackPositions = MechHeapAlloc(g_primaryHeap, (count + 1) * 4);
 	if (p_tracks->m_trackPositions == NULL) {
 		g_cdAudioInitialized = 0;
 		return 1;
@@ -604,7 +604,7 @@ MechS32 GetCdAudioTracks(CdAudioTracks* p_tracks)
 void FreeCdAudioTracks(CdAudioTracks* p_tracks)
 {
 	if (p_tracks->m_trackPositions) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_tracks->m_trackPositions);
+		MechHeapFree(g_primaryHeap, p_tracks->m_trackPositions);
 		p_tracks->m_trackPositions = NULL;
 	}
 }

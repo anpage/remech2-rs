@@ -122,7 +122,7 @@ void ArchiveReader::AddTopic(MechS16 p_entry, MechS32 p_index)
 {
 	Topic* topic = NULL;
 
-	topic = (Topic*) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(Topic));
+	topic = (Topic*) MechHeapAlloc(g_primaryHeap, sizeof(Topic));
 	topic->m_id = p_index + c_buttonTopic;
 	topic->m_entry = p_entry;
 	ExpandCollection(m_topics, topic);

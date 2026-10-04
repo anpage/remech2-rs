@@ -498,11 +498,11 @@ SpeechEntry* FreeSpeechEntry(SpeechEntry* p_entry)
 	p_entry->m_used = 0;
 	p_entry->m_next = NULL;
 	if (p_entry->m_data) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_entry->m_data);
+		MechHeapFree(g_primaryHeap, p_entry->m_data);
 	}
 
 	if (p_entry->m_suffixData) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_entry->m_suffixData);
+		MechHeapFree(g_primaryHeap, p_entry->m_suffixData);
 	}
 
 	return next;

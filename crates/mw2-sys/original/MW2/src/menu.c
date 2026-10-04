@@ -81,7 +81,7 @@ MechS32 RegisterMenu(MechS32 p_id)
 	MenuSlot* slot;
 
 	result = 0;
-	slot = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(MenuSlot));
+	slot = MechHeapAlloc(g_primaryHeap, sizeof(MenuSlot));
 	if (slot == NULL) {
 		return result;
 	}
@@ -154,7 +154,7 @@ void FreeMenus(void)
 		DeactivateMenu(slot);
 		freed = slot;
 		slot = slot->m_next;
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, freed);
+		MechHeapFree(g_primaryHeap, freed);
 	}
 
 	g_menuSlots = NULL;

@@ -34,6 +34,7 @@ mod ailrs;
 mod cd_audio;
 mod common;
 mod drawmode;
+mod heap;
 mod launcher;
 mod midi_source;
 mod settings;

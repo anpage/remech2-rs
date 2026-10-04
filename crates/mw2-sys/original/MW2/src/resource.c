@@ -178,7 +178,7 @@ MechS32 LoadScenarioTable(ScenarioTable* p_table)
 
 	result = FALSE;
 	if (g_scenarios) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_scenarios);
+		MechHeapFree(g_primaryHeap, g_scenarios);
 	}
 
 	g_scenarios = NULL;
@@ -207,7 +207,7 @@ MechS32 LoadMissionTable(MissionTable* p_table)
 	result = FALSE;
 	slot = p_table->m_star;
 	if (g_missionTables[slot]) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_missionTables[slot]);
+		MechHeapFree(g_primaryHeap, g_missionTables[slot]);
 	}
 
 	g_missionTables[slot] = NULL;
@@ -426,20 +426,20 @@ void FreeMissionTables(void)
 	MechS32 i;
 
 	if (g_scenarios) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_scenarios);
+		MechHeapFree(g_primaryHeap, g_scenarios);
 	}
 
 	g_scenarios = NULL;
 	for (i = 0; i < 16; i++) {
 		if (g_missionTables[i]) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_missionTables[i]);
+			MechHeapFree(g_primaryHeap, g_missionTables[i]);
 		}
 
 		g_missionTables[i] = NULL;
 	}
 
 	if (g_unk0x100a860c) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_unk0x100a860c);
+		MechHeapFree(g_primaryHeap, g_unk0x100a860c);
 	}
 
 	g_unk0x100a860c = NULL;
@@ -778,7 +778,7 @@ void CreateObjectNode(
 	}
 
 	if (!fromResource) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, data);
+		MechHeapFree(g_primaryHeap, data);
 	}
 	else {
 		FreeCachedResource(resource, g_resourceTypeTags[c_resTagPoly]);

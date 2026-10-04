@@ -41,7 +41,7 @@ MechChar g_pageTemp[0x400];
 // Records the area of the link word just placed. Layout does this in three places.
 #define PAGE_ADD_LINK(WORD_WIDTH)                                                                                      \
 	if (link != -1) {                                                                                                  \
-		rect = (Link*) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(Link));                                      \
+		rect = (Link*) MechHeapAlloc(g_primaryHeap, sizeof(Link));                                      \
 		if (wrapped == TRUE) {                                                                                         \
 			rect->m_left = m_left;                                                                                     \
 			rect->m_top = m_top;                                                                                       \
@@ -542,8 +542,8 @@ Page::~Page()
 		delete glyph;
 	}
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_glyphs->m_items);
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_glyphs);
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_links->m_items);
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_links);
+	MechHeapFree(g_primaryHeap, m_glyphs->m_items);
+	MechHeapFree(g_primaryHeap, m_glyphs);
+	MechHeapFree(g_primaryHeap, m_links->m_items);
+	MechHeapFree(g_primaryHeap, m_links);
 }

@@ -189,7 +189,7 @@ MidiSequence::~MidiSequence()
 		Stop();
 		m_subsystem->m_currentMidiSequence = NULL;
 		AIL_release_sequence_handle(m_sequence);
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_data);
+		MechHeapFree(g_primaryHeap, m_data);
 	}
 }
 
@@ -266,7 +266,7 @@ AudioSample::~AudioSample()
 	if (m_sample) {
 		AIL_end_sample(m_sample);
 		AIL_release_sample_handle(m_sample);
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_data);
+		MechHeapFree(g_primaryHeap, m_data);
 	}
 }
 
@@ -439,13 +439,13 @@ VideoSound::VideoSound(AudioSubsystem* p_subsystem, MechS32 p_stereo, MechS32 p_
 			p_size <<= 1;
 		}
 
-		m_buffer0 = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, p_size);
-		m_buffer1 = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, p_size);
+		m_buffer0 = MechHeapAlloc(g_primaryHeap, p_size);
+		m_buffer1 = MechHeapAlloc(g_primaryHeap, p_size);
 	}
 
 	if (!m_buffer0 || !m_buffer1) {
 		if (m_buffer0) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_buffer0);
+			MechHeapFree(g_primaryHeap, m_buffer0);
 		}
 		AIL_release_sample_handle(m_sample);
 		if (!m_sample) {
@@ -467,10 +467,10 @@ VideoSound::~VideoSound()
 		AIL_end_sample(m_sample);
 		AIL_release_sample_handle(m_sample);
 		if (m_buffer0 != NULL) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_buffer0);
+			MechHeapFree(g_primaryHeap, m_buffer0);
 		}
 		if (m_buffer1 != NULL) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_buffer1);
+			MechHeapFree(g_primaryHeap, m_buffer1);
 		}
 	}
 }

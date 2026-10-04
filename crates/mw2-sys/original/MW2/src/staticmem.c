@@ -149,7 +149,7 @@ void FreeStaticMem(void)
 	MechS32 i;
 
 	for (i = 0; i < g_staticPoolGroupCount; i++) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_staticPoolGroups[i].m_block);
+		MechHeapFree(g_primaryHeap, g_staticPoolGroups[i].m_block);
 		g_staticPoolGroups[i].m_block = NULL;
 	}
 

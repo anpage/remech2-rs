@@ -89,7 +89,7 @@ MechS16 LoadAnim2d(MechU32 p_flags, MechS32 p_frameTime, MechS32 p_type, MechS16
 		return -1;
 	}
 
-	anim = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(Anim2d));
+	anim = MechHeapAlloc(g_primaryHeap, sizeof(Anim2d));
 	if (!anim) {
 		return -1;
 	}
@@ -126,7 +126,7 @@ void FreeAnim2d(MechS32 p_index)
 			UnlockCachedResource(g_anim2ds[p_index]->m_resourceId + g_artResolution, g_resourceTypeTags[c_resTagShp]);
 		}
 
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_anim2ds[p_index]);
+		MechHeapFree(g_primaryHeap, g_anim2ds[p_index]);
 		g_anim2ds[p_index] = NULL;
 	}
 }

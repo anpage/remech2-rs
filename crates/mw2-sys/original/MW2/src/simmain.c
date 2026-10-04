@@ -107,7 +107,7 @@ HWND g_gameWindow = NULL;
 HINSTANCE g_simModule = NULL;
 
 // GLOBAL: MW2 0x100acb68
-HANDLE g_primaryHeap = NULL;
+MechHeap* g_primaryHeap = NULL;
 
 // GLOBAL: MW2 0x100acb6c
 MechS32 g_gameWindowWidth = 0;
@@ -185,7 +185,7 @@ int __stdcall SimMain(
 	g_simModule = p_module;
 	g_desktopWidth = GetSystemMetrics(SM_CXSCREEN);
 	g_desktopHeight = GetSystemMetrics(SM_CYSCREEN);
-	g_primaryHeap = HeapCreate(HEAP_NO_SERIALIZE, 1000000, 0);
+	g_primaryHeap = MechHeapCreate();
 	if (g_primaryHeap == NULL) {
 		Error(9, "Insufficient memory available.");
 	}
@@ -515,7 +515,7 @@ int __stdcall SimMain(
 		}
 	}
 
-	HeapDestroy(g_primaryHeap);
+	MechHeapDestroy(g_primaryHeap);
 	g_primaryHeap = NULL;
 	while (ShowCursor(TRUE) < 1) {
 	}

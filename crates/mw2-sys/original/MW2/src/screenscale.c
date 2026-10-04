@@ -361,7 +361,7 @@ void DrawWrappedText(PANE* p_target, MechChar* p_text, void* p_font)
 		return;
 	}
 
-	buffer = p = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, length + 1);
+	buffer = p = MechHeapAlloc(g_primaryHeap, length + 1);
 	end = buffer + length;
 	strcpy(buffer, p_text);
 	ScalePointToFrame(p_target, &g_textMargins, &origin);
@@ -413,7 +413,7 @@ void DrawWrappedText(PANE* p_target, MechChar* p_text, void* p_font)
 		p++;
 	}
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, buffer);
+	MechHeapFree(g_primaryHeap, buffer);
 }
 
 // Sizes p_rect to fit a block of text, lines separated by newlines, plus the margins.

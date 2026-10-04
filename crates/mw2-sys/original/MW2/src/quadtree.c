@@ -216,7 +216,7 @@ QuadtreeNode* AllocQuadtreeNode(
 	QuadtreeNode* node;
 	MechS32 i;
 
-	node = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, p_faceCount * sizeof(undefined4) + sizeof(QuadtreeNode));
+	node = MechHeapAlloc(g_primaryHeap, p_faceCount * sizeof(undefined4) + sizeof(QuadtreeNode));
 	if (node) {
 		node->m_minX = p_minX;
 		node->m_maxX = p_maxX;
@@ -258,7 +258,7 @@ void FreeQuadtree(QuadtreeNode* p_node)
 		}
 	}
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_node);
+	MechHeapFree(g_primaryHeap, p_node);
 }
 
 // Returns whether face p_face of p_model overlaps the box from (p_minX, p_minZ) to

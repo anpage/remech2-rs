@@ -97,8 +97,8 @@ TMPackDataBase::~TMPackDataBase()
 		delete entry;
 	}
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_entries->m_items);
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_entries);
+	MechHeapFree(g_primaryHeap, m_entries->m_items);
+	MechHeapFree(g_primaryHeap, m_entries);
 	fclose(m_file);
 }
 
@@ -136,7 +136,7 @@ MechS32 TMPackDataBase::GetDBItem(MechS32 p_id, void** p_data, MechS32* p_size)
 		return 1;
 	}
 
-	data = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, entry->m_size);
+	data = MechHeapAlloc(g_primaryHeap, entry->m_size);
 	if (data == NULL) {
 		fprintf(stderr, "Out of memory in TMPackDataBaseObj :: GetDBItem\n");
 		fflush(stderr);
@@ -177,7 +177,7 @@ MechS32 TMPackDataBase::GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size
 		return 1;
 	}
 
-	out = (MechU8*) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, remaining);
+	out = (MechU8*) MechHeapAlloc(g_primaryHeap, remaining);
 	if (out == NULL) {
 		fprintf(stderr, "Out of memory in TMPackDataBaseObj :: GetDBItem\n");
 		fflush(stderr);

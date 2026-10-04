@@ -55,7 +55,7 @@ MechS32 InitializeDigitalAudio(MechU32 p_numSamples)
 		return -1;
 	}
 
-	g_audioEngine = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(AudioEngine));
+	g_audioEngine = MechHeapAlloc(g_primaryHeap, sizeof(AudioEngine));
 	if (!g_audioEngine) {
 		return -3;
 	}
@@ -63,7 +63,7 @@ MechS32 InitializeDigitalAudio(MechU32 p_numSamples)
 	memset(g_audioEngine, 0, sizeof(AudioEngine));
 	g_audioEngine->m_driver = OpenDigitalDriver();
 	if (!g_audioEngine->m_driver) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_audioEngine);
+		MechHeapFree(g_primaryHeap, g_audioEngine);
 		g_audioEngine = NULL;
 		return -4;
 	}
@@ -82,7 +82,7 @@ MechS32 InitializeDigitalAudio(MechU32 p_numSamples)
 			break;
 		}
 		else {
-			g_audioEngine->m_buffers[i][0] = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, 0x4000);
+			g_audioEngine->m_buffers[i][0] = MechHeapAlloc(g_primaryHeap, 0x4000);
 			if (!g_audioEngine->m_buffers[i][0]) {
 				g_audioEngine->m_numSamples = i;
 				break;
@@ -115,10 +115,10 @@ void ShutdownDigitalAudio(void)
 			g_audioEngine->m_playing[i] = 0;
 		}
 
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_audioEngine->m_buffers[i][0]);
+		MechHeapFree(g_primaryHeap, g_audioEngine->m_buffers[i][0]);
 	}
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_audioEngine);
+	MechHeapFree(g_primaryHeap, g_audioEngine);
 	g_audioEngine = NULL;
 }
 
@@ -362,7 +362,7 @@ MechS32 StartSample(MechS32 p_id, void* p_data, MechU16 p_flags, MechS16 p_slot,
 
 	if (strncmp(g_audioEngine->m_headers[slot].m_tag, g_sampleTag, 4)) {
 		if (p_data) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_data);
+			MechHeapFree(g_primaryHeap, p_data);
 		}
 		else {
 			UnlockCachedResource(p_id, g_resourceTypeTags[c_resTagSnds]);
@@ -437,7 +437,7 @@ void AILCALLBACK SampleEosCallback(HSAMPLE p_sample)
 
 	data = (void*) AIL_sample_user_data(p_sample, 4);
 	if (data) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, data);
+		MechHeapFree(g_primaryHeap, data);
 	}
 
 	if (next) {

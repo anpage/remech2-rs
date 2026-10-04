@@ -12,7 +12,7 @@
 // The original frees through a macro: its trailing empty `else` emits a `jmp` to the next statement.
 #define HEAP_FREE(p_mem)                                                                                               \
 	if ((p_mem) != NULL) {                                                                                             \
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, (p_mem));                                                           \
+		MechHeapFree(g_primaryHeap, (p_mem));                                                           \
 		(p_mem) = NULL;                                                                                                \
 	}                                                                                                                  \
 	else
@@ -31,7 +31,7 @@ MechS32 CreateCollection(
 	void** items;
 	MechS32 i;
 
-	collection = (Collection*) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(Collection));
+	collection = (Collection*) MechHeapAlloc(g_primaryHeap, sizeof(Collection));
 	if (collection == NULL) {
 		fprintf(stderr, "Could not allocate collection\n");
 		fflush(stderr);
@@ -47,7 +47,7 @@ MechS32 CreateCollection(
 	collection->m_unsorted = 0;
 	collection->m_compare = p_compare;
 
-	items = (void**) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, collection->m_growBy * sizeof(void*));
+	items = (void**) MechHeapAlloc(g_primaryHeap, collection->m_growBy * sizeof(void*));
 	if (items == NULL) {
 		fprintf(stderr, "Out of memory in create collection\n");
 		fflush(stderr);
@@ -94,10 +94,10 @@ MechS32 ExpandCollection(Collection* p_collection, void* p_item)
 
 		if (items != NULL) {
 			items =
-				(void**) HeapReAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, items, p_collection->m_capacity * sizeof(void*));
+				(void**) MechHeapReAlloc(g_primaryHeap, items, p_collection->m_capacity * sizeof(void*));
 		}
 		else {
-			items = (void**) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, p_collection->m_capacity * sizeof(void*));
+			items = (void**) MechHeapAlloc(g_primaryHeap, p_collection->m_capacity * sizeof(void*));
 		}
 
 		if (items == NULL) {
@@ -245,7 +245,7 @@ void ClearCollection(Collection* p_collection)
 	p_collection->m_count = 0;
 	p_collection->m_unsorted = 0;
 
-	items = (void**) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, p_collection->m_growBy * sizeof(void*));
+	items = (void**) MechHeapAlloc(g_primaryHeap, p_collection->m_growBy * sizeof(void*));
 	if (items == NULL) {
 		fprintf(stderr, "Out of memory in clear collection\n");
 		fflush(stderr);

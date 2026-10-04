@@ -37,7 +37,7 @@ PopupPicture::PopupPicture(
 
 	m_saved.m_xMax = m_width - 1;
 	m_saved.m_yMax = m_height - 1;
-	m_saved.m_buffer = (undefined*) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, m_width * m_height);
+	m_saved.m_buffer = (undefined*) MechHeapAlloc(g_primaryHeap, m_width * m_height);
 
 	m_savedView.m_x0 = 0;
 	m_savedView.m_y0 = 0;
@@ -58,7 +58,7 @@ PopupPicture::PopupPicture(
 PopupPicture::~PopupPicture()
 {
 	Hide();
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_data);
+	MechHeapFree(g_primaryHeap, m_data);
 
 	if (m_sample) {
 		m_sample->Stop();

@@ -369,7 +369,7 @@ void LayoutWeaponPanels(Mech* p_mech)
 		}
 	}
 
-	weapons = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, 10 * sizeof(WeaponSlot));
+	weapons = MechHeapAllocZeroed(g_primaryHeap, 10 * sizeof(WeaponSlot));
 	dst = weapons;
 	for (i = 3; i <= 7; i++) {
 		if (g_cockpitPanels[i]->m_weapon != -1) {
@@ -421,7 +421,7 @@ void LayoutWeaponPanels(Mech* p_mech)
 	}
 
 	memcpy(p_mech->m_weapons, weapons, 10 * sizeof(WeaponSlot));
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, weapons);
+	MechHeapFree(g_primaryHeap, weapons);
 	for (i = 0; i < 10; i++) {
 		slot = &p_mech->m_weapons[i];
 		if (!slot->m_type && !slot->m_ammo) {
@@ -479,7 +479,7 @@ void InitCockpitPanels(void)
 
 	mech = g_players[g_localPlayerId]->m_mech;
 	for (i = 0; i < c_panelCount; i++) {
-		g_cockpitPanels[i] = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(CockpitPanel));
+		g_cockpitPanels[i] = MechHeapAlloc(g_primaryHeap, sizeof(CockpitPanel));
 		InitCockpitPanel(g_cockpitPanels[i]);
 		g_cockpitPanels[i]->m_setLightUpTime(g_cockpitPanels[i], g_cockpitPanelLightUpTimes[i]);
 		g_cockpitPanels[i]->m_setTarget(g_cockpitPanels[i], &g_cockpitPanelPanes[i]);
@@ -824,7 +824,7 @@ MechS32 LoadMgdFile(
 	cursor++;
 	*p_radius = *cursor;
 	if (p_ref->m_id == -1) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, data);
+		MechHeapFree(g_primaryHeap, data);
 	}
 	else {
 		UnlockCachedResource(p_ref->m_id, g_resourceTypeTags[c_resTagMgeo]);
@@ -990,7 +990,7 @@ MechS32 LoadHudFile(ResourceRef* p_ref)
 	}
 
 	if (p_ref->m_id == -1) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, data);
+		MechHeapFree(g_primaryHeap, data);
 	}
 	else {
 		UnlockCachedResource(p_ref->m_id, g_resourceTypeTags[c_resTagHud]);
@@ -1062,7 +1062,7 @@ MechS32 LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels, Point* p
 	p_point->m_y = *value;
 	value++;
 	if (p_ref->m_id == -1) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, data);
+		MechHeapFree(g_primaryHeap, data);
 	}
 	else {
 		UnlockCachedResource(p_ref->m_id, g_resourceTypeTags[c_resTagCpit]);
@@ -1123,7 +1123,7 @@ MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_po
 
 	*p_size = filelength(file);
 	if (p_poolTag == NULL) {
-		*p_data = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, *p_size);
+		*p_data = MechHeapAlloc(g_primaryHeap, *p_size);
 	}
 	else {
 		*p_data = StaticPoolAlloc(*p_size, *p_poolTag);
@@ -1136,7 +1136,7 @@ MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_po
 
 	if (read(file, *p_data, *p_size) != *p_size) {
 		if (p_poolTag == NULL) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, *p_data);
+			MechHeapFree(g_primaryHeap, *p_data);
 		}
 		close(file);
 		return -1;
@@ -1193,7 +1193,7 @@ MechS32 LoadDifficultyCfg(MechChar* p_name, DifficultyCfg** p_cfg)
 	MechS32 file;
 	void* data;
 
-	*p_cfg = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, sizeof(DifficultyCfg));
+	*p_cfg = MechHeapAllocZeroed(g_primaryHeap, sizeof(DifficultyCfg));
 	file = LoadFile(BuildGamePath(p_name), &size, &data, NULL);
 	if (file != -1) {
 		memcpy(*p_cfg, data, size);
@@ -1257,7 +1257,7 @@ MechS32 LoadSndCfg(MechChar* p_name, SoundConfig** p_cfg)
 		*p_cfg = data;
 	}
 	else {
-		*p_cfg = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, sizeof(SoundConfig));
+		*p_cfg = MechHeapAllocZeroed(g_primaryHeap, sizeof(SoundConfig));
 		return -1;
 	}
 

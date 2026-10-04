@@ -436,7 +436,7 @@ extern "C" int __stdcall ShellMain(
 	MSG msg;
 	BOOL fromSim = FALSE;
 
-	g_primaryHeap = HeapCreate(HEAP_NO_SERIALIZE, 1000000, 0);
+	g_primaryHeap = MechHeapCreate();
 	if (g_primaryHeap == NULL) {
 		MessageBox(NULL, "Insufficient memory available.", g_windowClassName, MB_ICONEXCLAMATION);
 		return 0xff;
@@ -568,7 +568,7 @@ extern "C" int __stdcall ShellMain(
 		WinHelp(g_gameWindow, NULL, HELP_QUIT, 0);
 	}
 
-	HeapDestroy(g_primaryHeap);
+	MechHeapDestroy(g_primaryHeap);
 	g_primaryHeap = NULL;
 
 	if (msg.wParam == c_msgQuitToSim) {

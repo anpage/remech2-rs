@@ -274,16 +274,16 @@ void FirstNetwork(NetLaunchInfo* p_netLaunch)
 
 		g_careerRecord.m_playerCount = g_playerCount;
 		g_stateMsgSize = sizeof(NetStateMsg);
-		g_stateMsg = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, g_stateMsgSize);
+		g_stateMsg = MechHeapAlloc(g_primaryHeap, g_stateMsgSize);
 		memset(g_stateMsg, 0, g_stateMsgSize);
 		g_weaponsMsg = (NetWeaponsMsg*) g_stateMsg;
 		g_thingsMsgSize = 0x27;
-		g_thingsMsg = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, g_thingsMsgSize);
+		g_thingsMsg = MechHeapAlloc(g_primaryHeap, g_thingsMsgSize);
 		memset(g_thingsMsg, 0, g_thingsMsgSize);
-		g_chatMsg = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(NetChatMsg));
+		g_chatMsg = MechHeapAlloc(g_primaryHeap, sizeof(NetChatMsg));
 		memset(g_chatMsg, 0, sizeof(NetChatMsg));
-		g_unk0x101770cc = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, 0x100);
-		g_netRecvBuffer = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, 0x100);
+		g_unk0x101770cc = MechHeapAlloc(g_primaryHeap, 0x100);
+		g_netRecvBuffer = MechHeapAlloc(g_primaryHeap, 0x100);
 		for (i = 0; i < 8; i++) {
 			g_lastStateClock[i] = 0;
 			g_lastThingsCount[i] = 0;
@@ -436,19 +436,19 @@ void ShutdownNetwork(void)
 	StopExternalIO();
 	if (g_netState) {
 		if (g_stateMsg) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_stateMsg);
+			MechHeapFree(g_primaryHeap, g_stateMsg);
 		}
 
 		if (g_thingsMsg) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_thingsMsg);
+			MechHeapFree(g_primaryHeap, g_thingsMsg);
 		}
 
 		if (g_chatMsg) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_chatMsg);
+			MechHeapFree(g_primaryHeap, g_chatMsg);
 		}
 
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_unk0x101770cc);
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_netRecvBuffer);
+		MechHeapFree(g_primaryHeap, g_unk0x101770cc);
+		MechHeapFree(g_primaryHeap, g_netRecvBuffer);
 	}
 }
 

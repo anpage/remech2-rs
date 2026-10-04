@@ -746,10 +746,10 @@ void UpdateDorcs(void)
 		g_showHud = 0;
 		CloseInGameMenus();
 		g_dorcsGifTarget = g_currentPane;
-		g_dorcsGifState = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, 0x502e);
+		g_dorcsGifState = MechHeapAlloc(g_primaryHeap, 0x502e);
 		if (g_dorcsGifState) {
 			g_dorcsPalette =
-				HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, 0x100 * sizeof(PaletteColor));
+				MechHeapAllocZeroed(g_primaryHeap, 0x100 * sizeof(PaletteColor));
 			if (g_dorcsPalette) {
 				g_currentDisplayBackend->m_setPalette(0, 0x100, g_dorcsPalette, 1);
 				g_dorcsGif = ReadVfxBin("vfxjk");
@@ -861,12 +861,12 @@ void UpdateDorcs(void)
 
 			g_dorcsGif = NULL;
 			if (g_dorcsPalette) {
-				HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_dorcsPalette);
+				MechHeapFree(g_primaryHeap, g_dorcsPalette);
 			}
 
 			g_dorcsPalette = NULL;
 			if (g_dorcsGifState) {
-				HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_dorcsGifState);
+				MechHeapFree(g_primaryHeap, g_dorcsGifState);
 			}
 
 			g_dorcsGifState = NULL;

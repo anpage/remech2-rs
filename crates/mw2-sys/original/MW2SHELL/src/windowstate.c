@@ -40,7 +40,7 @@ MechS32 g_menuDialogOpen = 0;
 MechS32 g_littleMovies = 0;
 
 // GLOBAL: MW2SHELL 0x1006a9f4
-HANDLE g_primaryHeap = NULL;
+MechHeap* g_primaryHeap = NULL;
 
 // GLOBAL: MW2SHELL 0x100965d8
 MechS32 g_windowHeight;

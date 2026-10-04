@@ -366,7 +366,7 @@ MechS32 LoadMechConfig(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p
 		UnlockCachedResource(p_id, g_resourceTypeTags[c_resTagMek]);
 	}
 	else {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, header);
+		MechHeapFree(g_primaryHeap, header);
 	}
 
 	return TRUE;

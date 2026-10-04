@@ -89,7 +89,7 @@ void LockCacheEntry(ResourceCacheEntry* p_item)
 // FUNCTION: MW2 0x10019c0c
 void AllocateCacheTable(void)
 {
-	g_cacheTable = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, 0x3f1 * sizeof(ResourceCacheEntry*));
+	g_cacheTable = MechHeapAllocZeroed(g_primaryHeap, 0x3f1 * sizeof(ResourceCacheEntry*));
 }
 
 // Rebuilds the purge list from the unlocked items.
@@ -133,7 +133,7 @@ void ShutdownResourceCache(void)
 	g_cacheEntryCount = 0;
 	g_purgeListHead = NULL;
 	g_purgeListTail = NULL;
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_cacheTable);
+	MechHeapFree(g_primaryHeap, g_cacheTable);
 }
 
 // FUNCTION: MW2 0x10019d73
@@ -220,7 +220,7 @@ void FreeCacheEntry(ResourceCacheEntry* p_item)
 		}
 	}
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_item);
+	MechHeapFree(g_primaryHeap, p_item);
 	g_cacheEntryCount--;
 }
 
@@ -248,7 +248,7 @@ void DumpResourceCache(void)
 				item->m_id,
 				type,
 				item->m_lock,
-				HeapSize(g_primaryHeap, HEAP_NO_SERIALIZE, item)
+				MechHeapSize(g_primaryHeap, item)
 			);
 		}
 	}
@@ -262,7 +262,7 @@ void DumpResourceCache(void)
 			item->m_id,
 			type,
 			item->m_lock,
-			HeapSize(g_primaryHeap, HEAP_NO_SERIALIZE, item)
+			MechHeapSize(g_primaryHeap, item)
 		);
 	}
 
@@ -346,7 +346,7 @@ void* LoadCachedResource(MechS32 p_file, MechS32 p_id, const char* p_type, undef
 		return NULL;
 	}
 
-	while ((item = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, size + sizeof(ResourceCacheEntry))) == NULL) {
+	while ((item = MechHeapAlloc(g_primaryHeap, size + sizeof(ResourceCacheEntry))) == NULL) {
 		if (g_purgeListHead) {
 			FreeCacheEntry(g_purgeListHead);
 		}
@@ -428,7 +428,7 @@ MechS32 PurgeOldestCacheEntry(void)
 // FUNCTION: MW2 0x1001a59a
 void* MemAlloc(MechU32 p_size)
 {
-	return HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, p_size);
+	return MechHeapAllocZeroed(g_primaryHeap, p_size);
 }
 
 // FUNCTION: MW2 0x1001a5bc
@@ -500,5 +500,5 @@ void* MemSet(void* p_dst, MechS32 p_value, MechU32 p_size)
 // FUNCTION: MW2 0x1001a61e
 void MemFree(void* p_block)
 {
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_block);
+	MechHeapFree(g_primaryHeap, p_block);
 }

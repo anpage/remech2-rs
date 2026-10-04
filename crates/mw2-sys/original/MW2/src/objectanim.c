@@ -259,7 +259,7 @@ MechS32 ReelMotionTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS
 
 		if (!g_lastPlayer) {
 			g_reelMotionError = 1;
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, motion);
+			MechHeapFree(g_primaryHeap, motion);
 			return 0;
 		}
 
@@ -686,7 +686,7 @@ MechS32 ColorCycleTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS
 
 	switch (p_event) {
 	case 0:
-		cycle = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(ColorCycle));
+		cycle = MechHeapAlloc(g_primaryHeap, sizeof(ColorCycle));
 		if (!cycle) {
 			return 0;
 		}
@@ -774,7 +774,7 @@ MechS32 SpinTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_p
 
 	switch (p_event) {
 	case 0:
-		spin = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(ObjectSpin));
+		spin = MechHeapAlloc(g_primaryHeap, sizeof(ObjectSpin));
 		if (!spin) {
 			return 0;
 		}
@@ -863,7 +863,7 @@ MechS32 OrbitTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_
 
 	switch (p_event) {
 	case 0:
-		orbit = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(ObjectOrbit));
+		orbit = MechHeapAlloc(g_primaryHeap, sizeof(ObjectOrbit));
 		if (!orbit) {
 			return 0;
 		}
@@ -946,7 +946,7 @@ MechS32 AmbientSoundTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, Mec
 
 	switch (p_event) {
 	case 0:
-		sound = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(AmbientSound));
+		sound = MechHeapAlloc(g_primaryHeap, sizeof(AmbientSound));
 		if (!sound) {
 			return 0;
 		}
@@ -1074,7 +1074,7 @@ MechS32 PathTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_p
 		}
 		break;
 	case 0:
-		follower = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, sizeof(PathFollower));
+		follower = MechHeapAlloc(g_primaryHeap, sizeof(PathFollower));
 		if (!follower) {
 			return 0;
 		}

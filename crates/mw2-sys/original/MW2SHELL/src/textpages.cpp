@@ -156,7 +156,7 @@ void LayoutTextPages(
 		ExpandCollection(p_pages, page);
 	} while (text);
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, text);
+	MechHeapFree(g_primaryHeap, text);
 }
 
 // Lays out the text (HTXT node) of the project file p_name on pages, in colors that draw 0

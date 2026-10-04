@@ -126,7 +126,7 @@ void* LoadResourceByRef(
 			UnlockCachedResource(id, p_type);
 		}
 		else {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, loaded);
+			MechHeapFree(g_primaryHeap, loaded);
 		}
 	}
 

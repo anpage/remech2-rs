@@ -388,7 +388,7 @@ MechS32 DdrawInit(WINDOW* p_buffer, MechS32 p_width, MechS32 p_height)
 	p_buffer->m_bitmapInfo = &g_bitmapInfo;
 
 	if (g_ddrawPalette == NULL) {
-		if ((entries = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, 0x100 * sizeof(PALETTEENTRY))) !=
+		if ((entries = MechHeapAllocZeroed(g_primaryHeap, 0x100 * sizeof(PALETTEENTRY))) !=
 			NULL) {
 			g_ddrawResult =
 				IDirectDraw_CreatePalette(g_ddraw, DDPCAPS_8BIT | DDPCAPS_ALLOW256, entries, &g_ddrawPalette, NULL);

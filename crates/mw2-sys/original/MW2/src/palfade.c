@@ -19,7 +19,7 @@ MechS32 InitPaletteCycle(PaletteCycle* p_cycle, MechU8* p_palette, MechU8 p_firs
 	MechS32 i;
 	MechU8* dst;
 
-	working = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, p_count * 3);
+	working = MechHeapAlloc(g_primaryHeap, p_count * 3);
 	if (working == NULL) {
 		return 0;
 	}
@@ -66,7 +66,7 @@ void RotatePaletteCycle(PaletteCycle* p_cycle)
 void FreePaletteCycle(PaletteCycle* p_cycle)
 {
 	if (p_cycle->m_working) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_cycle->m_working);
+		MechHeapFree(g_primaryHeap, p_cycle->m_working);
 		p_cycle->m_working = NULL;
 	}
 
@@ -90,7 +90,7 @@ MechS32 InitPaletteFade(
 	MechS8* delta;
 	MechU8* block;
 
-	block = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, p_count * 12);
+	block = MechHeapAlloc(g_primaryHeap, p_count * 12);
 	if (block == NULL) {
 		return -1;
 	}
@@ -139,7 +139,7 @@ void StepPaletteFade(PaletteFade* p_fade)
 	p_fade->m_step++;
 	if (p_fade->m_step >= p_fade->m_steps && p_fade->m_palette) {
 		if (p_fade->m_palette) {
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_fade->m_palette);
+			MechHeapFree(g_primaryHeap, p_fade->m_palette);
 			p_fade->m_palette = NULL;
 		}
 

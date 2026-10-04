@@ -72,7 +72,7 @@ void RemoveTask(TimedCallback** p_list, TimedCallback* p_callback)
 
 	g_currentCallback = p_callback;
 	p_callback->m_fn(2, NULL, g_currentClock, p_callback->m_period);
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_callback->m_data);
+	MechHeapFree(g_primaryHeap, p_callback->m_data);
 }
 
 // FUNCTION: MW2 0x1007d475

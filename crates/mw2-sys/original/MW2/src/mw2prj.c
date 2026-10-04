@@ -96,5 +96,5 @@ void* Mw2PrjAlloc(MechU32 p_size)
 // FUNCTION: MW2 0x100508dc
 void Mw2PrjFree(void* p_block)
 {
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, p_block);
+	MechHeapFree(g_primaryHeap, p_block);
 }

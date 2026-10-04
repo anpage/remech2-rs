@@ -125,7 +125,7 @@ WINDOW g_mainPixelBuffer;
 // FUNCTION: MW2 0x10012720
 MechS32 InitGameWindowGeometry(void)
 {
-	g_gameWindowGeometry = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, sizeof(GameWindowGeometry));
+	g_gameWindowGeometry = MechHeapAllocZeroed(g_primaryHeap, sizeof(GameWindowGeometry));
 	if (g_gameWindowGeometry == NULL) {
 		return 0;
 	}
@@ -377,7 +377,7 @@ void ShutdownRender(void)
 	}
 
 	if (g_bannerBuffer) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, g_bannerBuffer);
+		MechHeapFree(g_primaryHeap, g_bannerBuffer);
 	}
 
 	g_displayReady = 0;
@@ -423,9 +423,9 @@ void ShowBanner(void)
 
 	gif = FILE_read(path, NULL);
 	if (gif) {
-		state = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE, 0x502e);
+		state = MechHeapAlloc(g_primaryHeap, 0x502e);
 		if (state) {
-			palette = HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, 0x100 * sizeof(PaletteColor));
+			palette = MechHeapAllocZeroed(g_primaryHeap, 0x100 * sizeof(PaletteColor));
 			if (palette) {
 				g_currentDisplayBackend->m_setPalette(0, 0x100, palette, 1);
 				target = g_currentPane;
@@ -439,13 +439,13 @@ void ShowBanner(void)
 
 				VFX_GIF_palette(gif, (MechU8*) palette);
 				g_currentDisplayBackend->m_blendPalettes(palette, 30);
-				HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, palette);
+				MechHeapFree(g_primaryHeap, palette);
 			}
 
-			HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, state);
+			MechHeapFree(g_primaryHeap, state);
 		}
 
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, gif);
+		MechHeapFree(g_primaryHeap, gif);
 	}
 }
 

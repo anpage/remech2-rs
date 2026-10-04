@@ -93,7 +93,7 @@ void FreeBwdNames(void)
 	while (next != NULL) {
 		node = next;
 		next = next->m_next;
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, node);
+		MechHeapFree(g_primaryHeap, node);
 	}
 
 	g_bwdNames = NULL;

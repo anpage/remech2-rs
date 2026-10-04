@@ -240,6 +240,6 @@ TextGlyph::~TextGlyph()
 	Shutdown();
 
 	if (m_text != NULL) {
-		HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_text);
+		MechHeapFree(g_primaryHeap, m_text);
 	}
 }

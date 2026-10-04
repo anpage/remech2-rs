@@ -87,7 +87,7 @@ VideoDriver::VideoDriver()
 	m_screenBuffer.m_yMax = m_backBuffer.m_yMax = m_height - 1;
 
 	m_backBuffer.m_buffer =
-		(undefined*) HeapAlloc(g_primaryHeap, HEAP_NO_SERIALIZE | HEAP_ZERO_MEMORY, m_width * m_height);
+		(undefined*) MechHeapAllocZeroed(g_primaryHeap, m_width * m_height);
 	if (!m_backBuffer.m_buffer) {
 		QuitWithVDriverError(1);
 	}
@@ -123,7 +123,7 @@ VideoDriver::~VideoDriver()
 {
 	delete m_overlayGlyphs;
 	delete m_glyphs;
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, m_backBuffer.m_buffer);
+	MechHeapFree(g_primaryHeap, m_backBuffer.m_buffer);
 	ShutdownRefreshMode();
 }
 
@@ -394,7 +394,7 @@ void VideoDriver::LoadBackground(TMPackDataBase* p_database, MechS32 p_id)
 		ExpandRect(m_screenView.m_x0, m_screenView.m_y0, m_screenView.m_x1, m_screenView.m_y1);
 	}
 
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, data);
+	MechHeapFree(g_primaryHeap, data);
 }
 
 // FUNCTION: MW2SHELL 0x10006da9
@@ -564,7 +564,7 @@ void VideoDriver::LoadPalette(MechS32 p_id)
 	m_paletteChanged = 1;
 	m_allColors = 1;
 	g_clearPaletteOnDraw = 1;
-	HeapFree(g_primaryHeap, HEAP_NO_SERIALIZE, data);
+	MechHeapFree(g_primaryHeap, data);
 }
 
 // Draws frame p_frame of an SHP animation to the screen.
