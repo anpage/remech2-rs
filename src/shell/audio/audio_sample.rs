@@ -1,7 +1,7 @@
 use anyhow::Result;
+use mw2_sys::shell;
 use rodio::{Decoder, Sink, Source};
 
-use crate::shell::audio::G_EFFECTS_VOLUME;
 
 use super::audio_subsystem::AudioSubsystem;
 
@@ -112,7 +112,7 @@ impl AudioSample {
     }
 
     pub fn apply_volume(&mut self) {
-        let scaled = unsafe { (G_EFFECTS_VOLUME.get() as i64 * self.volume as i64) >> 16 };
+        let scaled = unsafe { (shell::g_soundConfig.m_effectsVolume as i64 * self.volume as i64) >> 16 };
         self.sink.set_volume(scaled.clamp(0, 127) as f32 / 127.0);
     }
 

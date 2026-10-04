@@ -6,7 +6,7 @@ use std::{
 
 use mw2_sys::sim::{self, AnalogBinding, InputAxis};
 
-use crate::sim::{G_DELTA_TIME, timing::TICKS_PER_IDEAL_FRAME};
+use crate::sim::timing::TICKS_PER_IDEAL_FRAME;
 
 /// The ends of an axis's travel.
 const AXIS_POSITION_MAX: i32 = 65536;
@@ -20,7 +20,7 @@ static AXIS_POSITION_CARRY: LazyLock<Mutex<HashMap<usize, i32>>> =
 
 /// One frame of an axis ramp, `direction` being 1 for the increase key and -1 for decrease.
 unsafe fn ramp_axis(axis: *mut InputAxis, direction: i32) {
-    let delta_time = unsafe { G_DELTA_TIME.get() };
+    let delta_time = unsafe { sim::g_deltaTime };
     let step = (3 * delta_time).wrapping_shl(unsafe { (*axis).m_rampShift } as u32);
 
     let rate_ptr = unsafe { (*axis).m_rate };

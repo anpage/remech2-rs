@@ -3,7 +3,6 @@ use std::sync::atomic::Ordering;
 use mw2_sys::sim::{self, Shot};
 
 use crate::sim::{
-    G_DELTA_TIME,
     stats::{PROXIMITY_FUSES_SUPPRESSED, ZERO_LENGTH_FRAMES_SKIPPED},
     timing::TICKS_PER_IDEAL_FRAME,
 };
@@ -15,7 +14,7 @@ const SHOT_PROXIMITY_FUSE: u32 = 32768;
 /// Whether a shot that has just aged to `age` ticks crossed a 4-tick boundary doing so.
 /// Baiscally, whether a 45 FPS sim would have sampled it on this frame.
 fn crossed_ideal_frame_boundary(age: i32) -> bool {
-    let previous_age = age.saturating_sub(unsafe { G_DELTA_TIME.get() });
+    let previous_age = age.saturating_sub(unsafe { sim::g_deltaTime });
     age.div_euclid(TICKS_PER_IDEAL_FRAME) != previous_age.div_euclid(TICKS_PER_IDEAL_FRAME)
 }
 
@@ -45,7 +44,7 @@ pub unsafe extern "C" fn guide_missile_to_target(shot: *mut Shot, x: i32, y: i32
 /// that doesn't consider who shot the missile, so the missile detonates immediately on the mech who shot it.
 #[unsafe(export_name = "UpdateAllShots")]
 pub extern "C" fn update_all_shots() {
-    if unsafe { G_DELTA_TIME.get() } == 0 {
+    if unsafe { sim::g_deltaTime } == 0 {
         ZERO_LENGTH_FRAMES_SKIPPED.fetch_add(1, Ordering::Relaxed);
         return;
     }

@@ -2,7 +2,7 @@ use std::{ffi::CString, ptr};
 
 use anyhow::{Context, Result};
 
-use crate::{ailrs, sim::timing::G_DELTA_TIME};
+use crate::ailrs;
 
 mod cd_audio;
 mod input;

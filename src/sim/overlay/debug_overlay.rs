@@ -5,7 +5,6 @@ use egui::{Context, Response, Ui};
 
 use egui_plot::{Bar, BarChart, Legend, Plot};
 
-use crate::sim::G_DELTA_TIME;
 use crate::sim::stats::{
     PROXIMITY_FUSES_SUPPRESSED, ZERO_DIVISORS_SUPPRESSED, ZERO_LENGTH_FRAMES_SKIPPED,
 };
@@ -57,7 +56,7 @@ impl DebugOverlay {
 
     pub fn draw(&mut self, ctx: &Context, window_width: f32, window_height: f32) {
         // calculate recent deltatimes
-        let delta_time = unsafe { G_DELTA_TIME.get() };
+        let delta_time = unsafe { mw2_sys::sim::g_deltaTime };
         self.recent_deltatimes.rotate_left(1);
         self.recent_deltatimes[199] = Some(delta_time);
 

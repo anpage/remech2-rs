@@ -5,8 +5,6 @@ use std::{
 
 use mw2_sys::sim::{self, Mech};
 
-use crate::sim::G_DELTA_TIME;
-
 /// A full jumpjet tank, in ticks.
 const JUMPJET_FUEL_MAX: i32 = 1810;
 
@@ -38,7 +36,7 @@ pub unsafe extern "C" fn late_update_mech(mech: *mut Mech) {
     if mech.is_null() {
         return;
     }
-    let delta_time = unsafe { G_DELTA_TIME.get() };
+    let delta_time = unsafe { sim::g_deltaTime };
 
     let expected_fuel = unsafe { jumpjet_recharge_result(&*mech, delta_time) };
 

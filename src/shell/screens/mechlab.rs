@@ -409,8 +409,8 @@ impl Mechbay {
     /// Deletes the selected variant's file and moves off the emptied slot
     unsafe fn delete_variant(&self) {
         unsafe {
-            let slot = &mut variant_files()[shell::g_selectedVariant as usize];
-            match CStr::from_ptr(slot.as_ptr()).to_str() {
+            let slot = &raw mut (*variant_files())[shell::g_selectedVariant as usize];
+            match CStr::from_ptr((*slot).as_ptr()).to_str() {
                 Ok(name) => {
                     let path = files::resolve(&format!("mek\\{name}.mek"));
                     if let Err(e) = fs::remove_file(&path) {
@@ -419,7 +419,7 @@ impl Mechbay {
                 }
                 Err(e) => warn!("mechbay: variant filename is not UTF-8: {e}"),
             }
-            slot[0] = 0;
+            (*slot)[0] = 0;
 
             shell::NextVariant();
             self.update_delete_button();
@@ -427,14 +427,16 @@ impl Mechbay {
     }
 }
 
-unsafe fn variant_files() -> &'static mut [[c_char; 13]; 200] {
-    unsafe { &mut *&raw mut shell::g_variantFiles }
+const VARIANT_SLOTS: usize = 200;
+
+fn variant_files() -> *mut [[c_char; 13]; VARIANT_SLOTS] {
+    &raw mut shell::g_variantFiles
 }
 
 /// Registers the selected variant against the mission. `false` means it's over the tonnage limit.
 unsafe fn register_selected() -> bool {
     unsafe {
-        let filename = variant_files()[shell::g_selectedVariant as usize].as_mut_ptr();
+        let filename = (*variant_files())[shell::g_selectedVariant as usize].as_mut_ptr();
         shell::SetStarMech(-1, filename, null_mut()) != 0
     }
 }
@@ -443,7 +445,7 @@ unsafe fn register_selected() -> bool {
 unsafe fn free_user_slot() -> Option<usize> {
     unsafe {
         let filenames = variant_files();
-        (FIRST_USER_VARIANT..filenames.len()).find(|&i| filenames[i][0] == 0)
+        (FIRST_USER_VARIANT..VARIANT_SLOTS).find(|&i| (*filenames)[i][0] == 0)
     }
 }
 

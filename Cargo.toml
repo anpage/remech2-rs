@@ -5,7 +5,7 @@ edition = "2024"
 license = "MIT"
 
 [workspace]
-members = ["crates/binding", "crates/mw2-sys"]
+members = ["crates/mw2-sys"]
 
 [profile.release]
 panic = "abort"
@@ -25,7 +25,6 @@ debug = false
 
 [dependencies]
 anyhow = "1.0.98"
-binding = { path = "crates/binding" }
 bytemuck = { version = "1.25", features = ["derive"] }
 egui = "0.33.0"
 egui-wgpu = "0.33.0"

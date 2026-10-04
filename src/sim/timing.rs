@@ -1,16 +1,11 @@
 use std::{sync::RwLock, time::Instant};
 
-use binding::globals;
 use mw2_sys::sim;
 
 use crate::settings::SETTINGS;
 
 /// Ticks per frame at the ideal 45 FPS, which is what every sim system seems to be tuned for.
 pub(super) const TICKS_PER_IDEAL_FRAME: i32 = 4;
-
-globals!(
-    pub(super) static G_DELTA_TIME: i32 = sim::g_deltaTime;
-);
 
 /// Wrapped to limit the framerate to the configured value.
 #[unsafe(export_name = "NextClock")]

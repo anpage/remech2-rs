@@ -1,9 +1,9 @@
 use std::time::Duration;
 
 use anyhow::Result;
+use mw2_sys::shell;
 use rodio::{OutputStream, OutputStreamBuilder, Sink, buffer::SamplesBuffer};
 
-use crate::shell::audio::G_EFFECTS_VOLUME;
 
 /// How an audio track's samples are laid out
 #[derive(Clone, Copy)]
@@ -28,7 +28,7 @@ impl Sound {
 
         // Set volume based on the global effects volume
         // The original game didn't do this and FMVs were always full volume
-        let volume = unsafe { G_EFFECTS_VOLUME.get() }.clamp(0, 0x10000) as f32 / 65536.0;
+        let volume = unsafe { shell::g_soundConfig.m_effectsVolume }.clamp(0, 0x10000) as f32 / 65536.0;
         sink.set_volume(volume);
 
         sink.append(SamplesBuffer::new(

@@ -121,7 +121,7 @@ impl Debrief {
             // The original leaves this dangling until the viewer closes.
             delete(&raw mut shell::g_debriefMenu, shell::ButtonMenu_ButtonMenu_destructor);
 
-            let layout = &*&raw const shell::g_aftermathScreens[state as usize];
+            let layout = &raw const shell::g_aftermathScreens[state as usize];
             let viewer = allocate::<ArchiveReader>();
             if viewer.is_null() {
                 return;
@@ -134,8 +134,8 @@ impl Debrief {
                 0,
                 std::ptr::null_mut(),
                 shell::g_debriefPages,
-                layout.m_buttons,
-                layout.m_count,
+                (*layout).m_buttons,
+                (*layout).m_count,
             );
             shell::g_aftermathReader = viewer;
         }
@@ -160,7 +160,7 @@ impl Debrief {
                 return Some(next);
             }
 
-            let layout = &*&raw const shell::g_debriefScreens[state as usize];
+            let layout = &raw const shell::g_debriefScreens[state as usize];
             let buttons = allocate::<ButtonMenu>();
             if !buttons.is_null() {
                 shell::ButtonMenu_ButtonMenu(
@@ -168,8 +168,8 @@ impl Debrief {
                     shell::g_videoDriver,
                     shell::g_defaultFont,
                     0,
-                    layout.m_buttons,
-                    layout.m_count,
+                    (*layout).m_buttons,
+                    (*layout).m_count,
                 );
                 shell::g_debriefMenu = buttons;
             }
