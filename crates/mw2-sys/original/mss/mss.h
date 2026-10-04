@@ -65,7 +65,6 @@ extern "C"
 	typedef void(AILCALLBACK* AILSAMPLECB)(HSAMPLE p_sample);
 	typedef void (*AILTIMERCB)(unsigned int p_user);
 
-	AILIMPORT void AILCALL AIL_startup(void);
 	AILIMPORT void AILCALL AIL_shutdown(void);
 
 	AILIMPORT int AILCALL AIL_midiOutOpen(HMDIDRIVER* p_driver, AILMIDIOUT** p_midiOut, int p_deviceId);

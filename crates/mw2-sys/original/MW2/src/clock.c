@@ -188,7 +188,6 @@ void ScaleVectorToLength(MechS32 p_length, MechS32* p_x, MechS32* p_y, MechS32* 
 void FirstClock(void)
 {
 	if (!g_ticksTimerInitialized) {
-		AIL_startup();
 		g_ticksTimer = AIL_register_timer((AILTIMERCB) GameTickTimerCallback);
 		AIL_set_timer_divisor(g_ticksTimer, 6556);
 		AIL_start_timer(g_ticksTimer);

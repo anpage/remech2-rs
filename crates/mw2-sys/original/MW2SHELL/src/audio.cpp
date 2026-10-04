@@ -28,7 +28,6 @@ AudioSubsystem::AudioSubsystem()
 	m_digitalDriver = NULL;
 
 	if (g_midiAudio || g_digitalAudio) {
-		AIL_startup();
 		m_milesStarted = 1;
 	}
 	else {

@@ -240,6 +240,12 @@ pub unsafe extern "system" fn wave_out_open(
     0
 }
 
+/// Releases every sample and driver
+#[unsafe(export_name = "AIL_shutdown")]
+pub unsafe extern "system" fn shutdown() {
+    crate::ailrs::storage::shutdown();
+}
+
 #[unsafe(export_name = "AIL_serve")]
 pub unsafe extern "system" fn serve() {
     for (handle, callback) in crate::ailrs::storage::drain_pending_eos() {
