@@ -297,10 +297,10 @@ MechS32 AnnounceObjective(MechS32 p_star, MechS32 p_objective, MechS32 p_state)
 		line.m_text = "";
 	}
 	else {
+		CollapseWhitespace(line.m_text);
 		line.m_text = text;
 	}
 
-	CollapseWhitespace(line.m_text);
 	QueueSpeechLine(&line);
 	g_objectiveAnnounced[p_objective] = TRUE;
 	return TRUE;
