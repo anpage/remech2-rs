@@ -2,11 +2,20 @@ use std::marker::PhantomData;
 
 use super::module::ModuleBase;
 
-/// One of the game's global variables, addressed by its RVA.
+/// One of the game's global variables.
 pub struct Global<T: 'static> {
-    module: &'static ModuleBase,
-    rva: usize,
+    location: Location<T>,
     marker: PhantomData<*mut T>,
+}
+
+enum Location<T> {
+    /// A variable of the linked game code
+    Linked(*mut T),
+    /// An RVA into one of the original DLLs
+    Rva {
+        module: &'static ModuleBase,
+        rva: usize,
+    },
 }
 
 // This is only a declaration; the pointer is formed on access.
@@ -16,15 +25,25 @@ unsafe impl<T> Send for Global<T> {}
 impl<T> Global<T> {
     pub const fn new(module: &'static ModuleBase, rva: usize) -> Self {
         Self {
-            module,
-            rva,
+            location: Location::Rva { module, rva },
             marker: PhantomData,
         }
     }
 
-    /// Null until the module is loaded.
+    /// A global at `ptr`, which [`globals!`](crate::globals) takes from the linked game code.
+    pub const fn linked(ptr: *mut T) -> Self {
+        Self {
+            location: Location::Linked(ptr),
+            marker: PhantomData,
+        }
+    }
+
+    /// Null until the module is loaded, for a global addressed by RVA.
     pub fn ptr(&self) -> *mut T {
-        self.module.resolve(self.rva).cast()
+        match self.location {
+            Location::Linked(ptr) => ptr,
+            Location::Rva { module, rva } => module.resolve(rva).cast(),
+        }
     }
 
     /// # Safety

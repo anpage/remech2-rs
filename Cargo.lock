@@ -1735,6 +1735,7 @@ dependencies = [
  "egui-wgpu",
  "egui_plot",
  "hex-literal",
+ "mw2-sys",
  "pollster",
  "rand",
  "raw-window-handle",
