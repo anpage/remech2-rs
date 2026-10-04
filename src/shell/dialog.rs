@@ -3,12 +3,10 @@ use std::sync::Mutex;
 
 use binding::{macros::hook, patches};
 use tracing::{error, warn};
-use windows::Win32::{
-    Foundation::{HWND, LPARAM, WPARAM},
-    UI::WindowsAndMessaging::PostMessageA,
-};
+use windows::Win32::Foundation::WPARAM;
 
 use super::MODULE;
+use crate::messages;
 use crate::shell::overlay::confirm;
 use crate::shell::screens::ShellMsg;
 
@@ -79,16 +77,14 @@ pub fn park_transition(message: u32, wparam: WPARAM) -> bool {
 }
 
 /// Re-posts a blocked transition once the prompt is gone
-pub fn replay_transition(window: HWND) {
+pub fn replay_transition() {
     if confirm::is_open() {
         return;
     }
     let Some((message, wparam)) = PARKED.lock().unwrap().take() else {
         return;
     };
-    if let Err(e) = unsafe { PostMessageA(Some(window), message, WPARAM(wparam), LPARAM(0)) } {
-        error!("re-posting blocked transition {message:#x} failed: {e}");
-    }
+    messages::post(message, wparam, 0);
 }
 
 patches!(

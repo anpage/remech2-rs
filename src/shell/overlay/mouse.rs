@@ -1,8 +1,5 @@
 use binding::{globals, macros::hook, patches, thunks};
-use windows::{
-    Win32::{Foundation::HWND, Media::timeGetTime},
-    core::BOOL,
-};
+use windows::{Win32::Media::timeGetTime, core::BOOL};
 
 use crate::shell::{MODULE, overlay::ui};
 
@@ -41,7 +38,6 @@ pub struct OverlayMouseState {
 }
 
 globals!(
-    pub(in crate::shell) static G_WINDOW: HWND = 0x000965ec;
     pub(in crate::shell) static G_CURRENT_MOUSE_STATE: *mut MouseState = 0x00071204;
     pub(in crate::shell) static G_CURSOR_GRAPHIC: *mut [u8; CURSOR_GRAPHIC_SIZE] = 0x00071200;
 );

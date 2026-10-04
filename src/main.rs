@@ -24,6 +24,7 @@ mod drawmode;
 mod files;
 mod heap;
 mod launcher;
+mod messages;
 mod midi_source;
 mod settings;
 mod shell;

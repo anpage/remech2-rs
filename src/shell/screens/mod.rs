@@ -3,12 +3,8 @@ use std::sync::Mutex;
 
 use binding::{game_fns, globals};
 use tracing::error;
-use windows::Win32::{
-    Foundation::{LPARAM, WPARAM},
-    UI::WindowsAndMessaging::PostMessageA,
-};
 
-use crate::shell::overlay::mouse::G_WINDOW;
+use crate::messages;
 
 use super::MODULE;
 
@@ -320,15 +316,8 @@ pub unsafe fn run<S: Screen>(state: &Mutex<Option<S>>, mut args: ScreenArgs, msg
         screen.teardown(&mut args);
         *guard = None;
 
+        messages::post(msg.0, S::ID.0 as usize, 0);
         unsafe {
-            if let Err(e) = PostMessageA(
-                Some(G_WINDOW.get()),
-                msg.0,
-                WPARAM(S::ID.0 as usize),
-                LPARAM(0),
-            ) {
-                error!("screen {:?}: posting {msg:?} failed: {e}", S::ID);
-            }
             // Pass what's registered (the original address), not our own fn.
             (UNREGISTER_SCREEN_FUNCTION.get())(G_SHELL_CALLBACK.get());
         }

@@ -10,19 +10,15 @@ use egui::{
     Color32, ColorImage, Context, CursorIcon, FontFamily, Order, PointerButton, Rect, TextStyle,
     TextureHandle, Vec2,
 };
-use tracing::error;
-use windows::Win32::{
-    Foundation::{LPARAM, WPARAM},
-    UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND},
-};
+use mw2_sys::shared::c_mechMsgCommand;
 
 use crate::drawmode::fit_to_window;
 use crate::shell::dialog;
 use crate::shell::overlay::{
     confirm, menu,
-    mouse::{G_CURSOR_GRAPHIC, G_WINDOW, OverlayMouseState, update_global_mouse_state},
+    mouse::{G_CURSOR_GRAPHIC, OverlayMouseState, update_global_mouse_state},
 };
-use crate::{about, shell::screens};
+use crate::{about, messages, shell::screens};
 
 static SHOW_CURSOR: AtomicBool = AtomicBool::new(true);
 
@@ -142,7 +138,6 @@ impl OverlayUi {
             self.load_cursor_texture(ctx);
         }
 
-        let hwnd = unsafe { G_WINDOW.get() };
         let window_rect = ctx.content_rect();
         let window_size = (window_rect.width(), window_rect.height());
         let mouse_state = &ctx.input(|input| {
@@ -172,13 +167,7 @@ impl OverlayUi {
 
         if self.menu_visible {
             let handle_menu_button = |id: u16| {
-                let w_param: usize = id.into();
-                unsafe {
-                    if let Err(e) = PostMessageA(Some(hwnd), WM_COMMAND, WPARAM(w_param), LPARAM(0))
-                    {
-                        error!("menu command {id} failed: {e}");
-                    }
-                }
+                messages::post(c_mechMsgCommand as u32, id.into(), 0);
             };
 
             egui::Window::new("top_menu")
@@ -276,7 +265,7 @@ impl OverlayUi {
 
         about::window(ctx, &mut self.about_dialog_open, scale_factor);
         confirm::window(ctx, scale_factor);
-        dialog::replay_transition(hwnd);
+        dialog::replay_transition();
 
         if false {
             egui::Window::new("DEBUG")

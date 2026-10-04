@@ -3,15 +3,11 @@ use std::sync::atomic::{AtomicI32, Ordering};
 
 use binding::{game_fns, globals, macros::hook, patches};
 use egui::{Button, Ui};
-use tracing::error;
-use windows::Win32::{
-    Foundation::{LPARAM, WPARAM},
-    UI::WindowsAndMessaging::{PostMessageA, WM_APP},
-};
+use windows::Win32::UI::WindowsAndMessaging::WM_APP;
 
 use super::{Campaign, G_PILOT, G_SHELL_CALLBACK, MissionResults, ShellMsg};
+use crate::messages;
 use crate::shell::MODULE;
-use crate::shell::overlay::mouse::G_WINDOW;
 use crate::shell::screens::debrief;
 
 pub const JUMP_TO_SCREEN: u32 = WM_APP + 0x100;
@@ -41,10 +37,7 @@ pub unsafe fn jump(msg: u32) {
         (CLEAR_MENU_CALLBACK.get())();
         let callback = G_SHELL_CALLBACK.get();
         if callback.is_null() {
-            if let Err(e) = PostMessageA(Some(G_WINDOW.get()), msg, WPARAM(msg as usize), LPARAM(0))
-            {
-                error!("debug jump to {msg:#x} failed: {e}");
-            }
+            messages::post(msg, msg as usize, 0);
             return;
         }
         if msg == ShellMsg::MISSION_DEBRIEF.0
@@ -66,16 +59,7 @@ pub unsafe fn jump(msg: u32) {
 }
 
 fn request_jump(msg: ShellMsg) {
-    unsafe {
-        if let Err(e) = PostMessageA(
-            Some(G_WINDOW.get()),
-            JUMP_TO_SCREEN,
-            WPARAM(msg.0 as usize),
-            LPARAM(0),
-        ) {
-            error!("debug jump to {msg:?} failed: {e}");
-        }
-    }
+    messages::post(JUMP_TO_SCREEN, msg.0 as usize, 0);
 }
 
 pub fn menu(ui: &mut Ui) {
