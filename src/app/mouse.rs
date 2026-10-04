@@ -25,7 +25,6 @@ pub struct Mouse {
     grab: bool,
     /// Where the cursor is in the frame while it is grabbed
     grabbed_position: [f64; 2],
-    pub hidden: bool,
 }
 
 impl Mouse {
@@ -37,7 +36,6 @@ impl Mouse {
             frame_size: None,
             grab: false,
             grabbed_position: [0.0; 2],
-            hidden: false,
         }
     }
 
@@ -177,9 +175,14 @@ fn apply_grab(window: &Window, grab: bool) {
 }
 
 static CAPTURED: AtomicBool = AtomicBool::new(false);
+static HIDDEN: AtomicBool = AtomicBool::new(false);
 
 pub fn capture_pointer(captured: bool) {
     CAPTURED.store(captured, Ordering::Relaxed);
+}
+
+pub fn cursor_hidden() -> bool {
+    HIDDEN.load(Ordering::Relaxed)
 }
 
 impl State {
@@ -248,11 +251,6 @@ pub extern "C" fn grab(grab: c_int) {
 
 #[unsafe(export_name = "MechMouseShowCursor")]
 pub extern "C" fn show_cursor(show: c_int) -> c_int {
-    with(|app| {
-        let shown = !app.state.mouse.hidden;
-        app.state.mouse.hidden = show == 0;
-        shown
-    })
-    .unwrap_or(true)
-    .into()
+    let shown = !HIDDEN.swap(show == 0, Ordering::Relaxed);
+    shown.into()
 }

@@ -16,7 +16,6 @@ mod about;
 mod ailrs;
 mod app;
 mod cd_audio;
-mod common;
 mod display;
 mod drawmode;
 mod elapsed;

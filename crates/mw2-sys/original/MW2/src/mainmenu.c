@@ -25,8 +25,9 @@ MechChar g_abortMissionItem[] = "Abort Mission";
 // GLOBAL: MW2 0x100a1ab0
 MechChar g_monitorBrightnessItem[] = "Monitor Brightness";
 
+// The original said "Windows" here and in the title
 // GLOBAL: MW2 0x100a1ac8
-MechChar g_fleeToWindowsItem[] = "Flee to Windows";
+MechChar g_fleeToWindowsItem[] = "Flee to Desktop";
 
 // GLOBAL: MW2 0x100a1ad8
 MechChar g_acceptText[] = "Accept (Esc to cancel)";
@@ -35,7 +36,7 @@ MechChar g_acceptText[] = "Accept (Esc to cancel)";
 MechChar g_escToExitText[] = "(Esc to exit)";
 
 // GLOBAL: MW2 0x100a1b00
-MechChar g_fleeToWindowsTitle[] = "FLEE TO WINDOWS";
+MechChar g_fleeToWindowsTitle[] = "FLEE TO DESKTOP";
 
 // GLOBAL: MW2 0x100a1b10
 MechChar g_abortMissionTitle[] = "ABORT MISSION";

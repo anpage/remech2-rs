@@ -1,16 +1,6 @@
-use windows::{
-    Win32::{
-        Foundation::{FALSE, HWND, TRUE},
-        UI::WindowsAndMessaging::{
-            DispatchMessageA, MSG, PM_REMOVE, PeekMessageA, TranslateMessage, WM_QUIT, WaitMessage,
-        },
-    },
-    core::BOOL,
-};
-
 use binding::macros::{globals, hook, patches};
 
-use crate::{settings::SETTINGS, sim::types::DrawMode, sim::types::RenderTarget};
+use crate::settings::SETTINGS;
 
 use super::MODULE;
 
@@ -30,14 +20,6 @@ globals!(
     pub(crate) static G_GAME_WINDOW_GEOMETRY: *mut GameWindowGeometry = 0x00176eb4;
     pub(crate) static G_SCREEN_W_MINUS_1: i32 = 0x00176ee4;
     pub(crate) static G_SCREEN_H_MINUS_1: i32 = 0x00176ec0;
-    pub(crate) static G_WINDOW_ACTIVE: BOOL = 0x000acb74;
-    static G_STRETCH_BLIT_SOURCE_RECT: RenderTarget = 0x00176ed0;
-    static G_STRETCH_BLIT_OTHER_SOURCE_RECT: RenderTarget = 0x000bdff8;
-    static G_BLIT_GLOBAL_1: BOOL = 0x00176ebc;
-    static G_BLIT_GLOBAL_2: u32 = 0x000a5f18;
-    static G_BLIT_GLOBAL_3: u32 = 0x000a5a24;
-    static G_SHOULD_QUIT: BOOL = 0x000acb18;
-    pub(super) static G_CURRENT_DRAW_MODE: *mut DrawMode = 0x000b1774;
 );
 
 /// The game decides which resolution to use based on the DLL name passed to this function.
@@ -90,65 +72,9 @@ unsafe extern "cdecl" fn init_game_window_geometry() -> i32 {
     }
 }
 
-/// This function is called every frame to draw the game.
-#[hook(rva = 0x00012e15)]
-unsafe extern "stdcall" fn blit() {
-    unsafe {
-        if G_BLIT_GLOBAL_1.get() == FALSE {
-            if G_WINDOW_ACTIVE.get() == TRUE {
-                ((*G_CURRENT_DRAW_MODE.get()).blit_flip_func)();
-            }
-        } else {
-            ((*G_CURRENT_DRAW_MODE.get()).stretch_blit_func)(
-                (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).left + 1,
-                (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).top + 1,
-                (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).right,
-                (*G_STRETCH_BLIT_SOURCE_RECT.ptr()).bottom,
-            );
-
-            G_STRETCH_BLIT_SOURCE_RECT
-                .set(G_STRETCH_BLIT_OTHER_SOURCE_RECT.as_ref().unwrap().clone());
-
-            G_BLIT_GLOBAL_2.set(G_BLIT_GLOBAL_3.get());
-            G_BLIT_GLOBAL_1.set(FALSE);
-        }
-    }
-}
-
-/// The original function had a loop that was causing bad stuttering when the mouse was moved.
-#[hook(rva = 0x00067bbc)]
-unsafe extern "stdcall" fn handle_messages() {
-    unsafe {
-        if G_WINDOW_ACTIVE.get() == FALSE {
-            let _ = WaitMessage();
-        }
-
-        if G_SHOULD_QUIT.get() == FALSE {
-            let mut msg: MSG = MSG::default();
-
-            if PeekMessageA(&mut msg as *mut MSG, Some(HWND::default()), 0, 0, PM_REMOVE).into() {
-                if msg.hwnd == HWND::default() || msg.message != WM_QUIT {
-                    let _ = TranslateMessage(&msg);
-                    DispatchMessageA(&msg);
-                } else {
-                    G_SHOULD_QUIT.set(TRUE);
-                }
-            }
-        }
-    }
-}
-
-#[hook(rva = 0x00077392)]
-unsafe extern "stdcall" fn toggle_fullscreen() {
-    // Do nothing because we handle this in the custom window proc
-}
-
 patches!(
     pub(super) static PATCHES = [
         hook set_game_resolution,
         hook init_game_window_geometry,
-        hook blit,
-        hook handle_messages,
-        hook toggle_fullscreen,
     ];
 );

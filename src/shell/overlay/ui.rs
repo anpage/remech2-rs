@@ -1,10 +1,4 @@
-use std::{
-    process::exit,
-    sync::{
-        Arc,
-        atomic::{AtomicBool, Ordering},
-    },
-};
+use std::{process::exit, sync::Arc};
 
 use egui::{
     Color32, ColorImage, Context, CursorIcon, FontFamily, Order, PointerButton, Rect, TextStyle,
@@ -16,15 +10,9 @@ use crate::drawmode::fit_to_window;
 use crate::shell::dialog;
 use crate::shell::overlay::{
     confirm, menu,
-    mouse::{G_CURSOR_GRAPHIC, OverlayMouseState, update_global_mouse_state},
+    mouse::{G_CURSOR_GRAPHIC, OverlayMouseState},
 };
 use crate::{about, app, messages, shell::screens};
-
-static SHOW_CURSOR: AtomicBool = AtomicBool::new(true);
-
-pub(super) fn show_cursor(show: bool) {
-    SHOW_CURSOR.store(show, Ordering::Relaxed);
-}
 
 fn menu_button(ui: &mut egui::Ui, text: &str, command: u16) -> bool {
     let enabled = unsafe { mw2_sys::shell::IsShellMenuCommandEnabled(command.into()) } != 0;
@@ -309,7 +297,7 @@ impl OverlayUi {
         if let Some(cursor_texture) = &self.cursor_texture {
             ctx.set_cursor_icon(CursorIcon::None);
 
-            if SHOW_CURSOR.load(Ordering::Relaxed) {
+            if !app::cursor_hidden() {
                 let cursor_pos_1 = egui::pos2(mouse_state.pos_x, mouse_state.pos_y);
                 let cursor_pos_2 = egui::pos2(
                     mouse_state.pos_x + 29.0 * scale_factor,
@@ -337,12 +325,6 @@ impl OverlayUi {
             }
         }
 
-        let window_size = [window_size.0, window_size.1];
         app::capture_pointer(confirm::is_open());
-        if self.shell_hovered && !confirm::is_open() {
-            update_global_mouse_state(mouse_state, window_size);
-        } else {
-            update_global_mouse_state(&OverlayMouseState::default(), window_size);
-        }
     }
 }

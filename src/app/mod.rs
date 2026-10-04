@@ -23,7 +23,7 @@ use mw2_sys::shared::{c_mechMsgActivateApp, c_mechMsgKeyDown, c_mechMsgKeyUp, c_
 use crate::{messages, settings::SETTINGS};
 
 use mouse::Mouse;
-pub use mouse::{capture_pointer, show_cursor};
+pub use mouse::{capture_pointer, cursor_hidden, show_cursor};
 pub use renderer::Frame;
 use renderer::Renderer;
 
@@ -176,7 +176,7 @@ impl State {
         }
 
         let raw_input = egui_input.take_egui_input(window);
-        let cursor_hidden = self.mouse.hidden;
+        let cursor_hidden = mouse::cursor_hidden();
         let mut ui = ui;
         let full_output = self.egui_ctx.run(raw_input, |ctx| {
             ui(ctx);

@@ -52,41 +52,6 @@ impl RenderTarget {
     }
 }
 
-type DrawModeInitFunc = unsafe extern "cdecl" fn(*mut PixelBuffer, i32, i32) -> i32;
-type DrawModeDeInitFunc = unsafe extern "cdecl" fn() -> i32;
-type DrawModeBlitFlipFunc = unsafe extern "cdecl" fn() -> i32;
-type DrawModeBlitRectFunc = unsafe extern "cdecl" fn(i32, i32, i32, i32) -> i32;
-type DrawModeStretchBlitFunc = unsafe extern "cdecl" fn(i32, i32, i32, i32) -> i32;
-
-#[repr(C)]
-pub(super) struct DrawMode {
-    index: u32,
-    some_index_to_related_struct: i32,
-    initialized: i32,
-    unknown1: u32,
-    init_func: DrawModeInitFunc,
-    deinit_func: DrawModeDeInitFunc,
-    pub blit_flip_func: DrawModeBlitFlipFunc,
-    blit_rect_func: DrawModeBlitRectFunc,
-    pub stretch_blit_func: DrawModeStretchBlitFunc,
-    unknown2: u32,
-}
-
-#[repr(C)]
-pub(super) struct DrawModeExtension {
-    index: i32,
-    window_mode: u32,
-    gwl_style: u32,
-    begin_func: *mut c_void,
-    end_func: *mut c_void,
-    set_palette_func: *mut c_void,
-    unknown1: *mut c_void,
-    unknown2: *mut c_void,
-    /// Locks the display buffer for drawing; 0 on success.
-    pub lock_display_buffer_func: unsafe extern "stdcall" fn() -> i32,
-    unknown3: u32,
-}
-
 /// A 2D point with normalised 16.16 components
 #[repr(C)]
 #[derive(Clone, Copy)]

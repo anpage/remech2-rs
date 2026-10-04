@@ -5,12 +5,10 @@ use anyhow::{Context, Result};
 use binding::{macros::patch_groups, module::ModuleBase};
 
 mod audio;
-mod database;
 mod dialog;
 mod overlay;
 mod screens;
 mod smacker;
-mod win32;
 
 pub use overlay::OverlayUi;
 
@@ -18,16 +16,12 @@ pub static MODULE: ModuleBase = ModuleBase::new("MW2SHELL.DLL");
 
 patch_groups! {
     static PATCH_GROUPS = [
-        database,
-        overlay::mouse,
         screens::debrief,
         screens::debug,
         screens::main_menu,
         screens::mechlab,
         screens::roster,
         screens::settings,
-        smacker,
-        win32,
     ];
 }
 
