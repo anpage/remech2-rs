@@ -6,10 +6,10 @@ use std::{
 const SYSTEM_TYPES: &str = "HWND|HWND__|HINSTANCE|HINSTANCE__|HANDLE|BITMAPINFOHEADER|tagBITMAPINFOHEADER|\
                            RGBQUAD|tagRGBQUAD|FILE|_iobuf|BOOL|BYTE|WORD|DWORD|LONG|LONG_PTR|UINT|UINT_PTR|\
                            WPARAM|LPARAM|HWAVEOUT|HWAVEOUT__|LPHWAVEOUT";
-const SHARED_FILES: &str = ".*/src/original/(util|common|mss|smacker)/.*";
+const SHARED_FILES: &str = ".*/original/(util|common|mss|smacker)/.*";
 
 fn main() {
-    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../src/original");
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("original");
     println!("cargo::rerun-if-changed={}", root.display());
 
     let common = [
@@ -95,7 +95,7 @@ fn module(
         .wrap_unsafe_ops(true)
         .clang_arg("--target=i686-pc-windows-gnu")
         .clang_args(includes.iter().map(|p| format!("-I{}", p.display())))
-        .allowlist_file(format!(".*/src/original/{}/.*", dir.file_name().unwrap().to_str().unwrap()))
+        .allowlist_file(format!(".*/original/{}/.*", dir.file_name().unwrap().to_str().unwrap()))
         .blocklist_file(SHARED_FILES)
         .blocklist_type(SYSTEM_TYPES)
         .raw_line("use super::shared::*;")
