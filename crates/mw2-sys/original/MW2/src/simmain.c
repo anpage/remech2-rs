@@ -30,6 +30,7 @@
 #include "inputmap.h"
 #include "keyboard.h"
 #include "loadres.h"
+#include "log.h"
 #include "mainmenu.h"
 #include "menu.h"
 #include "messages.h"
@@ -452,7 +453,7 @@ int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 	__finally {
 		if (AbnormalTermination() && g_ticksTimerInitialized) {
 			MechSetMessageHandler(NULL);
-			MessageBox(NULL, "Attempting to shutdown from an unknown fatal error.", "MECHWARRIOR 2", MB_ICONHAND);
+			MechLogError("Attempting to shutdown from an unknown fatal error.");
 			AIL_shutdown();
 		}
 	}

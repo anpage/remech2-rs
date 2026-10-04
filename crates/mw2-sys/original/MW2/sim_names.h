@@ -60,10 +60,7 @@
 #define SavePreBrightnessPalette Sim_SavePreBrightnessPalette
 #define ScrollMonoDisplay Sim_ScrollMonoDisplay
 #define SetDebugLogName Sim_SetDebugLogName
-#define SetDebugMessageBoxType Sim_SetDebugMessageBoxType
-#define SetDebugMessageTitle Sim_SetDebugMessageTitle
 #define SetDebugOutputMode Sim_SetDebugOutputMode
-#define SetDebugWindow Sim_SetDebugWindow
 #define ShowMessage Sim_ShowMessage
 #define ShutdownMw2Prj Sim_ShutdownMw2Prj
 #define ShutdownRefreshMode Sim_ShutdownRefreshMode
@@ -78,11 +75,8 @@
 #define g_cursorClipped Sim_g_cursorClipped
 #define g_debugLogFile Sim_g_debugLogFile
 #define g_debugLogName Sim_g_debugLogName
-#define g_debugMessageBoxType Sim_g_debugMessageBoxType
-#define g_debugMessageTitle Sim_g_debugMessageTitle
 #define g_debugOutputMode Sim_g_debugOutputMode
 #define g_debugPrintBuffer Sim_g_debugPrintBuffer
-#define g_debugWindow Sim_g_debugWindow
 #define g_displayBrightness Sim_g_displayBrightness
 #define g_extendedScanCodeMap Sim_g_extendedScanCodeMap
 #define g_gameWindow Sim_g_gameWindow

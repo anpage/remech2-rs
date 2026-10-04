@@ -2,33 +2,25 @@
 
 #include "decomp.h"
 #include "files.h"
+#include "log.h"
 #include "types.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 // The debug log: messages go to a monochrome monitor's text screen (the MDA frame buffer at
-// 0xb0000, 80 by 25), the debugger, a message box or a log file, as g_debugOutputMode selects.
+// 0xb0000, 80 by 25), the debugger or a log file, as g_debugOutputMode selects. The original
+// also had a message box, shown only once SetDebugWindow was called, which nothing did.
 
 // GLOBAL: MW2 0x100a5730
 MechS32 g_debugOutputMode = 0;
-
-// GLOBAL: MW2 0x100a5734
-HWND g_debugWindow = NULL;
-
-// GLOBAL: MW2 0x100a5738
-UINT g_debugMessageBoxType = MB_ICONINFORMATION;
 
 // GLOBAL: MW2 0x100a573c
 FILE* g_debugLogFile = NULL;
 
 // GLOBAL: MW2 0x100a5740
 MechChar g_debugLogName[0x100] = "debug.log";
-
-// GLOBAL: MW2 0x100a5840
-MechChar g_debugMessageTitle[0x50] = "DEBUG Message";
 
 // Scrolls the monochrome screen up a line.
 // FUNCTION: MW2 0x1003a1c0
@@ -122,28 +114,6 @@ MechS32 SetDebugOutputMode(MechS32 p_mode)
 	}
 }
 
-// FUNCTION: MW2 0x1003a3b9
-void SetDebugWindow(HWND p_window)
-{
-	g_debugWindow = p_window;
-}
-
-// FUNCTION: MW2 0x1003a3cc
-void SetDebugMessageBoxType(UINT p_type)
-{
-	g_debugMessageBoxType = p_type;
-}
-
-// FUNCTION: MW2 0x1003a3df
-void SetDebugMessageTitle(const MechChar* p_format, ...)
-{
-	va_list args;
-
-	va_start(args, p_format);
-	_vsnprintf(g_debugMessageTitle, sizeof(g_debugMessageTitle), p_format, args);
-	va_end(args);
-}
-
 // FUNCTION: MW2 0x1003a411
 void SetDebugLogName(const MechChar* p_path)
 {
@@ -166,15 +136,10 @@ void DebugPrintInternal(const MechChar* p_format, ...)
 		PrintMono(message);
 		break;
 	case 2:
-		OutputDebugString(message);
+		MechLogDebug(message);
 		break;
 	case 4:
 		AppendDebugLog(message);
-		break;
-	case 3:
-		if (g_debugWindow) {
-			MessageBox(g_debugWindow, message, g_debugMessageTitle, g_debugMessageBoxType);
-		}
 		break;
 	default:
 		break;

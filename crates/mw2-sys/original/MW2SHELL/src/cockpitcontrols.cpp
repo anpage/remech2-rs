@@ -7,6 +7,7 @@
 #include "input.h"
 #include "inputdevice.h"
 #include "keyboardinput.h"
+#include "log.h"
 #include "loopingmovie.h"
 #include "mechbay.h"
 #include "mousestate.h"
@@ -2392,5 +2393,6 @@ void CpcShowDeviceMessage(MechS32 p_message, MechChar*, MechChar* p_name)
 		break;
 	}
 
-	MessageBox(g_gameWindow, g_cpcMessageText, "MechWarrior 2 Message", MB_ICONASTERISK);
+	// The original showed it in a message box
+	MechLogError(g_cpcMessageText);
 }

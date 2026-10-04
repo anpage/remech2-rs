@@ -18,6 +18,7 @@
 #include "inputsink.h"
 #include "joystick.h"
 #include "keyboard.h"
+#include "log.h"
 #include "mouse.h"
 #include "mw2log.h"
 #include "pointer.h"
@@ -1409,9 +1410,6 @@ MechS16 LookupGameKey(MechS16 p_keyCode)
 // FUNCTION: MW2 0x1007b7b1
 void ReportInputDeviceError(MechS32 p_code, MechChar* p_channel, MechChar* p_device)
 {
-	MechS32 hidden;
-
-	hidden = FALSE;
 	switch (p_code) {
 	case 0x6e:
 		sprintf(
@@ -1455,24 +1453,6 @@ void ReportInputDeviceError(MechS32 p_code, MechChar* p_channel, MechChar* p_dev
 	}
 
 	WriteToMw2Log(g_inputErrorText);
-	if (!MechMouseShowCursor(TRUE)) {
-		hidden = TRUE;
-	}
-
-	if (g_windowMode == 1) {
-		ShowWindow(g_gameWindow, SW_SHOWMINNOACTIVE);
-	}
-
-	if (MessageBox(g_gameWindow, g_inputErrorText, "MechWarrior2 Message", MB_OKCANCEL | MB_ICONASTERISK) == IDCANCEL) {
-		ShutdownOnError();
-		exit(p_code);
-	}
-
-	if (g_windowMode == 1) {
-		ShowWindow(g_gameWindow, SW_RESTORE);
-	}
-
-	if (hidden) {
-		MechMouseShowCursor(FALSE);
-	}
+	// The original showed it in a message box whose Cancel ended the game
+	MechLogError(g_inputErrorText);
 }

@@ -7,6 +7,7 @@
 #include "inifile.h"
 #include "inputmap.h"
 #include "loadres.h"
+#include "log.h"
 #include "mw2log.h"
 #include "network.h"
 #include "overlay.h"
@@ -157,13 +158,8 @@ void ShowFatalError(const char** p_args)
 	CloseInputDevices();
 	MechMouseShowCursor(TRUE);
 
-	ShowWindow(g_gameWindow, SW_SHOWMINNOACTIVE);
-	MessageBox(
-		NULL,
-		FormatErrorMessage(g_fatalErrorTitle, g_errorCode, p_args),
-		"MechWarrior2 Fatal Error",
-		MB_SETFOREGROUND | MB_TASKMODAL | MB_ICONHAND
-	);
+	// The original minimised the window and showed it in a message box
+	MechLogError(FormatErrorMessage(g_fatalErrorTitle, g_errorCode, p_args));
 	DebugPrint(FormatErrorMessage(g_fatalErrorTitle, g_errorCode, p_args));
 	exit(g_errorCode);
 }

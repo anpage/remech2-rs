@@ -17,6 +17,7 @@
 #include "hallofhonor.h"
 #include "keyboard.h"
 #include "keyboardinput.h"
+#include "log.h"
 #include "mainmenu.h"
 #include "mechbay.h"
 #include "mechvariant.h"
@@ -361,7 +362,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 
 	g_primaryHeap = MechHeapCreate();
 	if (g_primaryHeap == NULL) {
-		MessageBox(NULL, "Insufficient memory available.", g_windowClassName, MB_ICONEXCLAMATION);
+		MechLogError("Insufficient memory available.");
 		return 0xff;
 	}
 
