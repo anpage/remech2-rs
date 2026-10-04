@@ -2,7 +2,16 @@ use std::ffi::c_void;
 
 use crate::sim::{hud::hud_origin, window::G_GAME_WINDOW_GEOMETRY};
 
-use super::{G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH, drawmode::hooks::PixelBuffer};
+use super::{G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH};
+
+#[repr(C)]
+pub struct PixelBuffer {
+    pub data: *mut c_void,
+    pub width: i32,
+    pub height: i32,
+    pub bitmap_info: *mut c_void,
+    pub unknown: u32,
+}
 
 /// A render context: the pixel buffer to draw into plus the rect within that buffer
 /// where all the drawing happens.

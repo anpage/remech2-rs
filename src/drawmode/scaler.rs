@@ -1,8 +1,5 @@
 use std::num::NonZeroU64;
 
-use egui::PaintCallbackInfo;
-use egui_wgpu::{CallbackResources, CallbackTrait, ScreenDescriptor};
-
 use crate::settings::SETTINGS;
 
 /// How the framebuffer is filtered when we scale it to the window size
@@ -309,42 +306,6 @@ impl Scaler {
             texture,
             bind_group,
             size,
-        }
-    }
-}
-
-/// Paint callback that blits the framebuffer over the rect egui allocated for it
-pub struct SharpBilinear {
-    /// Framebuffer size in texels
-    pub source_size: [f32; 2],
-    /// Size of the on-screen rect, in physical pixels
-    pub output_size: [f32; 2],
-    pub mode: ScalingMode,
-}
-
-impl CallbackTrait for SharpBilinear {
-    fn prepare(
-        &self,
-        _device: &wgpu::Device,
-        queue: &wgpu::Queue,
-        _screen_descriptor: &ScreenDescriptor,
-        _egui_encoder: &mut wgpu::CommandEncoder,
-        callback_resources: &mut CallbackResources,
-    ) -> Vec<wgpu::CommandBuffer> {
-        if let Some(scaler) = callback_resources.get::<Scaler>() {
-            scaler.set_params(queue, self.source_size, self.output_size, self.mode);
-        }
-        Vec::new()
-    }
-
-    fn paint(
-        &self,
-        _info: PaintCallbackInfo,
-        render_pass: &mut wgpu::RenderPass<'static>,
-        callback_resources: &CallbackResources,
-    ) {
-        if let Some(scaler) = callback_resources.get::<Scaler>() {
-            scaler.draw(render_pass);
         }
     }
 }

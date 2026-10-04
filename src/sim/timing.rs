@@ -7,7 +7,7 @@ use crate::{
     settings::SETTINGS,
     sim::{
         RenderTarget,
-        drawmode::hooks::{G_CURRENT_DRAW_MODE_EXTENSION, PixelBuffer},
+        types::{DrawModeExtension, PixelBuffer},
         window::{G_CURRENT_DRAW_MODE, G_WINDOW_ACTIVE},
     },
 };
@@ -48,6 +48,7 @@ globals!(
     /// maxima rather than extents, the way the shape drawing code wants them.
     static G_SUP_ANIM_PIXEL_BUFFER: PixelBuffer = 0x000bcd70;
     static G_MAIN_PIXEL_BUFFER: PixelBuffer = 0x00176ef0;
+    static G_CURRENT_DRAW_MODE_EXTENSION: *mut DrawModeExtension = 0x000b1770;
     static G_TICKS_CHECK: u32 = 0x000ad008;
     static G_TICKS_1: u32 = 0x000ad20c;
     static G_TICKS_2: u32 = 0x000ad210;

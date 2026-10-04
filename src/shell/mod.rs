@@ -25,13 +25,15 @@ mod screens;
 mod smacker;
 mod win32;
 
+pub use drawmode::OverlayUi;
+
 pub static MODULE: ModuleBase = ModuleBase::new("MW2SHELL.DLL");
 
 patch_groups! {
     static PATCH_GROUPS = [
         database,
         dialog,
-        drawmode::hooks,
+        drawmode::mouse,
         screens::debrief,
         screens::debug,
         screens::main_menu,
@@ -103,7 +105,6 @@ impl Shell {
 impl Drop for Shell {
     fn drop(&mut self) {
         revert_groups(PATCH_GROUPS);
-        drawmode::hooks::shutdown();
 
         unsafe {
             self.ail.unhook();

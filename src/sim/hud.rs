@@ -2,8 +2,7 @@ use binding::{globals, macros::hook, patches};
 
 use crate::sim::{
     RenderTarget,
-    drawmode::hooks::PixelBuffer,
-    types::{Point, fmul16},
+    types::{PixelBuffer, Point, fmul16},
     window::{
         G_GAME_WINDOW_GEOMETRY, G_GAME_WINDOW_HEIGHT, G_GAME_WINDOW_WIDTH, G_SCREEN_H_MINUS_1,
         G_SCREEN_W_MINUS_1,

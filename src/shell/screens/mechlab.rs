@@ -15,7 +15,7 @@ use super::{
 use crate::shell::MODULE;
 use crate::shell::audio::{AUDIO_SAMPLE_DROP, AUDIO_SAMPLE_START};
 use crate::shell::drawmode::confirm;
-use crate::shell::drawmode::hooks::G_CURRENT_MOUSE_STATE;
+use crate::shell::drawmode::mouse::G_CURRENT_MOUSE_STATE;
 
 globals!(
     static G_BUTTONS: *mut c_void = 0x00061778;

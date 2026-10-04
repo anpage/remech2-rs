@@ -196,8 +196,8 @@ void VideoDriver::UpdatePalette()
 	g_currentDisplayBackend->m_setPalette(0, 0x100, m_palette, m_allColors);
 }
 
-// Presents the frame: reloads the palette if it changed (redrawing the whole screen), otherwise
-// blits the dirty rectangle, then empties it.
+// Presents the frame, reloading the palette first if it changed, then empties the dirty
+// rectangle.
 // FUNCTION: MW2SHELL 0x10006502
 void VideoDriver::DrawShell()
 {
@@ -246,7 +246,9 @@ void VideoDriver::DrawShell()
 
 		m_paletteChanged = 0;
 	}
-	else if (m_dirtyView.m_x1 >= m_dirtyView.m_x0 && m_dirtyView.m_y0 <= m_dirtyView.m_y1) {
+	else {
+		// The original only blitted when the dirty rectangle wasn't empty. The Rust side draws its
+		// overlay with every present, so there is one every time.
 		// With g_menuVisible the original called GdiBitBltRectWithMenu instead, which drew one menu
 		// bar height higher.
 		g_currentRefreshMode->m_blitRect(m_dirtyView.m_x0, m_dirtyView.m_y0, m_dirtyView.m_x1, m_dirtyView.m_y1);

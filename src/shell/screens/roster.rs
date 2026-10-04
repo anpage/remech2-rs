@@ -12,7 +12,7 @@ use super::{
 };
 use crate::shell::MODULE;
 use crate::shell::audio::AUDIO_SAMPLE_DROP;
-use crate::shell::drawmode::hooks::G_CURRENT_MOUSE_STATE;
+use crate::shell::drawmode::mouse::G_CURRENT_MOUSE_STATE;
 use crate::shell::drawmode::{confirm, menu};
 
 globals!(

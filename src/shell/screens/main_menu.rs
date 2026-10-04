@@ -13,7 +13,7 @@ use crate::shell::audio::{
     AUDIO_SAMPLE_DO_FADE, AUDIO_SAMPLE_DROP, AUDIO_SAMPLE_ENABLE_LOOP, AUDIO_SAMPLE_IS_PLAYING,
     AUDIO_SAMPLE_NEW, AUDIO_SAMPLE_SET_FADE, AUDIO_SAMPLE_START,
 };
-use crate::shell::drawmode::hooks::G_CURRENT_MOUSE_STATE;
+use crate::shell::drawmode::mouse::G_CURRENT_MOUSE_STATE;
 use crate::shell::screens::{BUTTONS_DROP, BUTTONS_HIT_TEST};
 
 globals!(

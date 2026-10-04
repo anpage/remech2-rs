@@ -8,7 +8,7 @@ use windows::Win32::{
     UI::WindowsAndMessaging::PostMessageA,
 };
 
-use crate::shell::drawmode::hooks::G_WINDOW;
+use crate::shell::drawmode::mouse::G_WINDOW;
 
 use super::MODULE;
 

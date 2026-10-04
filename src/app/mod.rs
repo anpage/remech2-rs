@@ -72,6 +72,10 @@ impl App {
         self.state.quit
     }
 
+    pub fn egui_ctx(&self) -> &egui::Context {
+        &self.state.egui_ctx
+    }
+
     /// Draws the game's frame with `ui` over it and waits for it to be shown
     pub fn present(&mut self, frame: Option<Frame>, ui: impl FnMut(&egui::Context)) {
         self.state.present(frame, ui);

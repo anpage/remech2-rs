@@ -42,13 +42,14 @@ mod types;
 mod win32;
 pub mod window;
 
+pub use drawmode::OverlayUi;
+
 pub static MODULE: ModuleBase = ModuleBase::new("MW2.DLL");
 
 patch_groups! {
     static PATCH_GROUPS = [
         audio,
         camera,
-        drawmode::hooks,
         hud,
         input,
         jumpjets,

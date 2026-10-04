@@ -11,7 +11,7 @@ use tracing::Level;
 use tracing_subscriber::{filter, prelude::*};
 use windows::Win32::Foundation::{FALSE, HWND};
 
-use crate::settings::SETTINGS;
+use crate::{display::Overlay, settings::SETTINGS};
 
 mod about;
 mod ail;
@@ -30,17 +30,24 @@ mod shell;
 mod sim;
 mod xmi;
 
-pub static mut WINDOW_WIDTH: i32 = 640;
-pub static mut WINDOW_HEIGHT: i32 = 480;
-
 fn start_shell(window: HWND, intro_or_sim: &str) -> Result<i32> {
     let shell = shell::Shell::new()?;
-    shell.shell_main(intro_or_sim, window)
+    display::set_overlay(app::with(|app| {
+        Overlay::Shell(shell::OverlayUi::new(app.egui_ctx()))
+    }));
+    let result = shell.shell_main(intro_or_sim, window);
+    display::set_overlay(None);
+    result
 }
 
 fn start_sim(window: HWND, cmd_line: &str) -> Result<i32> {
     let sim = sim::Sim::new()?;
-    sim.sim_main(cmd_line, std::ptr::null(), FALSE, window)
+    display::set_overlay(app::with(|app| {
+        Overlay::Sim(sim::OverlayUi::new(app.egui_ctx()))
+    }));
+    let result = sim.sim_main(cmd_line, std::ptr::null(), FALSE, window);
+    display::set_overlay(None);
+    result
 }
 
 fn str_to_level(loglevel: &str) -> Level {

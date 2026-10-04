@@ -10,7 +10,7 @@ use super::{
 };
 use crate::shell::MODULE;
 use crate::shell::drawmode::confirm;
-use crate::shell::drawmode::hooks::G_CURRENT_MOUSE_STATE;
+use crate::shell::drawmode::mouse::G_CURRENT_MOUSE_STATE;
 use crate::shell::screens::{
     CAMPAIGN_LENGTH, G_CAMPAIGN_MISSIONS, SAVE_PILOTS, ScreenButton, ScreenLayout,
 };

@@ -3,6 +3,7 @@ use std::{cell::RefCell, ffi::c_int, ptr, slice};
 use crate::{
     app::{self, Frame},
     drawmode::scaler::PaletteData,
+    shell, sim,
 };
 
 struct Display {
@@ -10,9 +11,19 @@ struct Display {
     size: [usize; 2],
 }
 
+pub enum Overlay {
+    Shell(shell::OverlayUi),
+    Sim(sim::OverlayUi),
+}
+
 thread_local! {
+    static OVERLAY: RefCell<Option<Overlay>> = const { RefCell::new(None) };
     static DISPLAY: RefCell<Option<Display>> = const { RefCell::new(None) };
     static PALETTE: RefCell<PaletteData> = const { RefCell::new([[0.0, 0.0, 0.0, 1.0]; 256]) };
+}
+
+pub fn set_overlay(overlay: Option<Overlay>) {
+    OVERLAY.set(overlay);
 }
 
 fn present(source: Option<[usize; 4]>) {
@@ -27,7 +38,15 @@ fn present(source: Option<[usize; 4]>) {
                 source,
                 palette,
             };
-            app::with(|app| app.present(Some(frame), |_| {}));
+            app::with(|app| {
+                app.present(Some(frame), |ctx| {
+                    OVERLAY.with_borrow_mut(|overlay| match overlay {
+                        Some(Overlay::Shell(overlay)) => overlay.ui(ctx),
+                        Some(Overlay::Sim(overlay)) => overlay.ui(ctx),
+                        None => {}
+                    });
+                })
+            });
         });
     });
 }
