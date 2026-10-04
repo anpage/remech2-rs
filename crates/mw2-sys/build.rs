@@ -5,7 +5,7 @@ use std::{
 
 const SYSTEM_TYPES: &str = "HWND|HWND__|HINSTANCE|HINSTANCE__|HANDLE|BITMAPINFOHEADER|tagBITMAPINFOHEADER|\
                            RGBQUAD|tagRGBQUAD|FILE|_iobuf|BOOL|BYTE|WORD|DWORD|LONG|LONG_PTR|UINT|UINT_PTR|\
-                           WPARAM|LPARAM|HWAVEOUT|HWAVEOUT__|LPHWAVEOUT";
+                           WPARAM|LPARAM";
 const SHARED_FILES: &str = ".*/original/(util|common|mss|smacker)/.*";
 
 fn main() {

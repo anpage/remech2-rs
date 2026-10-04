@@ -64,7 +64,7 @@ pub fn release_sample(handle: SampleHandle) {
     }
 }
 
-pub fn drain_pending_eos() -> Vec<(SampleHandle, unsafe extern "stdcall" fn(SampleHandle))> {
+pub fn drain_pending_eos() -> Vec<(SampleHandle, unsafe extern "system" fn(SampleHandle))> {
     let samples: Vec<(SampleHandle, Sample)> = SAMPLES
         .lock()
         .unwrap()

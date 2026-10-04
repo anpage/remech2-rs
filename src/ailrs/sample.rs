@@ -97,13 +97,13 @@ impl Sample {
 
     pub fn register_eos_callback(
         &self,
-        callback: Option<unsafe extern "stdcall" fn(SampleHandle)>,
-    ) -> Option<unsafe extern "stdcall" fn(SampleHandle)> {
+        callback: Option<unsafe extern "system" fn(SampleHandle)>,
+    ) -> Option<unsafe extern "system" fn(SampleHandle)> {
         let mut s = self.0.lock().unwrap();
         std::mem::replace(&mut s.eos_callback, callback)
     }
 
-    pub fn take_pending_eos(&self) -> Option<unsafe extern "stdcall" fn(SampleHandle)> {
+    pub fn take_pending_eos(&self) -> Option<unsafe extern "system" fn(SampleHandle)> {
         let mut s = self.0.lock().unwrap();
         if s.pending_eos {
             s.pending_eos = false;

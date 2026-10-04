@@ -53,7 +53,7 @@ AudioSubsystem::~AudioSubsystem()
 // FUNCTION: MW2SHELL 0x1003cf89
 HDIGDRIVER AudioSubsystem::GetDigitalDriver()
 {
-	PCMWAVEFORMAT format;
+	AILPCMWAVEFORMAT format;
 
 	if (m_digitalDriver) {
 		return m_digitalDriver;
@@ -63,14 +63,14 @@ HDIGDRIVER AudioSubsystem::GetDigitalDriver()
 		return NULL;
 	}
 
-	format.wf.wFormatTag = WAVE_FORMAT_PCM;
+	format.wf.wFormatTag = AIL_WAVE_FORMAT_PCM;
 	format.wf.nChannels = 1;
 	format.wf.nSamplesPerSec = 11025;
 	format.wf.nAvgBytesPerSec = 11025;
 	format.wf.nBlockAlign = 1;
 	format.wBitsPerSample = 8;
 
-	if (AIL_waveOutOpen(&m_digitalDriver, &m_waveOut, 0, (LPWAVEFORMAT) &format)) {
+	if (AIL_waveOutOpen(&m_digitalDriver, &m_waveOut, 0, (AILWAVEFORMAT*) &format)) {
 		m_digitalDriver = NULL;
 	}
 

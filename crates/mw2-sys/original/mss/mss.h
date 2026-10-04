@@ -1,12 +1,9 @@
 /* Miles Sound System (WAIL32.DLL) declarations: only what the game calls, with the types its
    matched callers prove. There is no SDK in the tree; add functions here as callers are
-   decompiled. The import library is generated from wail32.def. */
+   decompiled. The functions are implemented on the Rust side, so nothing here depends on
+   Windows. */
 #ifndef MSS_H
 #define MSS_H
-
-#include <windows.h>
-// windows.h first: mmsystem.h depends on it
-#include <mmsystem.h>
 
 // The sample user data: 32-bit in this Miles, pointer-sized (SINTa) from later versions on. The game
 // keeps pointers there, so it is pointer-sized where pointers are wider than 32 bits.
@@ -22,8 +19,35 @@ extern "C"
 {
 #endif
 
+// __stdcall like the original where that convention exists (Rust's extern "system")
+#if defined(_M_IX86) || defined(__i386__)
 #define AILCALL __stdcall
-#define AILIMPORT __declspec(dllimport)
+#else
+#define AILCALL
+#endif
+#define AILIMPORT
+
+	// Stand-ins for the Win32 multimedia types Miles took: the wave and MIDI device handles it
+	// hands back, and the PCM format it opens the wave device with.
+	typedef void* AILWAVEOUT;
+	typedef void* AILMIDIOUT;
+
+#define AIL_WAVE_FORMAT_PCM 1
+
+#pragma pack(push, 1)
+	typedef struct AILWAVEFORMAT {
+		unsigned short wFormatTag;
+		unsigned short nChannels;
+		unsigned int nSamplesPerSec;
+		unsigned int nAvgBytesPerSec;
+		unsigned short nBlockAlign;
+	} AILWAVEFORMAT;
+
+	typedef struct AILPCMWAVEFORMAT {
+		AILWAVEFORMAT wf;
+		unsigned short wBitsPerSample;
+	} AILPCMWAVEFORMAT;
+#pragma pack(pop)
 
 	typedef struct _MDI_DRIVER* HMDIDRIVER;
 	typedef struct _SEQUENCE* HSEQUENCE;
@@ -37,14 +61,14 @@ extern "C"
 #define SEQ_PLAYING 4
 #define SEQ_STOPPED 8
 
-#define AILCALLBACK __stdcall
+#define AILCALLBACK AILCALL
 	typedef void(AILCALLBACK* AILSAMPLECB)(HSAMPLE p_sample);
 	typedef void (*AILTIMERCB)(unsigned int p_user);
 
 	AILIMPORT void AILCALL AIL_startup(void);
 	AILIMPORT void AILCALL AIL_shutdown(void);
 
-	AILIMPORT int AILCALL AIL_midiOutOpen(HMDIDRIVER* p_driver, LPHMIDIOUT* p_midiOut, int p_deviceId);
+	AILIMPORT int AILCALL AIL_midiOutOpen(HMDIDRIVER* p_driver, AILMIDIOUT** p_midiOut, int p_deviceId);
 	AILIMPORT int AILCALL AIL_active_sequence_count(HMDIDRIVER p_driver);
 	AILIMPORT int AILCALL AIL_set_preference(unsigned int p_number, int p_value);
 	AILIMPORT int AILCALL AIL_lock_channel(HMDIDRIVER p_driver);
@@ -53,7 +77,7 @@ extern "C"
 	AIL_send_channel_voice_message(HMDIDRIVER p_driver, HSEQUENCE p_sequence, int p_status, int p_data1, int p_data2);
 
 	AILIMPORT int AILCALL
-	AIL_waveOutOpen(HDIGDRIVER* p_driver, LPHWAVEOUT* p_waveOut, int p_deviceId, LPWAVEFORMAT p_format);
+	AIL_waveOutOpen(HDIGDRIVER* p_driver, AILWAVEOUT** p_waveOut, int p_deviceId, AILWAVEFORMAT* p_format);
 	AILIMPORT void AILCALL AIL_waveOutClose(HDIGDRIVER p_driver);
 	AILIMPORT int AILCALL AIL_active_sample_count(HDIGDRIVER p_driver);
 
@@ -99,7 +123,7 @@ extern "C"
 	AILIMPORT void AILCALL
 	AIL_load_sample_buffer(HSAMPLE p_sample, unsigned int p_bufferNum, void* p_buffer, unsigned int p_size);
 
-	/* The original imports it under its Miles name (wail32.def: _MEM_free_lock@4). */
+	/* The original imports it under its Miles name (_MEM_free_lock@4). */
 	AILIMPORT void AILCALL MEM_free_lock(void* p_block);
 	AILIMPORT void* AILCALL FILE_read(const char* p_filename, void* p_dest);
 
