@@ -47,6 +47,7 @@ enum ShellMenuCommand {
 };
 
 // The functions and globals of shellmain.cpp that other units use.
+extern "C" int __stdcall ShellMain(HINSTANCE p_hInstance, HINSTANCE p_hPrevInstance, char* p_cmdLine, int p_cmdShow, HWND p_hWnd);
 MechS32 PumpMessage();
 void EnableShellMenu(HMENU p_menu);
 void DisableShellMenu(HMENU p_menu);

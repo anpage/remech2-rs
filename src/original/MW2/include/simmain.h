@@ -7,6 +7,7 @@
 #include <windows.h>
 
 struct DifficultyCfg;
+struct NetLaunchInfo;
 struct TimedCallback;
 struct VideoDriverChoice;
 
@@ -39,6 +40,14 @@ extern "C"
 	extern MechU32 g_windowedSwitchTime;
 	extern MechU32 g_windowedSwitchDeadline;
 
+	int __stdcall SimMain(
+		HINSTANCE p_module,
+		undefined4 p_unk0x0c,
+		LPSTR p_cmdLine,
+		struct NetLaunchInfo* p_netLaunch,
+		undefined4 p_isNetGameUnused,
+		HWND p_hWnd
+	);
 	void HandleMessages(void);
 	void UpdatePauseState(void);
 	void SetGameResolution(char* p_driverName);
