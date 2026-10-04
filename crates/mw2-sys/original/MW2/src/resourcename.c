@@ -3,6 +3,7 @@
 #include "resourcename.h"
 
 #include "config.h"
+#include "files.h"
 #include "loadres.h"
 #include "mw2prj.h"
 #include "prjfile.h"
@@ -11,9 +12,7 @@
 #include "staticmem.h"
 #include "types.h"
 
-#include <io.h>
 #include <string.h>
-#include <windows.h>
 
 // Returns the id of the resource named p_name in TABL resource p_table, or -1. The table's entries
 // are 12 bytes from 0x0c: a name of 10 bytes, each stored as 0x100 minus the character, and the id.
@@ -110,7 +109,7 @@ void* LoadResourceByRef(
 			data = NULL;
 		}
 		else {
-			_close(handle);
+			MechClose(handle);
 			fromResource = FALSE;
 		}
 	}

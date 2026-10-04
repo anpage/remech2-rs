@@ -4,8 +4,6 @@
 #include "transform.h"
 #include "types.h"
 
-#include <windows.h>
-
 // The functions and globals of clock.c that other units use.
 #ifdef __cplusplus
 extern "C"
@@ -21,7 +19,7 @@ extern "C"
 	extern MechS32 g_realClock;
 	extern MechS32 g_clockMode;
 	extern MechS32 g_deltaTime;
-	extern BOOL g_ticksTimerInitialized;
+	extern MechS32 g_ticksTimerInitialized;
 	extern MechS16* g_sqrtTable;
 	extern MechS32 g_sinTable[0x102];
 	extern MechS16 g_sqrtTableData[0x400];

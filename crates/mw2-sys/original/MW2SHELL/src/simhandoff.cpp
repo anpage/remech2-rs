@@ -13,7 +13,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(SimHandoffState, 0x218)
 
@@ -29,7 +28,7 @@ SimHandoffState g_simHandoff;
 // message to the shell window; otherwise it returns to the campaign's start (2, no pilot, no
 // scenario).
 // FUNCTION: MW2SHELL 0x10039b50
-void ReadSimHandoff(BOOL p_fromSim, MechS32* p_campaign, MechU8* p_pilotChosen, char** p_scenario)
+void ReadSimHandoff(MechS32 p_fromSim, MechS32* p_campaign, MechU8* p_pilotChosen, char** p_scenario)
 {
 	MechS32 i;
 	FILE* file;
@@ -74,7 +73,7 @@ void ReadSimHandoff(BOOL p_fromSim, MechS32* p_campaign, MechU8* p_pilotChosen, 
 // campaign, the pilot, and the simulator's command line (the scenario and "-b=" the mission's
 // name).
 // FUNCTION: MW2SHELL 0x10039c92
-void WriteSimHandoff(UINT p_msg, MechS32 p_campaign, MechU8 p_pilotChosen, const char* p_scenario)
+void WriteSimHandoff(MechU32 p_msg, MechS32 p_campaign, MechU8 p_pilotChosen, const char* p_scenario)
 {
 	FILE* file;
 

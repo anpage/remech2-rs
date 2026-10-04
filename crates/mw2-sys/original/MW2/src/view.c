@@ -21,8 +21,6 @@
 #include "transform.h"
 #include "types.h"
 
-#include <windows.h>
-
 // The level of detail: 1 high, 2 low (TOGGLE_LOD_QUALITY); it divides Eyepoint::m_detailScale.
 // GLOBAL: MW2 0x100a712c
 MechS32 g_lodQuality = 1;
@@ -261,8 +259,8 @@ void UpdateProjection(Eyepoint* p_eyepoint)
 	right = eyepoint->m_viewRight;
 	eyepoint->m_centerX = centerX = ((right + left + 1) >> 1) + offsetX;
 	eyepoint->m_centerY = centerY = ((bottom + top + 1) >> 1) + offsetY;
-	eyepoint->m_halfWidth = halfWidth = max((right - left + 1) >> 1, 1);
-	eyepoint->m_halfHeight = halfHeight = max((bottom - top + 1) >> 1, 1);
+	eyepoint->m_halfWidth = halfWidth = MECH_MAX((right - left + 1) >> 1, 1);
+	eyepoint->m_halfHeight = halfHeight = MECH_MAX((bottom - top + 1) >> 1, 1);
 	if (fov > 0x100000) {
 		fov = 0x100000;
 	}

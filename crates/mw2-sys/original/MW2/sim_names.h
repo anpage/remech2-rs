@@ -79,7 +79,6 @@
 #define g_debugPrintBuffer Sim_g_debugPrintBuffer
 #define g_displayBrightness Sim_g_displayBrightness
 #define g_extendedScanCodeMap Sim_g_extendedScanCodeMap
-#define g_gameWindow Sim_g_gameWindow
 #define g_gammaTable Sim_g_gammaTable
 #define g_inputDeviceCount Sim_g_inputDeviceCount
 #define g_inputDrivers Sim_g_inputDrivers

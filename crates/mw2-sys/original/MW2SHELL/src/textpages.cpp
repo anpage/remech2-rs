@@ -16,7 +16,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 // The index of the HTXT tag in g_bwdTags (projectarchive.cpp).
 enum {

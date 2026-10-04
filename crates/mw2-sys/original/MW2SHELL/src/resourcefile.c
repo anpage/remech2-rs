@@ -4,8 +4,6 @@
 #include "files.h"
 #include "types.h"
 
-#include <fcntl.h>
-#include <io.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,20 +36,20 @@ MechS32 LoadFile(MechChar* p_name, MechS32* p_size, void** p_data, MechS32 p_pre
 		return -1;
 	}
 
-	*p_size = _filelength(handle);
+	*p_size = MechFileLength(handle);
 	if (!p_preallocated) {
 		*p_data = malloc(*p_size);
 	}
 	if (*p_data == NULL) {
-		_close(handle);
+		MechClose(handle);
 		return -1;
 	}
 
-	if (_read(handle, *p_data, *p_size) != *p_size) {
+	if (MechRead(handle, *p_data, *p_size) != *p_size) {
 		if (!p_preallocated) {
 			free(*p_data);
 		}
-		_close(handle);
+		MechClose(handle);
 		return -1;
 	}
 

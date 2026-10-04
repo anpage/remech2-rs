@@ -1,5 +1,6 @@
 #include "mousestate.h"
 
+#include "elapsed.h"
 #include "font.h"
 #include "inputdeviceinfo.h"
 #include "inputdriver.h"
@@ -11,7 +12,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(MouseState, 0x43)
 
@@ -19,7 +19,7 @@ DECOMP_SIZE_ASSERT(MouseState, 0x43)
 MechChar g_cursorPositionText[0x20];
 
 // ReadMouseState's bounds test keeps a jmp per return: an /Ob1-expanded inline function.
-inline MechS32 IsInsideWindow(POINT& p_point)
+inline MechS32 IsInsideWindow(MechPoint& p_point)
 {
 	if (p_point.x < 0 || p_point.x >= g_windowWidth) {
 		return FALSE;
@@ -140,7 +140,7 @@ void MouseState::PressButton(MechS32 p_button)
 // FUNCTION: MW2SHELL 0x1003aac5
 void MouseState::ReadMouseState()
 {
-	POINT point;
+	MechPoint point;
 	MechS32 x;
 	MechS32 y;
 	undefined4 middleDown;
@@ -214,11 +214,11 @@ void MouseState::ReadMouseState()
 
 	m_doubleClicked = 0;
 	if (m_leftDown == 1 && leftDown == 0) {
-		if (timeGetTime() - m_lastClickTime <= 200) {
+		if (MechMilliseconds() - m_lastClickTime <= 200) {
 			m_doubleClicked = 1;
 		}
 		else {
-			m_lastClickTime = timeGetTime();
+			m_lastClickTime = MechMilliseconds();
 		}
 	}
 }

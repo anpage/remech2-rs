@@ -3,6 +3,7 @@
 #include "audiosubsystem.h"
 #include "decomp.h"
 #include "displaybackend.h"
+#include "elapsed.h"
 #include "files.h"
 #include "fmvslot.h"
 #include "keyboardinput.h"
@@ -22,7 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
+#include <string.h>
 
 // GLOBAL: MW2SHELL 0x100641a8
 FmvSlot g_fmvSlots[32] = {0};
@@ -56,7 +57,7 @@ MechChar* GetPathToShp(const MechChar* p_name)
 // The original looked for the video on the game CD when it wasn't on the hard disk, here and
 // wherever a video or its SHP animation is opened.
 // FUNCTION: MW2SHELL 0x10015e12
-BOOL CheckVideoExists(const MechChar* p_name)
+MechS32 CheckVideoExists(const MechChar* p_name)
 {
 	return MechFileExists(GetPathToVideo(p_name));
 }
@@ -439,7 +440,7 @@ void UpdateVideos()
 					video->m_flags &= ~0x100;
 				}
 
-				if (!(video->m_flags & 1) && !IsVideoFrameDue(video, timeGetTime())) {
+				if (!(video->m_flags & 1) && !IsVideoFrameDue(video, MechMilliseconds())) {
 					video->m_frame++;
 					if (video->m_frame >= video->m_frameCount) {
 						video->m_frame--;
@@ -577,7 +578,7 @@ void CloseVideo(MechS32 p_index)
 
 	g_fmvSlots[p_index].m_smack = NULL;
 	g_fmvSlots[p_index].m_shp = NULL;
-	ZeroMemory(&g_fmvSlots[p_index].m_flags, 4);
+	memset(&g_fmvSlots[p_index].m_flags, 0, 4);
 	g_fmvSlots[p_index].m_frameBuffer = NULL;
 }
 
@@ -609,7 +610,7 @@ void MoveVideo(MechS32 p_index, MechS32 p_left, MechS32 p_top)
 // Smacker's sound (flag 0x2000). With flag 0x1000 the first frame goes straight to the screen, with
 // flag 2 to the back buffer, otherwise to a buffer of its own.
 // FUNCTION: MW2SHELL 0x1001703b
-BOOL LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
+MechS32 LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 {
 	MechS32 result;
 
@@ -694,7 +695,7 @@ BOOL LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 
 // Loads the SHP animation p_name into the slot.
 // FUNCTION: MW2SHELL 0x10017376
-BOOL LoadShpFile(FmvSlot* p_slot, const MechChar* p_name)
+MechS32 LoadShpFile(FmvSlot* p_slot, const MechChar* p_name)
 {
 	MechS32 size;
 

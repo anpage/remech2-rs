@@ -34,7 +34,6 @@
 #include "view.h"
 
 #include <string.h>
-#include <windows.h>
 
 // GLOBAL: MW2 0x100a244c
 MechS32 g_drawModeIndex = -1;
@@ -170,31 +169,12 @@ MechS32 InitDisplayGeometry(void)
 	return result;
 }
 
-// Makes the code block writable (the drawing routines patch themselves), sets up the vertex
-// buffers and the scene, and installs the normal render hooks.
-// Stack-slot permutation: size, start, segment and oldProtect.
+// Sets up the vertex buffers and the scene, and installs the normal render hooks.
+// The original first made VFX's code block (GetCodeBlock) writable, as its drawing routines
+// patched themselves, failing with error 0x4d. The portable C patches nothing.
 // FUNCTION: MW2 0x100128b5
 void FirstRender(void)
 {
-	MechS32 segment;
-	MechS32 size;
-	DWORD oldProtect;
-	undefined4 start;
-
-	size = 0;
-	start = 0;
-	segment = 0;
-	oldProtect = 0;
-	size = GetCodeBlock(&start, &segment);
-	if (!VirtualProtect(
-			(void*) start,
-			size,
-			(GetVersion() & 0x80000000) ? PAGE_READWRITE : PAGE_EXECUTE_READWRITE,
-			&oldProtect
-		)) {
-		Error(0x4d, NULL);
-	}
-
 	InitializeDrawBuffer(0x80, 0x5dc);
 	g_maxPolygons = 0x578;
 	InitShapeLists();

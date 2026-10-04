@@ -8,7 +8,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 enum InputDeviceTable {
 	c_deviceTableGrowth = 50

@@ -1,9 +1,10 @@
 use std::{
-    ffi::{CStr, CString, OsStr, c_char, c_int, c_void},
-    fs,
+    ffi::{CStr, CString, OsStr, c_char, c_int, c_long, c_uint, c_void},
+    fs::{self, File, OpenOptions},
+    io::{ErrorKind, Read, Seek, SeekFrom, Write},
     path::{Component, MAIN_SEPARATOR_STR, Path, PathBuf},
-    ptr,
-    sync::OnceLock,
+    ptr, slice,
+    sync::{Mutex, OnceLock},
 };
 
 use tracing::warn;
@@ -125,13 +126,11 @@ unsafe fn game_path(path: *const c_char) -> Option<PathBuf> {
 #[cfg(windows)]
 unsafe extern "C" {
     fn _wfopen(path: *const u16, mode: *const u16) -> *mut c_void;
-    fn _wopen(path: *const u16, flags: c_int, ...) -> c_int;
 }
 
 #[cfg(not(windows))]
 unsafe extern "C" {
     fn fopen(path: *const c_char, mode: *const c_char) -> *mut c_void;
-    fn open(path: *const c_char, flags: c_int, ...) -> c_int;
 }
 
 #[cfg(windows)]
@@ -167,37 +166,23 @@ const OPEN_READ: c_int = 0;
 const OPEN_READ_WRITE: c_int = 1;
 const OPEN_CREATE: c_int = 2;
 
-// The C library's flags for `open`
-const O_RDONLY: c_int = 0;
-const O_WRONLY: c_int = 1;
-const O_RDWR: c_int = 2;
-#[cfg(windows)]
-const O_CREAT: c_int = 0x100;
-#[cfg(target_os = "linux")]
-const O_CREAT: c_int = 0o100;
-#[cfg(not(any(windows, target_os = "linux")))]
-const O_CREAT: c_int = 0x200;
-/// Only Windows tells text files from binary ones
-#[cfg(windows)]
-const O_BINARY: c_int = 0x8000;
-#[cfg(not(windows))]
-const O_BINARY: c_int = 0;
+const SEEK_SET: c_int = 0;
+const SEEK_CUR: c_int = 1;
+const SEEK_END: c_int = 2;
 
-#[cfg(windows)]
-const CREATE_PERMISSIONS: c_int = 0x180;
-#[cfg(not(windows))]
-const CREATE_PERMISSIONS: c_int = 0o644;
+/// The files `MechOpen` opened, by handle
+static OPEN_FILES: Mutex<Vec<Option<File>>> = Mutex::new(Vec::new());
 
-#[cfg(windows)]
-unsafe fn c_open(path: &Path, flags: c_int) -> c_int {
-    unsafe { _wopen(wide(path.as_os_str()).as_ptr(), flags, CREATE_PERMISSIONS) }
-}
-
-#[cfg(not(windows))]
-unsafe fn c_open(path: &Path, flags: c_int) -> c_int {
-    match narrow(path) {
-        Some(path) => unsafe { open(path.as_ptr(), flags, CREATE_PERMISSIONS) },
-        None => -1,
+/// Runs `f` on the open file `handle`, or returns -1 if it isn't one
+fn with_file<T: From<i8>>(handle: c_int, f: impl FnOnce(&mut File) -> T) -> T {
+    let mut files = OPEN_FILES.lock().unwrap();
+    let file = usize::try_from(handle)
+        .ok()
+        .and_then(|handle| files.get_mut(handle))
+        .and_then(Option::as_mut);
+    match file {
+        Some(file) => f(file),
+        None => T::from(-1),
     }
 }
 
@@ -226,17 +211,110 @@ pub unsafe extern "C" fn mech_fopen(path: *const c_char, mode: *const c_char) ->
 
 #[unsafe(export_name = "MechOpen")]
 pub unsafe extern "C" fn mech_open(path: *const c_char, mode: c_int) -> c_int {
-    let flags = match mode {
-        OPEN_READ => O_RDONLY,
-        OPEN_READ_WRITE => O_RDWR,
-        OPEN_CREATE => O_WRONLY | O_CREAT,
+    let mut options = OpenOptions::new();
+    match mode {
+        OPEN_READ => options.read(true),
+        OPEN_READ_WRITE => options.read(true).write(true),
+        OPEN_CREATE => options.write(true).create(true),
         _ => return -1,
     };
     let Some(path) = (unsafe { game_path(path) }) else {
         return -1;
     };
+    let file = match options.open(&path) {
+        Ok(file) => file,
+        Err(e) => {
+            warn!("files: couldn't open {}: {e}", path.display());
+            return -1;
+        }
+    };
 
-    unsafe { c_open(&path, flags | O_BINARY) }
+    let mut files = OPEN_FILES.lock().unwrap();
+    let handle = match files.iter().position(Option::is_none) {
+        Some(free) => free,
+        None => {
+            files.push(None);
+            files.len() - 1
+        }
+    };
+    let Ok(result) = c_int::try_from(handle) else {
+        return -1;
+    };
+    files[handle] = Some(file);
+    result
+}
+
+#[unsafe(export_name = "MechRead")]
+pub unsafe extern "C" fn mech_read(file: c_int, buffer: *mut c_void, count: c_uint) -> c_int {
+    if buffer.is_null() {
+        return -1;
+    }
+    let buffer = unsafe { slice::from_raw_parts_mut(buffer.cast::<u8>(), count as usize) };
+    with_file(file, |file| {
+        let mut done = 0;
+        while done < buffer.len() {
+            match file.read(&mut buffer[done..]) {
+                Ok(0) => break,
+                Ok(n) => done += n,
+                Err(e) if e.kind() == ErrorKind::Interrupted => {}
+                Err(_) => return -1,
+            }
+        }
+        c_int::try_from(done).unwrap_or(-1)
+    })
+}
+
+#[unsafe(export_name = "MechWrite")]
+pub unsafe extern "C" fn mech_write(file: c_int, buffer: *const c_void, count: c_uint) -> c_int {
+    if buffer.is_null() {
+        return -1;
+    }
+    let buffer = unsafe { slice::from_raw_parts(buffer.cast::<u8>(), count as usize) };
+    with_file(file, |file| match file.write_all(buffer) {
+        Ok(()) => c_int::try_from(buffer.len()).unwrap_or(-1),
+        Err(_) => -1,
+    })
+}
+
+#[unsafe(export_name = "MechSeek")]
+pub extern "C" fn mech_seek(file: c_int, offset: c_long, origin: c_int) -> c_long {
+    let offset = i64::from(offset);
+    let from = match origin {
+        SEEK_SET => match u64::try_from(offset) {
+            Ok(offset) => SeekFrom::Start(offset),
+            Err(_) => return -1,
+        },
+        SEEK_CUR => SeekFrom::Current(offset),
+        SEEK_END => SeekFrom::End(offset),
+        _ => return -1,
+    };
+    with_file(file, |file| match file.seek(from) {
+        Ok(position) => c_long::try_from(position).unwrap_or(-1),
+        Err(_) => -1,
+    })
+}
+
+#[unsafe(export_name = "MechClose")]
+pub extern "C" fn mech_close(file: c_int) -> c_int {
+    let mut files = OPEN_FILES.lock().unwrap();
+    match usize::try_from(file)
+        .ok()
+        .and_then(|file| files.get_mut(file))
+    {
+        Some(slot @ Some(_)) => {
+            *slot = None;
+            0
+        }
+        _ => -1,
+    }
+}
+
+#[unsafe(export_name = "MechFileLength")]
+pub extern "C" fn mech_file_length(file: c_int) -> c_long {
+    with_file(file, |file| match file.metadata() {
+        Ok(metadata) => c_long::try_from(metadata.len()).unwrap_or(-1),
+        Err(_) => -1,
+    })
 }
 
 #[unsafe(export_name = "MechRemove")]

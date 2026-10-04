@@ -149,7 +149,7 @@ static MechS32 DisplayBegin(WINDOW* p_buffer, MechS32 p_width, MechS32 p_height)
 	p_buffer->m_xMax = p_width - 1;
 	p_buffer->m_yMax = p_height - 1;
 	p_buffer->m_shadow = 0;
-	p_buffer->m_bitmapInfo = NULL;
+	p_buffer->m_stencil = NULL;
 	MechDisplaySetPalette((MechU8*) g_paletteColors);
 	MechDisplayPresent();
 	return 0;

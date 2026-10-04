@@ -29,7 +29,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 // The ready room screen.
 
@@ -49,7 +48,7 @@ ButtonMenu* g_readyRoomMenu;
 
 // DrawReadyRoom's p_wParam: the quick tips show when it comes from the clan hall (c_msgClanHall).
 // GLOBAL: MW2SHELL 0x100904a4
-WPARAM g_readyRoomMessage;
+size_t g_readyRoomMessage;
 
 // Play the second faction grid animation only when video slot zero is idle.
 // FUNCTION: MW2SHELL 0x10039de0
@@ -73,7 +72,7 @@ void ReadyRoomCallback(TMPackDataBase* p_database, MechS32* p_campaign, MechU8*,
 // Opens the ready room. Coming from the clan hall (c_msgClanHall) or a mission (c_msgDebrief) sets
 // up the pilot's next mission first; only the pilot FREEBIRTHTOAD gets the mission buttons.
 // FUNCTION: MW2SHELL 0x10039e72
-void DrawReadyRoom(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scenario, WPARAM p_wParam)
+void DrawReadyRoom(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scenario, size_t p_wParam)
 {
 	if (p_wParam == c_msgClanHall || p_wParam == c_msgDebrief) {
 		SelectStar(0, 0, 3, 1, 100);

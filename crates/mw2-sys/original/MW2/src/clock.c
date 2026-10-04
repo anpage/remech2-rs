@@ -59,7 +59,7 @@ MechS32 g_previousClock = 0;
 MechS32 g_clockModeBeforePause = 0;
 
 // GLOBAL: MW2 0x100ba584
-BOOL g_ticksTimerInitialized = FALSE;
+MechS32 g_ticksTimerInitialized = FALSE;
 
 // GLOBAL: MW2 0x100bfd54
 MechS16* g_sqrtTable;

@@ -7,7 +7,6 @@
 #include <search.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
 
 // The original frees through a macro: its trailing empty `else` emits a `jmp` to the next statement.
 #define HEAP_FREE(p_mem)                                                                                               \

@@ -30,7 +30,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 // The two stars of a custom battle: the player's and the enemy's.
 

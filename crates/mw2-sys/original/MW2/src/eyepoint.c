@@ -763,7 +763,7 @@ void UpdateFreeEyeView(MechS32 p_climb, MechS32 p_speed, MechS32 p_strafe, MechS
 	g_eyepoint->m_z -= FixedMul16(FixedMul16(speed, cosHeading) >> 13, cosPitch) >> 13;
 	floor = GetCameraFloor(g_eyepoint);
 	if (g_eyepoint->m_y < floor) {
-		g_eyepoint->m_y = max(g_eyepoint->m_y, floor);
+		g_eyepoint->m_y = MECH_MAX(g_eyepoint->m_y, floor);
 	}
 }
 

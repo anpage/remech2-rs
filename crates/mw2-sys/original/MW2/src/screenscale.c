@@ -19,7 +19,6 @@
 #include "window.h"
 
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(GaugeQuadrant, 0x04)
 DECOMP_SIZE_ASSERT(Rect, 0x10)

@@ -11,7 +11,6 @@
 
 #include <ctype.h>
 #include <stdio.h>
-#include <windows.h>
 
 enum KeyCodeBuffer {
 	c_keyCodeBufferSize = 64
@@ -140,8 +139,8 @@ MechS32 KeyboardCenterAxis(void);
 MechS32 KeyboardPoll(undefined4 p_unk0x00, undefined4 p_unk0x04, undefined4* p_keyStates);
 MechS32 KeyboardReadKeyCode(MechS16* p_keyCode);
 MechS32 KeyboardFlushKeyCodes(void);
-void KeyboardQueueKeyCode(WPARAM p_virtualKey, LPARAM p_lParam);
-void KeyboardRecordKeyState(WPARAM p_virtualKey, MechU32 p_lParam, BOOL p_pressed);
+void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam);
+void KeyboardRecordKeyState(size_t p_virtualKey, MechU32 p_lParam, MechS32 p_pressed);
 
 // GLOBAL: MW2 0x100a6670
 InputDriverModule g_keyboardDriver = {
@@ -241,10 +240,10 @@ MechS32 KeyboardFlushKeyCodes(void)
 
 // Unlike the shell's, the simulator queues a key's code when the key is released.
 // FUNCTION: MW2 0x10042966
-void HandleKeyboardMessages(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
+void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
 	MechMessage msg;
-	BOOL done;
+	MechS32 done;
 
 	done = FALSE;
 	do {
@@ -274,7 +273,7 @@ void HandleKeyboardMessages(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 }
 
 // FUNCTION: MW2 0x10042a71
-void KeyboardQueueKeyCode(WPARAM p_virtualKey, LPARAM p_lParam)
+void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam)
 {
 	MechS16 keyCode;
 
@@ -312,7 +311,7 @@ void KeyboardQueueKeyCode(WPARAM p_virtualKey, LPARAM p_lParam)
 }
 
 // FUNCTION: MW2 0x10042b90
-void KeyboardRecordKeyState(WPARAM p_virtualKey, MechU32 p_lParam, BOOL p_pressed)
+void KeyboardRecordKeyState(size_t p_virtualKey, MechU32 p_lParam, MechS32 p_pressed)
 {
 	MechS32 key;
 

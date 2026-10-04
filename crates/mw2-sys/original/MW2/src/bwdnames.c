@@ -9,7 +9,6 @@
 #include "types.h"
 
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(BwdName, 0x10)
 DECOMP_SIZE_ASSERT(BwdNameNode, 0xf)

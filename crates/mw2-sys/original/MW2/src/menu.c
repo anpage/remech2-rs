@@ -24,7 +24,6 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include <windows.h>
 
 // GLOBAL: MW2 0x100a59e0
 MechS32 g_menuRepeatTimer = -1;

@@ -9,8 +9,6 @@
 #include "staticmem.h"
 #include "types.h"
 
-#include <windows.h>
-
 DECOMP_SIZE_ASSERT(TimedCallback, 0x18)
 
 // The callback being created, run or removed.

@@ -10,7 +10,6 @@
 #include "windowstate.h"
 
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(HitRect, 0x10)
 
@@ -18,7 +17,7 @@ DECOMP_SIZE_ASSERT(HitRect, 0x10)
 #pragma pack(1)
 struct MenuEntry {
 	MechChar* m_text;    // 0x00
-	POINT m_textPos;     // 0x04
+	MechPoint m_textPos;     // 0x04
 	MechS32 m_bottom;    // 0x0c
 	Font* m_font;        // 0x10
 	undefined* m_colors; // 0x14
@@ -39,7 +38,7 @@ struct MenuEntry {
 		VideoDriver* p_videoDriver,
 		Font* p_font,
 		MechChar* p_text,
-		POINT p_textPos,
+		MechPoint p_textPos,
 		undefined* p_colors,
 		MechU8 p_enabled
 	);
@@ -279,7 +278,7 @@ MenuEntry::MenuEntry(
 	VideoDriver* p_videoDriver,
 	Font* p_font,
 	MechChar* p_text,
-	POINT p_textPos,
+	MechPoint p_textPos,
 	undefined* p_colors,
 	MechU8 p_enabled
 )

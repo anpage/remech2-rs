@@ -16,7 +16,6 @@
 #include "types.h"
 
 #include <string.h>
-#include <windows.h>
 
 // GLOBAL: MW2 0x100a00cc
 MechS32 g_paneIndex = -1;

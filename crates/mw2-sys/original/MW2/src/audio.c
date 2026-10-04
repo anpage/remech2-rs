@@ -20,7 +20,6 @@
 #include "world.h"
 
 #include <stdio.h>
-#include <windows.h>
 
 // The CD track the mission plays, or -1.
 // GLOBAL: MW2 0x100a1490

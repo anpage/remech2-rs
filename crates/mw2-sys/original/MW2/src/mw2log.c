@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #include <time.h>
-#include <windows.h>
 
 // Set by the command line; SimMain opens mw2.log when it is.
 // GLOBAL: MW2 0x100ae6d4

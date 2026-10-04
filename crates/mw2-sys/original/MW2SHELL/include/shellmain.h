@@ -4,8 +4,6 @@
 #include "tmpackdatabase.h"
 #include "types.h"
 
-#include <windows.h>
-
 // The shell's messages. Its message handler opens the screen of each; the screen functions get
 // them as p_msg (c_msgScreenFrame on every frame) and the screen they come from as p_wParam.
 enum ShellMessage {

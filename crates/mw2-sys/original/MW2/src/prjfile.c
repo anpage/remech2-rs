@@ -4,7 +4,6 @@
 #include "files.h"
 #include "types.h"
 
-#include <io.h>
 #include <string.h>
 
 // PROJ resource files: a header listing resource types, each with an index of resources by ID.
@@ -57,7 +56,7 @@ MechS32 WritePrjBytes(MechS32 p_fd, void* p_buffer, MechU32 p_length)
 	while (left > 0) {
 		chunk = left < 0x4000 ? left : 0x4000;
 
-		if (_write(p_fd, buffer, chunk) != chunk) {
+		if (MechWrite(p_fd, buffer, chunk) != chunk) {
 			return -1;
 		}
 
@@ -82,7 +81,7 @@ MechS32 ReadPrjBytes(MechS32 p_fd, void* p_buffer, MechU32 p_length)
 	while (left > 0) {
 		chunk = left < 0x4000 ? left : 0x4000;
 
-		if (_read(p_fd, buffer, chunk) != chunk) {
+		if (MechRead(p_fd, buffer, chunk) != chunk) {
 			return -1;
 		}
 
@@ -118,13 +117,13 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 			return -1;
 		}
 		else {
-			_read(fd, tag, 12);
+			MechRead(fd, tag, 12);
 			if (_strnicmp(tag, "PROJ", 4)) {
 				return -1;
 			}
 
 			if ((MechU8) tag[8] == 0xfe) {
-				_close(fd);
+				MechClose(fd);
 				return -2;
 			}
 		}
@@ -135,7 +134,7 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 			return -1;
 		}
 		else {
-			_read(fd, tag, 12);
+			MechRead(fd, tag, 12);
 			if (_strnicmp(tag, "PROJ", 4)) {
 				return -1;
 			}
@@ -145,7 +144,7 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 		return -1;
 	}
 
-	_lseek(fd, 0x10, 0);
+	MechSeek(fd, 0x10, 0);
 	if (ReadPrjBytes(fd, &size, 4) != 4) {
 		return -1;
 	}
@@ -156,7 +155,7 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 		return -1;
 	}
 
-	_lseek(fd, 0xc, 0);
+	MechSeek(fd, 0xc, 0);
 	if (ReadPrjBytes(fd, header, size) != size) {
 		PrjFreeBlock(header);
 		return -1;
@@ -191,7 +190,7 @@ MechS32 ClosePrjFile(MechS32 p_file)
 
 	g_prjFiles[p_file].m_open = FALSE;
 	_strnset(g_prjFiles[p_file].m_name, 0, 0x20);
-	return _close(g_prjFiles[p_file].m_fd);
+	return MechClose(g_prjFiles[p_file].m_fd);
 }
 
 // Returns the type's index in the header, or 0xffff.
@@ -246,7 +245,7 @@ MechS32 LoadPrjIndexes(MechS32 p_file)
 				return -1;
 			}
 
-			_lseek(g_prjFiles[p_file].m_fd, types[i].m_indexOffset, 0);
+			MechSeek(g_prjFiles[p_file].m_fd, types[i].m_indexOffset, 0);
 			if (ReadPrjBytes(g_prjFiles[p_file].m_fd, index, size) != size) {
 				PrjFreeBlock(index);
 				return -1;
@@ -321,7 +320,7 @@ MechS32 SeekPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, Me
 		*p_size = entries[p_id].m_end - types[type].m_indexBase;
 	}
 
-	_lseek(g_prjFiles[p_file].m_fd, offset, 0);
+	MechSeek(g_prjFiles[p_file].m_fd, offset, 0);
 	return 0;
 }
 
@@ -329,7 +328,7 @@ MechS32 SeekPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, Me
 MechS32 ReadPrjAt(void* p_buffer, MechS32 p_file, MechS32 p_offset, MechU32 p_length)
 {
 	p_file = g_prjFiles[p_file].m_fd;
-	_lseek(p_file, p_offset, 0);
+	MechSeek(p_file, p_offset, 0);
 	return ReadPrjBytes(p_file, p_buffer, p_length);
 }
 
@@ -355,7 +354,7 @@ MechS32 ReadPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, vo
 		types = g_prjFiles[p_file].m_header->m_types;
 		offset = types[type].m_indexBase + entries[id].m_offset;
 		size = entries[id].m_end - types[type].m_indexBase;
-		if (_lseek(g_prjFiles[p_file].m_fd, offset, 0) == -1) {
+		if (MechSeek(g_prjFiles[p_file].m_fd, offset, 0) == -1) {
 			return -1;
 		}
 

@@ -18,7 +18,6 @@
 #include "types.h"
 
 #include <string.h>
-#include <windows.h>
 
 // The lancemates a message addresses.
 // GLOBAL: MW2 0x100a96c8

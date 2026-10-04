@@ -4,7 +4,7 @@
 #include "inputdriver.h"
 #include "types.h"
 
-#include <windows.h>
+#include <stddef.h>
 
 // The functions and globals of keyboard.c that other units use.
 #ifdef __cplusplus
@@ -14,7 +14,7 @@ extern "C"
 
 	extern InputDriverModule g_keyboardDriver;
 
-	void HandleKeyboardMessages(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
+	void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
 	void KeyboardClearKeyStates(void);
 	MechS16 KeyboardPollKeyCode(void);
 

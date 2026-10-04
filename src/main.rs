@@ -19,6 +19,7 @@ mod cd_audio;
 mod common;
 mod display;
 mod drawmode;
+mod elapsed;
 mod files;
 mod heap;
 mod launcher;

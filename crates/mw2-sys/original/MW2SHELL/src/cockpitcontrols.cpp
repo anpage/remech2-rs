@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 // The cockpit controls screen: four configurations of bindings from the game's controls to
 // device axes and buttons, and the fields that show and edit them. The configurations are

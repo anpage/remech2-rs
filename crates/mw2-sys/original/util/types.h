@@ -42,6 +42,15 @@ typedef char MechChar;
 #define MECH_PTR_TO_S32(p_pointer) ((MechS32) (MECH_INTPTR) (p_pointer))
 #define MECH_S32_TO_PTR(p_value) ((void*) (MECH_INTPTR) (p_value))
 
+/* windows.h's max */
+#define MECH_MAX(p_a, p_b) ((p_a) > (p_b) ? (p_a) : (p_b))
+
+/* A position in pixels, laid out as Windows' POINT */
+typedef struct MechPoint {
+	MechS32 x;
+	MechS32 y;
+} MechPoint;
+
 /* Boolean typedefs (MechBool / MechBool8 ...) are added when a match proves
    the width and signedness. */
 

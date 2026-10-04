@@ -48,11 +48,8 @@
 #include "weapons.h"
 #include "weaponslot.h"
 
-#include <fcntl.h>
-#include <io.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(DifficultyCfg, 0x17)
 DECOMP_SIZE_ASSERT(Reel, 0x14)
@@ -1078,15 +1075,15 @@ MechS32 WriteScreenPicture(MechChar* p_path, void* p_palette)
 
 	header = LoadCachedResource(g_mw2PrjHandle, 15, g_resourceTypeTags[c_resTagTable], 1);
 	if (header == NULL) {
-		close(file);
+		MechClose(file);
 		return FALSE;
 	}
 
-	write(file, header, 0x20);
-	write(file, p_palette, 0x300);
+	MechWrite(file, header, 0x20);
+	MechWrite(file, p_palette, 0x300);
 	pixels = g_mainPixelBuffer.m_buffer;
-	write(file, pixels, g_screenPixelCount);
-	close(file);
+	MechWrite(file, pixels, g_screenPixelCount);
+	MechClose(file);
 	UnlockCachedResource(15, g_resourceTypeTags[c_resTagTable]);
 	return TRUE;
 }
@@ -1110,7 +1107,7 @@ MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_po
 		return -1;
 	}
 
-	*p_size = filelength(file);
+	*p_size = MechFileLength(file);
 	if (p_poolTag == NULL) {
 		*p_data = MechHeapAlloc(g_primaryHeap, *p_size);
 	}
@@ -1119,15 +1116,15 @@ MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_po
 	}
 
 	if (*p_data == NULL) {
-		close(file);
+		MechClose(file);
 		return -1;
 	}
 
-	if (read(file, *p_data, *p_size) != *p_size) {
+	if (MechRead(file, *p_data, *p_size) != *p_size) {
 		if (p_poolTag == NULL) {
 			MechHeapFree(g_primaryHeap, *p_data);
 		}
-		close(file);
+		MechClose(file);
 		return -1;
 	}
 
@@ -1146,7 +1143,7 @@ MechS32 ReadGameFile(MechChar* p_name, void** p_data)
 	*p_data = NULL;
 	file = LoadFile(BuildGamePath(p_name), &size, &data, NULL);
 	if (file != -1) {
-		close(file);
+		MechClose(file);
 		*p_data = data;
 	}
 
@@ -1161,8 +1158,8 @@ MechS32 WriteCareerRecordFile(MechChar* p_name, void* p_data)
 
 	file = MechOpen(BuildGamePath(p_name), c_mechOpenCreate);
 	if (file != -1) {
-		write(file, p_data, 0xd6);
-		close(file);
+		MechWrite(file, p_data, 0xd6);
+		MechClose(file);
 		result = 0;
 	}
 	else {
@@ -1191,7 +1188,7 @@ MechS32 LoadDifficultyCfg(MechChar* p_name, DifficultyCfg** p_cfg)
 		return -1;
 	}
 
-	close(file);
+	MechClose(file);
 	if (g_isNetworkGame) {
 		(*p_cfg)->m_enemySkill = 2;
 		(*p_cfg)->m_invulnerable = 0;
@@ -1221,8 +1218,8 @@ MechS32 SaveDifficultyCfg(MechChar* p_name, DifficultyCfg* p_cfg)
 
 	file = MechOpen(BuildGamePath(p_name), c_mechOpenCreate);
 	if (file != -1) {
-		write(file, p_cfg, sizeof(DifficultyCfg));
-		close(file);
+		MechWrite(file, p_cfg, sizeof(DifficultyCfg));
+		MechClose(file);
 		result = 0;
 	}
 	else {
@@ -1250,7 +1247,7 @@ MechS32 LoadSndCfg(MechChar* p_name, SoundConfig** p_cfg)
 		return -1;
 	}
 
-	close(file);
+	MechClose(file);
 	return 1;
 }
 
@@ -1262,8 +1259,8 @@ MechS32 SaveSndCfg(MechChar* p_name, SoundConfig* p_cfg)
 
 	file = MechOpen(BuildGamePath(p_name), c_mechOpenCreate);
 	if (file != -1) {
-		write(file, p_cfg, sizeof(SoundConfig));
-		close(file);
+		MechWrite(file, p_cfg, sizeof(SoundConfig));
+		MechClose(file);
 		result = 0;
 	}
 	else {

@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 // Returns a copy of the string on the primary heap, or NULL for an empty string.
 // FUNCTION: MW2SHELL 0x10030900

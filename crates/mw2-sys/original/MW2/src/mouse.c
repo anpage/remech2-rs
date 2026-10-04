@@ -8,7 +8,6 @@
 #include "types.h"
 
 #include <stdio.h>
-#include <windows.h>
 
 // The mouse input driver, the simulator's copy of the shell's. Without /Ob1, the __inline bounds
 // test IsInsideWindow isn't expanded as in the shell: the compiler emits it after the unit's
@@ -30,7 +29,7 @@ MechChar* g_mouseButtonNames[] = {"Left button", "Middle button", "Right button"
 MechChar* g_mouseButtonTypes[] = {"LeftBtn", "MiddleBtn", "RightBtn"};
 
 // GLOBAL: MW2 0x100ad244
-BOOL g_cursorClipped = FALSE;
+MechS32 g_cursorClipped = FALSE;
 
 // GLOBAL: MW2 0x100ad248
 undefined4 g_reclipCursor = 0;
@@ -128,7 +127,7 @@ MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis)
 // FUNCTION: MW2 0x10068a49
 MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
 {
-	POINT point;
+	MechPoint point;
 	MechS32 x;
 	MechS32 y;
 

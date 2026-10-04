@@ -4,8 +4,6 @@
 #include "dplay.h"
 #include "types.h"
 
-#include <windows.h>
-
 struct NetLaunchInfo;
 
 // The functions and globals of network.c that other units use.

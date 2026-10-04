@@ -10,7 +10,6 @@
 #include "weapons.h"
 
 #include <mbstring.h>
-#include <windows.h>
 
 // The resource type tags in the mw2.prj archive and their file extensions, as MW2SHELL's mw2prj.c
 // has them. In the original this object's data (the tables, their strings, then FirstResource's

@@ -30,7 +30,6 @@
 #include "vfxa.h"
 
 #include <stdio.h>
-#include <windows.h>
 
 // GLOBAL: MW2 0x100ae760
 MechChar g_dorcsPageTitle[] = "MW2 Programmer Dorcs Page";

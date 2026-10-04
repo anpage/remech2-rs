@@ -21,7 +21,6 @@
 
 #include <stdlib.h>
 #include <time.h>
-#include <windows.h>
 
 // The trainer's idle video alternates between two takes; a countdown to the next.
 // GLOBAL: MW2SHELL 0x1006acc8
@@ -48,14 +47,14 @@ ButtonMenu* g_cadetTrainingMenu;
 // DrawCadetTraining's p_wParam: the quick tips show when it comes from the clan hall
 // (c_msgClanHall).
 // GLOBAL: MW2SHELL 0x1009066c
-WPARAM g_trainingMessage;
+size_t g_trainingMessage;
 
 void CadetTrainingCallback(TMPackDataBase*, MechS32*, MechU8*, MechChar**, MechS32);
 
 // Sets up the campaign's training screen: its first button, its background and the videos of
 // the trainer.
 // FUNCTION: MW2SHELL 0x1003c7e0
-void DrawCadetTraining(TMPackDataBase* p_database, MechS32 p_campaign, char**, WPARAM p_wParam)
+void DrawCadetTraining(TMPackDataBase* p_database, MechS32 p_campaign, char**, size_t p_wParam)
 {
 	g_trainingMessage = p_wParam;
 	g_cadetTrainingMenu =

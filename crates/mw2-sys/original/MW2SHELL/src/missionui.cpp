@@ -27,7 +27,6 @@
 #include "windowstate.h"
 
 #include <string.h>
-#include <windows.h>
 
 // The mission briefing screen: the mission's stars and their mechs, read from the mission's
 // BWD file, and its briefing text and videos.
@@ -147,7 +146,7 @@ MechS32 g_briefingRival;
 
 // DrawMissionBriefing's p_wParam: WM_USER + 0xe for a trial.
 // GLOBAL: MW2SHELL 0x10090174
-WPARAM g_briefingMessage;
+size_t g_briefingMessage;
 
 // GLOBAL: MW2SHELL 0x10090178
 MechS32 g_enemyFormation;
@@ -272,7 +271,7 @@ void ShowMechName(MechNameTag* p_tag, MechS32 p_type, MechS32 p_left, MechS32 p_
 // FUNCTION: MW2SHELL 0x10038093
 void ShowFormationNames()
 {
-	POINT* pos;
+	MechPoint* pos;
 
 	g_playerFormation = GetStarFormation(0);
 	if (g_playerFormationName) {
@@ -315,9 +314,9 @@ MechS32 GetChassisCount()
 // Sets up the mission briefing screen. p_wParam is WM_USER + 0xe for a trial.
 // Not 100%: the stack slots of pos, audioData, i and audioSize are permuted.
 // FUNCTION: MW2SHELL 0x100382e6
-void DrawMissionBriefing(TMPackDataBase* p_database, MechChar** p_scenario, WPARAM p_wParam)
+void DrawMissionBriefing(TMPackDataBase* p_database, MechChar** p_scenario, size_t p_wParam)
 {
-	POINT* pos;
+	MechPoint* pos;
 	void* audioData = NULL;
 	MechS32 i;
 	MechS32 audioSize;
@@ -392,7 +391,7 @@ void DrawMissionBriefing(TMPackDataBase* p_database, MechChar** p_scenario, WPAR
 // FUNCTION: MW2SHELL 0x10038744
 void MissionBriefingCallback(TMPackDataBase*, MechS32*, MechU8*, MechChar** p_scenario, MechS32 p_msg)
 {
-	POINT* pos;
+	MechPoint* pos;
 	MechChar* variant;
 	MechS32 i;
 	MechS32 button;

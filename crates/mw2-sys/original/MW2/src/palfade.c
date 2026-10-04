@@ -6,8 +6,6 @@
 #include "simmain.h"
 #include "types.h"
 
-#include <windows.h>
-
 DECOMP_SIZE_ASSERT(PaletteCycle, 0x0d)
 DECOMP_SIZE_ASSERT(PaletteFade, 0x19)
 

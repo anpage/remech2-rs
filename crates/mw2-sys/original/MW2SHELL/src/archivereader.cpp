@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(ArchiveReader, 0x1b9)
 DECOMP_SIZE_ASSERT(ArchiveReader::Topic, 0x06)
@@ -35,7 +34,7 @@ ArchiveReader* g_archiveReader = NULL;
 
 // The message to post when the archive is left.
 // GLOBAL: MW2SHELL 0x100665fc
-WPARAM g_archiveReturnMessage = 0;
+size_t g_archiveReturnMessage = 0;
 
 // Database item 103: started when the archive opens, and again once a long entry's text has
 // been read.
@@ -67,7 +66,7 @@ void ArchiveCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg);
 
 // Opens the clan hall archive of a campaign.
 // FUNCTION: MW2SHELL 0x10029010
-void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, WPARAM p_wParam)
+void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam)
 {
 	void* audioData;
 	MechS32 audioSize;

@@ -8,7 +8,6 @@
 #include "windowstate.h"
 
 #include <stdio.h>
-#include <windows.h>
 
 typedef struct MouseDeviceInfo {
 	MechChar m_name[0x0c];                // 0x00
@@ -24,7 +23,7 @@ typedef struct MouseDeviceInfo {
 } MouseDeviceInfo;
 
 // MousePoll's bounds test keeps a jmp per return: an /Ob1-expanded inline function.
-__inline MechS32 IsInsideWindow(POINT* p_point)
+__inline MechS32 IsInsideWindow(MechPoint* p_point)
 {
 	if (p_point->x < 0 || p_point->x >= g_windowWidth) {
 		return FALSE;
@@ -57,7 +56,7 @@ const MechChar* g_mouseButtonNames[] = {"Left button", "Middle button", "Right b
 const MechChar* g_mouseButtonTypes[] = {"LeftBtn", "MiddleBtn", "RightBtn"};
 
 // GLOBAL: MW2SHELL 0x10071d44
-BOOL g_cursorClipped = FALSE;
+MechS32 g_cursorClipped = FALSE;
 
 // GLOBAL: MW2SHELL 0x10071d48
 undefined4 g_reclipCursor = 0;
@@ -155,7 +154,7 @@ MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis)
 // FUNCTION: MW2SHELL 0x10046bd9
 MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
 {
-	POINT point;
+	MechPoint point;
 	MechS32 x;
 	MechS32 y;
 

@@ -3,10 +3,9 @@
 #include "clock.h"
 #include "debugprint.h"
 #include "decomp.h"
+#include "elapsed.h"
 #include "network.h"
 #include "types.h"
-
-#include <windows.h>
 
 // The consecutive failed sends and receives: each one after the first waits before the next.
 
@@ -42,10 +41,10 @@ void NetSend(MechU8* p_msg, MechU32 p_size)
 		case 1:
 			break;
 		case 2:
-			Sleep(100);
+			MechSleep(100);
 			break;
 		case 3:
-			Sleep(200);
+			MechSleep(200);
 			break;
 		default:
 			g_sendRetries = 0;
@@ -63,7 +62,7 @@ void NetSend(MechU8* p_msg, MechU32 p_size)
 		}
 
 		if (g_sendRetries++) {
-			Sleep(100);
+			MechSleep(100);
 		}
 
 		g_sendResult = 5;
@@ -105,10 +104,10 @@ DPID NetReceive(void)
 		case 0:
 			break;
 		case 1:
-			Sleep(100);
+			MechSleep(100);
 			break;
 		default:
-			Sleep(100);
+			MechSleep(100);
 			break;
 		}
 	}

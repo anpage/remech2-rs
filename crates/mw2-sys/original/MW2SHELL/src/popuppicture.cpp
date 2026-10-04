@@ -5,8 +5,6 @@
 #include "videodriver.h"
 #include "windowstate.h"
 
-#include <windows.h>
-
 DECOMP_SIZE_ASSERT(PopupPicture, 0x35c)
 
 // FUNCTION: MW2SHELL 0x10045d60

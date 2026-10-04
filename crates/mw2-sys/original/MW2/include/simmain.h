@@ -5,8 +5,6 @@
 #include "heap.h"
 #include "types.h"
 
-#include <windows.h>
-
 struct DifficultyCfg;
 struct NetLaunchInfo;
 struct TimedCallback;
@@ -33,7 +31,6 @@ extern "C"
 	extern MechS32 g_simPaused;
 	extern MechS32 g_pauseRequested;
 	extern MechS32 g_mouseOutsideClientWindow;
-	extern HWND g_gameWindow;
 
 	int SimMain(char* p_cmdLine, struct NetLaunchInfo* p_netLaunch);
 	void HandleMessages(void);

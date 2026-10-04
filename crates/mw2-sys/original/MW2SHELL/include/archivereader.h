@@ -5,7 +5,7 @@
 #include "tmpackdatabase.h"
 #include "types.h"
 
-#include <windows.h>
+#include <stddef.h>
 
 class Font;
 class TextGlyph;
@@ -81,6 +81,6 @@ private:
 #pragma pack()
 
 // The functions and globals of archivereader.cpp that other units use.
-void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, WPARAM p_wParam);
+void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam);
 
 #endif // ARCHIVEREADER_H

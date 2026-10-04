@@ -6,7 +6,24 @@
 // DirectPlay behind them. Creating the interface fails, so a network game can't start and none
 // of the calls through it are reached: the network code is kept as the reference for
 // reimplementing it.
-#include <windows.h>
+
+// The Windows types it uses, with the sizes they had on 32-bit Windows
+typedef int BOOL;
+typedef unsigned int DWORD, *LPDWORD;
+typedef int HRESULT;
+typedef char* LPSTR;
+typedef void* LPVOID;
+typedef void* HANDLE, **LPHANDLE;
+
+typedef struct GUID {
+	unsigned int Data1;
+	unsigned short Data2;
+	unsigned short Data3;
+	unsigned char Data4[8];
+} GUID, *LPGUID;
+
+// The callbacks were __stdcall
+#define PASCAL
 
 #define DP_OK ((HRESULT) 0)
 #define DPERR_UNSUPPORTED ((HRESULT) 0x80004001)

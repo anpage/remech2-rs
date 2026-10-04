@@ -3,6 +3,7 @@
 #include "config.h"
 #include "decomp.h"
 #include "error.h"
+#include "files.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"
 #include "loadres.h"
@@ -21,10 +22,8 @@
 #include "weapons.h"
 #include "weaponslot.h"
 
-#include <io.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 // A .MEK file's header. The file goes on with the eight sections (MechSection), the weapons
 // (MekWeapon) and the ammunition bins (MekAmmo).
@@ -134,7 +133,7 @@ MechS32 LoadMechConfig(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p
 		}
 	}
 	else {
-		_close(file);
+		MechClose(file);
 	}
 
 	p_mech->m_flags = 0;

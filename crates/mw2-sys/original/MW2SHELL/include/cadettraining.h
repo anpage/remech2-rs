@@ -4,9 +4,9 @@
 #include "tmpackdatabase.h"
 #include "types.h"
 
-#include <windows.h>
+#include <stddef.h>
 
 // The functions and globals of cadettraining.cpp that other units use.
-void DrawCadetTraining(TMPackDataBase* p_database, MechS32 p_campaign, char**, WPARAM p_wParam);
+void DrawCadetTraining(TMPackDataBase* p_database, MechS32 p_campaign, char**, size_t p_wParam);
 
 #endif // CADETTRAINING_H

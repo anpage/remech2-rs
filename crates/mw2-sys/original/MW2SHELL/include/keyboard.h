@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#include <windows.h>
+#include <stddef.h>
 
 // The functions and globals of keyboard.c that other units use.
 #ifdef __cplusplus
@@ -11,7 +11,7 @@ extern "C"
 {
 #endif
 
-	void HandleKeyboardMessages(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
+	void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
 	MechS16 KeyboardPollKeyCode(void);
 
 #ifdef __cplusplus

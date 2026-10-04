@@ -7,8 +7,6 @@
 #include "types.h"
 #include "window.h"
 
-#include <windows.h>
-
 #pragma pack(1)
 // A refresh mode (the original's debug strings name them): how the framebuffer reaches the
 // screen through a display back end. The original had six, several to a back end.
@@ -38,7 +36,6 @@ extern "C"
 	extern WINDOW* g_refreshModeBuffer;
 	extern PaletteColor g_paletteColors[0x100];
 	extern MechS32 g_windowMode;
-	extern HWND g_gameWindow;
 	extern MechS32 g_refreshModePixelCount;
 	extern MechS32 g_refreshModeWidth;
 	extern MechS32 g_refreshModeHeight;

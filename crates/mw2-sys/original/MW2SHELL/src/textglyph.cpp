@@ -11,7 +11,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(TextGlyph, 0x3e)
 

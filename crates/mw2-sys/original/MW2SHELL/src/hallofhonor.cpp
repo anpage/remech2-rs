@@ -21,7 +21,6 @@ void operator delete(void*);
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 // FUNCTION: MW2SHELL 0x1003e2f0
 MechS32 ComparePilotRecords(const PilotRecord** p_first, const PilotRecord** p_second)

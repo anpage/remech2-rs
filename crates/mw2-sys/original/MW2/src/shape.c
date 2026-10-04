@@ -12,7 +12,6 @@
 #include "vertex.h"
 
 #include <math.h>
-#include <windows.h>
 
 // The flags a new shape starts with (CreateShape).
 // GLOBAL: MW2 0x100a5898

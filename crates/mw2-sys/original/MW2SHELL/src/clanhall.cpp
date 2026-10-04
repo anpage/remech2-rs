@@ -21,8 +21,6 @@
 #include "video.h"
 #include "videodriver.h"
 
-#include <windows.h>
-
 // The clan hall screen.
 
 // GLOBAL: MW2SHELL 0x10063b70
@@ -53,7 +51,7 @@ void ClanHallCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**,
 // pilot's star first.
 // Not 100%: the stack slots of unused, data and size are permuted.
 // FUNCTION: MW2SHELL 0x10014040
-void DrawClanHall(TMPackDataBase* p_database, MechS32 p_campaign, MechU8, WPARAM p_wParam)
+void DrawClanHall(TMPackDataBase* p_database, MechS32 p_campaign, MechU8, size_t p_wParam)
 {
 	MechS32 unused = -1;
 	void* data = NULL;

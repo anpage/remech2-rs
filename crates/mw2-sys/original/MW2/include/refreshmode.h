@@ -7,8 +7,6 @@
 #include "types.h"
 #include "window.h"
 
-#include <windows.h>
-
 #pragma pack(1)
 // A refresh mode (the original's debug strings name them): how the framebuffer reaches the
 // screen through a display back end. The original had six, several to a back end.

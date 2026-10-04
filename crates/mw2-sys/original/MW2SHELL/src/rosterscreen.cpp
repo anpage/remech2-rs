@@ -33,7 +33,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <windows.h>
 
 // The pilot roster screen of a clan hall: ten pilot slots, the selected pilot's record and the
 // mission list.

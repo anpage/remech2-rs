@@ -13,10 +13,8 @@
 #include "simmain.h"
 #include "types.h"
 
-#include <io.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(BwdNode, 0x08)
 DECOMP_SIZE_ASSERT(BwdHeader, 0x0c)
@@ -85,7 +83,7 @@ BwdStream* OpenBwdStream(BwdStreamKey* p_key, BwdStream* p_stream)
 
 		file = LoadFile(BuildGamePath(p_key->m_name), &size, &data, NULL);
 		if (file != -1) {
-			_close(file);
+			MechClose(file);
 		}
 		else {
 			if (!g_streamsFromFiles) {

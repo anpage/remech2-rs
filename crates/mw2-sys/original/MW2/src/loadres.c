@@ -15,7 +15,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(ResourceCacheEntry, 0x14)
 

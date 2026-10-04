@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 // The local player's steering: the outputs of INPUT.MAP's sinks.
 // GLOBAL: MW2 0x100b2500

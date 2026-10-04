@@ -13,8 +13,6 @@
 #include "videodriver.h"
 #include "windowstate.h"
 
-#include <windows.h>
-
 void operator delete(void*);
 
 void CreditsCallback(MechS32 p_active);

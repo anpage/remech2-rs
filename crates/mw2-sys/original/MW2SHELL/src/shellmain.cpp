@@ -46,7 +46,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 // The current screen's function (RegisterScreenFunction): ShellMain's loop calls it every frame
 // with c_msgScreenFrame, and a menu command or leaving the shell with the message to move on to.
@@ -90,7 +89,7 @@ MechS32 g_selectedCampaign;
 // GLOBAL: MW2SHELL 0x1007cc8c
 MechU8 g_pilotChosen;
 
-void PlayMidiSong(UINT p_msg, MechS32 p_campaign);
+void PlayMidiSong(MechU32 p_msg, MechS32 p_campaign);
 void ParseCommandLineFlags(char* p_cmdLine);
 void RunScreenFrame();
 void CloseMenuFunction();
@@ -161,7 +160,7 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 			CloseVideo(0);
 		}
 
-		switch (LOWORD(p_wParam)) {
+		switch (p_wParam & 0xffff) {
 		case c_menuNewAllegiance:
 			CloseMenuFunction();
 			if (g_screenFunction) {
@@ -358,7 +357,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 	MechS32 unk0x14 = c_msgQuit;
 	MechS32 itemSize;
 	MechMessage msg;
-	BOOL fromSim = FALSE;
+	MechS32 fromSim = FALSE;
 
 	g_primaryHeap = MechHeapCreate();
 	if (g_primaryHeap == NULL) {
@@ -525,7 +524,7 @@ MechS32 PumpMessage()
 // displacements (each table less c_msgBriefing entries) land on unrelated data, which reccmp names
 // after whatever symbol is there on each side.
 // FUNCTION: MW2SHELL 0x1000fe86
-void PlayMidiSong(UINT p_msg, MechS32 p_campaign)
+void PlayMidiSong(MechU32 p_msg, MechS32 p_campaign)
 {
 	MechS32 size;
 	void* data;

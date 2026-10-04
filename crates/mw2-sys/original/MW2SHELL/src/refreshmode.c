@@ -7,8 +7,6 @@
 #include "types.h"
 #include "window.h"
 
-#include <windows.h>
-
 // The refresh mode manager. The original chose between DirectDraw, DisplayDib and GDI back ends
 // and six ways of getting the frame to the screen, profiled them, and sized and restyled the
 // window to suit. One back end and one refresh mode are left, over util/display.h: the Rust side
@@ -63,9 +61,6 @@ static MechU8* g_frame = NULL;
 // end, or to full screen when the frame covered the desktop.
 // GLOBAL: MW2SHELL 0x10062ffc
 MechS32 g_windowMode = c_windowModeWindowed;
-
-// GLOBAL: MW2SHELL 0x100965ec
-HWND g_gameWindow;
 
 // The frame's size in pixels, p_width * p_height of InitRefreshMode.
 // GLOBAL: MW2SHELL 0x10096e88
@@ -153,7 +148,7 @@ static MechS32 DisplayBegin(WINDOW* p_buffer, MechS32 p_width, MechS32 p_height)
 	p_buffer->m_xMax = p_width - 1;
 	p_buffer->m_yMax = p_height - 1;
 	p_buffer->m_shadow = 0;
-	p_buffer->m_bitmapInfo = NULL;
+	p_buffer->m_stencil = NULL;
 	MechDisplaySetPalette((MechU8*) g_paletteColors);
 	MechDisplayPresent();
 	return 0;

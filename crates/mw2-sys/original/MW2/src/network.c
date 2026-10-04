@@ -38,7 +38,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 #pragma pack(push, 1)
 

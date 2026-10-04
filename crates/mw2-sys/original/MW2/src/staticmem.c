@@ -10,7 +10,6 @@
 #include "types.h"
 
 #include <stdlib.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(StaticPool, 0x14)
 DECOMP_SIZE_ASSERT(StaticPoolGroup, 0x0c)

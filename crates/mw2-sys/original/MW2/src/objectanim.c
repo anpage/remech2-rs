@@ -42,7 +42,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 #pragma warning(disable : 4102) /* labels only __asm blocks jump to */
 

@@ -11,8 +11,6 @@
 #include "types.h"
 #include "vertex.h"
 
-#include <windows.h>
-
 DECOMP_SIZE_ASSERT(QuadtreeNode, 0x2c)
 
 // GLOBAL: MW2 0x100a37dc

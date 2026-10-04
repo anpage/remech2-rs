@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(TokenStream, 0x14)
 

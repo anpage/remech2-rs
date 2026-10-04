@@ -34,7 +34,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(GeoClass, 0x08)
 DECOMP_SIZE_ASSERT(StaticObject, 0x7c)

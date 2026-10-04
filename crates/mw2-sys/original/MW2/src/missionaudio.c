@@ -12,7 +12,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 // A project file entry: a sound file name, chained in its hash bucket.
 // SIZE 0x14

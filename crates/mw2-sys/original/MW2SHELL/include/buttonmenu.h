@@ -5,8 +5,6 @@
 #include "mainmenubutton.h"
 #include "types.h"
 
-#include <windows.h>
-
 class Font;
 class VideoDriver;
 struct Collection;

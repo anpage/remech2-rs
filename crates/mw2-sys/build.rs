@@ -5,9 +5,6 @@ use std::{
 
 use bindgen::callbacks::{ItemInfo, ParseCallbacks};
 
-const SYSTEM_TYPES: &str = "HWND|HWND__|HINSTANCE|HINSTANCE__|HANDLE|BITMAPINFOHEADER|tagBITMAPINFOHEADER|\
-                           RGBQUAD|tagRGBQUAD|FILE|_iobuf|BOOL|BYTE|WORD|DWORD|LONG|LONG_PTR|UINT|UINT_PTR|\
-                           WPARAM|LPARAM";
 const SHARED_FILES: &str = ".*/original/(util|common|mss|smacker)/.*";
 
 const NAMES_PREFIX: &str = "Sim_";
@@ -75,7 +72,6 @@ fn shared_bindings(common: &[PathBuf]) {
         .clang_arg("--target=i686-pc-windows-gnu")
         .clang_args(common.iter().map(|p| format!("-I{}", p.display())))
         .allowlist_file(SHARED_FILES)
-        .allowlist_type(SYSTEM_TYPES)
         .derive_default(true)
         .generate()
         .unwrap()
@@ -118,7 +114,6 @@ fn module(
             dir.file_name().unwrap().to_str().unwrap()
         ))
         .blocklist_file(SHARED_FILES)
-        .blocklist_type(SYSTEM_TYPES)
         .raw_line("use super::shared::*;")
         .derive_default(true);
     if let Some(forced) = &forced {

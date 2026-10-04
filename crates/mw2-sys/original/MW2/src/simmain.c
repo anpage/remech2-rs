@@ -73,7 +73,6 @@
 #include <excpt.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(SoundConfig, 0x3c)
 DECOMP_SIZE_ASSERT(StarMission, 0x3c0a)
@@ -100,9 +99,6 @@ MechS32 g_remoteWaitTime = 0;
 // Set when the local player starts on the autopilot (FirstMech).
 // GLOBAL: MW2 0x100acb34
 MechS32 g_startOnAutopilot = 0;
-
-// GLOBAL: MW2 0x100acb60
-HWND g_gameWindow = NULL;
 
 // GLOBAL: MW2 0x100acb68
 MechHeap* g_primaryHeap = NULL;

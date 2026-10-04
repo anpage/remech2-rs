@@ -5,8 +5,6 @@
 #include "heap.h"
 #include "types.h"
 
-#include <windows.h>
-
 // The functions and globals of windowstate.c that other units use.
 #ifdef __cplusplus
 extern "C"

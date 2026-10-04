@@ -16,7 +16,6 @@
 
 #include <mbstring.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(SceneObject, 0x7c)
 

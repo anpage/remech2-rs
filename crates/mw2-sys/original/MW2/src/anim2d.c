@@ -10,7 +10,6 @@
 #include "types.h"
 
 #include <string.h>
-#include <windows.h>
 
 // Frame projections (a table of 96) and 2D animations: up to seven SHP resources whose frames
 // play on the clock, once or looping, drawn into a pane.

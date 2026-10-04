@@ -13,7 +13,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 DECOMP_SIZE_ASSERT(VideoDriver, 0x3ae)
 DECOMP_SIZE_ASSERT(WINDOW, 0x14)

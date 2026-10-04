@@ -3,8 +3,6 @@
 #include "textglyph.h"
 #include "windowstate.h"
 
-#include <windows.h>
-
 DECOMP_SIZE_ASSERT(TextGlyphList, 0x04)
 
 // FUNCTION: MW2SHELL 0x1003e100

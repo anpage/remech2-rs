@@ -31,7 +31,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 // The mech bay: the variant being edited, its engine, weapons and armor, and the fields that
 // show them.
@@ -3544,7 +3543,7 @@ void MechBayCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar** p
 // current star's selected mech, and its fields.
 // Not 100%: the stack slots of data, i and size are permuted.
 // FUNCTION: MW2SHELL 0x1000d0d4
-void DrawMechBay(TMPackDataBase* p_database, MechS32 p_campaign, WPARAM p_wParam)
+void DrawMechBay(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam)
 {
 	CustomStar* star;
 	void* data;

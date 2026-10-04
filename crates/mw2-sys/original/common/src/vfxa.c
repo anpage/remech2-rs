@@ -1444,7 +1444,7 @@ MechS32 VFX_pane_scroll(PANE* p_pane, MechS32 p_dx, MechS32 p_dy, MechS32 p_mode
 		scratch.m_buffer = (undefined*) (size_t) (MechU32) p_parm;
 		scratch.m_xMax = width - 1;
 		scratch.m_yMax = height - 1;
-		scratch.m_bitmapInfo = NULL;
+		scratch.m_stencil = NULL;
 		scratch.m_shadow = 0;
 		scratchView.m_window = &scratch;
 		scratchView.m_x0 = 0;
@@ -2749,7 +2749,7 @@ MechS32 VFX_shape_transform(
 	scratch.m_buffer = p_buffer;
 	scratch.m_xMax = right;
 	scratch.m_yMax = bottom;
-	scratch.m_bitmapInfo = NULL;
+	scratch.m_stencil = NULL;
 	scratch.m_shadow = 0;
 	scratchView.m_window = &scratch;
 	scratchView.m_x0 = 0;

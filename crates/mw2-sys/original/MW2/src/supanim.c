@@ -15,7 +15,6 @@
 #include "window.h"
 
 #include <stdio.h>
-#include <windows.h>
 
 // The dropship of the loading screen ("sup anim"). The original animated it from an AIL timer's
 // thread while the mission loaded; for now it's one frame.

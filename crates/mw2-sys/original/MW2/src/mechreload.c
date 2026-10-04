@@ -20,7 +20,6 @@
 #include "types.h"
 
 #include <string.h>
-#include <windows.h>
 
 // The player whose mech ReloadPlayerMech is reloading, or -1.
 // GLOBAL: MW2 0x100ba690

@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 // GLOBAL: MW2 0x100a589c
 MechChar* g_fatalErrorTitle = "\nMW2.EXE - fatal error";

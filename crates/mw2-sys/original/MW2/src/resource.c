@@ -10,6 +10,7 @@
 #include "config.h"
 #include "decomp.h"
 #include "error.h"
+#include "files.h"
 #include "geocache.h"
 #include "includerecord.h"
 #include "includerecord2.h"
@@ -33,13 +34,11 @@
 #include "weapons.h"
 #include "wtbshapes.h"
 
-#include <io.h>
 #include <math.h>
 #include <mbstring.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 // A bitmap record: its size and palette-sized data.
 typedef struct BitmapRecord {
@@ -724,7 +723,7 @@ void CreateObjectNode(
 
 		handle = LoadFile(BuildGamePath(name), &size, &data, NULL);
 		if (handle != -1) {
-			_close(handle);
+			MechClose(handle);
 		}
 		else {
 			Error(0x36, NULL);

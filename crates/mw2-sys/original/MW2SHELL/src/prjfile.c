@@ -4,8 +4,6 @@
 #include "files.h"
 #include "types.h"
 
-#include <fcntl.h>
-#include <io.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -87,7 +85,7 @@ MechS32 ArchiveWrite(MechS32 p_fd, MechU8* p_buffer, MechU32 p_size)
 	buffer = p_buffer;
 	while (remaining > 0) {
 		chunk = remaining < 0x4000 ? remaining : 0x4000;
-		if (_write(p_fd, buffer, chunk) != chunk) {
+		if (MechWrite(p_fd, buffer, chunk) != chunk) {
 			return -1;
 		}
 
@@ -111,7 +109,7 @@ MechS32 ArchiveRead(MechS32 p_fd, MechU8* p_buffer, MechU32 p_size)
 	buffer = p_buffer;
 	while (remaining > 0) {
 		chunk = remaining < 0x4000 ? remaining : 0x4000;
-		if (_read(p_fd, buffer, chunk) != chunk) {
+		if (MechRead(p_fd, buffer, chunk) != chunk) {
 			return -1;
 		}
 
@@ -147,13 +145,13 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 			return -1;
 		}
 		else {
-			_read(fd, tag, sizeof(tag));
+			MechRead(fd, tag, sizeof(tag));
 			if (_strnicmp((char*) tag, "PROJ", 4)) {
 				return -1;
 			}
 
 			if (tag[8] == 0xfe) {
-				_close(fd);
+				MechClose(fd);
 				return -2;
 			}
 		}
@@ -164,7 +162,7 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 			return -1;
 		}
 		else {
-			_read(fd, tag, sizeof(tag));
+			MechRead(fd, tag, sizeof(tag));
 			if (_strnicmp((char*) tag, "PROJ", 4)) {
 				return -1;
 			}
@@ -174,7 +172,7 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 		return -1;
 	}
 
-	_lseek(fd, 0x10, SEEK_SET);
+	MechSeek(fd, 0x10, SEEK_SET);
 	if (ArchiveRead(fd, (MechU8*) &size, 4) != 4) {
 		return -1;
 	}
@@ -185,7 +183,7 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 		return -1;
 	}
 
-	_lseek(fd, 0xc, SEEK_SET);
+	MechSeek(fd, 0xc, SEEK_SET);
 	if (ArchiveRead(fd, (MechU8*) header, size) != size) {
 		ArchiveFree(header);
 		return -1;
@@ -220,7 +218,7 @@ MechS32 CloseArchive(MechS32 p_handle)
 
 	g_archiveSlots[p_handle].m_open = 0;
 	_strnset(g_archiveSlots[p_handle].m_name, 0, 0x20);
-	return _close(g_archiveSlots[p_handle].m_fd);
+	return MechClose(g_archiveSlots[p_handle].m_fd);
 }
 
 // Find an archive entry by its four-byte type tag. Returns 0xffff if absent.
@@ -275,7 +273,7 @@ MechS32 LoadArchiveEntries(MechS32 p_handle)
 				return -1;
 			}
 
-			_lseek(g_archiveSlots[p_handle].m_fd, entries[index].m_offset, SEEK_SET);
+			MechSeek(g_archiveSlots[p_handle].m_fd, entries[index].m_offset, SEEK_SET);
 			if (ArchiveRead(g_archiveSlots[p_handle].m_fd, (MechU8*) data, size) != size) {
 				ArchiveFree(data);
 				return -1;
@@ -348,7 +346,7 @@ MechS32 SeekArchiveItem(MechS32 p_handle, MechChar* p_name, MechU32 p_index, voi
 		*p_size = *(MechS32*) (offsets + (p_index & 0xffff) * 8 + 4) - entries[entry].m_baseOffset;
 	}
 
-	_lseek(g_archiveSlots[p_handle].m_fd, offset, SEEK_SET);
+	MechSeek(g_archiveSlots[p_handle].m_fd, offset, SEEK_SET);
 	return 0;
 }
 
@@ -357,7 +355,7 @@ MechS32 SeekArchiveItem(MechS32 p_handle, MechChar* p_name, MechU32 p_index, voi
 void ReadArchiveAt(void* p_data, MechS32 p_handle, void* p_offset, MechU32 p_size)
 {
 	p_handle = g_archiveSlots[p_handle].m_fd;
-	_lseek(p_handle, MECH_PTR_TO_S32(p_offset), SEEK_SET);
+	MechSeek(p_handle, MECH_PTR_TO_S32(p_offset), SEEK_SET);
 	ArchiveRead(p_handle, (MechU8*) p_data, p_size);
 	return;
 }
@@ -385,7 +383,7 @@ MechS32 ReadArchiveItem(MechS32 p_handle, MechChar* p_name, MechU16 p_index, voi
 		entries = g_archiveSlots[p_handle].m_header->m_entries;
 		offset = entries[entry].m_baseOffset + *(MechU32*) (offsets + index * 8);
 		size = *(MechU32*) (offsets + index * 8 + 4) - entries[entry].m_baseOffset;
-		if (_lseek(g_archiveSlots[p_handle].m_fd, offset, SEEK_SET) == -1) {
+		if (MechSeek(g_archiveSlots[p_handle].m_fd, offset, SEEK_SET) == -1) {
 			return -1;
 		}
 

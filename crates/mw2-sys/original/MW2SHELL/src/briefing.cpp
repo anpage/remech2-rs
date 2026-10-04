@@ -23,7 +23,6 @@
 #include "videodriver.h"
 
 #include <string.h>
-#include <windows.h>
 
 // The mission briefing screen.
 
