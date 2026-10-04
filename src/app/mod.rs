@@ -86,7 +86,7 @@ impl App {
         if let Some(window) = &self.state.window
             && let Some(lparam) = self.state.mouse.take_move(window)
         {
-            messages::post_to_game(c_mechMsgMouseMove as u32, 0, lparam);
+            messages::post_to_game(c_mechMsgMouseMove, 0, lparam);
         }
         if matches!(status, PumpStatus::Exit(_)) {
             self.state.quit = true;
@@ -236,7 +236,7 @@ impl ApplicationHandler for State {
                 if let Some(window) = &self.window {
                     self.mouse.focused(window, focused);
                 }
-                messages::post_to_game(c_mechMsgActivateApp as u32, focused.into(), 0);
+                messages::post_to_game(c_mechMsgActivateApp, focused.into(), 0);
             }
             WindowEvent::CursorMoved { position, .. } => self.mouse.cursor_moved(Some(position)),
             WindowEvent::CursorLeft { .. } => self.mouse.cursor_moved(None),

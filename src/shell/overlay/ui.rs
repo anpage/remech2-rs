@@ -8,10 +8,7 @@ use mw2_sys::{shared::c_mechMsgCommand, shell};
 
 use crate::drawmode::fit_to_window;
 use crate::shell::dialog;
-use crate::shell::overlay::{
-    confirm, menu,
-    mouse::OverlayMouseState,
-};
+use crate::shell::overlay::{confirm, menu, mouse::OverlayMouseState};
 use crate::{about, app, messages, shell::screens};
 
 const CURSOR_GRAPHIC_SIZE: usize = 423;
@@ -162,7 +159,7 @@ impl OverlayUi {
 
         if self.menu_visible {
             let handle_menu_button = |id: u16| {
-                messages::post(c_mechMsgCommand as u32, id.into(), 0);
+                messages::post(c_mechMsgCommand, id.into(), 0);
             };
 
             egui::Window::new("top_menu")
