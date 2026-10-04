@@ -5,4 +5,4 @@ edition = "2024"
 
 [build-dependencies]
 bindgen = "0.73.2"
-cc = "1.6.0"
+cc = { version = "1.6.0", features = ["parallel"] }
