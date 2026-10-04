@@ -60,14 +60,6 @@ PaletteColor g_savedPalette[0x100];
 // GLOBAL: MW2SHELL 0x10092f30
 void* g_sliderImages;
 
-// The lines of ShowDialog's message box...
-// GLOBAL: MW2SHELL 0x10092c20
-MechChar* g_dialogLines[3];
-
-// ...and the text they point into.
-// GLOBAL: MW2SHELL 0x10092f38
-MechChar g_dialogText[0x200];
-
 // GLOBAL: MW2SHELL 0x10070d98
 MechChar* g_skillNames[] = {"~EASY", "~MEDIUM", "~HARD"};
 
@@ -458,86 +450,3 @@ ScreenField g_optionFields[16] = {
 };
 #undef OPTION_ROW
 #undef OPTION_BAR
-
-BOOL CALLBACK ShowDialogProc(HWND p_hDlg, UINT p_msg, WPARAM p_wParam, LPARAM);
-
-// Shows a message box. p_text holds up to three lines separated by '|', then after a '#' the
-// buttons, also separated by '|': two buttons pick the yes/no dialog (0x80), anything else the
-// OK dialog (0x81). A single line goes in the middle. Returns the dialog's result (0 for yes).
-// Not 100%: the stack slots of count, line, id and the p_text++ temporary are permuted.
-// FUNCTION: MW2SHELL 0x10043e25
-MechS32 ShowDialog(const char* p_text, MechS32)
-{
-	MechS32 count;
-	MechChar* line;
-	MechS32 id;
-
-	line = g_dialogText;
-	g_dialogLines[0] = g_dialogLines[1] = g_dialogLines[2] = NULL;
-
-	count = 0;
-	while (*p_text != '\0' && *p_text != '#') {
-		g_dialogLines[count] = line;
-		count++;
-
-		while (*p_text != '\0' && *p_text != '|' && *p_text != '#') {
-			*line = *p_text;
-			p_text++;
-			line++;
-		}
-		if (*p_text == '|') {
-			p_text++;
-		}
-		*line = '\0';
-		line++;
-	}
-
-	if (count == 1) {
-		g_dialogLines[1] = g_dialogLines[0];
-		g_dialogLines[0] = NULL;
-	}
-
-	count = 0;
-	while (*p_text++ != '\0') {
-		for (; *p_text != '\0' && *p_text != '|'; p_text++) {
-		}
-		count++;
-	}
-
-	if (count == 2) {
-		id = 0x80;
-	}
-	else {
-		id = 0x81;
-	}
-
-	return DialogBoxParam(g_module, MAKEINTRESOURCE(id), g_gameWindow, (DLGPROC) ShowDialogProc, 0);
-}
-
-// FUNCTION: MW2SHELL 0x10043f9a
-BOOL CALLBACK ShowDialogProc(HWND p_hDlg, UINT p_msg, WPARAM p_wParam, LPARAM)
-{
-	MechS32 id;
-
-	switch (p_msg) {
-	case WM_INITDIALOG:
-		SetDlgItemText(p_hDlg, 0x3ed, g_dialogLines[0]);
-		SetDlgItemText(p_hDlg, 0x3ee, g_dialogLines[1]);
-		SetDlgItemText(p_hDlg, 0x3ef, g_dialogLines[2]);
-		return TRUE;
-	case WM_COMMAND:
-		id = LOWORD(p_wParam);
-		switch (id) {
-		case IDOK:
-		case IDYES:
-			EndDialog(p_hDlg, 0);
-			return TRUE;
-		case IDNO:
-			EndDialog(p_hDlg, 1);
-			return TRUE;
-		}
-		break;
-	}
-
-	return FALSE;
-}

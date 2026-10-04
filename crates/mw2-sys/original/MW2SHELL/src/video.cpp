@@ -99,9 +99,6 @@ MechS32 BeginFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam
 		return 0;
 	}
 
-	if (g_littleMovies != 0) {
-		g_videoDriver->ActivateFramebuffer();
-	}
 	g_fullscreenVideoMsg = p_msg;
 	g_fullscreenVideoWParam = p_wParam;
 	RegisterScreenFunction(FullscreenVideoCallback);

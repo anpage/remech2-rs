@@ -282,7 +282,7 @@ void VideoDriver::DrawFmv()
 	}
 
 	if (m_dirtyView.m_x0 <= m_dirtyView.m_x1 && m_dirtyView.m_y0 <= m_dirtyView.m_y1) {
-		// With g_littleMovies the original called GdiBlitCentered instead, which drew the
+		// With its Little Movies option the original called GdiBlitCentered instead, which drew the
 		// rectangle unscaled at (160, 140).
 		g_currentRefreshMode->m_stretchBlit(m_dirtyView.m_x0, m_dirtyView.m_y0, m_dirtyView.m_x1, m_dirtyView.m_y1);
 	}

@@ -19,7 +19,6 @@ pub static MODULE: ModuleBase = ModuleBase::new("MW2SHELL.DLL");
 patch_groups! {
     static PATCH_GROUPS = [
         database,
-        dialog,
         overlay::mouse,
         screens::debrief,
         screens::debug,

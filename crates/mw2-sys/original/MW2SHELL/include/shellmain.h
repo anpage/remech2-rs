@@ -37,11 +37,9 @@ enum ShellMenuCommand {
 	c_menuFleeToWindows = 40003,
 	c_menuCockpitControls = 40011,
 	c_menuHelpContents = 40012, // "Codes and Procedures"
-	c_menuQuickTips = 40050,
 	c_menuKeshik = 40082, // the credits
 	c_menuCombatVariables = 40084,
-	c_menuTechnicalHelp = 40085,
-	c_menuMoviePlayback = 40086
+	c_menuTechnicalHelp = 40085
 };
 
 // The functions and globals of shellmain.cpp that other units use.
@@ -51,7 +49,6 @@ extern "C" MechS32 IsShellMenuCommandEnabled(MechS32 p_command);
 void EnableShellMenuCommand(MechS32 p_command, MechS32 p_enabled);
 void EnableShellMenu();
 void DisableShellMenu();
-BOOL CALLBACK OkDialogProc(HWND p_hDlg, UINT p_msg, WPARAM p_wParam, LPARAM);
 void RegisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32));
 void UnregisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32));
 void RegisterMenuFunction(void (*p_callback)(MechS32 p_active));

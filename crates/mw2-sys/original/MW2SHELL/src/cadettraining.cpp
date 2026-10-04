@@ -42,10 +42,6 @@ MechS32 g_trainingExitVideo = -1;
 // GLOBAL: MW2SHELL 0x1006acd8
 AudioSample* g_trainingAmbience = NULL;
 
-// Set once the training screen's quick tips have been shown.
-// GLOBAL: MW2SHELL 0x1006acdc
-MechS32 g_trainingTipsShown = 0;
-
 // GLOBAL: MW2SHELL 0x10090668
 ButtonMenu* g_cadetTrainingMenu;
 
@@ -101,11 +97,6 @@ void CadetTrainingCallback(
 	// The original skips the frame's work with a goto, like StarConfigCallback.
 	if (p_msg != c_msgScreenFrame) {
 		goto done;
-	}
-
-	if (g_quickTips && !g_trainingTipsShown && g_trainingMessage == c_msgClanHall && g_trainingButtonsShown) {
-		DialogBoxParam(g_module, MAKEINTRESOURCE(0x68), g_gameWindow, (DLGPROC) OkDialogProc, 0);
-		g_trainingTipsShown = 1;
 	}
 
 	if (!g_trainingButtonsShown && !IsVideoPlaying(0)) {
@@ -179,7 +170,6 @@ done:
 		delete g_cadetTrainingMenu;
 		delete g_trainingAmbience;
 		g_trainingAmbience = NULL;
-		g_trainingTipsShown = 0;
 		g_trainerTake = 0;
 		g_trainerIdleCountdown = -1;
 		g_trainingButtonsShown = 0;

@@ -91,7 +91,6 @@ MechU8 g_pilotChosen;
 
 void PlayMidiSong(UINT p_msg, MechS32 p_campaign);
 void ParseCommandLineFlags(char* p_cmdLine);
-BOOL CALLBACK LittleMoviesDialogProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
 void RunScreenFrame();
 void CloseMenuFunction();
 
@@ -177,9 +176,6 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 			DrawHallOfHonor();
 			g_menuDialogOpen = TRUE;
 			break;
-		case c_menuQuickTips:
-			g_quickTips = 1 - g_quickTips;
-			break;
 		case c_menuFleeToWindows:
 			if (ShowDialog("Embrace cowardice?#Yes|No", 1) == 0) {
 				CloseMenuFunction();
@@ -205,9 +201,6 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 			EnableShellMenuCommand(c_menuCockpitControls, FALSE);
 			OpenCockpitControls();
 			g_menuDialogOpen = TRUE;
-			break;
-		case c_menuMoviePlayback:
-			DialogBoxParam(g_module, MAKEINTRESOURCE(138), g_gameWindow, (DLGPROC) LittleMoviesDialogProc, 0);
 			break;
 		case c_menuKeshik:
 			CloseMenuFunction();
@@ -629,14 +622,12 @@ void ParseCommandLineFlags(char* p_cmdLine)
 static const MechS32 g_menuCommands[] = {
 	c_menuNewAllegiance,
 	c_menuHallOfHonor,
-	c_menuQuickTips,
 	c_menuCombatVariables,
 	c_menuCockpitControls,
-	c_menuMoviePlayback,
 	c_menuKeshik,
 };
 
-static MechU8 g_menuCommandEnabled[sizeof(g_menuCommands) / sizeof(g_menuCommands[0])] = {1, 1, 1, 1, 1, 1, 1};
+static MechU8 g_menuCommandEnabled[sizeof(g_menuCommands) / sizeof(g_menuCommands[0])] = {1, 1, 1, 1, 1};
 
 // Whether a menu command can be chosen. The commands that are never grayed always can.
 extern "C" MechS32 IsShellMenuCommandEnabled(MechS32 p_command)
@@ -664,7 +655,7 @@ void EnableShellMenuCommand(MechS32 p_command, MechS32 p_enabled)
 	}
 }
 
-// The original also enabled the Options menu itself, and checked Quick Tips to match g_quickTips.
+// The original also enabled the Options menu itself.
 // FUNCTION: MW2SHELL 0x1001023c
 void EnableShellMenu()
 {
@@ -675,87 +666,6 @@ void EnableShellMenu()
 void DisableShellMenu()
 {
 	memset(g_menuCommandEnabled, 0, sizeof(g_menuCommandEnabled));
-}
-
-// FUNCTION: MW2SHELL 0x1001067f
-BOOL CALLBACK OkDialogProc(HWND p_hDlg, UINT p_msg, WPARAM p_wParam, LPARAM)
-{
-	MechS32 id;
-
-	switch (p_msg) {
-	case WM_INITDIALOG:
-		SetFocus(GetDlgItem(p_hDlg, IDOK));
-		return FALSE;
-	case WM_COMMAND:
-		id = LOWORD(p_wParam);
-		switch (id) {
-		case IDOK:
-			EndDialog(p_hDlg, 0);
-			break;
-		}
-
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
-// The Movie Playback dialog's (138) choices: 320 x 200 or stretched to 640 x 480
-enum {
-	c_idLittleMovies = 1000,
-	c_idBigMovies = 1001
-};
-
-// FUNCTION: MW2SHELL 0x10010724
-BOOL CALLBACK LittleMoviesDialogProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM)
-{
-	UINT command;
-
-	switch (p_msg) {
-	case WM_INITDIALOG:
-		if (g_littleMovies != 0) {
-			CheckDlgButton(p_hWnd, c_idLittleMovies, BST_CHECKED);
-		}
-		else {
-			CheckDlgButton(p_hWnd, c_idBigMovies, BST_CHECKED);
-		}
-		SetFocus(GetDlgItem(p_hWnd, IDOK));
-		return FALSE;
-	case WM_COMMAND:
-		command = LOWORD(p_wParam);
-		switch (command) {
-		case c_idLittleMovies:
-			if (IsDlgButtonChecked(p_hWnd, c_idLittleMovies) == BST_CHECKED) {
-				CheckDlgButton(p_hWnd, c_idBigMovies, BST_UNCHECKED);
-			}
-			else {
-				CheckDlgButton(p_hWnd, c_idBigMovies, BST_CHECKED);
-			}
-			break;
-		case c_idBigMovies:
-			if (IsDlgButtonChecked(p_hWnd, c_idBigMovies) == BST_CHECKED) {
-				CheckDlgButton(p_hWnd, c_idLittleMovies, BST_UNCHECKED);
-			}
-			else {
-				CheckDlgButton(p_hWnd, c_idLittleMovies, BST_CHECKED);
-			}
-			break;
-		case IDOK:
-			if (IsDlgButtonChecked(p_hWnd, c_idLittleMovies) == BST_CHECKED) {
-				g_littleMovies = 1;
-			}
-			else {
-				g_littleMovies = 0;
-			}
-			// fall through to EndDialog
-		case IDCANCEL:
-			EndDialog(p_hWnd, 0);
-			break;
-		}
-		return TRUE;
-	}
-
-	return FALSE;
 }
 
 // FUNCTION: MW2SHELL 0x100108e5

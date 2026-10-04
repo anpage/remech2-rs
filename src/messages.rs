@@ -29,6 +29,12 @@ pub fn post(message: u32, wparam: usize, lparam: isize) {
     });
 }
 
+pub fn discard(first: u32, last: u32) {
+    QUEUE.with_borrow_mut(|queue| {
+        queue.retain(|queued| !(first..=last).contains(&queued.m_message));
+    });
+}
+
 #[unsafe(export_name = "MechSetMessageHandler")]
 pub extern "C" fn set_handler(handler: MechMessageHandler) -> MechMessageHandler {
     HANDLER.replace(handler)

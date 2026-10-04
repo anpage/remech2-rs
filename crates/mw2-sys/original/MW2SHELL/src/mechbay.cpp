@@ -393,13 +393,6 @@ AudioSample* g_mechBayAmbience = NULL;
 // GLOBAL: MW2SHELL 0x10061780
 MechS32 g_mechBayWParam = c_msgScreenFrame;
 
-// Set once the bay's and the customize screen's quick tips have been shown.
-// GLOBAL: MW2SHELL 0x10061784
-MechS32 g_mechBayTipShown = 0;
-
-// GLOBAL: MW2SHELL 0x10061788
-MechS32 g_customizeTipShown = 0;
-
 // Set to 1 when the mech bay closes; nothing reads it.
 // GLOBAL: MW2SHELL 0x1006178c
 MechS32 g_unk0x1006178c = 1;
@@ -3733,11 +3726,6 @@ void MechBayCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, 
 		goto done;
 	}
 
-	if (g_quickTips && !g_mechBayTipShown && !g_chassisNameSound->IsPlaying()) {
-		DialogBoxParam(g_module, MAKEINTRESOURCE(0x71), g_gameWindow, (DLGPROC) OkDialogProc, 0);
-		g_mechBayTipShown = 1;
-	}
-
 	pressed = g_mouseState->GetLeftPressed();
 	if (pressed == 1) {
 		tab = FindFieldAt(g_screenFields, g_mouseState->m_x, g_mouseState->m_y);
@@ -3917,11 +3905,6 @@ void MechBayCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, 
 		g_mechBayMenu->DisableButton(10);
 		g_mechBayMenu->EnableButton(8);
 		g_mechBayMenu->EnableButton(9);
-		if (g_quickTips && !g_customizeTipShown) {
-			g_videoDriver->DrawShell();
-			DialogBoxParam(g_module, MAKEINTRESOURCE(0x72), g_gameWindow, (DLGPROC) OkDialogProc, 0);
-			g_customizeTipShown = 1;
-		}
 		break;
 	case 7:
 		if (pressed != 1) {
@@ -3989,8 +3972,6 @@ done:
 			delete g_locationSound;
 		}
 		g_mechBayAmbience = g_chassisNameSound = g_locationSound = NULL;
-		g_mechBayTipShown = 0;
-		g_customizeTipShown = 0;
 		g_unk0x1006178c = 1;
 		delete g_acceptSound;
 		delete g_variantSound;

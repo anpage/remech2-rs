@@ -125,10 +125,6 @@ AudioSample* g_launchSound = NULL;
 // GLOBAL: MW2SHELL 0x1006a2b4
 AudioSample* g_trialSound = NULL;
 
-// Set once the briefing's quick tips have been shown.
-// GLOBAL: MW2SHELL 0x1006a2b8
-MechS32 g_briefingTipsShown = 0;
-
 // The text colors: each color maps to itself, but 0 is transparent and 1 is drawn in 0x22.
 // GLOBAL: MW2SHELL 0x10090058
 MechU8 g_briefingTextColors[0x100];
@@ -406,11 +402,6 @@ void MissionBriefingCallback(TMPackDataBase*, MechS32*, MechU8*, MechChar** p_sc
 		goto done;
 	}
 
-	if (g_quickTips && !g_briefingTipsShown && g_briefingMessage == c_msgMainMenu) {
-		DialogBoxParam(g_module, MAKEINTRESOURCE(0x6f), g_gameWindow, (DLGPROC) OkDialogProc, 0);
-		g_briefingTipsShown = 1;
-	}
-
 	button = g_missionBriefingMenu->HitTest(g_mouseState->m_x, g_mouseState->m_y);
 	switch (button) {
 	case 0:
@@ -660,7 +651,6 @@ done:
 		}
 		g_videoDriver->ClearGlyphs(TRUE);
 		g_simHandoff.m_briefingMission = g_briefingMission;
-		g_briefingTipsShown = 0;
 		MechPostMessage(p_msg, c_msgTrials, 0);
 		UnregisterScreenFunction(MissionBriefingCallback);
 	}

@@ -157,9 +157,6 @@ TextGlyph* g_tonnageLine = NULL;
 // GLOBAL: MW2SHELL 0x1005b89c
 TextGlyph* g_starMassLine = NULL;
 
-// GLOBAL: MW2SHELL 0x1005b8a0
-MechS32 g_starTipShown = 0;
-
 // Per position: the name, type and mass glyphs.
 // GLOBAL: MW2SHELL 0x10079438
 TextGlyph* g_positionGlyphs[3][3];
@@ -686,13 +683,6 @@ void StarConfigCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, char**, M
 		goto done;
 	}
 
-	if (g_quickTips && !g_starTipShown) {
-		UpdateVideos();
-		g_videoDriver->DrawShell();
-		DialogBoxParam(g_module, MAKEINTRESOURCE(0x7c), g_gameWindow, (DLGPROC) OkDialogProc, 0);
-		g_starTipShown = 1;
-	}
-
 	button = g_starMenu->HitTest(g_mouseState->m_x, g_mouseState->m_y);
 	if (*p_campaign == 2) {
 		SetVideoFlags(5, 0x20, 0x20);
@@ -826,7 +816,6 @@ done:
 		delete g_starSound;
 		CloseAllVideos();
 		g_videoDriver->ClearGlyphs(TRUE);
-		g_starTipShown = 0;
 		MechPostMessage(p_msg, c_msgStarConfig, 0);
 		UnregisterScreenFunction(StarConfigCallback);
 	}

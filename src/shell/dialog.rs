@@ -1,11 +1,9 @@
-use std::ffi::{CStr, c_char};
+use std::ffi::{CStr, c_char, c_int};
 use std::sync::Mutex;
 
-use binding::{macros::hook, patches};
-use tracing::{error, warn};
+use tracing::warn;
 use windows::Win32::Foundation::WPARAM;
 
-use super::MODULE;
 use crate::messages;
 use crate::shell::overlay::confirm;
 use crate::shell::screens::ShellMsg;
@@ -34,24 +32,22 @@ fn parse(message: &str) -> Message {
     }
 }
 
-#[hook(rva = 0x00043e25)]
-unsafe extern "cdecl" fn show_dialog(message: *const c_char, _confirm: i32) -> i32 {
+#[unsafe(export_name = "ShowDialog")]
+pub unsafe extern "C" fn show_dialog(message: *const c_char, _confirm: c_int) -> c_int {
+    if message.is_null() {
+        return 0;
+    }
     let raw = unsafe { CStr::from_ptr(message) }
         .to_string_lossy()
         .into_owned();
     let message = parse(&raw);
+    let lines: Vec<&str> = message.lines.iter().map(String::as_str).collect();
 
-    // We've hooked all the places that show yes/no dialogs.
-    // If this gets called with two buttons, we missed something.
-    if message.buttons >= 2 {
-        error!("confirmation reached the ShowDialog hook: {raw:?}");
-        debug_assert!(false);
-        return DECLINED;
+    if message.buttons == 2 {
+        return if confirm::run(&lines) { 0 } else { DECLINED };
     }
 
-    let lines: Vec<&str> = message.lines.iter().map(String::as_str).collect();
     confirm::notify(&lines);
-
     0
 }
 
@@ -86,9 +82,3 @@ pub fn replay_transition() {
     };
     messages::post(message, wparam, 0);
 }
-
-patches!(
-    pub(super) static PATCHES = [
-        hook show_dialog,
-    ];
-);

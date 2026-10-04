@@ -23,6 +23,7 @@ thread_local! {
 }
 
 pub fn set_overlay(overlay: Option<Overlay>) {
+    app::capture_pointer(false);
     OVERLAY.set(overlay);
 }
 

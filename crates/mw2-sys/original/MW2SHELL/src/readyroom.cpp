@@ -44,10 +44,6 @@ MechS32 g_readyRoomExitMessage = c_msgScreenFrame;
 // GLOBAL: MW2SHELL 0x1006a590
 AudioSample* g_readyRoomSound = NULL;
 
-// Set once the ready room's quick tips have been shown.
-// GLOBAL: MW2SHELL 0x1006a594
-MechS32 g_readyRoomTipsShown = 0;
-
 // GLOBAL: MW2SHELL 0x100904a0
 ButtonMenu* g_readyRoomMenu;
 
@@ -136,11 +132,6 @@ void ReadyRoomCallback(TMPackDataBase* p_database, MechS32* p_campaign, MechU8*,
 	// The original skips the frame's work with a goto, like StarConfigCallback.
 	if (p_msg != c_msgScreenFrame) {
 		goto done;
-	}
-
-	if (g_quickTips && !g_readyRoomTipsShown && g_readyRoomMessage == c_msgClanHall && !IsVideoPlaying(0x10)) {
-		DialogBoxParam(g_module, MAKEINTRESOURCE(0x70), g_gameWindow, (DLGPROC) OkDialogProc, 0);
-		g_readyRoomTipsShown = 1;
 	}
 
 	if (g_readyRoomExitVideo == -1) {
@@ -253,7 +244,6 @@ done:
 			delete g_readyRoomSound;
 		}
 		g_readyRoomSound = NULL;
-		g_readyRoomTipsShown = 0;
 		MechPostMessage(p_msg, c_msgReadyRoom, 0);
 		UnregisterScreenFunction(ReadyRoomCallback);
 	}

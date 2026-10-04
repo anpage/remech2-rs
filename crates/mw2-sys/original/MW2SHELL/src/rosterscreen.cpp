@@ -242,13 +242,6 @@ AudioSample* g_rosterSound = NULL;
 // GLOBAL: MW2SHELL 0x10064120
 MechS32 g_missionListShown = 0;
 
-// Set once each clan's quick tips have been shown.
-// GLOBAL: MW2SHELL 0x10064124
-MechS32 g_jadeFalconTipsShown = 0;
-
-// GLOBAL: MW2SHELL 0x10064128
-MechS32 g_wolfTipsShown = 0;
-
 // GLOBAL: MW2SHELL 0x1007cda0
 ButtonMenu* g_rosterMenu;
 
@@ -259,7 +252,6 @@ void PilotRosterCallback(
 	MechChar** p_scenario,
 	MechS32 p_msg
 );
-BOOL CALLBACK QuickTipsDialogProc(HWND p_hDlg, UINT p_msg, WPARAM p_wParam, LPARAM);
 
 // Opens the pilot roster of the campaign's clan hall: the ten pilot slots, the active pilot's
 // record, and the menu.
@@ -354,20 +346,6 @@ void PilotRosterCallback(
 	}
 
 	button = g_rosterMenu->HitTest(g_mouseState->m_x, g_mouseState->m_y);
-	if (g_showDialog &&
-		((g_rosterCampaign == 1 && !g_jadeFalconTipsShown) || (g_rosterCampaign == 0 && !g_wolfTipsShown))) {
-		switch (g_rosterCampaign) {
-		case 1:
-			DialogBoxParam(g_module, MAKEINTRESOURCE(0x65), g_gameWindow, (DLGPROC) QuickTipsDialogProc, 0);
-			g_jadeFalconTipsShown = 1;
-			break;
-		case 0:
-			DialogBoxParam(g_module, MAKEINTRESOURCE(0x66), g_gameWindow, (DLGPROC) QuickTipsDialogProc, 0);
-			g_wolfTipsShown = 1;
-			break;
-		}
-	}
-
 	if (g_mouseState->GetLeftPressed() == 1) {
 		if (g_missionListShown) {
 			tab = FindFieldAt(g_missionListFields, g_mouseState->m_x, g_mouseState->m_y);
@@ -510,65 +488,4 @@ done:
 		MechPostMessage(p_msg, c_msgPilotRoster, 0);
 		UnregisterScreenFunction(PilotRosterCallback);
 	}
-}
-
-// The quick tips dialog of the pilot roster: whether the quick tips show, and a checkbox for
-// g_showDialog.
-// FUNCTION: MW2SHELL 0x10015a6c
-BOOL CALLBACK QuickTipsDialogProc(HWND p_hDlg, UINT p_msg, WPARAM p_wParam, LPARAM)
-{
-	UINT command;
-
-	switch (p_msg) {
-	case WM_INITDIALOG:
-		if (g_quickTips) {
-			CheckDlgButton(p_hDlg, 0x3e8, 1);
-		}
-		else {
-			CheckDlgButton(p_hDlg, 0x3e9, 1);
-		}
-		SetFocus(GetDlgItem(p_hDlg, 1));
-		return FALSE;
-	case WM_COMMAND:
-		command = LOWORD(p_wParam);
-		switch (command) {
-		case 0x3e8:
-			if (IsDlgButtonChecked(p_hDlg, 0x3e8) == 1) {
-				CheckDlgButton(p_hDlg, 0x3e9, 0);
-			}
-			else {
-				CheckDlgButton(p_hDlg, 0x3e9, 1);
-			}
-			break;
-		case 0x3e9:
-			if (IsDlgButtonChecked(p_hDlg, 0x3e9) == 1) {
-				CheckDlgButton(p_hDlg, 0x3e8, 0);
-			}
-			else {
-				CheckDlgButton(p_hDlg, 0x3e8, 1);
-			}
-			break;
-		case 0x3ea:
-			if (IsDlgButtonChecked(p_hDlg, 0x3ea) == 1) {
-				g_showDialog = 0;
-			}
-			else {
-				g_showDialog = 1;
-			}
-			break;
-		case 1:
-			EndDialog(p_hDlg, 0);
-			break;
-		}
-
-		if (IsDlgButtonChecked(p_hDlg, 0x3e8) == 1) {
-			g_quickTips = 1;
-		}
-		else {
-			g_quickTips = 0;
-		}
-		return TRUE;
-	}
-
-	return FALSE;
 }

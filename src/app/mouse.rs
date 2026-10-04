@@ -1,4 +1,7 @@
-use std::ffi::c_int;
+use std::{
+    ffi::c_int,
+    sync::atomic::{AtomicBool, Ordering},
+};
 
 use mw2_sys::shared::{c_mechMouseLeft, c_mechMouseMiddle, c_mechMouseRight};
 use winit::{
@@ -173,9 +176,16 @@ fn apply_grab(window: &Window, grab: bool) {
     }
 }
 
+static CAPTURED: AtomicBool = AtomicBool::new(false);
+
+pub fn capture_pointer(captured: bool) {
+    CAPTURED.store(captured, Ordering::Relaxed);
+}
+
 impl State {
     fn game_has_pointer(&self) -> bool {
-        self.mouse.grab || !self.egui_ctx.is_pointer_over_area()
+        self.mouse.grab
+            || !(CAPTURED.load(Ordering::Relaxed) || self.egui_ctx.is_pointer_over_area())
     }
 }
 

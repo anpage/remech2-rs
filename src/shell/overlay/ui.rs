@@ -18,7 +18,7 @@ use crate::shell::overlay::{
     confirm, menu,
     mouse::{G_CURSOR_GRAPHIC, OverlayMouseState, update_global_mouse_state},
 };
-use crate::{about, messages, shell::screens};
+use crate::{about, app, messages, shell::screens};
 
 static SHOW_CURSOR: AtomicBool = AtomicBool::new(true);
 
@@ -338,6 +338,7 @@ impl OverlayUi {
         }
 
         let window_size = [window_size.0, window_size.1];
+        app::capture_pointer(confirm::is_open());
         if self.shell_hovered && !confirm::is_open() {
             update_global_mouse_state(mouse_state, window_size);
         } else {

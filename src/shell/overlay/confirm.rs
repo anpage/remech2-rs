@@ -3,7 +3,10 @@ use std::sync::Mutex;
 
 use egui::{Align, Button, Color32, Context, FontId, Layout, RichText, Vec2};
 
+use mw2_sys::shared::{c_mechMsgKeyFirst, c_mechMsgKeyLast, c_mechMsgMouseMove};
+
 use super::menu::{self, MenuLock};
+use crate::{app, display, messages};
 
 const BUTTON_WIDTH: f32 = 64.0;
 const BUTTON_GAP: f32 = 42.0;
@@ -66,6 +69,28 @@ pub fn notify(lines: &[&str]) {
         Some(_) => QUEUED.lock().unwrap().push_back(owned(lines)),
         None => *prompt = Some(Prompt::new(owned(lines), Buttons::Ok, true)),
     }
+}
+
+/// Shows a Yes/No prompt and keeps the window running until it's answered.
+/// Returns whether Yes was chosen.
+pub fn run(lines: &[&str]) -> bool {
+    open(lines);
+    let cursor_shown = app::show_cursor(1);
+
+    let answer = loop {
+        app::pump();
+        display::present_frame();
+        if let Some(answer) = answer() {
+            break answer;
+        }
+    };
+
+    close();
+    app::show_cursor(cursor_shown);
+
+    messages::discard(c_mechMsgKeyFirst, c_mechMsgKeyLast);
+    messages::discard(c_mechMsgMouseMove, c_mechMsgMouseMove);
+    answer
 }
 
 fn owned(lines: &[&str]) -> Vec<String> {
