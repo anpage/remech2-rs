@@ -3,6 +3,7 @@
 #include "font.h"
 #include "inputdeviceinfo.h"
 #include "inputdriver.h"
+#include "pointer.h"
 #include "refreshmode.h"
 #include "shellglobals.h"
 #include "videodriver.h"
@@ -54,16 +55,11 @@ MouseState::MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_unk0x00
 // FUNCTION: MW2SHELL 0x1003a884
 void MouseState::MoveCursorTo(MechS32 p_x, MechS32 p_y)
 {
-	POINT point;
-
 	if (!m_enabled) {
 		return;
 	}
 
-	point.x = p_x;
-	point.y = p_y;
-	ClientToScreen(g_gameWindow, &point);
-	SetCursorPos(point.x, point.y);
+	MechMouseSetPosition(p_x, p_y);
 }
 
 // FUNCTION: MW2SHELL 0x1003a8d8
@@ -145,6 +141,8 @@ void MouseState::PressButton(MechS32 p_button)
 void MouseState::ReadMouseState()
 {
 	POINT point;
+	MechS32 x;
+	MechS32 y;
 	undefined4 middleDown;
 	undefined4 leftDown;
 	undefined4 rightDown;
@@ -161,28 +159,30 @@ void MouseState::ReadMouseState()
 	rightDown = m_rightDown;
 	middleDown = m_middleDown;
 
-	if (m_enabled && GetCursorPos(&point)) {
-		ScreenToClient(g_gameWindow, &point);
-
+	if (m_enabled && MechMouseGetPosition(&x, &y)) {
+		point.x = x;
+		point.y = y;
 		if (IsInsideWindow(point)) {
+			MechU32 buttons = MechMouseButtons();
+
 			m_x = point.x;
 			m_y = point.y;
 
-			if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
+			if (buttons & c_mechMouseLeft) {
 				m_leftDown = 1;
 			}
 			else {
 				m_leftDown = 0;
 			}
 
-			if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
+			if (buttons & c_mechMouseRight) {
 				m_rightDown = 1;
 			}
 			else {
 				m_rightDown = 0;
 			}
 
-			if (GetAsyncKeyState(VK_MBUTTON) & 0x8000) {
+			if (buttons & c_mechMouseMiddle) {
 				m_middleDown = 1;
 			}
 			else {

@@ -28,6 +28,7 @@
 #include "options.h"
 #include "pilotrecord.h"
 #include "pilotroster.h"
+#include "pointer.h"
 #include "projectarchive.h"
 #include "readyroom.h"
 #include "refreshmode.h"
@@ -146,8 +147,7 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 	// On WM_NCMOUSEMOVE the original showed the cursor again if a movie had hidden it.
 	case c_mechMsgMouseMove:
 		if (IsFullscreenVideoPlaying() && !g_cursorHidden) {
-			while (ShowCursor(FALSE) >= 0)
-				;
+			MechMouseShowCursor(FALSE);
 			g_cursorHidden = TRUE;
 		}
 
@@ -238,8 +238,7 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 		g_pilotChosen = FALSE;
 		DrawMainMenu(g_mw2Database, &g_selectedCampaign);
 		if (g_cursorHidden) {
-			while (ShowCursor(TRUE) < 0)
-				;
+			MechMouseShowCursor(TRUE);
 			g_cursorHidden = FALSE;
 		}
 		break;
@@ -261,8 +260,7 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 		}
 		else {
 			if (g_cursorHidden) {
-				while (ShowCursor(TRUE) < 0)
-					;
+				MechMouseShowCursor(TRUE);
 				g_cursorHidden = FALSE;
 			}
 
@@ -271,8 +269,7 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 		break;
 	case c_msgPilotRoster:
 		if (g_cursorHidden) {
-			while (ShowCursor(TRUE) < 0)
-				;
+			MechMouseShowCursor(TRUE);
 			g_cursorHidden = FALSE;
 		}
 
@@ -322,8 +319,7 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 		DrawMissionDebrief(g_mw2Database, g_selectedCampaign, &g_scenario);
 		break;
 	case c_msgLandingVideo:
-		while (ShowCursor(FALSE) >= 0)
-			;
+		MechMouseShowCursor(FALSE);
 		g_cursorHidden = TRUE;
 
 		switch (g_selectedCampaign) {
@@ -340,8 +336,7 @@ static MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPT
 		}
 		break;
 	case c_msgEndingVideo:
-		while (ShowCursor(FALSE) >= 0)
-			;
+		MechMouseShowCursor(FALSE);
 		g_cursorHidden = TRUE;
 
 		switch (g_selectedCampaign) {
@@ -446,17 +441,15 @@ extern "C" int ShellMain(char* p_cmdLine)
 	LoadPilotRoster();
 	LoadDifficultyConfig();
 	ReadSimHandoff(fromSim, &g_selectedCampaign, &g_pilotChosen, &g_scenario);
-	ClipCursor(NULL);
+	MechMouseGrab(FALSE);
 
 	if (fromSim) {
 		EnableShellMenu(g_windowMenu);
-		while (ShowCursor(TRUE) < 0)
-			;
+		MechMouseShowCursor(TRUE);
 		g_cursorHidden = FALSE;
 	}
 	else {
-		while (ShowCursor(FALSE) >= 0)
-			;
+		MechMouseShowCursor(FALSE);
 		g_cursorHidden = TRUE;
 	}
 

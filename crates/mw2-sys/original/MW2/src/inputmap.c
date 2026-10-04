@@ -20,6 +20,7 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "mw2log.h"
+#include "pointer.h"
 #include "refreshmode.h"
 #include "simmain.h"
 #include "statuspanels.h"
@@ -1454,10 +1455,8 @@ void ReportInputDeviceError(MechS32 p_code, MechChar* p_channel, MechChar* p_dev
 	}
 
 	WriteToMw2Log(g_inputErrorText);
-	if (ShowCursor(TRUE) <= 0) {
+	if (!MechMouseShowCursor(TRUE)) {
 		hidden = TRUE;
-		while (ShowCursor(TRUE) < 0) {
-		}
 	}
 
 	if (g_windowMode == 1) {
@@ -1474,7 +1473,6 @@ void ReportInputDeviceError(MechS32 p_code, MechChar* p_channel, MechChar* p_dev
 	}
 
 	if (hidden) {
-		while (ShowCursor(FALSE) >= 0) {
-		}
+		MechMouseShowCursor(FALSE);
 	}
 }

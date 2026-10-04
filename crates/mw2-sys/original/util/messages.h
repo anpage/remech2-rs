@@ -33,6 +33,8 @@ extern "C"
 		c_mechMsgSysKeyUp = 0x0105,
 		c_mechMsgKeyLast = 0x0108,
 		c_mechMsgCommand = 0x0111,
+		// The cursor moved over the window, posted at most once for each MechAppPump. lParam has its
+		// position in the frame (pointer.h): x in bits 0 to 15, y in bits 16 to 31.
 		c_mechMsgMouseMove = 0x0200,
 		c_mechMsgUser = 0x0400
 	};

@@ -47,6 +47,7 @@
 #include "perf.h"
 #include "players.h"
 #include "point.h"
+#include "pointer.h"
 #include "polydraw.h"
 #include "random.h"
 #include "refreshmode.h"
@@ -337,8 +338,7 @@ int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 			Error(0x50, "Error profiling video modes.");
 		}
 
-		while (ShowCursor(FALSE) >= 0) {
-		}
+		MechMouseShowCursor(FALSE);
 
 		g_mouseOutsideClientWindow = 0;
 		// The original waited here for the refresh modes to be profiled.
@@ -459,8 +459,7 @@ int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 
 	MechHeapDestroy(g_primaryHeap);
 	g_primaryHeap = NULL;
-	while (ShowCursor(TRUE) < 1) {
-	}
+	MechMouseShowCursor(TRUE);
 
 	result = g_fledToWindows ? 0xff : 0;
 	return result;
@@ -506,8 +505,7 @@ static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR 
 	case c_mechMsgMouseMove:
 		if (g_mouseOutsideClientWindow) {
 			if (!g_simPaused || GetMenuSlotState(4) == 1) {
-				while (ShowCursor(FALSE) >= 0) {
-				}
+				MechMouseShowCursor(FALSE);
 				g_mouseOutsideClientWindow = FALSE;
 			}
 		}
@@ -574,8 +572,7 @@ void UpdatePauseState(void)
 
 	if (!GetMenuSlotState(4) && g_windowActive && !g_pauseRequested) {
 		if (g_simPaused) {
-			while (ShowCursor(FALSE) >= 0) {
-			}
+			MechMouseShowCursor(FALSE);
 
 			g_mouseOutsideClientWindow = FALSE;
 			DebugPrint("WinMain(3): pause_timer(false)");
@@ -592,8 +589,7 @@ void UpdatePauseState(void)
 		}
 
 		if (!GetMenuSlotState(4) && g_windowMode != c_windowModeFullscreen) {
-			while (ShowCursor(TRUE) < 0) {
-			}
+			MechMouseShowCursor(TRUE);
 
 			g_mouseOutsideClientWindow = TRUE;
 		}

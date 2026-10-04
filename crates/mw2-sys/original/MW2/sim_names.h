@@ -17,7 +17,6 @@
 #define FindResourceIdByName Sim_FindResourceIdByName
 #define FreeCacheEntry Sim_FreeCacheEntry
 #define FreeCachedResource Sim_FreeCachedResource
-#define GetClientScreenRect Sim_GetClientScreenRect
 #define GetJoystickDeviceCount Sim_GetJoystickDeviceCount
 #define GetKeyboardDeviceCount Sim_GetKeyboardDeviceCount
 #define GetMouseDeviceCount Sim_GetMouseDeviceCount
@@ -76,7 +75,6 @@
 #define g_cacheTable Sim_g_cacheTable
 #define g_currentDisplayBackend Sim_g_currentDisplayBackend
 #define g_currentRefreshMode Sim_g_currentRefreshMode
-#define g_cursorClipRect Sim_g_cursorClipRect
 #define g_cursorClipped Sim_g_cursorClipped
 #define g_debugLogFile Sim_g_debugLogFile
 #define g_debugLogName Sim_g_debugLogName

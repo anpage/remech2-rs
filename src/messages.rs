@@ -11,6 +11,13 @@ thread_local! {
     static HANDLER: Cell<MechMessageHandler> = const { Cell::new(None) };
 }
 
+/// Adds a message to the back of the queue if the game is there to handle it
+pub fn post_to_game(message: u32, wparam: usize, lparam: isize) {
+    if HANDLER.get().is_some() {
+        post(message, wparam, lparam);
+    }
+}
+
 /// Adds a message to the back of the queue
 pub fn post(message: u32, wparam: usize, lparam: isize) {
     QUEUE.with_borrow_mut(|queue| {

@@ -3,6 +3,7 @@
 #include "decomp.h"
 #include "inputdeviceinfo.h"
 #include "inputdriver.h"
+#include "pointer.h"
 #include "simmain.h"
 #include "types.h"
 
@@ -42,7 +43,6 @@ MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis);
 MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons);
 MechS32 MouseReadKeyCode(void);
 MechS32 MouseFlushKeyCodes(void);
-void GetClientScreenRect(RECT* p_rect, MechS32 p_width, MechS32 p_height);
 
 // GLOBAL: MW2 0x100ad250
 InputDriverModule g_mouseDriver = {
@@ -64,9 +64,6 @@ MechChar g_mouseDisplayName[8] = "Mouse";
 
 // GLOBAL: MW2 0x100ad280
 MechChar g_mouseTypeName[8] = "mouse";
-
-// GLOBAL: MW2 0x100e9230
-RECT g_cursorClipRect;
 
 // FUNCTION: MW2 0x100688e0
 MechS32 GetMouseDeviceCount(void)
@@ -100,7 +97,7 @@ MechS32 MouseOpenDevice(void)
 // FUNCTION: MW2 0x10068998
 MechS32 MouseCloseDevice(void)
 {
-	ClipCursor(NULL);
+	MechMouseGrab(FALSE);
 	g_cursorClipped = FALSE;
 	return 0;
 }
@@ -108,20 +105,21 @@ MechS32 MouseCloseDevice(void)
 // FUNCTION: MW2 0x100689bc
 MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis)
 {
-	POINT point;
+	MechS32 x;
+	MechS32 y;
 
 	if (g_windowActive) {
-		GetCursorPos(&point);
-		ScreenToClient(g_gameWindow, &point);
+		x = g_gameWindowWidth / 2;
+		y = g_gameWindowHeight / 2;
+		MechMouseGetPosition(&x, &y);
 		if (p_axis == 0) {
-			point.y = g_gameWindowHeight / 2;
+			y = g_gameWindowHeight / 2;
 		}
 		else if (p_axis == 1) {
-			point.x = g_gameWindowWidth / 2;
+			x = g_gameWindowWidth / 2;
 		}
 
-		ClientToScreen(g_gameWindow, &point);
-		SetCursorPos(point.x, point.y);
+		MechMouseSetPosition(x, y);
 	}
 
 	return 0;
@@ -130,15 +128,14 @@ MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis)
 // FUNCTION: MW2 0x10068a49
 MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
 {
-	MechS16 left;
-	MechS16 middle;
 	POINT point;
-	MechS16 right;
+	MechS32 x;
+	MechS32 y;
 
 	if (g_windowActive) {
 		if (!g_cursorClipped || g_reclipCursor) {
-			GetClientScreenRect(&g_cursorClipRect, g_gameWindowWidth, g_gameWindowHeight);
-			ClipCursor(&g_cursorClipRect);
+			// The original clipped the cursor to the window's client area.
+			MechMouseGrab(TRUE);
 			CenterCursor(p_unk0x00, 0);
 			CenterCursor(p_unk0x00, 1);
 			g_cursorClipped = TRUE;
@@ -146,30 +143,13 @@ MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
 		}
 
 		if (p_buttons) {
-			if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
-				left = 1;
-			}
-			else {
-				left = 0;
-			}
-			if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
-				right = 1;
-			}
-			else {
-				right = 0;
-			}
-			if (GetAsyncKeyState(VK_MBUTTON) & 0x8000) {
-				middle = 1;
-			}
-			else {
-				middle = 0;
-			}
-
-			*p_buttons = (right << 2) | (middle << 1) | left;
+			// Bit 0 is the left button, bit 1 the middle one and bit 2 the right one.
+			*p_buttons = MechMouseButtons();
 		}
 
-		if (p_position && GetCursorPos(&point)) {
-			ScreenToClient(g_gameWindow, &point);
+		if (p_position && MechMouseGetPosition(&x, &y)) {
+			point.x = x;
+			point.y = y;
 			if (IsInsideWindow(point.x, point.y)) {
 				p_position[0] = ((point.y * 2 - g_gameWindowHeight) << 16) / g_gameWindowHeight;
 				p_position[1] = ((point.x * 2 - g_gameWindowWidth) << 16) / g_gameWindowWidth;
@@ -178,7 +158,7 @@ MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
 	}
 	else {
 		if (g_cursorClipped) {
-			ClipCursor(NULL);
+			MechMouseGrab(FALSE);
 			g_cursorClipped = FALSE;
 		}
 
@@ -199,23 +179,6 @@ MechS32 MouseReadKeyCode(void)
 MechS32 MouseFlushKeyCodes(void)
 {
 	return 0;
-}
-
-// FUNCTION: MW2 0x10068c3d
-void GetClientScreenRect(RECT* p_rect, MechS32 p_width, MechS32 p_height)
-{
-	POINT point;
-
-	point.x = point.y = 0;
-	ClientToScreen(g_gameWindow, &point);
-	p_rect->left = point.x;
-	p_rect->top = point.y;
-
-	point.x = p_width - 1;
-	point.y = p_height - 1;
-	ClientToScreen(g_gameWindow, &point);
-	p_rect->right = point.x;
-	p_rect->bottom = point.y;
 }
 
 // Whether a client point lies inside the game window.

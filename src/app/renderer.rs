@@ -6,7 +6,7 @@ use egui_wgpu::{RendererOptions, ScreenDescriptor};
 use winit::window::Window;
 
 use crate::drawmode::{
-    ScalingMode, fit_to_window,
+    ScalingMode, frame_rect,
     scaler::{PaletteData, Scaler},
 };
 
@@ -113,12 +113,10 @@ impl Renderer {
         };
 
         let window_size = [self.config.width as f32, self.config.height as f32];
-        let mut output_size = egui::Vec2::ZERO;
-        if let Some(frame) = frame.as_ref().filter(|frame| frame.size[1] != 0) {
-            // Pixels are square
-            let aspect_ratio = frame.size[0] as f32 / frame.size[1] as f32;
-            output_size = fit_to_window(window_size[0], window_size[1], aspect_ratio).round();
-
+        let output_rect = frame
+            .as_ref()
+            .and_then(|frame| frame_rect(window_size, frame.size));
+        if let (Some(frame), Some((_, output_size))) = (&frame, output_rect) {
             let [x, y, width, height] =
                 frame.source.unwrap_or([0, 0, frame.size[0], frame.size[1]]);
             self.scaler.upload_palette(&self.queue, frame.palette);
@@ -133,7 +131,7 @@ impl Renderer {
             self.scaler.set_params(
                 &self.queue,
                 [width as f32, height as f32],
-                output_size.into(),
+                output_size,
                 self.scaling,
             );
         }
@@ -180,15 +178,8 @@ impl Renderer {
             });
             // egui's renderer requires it
             let mut render_pass = render_pass.forget_lifetime();
-            if output_size.x >= 1.0 && output_size.y >= 1.0 {
-                render_pass.set_viewport(
-                    ((window_size[0] - output_size.x) / 2.0).floor(),
-                    ((window_size[1] - output_size.y) / 2.0).floor(),
-                    output_size.x,
-                    output_size.y,
-                    0.0,
-                    1.0,
-                );
+            if let Some((origin, size)) = output_rect {
+                render_pass.set_viewport(origin[0], origin[1], size[0], size[1], 0.0, 1.0);
                 self.scaler.draw(&mut render_pass);
             }
             self.egui

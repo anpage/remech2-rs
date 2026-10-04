@@ -10,6 +10,7 @@
 #include "mw2log.h"
 #include "network.h"
 #include "overlay.h"
+#include "pointer.h"
 #include "render.h"
 #include "resource.h"
 #include "simmain.h"
@@ -154,8 +155,7 @@ void ShowFatalError(const char** p_args)
 	ShutdownRender();
 	StopTimers();
 	CloseInputDevices();
-	while (ShowCursor(TRUE) < 0) {
-	}
+	MechMouseShowCursor(TRUE);
 
 	ShowWindow(g_gameWindow, SW_SHOWMINNOACTIVE);
 	MessageBox(

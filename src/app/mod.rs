@@ -1,4 +1,5 @@
 mod keyboard;
+mod mouse;
 mod renderer;
 
 use std::{cell::RefCell, ffi::c_int, process::exit, sync::Arc, thread, time::Duration};
@@ -7,7 +8,7 @@ use anyhow::{Result, bail};
 use winit::{
     application::ApplicationHandler,
     dpi::PhysicalSize,
-    event::{ElementState, KeyEvent, WindowEvent},
+    event::{DeviceEvent, DeviceId, ElementState, KeyEvent, WindowEvent},
     event_loop::{ActiveEventLoop, EventLoop},
     keyboard::{Key, ModifiersState, NamedKey, PhysicalKey},
     platform::{
@@ -17,10 +18,11 @@ use winit::{
     window::{Fullscreen, Window, WindowId},
 };
 
-use mw2_sys::shared::{c_mechMsgActivateApp, c_mechMsgKeyDown, c_mechMsgKeyUp};
+use mw2_sys::shared::{c_mechMsgActivateApp, c_mechMsgKeyDown, c_mechMsgKeyUp, c_mechMsgMouseMove};
 
 use crate::{messages, settings::SETTINGS};
 
+use mouse::Mouse;
 pub use renderer::Frame;
 use renderer::Renderer;
 
@@ -79,6 +81,12 @@ impl App {
 
     fn pump_events(&mut self, timeout: Option<Duration>) -> bool {
         let status = self.event_loop.pump_app_events(timeout, &mut self.state);
+        // One for however many times the cursor moved
+        if let Some(window) = &self.state.window
+            && let Some(lparam) = self.state.mouse.take_move(window)
+        {
+            messages::post_to_game(c_mechMsgMouseMove as u32, 0, lparam);
+        }
         if matches!(status, PumpStatus::Exit(_)) {
             self.state.quit = true;
         }
@@ -102,6 +110,7 @@ struct State {
     egui_input: Option<egui_winit::State>,
     modifiers: ModifiersState,
     focused: bool,
+    mouse: Mouse,
     quit: bool,
     error: Option<anyhow::Error>,
 }
@@ -115,6 +124,7 @@ impl State {
             egui_input: None,
             modifiers: ModifiersState::empty(),
             focused: false,
+            mouse: Mouse::new(),
             quit: false,
             error: None,
         }
@@ -160,8 +170,19 @@ impl State {
             return;
         }
 
+        if let Some(frame) = &frame {
+            self.mouse.set_frame_size(frame.size);
+        }
+
         let raw_input = egui_input.take_egui_input(window);
-        let full_output = self.egui_ctx.run(raw_input, ui);
+        let cursor_hidden = self.mouse.hidden;
+        let mut ui = ui;
+        let full_output = self.egui_ctx.run(raw_input, |ctx| {
+            ui(ctx);
+            if cursor_hidden {
+                ctx.set_cursor_icon(egui::CursorIcon::None);
+            }
+        });
         egui_input.handle_platform_output(window, full_output.platform_output);
 
         let primitives = self
@@ -211,8 +232,14 @@ impl ApplicationHandler for State {
             WindowEvent::CloseRequested => self.quit = true,
             WindowEvent::Focused(focused) => {
                 self.focused = focused;
-                messages::post(c_mechMsgActivateApp as u32, focused.into(), 0);
+                if let Some(window) = &self.window {
+                    self.mouse.focused(window, focused);
+                }
+                messages::post_to_game(c_mechMsgActivateApp as u32, focused.into(), 0);
             }
+            WindowEvent::CursorMoved { position, .. } => self.mouse.cursor_moved(Some(position)),
+            WindowEvent::CursorLeft { .. } => self.mouse.cursor_moved(None),
+            WindowEvent::MouseInput { state, button, .. } => self.mouse.button(button, state),
             WindowEvent::Resized(size) => {
                 if let Some(renderer) = &mut self.renderer {
                     renderer.resize(size.width, size.height);
@@ -238,6 +265,17 @@ impl ApplicationHandler for State {
             _ => {}
         }
     }
+
+    fn device_event(
+        &mut self,
+        _event_loop: &ActiveEventLoop,
+        _device_id: DeviceId,
+        event: DeviceEvent,
+    ) {
+        if let (DeviceEvent::MouseMotion { delta }, Some(window)) = (event, &self.window) {
+            self.mouse.motion(window, delta);
+        }
+    }
 }
 
 /// Posts a key event to the game's message queue
@@ -257,7 +295,7 @@ fn post_key(event: &KeyEvent) {
         ElementState::Pressed => c_mechMsgKeyDown,
         ElementState::Released => c_mechMsgKeyUp,
     };
-    messages::post(message, wparam, lparam);
+    messages::post_to_game(message, wparam, lparam);
 }
 
 #[unsafe(export_name = "MechAppPump")]
