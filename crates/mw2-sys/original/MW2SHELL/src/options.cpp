@@ -27,7 +27,7 @@
 #include <string.h>
 
 void OptionsCallback(MechS32);
-extern ScreenField g_optionFields[15];
+extern ScreenField g_optionFields[16];
 
 // A button with a centered caption. Nothing calls its two functions.
 // SIZE 0x9c
@@ -431,7 +431,7 @@ void OptionsCallback(MechS32 p_active)
 #define OPTION_BAR(x, y, width, height, draw, click, value)                                                            \
 	{x, y, width, height, 0, NULL, NULL, draw, click, value, NULL}
 // GLOBAL: MW2SHELL 0x10070da8
-ScreenField g_optionFields[15] = {
+ScreenField g_optionFields[16] = {
 	OPTION_ROW(0x189, 0xdb, 100, DrawSkillOption, CycleByteOption, &g_difficultyConfig.m_enemySkill),
 	OPTION_ROW(0x189, 0xef, 100, DrawByteToggle, ToggleByteOption, &g_difficultyConfig.m_heatTracking),
 	OPTION_ROW(0x189, 0x115, 100, DrawIntToggle, ToggleIntOption, &g_soundConfig.m_objectTextmaps),
@@ -454,6 +454,7 @@ ScreenField g_optionFields[15] = {
 	OPTION_BAR(0x14f, 0x80, 0x11d, 0x15, DrawVolumeSlider, DragVolumeSlider, &g_soundConfig.m_midiVolume),
 	OPTION_BAR(0x14f, 0x98, 0x11d, 0x15, DrawVolumeSlider, DragVolumeSlider, &g_soundConfig.m_effectsVolume),
 	OPTION_BAR(0x14f, 0xb0, 0x11d, 0x15, DrawVolumeSlider, DragVolumeSlider, &g_soundConfig.m_voiceVolume),
+	{-1, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL},
 };
 #undef OPTION_ROW
 #undef OPTION_BAR
