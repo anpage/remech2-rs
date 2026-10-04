@@ -37,9 +37,6 @@ MechS32 g_audioPaused = 0;
 // GLOBAL: MW2 0x100a14dc
 MechS32 g_musicStarted = 0;
 
-// GLOBAL: MW2 0x100bcda8
-static AILPCMWAVEFORMAT g_waveFormat;
-
 // GLOBAL: MW2 0x10179e80
 MechS32 g_nextEngageCheck;
 
@@ -397,13 +394,7 @@ HDIGDRIVER OpenDigitalDriver(void)
 {
 	HDIGDRIVER driver;
 
-	g_waveFormat.wf.wFormatTag = AIL_WAVE_FORMAT_PCM;
-	g_waveFormat.wf.nChannels = 2;
-	g_waveFormat.wf.nSamplesPerSec = 11025;
-	g_waveFormat.wf.nAvgBytesPerSec = 22050;
-	g_waveFormat.wf.nBlockAlign = 2;
-	g_waveFormat.wBitsPerSample = 8;
-	if (AIL_waveOutOpen(&driver, NULL, 0, (AILWAVEFORMAT*) &g_waveFormat)) {
+	if (AIL_waveOutOpen(&driver, NULL, 0, 2, 11025)) {
 		return NULL;
 	}
 	else {

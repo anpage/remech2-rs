@@ -1,7 +1,6 @@
 use std::{ffi::c_void, num::NonZero, slice};
 
 use tracing::{Level, instrument};
-use windows::Win32::Media::Audio::{WAVE_FORMAT_PCM, WAVEFORMATEX};
 
 use crate::ailrs::storage::{create_driver, create_sample, get_sample, release_sample};
 
@@ -210,27 +209,14 @@ pub unsafe extern "system" fn wave_out_open(
     dig_driver_out: *mut DriverHandle,
     _: *mut c_void,
     _device_id: u32,
-    wave_format: *const WAVEFORMATEX,
+    channels: u16,
+    samples_per_sec: u32,
 ) -> i32 {
-    if dig_driver_out.is_null() || wave_format.is_null() {
+    if dig_driver_out.is_null() {
         return -1;
     }
 
-    let wave_format = unsafe { *wave_format };
-
-    let WAVEFORMATEX {
-        wFormatTag,
-        nChannels,
-        nSamplesPerSec,
-        ..
-    } = wave_format;
-
-    if wFormatTag as u32 != WAVE_FORMAT_PCM {
-        tracing::error!("Unsupported wave format");
-        return -1;
-    }
-
-    let driver = create_driver(nChannels, nSamplesPerSec);
+    let driver = create_driver(channels, samples_per_sec);
     unsafe {
         *dig_driver_out = driver;
     }

@@ -55,16 +55,8 @@ egui_plot = { version = "0.34.1", optional = true }
 [dependencies.windows]
 version = "0.62.2"
 features = [
-    "Win32_Graphics_Gdi",
-    "Win32_System_LibraryLoader",
-    "Win32_UI_WindowsAndMessaging",
-    "Win32_Media_Audio",
-    "Win32_System_Memory",
-    "Win32_Media_Multimedia",
     "Win32_Storage_FileSystem",
     "Win32_System_WindowsProgramming",
-    "Win32_UI_Input_KeyboardAndMouse",
-    "Win32_System_IO",
 ]
 
 [features]

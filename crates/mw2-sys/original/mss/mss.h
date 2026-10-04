@@ -31,23 +31,6 @@ extern "C"
 	// and the PCM format it opens the device with.
 	typedef void* AILWAVEOUT;
 
-#define AIL_WAVE_FORMAT_PCM 1
-
-#pragma pack(push, 1)
-	typedef struct AILWAVEFORMAT {
-		unsigned short wFormatTag;
-		unsigned short nChannels;
-		unsigned int nSamplesPerSec;
-		unsigned int nAvgBytesPerSec;
-		unsigned short nBlockAlign;
-	} AILWAVEFORMAT;
-
-	typedef struct AILPCMWAVEFORMAT {
-		AILWAVEFORMAT wf;
-		unsigned short wBitsPerSample;
-	} AILPCMWAVEFORMAT;
-#pragma pack(pop)
-
 	typedef struct _SAMPLE* HSAMPLE;
 	typedef struct _DIG_DRIVER* HDIGDRIVER;
 
@@ -57,7 +40,12 @@ extern "C"
 	AILIMPORT void AILCALL AIL_shutdown(void);
 
 	AILIMPORT int AILCALL
-	AIL_waveOutOpen(HDIGDRIVER* p_driver, AILWAVEOUT** p_waveOut, int p_deviceId, AILWAVEFORMAT* p_format);
+	AIL_waveOutOpen(
+		HDIGDRIVER* p_driver,
+		AILWAVEOUT** p_waveOut,
+		int p_deviceId,
+		unsigned short nChannels,
+		unsigned int nSamplesPerSec);
 
 	AILIMPORT HSAMPLE AILCALL AIL_allocate_sample_handle(HDIGDRIVER p_driver);
 	AILIMPORT void AILCALL AIL_release_sample_handle(HSAMPLE p_sample);
