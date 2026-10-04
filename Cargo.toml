@@ -5,13 +5,7 @@ edition = "2024"
 license = "MIT"
 
 [workspace]
-members = ["crates/binding", "crates/binding-macros", "crates/mw2-sys"]
-
-# Shared so that `binding` and `remech2` can't drift onto two versions of
-# `retour`, which would make their `Hook<F>` types mutually unassignable.
-[workspace.dependencies]
-anyhow = "1.0.98"
-retour = { version = "0.4.0-alpha.4", features = ["thiscall-abi"] }
+members = ["crates/binding", "crates/mw2-sys"]
 
 [profile.release]
 panic = "abort"
@@ -30,7 +24,7 @@ opt-level = 3
 debug = false
 
 [dependencies]
-anyhow = { workspace = true }
+anyhow = "1.0.98"
 binding = { path = "crates/binding" }
 bytemuck = { version = "1.25", features = ["derive"] }
 egui = "0.33.0"
@@ -41,7 +35,6 @@ mw2-sys = { path = "crates/mw2-sys" }
 pollster = "0.4.0"
 rand = "0.9.1"
 ureq = { version = "2.12", default-features = false, features = ["tls"] }
-retour = { workspace = true }
 rodio = { version = "0.21.1", default-features = false, features = [
     "mp3",
     "playback",

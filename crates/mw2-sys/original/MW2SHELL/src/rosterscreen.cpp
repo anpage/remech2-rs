@@ -107,15 +107,6 @@ void SetActivePilot(PilotRecord* p_pilot)
 	p_pilot->m_active = 1;
 }
 
-// Draws the tab's data, a string, in the text font. Unused.
-// FUNCTION: MW2SHELL 0x10014d8a
-TextGlyph* DrawRosterText(ScreenField* p_tab)
-{
-	MechChar* text = (MechChar*) p_tab->m_data;
-
-	return g_textFont->AddText(p_tab->m_left, p_tab->m_top, text, NULL);
-}
-
 // Draws the tab's data, a string, in the button font.
 // FUNCTION: MW2SHELL 0x10014dc4
 TextGlyph* DrawRosterLabel(ScreenField* p_tab)

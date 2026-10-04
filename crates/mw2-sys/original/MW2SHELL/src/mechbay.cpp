@@ -1066,17 +1066,6 @@ TextGlyph* DrawUsedMass(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, colors);
 }
 
-// Draws a mass in hundredths of a ton. Unused.
-// FUNCTION: MW2SHELL 0x10008d4c
-TextGlyph* DrawTons(ScreenField* p_tab)
-{
-	MechS32 value;
-
-	value = *(MechS32*) p_tab->m_data;
-	sprintf(g_tempBuffer, "%d.%d%d T", value / 100, value / 10 % 10, value % 10);
-	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
-}
-
 // FUNCTION: MW2SHELL 0x10008dcc
 TextGlyph* DrawEngineRating(ScreenField* p_tab)
 {
@@ -1117,17 +1106,6 @@ TextGlyph* DrawSpeed(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// Draws the field's data times 30 as meters. Unused.
-// FUNCTION: MW2SHELL 0x10008f7d
-TextGlyph* DrawMeters(ScreenField* p_tab)
-{
-	MechS32 value;
-
-	value = *(MechS32*) p_tab->m_data;
-	sprintf(g_tempBuffer, "%d m", value * 30);
-	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
-}
-
 // FUNCTION: MW2SHELL 0x10008fdd
 TextGlyph* DrawHeatSinkCount(ScreenField* p_tab)
 {
@@ -1164,24 +1142,6 @@ TextGlyph* DrawNumber(ScreenField* p_tab)
 	value = *(MechS32*) p_tab->m_data;
 	sprintf(g_tempBuffer, "%d", value);
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
-}
-
-// DrawLabel for a field whose data points at the string. Unused.
-// FUNCTION: MW2SHELL 0x10009126
-TextGlyph* DrawIndirectLabel(ScreenField* p_tab)
-{
-	MechChar* text;
-
-	if (p_tab->m_data == NULL) {
-		return NULL;
-	}
-
-	text = *(MechChar**) p_tab->m_data;
-	if (text == NULL) {
-		return NULL;
-	}
-
-	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, text, p_tab->m_colors);
 }
 
 // FUNCTION: MW2SHELL 0x1000918c
@@ -1353,20 +1313,6 @@ TextGlyph* DrawWeaponTableEntry(ScreenField* p_tab)
 	}
 
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_weapons[index].m_name, colors);
-}
-
-// Draws the name of the weapon the field's data holds (times 100, -1 for none). Unused.
-// FUNCTION: MW2SHELL 0x1000973c
-TextGlyph* DrawWeaponName(ScreenField* p_tab)
-{
-	MechS32 value;
-
-	value = *(MechS32*) p_tab->m_data;
-	if (value == -1) {
-		return NULL;
-	}
-
-	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_weapons[value / 100].m_name, p_tab->m_colors);
 }
 
 // Draws one statistic (p_tab->m_data) of the highlighted weapon.
@@ -2839,26 +2785,6 @@ void LoadChassis()
 	LoadMekFile(g_variantFiles[g_selectedVariant]);
 	g_variant.m_title[0] = '~';
 	strcpy(&g_variant.m_title[1], g_mechChassis[g_selectedChassis].m_name);
-}
-
-// Closes the chassis video after its next frame.
-// FUNCTION: MW2SHELL 0x1000cb4b
-void CloseChassisVideo()
-{
-	SetVideoFlags(0x10, 0x40000000, 0x40000000);
-}
-
-// FUNCTION: MW2SHELL 0x1000cb6f
-void ShowChassisVideo()
-{
-	ShowVideo(0x10);
-}
-
-// Unused.
-// FUNCTION: MW2SHELL 0x1000cb89
-void HideChassisVideo()
-{
-	SetVideoFlags(0x10, 0x20, 0x20);
 }
 
 // Plays the selected mech's name. Stack-slot permutation: audioData and audioSize.
