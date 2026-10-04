@@ -1,21 +1,10 @@
-mod scaler;
+pub mod scaler;
 
 pub use scaler::ScalingMode;
 
-use std::num::{NonZero, NonZeroIsize};
-
-use anyhow::Result;
 use egui::{Context, Event, Frame, Margin, Rect, Response, Sense, Vec2, pos2, vec2};
-use egui_wgpu::{RendererOptions, WgpuConfiguration};
-use windows::Win32::{
-    Foundation::{HINSTANCE, HWND},
-    System::LibraryLoader::GetModuleHandleA,
-};
 
-use crate::{
-    drawmode::scaler::{PaletteData, Scaler, SharpBilinear},
-    launcher::painter::Painter,
-};
+use crate::drawmode::scaler::{PaletteData, SharpBilinear};
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug)]
@@ -27,47 +16,15 @@ pub struct PaletteColor {
 
 pub struct Framebuffer {
     ctx: Context,
-    painter: Painter,
     palette: PaletteData,
-    palette_dirty: bool,
-    cached_width: i32,
-    cached_height: i32,
 }
 
 impl Framebuffer {
-    pub fn new(wnd: HWND, window_width: i32, window_height: i32) -> Result<Self> {
-        let instance: HINSTANCE = unsafe { GetModuleHandleA(None)?.into() };
-
-        let window = {
-            let mut wnd = raw_window_handle::Win32WindowHandle::new(
-                NonZeroIsize::new(wnd.0 as isize).unwrap(),
-            );
-            wnd.hinstance = Some(NonZeroIsize::new(instance.0 as isize).unwrap());
-            wnd
-        };
-        let ctx = egui::Context::default();
-        let mut painter = pollster::block_on(Painter::new(
-            WgpuConfiguration::default(),
-            false,
-            RendererOptions {
-                msaa_samples: 0,
-                depth_stencil_format: None,
-                dithering: false,
-                predictable_texture_filtering: false,
-            },
-        ));
-        unsafe {
-            pollster::block_on(painter.set_window(ctx.viewport_id(), Some(&window)))?;
-        }
-
-        Ok(Self {
-            ctx,
-            painter,
+    pub fn new() -> Self {
+        Self {
+            ctx: egui::Context::default(),
             palette: [[0.0, 0.0, 0.0, 1.0]; 256],
-            palette_dirty: true,
-            cached_width: window_width,
-            cached_height: window_height,
-        })
+        }
     }
 
     pub fn ctx(&self) -> &Context {
@@ -80,35 +37,23 @@ impl Framebuffer {
         for (i, color) in palette_data.iter().enumerate() {
             self.palette[i] = to_gpu_color(scale(color.red), scale(color.green), scale(color.blue));
         }
-        self.palette_dirty = true;
     }
 
     pub fn set_palette(&mut self, palette_data: &[PaletteColor; 256]) {
         for (i, color) in palette_data.iter().enumerate() {
             self.palette[i] = to_gpu_color(color.red, color.green, color.blue);
         }
-        self.palette_dirty = true;
     }
 
     pub fn draw(
         &mut self,
-        pixel_data: &[u8],
-        game_size: [usize; 2],
+        _pixel_data: &[u8],
+        _game_size: [usize; 2],
         window_size: [i32; 2],
         events: Vec<Event>,
         ui: impl FnMut(&Context),
     ) {
         let [window_width, window_height] = window_size;
-
-        if self.cached_width != window_width || self.cached_height != window_height {
-            self.painter.on_window_resized(
-                self.ctx.viewport_id(),
-                NonZero::new(window_width as u32).unwrap(),
-                NonZero::new(window_height as u32).unwrap(),
-            );
-            self.cached_width = window_width;
-            self.cached_height = window_height;
-        }
 
         let raw_input = egui::RawInput {
             screen_rect: Some(Rect {
@@ -119,32 +64,7 @@ impl Framebuffer {
             ..Default::default()
         };
 
-        if let Some(render_state) = self.painter.render_state() {
-            let mut renderer = render_state.renderer.write();
-            let scaler = renderer
-                .callback_resources
-                .entry::<Scaler>()
-                .or_insert_with(|| Scaler::new(render_state));
-            if self.palette_dirty {
-                scaler.upload_palette(render_state, &self.palette);
-                self.palette_dirty = false;
-            }
-            scaler.upload(render_state, pixel_data, game_size);
-        }
-
-        let full_output = self.ctx.run(raw_input, ui);
-
-        let clipped_primitives = self
-            .ctx
-            .tessellate(full_output.shapes, full_output.pixels_per_point);
-
-        self.painter.paint_and_update_textures(
-            self.ctx.viewport_id(),
-            full_output.pixels_per_point,
-            [0.0, 0.0, 0.0, 1.0],
-            &clipped_primitives,
-            &full_output.textures_delta,
-        );
+        let _ = self.ctx.run(raw_input, ui);
     }
 }
 

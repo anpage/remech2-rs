@@ -15,7 +15,7 @@ use binding::{
     patch::{apply_groups, revert_groups},
 };
 
-use crate::{WindowProc, ail::Ail};
+use crate::ail::Ail;
 
 mod audio;
 mod database;
@@ -24,9 +24,6 @@ mod drawmode;
 mod screens;
 mod smacker;
 mod win32;
-
-pub use dialog::park_transition;
-pub use screens::debug::{JUMP_TO_SCREEN as DEBUG_JUMP, jump as debug_jump};
 
 pub static MODULE: ModuleBase = ModuleBase::new("MW2SHELL.DLL");
 
@@ -100,17 +97,6 @@ impl Shell {
         }
 
         Ok(result)
-    }
-
-    pub fn window_proc(&self) -> Result<WindowProc> {
-        unsafe {
-            let window_proc = GetProcAddress(self.module, s!("ShellWindowProc"))
-                .context("Couldn't find ShellWindowProc")?;
-            Ok(std::mem::transmute::<
-                unsafe extern "system" fn() -> isize,
-                WindowProc,
-            >(window_proc))
-        }
     }
 }
 

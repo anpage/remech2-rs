@@ -456,8 +456,7 @@ unsafe extern "stdcall" fn begin(pixel_buffer: *mut PixelBuffer, width: i32, hei
         (*pixel_buffer).height = height;
         (*pixel_buffer).bitmap_info = G_GDI_BLIT_BITMAP_INFO.ptr();
 
-        *CUSTOM_DRAW_MODE.write().unwrap() =
-            CustomDrawMode::new(G_WINDOW.get(), WINDOW_WIDTH, WINDOW_HEIGHT).ok();
+        *CUSTOM_DRAW_MODE.write().unwrap() = Some(CustomDrawMode::new());
 
         tracing::trace!("GdiBegin finish");
 

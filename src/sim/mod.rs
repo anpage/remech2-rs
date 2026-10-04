@@ -16,7 +16,6 @@ use binding::{
 };
 
 use crate::{
-    WindowProc,
     ail::Ail,
     ailrs,
     sim::{
@@ -134,17 +133,6 @@ impl Sim {
         }
 
         Ok(result)
-    }
-
-    pub fn window_proc(&self) -> Result<WindowProc> {
-        unsafe {
-            let window_proc = GetProcAddress(self.module, s!("SimWindowProc"))
-                .context("Couldn't find SimWindowProc")?;
-            Ok(std::mem::transmute::<
-                unsafe extern "system" fn() -> isize,
-                WindowProc,
-            >(window_proc))
-        }
     }
 }
 

@@ -73,8 +73,7 @@ pub unsafe extern "stdcall" fn begin(
         (*pixel_buffer).bitmap_info = G_GDI_BLIT_BITMAP_INFO.ptr();
 
         let mut custom_draw_mode = CUSTOM_DRAW_MODE.write().unwrap();
-        *custom_draw_mode =
-            CustomDrawMode::new(G_GAME_WINDOW.get(), WINDOW_WIDTH, WINDOW_HEIGHT).ok();
+        *custom_draw_mode = Some(CustomDrawMode::new());
 
         tracing::trace!("GdiBegin finish");
 

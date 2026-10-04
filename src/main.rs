@@ -6,31 +6,17 @@ use std::{
     env,
     fs::File,
     io::{BufReader, Read, Seek, SeekFrom},
-    process::exit,
-    sync::Mutex,
 };
 use tracing::Level;
 use tracing_subscriber::{filter, prelude::*};
-use windows::{
-    Win32::{
-        Foundation::*,
-        Graphics::Gdi::*,
-        System::LibraryLoader::GetModuleHandleA,
-        UI::{
-            Input::KeyboardAndMouse::{SetFocus, VK_RETURN},
-            WindowsAndMessaging::*,
-        },
-    },
-    core::{PCSTR, s},
-};
+use windows::Win32::Foundation::{FALSE, HWND};
 
-use crate::{
-    settings::SETTINGS, sim::drawmode::hooks::G_MOUSE_NEEDS_CENTERING, sim::window::G_WINDOW_ACTIVE,
-};
+use crate::settings::SETTINGS;
 
 mod about;
 mod ail;
 mod ailrs;
+mod app;
 mod cd_audio;
 mod common;
 mod drawmode;
@@ -43,344 +29,17 @@ mod shell;
 mod sim;
 mod xmi;
 
-type WindowProc = unsafe extern "system" fn(HWND, u32, WPARAM, LPARAM) -> LRESULT;
-
-static mut SIM_WINDOW_PROC: Option<WindowProc> = None;
-static mut SHELL_WINDOW_PROC: Option<WindowProc> = None;
-
-enum ProcessType {
-    None,
-    Sim,
-    Shell,
-}
-
-static mut PROCESS_TYPE: ProcessType = ProcessType::None;
-
 pub static mut WINDOW_WIDTH: i32 = 640;
 pub static mut WINDOW_HEIGHT: i32 = 480;
 
-unsafe fn request_sim_mouse_centering(window: HWND) {
-    unsafe {
-        if IsIconic(window).as_bool() {
-            return;
-        }
-
-        if matches!(PROCESS_TYPE, ProcessType::Sim) {
-            G_MOUSE_NEEDS_CENTERING.set(TRUE);
-        }
-    }
-}
-
-/// Tell the sim it has lost activation and unclip the cursor.
-unsafe fn release_sim_mouse() {
-    unsafe {
-        if !matches!(PROCESS_TYPE, ProcessType::Sim) {
-            return;
-        }
-
-        G_WINDOW_ACTIVE.set(FALSE);
-
-        let _ = ClipCursor(None);
-    }
-}
-
-unsafe fn dispatch(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
-    unsafe {
-        match PROCESS_TYPE {
-            ProcessType::None => {}
-            ProcessType::Sim => {
-                if let Some(proc) = SIM_WINDOW_PROC {
-                    return proc(window, message, wparam, lparam);
-                }
-            }
-            ProcessType::Shell => {
-                if message == shell::DEBUG_JUMP {
-                    shell::debug_jump(wparam.0 as u32);
-                    return LRESULT(0);
-                }
-                // Held until the prompt over it is acknowledged, then re-posted.
-                if shell::park_transition(message, wparam) {
-                    return LRESULT(0);
-                }
-                if let Some(proc) = SHELL_WINDOW_PROC {
-                    return proc(window, message, wparam, lparam);
-                }
-            }
-        }
-
-        DefWindowProcA(window, message, wparam, lparam)
-    }
-}
-
-extern "system" fn wnd_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
-    tracing::trace!(
-        "WndProc: window = {:?}, message = {}, wparam = {:?}, lparam = {:?}",
-        window,
-        message,
-        wparam,
-        lparam
-    );
-
-    unsafe {
-        match message {
-            0x41E => {
-                PROCESS_TYPE = ProcessType::None;
-            }
-            0x41F => {
-                PROCESS_TYPE = ProcessType::Sim;
-            }
-            0x420 => {
-                PROCESS_TYPE = ProcessType::Shell;
-            }
-            WM_SIZE => {
-                let width = (lparam.0 as i32) & 0xFFFF;
-                let height = (lparam.0 as i32 >> 16) & 0xFFFF;
-
-                tracing::debug!("Window resized: width = {}, height = {}", width, height);
-
-                if width != WINDOW_WIDTH || height != WINDOW_HEIGHT {
-                    WINDOW_WIDTH = width.max(1);
-                    WINDOW_HEIGHT = height.max(1);
-                }
-
-                request_sim_mouse_centering(window);
-            }
-            WM_MOVE => {
-                request_sim_mouse_centering(window);
-            }
-            WM_ACTIVATEAPP => {
-                let activating = wparam.0 != 0;
-                if activating {
-                    request_sim_mouse_centering(window);
-                }
-
-                let result = dispatch(window, message, WPARAM(1), lparam);
-
-                if !activating {
-                    release_sim_mouse();
-                }
-
-                return result;
-            }
-            WM_CLOSE => {
-                exit(0);
-            }
-            WM_SYSKEYDOWN if wparam.0 == VK_RETURN.0.into() => {
-                toggle_fullscreen(window);
-                return LRESULT(1);
-            }
-            _ => {}
-        }
-
-        dispatch(window, message, wparam, lparam)
-    }
-}
-
-static SAVED_DIMENSIONS: Mutex<(i32, i32)> = Mutex::new((0, 0));
-
-fn toggle_fullscreen(window: HWND) {
-    let mode = { *WINDOW_MODE.lock().unwrap() };
-    let mut style = unsafe { GetWindowLongPtrA(window, GWL_STYLE) as u32 };
-    match mode {
-        WindowMode::Fullscreen => {
-            SETTINGS.set_bool("video", "fullscreen", false);
-
-            let (width, height) = { *SAVED_DIMENSIONS.lock().unwrap() };
-
-            {
-                let mut window_mode = WINDOW_MODE.lock().unwrap();
-                *window_mode = WindowMode::Windowed(width, height);
-            }
-
-            style &= !WS_POPUP.0;
-            style |= WS_OVERLAPPEDWINDOW.0;
-            unsafe { SetWindowLongPtrA(window, GWL_STYLE, style as i32) };
-
-            let mut window_rect = RECT {
-                left: 0,
-                top: 0,
-                right: width,
-                bottom: height,
-            };
-
-            let display_width = unsafe { GetSystemMetrics(SM_CXSCREEN) };
-            let display_height = unsafe { GetSystemMetrics(SM_CYSCREEN) };
-
-            let _ = unsafe { AdjustWindowRect(&mut window_rect, WINDOW_STYLE(style), false) };
-
-            window_rect.right -= window_rect.left;
-            window_rect.bottom -= window_rect.top;
-            window_rect.top = (display_height - window_rect.bottom) / 2;
-            window_rect.left = (display_width - window_rect.right) / 2;
-
-            unsafe {
-                let _ = SetWindowPos(
-                    window,
-                    None,
-                    window_rect.top,
-                    window_rect.left,
-                    window_rect.right,
-                    window_rect.bottom,
-                    SWP_FRAMECHANGED | SWP_SHOWWINDOW,
-                );
-            }
-        }
-        WindowMode::Windowed(width, height) => {
-            SETTINGS.set_bool("video", "fullscreen", true);
-
-            {
-                let mut window_mode = WINDOW_MODE.lock().unwrap();
-                *window_mode = WindowMode::Fullscreen;
-            }
-
-            {
-                let mut saved_dimensions = SAVED_DIMENSIONS.lock().unwrap();
-                *saved_dimensions = (width, height);
-            }
-
-            style &= !WS_OVERLAPPEDWINDOW.0;
-            style |= WS_POPUP.0;
-
-            unsafe { SetWindowLongPtrA(window, GWL_STYLE, style as i32) };
-
-            let display_width = unsafe { GetSystemMetrics(SM_CXSCREEN) };
-            let display_height = unsafe { GetSystemMetrics(SM_CYSCREEN) };
-
-            unsafe {
-                let _ = SetWindowPos(
-                    window,
-                    Some(HWND_TOP),
-                    0,
-                    0,
-                    display_width,
-                    display_height,
-                    SWP_FRAMECHANGED | SWP_SHOWWINDOW,
-                );
-            }
-        }
-    }
-
-    unsafe {
-        let _ = SetFocus(Some(window));
-    }
-}
-
-#[derive(Clone, Copy)]
-enum WindowMode {
-    Fullscreen,
-    Windowed(i32, i32),
-}
-
-static WINDOW_MODE: Mutex<WindowMode> = Mutex::new(WindowMode::Fullscreen);
-
-fn create_window(mode: WindowMode) -> Result<(HWND, HINSTANCE)> {
-    {
-        let mut window_mode = WINDOW_MODE.lock().unwrap();
-        *window_mode = mode;
-    }
-
-    unsafe {
-        let instance: HINSTANCE = GetModuleHandleA(None)?.into();
-
-        let class_name = s!("REMECH 2");
-
-        let wc = WNDCLASSA {
-            style: CS_HREDRAW | CS_VREDRAW,
-            lpfnWndProc: Some(wnd_proc),
-            cbClsExtra: 0,
-            cbWndExtra: 0,
-            hInstance: instance,
-            hbrBackground: HBRUSH(GetStockObject(BLACK_BRUSH).0),
-            lpszMenuName: PCSTR::null(),
-            lpszClassName: class_name,
-            hCursor: LoadCursorW(None, IDC_ARROW)?,
-            ..Default::default()
-        };
-
-        let atom = RegisterClassA(&wc);
-        debug_assert!(atom != 0);
-
-        let (window_rect, style) = match mode {
-            WindowMode::Windowed(width, height) => {
-                let mut window_rect = RECT {
-                    left: 0,
-                    top: 0,
-                    right: width,
-                    bottom: height,
-                };
-
-                let style = WS_OVERLAPPEDWINDOW;
-
-                let display_width = GetSystemMetrics(SM_CXSCREEN);
-                let display_height = GetSystemMetrics(SM_CYSCREEN);
-
-                AdjustWindowRect(&mut window_rect, style, false)?;
-
-                window_rect.right -= window_rect.left;
-                window_rect.bottom -= window_rect.top;
-                window_rect.top = (display_height - window_rect.bottom) / 2;
-                window_rect.left = (display_width - window_rect.right) / 2;
-
-                (window_rect, style)
-            }
-            WindowMode::Fullscreen => {
-                let display_width = GetSystemMetrics(SM_CXSCREEN);
-                let display_height = GetSystemMetrics(SM_CYSCREEN);
-
-                let window_rect = RECT {
-                    left: 0,
-                    top: 0,
-                    right: display_width,
-                    bottom: display_height,
-                };
-
-                (window_rect, WS_POPUP)
-            }
-        };
-
-        let window = CreateWindowExA(
-            WS_EX_LEFT,
-            class_name,
-            s!("REMECH 2"),
-            style,
-            window_rect.left,
-            window_rect.top,
-            window_rect.right,
-            window_rect.bottom,
-            None,
-            None,
-            Some(instance),
-            None,
-        )?;
-
-        SetMenu(window, None)?;
-        let _ = ShowWindow(window, SW_SHOWDEFAULT);
-        let _ = UpdateWindow(window);
-
-        Ok((window, instance))
-    }
-}
-
-fn start_launcher(window: HWND, instance: HINSTANCE) -> Result<()> {
-    let mut launcher = launcher::Launcher::new(window, instance)?;
-    launcher.launch()?;
-    Ok(())
-}
-
 fn start_shell(window: HWND, intro_or_sim: &str) -> Result<i32> {
     let shell = shell::Shell::new()?;
-    unsafe { SHELL_WINDOW_PROC = Some(shell.window_proc()?) };
-    let result = shell.shell_main(intro_or_sim, window)?;
-    unsafe { SHELL_WINDOW_PROC = None };
-    Ok(result)
+    shell.shell_main(intro_or_sim, window)
 }
 
 fn start_sim(window: HWND, cmd_line: &str) -> Result<i32> {
     let sim = sim::Sim::new()?;
-    unsafe { SIM_WINDOW_PROC = Some(sim.window_proc()?) };
-    let result = sim.sim_main(cmd_line, std::ptr::null(), FALSE, window)?;
-    unsafe { SIM_WINDOW_PROC = None };
-    Ok(result)
+    sim.sim_main(cmd_line, std::ptr::null(), FALSE, window)
 }
 
 fn str_to_level(loglevel: &str) -> Level {
@@ -410,22 +69,14 @@ fn main() -> Result<()> {
 
     let args: Vec<String> = env::args().collect();
 
-    let fullscreen = SETTINGS.get_bool("video", "fullscreen", true);
-    let width = SETTINGS.get_int("video", "width", 1024);
-    let height = SETTINGS.get_int("video", "height", 768);
+    let mut app = app::App::new()?;
 
-    {
-        let mut saved_dimensions = SAVED_DIMENSIONS.lock().unwrap();
-        *saved_dimensions = (width, height);
+    if !launcher::Launcher::new().run(&mut app)? {
+        // The window was closed
+        return Ok(());
     }
 
-    let (window, instance) = create_window(if fullscreen {
-        WindowMode::Fullscreen
-    } else {
-        WindowMode::Windowed(width, height)
-    })?;
-
-    start_launcher(window, instance)?;
+    let window = HWND::default();
 
     if args.len() > 1 {
         // launch the sim with the given cmdline

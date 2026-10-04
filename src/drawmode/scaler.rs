@@ -1,7 +1,7 @@
 use std::num::NonZeroU64;
 
 use egui::PaintCallbackInfo;
-use egui_wgpu::{CallbackResources, CallbackTrait, RenderState, ScreenDescriptor};
+use egui_wgpu::{CallbackResources, CallbackTrait, ScreenDescriptor};
 
 use crate::settings::SETTINGS;
 
@@ -76,9 +76,7 @@ pub struct Scaler {
 }
 
 impl Scaler {
-    pub fn new(render_state: &RenderState) -> Self {
-        let device = &render_state.device;
-
+    pub fn new(device: &wgpu::Device, target_format: wgpu::TextureFormat) -> Self {
         let module = device.create_shader_module(wgpu::include_wgsl!("sharp_bilinear.wgsl"));
 
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
@@ -123,7 +121,6 @@ impl Scaler {
             push_constant_ranges: &[],
         });
 
-        let target_format = render_state.target_format;
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("sharp_bilinear_pipeline"),
             layout: Some(&pipeline_layout),
@@ -181,14 +178,18 @@ impl Scaler {
         }
     }
 
-    pub fn upload_palette(&self, render_state: &RenderState, palette: &PaletteData) {
-        render_state
-            .queue
-            .write_buffer(&self.palette, 0, bytemuck::cast_slice(palette));
+    pub fn upload_palette(&self, queue: &wgpu::Queue, palette: &PaletteData) {
+        queue.write_buffer(&self.palette, 0, bytemuck::cast_slice(palette));
     }
 
     /// Copies this frame's palette indices into the framebuffer texture, reallocating it only when the game changes resolution.
-    pub fn upload(&mut self, render_state: &RenderState, indices: &[u8], size: [usize; 2]) {
+    pub fn upload(
+        &mut self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        indices: &[u8],
+        size: [usize; 2],
+    ) {
         let Some(indices) = indices.get(..size[0] * size[1]) else {
             tracing::warn!(
                 "framebuffer is {} bytes, expected {}x{}",
@@ -208,13 +209,13 @@ impl Scaler {
             .as_ref()
             .is_none_or(|target| target.size != size)
         {
-            self.target = Some(self.create_target(&render_state.device, size));
+            self.target = Some(self.create_target(device, size));
         }
         let Some(target) = &self.target else {
             return;
         };
 
-        render_state.queue.write_texture(
+        queue.write_texture(
             target.texture.as_image_copy(),
             indices,
             wgpu::TexelCopyBufferLayout {
@@ -228,6 +229,37 @@ impl Scaler {
                 depth_or_array_layers: 1,
             },
         );
+    }
+
+    /// `source_size` is in texels, `output_size` in physical pixels.
+    pub fn set_params(
+        &self,
+        queue: &wgpu::Queue,
+        source_size: [f32; 2],
+        output_size: [f32; 2],
+        mode: ScalingMode,
+    ) {
+        let params = Params {
+            sizes: [
+                source_size[0],
+                source_size[1],
+                output_size[0],
+                output_size[1],
+            ],
+            opts: [mode.prescale_override(), 0.0, 0.0, 0.0],
+        };
+        queue.write_buffer(&self.params, 0, bytemuck::bytes_of(&params));
+    }
+
+    /// Draws the framebuffer over the render pass's current viewport
+    pub fn draw(&self, render_pass: &mut wgpu::RenderPass<'_>) {
+        let Some(target) = &self.target else {
+            return;
+        };
+
+        render_pass.set_pipeline(&self.pipeline);
+        render_pass.set_bind_group(0, &target.bind_group, &[]);
+        render_pass.draw(0..3, 0..1);
     }
 
     fn create_target(&self, device: &wgpu::Device, size: [u32; 2]) -> Target {
@@ -293,16 +325,7 @@ impl CallbackTrait for SharpBilinear {
         callback_resources: &mut CallbackResources,
     ) -> Vec<wgpu::CommandBuffer> {
         if let Some(scaler) = callback_resources.get::<Scaler>() {
-            let params = Params {
-                sizes: [
-                    self.source_size[0],
-                    self.source_size[1],
-                    self.output_size[0],
-                    self.output_size[1],
-                ],
-                opts: [self.mode.prescale_override(), 0.0, 0.0, 0.0],
-            };
-            queue.write_buffer(&scaler.params, 0, bytemuck::bytes_of(&params));
+            scaler.set_params(queue, self.source_size, self.output_size, self.mode);
         }
         Vec::new()
     }
@@ -313,15 +336,8 @@ impl CallbackTrait for SharpBilinear {
         render_pass: &mut wgpu::RenderPass<'static>,
         callback_resources: &CallbackResources,
     ) {
-        let Some(scaler) = callback_resources.get::<Scaler>() else {
-            return;
-        };
-        let Some(target) = &scaler.target else {
-            return;
-        };
-
-        render_pass.set_pipeline(&scaler.pipeline);
-        render_pass.set_bind_group(0, &target.bind_group, &[]);
-        render_pass.draw(0..3, 0..1);
+        if let Some(scaler) = callback_resources.get::<Scaler>() {
+            scaler.draw(render_pass);
+        }
     }
 }

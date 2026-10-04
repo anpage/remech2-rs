@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use anyhow::Result;
 use egui::{Color32, ColorImage, TextureHandle};
 use windows::Win32::Foundation::HWND;
 
@@ -29,16 +28,16 @@ pub struct CustomDrawMode {
 }
 
 impl CustomDrawMode {
-    pub fn new(wnd: HWND, window_width: i32, window_height: i32) -> Result<Self> {
-        let framebuffer = Framebuffer::new(wnd, window_width, window_height)?;
+    pub fn new() -> Self {
+        let framebuffer = Framebuffer::new();
         let overlay_ui = OverlayUi::new(framebuffer.ctx());
 
-        Ok(Self {
+        Self {
             framebuffer,
             cursor_texture: None,
             cached_mouse_state: Default::default(),
             overlay_ui,
-        })
+        }
     }
 
     pub fn load_cursor_texture(&mut self) {
