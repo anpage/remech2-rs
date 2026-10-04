@@ -12,7 +12,6 @@ extern "C"
 #endif
 
 	extern MechS32 g_cdTrack;
-	extern MechS32 g_midiSequence;
 	extern SoundConfig g_soundConfig;
 	extern SoundConfig* g_mw2SndCfgData;
 	extern MechS32 g_audioPaused;
@@ -32,7 +31,6 @@ extern "C"
 	void PauseAudio(void);
 	void ResumeAudio(void);
 	HDIGDRIVER OpenDigitalDriver(void);
-	HMDIDRIVER OpenMidiDriver(void);
 
 #ifdef __cplusplus
 }

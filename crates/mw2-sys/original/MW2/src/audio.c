@@ -1,5 +1,6 @@
-/* The mission's sound: the digital effects, the MIDI or CD music the mission's "MUS" resource
-   names, and the warning tone when an AI player engages the local player. */
+/* The mission's sound: the digital effects, the CD music the mission's "MUS" resource names, and
+   the warning tone when an AI player engages the local player. The original also had MIDI: music
+   sequences that nothing ever started, and a held note for the engine. */
 #include "audio.h"
 
 #include "cdaudio.h"
@@ -7,7 +8,6 @@
 #include "config.h"
 #include "decomp.h"
 #include "loadres.h"
-#include "midi.h"
 #include "mss.h"
 #include "mw2prj.h"
 #include "network.h"
@@ -25,10 +25,6 @@
 // The CD track the mission plays, or -1.
 // GLOBAL: MW2 0x100a1490
 MechS32 g_cdTrack = -1;
-
-// The MIDI sequence the mission plays, or -1.
-// GLOBAL: MW2 0x100a1494
-MechS32 g_midiSequence = -1;
 
 // GLOBAL: MW2 0x100a1498
 SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 0x10000, 11, 1, 1, 1, 1, 1, 9, "mcga.dll"};
@@ -137,9 +133,6 @@ void PreviewSoundSetting(MechS32 p_setting, MechS32 p_value)
 			if (g_soundConfig.m_midiVolume != old) {
 				if (IsCdAudioInitialized()) {
 					notify = ApplyCdAudioVolume;
-				}
-				else {
-					notify = ApplyMidiVolume;
 				}
 
 				if (!old) {
@@ -273,7 +266,8 @@ void StartMissionMusic(void)
 			return;
 		}
 
-		sscanf(music, "%d %d", &g_cdTrack, &g_midiSequence);
+		// The CD track; a MIDI sequence number follows it, which the original never played
+		sscanf(music, "%d", &g_cdTrack);
 		UnlockCachedResource(g_musicResource, g_resourceTypeTags[c_resTagMus]);
 	}
 
@@ -285,22 +279,13 @@ void StartMissionMusic(void)
 		if (RefreshCdStatus() != 3) {
 			g_cdTrack = -1;
 		}
-		else {
-			g_midiSequence = -1;
-		}
 	}
-
-	g_midiSequence = -1;
 }
 
 // FUNCTION: MW2 0x10006d73
 void PauseMusic(void)
 {
 	if (!g_audioPaused) {
-		if (g_midiSequence != -1 && (g_soundConfig.m_simFlags & 4)) {
-			PauseMidiSequences();
-		}
-
 		if (g_cdTrack != -1 && (g_soundConfig.m_simFlags & 8)) {
 			CdAudioTogglePaused();
 		}
@@ -313,10 +298,6 @@ void PauseMusic(void)
 void ResumeMusic(void)
 {
 	if (g_audioPaused) {
-		if (g_midiSequence != -1 && (g_soundConfig.m_simFlags & 4)) {
-			ResumeMidiSequences();
-		}
-
 		if (g_cdTrack != -1 && (g_soundConfig.m_simFlags & 8)) {
 			CdAudioTogglePaused();
 		}
@@ -330,10 +311,6 @@ void StopMusic(void)
 {
 	if (g_cdTrack != -1) {
 		StopCdAudioAndWait();
-	}
-
-	if (g_midiSequence != -1) {
-		StopMidiSequences();
 	}
 }
 
@@ -352,7 +329,6 @@ void LoopCdMusic(void)
 MechS32 FirstAudio(void)
 {
 	InitializeDigitalAudio(8);
-	InitializeMidi();
 	StartCdAudio();
 	InitSoundInfo();
 	g_nextEngageCheck = g_currentClock + 0x389;
@@ -396,7 +372,6 @@ void ShutdownAudio(void)
 {
 	StopMusic();
 	DeInitCdAudio();
-	ShutdownMidi();
 	ShutdownDigitalAudio();
 	SaveSndCfg("mw2snd.cfg", g_mw2SndCfgData);
 	MechHeapFree(g_primaryHeap, g_mw2SndCfgData);
@@ -408,7 +383,6 @@ void PauseAudio(void)
 	StopSamples(0);
 	StopSpeech();
 	PauseMusic();
-	MuteEngineNote();
 }
 
 // FUNCTION: MW2 0x10007064
@@ -431,20 +405,6 @@ HDIGDRIVER OpenDigitalDriver(void)
 	g_waveFormat.wf.nBlockAlign = 2;
 	g_waveFormat.wBitsPerSample = 8;
 	if (AIL_waveOutOpen(&driver, NULL, 0, (AILWAVEFORMAT*) &g_waveFormat)) {
-		return NULL;
-	}
-	else {
-		return driver;
-	}
-}
-
-// Opens the MIDI mapper, or MIDI device 0.
-// FUNCTION: MW2 0x100070ee
-HMDIDRIVER OpenMidiDriver(void)
-{
-	HMDIDRIVER driver;
-
-	if (AIL_midiOutOpen(&driver, NULL, -1) && AIL_midiOutOpen(&driver, NULL, 0)) {
 		return NULL;
 	}
 	else {

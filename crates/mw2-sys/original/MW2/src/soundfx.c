@@ -11,7 +11,6 @@
 #include "fixedmul.h"
 #include "fixedtrig.h"
 #include "loadres.h"
-#include "midi.h"
 #include "mss.h"
 #include "mw2prj.h"
 #include "object.h"
@@ -563,13 +562,6 @@ MechS32 PlayDelayedSound(
 	MechU16 p_flags
 )
 {
-	MechS32 result;
-
-	result = FUN_100219f5(p_delay, p_bearing, p_id, p_volume, p_pan, p_flags);
-	if (result > 0) {
-		return result;
-	}
-
 	return PlaySoundRandomRate(p_delay, p_bearing, p_id, p_volume, p_pan, p_flags);
 }
 

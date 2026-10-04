@@ -27,10 +27,9 @@ extern "C"
 #endif
 #define AILIMPORT
 
-	// Stand-ins for the Win32 multimedia types Miles took: the wave and MIDI device handles it
-	// hands back, and the PCM format it opens the wave device with.
+	// Stand-ins for the Win32 multimedia types Miles took: the wave device handle it hands back,
+	// and the PCM format it opens the device with.
 	typedef void* AILWAVEOUT;
-	typedef void* AILMIDIOUT;
 
 #define AIL_WAVE_FORMAT_PCM 1
 
@@ -49,40 +48,16 @@ extern "C"
 	} AILPCMWAVEFORMAT;
 #pragma pack(pop)
 
-	typedef struct _MDI_DRIVER* HMDIDRIVER;
-	typedef struct _SEQUENCE* HSEQUENCE;
 	typedef struct _SAMPLE* HSAMPLE;
 	typedef struct _DIG_DRIVER* HDIGDRIVER;
-
-#define SMP_PLAYING 4
-
-#define SEQ_DONE 2
-#define SEQ_PLAYING 4
-#define SEQ_STOPPED 8
 
 #define AILCALLBACK AILCALL
 	typedef void(AILCALLBACK* AILSAMPLECB)(HSAMPLE p_sample);
 
 	AILIMPORT void AILCALL AIL_shutdown(void);
 
-	AILIMPORT int AILCALL AIL_midiOutOpen(HMDIDRIVER* p_driver, AILMIDIOUT** p_midiOut, int p_deviceId);
-	AILIMPORT int AILCALL AIL_set_preference(unsigned int p_number, int p_value);
-	AILIMPORT int AILCALL AIL_lock_channel(HMDIDRIVER p_driver);
-	AILIMPORT void AILCALL AIL_release_channel(HMDIDRIVER p_driver, int p_channel);
-	AILIMPORT void AILCALL
-	AIL_send_channel_voice_message(HMDIDRIVER p_driver, HSEQUENCE p_sequence, int p_status, int p_data1, int p_data2);
-
 	AILIMPORT int AILCALL
 	AIL_waveOutOpen(HDIGDRIVER* p_driver, AILWAVEOUT** p_waveOut, int p_deviceId, AILWAVEFORMAT* p_format);
-
-	AILIMPORT HSEQUENCE AILCALL AIL_allocate_sequence_handle(HMDIDRIVER p_driver);
-	AILIMPORT void AILCALL AIL_release_sequence_handle(HSEQUENCE p_sequence);
-	AILIMPORT int AILCALL AIL_init_sequence(HSEQUENCE p_sequence, void* p_start, int p_sequenceNum);
-	AILIMPORT void AILCALL AIL_start_sequence(HSEQUENCE p_sequence);
-	AILIMPORT void AILCALL AIL_stop_sequence(HSEQUENCE p_sequence);
-	AILIMPORT void AILCALL AIL_resume_sequence(HSEQUENCE p_sequence);
-	AILIMPORT int AILCALL AIL_sequence_status(HSEQUENCE p_sequence);
-	AILIMPORT void AILCALL AIL_set_sequence_volume(HSEQUENCE p_sequence, int p_volume, int p_milliseconds);
 
 	AILIMPORT HSAMPLE AILCALL AIL_allocate_sample_handle(HDIGDRIVER p_driver);
 	AILIMPORT void AILCALL AIL_release_sample_handle(HSAMPLE p_sample);

@@ -18,7 +18,6 @@
 #include "mech.h"
 #include "mechdamage.h"
 #include "mechviewpanel.h"
-#include "midi.h"
 #include "mw2prj.h"
 #include "network.h"
 #include "objectanim.h"
@@ -636,7 +635,6 @@ void UpdateCockpit(Mech* p_mech)
 			distance,
 			g_cockpitEyeSteady
 		);
-		UpdateEngineNote(p_mech->m_throttle.m_value);
 		break;
 	case 1:
 		if (g_difficulty->m_radar) {
@@ -649,7 +647,6 @@ void UpdateCockpit(Mech* p_mech)
 			}
 		}
 
-		StartEngineNote();
 		break;
 	default:
 		if (g_difficulty->m_radar) {
@@ -662,12 +659,7 @@ void UpdateCockpit(Mech* p_mech)
 			}
 		}
 
-		StopEngineNote();
 		break;
-	}
-
-	if (!g_inCockpitView) {
-		MuteEngineNote();
 	}
 }
 
