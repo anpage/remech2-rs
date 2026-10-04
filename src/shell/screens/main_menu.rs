@@ -3,26 +3,9 @@ use std::ptr::null_mut;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
-use binding::{globals, macros::hook, patches};
+use mw2_sys::shell::{self, AudioSample, TMPackDataBase};
 
-use super::{
-    ALLOCATE, Campaign, DEALLOCATE, FREE_ANIMATIONS, GET_DB_ITEM, Screen, ScreenArgs, ShellMsg, run,
-};
-use crate::shell::MODULE;
-use crate::shell::audio::{
-    AUDIO_SAMPLE_DO_FADE, AUDIO_SAMPLE_DROP, AUDIO_SAMPLE_ENABLE_LOOP, AUDIO_SAMPLE_IS_PLAYING,
-    AUDIO_SAMPLE_NEW, AUDIO_SAMPLE_SET_FADE, AUDIO_SAMPLE_START,
-};
-use crate::shell::overlay::mouse::G_CURRENT_MOUSE_STATE;
-use crate::shell::screens::{BUTTONS_DROP, BUTTONS_HIT_TEST};
-
-globals!(
-    static G_BUTTONS: *mut c_void = 0x0006ae74;
-    static G_AMBIENT_FIRE_SAMPLE: *mut c_void = 0x0006ae78;
-    static G_MECHWARRIOR_SAMPLE: *mut c_void = 0x0006ae7c;
-    static G_AMBIENT_STARTED: i32 = 0x0006ae80;
-    static G_AUDIO_SUBSYSTEM: *mut c_void = 0x000711fc;
-);
+use super::{Campaign, Screen, ScreenArgs, ShellMsg, allocate, delete, run};
 
 const AMBIENT_FIRE_DB_ITEM: i32 = 74;
 
@@ -39,10 +22,10 @@ impl Screen for MainMenu {
         unsafe {
             self.update_ambient(args.db);
 
-            let mouse = G_CURRENT_MOUSE_STATE.get().as_ref()?;
+            let mouse = shell::g_mouseState.as_ref()?;
 
-            let hit = (BUTTONS_HIT_TEST.get())(G_BUTTONS.get(), mouse.pos_x, mouse.pos_y);
-            if mouse.left_pressed.0 != 1 {
+            let hit = shell::ButtonMenu_HitTest(shell::g_mainMenu, mouse.m_x, mouse.m_y);
+            if mouse.m_leftPressed != 1 {
                 return None;
             }
 
@@ -68,25 +51,13 @@ impl Screen for MainMenu {
 
     fn teardown(&mut self, _args: &mut ScreenArgs) {
         unsafe {
-            (FREE_ANIMATIONS.get())();
+            shell::CloseAllVideos();
 
-            let buttons = G_BUTTONS.get();
-            if !buttons.is_null() {
-                (BUTTONS_DROP.get())(buttons);
-                (DEALLOCATE.get())(buttons);
-            }
-            G_BUTTONS.set(null_mut());
+            delete(&raw mut shell::g_mainMenu, shell::ButtonMenu_ButtonMenu_destructor);
+            delete(&raw mut shell::g_mainMenuMusic, shell::AudioSample_AudioSample_destructor);
+            delete(&raw mut shell::g_mainMenuIntro, shell::AudioSample_AudioSample_destructor);
 
-            for sample in [&G_AMBIENT_FIRE_SAMPLE, &G_MECHWARRIOR_SAMPLE] {
-                let p = sample.get();
-                if !p.is_null() {
-                    (AUDIO_SAMPLE_DROP.get())(p);
-                    (DEALLOCATE.get())(p);
-                }
-                sample.set(null_mut());
-            }
-
-            G_AMBIENT_STARTED.set(0);
+            shell::g_mainMenuMusicStarted = 0;
         }
     }
 }
@@ -95,38 +66,37 @@ const FADE_TICK: Duration = Duration::from_micros(50);
 
 impl MainMenu {
     /// Fades in the fire loop once the "MechWarrior: Choose Your Clan" bit ends.
-    unsafe fn update_ambient(&mut self, db: *mut c_void) {
+    unsafe fn update_ambient(&mut self, db: *mut TMPackDataBase) {
         unsafe {
-            if G_AMBIENT_STARTED.get() != 0 {
+            if shell::g_mainMenuMusicStarted != 0 {
                 if let Some((start, done)) = &mut self.fade_clock {
                     let due = start.elapsed().as_nanos() / FADE_TICK.as_nanos();
-                    let sample = G_AMBIENT_FIRE_SAMPLE.get();
                     for _ in *done..due {
-                        (AUDIO_SAMPLE_DO_FADE.get())(sample);
+                        shell::AudioSample_DoFade(shell::g_mainMenuMusic);
                     }
                     *done = due;
                 }
                 return;
             }
-            if (AUDIO_SAMPLE_IS_PLAYING.get())(G_MECHWARRIOR_SAMPLE.get()) & 0xff != 0 {
+            if shell::AudioSample_IsPlaying(shell::g_mainMenuIntro) != 0 {
                 return;
             }
 
-            let mut data = null_mut();
+            let mut data: *mut c_void = null_mut();
             let mut size = 0;
-            (GET_DB_ITEM.get())(db, AMBIENT_FIRE_DB_ITEM, &mut data, &mut size);
+            shell::TMPackDataBase_GetDBItem(db, AMBIENT_FIRE_DB_ITEM, &mut data, &mut size);
 
-            let sample = (ALLOCATE.get())(0x2c);
+            let sample = allocate::<AudioSample>();
             if sample.is_null() {
                 return;
             }
-            let sample = (AUDIO_SAMPLE_NEW.get())(sample, G_AUDIO_SUBSYSTEM.get(), data, size);
-            G_AMBIENT_FIRE_SAMPLE.set(sample);
+            shell::AudioSample_AudioSample(sample, shell::g_audioSubsystem, data, size as u32);
+            shell::g_mainMenuMusic = sample;
 
-            (AUDIO_SAMPLE_ENABLE_LOOP.get())(sample);
-            (AUDIO_SAMPLE_START.get())(sample);
-            (AUDIO_SAMPLE_SET_FADE.get())(sample, 500, 1000, 0, 30);
-            G_AMBIENT_STARTED.set(1);
+            shell::AudioSample_EnableLoop(sample);
+            shell::AudioSample_Start(sample);
+            shell::AudioSample_SetFade(sample, 500, 1000, 0, 30);
+            shell::g_mainMenuMusicStarted = 1;
             self.fade_clock = Some((Instant::now(), 0));
         }
     }
@@ -134,13 +104,13 @@ impl MainMenu {
 
 static STATE: Mutex<Option<MainMenu>> = Mutex::new(None);
 
-#[hook(rva = 0x0003dd89)]
-unsafe extern "cdecl" fn main_menu(
-    db: *mut c_void,
+#[unsafe(export_name = "MainMenuCallback")]
+pub unsafe extern "C" fn main_menu(
+    db: *mut TMPackDataBase,
     campaign: *mut i32,
     pilot_chosen: *mut u8,
     scenario: *mut *mut c_char,
-    msg: u32,
+    msg: i32,
 ) {
     unsafe {
         run(
@@ -151,13 +121,7 @@ unsafe extern "cdecl" fn main_menu(
                 pilot_chosen,
                 scenario,
             },
-            msg,
+            msg as u32,
         );
     }
 }
-
-patches!(
-    pub(in crate::shell) static PATCHES = [
-        hook main_menu,
-    ];
-);

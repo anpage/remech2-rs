@@ -1,7 +1,12 @@
 #ifndef DEBRIEF_H
 #define DEBRIEF_H
 
+#include "archivereader.h"
+#include "buttonmenu.h"
+#include "collection.h"
 #include "decomp.h"
+#include "page.h"
+#include "pilotrecord.h"
 #include "tmpackdatabase.h"
 #include "types.h"
 
@@ -28,9 +33,22 @@ struct MissionResults {
 };
 
 // The functions and globals of debrief.cpp that other units use.
+extern ButtonMenu* g_debriefMenu;
+extern Page* g_debriefPage;
+extern Collection* g_debriefPages;
+extern ArchiveReader* g_aftermathReader;
+extern PilotRecord g_pilotBeforeMission;
 extern MissionResults g_missionResults;
 
 void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scenario);
+// The debriefing screen's frame, implemented on the Rust side (src/shell/screens/debrief.rs)
+extern "C" void MissionDebriefCallback(
+	TMPackDataBase* p_database,
+	MechS32* p_campaign,
+	MechU8* p_pilotChosen,
+	char** p_scenario,
+	MechS32 p_msg
+);
 // Implemented on the Rust side (src/shell/screens/debug.rs), around ReadMissionResultsC
 extern "C" void ReadMissionResults(void* p_results);
 void ReadMissionResultsC(void* p_results);

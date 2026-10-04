@@ -125,7 +125,6 @@ MechChar g_honorLine[0x200];
 // GLOBAL: MW2SHELL 0x100793b8
 MechChar g_objectiveTime[0x80];
 
-void MissionDebriefCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar** p_scenario, MechS32 p_msg);
 
 // Returns TRUE when one of the options that makes a trial easier is set.
 // FUNCTION: MW2SHELL 0x10001000
@@ -742,108 +741,5 @@ void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p
 	RegisterScreenFunction(MissionDebriefCallback);
 }
 
-// The debriefing screen's frame: EXIT (on to the next mission once one is completed),
-// AFTERMATH (the text in a reader) and REPLAY (restores the pilot).
-// FUNCTION: MW2SHELL 0x1000287f
-void MissionDebriefCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar** p_scenario, MechS32 p_msg)
-{
-	MechS32 result;
-	MechS32 button;
-
-	// The original skips the frame's work with a goto, like StarConfigCallback.
-	if (p_msg != c_msgScreenFrame) {
-		goto done;
-	}
-
-	if (!g_aftermathReader) {
-		g_debriefPage->TypeStep();
-		button = g_debriefMenu->HitTest(g_mouseState->m_x, g_mouseState->m_y);
-		switch (button) {
-		case 0:
-			if (g_mouseState->GetLeftPressed() != 1) {
-				break;
-			}
-			p_msg = c_msgReadyRoom;
-			if (*p_campaign != 2 && g_missionResults.m_outcome == 2) {
-				if (g_currentPilot->m_mission >= 16) {
-					p_msg = c_msgEndingVideo;
-				}
-				else {
-					*p_scenario = g_campaignMissions[*p_campaign][g_currentPilot->m_mission].m_scenario;
-				}
-			}
-			break;
-		case 1:
-			if (g_mouseState->GetLeftPressed() != 1) {
-				break;
-			}
-			g_debriefPage->Hide();
-			delete g_debriefMenu;
-			g_aftermathReader = new ArchiveReader(
-				"",
-				g_archiveFont,
-				-1,
-				FALSE,
-				NULL,
-				g_debriefPages,
-				g_aftermathScreens[*p_campaign].m_buttons,
-				g_aftermathScreens[*p_campaign].m_count
-			);
-			break;
-		case 2:
-			if (g_mouseState->GetLeftPressed() != 1) {
-				break;
-			}
-			if (g_missionResults.m_outcome == 2) {
-				if (!ShowDialog("Are you Sure?#Yes|No", 1)) {
-					*g_currentPilot = g_pilotBeforeMission;
-					SavePilotRoster();
-					p_msg = c_msgBriefing;
-				}
-				else {
-					UpdateVideos();
-				}
-			}
-			else {
-				p_msg = c_msgBriefing;
-			}
-			break;
-		default:
-			break;
-		}
-	}
-	else {
-		result = g_aftermathReader->Run();
-		if (result == c_msgQuit) {
-			p_msg = c_msgQuit;
-		}
-		if (result == c_msgMainMenu) {
-			p_msg = c_msgMainMenu;
-		}
-		if (result != c_msgArchive) {
-			delete g_aftermathReader;
-			g_aftermathReader = NULL;
-			g_debriefMenu = new ButtonMenu(
-				g_videoDriver,
-				g_defaultFont,
-				FALSE,
-				g_debriefScreens[*p_campaign].m_buttons,
-				g_debriefScreens[*p_campaign].m_count
-			);
-			g_debriefPage->Restart();
-		}
-	}
-
-done:
-	if (p_msg != c_msgScreenFrame) {
-		delete g_debriefPage;
-		delete g_debriefMenu;
-		if (g_aftermathReader) {
-			delete g_aftermathReader;
-		}
-		g_aftermathReader = NULL;
-		g_videoDriver->ClearGlyphs(TRUE);
-		MechPostMessage(p_msg, c_msgDebrief, 0);
-		UnregisterScreenFunction(MissionDebriefCallback);
-	}
-}
+// MissionDebriefCallback, the debriefing screen's frame, is implemented on the Rust side
+// (src/shell/screens/debrief.rs).

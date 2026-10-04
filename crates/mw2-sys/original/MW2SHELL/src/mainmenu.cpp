@@ -49,8 +49,6 @@ void* AllocateAllowNew(MechS32 p_size)
 	return ::operator new(p_size);
 }
 
-void MainMenuCallback(TMPackDataBase*, MechS32*, MechU8*, MechChar**, MechS32);
-
 // FUNCTION: MW2SHELL 0x1003dc10
 void DrawMainMenu(TMPackDataBase* p_database, MechS32*)
 {
@@ -70,80 +68,5 @@ void DrawMainMenu(TMPackDataBase* p_database, MechS32*)
 	RegisterScreenFunction(MainMenuCallback);
 }
 
-// The main menu's frame: the trials of grievance, the two clan halls and EXIT.
-// Not 100%: the stack slots of data, button and size are permuted.
-// FUNCTION: MW2SHELL 0x1003dd89
-void MainMenuCallback(TMPackDataBase* p_database, MechS32* p_campaign, MechU8*, MechChar**, MechS32 p_msg)
-{
-	void* data = NULL;
-	MechS32 button;
-	MechS32 size;
-
-	AIL_serve();
-
-	// The original skips the frame's work with a goto, like StarConfigCallback.
-	if (p_msg != c_msgScreenFrame) {
-		goto done;
-	}
-
-	if (!g_mainMenuMusicStarted && !g_mainMenuIntro->IsPlaying()) {
-		p_database->GetDBItem(0x4a, &data, &size);
-		g_mainMenuMusic = new AudioSample(g_audioSubsystem, data, size);
-		g_mainMenuMusic->EnableLoop();
-		g_mainMenuMusic->Start();
-		g_mainMenuMusic->SetFade(500, 1000, 0, 0x1e);
-		g_mainMenuMusicStarted = 1;
-	}
-	else if (g_mainMenuMusicStarted) {
-		g_mainMenuMusic->DoFade();
-	}
-
-	button = g_mainMenu->HitTest(g_mouseState->m_x, g_mouseState->m_y);
-	switch (button) {
-	case 0:
-		if (g_mouseState->GetLeftPressed() != 1) {
-			break;
-		}
-		p_msg = c_msgTrials;
-		*p_campaign = 2;
-		break;
-	case 1:
-		if (g_mouseState->GetLeftPressed() != 1) {
-			break;
-		}
-		p_msg = c_msgLandingVideo;
-		*p_campaign = 0;
-		break;
-	case 2:
-		if (g_mouseState->GetLeftPressed() != 1) {
-			break;
-		}
-		p_msg = c_msgLandingVideo;
-		*p_campaign = 1;
-		break;
-	case 3:
-		if (g_mouseState->GetLeftPressed() != 1) {
-			break;
-		}
-		if (!ShowDialog("Embrace cowardice?#Yes|No", 1)) {
-			p_msg = c_msgQuit;
-		}
-		break;
-	default:
-		break;
-	}
-
-done:
-	if (p_msg != c_msgScreenFrame) {
-		CloseAllVideos();
-		delete g_mainMenu;
-		g_mainMenu = NULL;
-		delete g_mainMenuMusic;
-		g_mainMenuMusic = NULL;
-		delete g_mainMenuIntro;
-		g_mainMenuIntro = NULL;
-		g_mainMenuMusicStarted = 0;
-		MechPostMessage(p_msg, c_msgMainMenu, 0);
-		UnregisterScreenFunction(MainMenuCallback);
-	}
-}
+// MainMenuCallback, the main menu's frame, is implemented on the Rust side
+// (src/shell/screens/main_menu.rs).

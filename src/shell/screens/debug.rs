@@ -4,7 +4,7 @@ use std::sync::atomic::{AtomicI32, Ordering};
 use egui::{Button, Ui};
 use mw2_sys::shell::{self, MissionResults};
 
-use super::{CAMPAIGN_LENGTH, Campaign, MissionResults as Outcome, ShellMsg};
+use super::{CAMPAIGN_LENGTH, Campaign, OUTCOME_FAILED, OUTCOME_SUCCESS, ShellMsg};
 use crate::{messages, shell::dialog};
 
 pub const JUMP_TO_SCREEN: u32 = 0x8100;
@@ -91,8 +91,8 @@ pub fn menu(ui: &mut Ui) {
     ui.label("Debrief outcome");
     let mut outcome = OUTCOME_OVERRIDE.load(Ordering::Relaxed);
     ui.radio_value(&mut outcome, 0, "From MW2MSN.CFG");
-    ui.radio_value(&mut outcome, Outcome::SUCCESS, "Won");
-    ui.radio_value(&mut outcome, Outcome::FAILED, "Lost");
+    ui.radio_value(&mut outcome, OUTCOME_SUCCESS, "Won");
+    ui.radio_value(&mut outcome, OUTCOME_FAILED, "Lost");
     OUTCOME_OVERRIDE.store(outcome, Ordering::Relaxed);
 }
 
