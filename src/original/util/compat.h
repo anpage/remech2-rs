@@ -36,4 +36,11 @@
 #define override override
 #endif
 
+#if !defined(_MSC_VER)
+#define __try if (1)
+#define __finally if (1)
+#undef AbnormalTermination
+#define AbnormalTermination() 0
+#endif
+
 #endif // COMPAT_H
