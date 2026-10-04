@@ -1,3 +1,4 @@
+mod keyboard;
 mod renderer;
 
 use std::{cell::RefCell, ffi::c_int, process::exit, sync::Arc, thread, time::Duration};
@@ -8,12 +9,15 @@ use winit::{
     dpi::PhysicalSize,
     event::{ElementState, KeyEvent, WindowEvent},
     event_loop::{ActiveEventLoop, EventLoop},
-    keyboard::{Key, ModifiersState, NamedKey},
-    platform::pump_events::{EventLoopExtPumpEvents, PumpStatus},
+    keyboard::{Key, ModifiersState, NamedKey, PhysicalKey},
+    platform::{
+        modifier_supplement::KeyEventExtModifierSupplement,
+        pump_events::{EventLoopExtPumpEvents, PumpStatus},
+    },
     window::{Fullscreen, Window, WindowId},
 };
 
-use mw2_sys::shared::c_mechMsgActivateApp;
+use mw2_sys::shared::{c_mechMsgActivateApp, c_mechMsgKeyDown, c_mechMsgKeyUp};
 
 use crate::{messages, settings::SETTINGS};
 
@@ -198,8 +202,9 @@ impl ApplicationHandler for State {
         _window_id: WindowId,
         event: WindowEvent,
     ) {
+        let mut consumed = false;
         if let (Some(window), Some(egui_input)) = (&self.window, &mut self.egui_input) {
-            let _ = egui_input.on_window_event(window, &event);
+            consumed = egui_input.on_window_event(window, &event).consumed;
         }
 
         match event {
@@ -224,9 +229,35 @@ impl ApplicationHandler for State {
                     },
                 ..
             } if self.modifiers.alt_key() => self.toggle_fullscreen(),
+            // Releases always reach the game so that no key is left held down
+            WindowEvent::KeyboardInput { event, .. }
+                if !consumed || event.state == ElementState::Released =>
+            {
+                post_key(&event);
+            }
             _ => {}
         }
     }
+}
+
+/// Posts a key event to the game's message queue
+fn post_key(event: &KeyEvent) {
+    let PhysicalKey::Code(code) = event.physical_key else {
+        return;
+    };
+    let character = match event.key_without_modifiers() {
+        Key::Character(text) => text.chars().next(),
+        _ => None,
+    };
+    let Some((wparam, lparam)) = keyboard::params(code, character) else {
+        return;
+    };
+
+    let message = match event.state {
+        ElementState::Pressed => c_mechMsgKeyDown,
+        ElementState::Released => c_mechMsgKeyUp,
+    };
+    messages::post(message, wparam, lparam);
 }
 
 #[unsafe(export_name = "MechAppPump")]

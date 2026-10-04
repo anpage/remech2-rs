@@ -280,18 +280,20 @@ void KeyboardQueueKeyCode(WPARAM p_virtualKey, LPARAM p_lParam)
 
 	keyCode = g_keyCodeMap[p_virtualKey];
 	if (keyCode == 0) {
-		keyCode = (MechChar) MapVirtualKey(p_virtualKey, 2);
+		// The original asked MapVirtualKey for the key's character.
+		keyCode = (MechChar) (p_lParam & 0xff);
 		keyCode = tolower(keyCode);
 	}
 
 	if (keyCode != 0) {
-		if (GetKeyState(VK_CONTROL) & 0x1000) {
+		// The original asked GetKeyState for the modifiers.
+		if (g_keyStates[c_modifierWord] & c_modifierControl) {
 			keyCode |= c_keyCodeControl;
 		}
-		if (GetKeyState(VK_MENU) & 0x1000) {
+		if (g_keyStates[c_modifierWord] & c_modifierAlt) {
 			keyCode |= c_keyCodeAlt;
 		}
-		if (GetKeyState(VK_SHIFT) & 0x1000) {
+		if (g_keyStates[c_modifierWord] & c_modifierShift) {
 			keyCode |= c_keyCodeShift;
 		}
 

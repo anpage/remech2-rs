@@ -23,6 +23,9 @@ extern "C"
 		c_mechMsgClose = 0x0010,
 		c_mechMsgQuit = 0x0012, // wParam is the exit code
 		c_mechMsgActivateApp = 0x001c,
+		// Key messages: wParam is the Windows virtual key. lParam has the character the key types
+		// without modifiers in bits 0 to 7 (0 if it isn't ASCII), the key's scan code in bits 16 to
+		// 23 and whether that is an extended one in bit 24.
 		c_mechMsgKeyFirst = 0x0100,
 		c_mechMsgKeyDown = 0x0100,
 		c_mechMsgKeyUp = 0x0101,
