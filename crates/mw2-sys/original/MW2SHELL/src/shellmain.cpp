@@ -458,7 +458,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 	while (MechPeekMessage(&msg, 0, 0, TRUE)) {
 	}
 	MechSetMessageHandler(ShellHandleMessage);
-	MechSendMessage(c_mechMsgActivateApp, MechAppActive(), 0);
+	g_windowActive = MechAppActive();
 
 	for (;;) {
 		MechAppPump();
