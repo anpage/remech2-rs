@@ -3,7 +3,6 @@
 #include "audiosubsystem.h"
 #include "debugprint.h"
 #include "displaybackend.h"
-#include "gdi.h"
 #include "refreshmode.h"
 #include "shellglobals.h"
 #include "textglyphlist.h"
@@ -248,12 +247,9 @@ void VideoDriver::DrawShell()
 		m_paletteChanged = 0;
 	}
 	else if (m_dirtyView.m_x1 >= m_dirtyView.m_x0 && m_dirtyView.m_y0 <= m_dirtyView.m_y1) {
-		if (g_menuVisible) {
-			GdiBitBltRectWithMenu(m_dirtyView.m_x0, m_dirtyView.m_y0, m_dirtyView.m_x1, m_dirtyView.m_y1);
-		}
-		else {
-			g_currentRefreshMode->m_blitRect(m_dirtyView.m_x0, m_dirtyView.m_y0, m_dirtyView.m_x1, m_dirtyView.m_y1);
-		}
+		// With g_menuVisible the original called GdiBitBltRectWithMenu instead, which drew one menu
+		// bar height higher.
+		g_currentRefreshMode->m_blitRect(m_dirtyView.m_x0, m_dirtyView.m_y0, m_dirtyView.m_x1, m_dirtyView.m_y1);
 	}
 
 	m_dirtyView.m_x0 = m_screenView.m_x1;
@@ -262,8 +258,7 @@ void VideoDriver::DrawShell()
 	m_dirtyView.m_y1 = m_screenView.m_y0;
 }
 
-// DrawShell for movie frames: the dirty rectangle is stretched to the screen, or drawn unscaled
-// at (160, 140) with g_littleMovies.
+// DrawShell for movie frames: the dirty rectangle is stretched to the screen.
 // Operand order: the original loads m_height first in both m_width * m_height (as in
 // FUN_10005f21; the source operand order doesn't flip it).
 // FUNCTION: MW2SHELL 0x10006842
@@ -285,12 +280,9 @@ void VideoDriver::DrawFmv()
 	}
 
 	if (m_dirtyView.m_x0 <= m_dirtyView.m_x1 && m_dirtyView.m_y0 <= m_dirtyView.m_y1) {
-		if (g_littleMovies) {
-			GdiBlitCentered(m_dirtyView.m_x0, m_dirtyView.m_y0, m_dirtyView.m_x1, m_dirtyView.m_y1);
-		}
-		else {
-			g_currentRefreshMode->m_stretchBlit(m_dirtyView.m_x0, m_dirtyView.m_y0, m_dirtyView.m_x1, m_dirtyView.m_y1);
-		}
+		// With g_littleMovies the original called GdiBlitCentered instead, which drew the
+		// rectangle unscaled at (160, 140).
+		g_currentRefreshMode->m_stretchBlit(m_dirtyView.m_x0, m_dirtyView.m_y0, m_dirtyView.m_x1, m_dirtyView.m_y1);
 	}
 
 	m_dirtyView.m_x0 = m_screenView.m_x1;

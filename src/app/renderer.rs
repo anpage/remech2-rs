@@ -14,6 +14,7 @@ use crate::drawmode::{
 pub struct Frame<'a> {
     pub pixels: &'a [u8],
     pub size: [usize; 2],
+    pub source: Option<[usize; 4]>,
     pub palette: &'a PaletteData,
 }
 
@@ -91,7 +92,7 @@ impl Renderer {
         self.device.limits().max_texture_dimension_2d as usize
     }
 
-    /// Scales the game's frame to the largest 4:3 rect that fits the window, draws egui's output over it, and presents
+    /// Scales the game's frame to the largest rect of its shape that fits the window, draws egui's output over it, and presents
     pub fn render(
         &mut self,
         frame: Option<Frame>,
@@ -112,15 +113,26 @@ impl Renderer {
         };
 
         let window_size = [self.config.width as f32, self.config.height as f32];
-        let output_size =
-            fit_to_window(window_size[0], window_size[1], const { 4.0 / 3.0 }).round();
-        if let Some(frame) = &frame {
+        let mut output_size = egui::Vec2::ZERO;
+        if let Some(frame) = frame.as_ref().filter(|frame| frame.size[1] != 0) {
+            // Pixels are square
+            let aspect_ratio = frame.size[0] as f32 / frame.size[1] as f32;
+            output_size = fit_to_window(window_size[0], window_size[1], aspect_ratio).round();
+
+            let [x, y, width, height] =
+                frame.source.unwrap_or([0, 0, frame.size[0], frame.size[1]]);
             self.scaler.upload_palette(&self.queue, frame.palette);
-            self.scaler
-                .upload(&self.device, &self.queue, frame.pixels, frame.size);
+            self.scaler.upload(
+                &self.device,
+                &self.queue,
+                frame.pixels,
+                frame.size[0],
+                [x, y],
+                [width, height],
+            );
             self.scaler.set_params(
                 &self.queue,
-                [frame.size[0] as f32, frame.size[1] as f32],
+                [width as f32, height as f32],
                 output_size.into(),
                 self.scaling,
             );
@@ -168,7 +180,7 @@ impl Renderer {
             });
             // egui's renderer requires it
             let mut render_pass = render_pass.forget_lifetime();
-            if frame.is_some() {
+            if output_size.x >= 1.0 && output_size.y >= 1.0 {
                 render_pass.set_viewport(
                     ((window_size[0] - output_size.x) / 2.0).floor(),
                     ((window_size[1] - output_size.y) / 2.0).floor(),

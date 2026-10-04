@@ -182,27 +182,34 @@ impl Scaler {
         queue.write_buffer(&self.palette, 0, bytemuck::cast_slice(palette));
     }
 
-    /// Copies this frame's palette indices into the framebuffer texture, reallocating it only when the game changes resolution.
+    /// Copies a rect of this frame's palette indices into the framebuffer texture, reallocating it only when the rect's size changes.
     pub fn upload(
         &mut self,
         device: &wgpu::Device,
         queue: &wgpu::Queue,
         indices: &[u8],
+        stride: usize,
+        origin: [usize; 2],
         size: [usize; 2],
     ) {
-        let Some(indices) = indices.get(..size[0] * size[1]) else {
-            tracing::warn!(
-                "framebuffer is {} bytes, expected {}x{}",
-                indices.len(),
-                size[0],
-                size[1]
-            );
-            return;
-        };
-        let size = [size[0] as u32, size[1] as u32];
         if size[0] == 0 || size[1] == 0 {
             return;
         }
+        let offset = origin[1] * stride + origin[0];
+        if origin[0] + size[0] > stride || offset + (size[1] - 1) * stride + size[0] > indices.len()
+        {
+            tracing::warn!(
+                "framebuffer is {} bytes, expected {}x{} at {},{} with {} a row",
+                indices.len(),
+                size[0],
+                size[1],
+                origin[0],
+                origin[1],
+                stride
+            );
+            return;
+        }
+        let size = [size[0] as u32, size[1] as u32];
 
         if self
             .target
@@ -219,8 +226,8 @@ impl Scaler {
             target.texture.as_image_copy(),
             indices,
             wgpu::TexelCopyBufferLayout {
-                offset: 0,
-                bytes_per_row: Some(size[0]),
+                offset: offset as u64,
+                bytes_per_row: Some(stride as u32),
                 rows_per_image: Some(size[1]),
             },
             wgpu::Extent3d {

@@ -1,6 +1,6 @@
 mod renderer;
 
-use std::{sync::Arc, thread, time::Duration};
+use std::{cell::RefCell, sync::Arc, thread, time::Duration};
 
 use anyhow::{Result, bail};
 use winit::{
@@ -17,6 +17,24 @@ use crate::settings::SETTINGS;
 
 pub use renderer::Frame;
 use renderer::Renderer;
+
+thread_local! {
+    static APP: RefCell<Option<App>> = const { RefCell::new(None) };
+}
+
+pub fn install(app: App) {
+    APP.set(Some(app));
+}
+
+pub fn with<R>(f: impl FnOnce(&mut App) -> R) -> Option<R> {
+    APP.with(|app| match app.try_borrow_mut() {
+        Ok(mut app) => app.as_mut().map(f),
+        Err(_) => {
+            tracing::warn!("the app is already in use");
+            None
+        }
+    })
+}
 
 /// The app's one window
 pub struct App {

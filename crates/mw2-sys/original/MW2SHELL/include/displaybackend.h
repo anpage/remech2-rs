@@ -6,7 +6,7 @@
 #include "types.h"
 #include "window.h"
 
-// DisplayBackend::m_id, the index in g_displayBackends.
+// DisplayBackend::m_id. Only the GDI back end's place is left, taken by the one in refreshmode.c.
 enum DisplayBackendId {
 	c_displayBackendDirectDraw = 0,
 	c_displayBackendDisplayDib = 1,

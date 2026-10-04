@@ -19,6 +19,7 @@ mod ailrs;
 mod app;
 mod cd_audio;
 mod common;
+mod display;
 mod drawmode;
 mod files;
 mod heap;
@@ -75,6 +76,8 @@ fn main() -> Result<()> {
         // The window was closed
         return Ok(());
     }
+
+    app::install(app);
 
     let window = HWND::default();
 
