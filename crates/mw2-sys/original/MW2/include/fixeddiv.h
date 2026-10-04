@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// The functions and globals of fixeddiv.c that other units use.
+// Implemented on the Rust side (src/sim/math.rs). The original was hand-written assembly.
 #ifdef __cplusplus
 extern "C"
 {

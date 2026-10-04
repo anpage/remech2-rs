@@ -10,6 +10,7 @@ extern "C"
 #endif
 
 	void InitRandom(MechU32 p_seed);
+	// Implemented on the Rust side (src/sim/math.rs)
 	MechS32 RandomIntBelow(MechS32 p_max);
 	MechS32 RandomNormal(void);
 	MechS32 RandomIntBelow2(MechS32 p_max);

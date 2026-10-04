@@ -8,9 +8,6 @@
 // Two tables of 127 random numbers, read round-robin: rand() values, and values roughly normally
 // distributed around 0 (the sum of 30 rand() calls, scaled to +-sqrt(90) * 1024).
 
-// GLOBAL: MW2 0x100ae74c
-MechS32 g_randomIndex = 0;
-
 // GLOBAL: MW2 0x100ae750
 MechS32 g_normalRandomIndex = 0;
 
@@ -54,16 +51,9 @@ void InitRandom(MechU32 p_seed)
 	}
 }
 
-// FUNCTION: MW2 0x100736b3
-MechS32 RandomIntBelow(MechS32 p_max)
-{
-	MechS32 value;
-
-	value = g_randomInts[g_randomIndex] % p_max;
-	g_randomIndex++;
-	g_randomIndex %= 127;
-	return value;
-}
+// RandomIntBelow is implemented on the Rust side. The original read g_randomInts round-robin
+// through g_randomIndex (0x100ae74c), which at some framerates never gave a number below 3 when
+// taken modulo a fixed delta time.
 
 // FUNCTION: MW2 0x100736f5
 MechS32 RandomNormal(void)

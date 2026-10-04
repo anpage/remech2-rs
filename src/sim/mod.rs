@@ -37,7 +37,6 @@ patch_groups! {
         hud,
         input,
         jumpjets,
-        math,
         shots,
         timing,
         window,
