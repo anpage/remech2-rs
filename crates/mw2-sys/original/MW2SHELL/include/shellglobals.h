@@ -37,7 +37,6 @@ extern MechS32 g_unk0x1007123c;
 extern MechS32 g_runSim;
 extern MechU32 g_movieOpenFlags;
 extern MechU8 g_drawFmv;
-extern MechChar g_dataDrivePath[4];
 extern MechChar* g_rankNames[10];
 extern MechChar* g_clanNames[6];
 extern MechS32 g_trialsSongs[18];

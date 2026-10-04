@@ -97,9 +97,6 @@ MechU32 g_movieOpenFlags = 0;
 // GLOBAL: MW2SHELL 0x1007124c
 MechU8 g_drawFmv = 0;
 
-// GLOBAL: MW2SHELL 0x10071250
-MechChar g_dataDrivePath[4] = "A:\\";
-
 // The pilot roster clamps rank + 1 and rank + 2 to index 9: the NULL after Khan.
 // GLOBAL: MW2SHELL 0x10071258
 MechChar* g_rankNames[10] = {

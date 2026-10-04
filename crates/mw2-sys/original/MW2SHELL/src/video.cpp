@@ -25,9 +25,6 @@
 // GLOBAL: MW2SHELL 0x100641a8
 FmvSlot g_fmvSlots[32] = {0};
 
-// GLOBAL: MW2SHELL 0x10064b28
-undefined4 g_videoOnDataDrive = 0;
-
 // GLOBAL: MW2SHELL 0x10064b2c
 MechS32 g_fullscreenVideoMsg = c_msgScreenFrame;
 
@@ -43,49 +40,23 @@ MechChar g_shpPath[0x20];
 // FUNCTION: MW2SHELL 0x10015d30
 MechChar* GetPathToVideo(const MechChar* p_name)
 {
-	if (g_videoOnDataDrive && g_dataDrivePath[0]) {
-		sprintf(g_videoPath, "%ssmk\\%s.smk", g_dataDrivePath, p_name);
-	}
-	else {
-		sprintf(g_videoPath, "smk\\%s.smk", p_name);
-	}
-
-	g_videoOnDataDrive = 0;
+	sprintf(g_videoPath, "smk\\%s.smk", p_name);
 	return g_videoPath;
 }
 
 // FUNCTION: MW2SHELL 0x10015da1
 MechChar* GetPathToShp(const MechChar* p_name)
 {
-	if (g_videoOnDataDrive && g_dataDrivePath[0]) {
-		sprintf(g_shpPath, "%ssmk\\%s.shp", g_dataDrivePath, p_name);
-	}
-	else {
-		sprintf(g_shpPath, "smk\\%s.shp", p_name);
-	}
-
-	g_videoOnDataDrive = 0;
+	sprintf(g_shpPath, "smk\\%s.shp", p_name);
 	return g_shpPath;
 }
 
-// Looks for the video on the hard disk, then on the data drive; a video found there keeps
-// g_videoOnDataDrive set for the next GetPathToVideo.
+// The original looked for the video on the game CD when it wasn't on the hard disk, here and
+// wherever a video or its SHP animation is opened.
 // FUNCTION: MW2SHELL 0x10015e12
 BOOL CheckVideoExists(const MechChar* p_name)
 {
-	if (GetFileAttributes(GetPathToVideo(p_name)) == 0xffffffff) {
-		g_videoOnDataDrive = 1;
-		if (GetFileAttributes(GetPathToVideo(p_name)) == 0xffffffff) {
-			return FALSE;
-		}
-		else {
-			g_videoOnDataDrive = 1;
-			return TRUE;
-		}
-	}
-	else {
-		return TRUE;
-	}
+	return GetFileAttributes(GetPathToVideo(p_name)) != 0xffffffff;
 }
 
 // The screen callback while a full-screen video plays: a click, a key or any other message ends
@@ -149,7 +120,7 @@ MechS32 PlayFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam)
 
 DECOMP_SIZE_ASSERT(LoopingMovie, 0x18)
 
-// Opens the movie p_name (retrying once, after setting g_videoOnDataDrive) and draws its first
+// Opens the movie p_name and draws its first
 // frame at (p_left, p_top). Without a framebuffer it closes the movie again.
 // FUNCTION: MW2SHELL 0x1001603a
 LoopingMovie::LoopingMovie(MechChar* p_name, MechS32 p_left, MechS32 p_top)
@@ -158,11 +129,7 @@ LoopingMovie::LoopingMovie(MechChar* p_name, MechS32 p_left, MechS32 p_top)
 
 	m_smack = SmackOpen(GetPathToVideo(p_name), g_movieOpenFlags, 0);
 	if (m_smack == NULL) {
-		g_videoOnDataDrive = 1;
-		m_smack = SmackOpen(GetPathToVideo(p_name), g_movieOpenFlags, 0);
-		if (m_smack == NULL) {
-			return;
-		}
+		return;
 	}
 
 	m_left = p_left;
@@ -642,14 +609,11 @@ void MoveVideo(MechS32 p_index, MechS32 p_left, MechS32 p_top)
 // Opens the video p_name in the slot. A video with sound that the audio subsystem can play gets
 // Smacker's sound (flag 0x2000). With flag 0x1000 the first frame goes straight to the screen, with
 // flag 2 to the back buffer, otherwise to a buffer of its own.
-// Not 100%: the stack slots of dataDrive, result and the delete temporaries are permuted.
 // FUNCTION: MW2SHELL 0x1001703b
 BOOL LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 {
-	undefined4 dataDrive;
 	MechS32 result;
 
-	dataDrive = g_videoOnDataDrive;
 	p_slot->m_smack = SmackOpen(GetPathToVideo(p_name), ((p_slot->m_flags & 0x40) >> 1) | 0xfe00, 0);
 	if (!p_slot->m_smack) {
 		return FALSE;
@@ -658,7 +622,6 @@ BOOL LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 	if (g_audioSubsystem && SmackSoundInTrack(p_slot->m_smack, 0x200)) {
 		SmackClose(p_slot->m_smack);
 		g_audioSubsystem->CloseDigitalDriver();
-		g_videoOnDataDrive = dataDrive;
 		p_slot->m_smack = SmackOpen(GetPathToVideo(p_name), ((p_slot->m_flags & 0x40) >> 1) | 0xfe00, 0);
 		if (!p_slot->m_smack) {
 			return FALSE;
@@ -668,7 +631,6 @@ BOOL LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 	}
 	else {
 		SmackClose(p_slot->m_smack);
-		g_videoOnDataDrive = dataDrive;
 		p_slot->m_smack = SmackOpen(GetPathToVideo(p_name), (p_slot->m_flags & 0x40) >> 1, 0);
 		if (!p_slot->m_smack) {
 			return FALSE;
@@ -799,11 +761,8 @@ MechS32 PlayVideo(
 		}
 	}
 	else if (!LoadShpFile(slot, p_name)) {
-		g_videoOnDataDrive = 1;
-		if (!LoadShpFile(slot, p_name)) {
-			slot->m_flags = 0;
-			return -1;
-		}
+		slot->m_flags = 0;
+		return -1;
 	}
 
 	slot->m_drawnLeft = slot->m_left;

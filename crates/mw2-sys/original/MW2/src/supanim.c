@@ -3,7 +3,6 @@
 #include "debugprint.h"
 #include "decomp.h"
 #include "displaybackend.h"
-#include "gamecd.h"
 #include "readfile.h"
 #include "network.h"
 #include "palettecolor.h"
@@ -71,9 +70,8 @@ PANE g_supAnimTarget;
 // GLOBAL: MW2 0x100bcd70
 WINDOW g_supAnimBuffer;
 
-// Starts the dropship loading screen: loads the backdrop (<drive>:\\launch\\supanm6.shp, netmech6.shp
-// in a network game, or the command line's override), from the CD if it isn't on the current
-// drive, draws it and fades its palette in (slowly with p_slowFade), then loads the dropship
+// Starts the dropship loading screen: loads the backdrop (launch\\supanm6.shp, netmech6.shp
+// in a network game, or the command line's override), draws it and fades its palette in (slowly with p_slowFade), then loads the dropship
 // (launch6.shp) and draws its first frame.
 // Stack-slot permutation: backdropPath, shapePath and palette.
 // FUNCTION: MW2 0x10003a70
@@ -82,18 +80,14 @@ void StartSupAnim(MechS32 p_slowFade)
 	MechChar backdropPath[256];
 	MechChar shapePath[256];
 	PaletteColor* palette;
-	MechChar drive;
 
-	GetCurrentDirectory(sizeof(backdropPath), backdropPath);
-	drive = backdropPath[0];
 	if (g_supAnimBackdropName == NULL || *g_supAnimBackdropName == '\0') {
-		sprintf(backdropPath, "%c:%s\\%s6.%s", drive, "launch", !g_isNetworkGame ? "supanm" : "netmech", "shp");
+		sprintf(backdropPath, "%s\\%s6.%s", "launch", !g_isNetworkGame ? "supanm" : "netmech", "shp");
 	}
 	else {
 		sprintf(
 			backdropPath,
-			"%c:%s\\%s6.%s",
-			drive,
+			"%s\\%s6.%s",
 			"launch",
 			!g_isNetworkGame ? g_supAnimBackdropName : "netmech",
 			"shp"
@@ -101,24 +95,15 @@ void StartSupAnim(MechS32 p_slowFade)
 	}
 
 	if (g_supAnimShapeName == NULL || *g_supAnimShapeName == '\0') {
-		sprintf(shapePath, "%c:%s\\%s6.%s", drive, "launch", "launch", "shp");
+		sprintf(shapePath, "%s\\%s6.%s", "launch", "launch", "shp");
 	}
 	else {
-		sprintf(shapePath, "%c:%s\\%s6.%s", drive, "launch", g_supAnimShapeName, "shp");
+		sprintf(shapePath, "%s\\%s6.%s", "launch", g_supAnimShapeName, "shp");
 	}
 
 	g_supAnimBackdrop = MechReadFile(g_primaryHeap, backdropPath);
 	if (g_supAnimBackdrop == NULL) {
-		drive = FindGameCdDrive();
-		if (!drive) {
-			return;
-		}
-
-		backdropPath[0] = shapePath[0] = drive;
-		g_supAnimBackdrop = MechReadFile(g_primaryHeap, backdropPath);
-		if (g_supAnimBackdrop == NULL) {
-			return;
-		}
+		return;
 	}
 
 	palette = MechHeapAllocZeroed(g_primaryHeap, 0x100 * sizeof(PaletteColor));

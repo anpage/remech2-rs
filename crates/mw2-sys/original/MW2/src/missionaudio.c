@@ -4,7 +4,6 @@
 
 #include "decomp.h"
 #include "error.h"
-#include "gamecd.h"
 #include "namehash.h"
 #include "readfile.h"
 #include "simmain.h"
@@ -68,29 +67,18 @@ ProjectFileEntry* FindSoundFile(MechChar* p_name, MechS32 p_add)
 	return added;
 }
 
-// Lists the mission's sound files (keating\*.sfl, on the game CD when they aren't installed) in
-// the project file table and keeps their directory in g_soundFileDir.
+// Lists the mission's sound files (keating\*.sfl) in the project file table and keeps their
+// directory in g_soundFileDir. The original fell back to the game CD when they weren't installed.
 // FUNCTION: MW2 0x10007252
 void CollectMissionAudio(void)
 {
-	MechChar drive;
 	HANDLE find;
 	WIN32_FIND_DATA data;
 
-	drive = '\0';
 	sprintf(g_soundFileDir, "%s\\*.sfl", "keating");
 	find = FindFirstFile(g_soundFileDir, &data);
 	if (find == INVALID_HANDLE_VALUE) {
-		drive = FindGameCdDrive();
-		if (!drive) {
-			return;
-		}
-
-		sprintf(g_soundFileDir, "%c:\\%s\\*.sfl", drive, "keating");
-		find = FindFirstFile(g_soundFileDir, &data);
-		if (find == INVALID_HANDLE_VALUE) {
-			return;
-		}
+		return;
 	}
 
 	for (;;) {
@@ -107,12 +95,7 @@ void CollectMissionAudio(void)
 	}
 
 	FindClose(find);
-	if (drive) {
-		sprintf(g_soundFileDir, "%c:\\%s", drive, "keating");
-	}
-	else {
-		sprintf(g_soundFileDir, "%s", "keating");
-	}
+	sprintf(g_soundFileDir, "%s", "keating");
 }
 
 // Reads the sound file p_name (".sfl" appended) from the mission's directory, if the project

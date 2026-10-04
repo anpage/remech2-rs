@@ -4,7 +4,6 @@
 #include "audiosubsystem.h"
 #include "briefing.h"
 #include "cadettraining.h"
-#include "cdcheck.h"
 #include "clanhall.h"
 #include "cockpitcontrols.h"
 #include "credits.h"
@@ -259,9 +258,6 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 			break;
 		case c_menuHelpContents:
 			sprintf(helpFile, "%s", "mw2help.hlp");
-			if (GetFileAttributes(helpFile) == -1) {
-				sprintf(helpFile, "%s%s", g_dataDrivePath, "mw2help.hlp");
-			}
 
 			if (WinHelp(g_gameWindow, helpFile, HELP_CONTENTS, 0)) {
 				g_helpRegistered = TRUE;
@@ -269,9 +265,6 @@ extern "C" LRESULT CALLBACK ShellWindowProc(HWND p_hWnd, UINT p_msg, WPARAM p_wP
 			break;
 		case c_menuTechnicalHelp:
 			sprintf(helpFile, "%s", "tech.hlp");
-			if (GetFileAttributes(helpFile) == -1) {
-				sprintf(helpFile, "%s%s", g_dataDrivePath, "tech.hlp");
-			}
 
 			if (WinHelp(g_gameWindow, helpFile, HELP_CONTENTS, 0)) {
 				g_helpRegistered = TRUE;
@@ -454,10 +447,6 @@ extern "C" int __stdcall ShellMain(
 	}
 
 	ParseCommandLineFlags(p_cmdLine);
-	g_dataDrivePath[0] = CdCheck();
-	if (*p_cmdLine == '\0') {
-		g_dataDrivePath[0] = '\0';
-	}
 
 	InitTextColorMaps();
 
