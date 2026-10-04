@@ -1,3 +1,4 @@
+use anyhow::Result;
 use rodio::{Decoder, Sink, Source};
 
 use crate::shell::audio::G_EFFECTS_VOLUME;
@@ -23,13 +24,13 @@ pub struct AudioSample {
 }
 
 impl AudioSample {
-    pub fn new(subsystem: *mut AudioSubsystem, data: &[u8]) -> Self {
-        let source = Decoder::new(std::io::Cursor::new(data.to_vec())).unwrap();
-        let sink = unsafe { (*subsystem).get_sink().unwrap() };
+    pub fn new(subsystem: *mut AudioSubsystem, data: &[u8]) -> Result<Self> {
+        let source = Decoder::new(std::io::Cursor::new(data.to_vec()))?;
+        let sink = unsafe { (*subsystem).get_sink()? };
         sink.pause();
         sink.append(source);
 
-        Self {
+        Ok(Self {
             data: data.to_vec(),
             sink,
             volume: 0,
@@ -39,7 +40,7 @@ impl AudioSample {
             max_fade: 0,
             start_volume: 0,
             end_volume: 0,
-        }
+        })
     }
 
     pub fn start(&mut self) {
@@ -58,6 +59,10 @@ impl AudioSample {
         } else {
             self.sink.append(source);
         }
+    }
+
+    pub fn stop(&mut self) {
+        self.sink.pause();
     }
 
     pub fn is_playing(&self) -> bool {

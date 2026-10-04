@@ -33,7 +33,6 @@ pub static MODULE: ModuleBase = ModuleBase::new("MW2SHELL.DLL");
 
 patch_groups! {
     static PATCH_GROUPS = [
-        audio::hooks,
         database,
         dialog,
         drawmode::hooks,

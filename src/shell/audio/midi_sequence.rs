@@ -1,5 +1,6 @@
 use std::{io::Cursor, ptr::NonNull};
 
+use anyhow::Result;
 use rodio::Sink;
 
 use crate::{midi_source::MidiSource, shell::audio::G_MIDI_VOLUME, xmi::XmiFile};
@@ -15,22 +16,22 @@ pub struct MidiSequence {
 }
 
 impl MidiSequence {
-    pub fn new(subsystem: *mut AudioSubsystem, data: &[u8]) -> Self {
+    pub fn new(subsystem: *mut AudioSubsystem, data: &[u8]) -> Result<Self> {
         let midi_file = {
-            let xmi_file = XmiFile::new(Cursor::new(data)).unwrap();
+            let xmi_file = XmiFile::new(Cursor::new(data))?;
             xmi_file.to_smf_file()
         };
 
-        let source = MidiSource::new(&midi_file[..]).unwrap();
-        let sink = unsafe { (*subsystem).get_sink().unwrap() };
+        let source = MidiSource::new(&midi_file[..])?;
+        let sink = unsafe { (*subsystem).get_sink()? };
         sink.pause();
         sink.append(source);
 
-        Self {
+        Ok(Self {
             subsystem,
             sink,
             volume: 50,
-        }
+        })
     }
 
     pub fn start(&mut self) {

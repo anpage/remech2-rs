@@ -39,10 +39,6 @@ impl AudioSubsystem {
         }
     }
 
-    pub fn active_sequence_count(&self) -> u32 {
-        0
-    }
-
     pub fn current_midi_sequence(&self) -> Option<NonNull<MidiSequence>> {
         self.current_midi_sequence
     }

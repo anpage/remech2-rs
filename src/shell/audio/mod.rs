@@ -1,17 +1,16 @@
 use std::ffi::c_void;
 
 use binding::{game_fns, globals};
+use mw2_sys::shell;
 
 use crate::shell::MODULE;
 
 mod audio_sample;
 mod audio_subsystem;
-pub mod hooks;
+mod interface;
 mod midi_sequence;
 
 // The game's `AudioSample` methods, for the screens that own samples.
-//
-// We already have hooks for these, but we're calling them through their original addresses for now.
 game_fns!(
     pub(in crate::shell) static LOAD_SOUND_CONFIG: unsafe extern "cdecl" fn() = 0x00043926;
     /// `(this, subsystem, data, data_size)`
@@ -44,7 +43,7 @@ game_fns!(
 
 globals!(
     /// Master SFX volume, 0..=0x10000
-    pub(in crate::shell) static G_EFFECTS_VOLUME: i32 = 0x0007167c;
+    pub(in crate::shell) static G_EFFECTS_VOLUME: i32 = shell::g_soundConfig.m_effectsVolume;
     /// Master MIDI volume, 0..=0x10000
-    static G_MIDI_VOLUME: i32 = 0x00071684;
+    static G_MIDI_VOLUME: i32 = shell::g_soundConfig.m_midiVolume;
 );

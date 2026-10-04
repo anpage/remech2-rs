@@ -68,7 +68,6 @@ extern "C"
 	AILIMPORT void AILCALL AIL_shutdown(void);
 
 	AILIMPORT int AILCALL AIL_midiOutOpen(HMDIDRIVER* p_driver, AILMIDIOUT** p_midiOut, int p_deviceId);
-	AILIMPORT int AILCALL AIL_active_sequence_count(HMDIDRIVER p_driver);
 	AILIMPORT int AILCALL AIL_set_preference(unsigned int p_number, int p_value);
 	AILIMPORT int AILCALL AIL_lock_channel(HMDIDRIVER p_driver);
 	AILIMPORT void AILCALL AIL_release_channel(HMDIDRIVER p_driver, int p_channel);
@@ -77,8 +76,6 @@ extern "C"
 
 	AILIMPORT int AILCALL
 	AIL_waveOutOpen(HDIGDRIVER* p_driver, AILWAVEOUT** p_waveOut, int p_deviceId, AILWAVEFORMAT* p_format);
-	AILIMPORT void AILCALL AIL_waveOutClose(HDIGDRIVER p_driver);
-	AILIMPORT int AILCALL AIL_active_sample_count(HDIGDRIVER p_driver);
 
 	AILIMPORT HSEQUENCE AILCALL AIL_allocate_sequence_handle(HMDIDRIVER p_driver);
 	AILIMPORT void AILCALL AIL_release_sequence_handle(HSEQUENCE p_sequence);
@@ -88,17 +85,14 @@ extern "C"
 	AILIMPORT void AILCALL AIL_resume_sequence(HSEQUENCE p_sequence);
 	AILIMPORT int AILCALL AIL_sequence_status(HSEQUENCE p_sequence);
 	AILIMPORT void AILCALL AIL_set_sequence_volume(HSEQUENCE p_sequence, int p_volume, int p_milliseconds);
-	AILIMPORT void AILCALL AIL_set_sequence_loop_count(HSEQUENCE p_sequence, int p_loopCount);
 
 	AILIMPORT HSAMPLE AILCALL AIL_allocate_sample_handle(HDIGDRIVER p_driver);
 	AILIMPORT void AILCALL AIL_release_sample_handle(HSAMPLE p_sample);
 	AILIMPORT void AILCALL AIL_init_sample(HSAMPLE p_sample);
-	AILIMPORT int AILCALL AIL_set_sample_file(HSAMPLE p_sample, void* p_fileImage, int p_block);
 	AILIMPORT void AILCALL AIL_start_sample(HSAMPLE p_sample);
 	AILIMPORT void AILCALL AIL_stop_sample(HSAMPLE p_sample);
 	AILIMPORT void AILCALL AIL_resume_sample(HSAMPLE p_sample);
 	AILIMPORT void AILCALL AIL_end_sample(HSAMPLE p_sample);
-	AILIMPORT unsigned int AILCALL AIL_sample_status(HSAMPLE p_sample);
 	AILIMPORT void AILCALL AIL_set_sample_volume(HSAMPLE p_sample, int p_volume);
 	AILIMPORT void AILCALL AIL_set_sample_loop_count(HSAMPLE p_sample, int p_loopCount);
 	AILIMPORT void AILCALL AIL_set_sample_pan(HSAMPLE p_sample, int p_pan);
