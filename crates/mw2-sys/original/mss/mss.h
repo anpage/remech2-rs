@@ -53,7 +53,6 @@ extern "C"
 	typedef struct _SEQUENCE* HSEQUENCE;
 	typedef struct _SAMPLE* HSAMPLE;
 	typedef struct _DIG_DRIVER* HDIGDRIVER;
-	typedef long HTIMER;
 
 #define SMP_PLAYING 4
 
@@ -63,7 +62,6 @@ extern "C"
 
 #define AILCALLBACK AILCALL
 	typedef void(AILCALLBACK* AILSAMPLECB)(HSAMPLE p_sample);
-	typedef void (*AILTIMERCB)(unsigned int p_user);
 
 	AILIMPORT void AILCALL AIL_shutdown(void);
 
@@ -103,12 +101,6 @@ extern "C"
 	AILIMPORT HSAMPLE AILCALL AIL_allocate_file_sample(HDIGDRIVER p_driver, void* p_fileImage, int p_block);
 
 	AILIMPORT void AILCALL AIL_serve(void);
-
-	AILIMPORT HTIMER AILCALL AIL_register_timer(AILTIMERCB p_callback);
-	AILIMPORT void AILCALL AIL_set_timer_divisor(HTIMER p_timer, unsigned int p_divisor);
-	AILIMPORT void AILCALL AIL_set_timer_period(HTIMER p_timer, unsigned int p_microseconds);
-	AILIMPORT void AILCALL AIL_start_timer(HTIMER p_timer);
-	AILIMPORT void AILCALL AIL_release_timer_handle(HTIMER p_timer);
 
 	AILIMPORT void AILCALL AIL_set_sample_type(HSAMPLE p_sample, int p_format, unsigned int p_flags);
 	AILIMPORT int AILCALL AIL_sample_buffer_ready(HSAMPLE p_sample);

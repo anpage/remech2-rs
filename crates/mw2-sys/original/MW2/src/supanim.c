@@ -4,7 +4,6 @@
 #include "decomp.h"
 #include "displaybackend.h"
 #include "gamecd.h"
-#include "mss.h"
 #include "readfile.h"
 #include "network.h"
 #include "palettecolor.h"
@@ -19,10 +18,8 @@
 #include <stdio.h>
 #include <windows.h>
 
-// The dropship animation of the loading screen ("sup anim"), drawn by an AIL timer.
-
-// GLOBAL: MW2 0x100a0150
-HTIMER g_supAnimTimer = -1;
+// The dropship of the loading screen ("sup anim"). The original animated it from an AIL timer's
+// thread while the mission loaded; for now it's one frame.
 
 // GLOBAL: MW2 0x100a0154
 void* g_supAnimBackdrop = NULL;
@@ -62,9 +59,6 @@ PaletteColor g_supAnimPalette[16] = {
 	{0x01, 0x01, 0x02},
 };
 
-// GLOBAL: MW2 0x100a0198
-MechS32 g_supAnimFrame = 0;
-
 // GLOBAL: MW2 0x100bcd50
 MechS32 g_supAnimY;
 
@@ -77,12 +71,10 @@ PANE g_supAnimTarget;
 // GLOBAL: MW2 0x100bcd70
 WINDOW g_supAnimBuffer;
 
-void SupAnimTimerCallback(void);
-
 // Starts the dropship loading screen: loads the backdrop (<drive>:\\launch\\supanm6.shp, netmech6.shp
 // in a network game, or the command line's override), from the CD if it isn't on the current
 // drive, draws it and fades its palette in (slowly with p_slowFade), then loads the dropship
-// (launch6.shp) and animates it on an AIL timer. On the DisplayDib back end it draws one frame.
+// (launch6.shp) and draws its first frame.
 // Stack-slot permutation: backdropPath, shapePath and palette.
 // FUNCTION: MW2 0x10003a70
 void StartSupAnim(MechS32 p_slowFade)
@@ -174,7 +166,7 @@ void StartSupAnim(MechS32 p_slowFade)
 	g_supAnimFrameCount = VFX_shape_count(g_supAnimShape);
 	g_supAnimX = (g_supAnimTarget.m_x1 - g_supAnimTarget.m_x0) * 0.55;
 	g_supAnimY = 0;
-	if (!g_isNetworkGame && g_currentDisplayBackend->m_id == c_displayBackendDisplayDib) {
+	if (!g_isNetworkGame) {
 		if ((g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1) == 0) {
 			VFX_shape_draw(&g_supAnimTarget, g_supAnimBackdrop, 0, 0, 0);
 			VFX_shape_draw(&g_supAnimTarget, g_supAnimShape, 0, g_supAnimX, g_supAnimY);
@@ -183,44 +175,12 @@ void StartSupAnim(MechS32 p_slowFade)
 			}
 		}
 	}
-	else if (!g_isNetworkGame) {
-		g_supAnimTimer = AIL_register_timer((AILTIMERCB) SupAnimTimerCallback);
-		AIL_set_timer_period(g_supAnimTimer, 330000);
-		AIL_start_timer(g_supAnimTimer);
-	}
 }
 
-// Draws the backdrop and the next frame of the dropship, and presents them. AIL calls it as a
-// timer callback, which takes an argument this one doesn't pop.
-// FUNCTION: MW2 0x10003f3d
-void SupAnimTimerCallback(void)
-{
-	if (!g_displayReady || !g_supAnimBackdrop || !g_supAnimShape || g_supAnimFrameCount < 2) {
-		return;
-	}
-
-	if ((g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1) == 0) {
-		g_supAnimBuffer.m_buffer = g_mainPixelBuffer.m_buffer;
-		VFX_pane_wipe(&g_supAnimTarget, 0);
-		VFX_shape_draw(&g_supAnimTarget, g_supAnimBackdrop, 0, 0, 0);
-		VFX_shape_draw(&g_supAnimTarget, g_supAnimShape, g_supAnimFrame, g_supAnimX, g_supAnimY);
-		if (g_windowActive) {
-			g_currentRefreshMode->m_flip();
-		}
-
-		g_supAnimFrame = (g_supAnimFrame + 1) % g_supAnimFrameCount;
-	}
-}
-
-// Releases the timer and frees the backdrop and the dropship.
+// Frees the backdrop and the dropship.
 // FUNCTION: MW2 0x10004031
 void StopSupAnim(void)
 {
-	if (g_supAnimTimer != -1) {
-		AIL_release_timer_handle(g_supAnimTimer);
-		g_supAnimTimer = -1;
-	}
-
 	if (g_supAnimBackdrop) {
 		MechHeapFree(g_primaryHeap, g_supAnimBackdrop);
 		g_supAnimBackdrop = NULL;
