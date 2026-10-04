@@ -640,8 +640,10 @@ void UpdateMech(Mech* p_mech)
 // running, shut down, destroyed (exploding until the timer runs out) and ejecting.
 // Every player type's late update (PlayerType::m_lateUpdateFn).
 // Stack-slot permutation of the locals.
+// LateUpdateMech on the Rust side (src/sim/jumpjets.rs) wraps it, keeping the jump fuel's
+// recharge at the same rate whatever the framerate.
 // FUNCTION: MW2 0x100180cd
-void LateUpdateMech(Mech* p_mech)
+void LateUpdateMechC(Mech* p_mech)
 {
 	MechS32 throttle;
 	MechS32 isLocal;

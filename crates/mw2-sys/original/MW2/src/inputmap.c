@@ -1161,8 +1161,10 @@ MechS32 LoadGamekeyMap(void)
 // channel), _set works the position back from the output, and unless something already drove the
 // axis, _plus and _minus ramp it. Returns whether the axis was driven.
 // Stack-slot permutation: driven, device, channel and position.
+// UpdateAxisFromKeys on the Rust side (src/sim/input.rs) wraps it, ramping with _plus and _minus at
+// the same rate whatever the framerate.
 // FUNCTION: MW2 0x1007aecc
-MechS32 UpdateAxisFromKeys(AnalogBinding* p_binding)
+MechS32 UpdateAxisFromKeysC(AnalogBinding* p_binding)
 {
 	InputAxis* axis;
 	MechS32 driven;

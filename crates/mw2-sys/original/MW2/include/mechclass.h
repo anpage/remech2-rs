@@ -26,7 +26,9 @@ extern "C"
 
 	void FirstMech(struct Player* p_player);
 	void UpdateMech(struct Mech* p_mech);
+	// Implemented on the Rust side (src/sim/jumpjets.rs), around LateUpdateMechC
 	void LateUpdateMech(struct Mech* p_mech);
+	void LateUpdateMechC(struct Mech* p_mech);
 	void UpdateLocalMech(struct Mech* p_mech);
 	void DrawMechCockpit(struct Mech* p_mech);
 	void ShutdownMech(struct Mech* p_mech);

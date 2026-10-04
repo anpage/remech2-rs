@@ -35,10 +35,6 @@ patch_groups! {
     static PATCH_GROUPS = [
         camera,
         hud,
-        input,
-        jumpjets,
-        shots,
-        timing,
         window,
     ];
 }

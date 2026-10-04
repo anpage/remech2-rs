@@ -179,8 +179,9 @@ void ResetShotSlot(MechS32 p_index)
 
 // Ages every shot in flight by g_deltaTime and moves it on.
 // Stack-slot permutation: i and shot.
+// UpdateAllShots on the Rust side (src/sim/shots.rs) wraps it, skipping frames of no time.
 // FUNCTION: MW2 0x1006a486
-void UpdateAllShots(void)
+void UpdateAllShotsC(void)
 {
 	MechS32 i;
 	Shot* shot;
@@ -443,8 +444,10 @@ void SwayShot(Shot* p_shot, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 // Steers a guided missile at (p_x, p_y, p_z) toward its target, and arms its proximity fuse
 // within 100 units of it.
 // Stack-slot permutation: every local but distance.
+// GuideMissileToTarget on the Rust side (src/sim/shots.rs) wraps it, arming the fuse at the rate
+// of a 45 FPS sim.
 // FUNCTION: MW2 0x1006ae5a
-void GuideMissileToTarget(Shot* p_shot, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void GuideMissileToTargetC(Shot* p_shot, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 targetY;
 	MechS32 targetZ;

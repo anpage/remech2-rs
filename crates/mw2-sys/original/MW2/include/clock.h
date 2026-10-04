@@ -33,7 +33,9 @@ extern "C"
 	void NormalizeRotation(Matrix* p_matrix);
 	void ScaleVectorToLength(MechS32 p_length, MechS32* p_x, MechS32* p_y, MechS32* p_z);
 	void FirstClock(void);
+	// Implemented on the Rust side (src/sim/timing.rs), around NextClockC
 	void NextClock(void);
+	void NextClockC(void);
 	void StopTimers(void);
 	MechS32 GetGameClock(void);
 	MechS32 GetTicksSinceSync(void);

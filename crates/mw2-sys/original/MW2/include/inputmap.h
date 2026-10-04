@@ -1,6 +1,7 @@
 #ifndef INPUTMAP_H
 #define INPUTMAP_H
 
+#include "analogbinding.h"
 #include "playersteering.h"
 #include "types.h"
 
@@ -64,6 +65,9 @@ extern "C"
 	void EnableGameplayInput(void);
 	MechS16 LookupGameKey(MechS16 p_keyCode);
 	void ReportInputDeviceError(MechS32 p_code, MechChar* p_channel, MechChar* p_device);
+	// Implemented on the Rust side (src/sim/input.rs), around UpdateAxisFromKeysC
+	MechS32 UpdateAxisFromKeys(AnalogBinding* p_binding);
+	MechS32 UpdateAxisFromKeysC(AnalogBinding* p_binding);
 
 #ifdef __cplusplus
 }

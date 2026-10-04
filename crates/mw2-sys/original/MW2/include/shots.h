@@ -75,10 +75,14 @@ extern "C"
 	void FirstShots(void);
 	void ResetEffectSlot(MechS32 p_index);
 	void ResetShotSlot(MechS32 p_index);
+	// Implemented on the Rust side (src/sim/shots.rs), around UpdateAllShotsC
 	void UpdateAllShots(void);
+	void UpdateAllShotsC(void);
 	void UpdateShot(MechS32 p_index);
 	void SwayShot(Shot* p_shot, MechS32* p_x, MechS32* p_y, MechS32* p_z);
+	// Implemented on the Rust side (src/sim/shots.rs), around GuideMissileToTargetC
 	void GuideMissileToTarget(Shot* p_shot, MechS32 p_x, MechS32 p_y, MechS32 p_z);
+	void GuideMissileToTargetC(Shot* p_shot, MechS32 p_x, MechS32 p_y, MechS32 p_z);
 	void DetonateShot(
 		MechS32 p_index,
 		MechS32 p_explode,

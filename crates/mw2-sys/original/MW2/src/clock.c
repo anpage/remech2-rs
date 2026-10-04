@@ -199,8 +199,9 @@ void FirstClock(void)
 	g_realClock = 0;
 }
 
+// NextClock on the Rust side (src/sim/timing.rs) wraps it, limiting the framerate.
 // FUNCTION: MW2 0x1007ce2c
-void NextClock(void)
+void NextClockC(void)
 {
 	if (!g_ticksTimerInitialized) {
 		return;
