@@ -118,10 +118,12 @@ struct State {
 
 impl State {
     fn new() -> Self {
+        let egui_ctx = egui::Context::default();
+        egui_ctx.set_theme(egui::Theme::Dark);
         Self {
             window: None,
             renderer: None,
-            egui_ctx: egui::Context::default(),
+            egui_ctx,
             egui_input: None,
             modifiers: ModifiersState::empty(),
             focused: false,
