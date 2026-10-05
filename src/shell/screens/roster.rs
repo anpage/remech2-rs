@@ -4,9 +4,8 @@ use std::sync::Mutex;
 
 use mw2_sys::shell::{self, PilotRecord, ScreenField, TMPackDataBase};
 
-use super::{
-    Campaign, Screen, ScreenArgs, ShellMsg, delete, field_index, rand, run,
-};
+use super::{Campaign, Screen, ScreenArgs, ShellMsg, delete, field_index, run};
+use crate::mech_rand::rand;
 use crate::shell::overlay::{confirm, menu};
 
 /// Button ids, in the order the roster's layout table lists them
@@ -27,7 +26,7 @@ const CALLSIGN_MAX_WIDTH: i32 = 300;
 
 /// A new pilot starts somewhere in `HONOR..HONOR * 2`
 const HONOR: f64 = 1000.0;
-const RAND_MAX: f64 = 32767.0;
+const RAND_MAX: f64 = mw2_sys::shared::MECH_RAND_MAX as f64;
 
 /// The selected pilot's stats
 fn pilot_stats() -> *mut ScreenField {

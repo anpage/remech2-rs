@@ -1,12 +1,13 @@
 #include "random.h"
 
+#include "mechrand.h"
 #include "types.h"
 
 #include <math.h>
-#include <stdlib.h>
 
 // Two tables of 127 random numbers, read round-robin: rand() values, and values roughly normally
-// distributed around 0 (the sum of 30 rand() calls, scaled to +-sqrt(90) * 1024).
+// distributed around 0 (the sum of 30 rand() calls, scaled to +-sqrt(90) * 1024). rand is
+// MechRand, with Visual C++'s 15-bit range: glibc's 31-bit numbers overflowed the sum.
 
 // GLOBAL: MW2 0x100ae750
 MechS32 g_normalRandomIndex = 0;
@@ -35,16 +36,16 @@ void InitRandom(MechU32 p_seed)
 	MechS32 j;
 	MechDouble range;
 
-	srand(p_seed);
+	MechSRand(p_seed);
 	for (i = 0; i < 127; i++) {
-		g_randomInts[i] = rand();
+		g_randomInts[i] = MechRand();
 	}
 
-	scale = (range = sqrt(90.0)) * 2.0 / (30 * RAND_MAX);
+	scale = (range = sqrt(90.0)) * 2.0 / (30 * MECH_RAND_MAX);
 	for (i = 0; i < 127; i++) {
 		sum = 0;
 		for (j = 0; j < 30; j++) {
-			sum += rand();
+			sum += MechRand();
 		}
 
 		g_normalRandomInts[i] = (MechS32) ((sum * scale - range) * 1024.0);

@@ -186,7 +186,8 @@ void FlushEventLists(MechU32 p_lists)
 	for (i = 0; i < g_objectiveCount; i++) {
 		if (g_missionTables[i]) {
 			for (j = 0; j < 48; j++) {
-				if ((p_lists & (1 << j)) && (p_lists & ((1 << i) << 16)) &&
+				// x86's shl takes the count modulo 32, which C leaves undefined past 31
+				if ((p_lists & (1u << (j & 31))) && (p_lists & ((1u << (i & 31)) << 16)) &&
 					g_objectiveTable[i].m_objectives[j].m_state == 7) {
 				}
 			}

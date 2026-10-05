@@ -341,7 +341,7 @@ MechS32 g_localStarAssigned = 0;
 
 // GLOBAL: MW2 0x100a90c8
 AiStateFn g_aiStateFns[14] = {
-	(AiStateFn) AiStateIdle,
+	AiStateIdle,
 	AiStateMove,
 	AiStateMove,
 	AiStateAttack,
@@ -352,7 +352,7 @@ AiStateFn g_aiStateFns[14] = {
 	AiStateMove,
 	AiStateMove,
 	AiStateMove,
-	(AiStateFn) AiStateIdle,
+	AiStateIdle,
 	NULL,
 	NULL,
 };
@@ -363,9 +363,9 @@ AiMessageFn g_aiMessageFns[8] = {
 	AiMessageProx,
 	AiMessageDist,
 	AiMessageReach,
-	(AiMessageFn) AiMessageTrue,
-	(AiMessageFn) AiMessageFalse,
-	(AiMessageFn) AiMessageDestroy,
+	AiMessageTrue,
+	AiMessageFalse,
+	AiMessageDestroy,
 	AiMessageTargetable,
 };
 
@@ -950,16 +950,17 @@ MechS16 ResolveTarget(Player* p_player, MechS16 p_target)
 }
 
 // The rule message functions (g_aiMessageFns): each returns the target the message matches
-// for p_player, or 0. M_TRUE always matches.
+// for p_player, or 0. M_TRUE always matches. The original declared some of them with fewer
+// parameters (or an unsigned target) and cast them into the table.
 // FUNCTION: MW2 0x10052311
-MechS16 AiMessageTrue(Player* p_player, MechU16 p_target)
+MechS16 AiMessageTrue(Player* p_player, MechS16 p_target, MechS16 p_arg)
 {
 	return p_target;
 }
 
 // M_FALSE never matches.
 // FUNCTION: MW2 0x10052325
-MechS16 AiMessageFalse(void)
+MechS16 AiMessageFalse(Player* p_player, MechS16 p_target, MechS16 p_arg)
 {
 	return 0;
 }
@@ -1451,7 +1452,7 @@ MechS16 FUN_100531e4(void)
 
 // M_DESTROY: p_target when it is destroyed, reporting it when the local player leads the star.
 // FUNCTION: MW2 0x100531f7
-MechS16 AiMessageDestroy(Player* p_player, MechU16 p_target)
+MechS16 AiMessageDestroy(Player* p_player, MechS16 p_target, MechS16 p_arg)
 {
 	if (!IsTargetDone(p_target, 2)) {
 		p_target = 0;
@@ -1463,9 +1464,10 @@ MechS16 AiMessageDestroy(Player* p_player, MechU16 p_target)
 	return p_target;
 }
 
-// The state functions (g_aiStateFns), run each tick with the player's target.
+// The state functions (g_aiStateFns), run each tick with the player's target, which idling
+// ignores. The original declared it without one and cast it into the table.
 // FUNCTION: MW2 0x10053258
-void AiStateIdle(Player* p_player)
+void AiStateIdle(Player* p_player, MechU16 p_target)
 {
 	p_player->m_targetInfo.m_distance = 0;
 	return;

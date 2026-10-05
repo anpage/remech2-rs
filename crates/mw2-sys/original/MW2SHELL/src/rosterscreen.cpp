@@ -5,10 +5,12 @@
 #include "buttonmenu.h"
 #include "campaignmission.h"
 #include "decomp.h"
+#include "elapsed.h"
 #include "font.h"
 #include "keyboardinput.h"
 #include "mainmenubutton.h"
 #include "mechbay.h"
+#include "mechrand.h"
 #include "mechvariant.h"
 #include "menudata.h"
 #include "menuscreen.h"
@@ -32,7 +34,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 // The pilot roster screen of a clan hall: ten pilot slots, the selected pilot's record and the
 // mission list.
@@ -247,7 +248,8 @@ void DrawPilotRoster(TMPackDataBase* p_database, MechS32 p_campaign, MechU8* p_p
 	MechS32 size;
 
 	g_rosterCampaign = p_campaign;
-	srand(clock());
+	// The original seeded with clock(), milliseconds since the program started
+	MechSRand(MechMilliseconds());
 	g_videoDriver->LoadBackground(p_database, g_rosterScreens[p_campaign].m_picture);
 	LoadPilotRoster();
 	g_currentPilot = NULL;

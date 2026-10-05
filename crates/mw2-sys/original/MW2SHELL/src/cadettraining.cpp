@@ -4,7 +4,9 @@
 #include "audiosubsystem.h"
 #include "buttonmenu.h"
 #include "decomp.h"
+#include "elapsed.h"
 #include "mainmenubutton.h"
+#include "mechrand.h"
 #include "menudata.h"
 #include "menuscreen.h"
 #include "messages.h"
@@ -20,7 +22,6 @@
 #include "windowstate.h"
 
 #include <stdlib.h>
-#include <time.h>
 
 // The trainer's idle video alternates between two takes; a countdown to the next.
 // GLOBAL: MW2SHELL 0x1006acc8
@@ -72,7 +73,8 @@ void DrawCadetTraining(TMPackDataBase* p_database, MechS32 p_campaign, char**, s
 		break;
 	}
 
-	srand(clock());
+	// The original seeded with clock(), milliseconds since the program started
+	MechSRand(MechMilliseconds());
 	RegisterScreenFunction(CadetTrainingCallback);
 }
 

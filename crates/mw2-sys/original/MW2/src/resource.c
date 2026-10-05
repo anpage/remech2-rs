@@ -292,11 +292,10 @@ MechS32 LoadFormationTable(FormationRecord* p_record)
 
 // Runs p_fn on the stream an include record names. A name of "^" with id -1 or -2 takes the
 // scenario table's next name.
-// Stack-slot permutation: record, keyData, ok and buffer.
 // FUNCTION: MW2 0x1004f9a8
 MechS32 ExecuteInclude(IncludeRecord* p_record, BwdStreamFn p_fn)
 {
-	undefined buffer[0x20];
+	BwdStream streamData;
 	BwdStreamKey keyData;
 	IncludeRecord* record;
 	MechS32 ok;
@@ -328,7 +327,7 @@ MechS32 ExecuteInclude(IncludeRecord* p_record, BwdStreamFn p_fn)
 	}
 
 	if (ok) {
-		stream = OpenBwdStream(key, (BwdStream*) buffer);
+		stream = OpenBwdStream(key, &streamData);
 		if (stream) {
 			result = TRUE;
 			result &= p_fn(stream);
@@ -385,11 +384,10 @@ void SetTeamFormations(FormationNames* p_record)
 }
 
 // Runs p_fn on the stream a record names.
-// Stack-slot permutation: record, keyData and buffer.
 // FUNCTION: MW2 0x1004fcac
 MechS32 RunIncludedStream(IncludeRecord2* p_record, BwdStreamFn p_fn)
 {
-	undefined buffer[0x20];
+	BwdStream streamData;
 	BwdStreamKey keyData;
 	MechS32 id;
 	IncludeRecord2* record;
@@ -404,7 +402,7 @@ MechS32 RunIncludedStream(IncludeRecord2* p_record, BwdStreamFn p_fn)
 	strncpy(key->m_name, record->m_name, 0xc);
 	key->m_name[0xc] = '\0';
 	key->m_id = id;
-	stream = OpenBwdStream(key, (BwdStream*) buffer);
+	stream = OpenBwdStream(key, &streamData);
 	if (stream) {
 		result = TRUE;
 		result = p_fn(stream);

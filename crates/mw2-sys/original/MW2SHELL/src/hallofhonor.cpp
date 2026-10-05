@@ -23,10 +23,10 @@ void operator delete(void*);
 #include <string.h>
 
 // FUNCTION: MW2SHELL 0x1003e2f0
-MechS32 ComparePilotRecords(const PilotRecord** p_first, const PilotRecord** p_second)
+int ComparePilotRecords(const void* p_first, const void* p_second)
 {
-	const PilotRecord** firstParam = p_first;
-	const PilotRecord** secondParam = p_second;
+	const PilotRecord* const* firstParam = (const PilotRecord* const*) p_first;
+	const PilotRecord* const* secondParam = (const PilotRecord* const*) p_second;
 	const PilotRecord* first = *firstParam;
 	const PilotRecord* second = *secondParam;
 
@@ -77,7 +77,7 @@ void DrawHallOfHonor()
 	for (i = 0; i < 20; i++) {
 		pilots[i] = &g_pilotRoster[i];
 	}
-	qsort(pilots, 20, sizeof(pilots[0]), (int (*)(const void*, const void*)) ComparePilotRecords);
+	qsort(pilots, 20, sizeof(pilots[0]), ComparePilotRecords);
 
 	top = 0x96;
 	g_videoDriver->DrawString(0, top, g_buttonFont->m_dataCopy, "Pilot", NULL);

@@ -27,6 +27,8 @@ pub struct Renderer {
     scaler: Scaler,
     scaling: ScalingMode,
     egui: egui_wgpu::Renderer,
+    /// Dropped last to keep alive for wgpu
+    _window: Arc<Window>,
 }
 
 impl Renderer {
@@ -34,7 +36,7 @@ impl Renderer {
         let size = window.inner_size();
 
         let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor::default());
-        let surface = instance.create_surface(window)?;
+        let surface = instance.create_surface(window.clone())?;
         let adapter = pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
             compatible_surface: Some(&surface),
             ..Default::default()
@@ -73,6 +75,7 @@ impl Renderer {
             scaler,
             scaling: ScalingMode::from_settings(),
             egui,
+            _window: window,
         })
     }
 

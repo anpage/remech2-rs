@@ -107,7 +107,6 @@ MechU32 GetStaticPoolSize(MechS32 p_index)
 
 // Reads a mission's static memory table (seven tag and size pairs), or returns NULL. A mission
 // named by a number is looked up by that resource id.
-// Stack-slot permutation: result, key, keyData and buffer.
 // FUNCTION: MW2 0x1005640e
 StaticPoolSize* ReadStaticMemoryTable(char* p_mission)
 {
@@ -115,7 +114,7 @@ StaticPoolSize* ReadStaticMemoryTable(char* p_mission)
 	BwdStreamKey* key;
 	StaticPoolSize* result;
 	BwdStreamKey keyData;
-	undefined buffer[0x20];
+	BwdStream streamData;
 
 	result = NULL;
 	key = &keyData;
@@ -128,7 +127,7 @@ StaticPoolSize* ReadStaticMemoryTable(char* p_mission)
 		key->m_id = -1;
 	}
 
-	stream = OpenBwdStream(key, (BwdStream*) buffer);
+	stream = OpenBwdStream(key, &streamData);
 	if (stream) {
 		if (CountMissionStream(stream)) {
 			result = BuildStaticMemoryTable();

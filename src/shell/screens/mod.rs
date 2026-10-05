@@ -1,4 +1,4 @@
-use std::ffi::{c_char, c_int, c_void};
+use std::ffi::{c_char, c_void};
 use std::sync::Mutex;
 
 use mw2_sys::shell::{self, ScreenField, TMPackDataBase};
@@ -100,8 +100,6 @@ const CAMPAIGN_LENGTH: i32 = 16;
 unsafe extern "C" {
     fn malloc(size: usize) -> *mut c_void;
     fn free(ptr: *mut c_void);
-    /// The C library's, which the shell seeds
-    fn rand() -> c_int;
 }
 
 unsafe fn allocate<T>() -> *mut T {

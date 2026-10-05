@@ -227,10 +227,12 @@ static MechS32 DisplayBlendPalettes(PaletteColor* p_palette, MechS32 p_steps)
 
 	i = p_steps;
 	while (i--) {
+		// Converts through an int, as the original's __ftol did: a fade down makes the step
+		// negative, which C can't convert to an unsigned byte
 		for (j = 0; j < 0x100; j++) {
-			p_palette[j].m_red = (MechU8) ((p_steps - i) * deltas[j][0]) + g_paletteColorsPreBrightness[j].m_red;
-			p_palette[j].m_green = (MechU8) ((p_steps - i) * deltas[j][1]) + g_paletteColorsPreBrightness[j].m_green;
-			p_palette[j].m_blue = (MechU8) ((p_steps - i) * deltas[j][2]) + g_paletteColorsPreBrightness[j].m_blue;
+			p_palette[j].m_red = (MechS32) ((p_steps - i) * deltas[j][0]) + g_paletteColorsPreBrightness[j].m_red;
+			p_palette[j].m_green = (MechS32) ((p_steps - i) * deltas[j][1]) + g_paletteColorsPreBrightness[j].m_green;
+			p_palette[j].m_blue = (MechS32) ((p_steps - i) * deltas[j][2]) + g_paletteColorsPreBrightness[j].m_blue;
 			g_paletteColors[j] = p_palette[j];
 		}
 

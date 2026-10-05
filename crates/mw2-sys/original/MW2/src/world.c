@@ -780,13 +780,13 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			BwdStreamKey* key;
 			BwdStreamKey keyData;
 			BwdResourceRecord* pit = (BwdResourceRecord*) node;
-			undefined buffer[0x20];
+			BwdStream streamData;
 
 			if (g_lastPlayer && !g_lastPlayer->m_aiMode) {
 				key = &keyData;
 				key->m_id = pit->m_ref.m_id;
 				strcpy(key->m_name, pit->m_ref.m_name);
-				stream = OpenBwdStream(key, (BwdStream*) buffer);
+				stream = OpenBwdStream(key, &streamData);
 				if (stream) {
 					result &= BwdExecuteStream(stream);
 					UnloadResource(stream);
@@ -801,13 +801,13 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			BwdStreamKey* key;
 			BwdStreamKey keyData;
 			BwdResourceRecord* vpt = (BwdResourceRecord*) node;
-			undefined buffer[0x20];
+			BwdStream streamData;
 
 			if (g_lastPlayer && !g_lastPlayer->m_aiMode) {
 				key = &keyData;
 				key->m_id = vpt->m_ref.m_id;
 				strcpy(key->m_name, vpt->m_ref.m_name);
-				stream = OpenBwdStream(key, (BwdStream*) buffer);
+				stream = OpenBwdStream(key, &streamData);
 				if (stream) {
 					result &= BwdExecuteStream(stream);
 					UnloadResource(stream);
@@ -1349,7 +1349,7 @@ MechS32 LoadWorld(MechChar* p_name)
 	MechS32 result;
 	MechS32 i;
 	BwdStreamKey keyData;
-	undefined buffer[0x20];
+	BwdStream streamData;
 
 	result = FALSE;
 	ResetTeams();
@@ -1371,7 +1371,7 @@ MechS32 LoadWorld(MechChar* p_name)
 	strncpy(key->m_name, p_name, 0xc);
 	key->m_name[0xc] = '\0';
 	SetMangleBase(0);
-	stream = OpenBwdStream(key, (BwdStream*) buffer);
+	stream = OpenBwdStream(key, &streamData);
 	if (stream && AllocGeoTables()) {
 		result = BwdExecuteStream(stream);
 		UnloadResource(stream);

@@ -25,6 +25,7 @@ mod launcher;
 mod log;
 mod messages;
 mod midi_source;
+mod mech_rand;
 mod settings;
 mod shell;
 mod sim;
