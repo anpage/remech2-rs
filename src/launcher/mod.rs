@@ -2,14 +2,13 @@ use anyhow::Result;
 
 use crate::app::App;
 
-mod dll_check;
 mod file_check;
 
 enum Action {
     /// Stay on current stage
     Nothing,
     /// Move on to another stage
-    Continue(Box<dyn Stage>),
+    _Continue(Box<dyn Stage>),
     /// Exit the launcher and run the game
     Break,
 }
@@ -46,7 +45,7 @@ impl Launcher {
     fn ui(&mut self, ctx: &egui::Context) -> Result<bool> {
         match self.current_stage.ui(ctx)? {
             Action::Nothing => Ok(false),
-            Action::Continue(stage) => {
+            Action::_Continue(stage) => {
                 self.current_stage = stage;
                 Ok(false)
             }

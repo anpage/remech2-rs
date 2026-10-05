@@ -14,10 +14,6 @@ pub const GAME_FILES: &[GameFile] = &[
         cd_paths: &["DATABASE.MW2", "MECH2/DATABASE.MW2"],
     },
     GameFile {
-        path: "DPLAY.DLL",
-        cd_paths: &["DIRECTX/DPLAY.DLL"],
-    },
-    GameFile {
         path: "EN00STAR.BWD",
         cd_paths: &["EN00STAR.BWD"],
     },
@@ -62,10 +58,6 @@ pub const GAME_FILES: &[GameFile] = &[
         cd_paths: &["INSTMAP1.BWD"],
     },
     GameFile {
-        path: "MW2.DLL",
-        cd_paths: &["MW2.DLL"],
-    },
-    GameFile {
         path: "MW2.PRJ",
         cd_paths: &["MW2.PRJ", "MECH2/MW2.PRJ"],
     },
@@ -94,24 +86,12 @@ pub const GAME_FILES: &[GameFile] = &[
         cd_paths: &["MW2REG.CFG"],
     },
     GameFile {
-        path: "MW2SHELL.DLL",
-        cd_paths: &["MW2SHELL.DLL"],
-    },
-    GameFile {
         path: "MW2SND.CFG",
         cd_paths: &["MW2SND.CFG"],
     },
     GameFile {
-        path: "SMACKW32.DLL",
-        cd_paths: &["SMACKW32.DLL"],
-    },
-    GameFile {
         path: "USERSTAR.BWD",
         cd_paths: &["USERSTAR.BWD"],
-    },
-    GameFile {
-        path: "WAIL32.DLL",
-        cd_paths: &["WAIL32.DLL"],
     },
 ];
 

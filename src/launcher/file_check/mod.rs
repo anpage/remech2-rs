@@ -5,7 +5,7 @@ use std::{
 
 use anyhow::{Result, bail};
 
-use super::{Action, Stage, dll_check};
+use super::{Action, Stage};
 use crate::files;
 
 mod list;
@@ -264,7 +264,7 @@ impl FileCheck {
                 self.cd_drive_path = Self::cd_check();
                 Ok(Action::Nothing)
             }
-            Some(Choice::Skip) => Ok(Action::Continue(Box::new(dll_check::DllCheck::new()))),
+            Some(Choice::Skip) => Ok(Action::Break),
             Some(Choice::Install) => {
                 if let Some(cd_drive_path) = self.cd_drive_path.clone() {
                     self.start_copy(cd_drive_path);
@@ -283,7 +283,7 @@ impl Stage for FileCheck {
         }
 
         if self.missing_files.is_empty() {
-            return Ok(Action::Continue(Box::new(dll_check::DllCheck::new())));
+            return Ok(Action::Break);
         }
 
         self.missing_files_ui(ctx)
