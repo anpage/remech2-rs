@@ -1003,7 +1003,8 @@ void LateUpdateMechC(Mech* p_mech)
 			mech->m_torsoPitch.m_target = mech->m_player->m_steering->m_torsoTilt;
 		}
 
-		mech->m_deltaHeat += MulDiv64(mech->m_throttle.m_value - 0x400, mech->m_cooling, 0x2800);
+		// Per ideal 4-tick frame in the original. We scale to the elapsed ticks.
+		mech->m_deltaHeat += MulDiv64(mech->m_throttle.m_value - 0x400, mech->m_cooling * g_deltaTime, 0x2800 * 4);
 	}
 
 	if (mech->m_powerState != 2) {
