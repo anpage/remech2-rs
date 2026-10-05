@@ -192,6 +192,24 @@ key_codes!(
     WakeUp,
 );
 
+impl KeyCode {
+    pub fn is_digit(self) -> bool {
+        matches!(
+            self,
+            KeyCode::Digit0
+                | KeyCode::Digit1
+                | KeyCode::Digit2
+                | KeyCode::Digit3
+                | KeyCode::Digit4
+                | KeyCode::Digit5
+                | KeyCode::Digit6
+                | KeyCode::Digit7
+                | KeyCode::Digit8
+                | KeyCode::Digit9
+        )
+    }
+}
+
 impl fmt::Display for KeyCode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self.name())

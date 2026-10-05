@@ -8,6 +8,9 @@ const TIMER_HZ: u128 = 1_193_182;
 /// The divisor that the original game used to scale the timer rate
 const TIMER_DIVISOR: u128 = 6556;
 
+/// The game clock's rate
+pub(super) const TICKS_PER_SECOND: f64 = TIMER_HZ as f64 / TIMER_DIVISOR as f64;
+
 /// Handles to each counter
 const HANDLES: usize = 64;
 

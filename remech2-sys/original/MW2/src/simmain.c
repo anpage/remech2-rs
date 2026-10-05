@@ -590,11 +590,7 @@ void UpdatePauseState(void)
 			g_localSteering.m_keyCode = 0;
 		}
 
-		if (!GetMenuSlotState(4) && g_windowMode != c_windowModeFullscreen) {
-			MechMouseShowCursor(TRUE);
-
-			g_mouseOutsideClientWindow = TRUE;
-		}
+		// In a window, the original showed the cursor here. We keep it hidden.
 
 		DebugPrint("WinMain(4): pause_timer(TRUE)");
 		PauseTimer(0x80, TRUE);

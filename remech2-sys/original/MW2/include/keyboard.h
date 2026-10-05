@@ -27,6 +27,8 @@ extern "C"
 	extern MechChar* g_keyNames[0x79];
 
 	void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+	MechS32 KeyboardReadKeyCode(MechS16* p_keyCode);
+	MechS32 KeyboardFlushKeyCodes(void);
 	void KeyboardClearKeyStates(void);
 	MechS16 KeyboardPollKeyCode(void);
 

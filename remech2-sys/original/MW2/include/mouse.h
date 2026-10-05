@@ -22,6 +22,8 @@ extern "C"
 	extern MechChar g_mouseDisplayName[8];
 	extern MechChar g_mouseTypeName[8];
 
+	MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons);
+
 #ifdef __cplusplus
 }
 #endif

@@ -39,7 +39,6 @@ MechS32 FillMouseDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info);
 MechS32 MouseOpenDevice(InputDeviceInfo* p_info);
 MechS32 MouseCloseDevice(InputDeviceInfo* p_info);
 MechS32 CenterCursor(void* p_data, MechS32 p_axis);
-MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons);
 MechS32 MouseReadKeyCode(MechS16* p_keyCode);
 MechS32 MouseFlushKeyCodes(void);
 

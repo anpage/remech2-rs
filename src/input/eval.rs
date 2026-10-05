@@ -256,8 +256,12 @@ impl Evaluator {
                 let motion = matches!(binding.trigger, Input::MouseAxis(_));
                 let delta = take_delta(&mut binding.counter, reading.counter, motion);
                 let typed = matches!(binding.trigger, Input::Key(_) | Input::Modifier(_));
+                // An open menu takes the digits
+                let menu_digit =
+                    context.menu && matches!(binding.trigger, Input::Key(key) if key.is_digit());
                 let available = binding.action.action().availability.includes(context)
-                    && !(frame.typing && typed);
+                    && !(frame.typing && typed)
+                    && !menu_digit;
                 let chord = available
                     && binding
                         .modifiers

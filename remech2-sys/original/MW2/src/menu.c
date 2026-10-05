@@ -392,25 +392,28 @@ void FirstMenu(void)
 	}
 }
 
-// Works out g_menuKey for the open menu from the key code, or from the menu bindings in menus
-// that take navigation keys (repeating while they are held), and takes the key code it uses.
-// Stack-slot permutation: menu and flags.
+// Works out g_menuKey for the open menu: the digits from the key code, Escape and (in menus that
+// take navigation keys) the rest from the bindings, else from the menu sinks (repeating while they
+// are held). The typed keys the original took from the key code are dropped.
 // FUNCTION: MW2 0x1003cc20
 void UpdateMenuKey(void)
 {
 	MenuDefinition* menu;
 	MechU32 flags;
+	MechS16 bound;
 
 	g_menuKey = 0;
+	bound = TakeBoundMenuKey();
 	menu = GetOpenMenu();
 	if (menu) {
 		flags = menu->m_flags;
-		if (g_localSteering.m_keyCode) {
+		if (g_localSteering.m_keyCode >= '0' && g_localSteering.m_keyCode <= '9') {
+			g_menuKey = g_localSteering.m_keyCode;
+			g_localSteering.m_keyCode = 0;
+		}
+		else {
 			if (g_localSteering.m_keyCode == 0x1b) {
-				g_menuKey = g_localSteering.m_keyCode;
-			}
-			else if (g_localSteering.m_keyCode >= '0' && g_localSteering.m_keyCode <= '9') {
-				g_menuKey = g_localSteering.m_keyCode;
+				g_localSteering.m_keyCode = 0;
 			}
 			else if (flags & 1) {
 				switch (g_localSteering.m_keyCode) {
@@ -422,40 +425,40 @@ void UpdateMenuKey(void)
 				case 0xc8:
 				case 0xc9:
 				case 0x209:
-					g_menuKey = g_localSteering.m_keyCode;
+					g_localSteering.m_keyCode = 0;
 					break;
 				default:
 					break;
 				}
 			}
 
-			if (g_localSteering.m_keyCode == g_menuKey) {
-				g_localSteering.m_keyCode = 0;
+			if (bound == 0x1b || (bound && (flags & 1))) {
+				g_menuKey = bound;
 			}
-		}
-		else if (flags & 1) {
-			if (g_sinkMenuEnter) {
-				g_menuKey = 0x0d;
-			}
-			else if (g_sinkMenuAbort) {
-				g_menuKey = 0x1b;
-			}
+			else if (flags & 1) {
+				if (g_sinkMenuEnter) {
+					g_menuKey = 0x0d;
+				}
+				else if (g_sinkMenuAbort) {
+					g_menuKey = 0x1b;
+				}
 
-			if (g_menuKey == 0 && GetTicks(g_menuRepeatTimer) > 90) {
-				if (g_sinkMenuItem < -0x2000) {
-					g_menuKey = 0xc6;
+				if (g_menuKey == 0 && GetTicks(g_menuRepeatTimer) > 90) {
+					if (g_sinkMenuItem < -0x2000) {
+						g_menuKey = 0xc6;
+					}
+					else if (g_sinkMenuItem > 0x2000) {
+						g_menuKey = 0xc7;
+					}
 				}
-				else if (g_sinkMenuItem > 0x2000) {
-					g_menuKey = 0xc7;
-				}
-			}
 
-			if (g_menuKey == 0 && GetTicks(g_menuRepeatTimer) > 45) {
-				if (g_sinkMenuValue < -0x2000) {
-					g_menuKey = 0xc9;
-				}
-				else if (g_sinkMenuValue > 0x2000) {
-					g_menuKey = 0x20;
+				if (g_menuKey == 0 && GetTicks(g_menuRepeatTimer) > 45) {
+					if (g_sinkMenuValue < -0x2000) {
+						g_menuKey = 0xc9;
+					}
+					else if (g_sinkMenuValue > 0x2000) {
+						g_menuKey = 0x20;
+					}
 				}
 			}
 		}

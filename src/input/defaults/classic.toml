@@ -115,7 +115,6 @@ bindings = [
     { action = "zoom", source = "key/KeyZ", direction = "increase" },
     { action = "zoom", source = "key/KeyZ", modifiers = ["key/Shift"], direction = "decrease" },
     { action = "cockpit_reset_zoom", source = "key/KeyZ", modifiers = ["key/Control"] },
-    { action = "zoom", source = "key/KeyZ", modifiers = ["key/Control"], direction = "increase" },
     { action = "camera_distance", source = "key/KeyZ", modifiers = ["key/Control"], direction = "decrease" },
     { action = "look_left_right", source = "key/ArrowLeft", modifiers = ["key/Control"], direction = "decrease" },
     { action = "look_left_right", source = "key/ArrowRight", modifiers = ["key/Control"], direction = "increase" },

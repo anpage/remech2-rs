@@ -299,9 +299,11 @@ fn post_key(event: &KeyEvent) {
         Key::Character(text) => text.chars().next(),
         _ => None,
     };
-    let Some((wparam, lparam)) = keyboard::params(code, character) else {
+    let Some((wparam, mut lparam)) = keyboard::params(code, character) else {
         return;
     };
+    // Bit 30 marks a repeat
+    lparam |= isize::from(event.repeat) << 30;
 
     let message = match event.state {
         ElementState::Pressed => c_mechMsgKeyDown,

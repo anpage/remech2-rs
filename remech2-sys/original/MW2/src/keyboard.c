@@ -133,8 +133,6 @@ MechS32 KeyboardOpenDevice(InputDeviceInfo* p_info);
 MechS32 KeyboardCloseDevice(InputDeviceInfo* p_info);
 MechS32 KeyboardCenterAxis(void* p_data, MechS32 p_axis);
 MechS32 KeyboardPoll(void* p_data, MechS32* p_axes, MechU32* p_keyStates);
-MechS32 KeyboardReadKeyCode(MechS16* p_keyCode);
-MechS32 KeyboardFlushKeyCodes(void);
 void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam);
 void KeyboardRecordKeyState(size_t p_virtualKey, MechU32 p_lParam, MechS32 p_pressed);
 
@@ -234,7 +232,8 @@ MechS32 KeyboardFlushKeyCodes(void)
 	return 0;
 }
 
-// Unlike the shell's, the simulator queues a key's code when the key is released.
+// The original simulator queued a key's code when the key was released. We queue it on the
+// press, as the bindings fire, and only once however long the key is held.
 // FUNCTION: MW2 0x10042966
 void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
@@ -246,11 +245,14 @@ void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam
 		switch (p_msg) {
 		case c_mechMsgKeyDown:
 		case c_mechMsgSysKeyDown:
+			// Bit 30 marks a repeat
+			if (!(p_lParam & 0x40000000)) {
+				KeyboardQueueKeyCode(p_wParam, p_lParam);
+			}
 			KeyboardRecordKeyState(p_wParam, p_lParam, TRUE);
 			break;
 		case c_mechMsgKeyUp:
 		case c_mechMsgSysKeyUp:
-			KeyboardQueueKeyCode(p_wParam, p_lParam);
 			KeyboardRecordKeyState(p_wParam, p_lParam, FALSE);
 			break;
 		}

@@ -85,16 +85,17 @@ extern "C"
 	MechS32 FindInputButton(MechS32 p_device, MechChar* p_name);
 	MechS32 LoadInputMap(void);
 	MechS32 LoadGamekeyMap(void);
+	void DisableGameplayInput(void);
+	void EnableGameplayInput(void);
+	void ReportInputDeviceError(MechS32 p_code, MechChar* p_channel, MechChar* p_device);
+
+	// Implemented on the Rust side (src/sim/input.rs)
 	void FirstInputs(void);
 	void UpdateInputs(void);
 	void CloseInputDevices(void);
-	void DisableGameplayInput(void);
-	void EnableGameplayInput(void);
 	MechS16 LookupGameKey(MechS16 p_keyCode);
-	void ReportInputDeviceError(MechS32 p_code, MechChar* p_channel, MechChar* p_device);
-	// Implemented on the Rust side (src/sim/input.rs), around UpdateAxisFromKeysC
-	MechS32 UpdateAxisFromKeys(AnalogBinding* p_binding);
-	MechS32 UpdateAxisFromKeysC(AnalogBinding* p_binding);
+	// The key code the bindings give the open menu this frame, or 0
+	MechS16 TakeBoundMenuKey(void);
 
 #ifdef __cplusplus
 }
