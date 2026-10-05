@@ -160,16 +160,16 @@ MechS32 g_monoColumn = 0;
 
 // The totals CountSceneShape adds up for ShowSceneInfo.
 // GLOBAL: MW2 0x100bea00
-static MechS32 g_sceneVertexCount;
+MechS32 g_sceneVertexCount;
 
 // GLOBAL: MW2 0x100bea04
-static MechS32 g_sceneMemory;
+MechS32 g_sceneMemory;
 
 // GLOBAL: MW2 0x100bea08
-static MechS32 g_sceneShapeCount;
+MechS32 g_sceneShapeCount;
 
 // GLOBAL: MW2 0x100bea0c
-static MechS32 g_sceneFaceCount;
+MechS32 g_sceneFaceCount;
 
 // Set when the monochrome debug screen is in use; the AI logs its state to it too. Only the
 // /M switch's InitializeMono could have set it, in a branch compiled out.

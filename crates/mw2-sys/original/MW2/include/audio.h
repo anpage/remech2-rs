@@ -15,6 +15,8 @@ extern "C"
 	extern SoundConfig g_soundConfig;
 	extern SoundConfig* g_mw2SndCfgData;
 	extern MechS32 g_audioPaused;
+	extern MechS32 g_musicStarted;
+	extern MechS32 g_nextEngageCheck;
 
 	MechS32 GetSoundSetting(MechS32 p_setting);
 	void PreviewSoundSetting(MechS32 p_setting, MechS32 p_value);

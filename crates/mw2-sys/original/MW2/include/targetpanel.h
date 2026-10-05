@@ -13,6 +13,10 @@ extern "C"
 
 	extern MechS32 g_targetPanelMode;
 	extern MechChar g_anonymousInstallationName[8];
+	extern MechS32 g_announceTargetSide;
+	extern MechS32 g_targetFullNameTime;
+	extern MechS32 g_lastPanelTarget;
+	extern MechS32 g_targetPanelStatic;
 
 	void DrawTargetPanelText(struct CockpitPanel* p_panel);
 	void DrawTargetPanel(struct CockpitPanel* p_panel);

@@ -14,11 +14,6 @@
 #include "speech.h"
 #include "types.h"
 
-typedef struct TimeOfDayPhase {
-	MechS32 m_palette;  // 0x00
-	MechS32 m_duration; // 0x04
-} TimeOfDayPhase;
-
 DECOMP_SIZE_ASSERT(TimeOfDayPhase, 0x08)
 
 // GLOBAL: MW2 0x100ba5d8

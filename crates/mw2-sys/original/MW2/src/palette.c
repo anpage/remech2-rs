@@ -51,10 +51,10 @@ MechS32 g_paletteCycling = 0;
 MechS32 g_paletteCycleResource = -1;
 
 // GLOBAL: MW2 0x100bcd20
-static PaletteFade g_paletteFade;
+PaletteFade g_paletteFade;
 
 // GLOBAL: MW2 0x100bcd40
-static PaletteCycle g_paletteCycle;
+PaletteCycle g_paletteCycle;
 
 // GLOBAL: MW2 0x10181a60
 PANE g_panes[11];

@@ -2,6 +2,8 @@
 #define EYEPOINT_H
 
 #include "decomp.h"
+#include "ramp.h"
+#include "savedview.h"
 #include "transform.h"
 #include "types.h"
 
@@ -93,6 +95,18 @@ extern "C"
 	extern MechS32 g_ordinanceReturnMode;
 	extern MechS32 g_trackedPlayer;
 	extern MechS32 g_autopilotStart;
+	extern MechS32 g_ordinanceSavedView[7];
+	extern MechS32 g_trackMaxHeight;
+	extern Ramp g_trackOffsetZ;
+	extern WrappedRamp g_trackPitch;
+	extern WrappedRamp g_trackHeading;
+	extern MechS32 g_trackMinHeight;
+	extern Ramp g_pilotTilt;
+	extern Ramp g_trackOffsetY;
+	extern SavedView g_savedViews[5];
+	extern Ramp g_pilotPan;
+	extern Ramp g_freeEyeSpeed;
+	extern Ramp g_trackOffsetX;
 	void FirstEyepoint(void);
 	void UpdateCockpitView(void);
 	void GetCockpitEyeView(

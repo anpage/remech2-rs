@@ -152,6 +152,11 @@ fn slot(handle: u32) -> usize {
     (handle & !FIRST) as usize
 }
 
+/// Frees every handle and zeroes both counters, as loading the sim afresh did
+pub fn clear() {
+    *TICKS.lock().unwrap() = Ticks::new();
+}
+
 /// Starts both counters
 #[unsafe(export_name = "StartTicks")]
 pub extern "C" fn start() {

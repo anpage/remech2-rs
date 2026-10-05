@@ -57,6 +57,9 @@ public:
 #pragma pack()
 
 // The functions and globals of textglyph.cpp that other units use.
+extern undefined g_linkColorMap[256];
+extern undefined g_unk0x10074758[256];
+extern undefined g_unk0x10074858[256];
 void InitTextColorMaps();
 
 #endif // TEXTGLYPH_H

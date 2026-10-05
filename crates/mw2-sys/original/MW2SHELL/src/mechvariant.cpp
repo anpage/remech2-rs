@@ -33,29 +33,6 @@
 
 // The two stars of a custom battle: the player's and the enemy's.
 
-// SIZE 0x08
-// A formation: its label and its simulator option.
-struct FormationOption {
-	MechChar* m_label;  // 0x00
-	MechChar* m_option; // 0x04
-};
-
-// SIZE 0x10
-// A mech's place in a formation on the star screen: the star's mech it shows, where its video
-// plays and which label position its name takes.
-struct FormationSlot {
-	MechS32 m_mech;  // 0x00
-	MechS32 m_left;  // 0x04
-	MechS32 m_top;   // 0x08
-	MechS32 m_label; // 0x0c
-};
-
-// SIZE 0x30
-// A formation's three positions.
-struct FormationPositions {
-	FormationSlot m_posts[3]; // 0x00
-};
-
 DECOMP_SIZE_ASSERT(StarMech, 0x24)
 DECOMP_SIZE_ASSERT(CustomStar, 0x80)
 DECOMP_SIZE_ASSERT(FormationOption, 0x08)

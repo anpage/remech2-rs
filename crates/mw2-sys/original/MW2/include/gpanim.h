@@ -10,6 +10,9 @@ extern "C"
 {
 #endif
 
+	extern MechS32 g_motionSounds[4][4];
+	extern MechS32 g_lastMotionSound[60];
+
 	void FirstGPAnim(void);
 	void StartMotion(Player* p_player);
 	void StopMotion(Player* p_player);

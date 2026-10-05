@@ -11,18 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// A cached resource, followed by its data. DumpResourceCache prints the fields as "ID", "Type"
-// and "Lock". Unlocked entries sit on the purge list, oldest first.
-// SIZE 0x14
-typedef struct ResourceCacheEntry {
-	MechS16 m_id;                           // 0x00
-	MechS16 m_lock;                         // 0x02
-	undefined4 m_type;                      // 0x04 — the four-character type tag
-	struct ResourceCacheEntry* m_next;      // 0x08 — in the g_cacheTable bucket
-	struct ResourceCacheEntry* m_purgeNext; // 0x0c — toward g_purgeListTail
-	struct ResourceCacheEntry* m_purgePrev; // 0x10
-} ResourceCacheEntry;
-
 void FreeCacheEntry(ResourceCacheEntry* p_entry);
 
 // GLOBAL: MW2SHELL 0x10063a54

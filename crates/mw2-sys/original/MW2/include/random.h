@@ -9,6 +9,12 @@ extern "C"
 {
 #endif
 
+	extern MechS32 g_normalRandomIndex;
+	extern MechS32 g_randomIndex2;
+	extern MechS32 g_normalRandomIndex2;
+	extern MechS32 g_normalRandomInts[127];
+	extern MechS32 g_randomInts[127];
+
 	void InitRandom(MechU32 p_seed);
 	// Implemented on the Rust side (src/sim/math.rs)
 	MechS32 RandomIntBelow(MechS32 p_max);

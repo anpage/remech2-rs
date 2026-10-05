@@ -40,20 +40,6 @@ DECOMP_SIZE_ASSERT(AiRule, 0x0c)
 DECOMP_SIZE_ASSERT(Player, 0x1aa)
 DECOMP_SIZE_ASSERT(PlayerTargetInfo, 0x28)
 
-// A name for a value, for the AI's log.
-struct AiName {
-	const MechChar* m_name; // 0x00
-	MechS32 m_value;        // 0x04
-};
-
-// For each script slot, the script (by resource index) for a player that leads its team
-// ([1] == 0) or follows ([1] == 1).
-typedef MechS16 AiScriptTable[16][2];
-
-typedef void (*AiStateFn)(Player* p_player, MechU16 p_target);
-typedef MechS16 (*AiMessageFn)(Player* p_player, MechS16 p_target, MechS16 p_arg);
-typedef MechS32 (*AiTransitionFn)(Player* p_player, AiRule* p_rule);
-
 // GLOBAL: MW2 0x100a88f0
 MechS32 g_debugStar = -1;
 

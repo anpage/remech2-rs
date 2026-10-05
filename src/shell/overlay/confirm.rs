@@ -51,6 +51,12 @@ impl Buttons {
 static PROMPT: Mutex<Option<Prompt>> = Mutex::new(None);
 static QUEUED: Mutex<VecDeque<Vec<String>>> = Mutex::new(VecDeque::new());
 
+/// Closes the prompt and drops the queued messages, as unloading the shell did
+pub fn clear() {
+    *PROMPT.lock().unwrap() = None;
+    QUEUED.lock().unwrap().clear();
+}
+
 /// Opens a Yes/No prompt, replacing any open one.
 pub fn open(lines: &[&str]) {
     *PROMPT.lock().unwrap() = Some(Prompt::new(owned(lines), Buttons::YesNo, false));

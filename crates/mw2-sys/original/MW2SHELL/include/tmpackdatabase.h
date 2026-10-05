@@ -7,6 +7,10 @@
 
 #include <stdio.h>
 
+enum {
+	c_lzWindowSize = 0x1000
+};
+
 // SIZE 0x8c
 class TMPackDataBase {
 public:
@@ -38,5 +42,8 @@ private:
 	MechS32 m_numEntries;  // 0x84
 	Collection* m_entries; // 0x88
 };
+
+// The globals of tmpackdatabase.cpp that other units use.
+extern MechU8 g_lzWindow[c_lzWindowSize];
 
 #endif // TMPACKDATABASE_H

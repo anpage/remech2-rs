@@ -39,6 +39,9 @@ extern "C"
 	extern MechS32 g_refreshModePixelCount;
 	extern MechS32 g_refreshModeWidth;
 	extern MechS32 g_refreshModeHeight;
+	extern DisplayBackend g_displayBackend;
+	extern RefreshMode g_refreshMode;
+	extern MechU8* g_frame;
 
 	MechS32 GetPaletteColors(MechS32 p_first, MechS32 p_count, PaletteColor* p_palette);
 	MechS32 InitRefreshMode(

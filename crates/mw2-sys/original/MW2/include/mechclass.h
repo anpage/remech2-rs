@@ -23,6 +23,12 @@ extern "C"
 	extern MechS32 g_powerRequest;
 	extern MechS32 g_mechPoweredUp;
 	extern MechS32 g_localMechDestroyed;
+	extern MechS32 g_unk0x100a2bf4;
+	extern MechS32 g_unk0x100a2bfc;
+	extern MechS32 g_unk0x100a2c00;
+	extern MechS32 g_recenterLastHeading;
+	extern MechS32 g_lastMascRoll;
+	extern MechS32 g_ejectStarted;
 
 	void FirstMech(struct Player* p_player);
 	void UpdateMech(struct Mech* p_mech);

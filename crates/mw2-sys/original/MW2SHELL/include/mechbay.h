@@ -11,6 +11,76 @@
 
 #include <stddef.h>
 
+// An engine: its rating, its weight (in 1/100 t) and its maker. Ids from 10000 up are XL
+// engines at half the weight.
+// SIZE 0x0c
+struct EngineType {
+	MechS32 m_rating; // 0x00
+	MechS32 m_weight; // 0x04
+	MechChar* m_name; // 0x08
+};
+
+// A weapon: the stats the weapon info fields show. Masses are in 1/100 t. The table holds
+// negative values in the fields up to 0x14, so those are signed.
+// SIZE 0x28
+struct Weapon {
+	MechS32 m_heat;         // 0x00
+	MechS32 m_damage;       // 0x04 — negative: per missile
+	MechS32 m_minimumRange; // 0x08 — -1 for none
+	MechS32 m_shortRange;   // 0x0c — -1 for none
+	MechS32 m_mediumRange;  // 0x10 — -1 for none
+	MechS32 m_range;        // 0x14 — -1 for none
+	MechS32 m_mass;         // 0x18
+	undefined4 m_criticals; // 0x1c — critical slots it takes
+	MechS32 m_ammoPerTon;   // 0x20 — rounds per ton of ammo, 0 for weapons without ammo
+	MechChar* m_name;       // 0x24
+};
+
+// SIZE 0x10
+// The internal structure of a weight class (20 to 110 tons in steps of 5) per location.
+struct InternalStructure {
+	MechS32 m_centerTorso; // 0x00
+	MechS32 m_sideTorso;   // 0x04
+	MechS32 m_arm;         // 0x08
+	MechS32 m_leg;         // 0x0c
+};
+
+// SIZE 0x08
+// A piece of equipment other than a weapon: ids come in steps of 50 from 5000.
+struct Equipment {
+	MechS32 m_id;     // 0x00
+	MechChar* m_name; // 0x04
+};
+
+// SIZE 0x28
+// One location in the image of a .mek file: its armor and its critical slots.
+struct MekLocation {
+	MechS32 m_front;      // 0x00
+	MechS32 m_rear;       // 0x04
+	MechS32 m_internal;   // 0x08
+	MechU16 m_items[12];  // 0x0c — item ids, ammunition as g_mekAmmo ids
+	MechS16 m_slotCount;  // 0x24 — 12, or 6 for the head and legs
+	undefined2 m_unk0x26; // 0x26 — always 1 in a saved .mek file, never read
+};
+
+// SIZE 0x18
+// The header of a .mek file.
+struct MekHeader {
+	MechS32 m_tonnage;      // 0x00
+	MechS32 m_walkingSpeed; // 0x04
+	MechS32 m_jumpJets;     // 0x08
+	MechS32 m_heatSinks;    // 0x0c — the count, doubled for double heat sinks
+	MechS32 m_weaponCount;  // 0x10
+	MechS32 m_ammoCount;    // 0x14
+};
+
+// SIZE 0x08
+// A weapon or an ammunition entry of a .mek file.
+struct MekItem {
+	MechS32 m_id;     // 0x00 — the weapon id; for ammunition, 10000 + weapon type * 100 + n
+	MechS32 m_weapon; // 0x04 — the weapon id the ammunition feeds, -1 for a weapon
+};
+
 // SIZE 0x7a8
 // The variant being edited. DeleteItem copies an m_unassigned entry through the struct base
 // (0x1005c640 + 0x4a0), which places the start; LoadMekFile copies the whole struct to
@@ -90,7 +160,7 @@ struct MekVariant {
 };
 
 // The functions and globals of mechbay.cpp that other units use.
-extern MechChassis g_mechChassis[];
+extern MechChassis g_mechChassis[19];
 extern MechS32 g_pickStarMech;
 extern MekVariant g_variant;
 extern ScreenField* g_componentFields;
@@ -107,9 +177,48 @@ extern AudioSample* g_acceptSound;
 extern AudioSample* g_variantSound;
 extern MechChar g_variantFiles[200][13];
 extern MechS32 g_selectedVariant;
-extern ScreenField g_engineFields[];
-extern ScreenField g_customizeFields[];
-extern ScreenField g_mechBayFields[];
+extern ScreenField g_engineFields[16];
+extern ScreenField g_customizeFields[38];
+extern ScreenField g_mechBayFields[48];
+extern Equipment g_equipment[23];
+extern MechChar* g_locationNames[8];
+extern InternalStructure g_internalStructure[19];
+extern MekVariant g_previousVariant;
+extern EngineType g_engines[80];
+extern Weapon g_weapons[31];
+extern MechS32 g_armorTrimLocation;
+extern MechS32 g_locationMapLefts[8];
+extern MechS32 g_locationMapTops[8];
+extern MechS32 g_chassisCount;
+extern MechChar g_wolfChassisVideo[8];
+extern MechChar g_jadeFalconChassisVideo[8];
+extern MechChar g_trialChassisVideo[8];
+extern MechChar* g_chassisVideoFormat;
+extern undefined4 g_chassisVideoLeft;
+extern undefined4 g_chassisVideoTop;
+extern MechChar g_userMekName[0x20];
+extern MechChar g_callsignLine[0x80];
+extern MechChar g_tempBuffer[0x100];
+extern MekItem g_mekAmmo[25];
+extern MekHeader g_mekHeader;
+extern MechChar g_chassisVideoName[0x10];
+extern MechChar g_mekVariantName[0x32];
+extern MekItem g_mekWeapons[10];
+extern MechS32 g_mechBayMessage;
+extern MechChar g_variantFileName[0x20];
+extern undefined g_mekFileBuffer[0x800];
+extern MekLocation g_mekLocations[8];
+extern undefined g_warningColors[0x100];
+extern undefined g_activeColors[0x100];
+extern undefined g_textColors[0x100];
+extern MechChar g_mekPath[0x20];
+extern ScreenField g_heatSinkFields[10];
+extern ScreenField g_jumpJetFields[8];
+extern ScreenField g_internalFields[22];
+extern ScreenField g_armorFields[45];
+extern ScreenField g_equipmentFields[14];
+extern ScreenField g_weaponFields[59];
+extern ScreenField g_criticalFields[59];
 
 void ShowFields(ScreenField* p_tabs);
 void RedrawFields(ScreenField* p_tabs);

@@ -13,6 +13,7 @@ extern "C"
 	extern MechS32 g_displayBrightness;
 	extern MechS32 g_brightnessSetting;
 	extern PaletteColor g_paletteColorsPreBrightness[0x100];
+	extern MechU8 g_gammaTable[16][64];
 
 	void InitGammaTable(void);
 	void SavePreBrightnessPalette(void);

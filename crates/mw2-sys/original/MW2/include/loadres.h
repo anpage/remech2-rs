@@ -24,6 +24,10 @@ extern "C"
 #endif
 
 	extern MechS32 g_cacheEntryCount;
+	extern ResourceCacheEntry** g_cacheTable;
+	extern MechS32 g_cacheDumpNumber;
+	extern ResourceCacheEntry* g_purgeListHead;
+	extern ResourceCacheEntry* g_purgeListTail;
 
 	void UnlockCacheEntry(ResourceCacheEntry* p_item);
 	void LockCacheEntry(ResourceCacheEntry* p_item);

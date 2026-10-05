@@ -22,6 +22,11 @@ extern "C"
 	extern SpeechEntry* g_speechQueue;
 	extern HSAMPLE g_speechSample;
 	extern MechS32 g_speechLocked;
+	extern MechS32 g_unk0x100a96ec;
+	extern MechS32 g_unk0x100a9774;
+	extern MechS32 g_unk0x100a97cc;
+	extern MechS32 g_unk0x100a97f4;
+	extern SpeechEntry g_speechEntries[8];
 
 	MechS32 QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, MechS32 p_priority);
 	void AdvanceSpeechQueue(void);

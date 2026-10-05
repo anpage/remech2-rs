@@ -34,6 +34,11 @@ extern "C"
 	extern TimedCallbackFn g_taskFns[6];
 	extern MechS32 g_nextThingRecord;
 	extern MechS32 g_thingRecordIndices[0x96];
+	extern struct ScenarioTable* g_scenarios;
+	extern void* g_unk0x100a860c;
+	extern MechS32 g_nextScenario;
+	extern MechS32 g_mangleBase;
+	extern MechS32 g_scenarioCount;
 
 	void LoadMapBitmap(struct BwdRecord* p_record, MechS32* p_width, MechS32* p_height, MechS32* p_data);
 	MechS32 LoadScenarioTable(struct ScenarioTable* p_table);

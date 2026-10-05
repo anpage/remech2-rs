@@ -39,64 +39,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#pragma pack(push, 1)
-
-// DA: a player's state, filled from the local player every g_stateInterval ticks.
-// SIZE 0x85
-typedef struct NetStateMsg {
-	MechChar m_tag[2];       // 0x00
-	MechU8 m_player;         // 0x02
-	MechS16 m_target;        // 0x03 — the player's target (PlayerTargetInfo::m_target)
-	MechS16 m_killer;        // 0x05
-	MechU16 m_flags;         // 0x07 — the power state in the low nibble
-	MechS32 m_rearArmor3;    // 0x09 — m_sections[3].m_armor[1]
-	MechS32 m_rearArmor2;    // 0x0d — m_sections[2]'s
-	MechS32 m_rearArmor1;    // 0x11 — m_sections[1]'s
-	MechS32 m_frontArmor[8]; // 0x15 — each section's m_armor[0]
-	MechS32 m_internal[8];   // 0x35 — each section's m_unk0x08
-	MechS32 m_clock;         // 0x55
-	MechS32 m_x;             // 0x59
-	MechS32 m_y;             // 0x5d
-	MechS32 m_z;             // 0x61
-	MechS32 m_pitch;         // 0x65
-	MechS32 m_heading;       // 0x69
-	MechS32 m_roll;          // 0x6d
-	MechS32 m_speed;         // 0x71
-	MechS32 m_throttle;      // 0x75
-	MechS32 m_turnRate;      // 0x79
-	MechS32 m_torsoTwist;    // 0x7d
-	MechS32 m_torsoPitch;    // 0x81
-} NetStateMsg;
-
-// WE: the weapons a player fired since the last one, a bit each.
-// SIZE 0x05
-typedef struct NetWeaponsMsg {
-	MechChar m_tag[2]; // 0x00
-	MechU8 m_player;   // 0x02
-	MechU16 m_weapons; // 0x03
-} NetWeaponsMsg;
-
-// CO: a collision push, sent to the player pushed.
-// SIZE 0x1a
-typedef struct NetCollisionMsg {
-	MechChar m_tag[2];   // 0x00
-	MechS32 m_normalX;   // 0x02
-	MechS32 m_normalY;   // 0x06
-	MechS32 m_normalZ;   // 0x0a
-	MechS32 m_velocityX; // 0x0e — the pusher's Mech::m_newVelocityX
-	MechS32 m_velocityY; // 0x12
-	MechS32 m_velocityZ; // 0x16
-} NetCollisionMsg;
-
-// CH: a chat line.
-// SIZE 0x52
-typedef struct NetChatMsg {
-	MechChar m_tag[2];     // 0x00
-	MechChar m_text[0x50]; // 0x02
-} NetChatMsg;
-
-#pragma pack(pop)
-
 void SendStateMsg(void);
 void ReceiveChatMsg(NetChatMsg* p_msg, MechS32 p_slot);
 void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot);

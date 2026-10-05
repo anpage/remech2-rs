@@ -36,14 +36,14 @@ SceneObject* g_gridObject = NULL;
 // The eyepoint's cell and the object's position.
 
 // GLOBAL: MW2 0x100be9e0
-static Vector3 g_gridCell;
+Vector3 g_gridCell;
 
 // GLOBAL: MW2 0x100be9f0
-static Vector3 g_gridAnchor;
+Vector3 g_gridAnchor;
 
 // How far the eyepoint may stray from the object before it snaps to another cell.
 // GLOBAL: MW2 0x100be9fc
-static MechS32 g_gridSnapDistance;
+MechS32 g_gridSnapDistance;
 
 // Makes p_obj the object that follows the eyepoint on a grid, a cell at a time: the cells are its
 // model's span (with children) or a third of it, in steps of 0x4000, and it is snapped to the

@@ -30,36 +30,8 @@
 // saved as .cpc files (giddi\configNN.cpc, and one per device) and written out as the sim's
 // input.map.
 
-// One game control's binding in a configuration.
-// SIZE 0x18
-struct CpcBinding {
-	MechS32 m_channelKind;  // 0x00 — 0: axis, 1: button, 2: axis with a button
-	MechS32 m_deviceSlot;   // 0x04
-	MechS32 m_flags;        // 0x08 — bits 0-2: modifier, bit 31: inverted
-	MechS32 m_modeFlags;    // 0x0c — the flags of the axis's button
-	MechS32 m_controlIndex; // 0x10 — the axis or button
-	MechS32 m_mode;         // 0x14 — the button of an axis with a button
-};
-
 DECOMP_SIZE_ASSERT(CpcBinding, 0x18)
-
-// A device slot of a .cpc file: the device a binding's slot number stood for when it was saved.
-// SIZE 0x10
-struct CpcDeviceSlot {
-	MechS32 m_deviceId;    // 0x00
-	MechChar m_name[0x0c]; // 0x04
-};
-
 DECOMP_SIZE_ASSERT(CpcDeviceSlot, 0x10)
-
-enum CpcConfig {
-	c_configCount = 4,
-	c_bindingCount = 0x25,
-	c_axisBindingCount = 7,
-	c_buttonRows = 18,
-	c_deviceSlotCount = 16,
-	c_maxActiveDevices = 4
-};
 
 enum CpcBindingFlags {
 	c_flagModifierMask = 0x07

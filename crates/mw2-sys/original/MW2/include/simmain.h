@@ -31,6 +31,8 @@ extern "C"
 	extern MechS32 g_simPaused;
 	extern MechS32 g_pauseRequested;
 	extern MechS32 g_mouseOutsideClientWindow;
+	extern MechS32 g_remoteWaitTime;
+	extern MechS32 g_drawModeReady;
 
 	int SimMain(char* p_cmdLine, struct NetLaunchInfo* p_netLaunch);
 	void HandleMessages(void);

@@ -31,6 +31,7 @@ private:
 };
 
 // The functions and globals of keyboardinput.cpp that other units use.
+extern MechChar g_editTextBuffer[0x100];
 MechS32 EditTextField(
 	Font* p_font,
 	MechS32 p_left,

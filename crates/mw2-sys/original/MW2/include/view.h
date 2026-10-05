@@ -50,6 +50,16 @@ extern "C"
 	extern MechS32 g_viewLightX;
 	extern MechS32 g_viewLightY;
 	extern MechS32 g_viewNearPlane;
+	extern MechS32 g_viewHalfHeight;
+	extern MechS32 g_viewHalfWidth;
+	extern MechS32 g_viewProjectScaleX;
+	extern MechS32 g_viewProjectScaleY;
+	extern MechS32 g_viewLeftScaled;
+	extern MechS32 g_viewBottomScaled;
+	extern MechS32 g_viewProjectScaleX16;
+	extern MechS32 g_viewProjectScaleY16;
+	extern MechS32 g_viewTopScaled;
+	extern MechS32 g_viewRightScaled;
 
 	void SelectEyepoint(Eyepoint* p_eyepoint);
 	void UpdateProjection(Eyepoint* p_eyepoint);

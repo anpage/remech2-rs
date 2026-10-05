@@ -10,10 +10,6 @@
 DECOMP_SIZE_ASSERT(TMPackDataBase, 0x8c)
 DECOMP_SIZE_ASSERT(TMPackDataBase::TMPackDBEntry, 0x08)
 
-enum {
-	c_lzWindowSize = 0x1000
-};
-
 // The ring buffer of GetDBItemLZ's LZSS decoder.
 // GLOBAL: MW2SHELL 0x10094c90
 MechU8 g_lzWindow[c_lzWindowSize];

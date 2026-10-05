@@ -11,10 +11,12 @@
 // The functions and globals of rosterscreen.cpp that other units use.
 extern PilotRecord* g_rosterPilots[10];
 extern ScreenField g_pilotRecordFields[8];
-extern ScreenField g_missionListFields[];
+extern ScreenField g_missionListFields[19];
 extern AudioSample* g_rosterSound;
 extern MechS32 g_missionListShown;
 extern ButtonMenu* g_rosterMenu;
+extern MechS32 g_rosterCampaign;
+extern MechChar g_rosterFieldText[0x100];
 
 void ShowPilotCallsigns();
 void HidePilotCallsigns();

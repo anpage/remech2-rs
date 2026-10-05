@@ -136,10 +136,10 @@ MechS32 g_mapDamageAnimShown = 0;
 // The clock times the satellite view's static starts and stops at (DrawSatelliteStatic).
 
 // GLOBAL: MW2 0x100be410
-static MechS32 g_staticCleanUntil;
+MechS32 g_staticCleanUntil;
 
 // GLOBAL: MW2 0x100be414
-static MechS32 g_staticNoiseUntil;
+MechS32 g_staticNoiseUntil;
 
 // The cockpit view before the current one (SwitchCockpitView).
 // GLOBAL: MW2 0x10109c5c

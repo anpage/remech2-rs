@@ -19,6 +19,7 @@ extern "C"
 	extern MechS32 g_sampleRates[10];
 	extern AudioEngine* g_audioEngine;
 	extern SoundInfo g_soundInfo[1200];
+	extern MechChar g_sampleTag[5];
 
 	MechS32 InitializeDigitalAudio(MechU32 p_numSamples);
 	void ShutdownDigitalAudio(void);

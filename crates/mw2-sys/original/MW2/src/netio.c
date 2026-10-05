@@ -18,7 +18,7 @@ MechS32 g_recvRetries = 0;
 // The result of the last broadcast, or 5 after a failed one: a send after a failure goes out
 // guaranteed.
 // GLOBAL: MW2 0x100bcd18
-static HRESULT g_sendResult;
+HRESULT g_sendResult;
 
 // Sends a message to every player of the session.
 // FUNCTION: MW2 0x10001000

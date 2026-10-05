@@ -13,33 +13,6 @@ enum InputDeviceTable {
 	c_deviceTableGrowth = 50
 };
 
-// A button that modifies a control's binding (INPUT.MAP writes it as "+ device.button").
-// SIZE 0x0c
-typedef struct InputModifier {
-	MechChar* m_label;     // 0x00
-	InputDevice* m_device; // 0x04
-	MechS32 m_button;      // 0x08
-} InputModifier;
-
-enum InputModifierTable {
-	c_modifierCount = 5
-};
-
-// A cockpit control, its INPUT.MAP name, and the device axis or button bound to it. A name
-// starting with "#j " is a button that only acts while the jump jets are enabled.
-// SIZE 0x29
-#pragma pack(1)
-typedef struct InputControl {
-	MechChar* m_label;                    // 0x00
-	MechChar* m_name;                     // 0x04
-	MechS32 m_isButton;                   // 0x08 — 0: bound to an axis
-	InputDevice* m_device;                // 0x0c
-	MechS32 m_index;                      // 0x10 — the axis or button
-	MechU8 m_unk0x14;                     // 0x14 — never accessed
-	MechS32 m_modifiers[c_modifierCount]; // 0x15 — per modifier: 1 held, 2 ignored, else released
-} InputControl;
-#pragma pack()
-
 DECOMP_SIZE_ASSERT(InputDeviceInfo, 0x74)
 DECOMP_SIZE_ASSERT(InputDevice, 0x78)
 DECOMP_SIZE_ASSERT(InputModifier, 0x0c)

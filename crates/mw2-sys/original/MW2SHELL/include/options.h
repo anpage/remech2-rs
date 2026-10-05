@@ -1,11 +1,22 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#include "palettecolor.h"
 #include "screenfield.h"
 #include "textglyph.h"
 #include "types.h"
 
+class AudioSample;
+class LoopingMovie;
+
 // The functions and globals of options.cpp that other units use.
+extern LoopingMovie* g_optionsMovie;
+extern MechChar g_optionsMovieName[0x10];
+extern AudioSample* g_volumeTestSample;
+extern PaletteColor g_savedPalette[0x100];
+extern void* g_sliderImages;
+extern MechChar* g_skillNames[3];
+extern ScreenField g_optionFields[16];
 void LoadSoundConfig();
 void LoadDifficultyConfig();
 void DrawOptions();

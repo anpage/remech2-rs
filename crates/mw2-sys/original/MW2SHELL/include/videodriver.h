@@ -119,4 +119,10 @@ public:
 };
 #pragma pack()
 
+// The globals of videodriver.cpp that other units use.
+extern MechS32 g_redrawingGlyphs;
+extern MechS32 g_clearPaletteOnDraw;
+extern PaletteColor g_tempPalette[0x100];
+extern MechU8 g_defaultColorMap[0x100];
+
 #endif // VIDEODRIVER_H

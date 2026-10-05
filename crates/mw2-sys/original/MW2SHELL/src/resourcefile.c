@@ -16,7 +16,7 @@ MechChar g_resourceDir[0x100] = {0};
 
 // Shared scratch buffer returned by the path helpers (overwritten on each call).
 // GLOBAL: MW2SHELL 0x1008ff58
-static MechChar g_resourcePath[0x50];
+MechChar g_resourcePath[0x50];
 
 // Read a whole file into memory, allocated here unless p_preallocated; returns the open handle,
 // or -1 on failure.

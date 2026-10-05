@@ -16,6 +16,10 @@ extern "C"
 	extern MechU8* g_drawBufferBottom;
 	extern DepthEntry* g_depthQueue;
 	extern MechS32 g_queueHasRoom;
+	extern MechS32 g_drawBufferSize;
+	extern MechU8* g_drawBufferMemory;
+	extern MechU8* g_drawBuffer;
+	extern MechU8* g_drawBufferTop;
 
 	void ShutdownDrawBuffer(void);
 	void InitializeDrawBuffer(MechS32 p_kilobytes, MechS32 p_entries);

@@ -16,6 +16,8 @@ extern "C"
 	extern MechS32 g_chatRecipient;
 	extern MechS32 g_showObjectives;
 	extern MechChar g_chatMessage[0x30];
+	extern MechChar g_ticksText[16];
+	extern MechChar g_secondsText[16];
 
 	MechChar* FormatTicks(MechS32 p_ticks);
 	MechChar* FormatSeconds(MechS32 p_seconds);

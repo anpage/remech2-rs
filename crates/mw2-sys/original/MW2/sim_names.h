@@ -77,13 +77,17 @@
 #define g_debugLogName Sim_g_debugLogName
 #define g_debugOutputMode Sim_g_debugOutputMode
 #define g_debugPrintBuffer Sim_g_debugPrintBuffer
+#define g_displayBackend Sim_g_displayBackend
 #define g_displayBrightness Sim_g_displayBrightness
 #define g_extendedScanCodeMap Sim_g_extendedScanCodeMap
+#define g_frame Sim_g_frame
 #define g_gammaTable Sim_g_gammaTable
 #define g_inputDeviceCount Sim_g_inputDeviceCount
 #define g_inputDrivers Sim_g_inputDrivers
 #define g_joystickDriver Sim_g_joystickDriver
 #define g_keyCodeMap Sim_g_keyCodeMap
+#define g_keyCodeReadIndex Sim_g_keyCodeReadIndex
+#define g_keyCodeWriteIndex Sim_g_keyCodeWriteIndex
 #define g_keyCodes Sim_g_keyCodes
 #define g_keyNames Sim_g_keyNames
 #define g_keyShortNames Sim_g_keyShortNames
@@ -106,6 +110,7 @@
 #define g_purgeListHead Sim_g_purgeListHead
 #define g_purgeListTail Sim_g_purgeListTail
 #define g_reclipCursor Sim_g_reclipCursor
+#define g_refreshMode Sim_g_refreshMode
 #define g_refreshModeBuffer Sim_g_refreshModeBuffer
 #define g_refreshModeHeight Sim_g_refreshModeHeight
 #define g_refreshModePixelCount Sim_g_refreshModePixelCount

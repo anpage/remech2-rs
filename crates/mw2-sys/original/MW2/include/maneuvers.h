@@ -2,6 +2,7 @@
 #define MANEUVERS_H
 
 #include "maneuvertable.h"
+#include "point.h"
 #include "types.h"
 
 struct Ray;
@@ -37,6 +38,14 @@ extern "C"
 
 	extern MechS32 g_jumpJetDrag;
 	extern MechS32 g_slideSlope;
+	extern Point g_probeDirections[16];
+	extern ManeuverEntry g_mechManeuvers[13];
+	extern ManeuverEntry g_stupidManeuvers;
+	extern ManeuverEntry g_circleManeuvers;
+	extern ManeuverEntry g_behindManeuvers;
+	extern ManeuverEntry g_altMechManeuvers[13];
+	extern MechS32 g_maneuverTablesReady;
+	extern ManeuverTable g_maneuverTables[9];
 	void RunManeuver(struct Player* p_player, MechU16 p_target);
 	void InitializeManeuvers(struct Player* p_player);
 	MechS32 ChooseManeuver(struct Player* p_player);

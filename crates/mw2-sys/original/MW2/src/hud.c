@@ -66,39 +66,39 @@ MechS32 g_showAltimeter = 1;
 // The layout of the altimeter and the compass, from their shapes' extents (InitHudGauges).
 
 // GLOBAL: MW2 0x100be5a0
-static MechS32 g_compassArrowWidth;
+MechS32 g_compassArrowWidth;
 
 // GLOBAL: MW2 0x100be5a4
-static MechS32 g_compassArrowHeight;
+MechS32 g_compassArrowHeight;
 
 // GLOBAL: MW2 0x100be5a8
-static MechS32 g_compassSideArrowWidth;
+MechS32 g_compassSideArrowWidth;
 
 // GLOBAL: MW2 0x100be5ac
-static MechS32 g_compassSideArrowHeight;
+MechS32 g_compassSideArrowHeight;
 
 // GLOBAL: MW2 0x100be5b0
-static MechS32 g_altimeterGroundX;
+MechS32 g_altimeterGroundX;
 
 // GLOBAL: MW2 0x100be5b4
-static MechS32 g_altimeterTargetX;
+MechS32 g_altimeterTargetX;
 
 // The altimeter's scale: pixels per 16.16 unit of height.
 // GLOBAL: MW2 0x100be5b8
-static MechS32 g_altimeterScale;
+MechS32 g_altimeterScale;
 
 // The compass's scale: pixels per degree, 16.16.
 // GLOBAL: MW2 0x100be5bc
-static MechS32 g_compassScale;
+MechS32 g_compassScale;
 
 // GLOBAL: MW2 0x100be5c0
-static MechS32 g_compassTapeAbove;
+MechS32 g_compassTapeAbove;
 
 // GLOBAL: MW2 0x100be5c4
-static MechS32 g_altimeterLevelX;
+MechS32 g_altimeterLevelX;
 
 // GLOBAL: MW2 0x100be5c8
-static MechS32 g_compassTapeBelow;
+MechS32 g_compassTapeBelow;
 
 // Draws the HUD's overlays the display options enable: the compass and its target markers, the
 // crosshair, the target marker and the altimeter, at the gauge positions.

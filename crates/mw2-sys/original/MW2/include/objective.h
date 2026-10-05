@@ -19,6 +19,7 @@ extern "C"
 	void CollapseWhitespace(MechChar* p_text);
 	extern MechS32 g_forceMissionSuccess;
 	extern MechS32 g_missionResultAnnounced;
+	extern MechU32 g_missionResultTag;
 
 	MechS32 DoFirstObjtv(StarMission* p_mission, MechS32 p_team);
 	MechS32 GetObjectiveTargetState(MechU8* p_target);

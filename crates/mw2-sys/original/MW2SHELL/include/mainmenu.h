@@ -7,6 +7,7 @@
 #include "types.h"
 
 // The functions and globals of mainmenu.cpp that other units use.
+extern MechChar g_mainMenuLogoVideo[9];
 void* AllocateAllowNew(MechS32 p_size);
 extern ButtonMenu* g_mainMenu;
 extern AudioSample* g_mainMenuMusic;

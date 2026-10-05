@@ -46,6 +46,8 @@ extern "C"
 {
 #endif
 
+	extern MechU32 g_newShapeFlags;
+
 	MechU32 GetNewShapeFlags(void);
 	MechU32 SetNewShapeFlags(MechU32 p_flags);
 	void SelectFirstModel(Shape* p_shape);

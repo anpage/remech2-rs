@@ -30,10 +30,10 @@ PANE g_bottomMessagePane = {&g_mainPixelBuffer, 0, 0, 0x10000, 0x10000};
 undefined4 g_unk0x100adf0c = 0;
 
 // GLOBAL: MW2 0x100c3360
-static MechChar g_bottomMessageText[0x100];
+MechChar g_bottomMessageText[0x100];
 
 // GLOBAL: MW2 0x100c3460
-static MechChar g_topMessageText[0x100];
+MechChar g_topMessageText[0x100];
 
 // GLOBAL: MW2 0x100adf10
 TimedOverlay g_timedOverlays[2] = {

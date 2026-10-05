@@ -9,6 +9,13 @@
 #include "types.h"
 #include "vertex.h"
 
+// An animation file LoadAnimFile has loaded: its id and the base of its animation numbers.
+// SIZE 0x8
+typedef struct AnimFile {
+	MechS32 m_id;   // 0x00
+	MechS32 m_base; // 0x04
+} AnimFile;
+
 // The functions and globals of objectanim.c that other units use.
 #ifdef __cplusplus
 extern "C"
@@ -26,6 +33,13 @@ extern "C"
 	extern MechS32 g_polygonPointCount;
 	extern Path g_paths[0x40];
 	extern Reel* g_reels[0x780];
+	extern MechS32 g_reelMotionError;
+	extern MechU8* g_polygonPointCursor;
+	extern MechS32 g_facesTried;
+	extern MechS32 g_facesFrontFacing;
+	extern MechS32 g_verticesTransformed;
+	extern MechS32 g_polygonsQueued;
+	extern AnimFile g_animFiles[60];
 
 	MechS32 ReelMotionTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period);
 	MechS32 ScaleBySpeedLevel(MechS32 p_mode, MechS32 p_value);

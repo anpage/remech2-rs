@@ -6,6 +6,8 @@
 
 #include <stddef.h>
 
+class MidiSequence;
+
 // The shell's messages. Its message handler opens the screen of each; the screen functions get
 // them as p_msg (c_msgScreenFrame on every frame) and the screen they come from as p_wParam.
 enum ShellMessage {
@@ -47,6 +49,13 @@ extern void (*g_screenFunction)(TMPackDataBase*, MechS32*, MechU8*, char**, Mech
 extern char* g_scenario;
 extern MechS32 g_selectedCampaign;
 extern MechU8 g_pilotChosen;
+extern void (*g_menuFunction)(MechS32 p_active);
+extern MidiSequence* g_midiBackgroundMusic;
+extern MechS32 g_cursorHidden;
+extern MechU8 g_midiSongBaseSet;
+extern MechS32 g_midiSongBase;
+extern MechS32 g_midiSongPlaying;
+extern MechU8 g_menuCommandEnabled[5];
 
 extern "C" int ShellMain(char* p_cmdLine);
 // Implemented on the Rust side (src/shell/screens/debug.rs), around ShellHandleMessageC

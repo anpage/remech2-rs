@@ -15,6 +15,8 @@ extern "C"
 	extern Eyepoint g_mainEyepoint;
 	extern RenderSettings g_renderSettings;
 	extern MechS32 g_horizonBandHeight;
+	extern MechS32 g_lineEndX;
+	extern MechS32 g_lineEndY;
 	void DrawScenePolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags);
 	void DrawSkyAndGround(Eyepoint* p_eyepoint);
 	void DrawPentagon(

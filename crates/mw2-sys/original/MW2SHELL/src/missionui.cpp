@@ -31,13 +31,6 @@
 // The mission briefing screen: the mission's stars and their mechs, read from the mission's
 // BWD file, and its briefing text and videos.
 
-// SIZE 0x08
-// A mech's name on the briefing screen: its glyph and the mech type it shows.
-struct MechNameTag {
-	TextGlyph* m_glyph; // 0x00
-	MechS32 m_type;     // 0x04 — an index into g_mechChassis, negative for none
-};
-
 // SIZE 0x20
 // A star in a mission's BWD file (node type 0x46). Its mechs' variant names follow, one per
 // mech of the star's size.

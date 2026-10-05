@@ -12,10 +12,6 @@
 #include <ctype.h>
 #include <stdio.h>
 
-enum KeyCodeBuffer {
-	c_keyCodeBufferSize = 64
-};
-
 // Key code modifier bits.
 enum KeyCodeModifier {
 	c_keyCodeControl = 0x100,
@@ -37,10 +33,10 @@ enum KeyStateWord {
 };
 
 // GLOBAL: MW2 0x100be5d0
-static undefined4 g_keyCodeWriteIndex;
+undefined4 g_keyCodeWriteIndex;
 
 // GLOBAL: MW2 0x100be5cc
-static undefined4 g_keyCodeReadIndex;
+undefined4 g_keyCodeReadIndex;
 
 // A ring buffer of key codes, filled by KeyboardQueueKeyCode.
 // GLOBAL: MW2 0x10109a30

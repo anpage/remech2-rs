@@ -23,6 +23,17 @@ extern "C"
 	extern MechS32 g_showTargetMarker;
 	extern MechS32 g_showCompass;
 	extern MechS32 g_showAltimeter;
+	extern MechS32 g_compassArrowWidth;
+	extern MechS32 g_compassArrowHeight;
+	extern MechS32 g_compassSideArrowWidth;
+	extern MechS32 g_compassSideArrowHeight;
+	extern MechS32 g_altimeterGroundX;
+	extern MechS32 g_altimeterTargetX;
+	extern MechS32 g_altimeterScale;
+	extern MechS32 g_compassScale;
+	extern MechS32 g_compassTapeAbove;
+	extern MechS32 g_altimeterLevelX;
+	extern MechS32 g_compassTapeBelow;
 	void DrawHudAt(
 		Mech* p_mech,
 		MechS32 p_heading,

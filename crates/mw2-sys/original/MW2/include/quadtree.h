@@ -30,6 +30,8 @@ extern "C"
 {
 #endif
 
+	extern MechS32 g_quadtreesDisabled;
+
 	void BuildShapeQuadtree(struct Shape* p_shape);
 	QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, MechS32 p_quadrant, Model* p_model);
 	QuadtreeNode* AllocQuadtreeNode(

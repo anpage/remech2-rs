@@ -5,6 +5,8 @@
 #include "decomp.h"
 #include "quadtree.h"
 #include "shape.h"
+#include "staticblock.h"
+#include "staticobject.h"
 #include "types.h"
 #include "xform.h"
 
@@ -35,6 +37,25 @@ extern "C"
 	extern MechS32 g_currentBlock;
 	extern MechS32 g_thingCapacity;
 	extern MechS32 g_thingCount;
+	extern MechS32* g_starIndices;
+	extern MechS32* g_starIds;
+	extern MechS32 g_classCount;
+	extern MechS32 g_classCapacity;
+	extern GeoClass* g_classes;
+	extern MechS32 g_staticObjectCount;
+	extern undefined4 g_staticCacheReady;
+	extern MechS32 g_nextBlock;
+	extern Xform g_pendingXform;
+	extern Xform g_defaultXform;
+	extern MechS32 g_explosionChunks;
+	extern StaticBlock g_staticBlocks[32];
+	extern StaticObject g_staticObjects[0x402];
+	extern MechS32 g_starCapacity;
+	extern MechS32 g_blockStack[32];
+	extern MechS32 g_staticObjectsChanged;
+	extern Shape* g_blockBoxes[32];
+	extern MechS32 g_blockBoxesShown;
+	extern MechS32 g_starCount;
 
 	MechS32 AllocGeoTables(void);
 	MechS32 AddClass(MechS32 p_id, Shape* p_class);

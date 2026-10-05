@@ -19,6 +19,16 @@ extern "C"
 #endif
 
 	extern MechU32 g_staticPoolTags[10];
+	extern MechS16 g_missionPlayers;
+	extern MechS16 g_unk0x100e9daa;
+	extern MechS16 g_missionObjects;
+	extern MechS16 g_missionClassEntries;
+	extern MechS16 g_unk0x100e9db0;
+	extern MechS16 g_unk0x100e9db2;
+	extern MechS16 g_missionAnims;
+	extern MechS16 g_missionAnimTracks;
+	extern MechS32 g_missionAnimFrameBytes;
+	extern StaticPoolSize g_staticPoolSizes[10];
 
 	MechU32 GetStaticPoolSize(MechS32 p_index);
 	StaticPoolSize* ReadStaticMemoryTable(char* p_mission);

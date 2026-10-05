@@ -136,7 +136,7 @@ extern "C"
 
 	extern MechS32 g_playerCount;
 	extern MechS32 g_gameThingCount;
-	extern Player* g_players[];
+	extern Player* g_players[0x3c];
 	extern GameThing g_gameThings[254];
 
 	void FirstClassFunctions(void);

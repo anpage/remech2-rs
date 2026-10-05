@@ -25,6 +25,14 @@ extern "C"
 	extern MechS32 g_cameraShakeKeyCount;
 	extern MechS32 g_cameraShakeActive;
 	extern CameraShakeKey g_cameraShakeKeys[10];
+	extern Ramp g_cameraShakeHeading;
+	extern MechS32 g_cameraShakeKey;
+	extern Ramp g_cameraShakeZ;
+	extern MechS32 g_cameraShakeKeyTime;
+	extern Ramp g_cameraShakeRoll;
+	extern Ramp g_cameraShakeX;
+	extern Ramp g_cameraShakePitch;
+	extern Ramp g_cameraShakeY;
 
 	void ResetCameraShake(void);
 	MechS32 UpdateCameraShake(void);

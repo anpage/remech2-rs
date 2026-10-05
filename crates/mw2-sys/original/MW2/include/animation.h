@@ -2,6 +2,7 @@
 #define ANIMATION_H
 
 #include "animframe.h"
+#include "pane.h"
 #include "types.h"
 
 #pragma pack(push, 1)
@@ -28,6 +29,13 @@ extern "C"
 	extern AnimFrame g_animFrames[0x200][0x20];
 	extern MechS32 g_lumaResourceId;
 	extern Animation g_animations[0x200];
+	extern MechS32 g_animInitialized;
+	extern MechS32 g_currentAnimSet;
+	extern MechS32 g_animSetUsed;
+	extern MechS32 g_animSetIsSequence;
+	extern MechU16* g_lumaTables;
+	extern MechS32 g_preloadCels[103];
+	extern WINDOW g_animFrameBuffer;
 
 	MechS32 DrawAnimatedPolygon(
 		MechS32 p_index,

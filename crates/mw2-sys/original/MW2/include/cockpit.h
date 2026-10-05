@@ -72,6 +72,13 @@ extern "C"
 	extern MechS32 g_requestedCockpitView;
 	extern MechS32 g_mapFollowsFreeEye;
 	extern MechS32 g_satelliteClean;
+	extern PANE g_unk0x100a5ad0[8];
+	extern Point g_unk0x100a5b70[4];
+	extern Point g_unk0x100a5b90[4];
+	extern Point g_unk0x100a5bb0;
+	extern MechS32 g_mapDamageAnimShown;
+	extern MechS32 g_staticCleanUntil;
+	extern MechS32 g_staticNoiseUntil;
 
 	void LoadCockpitLayout(MechS32 p_cockpit, CockpitLayout* p_layout);
 	void InitCockpitViews(void);

@@ -53,6 +53,7 @@
 #include "random.h"
 #include "refreshmode.h"
 #include "render.h"
+#include "resetglobals.h"
 #include "resource.h"
 #include "screenscale.h"
 #include "setres.h"
@@ -147,6 +148,9 @@ int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 	MechS32 unk0x24;
 	MechS32 seed;
 	MechS32 quitLatched;
+
+	// The original was loaded fresh for each mission.
+	ResetSimGlobals();
 
 	quitLatched = 0;
 	seed = 0;

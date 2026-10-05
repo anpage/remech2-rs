@@ -24,6 +24,8 @@ extern "C"
 {
 #endif
 
+	extern TimedCallback* g_currentCallback;
+
 	TimedCallback* GetCurrentCallback(void);
 	TimedCallback* CreateDetachedTask(TimedCallback** p_list, TimedCallbackFn p_fn, MechS32 p_period, MechChar* p_data);
 	void RemoveTask(TimedCallback** p_list, TimedCallback* p_callback);

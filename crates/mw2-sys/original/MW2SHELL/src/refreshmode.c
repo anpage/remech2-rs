@@ -22,7 +22,7 @@ static MechS32 DisplayStretchBlit(MechS32 p_left, MechS32 p_top, MechS32 p_right
 
 // Takes the place of the GDI back end. Nothing in the shell sets the brightness or blends
 // palettes.
-static DisplayBackend g_displayBackend = {
+DisplayBackend g_displayBackend = {
 	c_displayBackendGdi,
 	c_windowModeWindowed,
 	0,
@@ -36,7 +36,7 @@ static DisplayBackend g_displayBackend = {
 };
 
 // Takes the place of the GDI refresh mode, which was mode 5.
-static RefreshMode g_refreshMode =
+RefreshMode g_refreshMode =
 	{5, c_displayBackendGdi, 1, 0, DisplayBegin, DisplayEnd, DisplayFlip, DisplayBlitRect, DisplayStretchBlit};
 
 // GLOBAL: MW2SHELL 0x10062cc8
@@ -55,7 +55,7 @@ PaletteColor g_paletteColors[0x100] = {0};
 // The frame, restored into g_refreshModeBuffer by m_acquireFramebuffer. Originally g_dibBits, the
 // DIB bits of the GDI and DisplayDib back ends.
 // GLOBAL: MW2SHELL 0x10062fe0
-static MechU8* g_frame = NULL;
+MechU8* g_frame = NULL;
 
 // Always windowed: full screen is the Rust side's business. The original set it from the back
 // end, or to full screen when the frame covered the desktop.

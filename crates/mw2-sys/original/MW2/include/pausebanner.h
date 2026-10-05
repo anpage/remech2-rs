@@ -1,6 +1,7 @@
 #ifndef PAUSEBANNER_H
 #define PAUSEBANNER_H
 
+#include "pane.h"
 #include "types.h"
 
 // The functions and globals of pausebanner.c that other units use.
@@ -11,6 +12,8 @@ extern "C"
 
 	extern MechS32 g_debugSlot;
 	extern MechS32 g_debugSection;
+	extern PANE g_pausedBannerRect;
+	extern MechS32 g_pausedBannerUnscaled;
 
 	void DrawPausedBanner(void);
 	void PlayPauseSound(void);

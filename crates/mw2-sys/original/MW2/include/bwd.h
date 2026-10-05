@@ -46,6 +46,7 @@ extern "C"
 
 	extern MechS32 g_streamsFromFiles;
 	extern MechS32 g_logStreams;
+	extern MechChar g_unk0x10109c40[1];
 
 	BwdStream* OpenBwdStream(struct BwdStreamKey* p_key, BwdStream* p_stream);
 	BwdNode* GetNextNode(BwdStream* p_stream);

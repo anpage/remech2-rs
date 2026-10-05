@@ -33,6 +33,7 @@
 #include "projectarchive.h"
 #include "readyroom.h"
 #include "refreshmode.h"
+#include "resetglobals.h"
 #include "rosterscreen.h"
 #include "shellglobals.h"
 #include "simhandoff.h"
@@ -361,10 +362,18 @@ extern "C" int ShellMain(char* p_cmdLine)
 	MechMessage msg;
 	MechS32 fromSim = FALSE;
 
+	// The original was loaded fresh each time.
+	ResetShellGlobals();
+
 	g_primaryHeap = MechHeapCreate();
 	if (g_primaryHeap == NULL) {
 		MechLogError("Insufficient memory available.");
 		return 0xff;
+	}
+
+	// Drop what the sim or an earlier shell run left queued. What the start-up below posts, like
+	// ReadSimHandoff's message, is kept.
+	while (MechPeekMessage(&msg, 0, 0, TRUE)) {
 	}
 
 	if (*p_cmdLine == '\0') {
@@ -434,8 +443,6 @@ extern "C" int ShellMain(char* p_cmdLine)
 
 	// The original sent the launcher's window c_msgActivateShell, to have it pass its messages to
 	// ShellWindowProc. Windows then told it whether the window was active.
-	while (MechPeekMessage(&msg, 0, 0, TRUE)) {
-	}
 	MechSetMessageHandler(ShellHandleMessage);
 	g_windowActive = MechAppActive();
 
@@ -475,6 +482,13 @@ extern "C" int ShellMain(char* p_cmdLine)
 	}
 
 	CloseAllVideos();
+
+	// The original left the song to FreeLibrary. It has to go before the audio subsystem it plays
+	// on, and before the heap its data is in.
+	if (g_midiBackgroundMusic) {
+		delete g_midiBackgroundMusic;
+		g_midiBackgroundMusic = NULL;
+	}
 
 	delete g_projectArchive;
 	delete g_mw2Database;
@@ -629,7 +643,7 @@ static const MechS32 g_menuCommands[] = {
 	c_menuKeshik,
 };
 
-static MechU8 g_menuCommandEnabled[sizeof(g_menuCommands) / sizeof(g_menuCommands[0])] = {1, 1, 1, 1, 1};
+MechU8 g_menuCommandEnabled[sizeof(g_menuCommands) / sizeof(g_menuCommands[0])] = {1, 1, 1, 1, 1};
 
 // Whether a menu command can be chosen. The commands that are never grayed always can.
 extern "C" MechS32 IsShellMenuCommandEnabled(MechS32 p_command)

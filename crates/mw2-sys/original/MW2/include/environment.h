@@ -4,6 +4,11 @@
 #include "decomp.h"
 #include "types.h"
 
+typedef struct TimeOfDayPhase {
+	MechS32 m_palette;  // 0x00
+	MechS32 m_duration; // 0x04
+} TimeOfDayPhase;
+
 // The functions and globals of environment.c that other units use.
 #ifdef __cplusplus
 extern "C"
@@ -20,6 +25,13 @@ extern "C"
 	extern MechS32 g_secondsPerDay;
 	extern MechS32 g_timeOfDayPhase;
 	extern MechS32 g_gravityScale;
+	extern TimeOfDayPhase g_timeOfDayPhases[4];
+	extern MechS32 g_timeOfDay;
+	extern MechS32 g_startTimeOfDay;
+	extern MechS32 g_timeOfDayFrames;
+	extern MechS32 g_timeOfDayStarts[4];
+	extern MechS32 g_timeOfDayEnabled;
+	extern MechS32 g_nextTimeOfDayUpdate;
 
 	void FirstEnvironment(void);
 	void UpdateTimeOfDay(void);

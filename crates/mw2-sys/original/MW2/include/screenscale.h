@@ -14,6 +14,12 @@ extern "C"
 {
 #endif
 
+	extern Point g_textMargins;
+	extern MechS32 g_pulseInset;
+	extern MechS32 g_pulseColor;
+	extern MechS32 g_pulseTime;
+	extern MechS32 g_pulseStep;
+
 	PANE* ScaleRectToScreen(WINDOW* p_buffer, PANE* p_src, PANE* p_dst);
 	PANE* ScaleRectToFrame(PANE* p_frame, PANE* p_src, PANE* p_dst);
 	Point* ScalePointToScreen(WINDOW* p_buffer, Point* p_src, Point* p_dst);

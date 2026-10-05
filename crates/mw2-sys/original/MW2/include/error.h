@@ -9,6 +9,11 @@ extern "C"
 {
 #endif
 
+	extern MechChar* g_fatalErrorTitle;
+	extern MechChar* g_warningTitle;
+	extern MechS32 g_errorCode;
+	extern MechChar g_errorMessage[0x400];
+
 	void Error(MechS32 p_code, const char* p_format, ...);
 	void ShutdownOnError(void);
 	void ShowFatalError(const char** p_args);

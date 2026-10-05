@@ -21,6 +21,7 @@ extern "C"
 	extern struct Shape* g_aimedShape;
 	extern MechS32 g_remoteWeaponsFired[10];
 	extern MechS32 g_localWeaponsFired[10];
+	extern MechS32 g_singleWeaponFire;
 
 	void ReleaseWeaponTriggers(struct Mech* p_mech);
 	void UpdateWeaponFireState(struct Mech* p_mech);

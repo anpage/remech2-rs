@@ -3,6 +3,8 @@
 
 #include "types.h"
 
+#include <stdio.h>
+
 // The functions and globals of mw2log.c that other units use.
 #ifdef __cplusplus
 extern "C"
@@ -10,6 +12,7 @@ extern "C"
 #endif
 
 	extern MechS32 g_logFileEnabled;
+	extern FILE* g_mw2Log;
 
 	MechS32 OpenMw2Log(void);
 	MechS32 CloseMw2Log(void);

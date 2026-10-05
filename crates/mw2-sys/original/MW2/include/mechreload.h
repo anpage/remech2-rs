@@ -15,6 +15,9 @@ extern "C"
 #endif
 
 	extern MechS32 g_reloadingPlayer;
+	extern MechS32 g_unk0x100ba694;
+	extern RememberedMech g_rememberedMechs[60];
+	extern MechSegment* g_mechSegments[60];
 
 	// Declared without a prototype: network.c calls it with two more (zero) arguments.
 	MechS32 ReloadPlayerMech();

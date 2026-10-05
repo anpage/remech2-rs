@@ -16,6 +16,9 @@ extern "C"
 	extern MechS32 g_otherArmorPerLevel;
 	extern MechS32 g_localArmorPerLevel;
 	extern MechS32 g_killCount;
+	extern MechS32 g_localMechHidden;
+	extern MechS32 g_criticalHeatWarned;
+	extern MechS32 g_criticalHeatWarningTime;
 
 	void RunAutopilot(struct Mech* p_mech);
 	void PunchInAutoHeading(struct Mech* p_mech);

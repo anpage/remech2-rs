@@ -56,4 +56,7 @@ private:
 
 #pragma pack()
 
+// The globals of mousestate.cpp that other units use.
+extern MechChar g_cursorPositionText[0x20];
+
 #endif // MOUSESTATE_H

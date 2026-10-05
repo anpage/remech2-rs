@@ -9,6 +9,9 @@ extern "C"
 {
 #endif
 
+	extern MechChar g_resourceDir[0x100];
+	extern MechChar g_resourcePath[0x50];
+
 	MechChar* MakeResourcePath(MechChar* p_name);
 
 #ifdef __cplusplus

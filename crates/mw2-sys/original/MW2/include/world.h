@@ -13,6 +13,9 @@ extern "C"
 
 	extern MechChar g_musicName[12];
 	extern MechS32 g_musicResource;
+	extern MechS32 g_loadHudFile;
+	extern MechS32 g_nextShotRecord;
+	extern MechS32 g_nextEffectRecord;
 	MechU32 WidenEventFlags(MechU32 p_flags);
 	MechS32 BwdExecuteStream(struct BwdStream* p_stream);
 	MechS32 LoadWorld(MechChar* p_name);

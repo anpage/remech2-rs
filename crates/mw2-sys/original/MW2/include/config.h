@@ -3,6 +3,7 @@
 
 #include "cockpitpanel.h"
 #include "decomp.h"
+#include "recttransition.h"
 #include "soundconfig.h"
 #include "targeting.h"
 #include "types.h"
@@ -48,6 +49,27 @@ extern "C"
 	extern MechS32 g_punchInAutoHeadingRequested;
 	extern MechChar g_gameDir[256];
 	extern MechS32 g_hitFadePending;
+	extern Point g_cockpitPanelTextOrigins[c_panelCount];
+	extern RectTransitionState g_targetTransitionState;
+	extern RectTransitionState g_mechViewTransitionState;
+	extern PANE g_targetTransitionFirst;
+	extern PANE g_targetTransitionSecond;
+	extern PANE g_targetTransitionRect;
+	extern RectTransitionDef g_targetTransitionDef;
+	extern RectTransition g_targetTransition;
+	extern PANE g_mechViewTransitionFirst;
+	extern PANE g_mechViewTransitionSecond;
+	extern PANE g_mechViewTransitionRect;
+	extern RectTransitionDef g_mechViewTransitionDef;
+	extern RectTransition g_mechViewTransition;
+	extern RectTransition* g_cockpitPanelTransitions[c_panelCount];
+	extern undefined4 g_cockpitPanelLightUpTimes[c_panelCount];
+	extern MechS32 g_lastWarningPowerState;
+	extern MechS32 g_lockedTonePlayed;
+	extern MechS32 g_lockingTonePlayed;
+	extern MechS32 g_hitFadeCount;
+	extern MechS32 g_screenshotCount;
+	extern MechChar g_gamePath[0x50];
 
 	MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_poolTag);
 	void SaveScreenshot(void);

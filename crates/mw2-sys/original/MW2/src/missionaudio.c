@@ -13,23 +13,16 @@
 #include <stdio.h>
 #include <string.h>
 
-// A project file entry: a sound file name, chained in its hash bucket.
-// SIZE 0x14
-typedef struct ProjectFileEntry {
-	MechChar m_name[0x10];           // 0x00
-	struct ProjectFileEntry* m_next; // 0x10
-} ProjectFileEntry;
-
 DECOMP_SIZE_ASSERT(ProjectFileEntry, 0x14)
 
 // GLOBAL: MW2 0x100a14f4
 MechS32 g_soundFileCount = 0;
 
 // GLOBAL: MW2 0x100bcdb8
-static ProjectFileEntry g_soundFileEntries[200];
+ProjectFileEntry g_soundFileEntries[200];
 
 // GLOBAL: MW2 0x100bdd58
-static ProjectFileEntry* g_soundFileTable[0x65];
+ProjectFileEntry* g_soundFileTable[0x65];
 
 // The directory of the mission's sound files.
 // GLOBAL: MW2 0x100bdef0

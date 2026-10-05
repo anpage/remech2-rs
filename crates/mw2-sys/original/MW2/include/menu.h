@@ -56,6 +56,9 @@ extern "C"
 	extern MechS32 g_menuRepeatTimer;
 	extern MechS32 g_menuKey;
 	extern MenuDefinition* g_menuDefinitions[11];
+	extern MechS32 g_openMenuCount;
+	extern MenuSlot* g_menuSlotsTail;
+	extern MenuSlot* g_menuSlots;
 
 	MechS32 RegisterMenu(MechS32 p_id);
 	MechS32 RequestMenu(MechS32 p_id);

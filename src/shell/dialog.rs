@@ -53,6 +53,12 @@ pub unsafe extern "C" fn show_dialog(message: *const c_char, _confirm: c_int) ->
 /// A video transition blocked while a prompt is up
 static PARKED: Mutex<Option<(u32, usize)>> = Mutex::new(None);
 
+/// Drops the open prompt and the transition it blocked, as unloading the shell did
+pub fn clear() {
+    confirm::clear();
+    *PARKED.lock().unwrap() = None;
+}
+
 /// Blocks the landing and finale transitions while a prompt is on screen
 pub fn park_transition(message: u32, wparam: usize) -> bool {
     let message = ShellMsg(message);

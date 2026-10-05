@@ -2,11 +2,13 @@
 #define ARCHIVEREADER_H
 
 #include "decomp.h"
+#include "mainmenubutton.h"
 #include "tmpackdatabase.h"
 #include "types.h"
 
 #include <stddef.h>
 
+class AudioSample;
 class Font;
 class TextGlyph;
 class ButtonMenu;
@@ -81,6 +83,15 @@ private:
 #pragma pack()
 
 // The functions and globals of archivereader.cpp that other units use.
+extern ArchiveReader* g_archiveReader;
+extern size_t g_archiveReturnMessage;
+extern AudioSample* g_archiveSound;
+extern MechChar g_archiveText[0x10000];
+extern MechChar g_archiveTitle[0x200];
+extern MechChar g_archiveTopicName[0x200];
+extern MainMenuButton g_prevPageLinkButton;
+extern MainMenuButton g_nextPageLinkButton;
+extern MechChar g_archiveLine[0x100];
 void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam);
 
 #endif // ARCHIVEREADER_H

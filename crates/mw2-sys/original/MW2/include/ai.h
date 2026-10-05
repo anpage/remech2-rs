@@ -60,6 +60,20 @@ enum {
 	c_aiTargetEnemy = 0x4201
 };
 
+// A name for a value, for the AI's log.
+struct AiName {
+	const MechChar* m_name; // 0x00
+	MechS32 m_value;        // 0x04
+};
+
+// For each script slot, the script (by resource index) for a player that leads its team
+// ([1] == 0) or follows ([1] == 1).
+typedef MechS16 AiScriptTable[16][2];
+
+typedef void (*AiStateFn)(struct Player* p_player, MechU16 p_target);
+typedef MechS16 (*AiMessageFn)(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
+typedef MechS32 (*AiTransitionFn)(struct Player* p_player, AiRule* p_rule);
+
 // The functions and globals of ai.c that other units use.
 #ifdef __cplusplus
 extern "C"
@@ -69,6 +83,37 @@ extern "C"
 	extern MechS32 g_debugStar;
 	extern MechS32 g_debugObjective;
 	extern MechS32 g_lairdoCheat;
+	extern MechS32 g_debugLastLine;
+	extern MechS32 g_debugFirstLine;
+	extern MechS32 g_debugListedStar;
+	extern AiName g_aiMessageNames[8];
+	extern AiName g_aiTransitionNames[7];
+	extern AiName g_aiStateNames[13];
+	extern AiName g_aiStateShortNames[14];
+	extern AiName g_aiSymbolicTargetNames[7];
+	extern AiName g_aiTargetTypeNames[3];
+	extern AiName g_aiTargetTypeLetters[3];
+	extern AiName g_shapeKindNames[3];
+	extern AiName g_playerTypeNames[9];
+	extern AiName g_powerStateNames[8];
+	extern AiName g_objectiveTypeNames[15];
+	extern AiName g_aiBehaviorNames[14];
+	extern MechS16 g_invalidTargetLogCount;
+	extern AiScriptTable g_mechScripts;
+	extern AiScriptTable g_artilleryScripts;
+	extern AiScriptTable g_wandererScripts;
+	extern AiScriptTable g_truckScripts;
+	extern AiScriptTable g_tankScripts;
+	extern MechS16 g_helicopterScripts[15][2];
+	extern MechS32 g_aiSpreadTargets;
+	extern MechS32 g_localStarAssigned;
+	extern AiStateFn g_aiStateFns[14];
+	extern AiMessageFn g_aiMessageFns[8];
+	extern AiTransitionFn g_aiTransitionFns[5];
+	extern void* g_aiScripts[10];
+	extern MechS16 g_hiddenTargetCount;
+	extern AiRule* g_aiRules[60][6];
+	extern MechS32 g_aiStateTime;
 
 	void UpdateAI(struct Player* p_player);
 	MechS32 RunAIRules(struct Player* p_player);

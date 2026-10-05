@@ -70,6 +70,8 @@ extern "C"
 
 	extern char* g_resourceTypeTags[26];
 	extern MechS32 g_mw2PrjHandle;
+	extern char* g_resourceTypeExtensions[25];
+	extern char* g_mw2PrjPath;
 
 #ifdef __cplusplus
 }

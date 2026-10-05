@@ -121,13 +121,6 @@ typedef struct PathFollower {
 	WrappedRamp m_roll;    // 0x74
 } PathFollower;
 
-// An animation file LoadAnimFile has loaded: its id and the base of its animation numbers.
-// SIZE 0x8
-typedef struct AnimFile {
-	MechS32 m_id;   // 0x00
-	MechS32 m_base; // 0x04
-} AnimFile;
-
 DECOMP_SIZE_ASSERT(AmbientSound, 0x1e)
 DECOMP_SIZE_ASSERT(PathPoint, 0x1c)
 DECOMP_SIZE_ASSERT(Path, 0x744)

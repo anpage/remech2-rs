@@ -49,6 +49,8 @@ extern "C"
 	extern MechS32 g_stretchPending;
 	extern MechS32 g_framePane;
 	extern MechS32 g_drawnPolygonCount;
+	extern struct SceneObject* g_skyObject;
+	extern struct SceneObject* g_cockpitObject;
 
 	MechS32 InitGameWindowGeometry(void);
 	MechS32 InitDisplayGeometry(void);

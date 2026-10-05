@@ -13,6 +13,8 @@ extern "C"
 
 	extern MenuDefinition g_commandPoint3Menu;
 	extern MenuPage* g_commandPoint3MenuPageStack[8];
+	extern PANE g_commandPoint3MenuTarget;
+	extern PANE g_commandPoint3MenuBackgroundTarget;
 
 #ifdef __cplusplus
 }

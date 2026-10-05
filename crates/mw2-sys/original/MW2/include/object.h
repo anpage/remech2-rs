@@ -38,6 +38,8 @@ extern "C"
 {
 #endif
 
+	extern MechU32 g_nextRenormalizeCountdown;
+
 	SceneObject* CreateObj(SceneObject* p_parent, MechU32 p_flags);
 	SceneObject* InitObj(SceneObject* p_parent, void* p_memory);
 	void SetObjShape(SceneObject* p_obj, Shape* p_shape);

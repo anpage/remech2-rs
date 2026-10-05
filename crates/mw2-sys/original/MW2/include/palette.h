@@ -3,6 +3,8 @@
 
 #include "decomp.h"
 #include "eyepoint.h"
+#include "palcycle.h"
+#include "palfade.h"
 #include "targeting.h"
 #include "types.h"
 
@@ -19,6 +21,16 @@ extern "C"
 	// SelectPane copies one of the eleven into the current one (g_currentPane) and sizes the
 	// eyepoint's view to it.
 	extern PANE g_panes[11];
+	extern MechS32 g_basePalette;
+	extern MechS32 g_settledPalette;
+	extern MechS32 g_paletteFadeTarget;
+	extern MechS32 g_paletteFadeBack;
+	extern MechS32 g_paletteFadeBackSteps;
+	extern MechS32 g_paletteFadeSteps;
+	extern MechS32 g_paletteCycling;
+	extern MechS32 g_paletteCycleResource;
+	extern PaletteFade g_paletteFade;
+	extern PaletteCycle g_paletteCycle;
 
 	void InitPanes(PANE* p_target);
 	void SelectPane(MechS32 p_index);

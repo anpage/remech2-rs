@@ -71,6 +71,12 @@ extern "C"
 	extern CareerRecord g_careerRecord;
 	extern Shot g_shots[0xaf];
 	extern Effect g_effects[0x100];
+	extern MechS32 g_savedLightX;
+	extern MechS32 g_savedLightY;
+	extern MechS32 g_savedLightZ;
+	extern MechS32 g_savedDirectionalLight;
+	extern MechS32 g_savedAmbientLight;
+	extern MechS32 g_savedDistanceFade;
 
 	void FirstShots(void);
 	void ResetEffectSlot(MechS32 p_index);

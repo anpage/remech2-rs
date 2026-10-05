@@ -28,6 +28,11 @@ extern "C"
 {
 #endif
 
+	extern MechS32 g_staticPoolGroupCount;
+	extern MechS32 g_staticPoolCount;
+	extern StaticPoolGroup g_staticPoolGroups[5];
+	extern StaticPool g_staticPools[32];
+
 	MechS32 InitStaticMem(char* p_mission);
 	void* StaticPoolAlloc(MechU32 p_size, MechU32 p_tag);
 	void FreeStaticMem(void);

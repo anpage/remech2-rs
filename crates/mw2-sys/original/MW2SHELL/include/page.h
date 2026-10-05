@@ -89,4 +89,12 @@ public:
 	Collection* m_links; // 0x30
 };
 
+// The globals of page.cpp that other units use.
+extern MechU8 g_pageLinkRead;
+extern MechU8 g_pageBackUpPending;
+extern MechU8 g_pageGoToPending;
+extern MechChar g_pageWord[0x400];
+extern MechChar g_pageLine[0x400];
+extern MechChar g_pageTemp[0x400];
+
 #endif // PAGE_H

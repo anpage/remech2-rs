@@ -77,66 +77,66 @@ static void GifCloseFile(void);
 // The bit file: the current data sub-block and the bits left in its current byte.
 
 // GLOBAL: MW2 0x100bf1b4
-static FILE* g_outFile;
+FILE* g_outFile;
 
 // GLOBAL: MW2 0x100bf0a0
-static MechU8 g_gifBuffer[256];
+MechU8 g_gifBuffer[256];
 
 // GLOBAL: MW2 0x100bf1b0
-static MechS32 g_gifIndex;
+MechS32 g_gifIndex;
 
 // GLOBAL: MW2 0x100bf1b8
-static MechS32 g_bitsLeft;
+MechS32 g_bitsLeft;
 
 // The LZW string table: each string's last byte, its prefix string, and the hash table.
 
 // GLOBAL: MW2 0x100b141c
-static MechU8* g_strChr = NULL;
+MechU8* g_strChr = NULL;
 
 // GLOBAL: MW2 0x100b1420
-static MechU32* g_strNxt = NULL;
+MechU32* g_strNxt = NULL;
 
 // GLOBAL: MW2 0x100b1424
-static MechU32* g_strHsh = NULL;
+MechU32* g_strHsh = NULL;
 
 // GLOBAL: MW2 0x100bf1c0
-static MechU32 g_numStrings;
+MechU32 g_numStrings;
 
 // GLOBAL: MW2 0x100bf09c
-static MechS32 g_bitsPrPrimColor;
+MechS32 g_bitsPrPrimColor;
 
 // GLOBAL: MW2 0x100bf1bc
-static MechS32 g_numColors;
+MechS32 g_numColors;
 
 // GLOBAL: MW2 0x100b1428
-static MechU8* g_colorTable = NULL;
+MechU8* g_colorTable = NULL;
 
 // GLOBAL: MW2 0x100bf08c
-static MechU32 g_gifScreenHeight;
+MechU32 g_gifScreenHeight;
 
 // GLOBAL: MW2 0x100bf088
-static MechU32 g_gifScreenWidth;
+MechU32 g_gifScreenWidth;
 
 // GLOBAL: MW2 0x100bf1a0
-static MechU32 g_imageHeight;
+MechU32 g_imageHeight;
 
 // GLOBAL: MW2 0x100bf1ac
-static MechU32 g_imageWidth;
+MechU32 g_imageWidth;
 
 // GLOBAL: MW2 0x100bf1a8
-static MechU32 g_imageLeft;
+MechU32 g_imageLeft;
 
 // GLOBAL: MW2 0x100bf090
-static MechU32 g_imageTop;
+MechU32 g_imageTop;
 
 // GLOBAL: MW2 0x100bf098
-static MechU32 g_relPixX;
+MechU32 g_relPixX;
 
 // GLOBAL: MW2 0x100bf094
-static MechU32 g_relPixY;
+MechU32 g_relPixY;
 
 // GLOBAL: MW2 0x100bf1a4
-static MechS32 (*g_getPixel)(MechS32 p_x, MechS32 p_y);
+MechS32 (*g_getPixel)(MechS32 p_x, MechS32 p_y);
 
 // Operand order: the loop test (q < tabSize) compares with tabSize in eax in the original, and the
 // color table size's bitfield store loads the byte before the value.
