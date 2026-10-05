@@ -427,7 +427,7 @@ MechChar g_cpcEditText[0x100];
 
 // Edits p_text with a cursor ('_') drawn after it, like EditTextField but keeping the screen's
 // video running. Return or a click store the text and return 1; Escape stores it and returns
-// 0. When the window closes it gives up without a return value.
+// 0. When the window closes it gives up, returning 0 (the original returned nothing).
 // Not 100%: the stack slots of the locals are permuted.
 // FUNCTION: MW2SHELL 0x1003ea0f
 MechS32 CpcEditTextField(
@@ -540,6 +540,8 @@ MechS32 CpcEditTextField(
 			}
 		}
 	}
+
+	return 0;
 }
 
 // Edit a field's text in place, then show it.

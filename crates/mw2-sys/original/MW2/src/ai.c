@@ -1231,10 +1231,10 @@ void LogStarMissionLines(MechS32 p_team)
 
 		switch (objective->m_state) {
 		case 5:
-			sprintf(line, "%s successful at %3.3d sec   %s", prefix, objective->m_endTime, objective->m_name);
+			snprintf(line, sizeof(line), "%s successful at %3.3d sec   %s", prefix, objective->m_endTime, objective->m_name);
 			break;
 		case 6:
-			sprintf(line, "%s failed     at %3.3d sec   %s", prefix, objective->m_endTime, objective->m_name);
+			snprintf(line, sizeof(line), "%s failed     at %3.3d sec   %s", prefix, objective->m_endTime, objective->m_name);
 			break;
 		default:
 			if (objective->m_active) {
@@ -1246,10 +1246,10 @@ void LogStarMissionLines(MechS32 p_team)
 
 			if (objective->m_timeLimit > 0 && objective->m_active) {
 				secondsLeft = objective->m_timeLimit - (g_missionTime - objective->m_startTime);
-				sprintf(line, "%s %s   %3.3d sec   %s", prefix, activity, secondsLeft, objective->m_name);
+				snprintf(line, sizeof(line), "%s %s   %3.3d sec   %s", prefix, activity, secondsLeft, objective->m_name);
 			}
 			else {
-				sprintf(line, "%s %s             %s", prefix, activity, objective->m_name);
+				snprintf(line, sizeof(line), "%s %s             %s", prefix, activity, objective->m_name);
 			}
 			break;
 		}
@@ -1842,7 +1842,7 @@ void EnterAIState(Player* p_player, MechU16 p_state)
 	case c_aiStateShutdown:
 		p_player->m_ai.m_flags = 1;
 	case c_aiStateRest:
-	case -1:
+		// The original also had case -1, which the unsigned state never matches
 		p_player->m_flags |= 0x10;
 		p_player->m_mech->m_powerState |= 3;
 	case c_aiStateIdle:
@@ -1904,8 +1904,9 @@ void EnterAIState(Player* p_player, MechU16 p_state)
 			sprintf(goalName, "%d", logged->m_player->m_ai.m_goal & 0xff);
 		}
 
-		sprintf(
+		snprintf(
 			line,
+			sizeof(line),
 			"%6d : %2d Mech %2d : state %8s %4s %2d, objective %4s %-12s\n",
 			g_currentClock,
 			logged->m_player->m_team,

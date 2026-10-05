@@ -1285,7 +1285,7 @@ void SaveScreenshot(void)
 	target.m_y1 = g_screenHeightMinus1;
 	if (g_screenshotCount < 1000) {
 		count = g_screenshotCount++;
-		sprintf(name, "mw2%04d.gif", count);
+		snprintf(name, sizeof(name), "mw2%04d.gif", count);
 		ScreenshotBegin(name);
 		ScreenshotWritePalette();
 		ScreenshotWriteImage(&target);
@@ -1304,7 +1304,7 @@ MechChar* BuildGamePath(MechChar* p_name)
 	}
 
 	if (g_gameDir[0] && !strchr(p_name, '\\') && !strchr(p_name, '/')) {
-		sprintf(g_gamePath, "%s\\%s", g_gameDir, p_name);
+		snprintf(g_gamePath, sizeof(g_gamePath), "%s\\%s", g_gameDir, p_name);
 	}
 	else {
 		strcpy(g_gamePath, p_name);
@@ -1324,7 +1324,7 @@ MechChar* BuildGameDirPath(MechChar* p_name)
 	}
 
 	if (g_gameDir[0]) {
-		sprintf(g_gamePath, "%s\\%s", g_gameDir, p_name);
+		snprintf(g_gamePath, sizeof(g_gamePath), "%s\\%s", g_gameDir, p_name);
 	}
 	else {
 		strcpy(g_gamePath, p_name);

@@ -35,7 +35,7 @@ void ClearMonoLastLine(void)
 	MechS32 pixelAddress = 0xb0f00;
 
 	while (pixelAddress < 0xb0fa0) {
-		*(MechS32*) pixelAddress = *(MechS32*) pixelAddress & 0xff00ff00;
+		*(MechS32*) MECH_S32_TO_PTR(pixelAddress) = *(MechS32*) MECH_S32_TO_PTR(pixelAddress) & 0xff00ff00;
 		pixelAddress += 4;
 	}
 }

@@ -203,7 +203,7 @@ MechS32 AppendHonorBreakdown(
 
 	sprintf(g_honorPoints, "%d", points);
 	width = g_bodyFont->GetTextWidth(g_honorPoints);
-	sprintf(g_honorLine, "\\nMission Completion:\\g%03d\\b%03d%s\\n", 350, width, g_honorPoints);
+	snprintf(g_honorLine, sizeof(g_honorLine), "\\nMission Completion:\\g%03d\\b%03d%s\\n", 350, width, g_honorPoints);
 	strcat(p_text, g_honorLine);
 	honor += points;
 
@@ -232,8 +232,9 @@ MechS32 AppendHonorBreakdown(
 		honor += points;
 		sprintf(g_honorPoints, "%d", points);
 		width = g_bodyFont->GetTextWidth(g_honorPoints);
-		sprintf(
+		snprintf(
 			g_honorLine,
+			sizeof(g_honorLine),
 			"Secondary Objective Completed:\\t\\t%d\\t(x%d)\\g%03d\\b%03d%s\\n",
 			1500,
 			secondary,
@@ -249,8 +250,9 @@ MechS32 AppendHonorBreakdown(
 		honor += points;
 		sprintf(g_honorPoints, "%d", points);
 		width = g_bodyFont->GetTextWidth(g_honorPoints);
-		sprintf(
+		snprintf(
 			g_honorLine,
+			sizeof(g_honorLine),
 			"Tertiary Objective Completed:\\t\\t%d\\t(x%d)\\g%03d\\b%03d%s\\n",
 			500,
 			tertiary,
@@ -266,8 +268,9 @@ MechS32 AppendHonorBreakdown(
 		honor += points;
 		sprintf(g_honorPoints, "%d", points);
 		width = g_bodyFont->GetTextWidth(g_honorPoints);
-		sprintf(
+		snprintf(
 			g_honorLine,
+			sizeof(g_honorLine),
 			"Wingman Deaths:\\t\\t\\t\\t%d\\t(x%d)\\g%03d\\b%03d%s\\n",
 			-4000,
 			p_career->m_wingmenLost,
@@ -286,8 +289,9 @@ MechS32 AppendHonorBreakdown(
 	sprintf(g_honorPoints, "%d", points);
 	width = g_bodyFont->GetTextWidth(g_honorPoints);
 	honor += points;
-	sprintf(
+	snprintf(
 		g_honorLine,
+		sizeof(g_honorLine),
 		"Enemy Mechs Destroyed:\\t\\t\\t%d\\t%d\\g%03d\\b%03d%s\\n",
 		p_career->m_directMechKills,
 		p_career->m_mechKills,
@@ -302,8 +306,9 @@ MechS32 AppendHonorBreakdown(
 	sprintf(g_honorPoints, "%d", points);
 	width = g_bodyFont->GetTextWidth(g_honorPoints);
 	honor += points;
-	sprintf(
+	snprintf(
 		g_honorLine,
+		sizeof(g_honorLine),
 		"Enemy Vehicles Destoyed:\\t\\t\\t%d\\t%d\\g%03d\\b%03d%s\\n",
 		p_career->m_directVehicleKills,
 		p_career->m_vehicleKills,
@@ -324,8 +329,9 @@ MechS32 AppendHonorBreakdown(
 		sprintf(g_honorPoints, "%d", points);
 		width = g_bodyFont->GetTextWidth(g_honorPoints);
 		honor += points;
-		sprintf(
+		snprintf(
 			g_honorLine,
+			sizeof(g_honorLine),
 			"Star Underweight Bonus:\\t\\t\\t%d\\t(x%d tons)\\g%03d\\b%03d%s\\n",
 			25,
 			tons,
@@ -353,8 +359,9 @@ MechS32 AppendHonorBreakdown(
 	if (hit <= 1.0) {
 		sprintf(g_honorPoints, "%d", hitBonus);
 		width = g_bodyFont->GetTextWidth(g_honorPoints);
-		sprintf(
+		snprintf(
 			g_honorLine,
+			sizeof(g_honorLine),
 			"Hit Percentage:\\t\\t\\t\\t%3.1f\\g%03d\\b%03d%s\\n",
 			hit * 100.0,
 			350,
@@ -391,15 +398,16 @@ MechS32 AppendHonorBreakdown(
 	else if (p_results->m_outcome == 2) {
 		sprintf(g_honorPoints, "%d", honor);
 		width = g_bodyFont->GetTextWidth(g_honorPoints);
-		sprintf(g_honorLine, "\\nMission Honor:\\g%03d\\b%03d%s\\n", 350, width, g_honorPoints);
+		snprintf(g_honorLine, sizeof(g_honorLine), "\\nMission Honor:\\g%03d\\b%03d%s\\n", 350, width, g_honorPoints);
 		strcat(p_text, g_honorLine);
 
 		bonus = (MechS32) (honor * multiplier) - honor;
 		honor += bonus;
 		sprintf(g_honorPoints, "%d", honor);
 		width = g_bodyFont->GetTextWidth(g_honorPoints);
-		sprintf(
+		snprintf(
 			g_honorLine,
+			sizeof(g_honorLine),
 			"Difficulty Multiplier:\\t(%s = %1.1f)\\g%03d\\b%03d%s\\n",
 			g_skillName,
 			multiplier,
@@ -545,7 +553,7 @@ void BuildDebriefText(
 
 	sprintf(g_careerHonor, "%d", g_currentPilot->m_honor);
 	width = g_bodyFont->GetTextWidth(g_careerHonor);
-	sprintf(g_careerHonorLine, "\\nCareer Honor:\\g%03d\\b%03d%s\\n", 350, width, g_careerHonor);
+	snprintf(g_careerHonorLine, sizeof(g_careerHonorLine), "\\nCareer Honor:\\g%03d\\b%03d%s\\n", 350, width, g_careerHonor);
 	strcat(p_text, g_careerHonorLine);
 }
 

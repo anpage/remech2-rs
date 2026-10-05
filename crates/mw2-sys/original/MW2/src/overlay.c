@@ -418,11 +418,11 @@ void ShowEyePosition(Eyepoint* p_eyepoint)
 		return;
 	}
 
-	sprintf(text, "txyz: %04.4d %04.4d %04.4d", p_eyepoint->m_x, p_eyepoint->m_y, p_eyepoint->m_z);
+	sprintf(text, "txyz: %4.4d %4.4d %4.4d", p_eyepoint->m_x, p_eyepoint->m_y, p_eyepoint->m_z);
 	DRAW_DEBUG_TEXT();
 	sprintf(
 		text,
-		"rxyz:  %04.4d %04.4d %04.4d",
+		"rxyz:  %4.4d %4.4d %4.4d",
 		(p_eyepoint->m_pitch >> 16) % 360,
 		(p_eyepoint->m_heading >> 16) % 360,
 		(p_eyepoint->m_roll >> 16) % 360
@@ -474,7 +474,8 @@ void HideCacheInfo(void)
 {
 	MechChar text[28];
 
-	sprintf(text, "                           ", 0x19, 0x19);
+	// The original also passed 0x19 twice, which the format doesn't use
+	sprintf(text, "                           ");
 	DRAW_DEBUG_TEXT();
 	g_cacheInfoShown = 0;
 }

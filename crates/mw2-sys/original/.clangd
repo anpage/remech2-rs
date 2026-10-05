@@ -16,4 +16,3 @@ CompileFlags:
 Diagnostics:
   Suppress:
     - writable-strings
-    - deprecated-non-prototype

@@ -75,9 +75,9 @@ MechS32 FillMouseDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info)
 {
 	p_info->m_axisCount = 2;
 	p_info->m_buttonCount = 3;
-	sprintf(p_info->m_shortName, g_mouseDeviceName);
-	sprintf(p_info->m_displayName, g_mouseDisplayName);
-	sprintf(p_info->m_matchName, g_mouseTypeName);
+	sprintf(p_info->m_shortName, "%s", g_mouseDeviceName);
+	sprintf(p_info->m_displayName, "%s", g_mouseDisplayName);
+	sprintf(p_info->m_matchName, "%s", g_mouseTypeName);
 	p_info->m_axisNames = g_mouseAxisNames;
 	p_info->m_axisShortNames = g_mouseAxisTypes;
 	p_info->m_buttonNames = g_mouseButtonNames;

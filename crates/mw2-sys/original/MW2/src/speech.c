@@ -350,8 +350,9 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 
 	slot = -1;
 	g_speechSample = 0;
+	// The original also tested m_text, an array, for null
 	if (!g_audioEngine || !(g_soundConfig.m_simFlags & 2)) {
-		if (p_entry->m_text && p_entry->m_text[0]) {
+		if (p_entry->m_text[0]) {
 			ShowInGameMessage(p_entry->m_text, 0, 0x712, 0x32);
 			p_entry->m_deadline = g_currentClock + 0x712;
 			return TRUE;
@@ -421,7 +422,7 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 			g_speechSample = g_audioEngine->m_samples[slot];
 		}
 	}
-	else if (p_entry->m_text && p_entry->m_text[0]) {
+	else if (p_entry->m_text[0]) {
 		ShowInGameMessage(p_entry->m_text, 0, 0x712, 0x32);
 	}
 

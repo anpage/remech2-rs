@@ -100,9 +100,7 @@ void* ReadSoundFile(MechChar* p_name)
 	MechChar path[0x100];
 	MechChar name[0x100];
 
-	if (!g_soundFileDir) {
-		return NULL;
-	}
+	// The original returned NULL here for a null g_soundFileDir, which as an array never is
 
 	strcpy(name, p_name);
 	strcat(name, ".sfl");

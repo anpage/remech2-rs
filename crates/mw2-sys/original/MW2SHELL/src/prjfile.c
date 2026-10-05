@@ -299,7 +299,9 @@ MechS32 SeekArchiveItem(MechS32 p_handle, MechChar* p_name, MechU32 p_index, voi
 	MechS32 offset;
 
 	entry = FindArchiveEntry(p_handle, p_name);
-	if ((MechS32) entry == -1) {
+	// FindArchiveEntry's -1 as the 16 bits it's kept in: compared with an int, as the
+	// original's source has it, it never matches
+	if (entry == (MechU16) -1) {
 		return -1;
 	}
 	if (g_archiveSlots[p_handle].m_entries[entry].m_data == NULL && LoadArchiveEntries(p_handle) == -1) {

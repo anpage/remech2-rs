@@ -1,4 +1,3 @@
---target=x86_64-unknown-linux-gnu
 -fms-extensions
 -fwrapv
 -fno-strict-aliasing
@@ -6,3 +5,13 @@
 -Icommon/include
 -Imss
 -Ismacker
+-Wno-format-truncation
+-Wno-unused-result
+-Wno-pointer-sign
+-Werror=strict-prototypes
+-Werror=implicit-function-declaration
+-Werror=int-conversion
+-Werror=incompatible-pointer-types
+-Werror=pointer-to-int-cast
+-Werror=int-to-pointer-cast
+-Werror=return-type

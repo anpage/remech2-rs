@@ -302,7 +302,9 @@ MechS32 SeekPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, Me
 	MechU16 type;
 
 	type = FindPrjType(p_file, p_type);
-	if (type == -1) {
+	// FindPrjType's -1 as the 16 bits it's kept in: compared with an int, as the original's
+	// source has it, it never matches
+	if (type == (MechU16) -1) {
 		return -1;
 	}
 

@@ -67,7 +67,7 @@ MechChar* MakeResourcePath(MechChar* p_name)
 	}
 
 	if (g_resourceDir[0] != '\0' && strchr(p_name, '\\') == NULL && strchr(p_name, '/') == NULL) {
-		sprintf(g_resourcePath, "%s\\%s", g_resourceDir, p_name);
+		snprintf(g_resourcePath, sizeof(g_resourcePath), "%s\\%s", g_resourceDir, p_name);
 	}
 	else {
 		strcpy(g_resourcePath, p_name);
@@ -87,7 +87,7 @@ MechChar* MakeResourcePathUnchecked(MechChar* p_name)
 	}
 
 	if (g_resourceDir[0] != '\0') {
-		sprintf(g_resourcePath, "%s\\%s", g_resourceDir, p_name);
+		snprintf(g_resourcePath, sizeof(g_resourcePath), "%s\\%s", g_resourceDir, p_name);
 	}
 	else {
 		strcpy(g_resourcePath, p_name);

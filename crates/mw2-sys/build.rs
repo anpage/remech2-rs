@@ -162,7 +162,12 @@ fn base(includes: &[PathBuf], cpp: bool) -> cc::Build {
         .cpp(cpp)
         .includes(includes)
         .opt_level(1)
-        .warnings(false)
+        .warnings(true)
+        .extra_warnings(false)
+        .flag("-Wno-all")
+        .flag("-Wno-format-truncation")
+        .flag("-Wno-unused-result")
+        .flag("-Werror=return-type")
         .flag("-fwrapv")
         .flag("-fno-strict-aliasing")
         .flag("-fms-extensions");
@@ -170,10 +175,11 @@ fn base(includes: &[PathBuf], cpp: bool) -> cc::Build {
         build
             .flag("-fno-exceptions")
             .flag("-fno-rtti")
-            .flag("-fcheck-new");
+            .flag("-fcheck-new")
+            .flag("-Wno-write-strings");
     } else {
-        // Errors even under -w: they catch pointers cut to 32 bits, and calls without a prototype
         build
+            .flag("-Wno-pointer-sign")
             .flag("-Werror=strict-prototypes")
             .flag("-Werror=implicit-function-declaration")
             .flag("-Werror=int-conversion")

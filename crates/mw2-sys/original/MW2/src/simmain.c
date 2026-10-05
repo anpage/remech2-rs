@@ -161,8 +161,9 @@ int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 
 	unk0x24 = 1;
 	unk0x28 = 0;
+	// The original strcpy'd, with no limit
 	if (getenv("MECHWARRIOR")) {
-		strcpy(g_gameDir, getenv("MECHWARRIOR"));
+		snprintf(g_gameDir, sizeof(g_gameDir), "%s", getenv("MECHWARRIOR"));
 	}
 
 	if (LoadSndCfg("mw2snd.cfg", &g_mw2SndCfgData) == -1) {

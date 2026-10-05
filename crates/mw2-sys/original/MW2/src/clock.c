@@ -134,7 +134,9 @@ MechS32 Hypot2D(MechS32 p_x, MechS32 p_y)
 	MechDouble y;
 
 	x = p_x;
-	length = (MechS32) sqrt((y = p_y) * y + x * x);
+	// The original assigned y inside the product, which C leaves unsequenced
+	y = p_y;
+	length = (MechS32) sqrt(y * y + x * x);
 	return length;
 }
 

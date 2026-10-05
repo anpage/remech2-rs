@@ -36,7 +36,7 @@ void ClearMonoLastLine(void)
 	MechS32* cell;
 
 	cell = (MechS32*) 0xb0f00;
-	while ((MechS32) cell < 0xb0fa0) {
+	while (MECH_PTR_TO_S32(cell) < 0xb0fa0) {
 		*cell &= 0xff00ff00;
 		cell++;
 	}

@@ -142,7 +142,7 @@ void DumpStrings(MechChar* p_title, Collection* p_collection)
 	fprintf(stdout, "%s\n", p_title);
 	fflush(stdout);
 	for (i = 0; i < p_collection->m_count; i++) {
-		fprintf(stdout, "%d, %s\n", i, CollectionGet(p_collection, i));
+		fprintf(stdout, "%d, %s\n", i, (char*) CollectionGet(p_collection, i));
 		fflush(stdout);
 	}
 

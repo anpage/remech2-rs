@@ -59,7 +59,7 @@ MechChar* FormatTicks(MechS32 p_ticks)
 	hours = p_ticks / (181 * 3600);
 	minutes = (p_ticks - hours * (181 * 3600)) / (181 * 60);
 	seconds = (p_ticks - hours * (181 * 3600) - minutes * (181 * 60)) / 181.0;
-	sprintf(g_ticksText, "%2.2d:%2.2d:%05.2f", hours, minutes, seconds);
+	snprintf(g_ticksText, sizeof(g_ticksText), "%2.2d:%2.2d:%05.2f", hours, minutes, seconds);
 	return g_ticksText;
 }
 
@@ -74,7 +74,7 @@ MechChar* FormatSeconds(MechS32 p_seconds)
 	hours = p_seconds / 3600;
 	minutes = (p_seconds - hours * 3600) / 60;
 	seconds = p_seconds - hours * 3600 - minutes * 60;
-	sprintf(g_secondsText, "%2.2d:%2.2d:%2.2d", hours, minutes, seconds);
+	snprintf(g_secondsText, sizeof(g_secondsText), "%2.2d:%2.2d:%2.2d", hours, minutes, seconds);
 	return g_secondsText;
 }
 

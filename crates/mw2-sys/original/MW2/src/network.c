@@ -542,7 +542,7 @@ void ReceiveChatMsg(NetChatMsg* p_msg, MechS32 p_slot)
 	}
 
 	p_msg->m_text[0x50] = 0; // one past the line: the buffer is the 0x100-byte receive buffer
-	sprintf(text, "%s: %s", g_players[p_slot]->m_name, p_msg->m_text);
+	snprintf(text, sizeof(text), "%s: %s", g_players[p_slot]->m_name, p_msg->m_text);
 	ShowInGameMessage(text, 1, 0x43e, 0x32);
 	PlaySoundEffect(0xdc, 100, 0x40, 5, 0x32);
 }
@@ -715,7 +715,7 @@ void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 					sprintf(text, "'%s' destroyed.", player->m_name);
 				}
 				else {
-					sprintf(text, "'%s' destroyed by '%s'.", player->m_name, g_players[player->m_killer]->m_name);
+					snprintf(text, sizeof(text), "'%s' destroyed by '%s'.", player->m_name, g_players[player->m_killer]->m_name);
 				}
 			}
 			else {
@@ -1034,6 +1034,9 @@ MechS32 FindSession(LPDPSESSIONDESC p_desc)
 	if (strcmp(p_desc->szSessionName, g_sessionName) == 0) {
 		return 1;
 	}
+
+	// The original fell off the end, returning what strcmp left in eax
+	return 0;
 }
 
 // The only diff is a stack-slot permutation of result, desc, guid and unk0x04.
@@ -1183,6 +1186,8 @@ MechS32 StopExternalIO(void)
 
 	g_netRole = 0;
 	g_clockMode = 0;
+	// The original returned nothing; its one caller ignores the result
+	return 0;
 }
 
 // Counts the players and elects the one with the lowest id master. Alone, the network stops.

@@ -246,7 +246,7 @@ void DumpResourceCache(void)
 				item->m_id,
 				type,
 				item->m_lock,
-				MechHeapSize(g_primaryHeap, item)
+				(MechS32) MechHeapSize(g_primaryHeap, item)
 			);
 		}
 	}
@@ -260,7 +260,7 @@ void DumpResourceCache(void)
 			item->m_id,
 			type,
 			item->m_lock,
-			MechHeapSize(g_primaryHeap, item)
+			(MechS32) MechHeapSize(g_primaryHeap, item)
 		);
 	}
 
