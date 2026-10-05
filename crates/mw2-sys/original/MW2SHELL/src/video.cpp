@@ -509,13 +509,20 @@ void PauseFullscreenVideo()
 }
 
 // Resumes the full-screen video when the shell gets the focus back: restores the screen and
-// redraws the frame PauseFullscreenVideo stepped back to.
+// redraws the frame PauseFullscreenVideo stepped back to. The original didn't take the frame's
+// palette, which lost the intro's when the focus came as it started.
 // FUNCTION: MW2SHELL 0x10016c3e
 void ResumeFullscreenVideo()
 {
 	MechS32 result;
+	Smack* smack;
 
-	SmackGoto(g_fmvSlots[0].m_smack, g_fmvSlots[0].m_frame);
+	smack = g_fmvSlots[0].m_smack;
+	SmackGoto(smack, g_fmvSlots[0].m_frame);
+	if (smack->NewPalette) {
+		g_videoDriver->SetPalette((PaletteColor*) (smack->PalType == 1 ? smack->Palette : smack->AlternatePalette), 0);
+	}
+
 	g_videoDriver->CopyBackgroundToScreen();
 	if (g_windowActive != 0) {
 		result = g_currentDisplayBackend->m_acquireFramebuffer();

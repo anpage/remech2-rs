@@ -216,7 +216,7 @@ impl Movie {
         let sought = self
             .seek(target)
             .with_context(|| format!("seek to frame {target}"));
-        self.state.palette_changed = before != *self.state.decoder.palette();
+        self.state.palette_changed |= before != *self.state.decoder.palette();
         self.resync_audio(self.frame_index());
         self.publish_frame_state();
         sought
