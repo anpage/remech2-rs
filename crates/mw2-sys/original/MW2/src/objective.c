@@ -965,7 +965,12 @@ MechS32 EndTheMission2(void)
 		result.m_objectives[count].m_startTime = mission->m_objectives[i].m_startTime;
 		result.m_objectives[count].m_endTime = mission->m_objectives[i].m_endTime;
 		result.m_objectives[count].m_mandatory = mission->m_objectives[i].m_mandatory;
-		strcpy(result.m_objectives[count].m_name, mission->m_objectives[i].m_name);
+		// The original strcpy'd, running a longer name into the next objective's fields
+		strncpy(
+			result.m_objectives[count].m_name,
+			mission->m_objectives[i].m_name,
+			sizeof(result.m_objectives[count].m_name) - 1
+		);
 		count++;
 	}
 
