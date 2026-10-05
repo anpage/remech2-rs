@@ -1,7 +1,16 @@
 use std::fmt;
 
+macro_rules! winit_key {
+    ($key:ident) => {
+        winit::keyboard::KeyCode::$key
+    };
+    ($key:ident $winit:ident) => {
+        winit::keyboard::KeyCode::$winit
+    };
+}
+
 macro_rules! key_codes {
-    ($($key:ident),* $(,)?) => {
+    ($($key:ident $(= $winit:ident)?),* $(,)?) => {
         #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
         pub enum KeyCode {
             $($key),*
@@ -19,6 +28,13 @@ macro_rules! key_codes {
             pub fn from_name(name: &str) -> Option<Self> {
                 match name {
                     $(stringify!($key) => Some(KeyCode::$key),)*
+                    _ => None,
+                }
+            }
+
+            pub fn from_winit(code: winit::keyboard::KeyCode) -> Option<Self> {
+                match code {
+                    $(winit_key!($key $($winit)?) => Some(KeyCode::$key),)*
                     _ => None,
                 }
             }
@@ -85,8 +101,8 @@ key_codes!(
     ControlLeft,
     ControlRight,
     Enter,
-    MetaLeft,
-    MetaRight,
+    MetaLeft = SuperLeft,
+    MetaRight = SuperRight,
     ShiftLeft,
     ShiftRight,
     Space,

@@ -1,3 +1,4 @@
+mod input;
 mod keyboard;
 mod mouse;
 mod renderer;
@@ -114,6 +115,7 @@ struct State {
     modifiers: ModifiersState,
     focused: bool,
     mouse: Mouse,
+    input: input::Feed,
     quit: bool,
     error: Option<anyhow::Error>,
 }
@@ -130,6 +132,7 @@ impl State {
             modifiers: ModifiersState::empty(),
             focused: false,
             mouse: Mouse::new(),
+            input: input::Feed::default(),
             quit: false,
             error: None,
         }
@@ -232,6 +235,7 @@ impl ApplicationHandler for State {
         if let (Some(window), Some(egui_input)) = (&self.window, &mut self.egui_input) {
             consumed = egui_input.on_window_event(window, &event).consumed;
         }
+        self.input.window_event(&event);
 
         match event {
             WindowEvent::CloseRequested => self.quit = true,
@@ -277,8 +281,11 @@ impl ApplicationHandler for State {
         _device_id: DeviceId,
         event: DeviceEvent,
     ) {
-        if let (DeviceEvent::MouseMotion { delta }, Some(window)) = (event, &self.window) {
-            self.mouse.motion(window, delta);
+        if let DeviceEvent::MouseMotion { delta } = event {
+            self.input.motion(delta);
+            if let Some(window) = &self.window {
+                self.mouse.motion(window, delta);
+            }
         }
     }
 }

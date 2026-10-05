@@ -1,5 +1,5 @@
 use std::{
-    collections::{BTreeMap, BTreeSet, VecDeque},
+    collections::{BTreeMap, BTreeSet},
     sync::{LazyLock, Mutex},
 };
 
@@ -88,7 +88,6 @@ pub enum KbmEvent {
         dy: i32,
     },
     Focus(bool),
-    Text(char),
 }
 
 #[derive(Clone, Debug, Default)]
@@ -138,7 +137,6 @@ impl KbmState {
                 }
                 self.focused = focused;
             }
-            KbmEvent::Text(_) => {}
         }
     }
 
@@ -167,29 +165,9 @@ impl KbmState {
 
 static KBM: LazyLock<Mutex<KbmState>> = LazyLock::new(Default::default);
 
-const UI_EVENTS_KEPT: usize = 256;
-
-static UI_EVENTS: Mutex<VecDeque<KbmEvent>> = Mutex::new(VecDeque::new());
-
-/// Applies events from the platform backend.
-pub fn push(events: impl IntoIterator<Item = KbmEvent>) {
-    let mut state = KBM.lock().unwrap();
-    let mut ui_events = UI_EVENTS.lock().unwrap();
-    for event in events {
-        state.apply(event);
-        if matches!(event, KbmEvent::MouseMotion { .. }) {
-            continue;
-        }
-        if ui_events.len() == UI_EVENTS_KEPT {
-            ui_events.pop_front();
-        }
-        ui_events.push_back(event);
-    }
-}
-
-/// Takes the events that arrived since the last call, oldest first
-pub fn take_ui_events() -> Vec<KbmEvent> {
-    UI_EVENTS.lock().unwrap().drain(..).collect()
+/// Applies an event from the app's event loop.
+pub fn push(event: KbmEvent) {
+    KBM.lock().unwrap().apply(event);
 }
 
 pub fn snapshot() -> KbmState {
