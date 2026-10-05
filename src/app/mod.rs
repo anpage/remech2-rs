@@ -23,7 +23,7 @@ use remech2_sys::shared::{
     c_mechMsgActivateApp, c_mechMsgKeyDown, c_mechMsgKeyUp, c_mechMsgMouseMove,
 };
 
-use crate::{messages, settings::SETTINGS};
+use crate::{input::pad::Controllers, messages, settings::SETTINGS};
 
 use mouse::Mouse;
 pub use mouse::{capture_pointer, cursor_hidden, show_cursor};
@@ -85,6 +85,7 @@ impl App {
 
     fn pump_events(&mut self, timeout: Option<Duration>) -> bool {
         let status = self.event_loop.pump_app_events(timeout, &mut self.state);
+        self.state.controllers.poll();
         // One for however many times the cursor moved
         if let Some(window) = &self.state.window
             && let Some(lparam) = self.state.mouse.take_move(window)
@@ -116,6 +117,7 @@ struct State {
     focused: bool,
     mouse: Mouse,
     input: input::Feed,
+    controllers: Controllers,
     quit: bool,
     error: Option<anyhow::Error>,
 }
@@ -133,6 +135,7 @@ impl State {
             focused: false,
             mouse: Mouse::new(),
             input: input::Feed::default(),
+            controllers: Controllers::start(),
             quit: false,
             error: None,
         }

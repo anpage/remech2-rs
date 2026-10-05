@@ -3,6 +3,8 @@ use std::{
     sync::{LazyLock, Mutex, MutexGuard, PoisonError},
 };
 
+mod gilrs;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum AxisKind {
     X,
@@ -74,9 +76,18 @@ impl HatDirection {
         HatDirection::UpLeft,
     ];
 
-    pub fn from_degrees(degrees: f32) -> Self {
-        let sector = (degrees.rem_euclid(360.0) / 45.0).round() as usize % 8;
-        Self::ALL[sector]
+    pub fn from_xy(x: i32, y: i32) -> Option<Self> {
+        Some(match (x.signum(), y.signum()) {
+            (0, 0) => return None,
+            (0, -1) => HatDirection::Up,
+            (1, -1) => HatDirection::UpRight,
+            (1, 0) => HatDirection::Right,
+            (1, 1) => HatDirection::DownRight,
+            (0, 1) => HatDirection::Down,
+            (-1, 1) => HatDirection::DownLeft,
+            (-1, 0) => HatDirection::Left,
+            _ => HatDirection::UpLeft,
+        })
     }
 
     pub fn from_name(name: &str) -> Option<Self> {
@@ -289,4 +300,35 @@ fn lock_pads() -> MutexGuard<'static, PadState> {
 
 pub fn snapshot() -> PadState {
     lock_pads().clone()
+}
+
+trait Backend {
+    fn poll(&mut self, pads: &mut PadState);
+}
+
+pub struct Controllers {
+    backend: Option<Box<dyn Backend>>,
+}
+
+impl Controllers {
+    pub fn start() -> Self {
+        let backend: Option<Box<dyn Backend>> = match gilrs::GilrsBackend::new() {
+            Ok(backend) => {
+                lock_pads().status = BackendStatus::Running;
+                Some(Box::new(backend))
+            }
+            Err(e) => {
+                tracing::error!("Couldn't start the controller backend: {e}");
+                lock_pads().status = BackendStatus::Failed(e.to_string());
+                None
+            }
+        };
+        Self { backend }
+    }
+
+    pub fn poll(&mut self) {
+        if let Some(backend) = &mut self.backend {
+            backend.poll(&mut lock_pads());
+        }
+    }
 }
