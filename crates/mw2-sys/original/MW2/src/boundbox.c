@@ -8,6 +8,8 @@
 #include "types.h"
 #include "vertex.h"
 
+#include <string.h>
+
 DECOMP_SIZE_ASSERT(BoundBox, 0x18)
 
 // FUNCTION: MW2 0x1006e970

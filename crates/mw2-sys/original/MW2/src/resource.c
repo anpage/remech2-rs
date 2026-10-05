@@ -720,7 +720,7 @@ void CreateObjectNode(
 			strcat(name, ".wtb");
 		}
 
-		handle = LoadFile(BuildGamePath(name), &size, &data, NULL);
+		handle = LoadFile(BuildGamePath(name), &size, (void**) &data, NULL);
 		if (handle != -1) {
 			MechClose(handle);
 		}

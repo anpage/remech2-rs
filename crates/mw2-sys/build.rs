@@ -69,7 +69,7 @@ fn shared_bindings(common: &[PathBuf]) {
     bindgen::Builder::default()
         .header(wrapper.to_str().unwrap())
         .wrap_unsafe_ops(true)
-        .clang_arg("--target=i686-pc-windows-gnu")
+        .clang_arg(format!("--target={}", env::var("TARGET").unwrap()))
         .clang_args(common.iter().map(|p| format!("-I{}", p.display())))
         .allowlist_file(SHARED_FILES)
         .derive_default(true)
@@ -107,7 +107,7 @@ fn module(
     let mut bindings = bindgen::Builder::default()
         .header(wrapper.to_str().unwrap())
         .wrap_unsafe_ops(true)
-        .clang_arg("--target=i686-pc-windows-gnu")
+        .clang_arg(format!("--target={}", env::var("TARGET").unwrap()))
         .clang_args(includes.iter().map(|p| format!("-I{}", p.display())))
         .allowlist_file(format!(
             ".*/original/{}/.*",
@@ -170,13 +170,17 @@ fn base(includes: &[PathBuf], cpp: bool) -> cc::Build {
         build
             .flag("-fno-exceptions")
             .flag("-fno-rtti")
-            .flag("-fcheck-new")
-            .flag("-fpermissive");
+            .flag("-fcheck-new");
     } else {
+        // C23 rejects calls through the function pointers declared with ()
+        build.flag("-std=gnu17");
+        // Errors even under -w: they catch pointers cut to 32 bits
         build
-            .flag("-Wno-error=implicit-function-declaration")
-            .flag("-Wno-error=int-conversion")
-            .flag("-Wno-error=incompatible-pointer-types");
+            .flag("-Werror=implicit-function-declaration")
+            .flag("-Werror=int-conversion")
+            .flag("-Werror=incompatible-pointer-types")
+            .flag("-Werror=pointer-to-int-cast")
+            .flag("-Werror=int-to-pointer-cast");
     }
     build
 }
