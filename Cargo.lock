@@ -2557,8 +2557,7 @@ dependencies = [
 [[package]]
 name = "smk"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "206125ea6519083d366404d5b1b7150d476e7c54db9171aa3aaf3f25ecec1349"
+source = "git+https://github.com/anpage/smk?branch=fix-missing-tree#a02cb63921eac500e0346bbe3be3d5c92034d226"
 dependencies = [
  "log",
 ]
