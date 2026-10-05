@@ -380,6 +380,7 @@ void VideoDriver::LoadBackground(TMPackDataBase* p_database, MechS32 p_id)
 	if (m_paletteChanged) {
 		VFX_PCX_draw(&m_backView, data);
 		DrawShell();
+		ExpandRect(m_screenView.m_x0, m_screenView.m_y0, m_screenView.m_x1, m_screenView.m_y1);
 	}
 	else if (ACQUIRE_FRAMEBUFFER() == 0) {
 		VFX_PCX_draw(&m_screenView, data);
