@@ -4,7 +4,10 @@
 #include "decomp.h"
 #include "types.h"
 
+struct Face;
 struct ProjectedVertex;
+struct Shape;
+struct Vertex;
 
 // SIZE 0x68
 // Rendering settings (g_renderSettings) the map view saves and replaces as one block.
@@ -36,9 +39,10 @@ typedef struct RenderSettings {
 	MechU32 m_untexturedKinds;         // 0x50 — the shape kinds (0x100 game pieces, 0x200 game things,
 									   // 0x800 terrain...) drawn without their texture maps
 	void (*m_frameDrawCallback)(void); // 0x54
-	MechS32 (*m_shapeFilter)();        // 0x58 — a shape filter: nonzero skips the shape
+	MechS32 (*m_shapeFilter)(struct Shape* p_shape); // 0x58 — a shape filter: nonzero skips the shape
 	struct ProjectedVertex* (*m_projectVertex)(struct ProjectedVertex* p_vertex); // 0x5c — projects a vertex
-	MechS32 (*m_drawFace)();                                                      // 0x60 — draws a face (GetFaceColor)
+	// 0x60 — draws a face (GetFaceColor)
+	MechU32 (*m_drawFace)(struct Face* p_face, struct Vertex* p_vertices, MechU32 p_color, MechS32 p_distance);
 	void (*m_drawPolygon)(MechS32 p_count, MechU32* p_points, MechU32 p_flags);   // 0x64
 } RenderSettings;
 

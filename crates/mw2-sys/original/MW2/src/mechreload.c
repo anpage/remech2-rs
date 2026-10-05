@@ -35,7 +35,7 @@ RememberedMech g_rememberedMechs[60] = {0};
 MechSegment* g_mechSegments[60] = {NULL};
 
 // Reloads player p_player's mech as it was remembered. Without p_force, only a player with
-// flag 2 set.
+// flag 2 set. The original was declared without a prototype, and two callers passed two more zeros.
 // FUNCTION: MW2 0x1007fbe0
 MechS32 ReloadPlayerMech(MechS32 p_player, MechS32 p_force)
 {

@@ -172,10 +172,9 @@ fn base(includes: &[PathBuf], cpp: bool) -> cc::Build {
             .flag("-fno-rtti")
             .flag("-fcheck-new");
     } else {
-        // C23 rejects calls through the function pointers declared with ()
-        build.flag("-std=gnu17");
-        // Errors even under -w: they catch pointers cut to 32 bits
+        // Errors even under -w: they catch pointers cut to 32 bits, and calls without a prototype
         build
+            .flag("-Werror=strict-prototypes")
             .flag("-Werror=implicit-function-declaration")
             .flag("-Werror=int-conversion")
             .flag("-Werror=incompatible-pointer-types")

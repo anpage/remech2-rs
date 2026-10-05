@@ -36,11 +36,11 @@ undefined4 g_reclipCursor = 0;
 
 MechS32 GetMouseDeviceCount(void);
 MechS32 FillMouseDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info);
-MechS32 MouseOpenDevice(void);
-MechS32 MouseCloseDevice(void);
-MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis);
-MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons);
-MechS32 MouseReadKeyCode(void);
+MechS32 MouseOpenDevice(InputDeviceInfo* p_info);
+MechS32 MouseCloseDevice(InputDeviceInfo* p_info);
+MechS32 CenterCursor(void* p_data, MechS32 p_axis);
+MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons);
+MechS32 MouseReadKeyCode(MechS16* p_keyCode);
 MechS32 MouseFlushKeyCodes(void);
 
 // GLOBAL: MW2 0x100ad250
@@ -88,13 +88,13 @@ MechS32 FillMouseDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info)
 }
 
 // FUNCTION: MW2 0x10068986
-MechS32 MouseOpenDevice(void)
+MechS32 MouseOpenDevice(InputDeviceInfo* p_info)
 {
 	return 0;
 }
 
 // FUNCTION: MW2 0x10068998
-MechS32 MouseCloseDevice(void)
+MechS32 MouseCloseDevice(InputDeviceInfo* p_info)
 {
 	MechMouseGrab(FALSE);
 	g_cursorClipped = FALSE;
@@ -102,7 +102,7 @@ MechS32 MouseCloseDevice(void)
 }
 
 // FUNCTION: MW2 0x100689bc
-MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis)
+MechS32 CenterCursor(void* p_data, MechS32 p_axis)
 {
 	MechS32 x;
 	MechS32 y;
@@ -125,7 +125,7 @@ MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis)
 }
 
 // FUNCTION: MW2 0x10068a49
-MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
+MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons)
 {
 	MechPoint point;
 	MechS32 x;
@@ -135,8 +135,8 @@ MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
 		if (!g_cursorClipped || g_reclipCursor) {
 			// The original clipped the cursor to the window's client area.
 			MechMouseGrab(TRUE);
-			CenterCursor(p_unk0x00, 0);
-			CenterCursor(p_unk0x00, 1);
+			CenterCursor(p_data, 0);
+			CenterCursor(p_data, 1);
 			g_cursorClipped = TRUE;
 			g_reclipCursor = 0;
 		}
@@ -169,7 +169,7 @@ MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
 }
 
 // FUNCTION: MW2 0x10068c19
-MechS32 MouseReadKeyCode(void)
+MechS32 MouseReadKeyCode(MechS16* p_keyCode)
 {
 	return 0;
 }

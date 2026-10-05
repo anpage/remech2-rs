@@ -181,7 +181,7 @@ void FirstRender(void)
 	g_renderSettings.m_frameDrawCallback = DrawScene;
 	g_renderSettings.m_shapeFilter = CullSceneShape;
 	g_renderSettings.m_projectVertex = ProjectVertex;
-	g_renderSettings.m_drawFace = (MechS32 (*)()) GetFaceColor;
+	g_renderSettings.m_drawFace = GetFaceColor;
 	g_renderSettings.m_drawPolygon = DrawScenePolygon;
 	g_unk0x100a5558 = 0xff;
 	if (g_renderSettings.m_drawSky || g_renderSettings.m_drawGround) {

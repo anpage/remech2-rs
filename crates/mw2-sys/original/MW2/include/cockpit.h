@@ -10,8 +10,21 @@
 #include "targeting.h"
 #include "types.h"
 
-// A gauge-drawing function of a cockpit layout, or one of the map view's hooks.
-typedef MechS32 (*CockpitGaugeFn)();
+struct Face;
+struct Vertex;
+
+// A gauge-drawing function of a cockpit layout, or one of the map view's hooks, stored as any of the
+// four kinds below; a call casts it to its slot's. The original called them without a prototype,
+// and passed IsInsideGaugeEllipse's x and y as one MechPoint.
+typedef void (*CockpitGaugeFn)(void);
+// m_gauges[0]: draws the view's outline
+typedef void (*CockpitOutlineFn)(PANE* p_target, MechS32 p_color);
+// m_gauges[1]: whether a point is inside the view
+typedef MechS32 (*CockpitInsideFn)(PANE* p_target, MechS32 p_x, MechS32 p_y);
+// m_gauges[2]: where the edge's needle towards a point ends
+typedef Point* (*CockpitNeedleTowardFn)(PANE* p_target, Point* p_point, Point* p_out);
+// m_gauges[3]: where the edge's needle at an angle ends
+typedef Point* (*CockpitNeedleAtFn)(PANE* p_target, MechS32 p_angle, Point* p_out);
 
 // The layout of one cockpit view (4: the satellite view).
 typedef struct CockpitLayout {
@@ -100,7 +113,7 @@ extern "C"
 	void ToggleSatelliteView(void);
 	void ZoomMapView(MechS32 p_zoom);
 	MechS32 MapShapeFilter(Shape* p_shape);
-	MechU32 SatelliteFaceColor(struct Face* p_face, undefined4 p_unk0x04, MechU32 p_flags);
+	MechU32 SatelliteFaceColor(struct Face* p_face, struct Vertex* p_vertices, MechU32 p_flags, MechS32 p_distance);
 	void SatelliteDrawPolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags);
 	MechS32 GetMapHeightShade(CockpitLayout* p_layout, MechS32 p_height);
 	MechS32 DrawMapViewTransition(

@@ -17,8 +17,8 @@ struct RefreshMode {
 	MechS32 m_available;                                                     // 0x08 — cleared when m_begin fails
 	MechU32 m_profileTime;                                                   // 0x0c
 	MechS32 (*m_begin)(WINDOW* p_buffer, MechS32 p_width, MechS32 p_height); // 0x10
-	MechS32 (*m_end)();                                                      // 0x14
-	MechS32 (*m_flip)();                                                     // 0x18
+	MechS32 (*m_end)(void);                                                  // 0x14
+	MechS32 (*m_flip)(void);                                                 // 0x18
 	MechS32 (*m_blitRect)(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom);    // 0x1c
 	MechS32 (*m_stretchBlit)(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom); // 0x20
 };

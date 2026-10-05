@@ -42,6 +42,7 @@
 #include "targeting.h"
 #include "team.h"
 #include "types.h"
+#include "vertex.h"
 #include "vfx3d.h"
 #include "vfxa.h"
 
@@ -450,7 +451,7 @@ void DrawMapView(void)
 	BeginMapView(pose, slot, range, farPlane);
 	if (g_cockpitLayoutIndex == 4) {
 		g_renderSettings.m_shapeFilter = MapShapeFilter;
-		g_renderSettings.m_drawFace = (MechS32 (*)()) SatelliteFaceColor;
+		g_renderSettings.m_drawFace = SatelliteFaceColor;
 		g_renderSettings.m_drawPolygon = SatelliteDrawPolygon;
 		zoom = GetViewMode();
 		SetViewMode(c_viewSatellite);
@@ -468,7 +469,7 @@ void DrawMapView(void)
 	DrawMapContents(layout);
 	EndMapView();
 	if (layout->m_gauges[0]) {
-		layout->m_gauges[0](viewport, layout->m_colors[12]);
+		((CockpitOutlineFn) layout->m_gauges[0])(viewport, layout->m_colors[12]);
 	}
 
 	if (g_mapViewMode == 4 && (g_cockpitLayoutIndex != 4 || g_satelliteStaticState <= 1)) {
@@ -519,7 +520,7 @@ void DrawMapIcon(CockpitLayout* p_layout, MapPoint p_pos, MechS32 p_icon)
 	viewport = p_layout->m_viewport;
 	visible = ProjectMapPoint(&p_pos);
 	if (visible && p_layout->m_gauges[1]) {
-		visible = p_layout->m_gauges[1](viewport, p_pos.m_xy);
+		visible = ((CockpitInsideFn) p_layout->m_gauges[1])(viewport, p_pos.m_xy.m_x, p_pos.m_xy.m_y);
 	}
 
 	if (visible) {
@@ -599,7 +600,7 @@ void DrawMapTarget(CockpitLayout* p_layout)
 	pos.m_z = player->m_targetInfo.m_position.m_z;
 	visible = ProjectMapPoint(&pos);
 	if (visible && p_layout->m_gauges[1]) {
-		visible = p_layout->m_gauges[1](viewport, pos.m_xy);
+		visible = ((CockpitInsideFn) p_layout->m_gauges[1])(viewport, pos.m_xy.m_x, pos.m_xy.m_y);
 	}
 
 	target = player->m_targetInfo.m_target;
@@ -663,7 +664,7 @@ void DrawMapTarget(CockpitLayout* p_layout)
 			VFX_shape_draw(viewport, shape, 0, pos.m_xy.m_x, pos.m_xy.m_y);
 		}
 		else if (p_layout->m_gauges[2]) {
-			p_layout->m_gauges[2](viewport, &pos, &pos);
+			((CockpitNeedleTowardFn) p_layout->m_gauges[2])(viewport, &pos.m_xy, &pos.m_xy);
 			VFX_shape_draw(viewport, shape, 0, pos.m_xy.m_x, pos.m_xy.m_y);
 		}
 
@@ -699,7 +700,7 @@ void DrawMapNavPoints(CockpitLayout* p_layout)
 
 			visible = ProjectMapPoint(&pos);
 			if (visible && p_layout->m_gauges[1]) {
-				visible = p_layout->m_gauges[1](viewport, pos.m_xy);
+				visible = ((CockpitInsideFn) p_layout->m_gauges[1])(viewport, pos.m_xy.m_x, pos.m_xy.m_y);
 			}
 
 			if (visible) {
@@ -743,9 +744,9 @@ void DrawMapFieldOfView(CockpitLayout* p_layout, MechS32 p_heading)
 	halfFov = FixedAtan2(0x10000, g_eyepoint->m_fovX);
 	p_heading = 0x5a0000 - p_heading;
 	if (p_layout->m_gauges[3]) {
-		p_layout->m_gauges[3](viewport, p_heading - halfFov, &end);
+		((CockpitNeedleAtFn) p_layout->m_gauges[3])(viewport, p_heading - halfFov, &end);
 		VFX_line_draw(viewport, x, y, end.m_x, end.m_y, 0, colors[11]);
-		p_layout->m_gauges[3](viewport, halfFov + p_heading, &end);
+		((CockpitNeedleAtFn) p_layout->m_gauges[3])(viewport, halfFov + p_heading, &end);
 		VFX_line_draw(viewport, x, y, end.m_x, end.m_y, 0, colors[11]);
 	}
 }
@@ -931,7 +932,7 @@ MechS32 MapShapeFilter(Shape* p_shape)
 // Faces of a textured kind (0x3000) draw in the view's color 10.
 // The only diff is a stack-slot permutation of the locals (and the jump tables' addresses).
 // FUNCTION: MW2 0x1003f0e7
-MechU32 SatelliteFaceColor(Face* p_face, undefined4 p_unk0x04, MechU32 p_flags)
+MechU32 SatelliteFaceColor(Face* p_face, Vertex* p_vertices, MechU32 p_flags, MechS32 p_distance)
 {
 	MechU32 color;
 	MechU32 type;
@@ -1256,7 +1257,7 @@ void DrawDamagedMapView(void)
 			viewport = layout->m_viewport;
 			DrawAnim2d(viewport, anim, 0, 0);
 			if (layout->m_gauges[0]) {
-				layout->m_gauges[0](viewport, layout->m_colors[12]);
+				((CockpitOutlineFn) layout->m_gauges[0])(viewport, layout->m_colors[12]);
 			}
 		}
 	}

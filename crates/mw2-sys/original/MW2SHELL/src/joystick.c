@@ -7,7 +7,7 @@
 #include "types.h"
 
 // FUNCTION: MW2SHELL 0x1003ad20
-MechS32 GetJoystickDeviceCount()
+MechS32 GetJoystickDeviceCount(void)
 {
 	return 0;
 }
@@ -35,7 +35,7 @@ MechS32 JoystickCloseDevice(InputDeviceInfo* p_device)
 }
 
 // FUNCTION: MW2SHELL 0x1003b8b7
-MechS32 JoystickCenterAxis()
+MechS32 JoystickCenterAxis(void* p_data, MechS32 p_axis)
 {
 	return 0;
 }
@@ -49,13 +49,13 @@ MechS32 JoystickPoll(void* p_data, MechS32* p_axes, MechU32* p_buttons)
 }
 
 // FUNCTION: MW2SHELL 0x1003bba0
-MechS32 JoystickReadKeyCode()
+MechS32 JoystickReadKeyCode(MechS16* p_keyCode)
 {
 	return 2;
 }
 
 // FUNCTION: MW2SHELL 0x1003bbb5
-MechS32 JoystickFlushKeyCodes()
+MechS32 JoystickFlushKeyCodes(void)
 {
 	return 2;
 }
@@ -63,11 +63,11 @@ MechS32 JoystickFlushKeyCodes()
 // GLOBAL: MW2SHELL 0x1006a800
 InputDriverModule g_joystickDriver = {
 	GetJoystickDeviceCount,
-	(MechS32 (*)()) FillJoystickDeviceInfo,
-	(MechS32 (*)()) JoystickOpenDevice,
-	(MechS32 (*)()) JoystickCloseDevice,
+	FillJoystickDeviceInfo,
+	JoystickOpenDevice,
+	JoystickCloseDevice,
 	JoystickCenterAxis,
-	(MechS32 (*)()) JoystickPoll,
+	JoystickPoll,
 	JoystickReadKeyCode,
 	JoystickFlushKeyCodes,
 };

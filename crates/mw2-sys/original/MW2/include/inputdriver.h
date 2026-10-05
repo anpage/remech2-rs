@@ -2,6 +2,7 @@
 #define INPUTDRIVER_H
 
 #include "decomp.h"
+#include "inputdeviceinfo.h"
 #include "types.h"
 
 #ifdef __cplusplus
@@ -13,14 +14,14 @@ extern "C"
 	// device enumeration through a table of these.
 	// SIZE 0x20
 	typedef struct InputDriverModule {
-		MechS32 (*m_getDeviceCount)(); // 0x00
-		MechS32 (*m_fillDeviceInfo)(); // 0x04
-		MechS32 (*m_openDevice)();     // 0x08
-		MechS32 (*m_closeDevice)();    // 0x0c
-		MechS32 (*m_centerAxis)();     // 0x10
-		MechS32 (*m_poll)();           // 0x14 — axes and buttons
-		MechS32 (*m_readKeyCode)();    // 0x18
-		MechS32 (*m_flushKeyCodes)();  // 0x1c
+		MechS32 (*m_getDeviceCount)(void);                                         // 0x00
+		MechS32 (*m_fillDeviceInfo)(MechS32 p_index, InputDeviceInfo* p_info);     // 0x04
+		MechS32 (*m_openDevice)(InputDeviceInfo* p_info);                          // 0x08
+		MechS32 (*m_closeDevice)(InputDeviceInfo* p_info);                         // 0x0c
+		MechS32 (*m_centerAxis)(void* p_data, MechS32 p_axis);                     // 0x10
+		MechS32 (*m_poll)(void* p_data, MechS32* p_axes, MechU32* p_buttons);      // 0x14 — axes and buttons
+		MechS32 (*m_readKeyCode)(MechS16* p_keyCode);                              // 0x18
+		MechS32 (*m_flushKeyCodes)(void);                                          // 0x1c
 	} InputDriverModule;
 
 #ifdef __cplusplus

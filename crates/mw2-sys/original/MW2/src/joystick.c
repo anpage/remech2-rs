@@ -13,19 +13,19 @@ MechS32 GetJoystickDeviceCount(void);
 MechS32 FillJoystickDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info);
 MechS32 JoystickOpenDevice(InputDeviceInfo* p_info);
 MechS32 JoystickCloseDevice(InputDeviceInfo* p_info);
-MechS32 JoystickCenterAxis(void);
+MechS32 JoystickCenterAxis(void* p_data, MechS32 p_axis);
 MechS32 JoystickPoll(void* p_data, MechS32* p_axes, MechU32* p_buttons);
-MechS32 JoystickReadKeyCode(void);
+MechS32 JoystickReadKeyCode(MechS16* p_keyCode);
 MechS32 JoystickFlushKeyCodes(void);
 
 // GLOBAL: MW2 0x100a6f58
 InputDriverModule g_joystickDriver = {
 	GetJoystickDeviceCount,
-	(MechS32 (*)()) FillJoystickDeviceInfo,
-	(MechS32 (*)()) JoystickOpenDevice,
-	(MechS32 (*)()) JoystickCloseDevice,
+	FillJoystickDeviceInfo,
+	JoystickOpenDevice,
+	JoystickCloseDevice,
 	JoystickCenterAxis,
-	(MechS32 (*)()) JoystickPoll,
+	JoystickPoll,
 	JoystickReadKeyCode,
 	JoystickFlushKeyCodes,
 };
@@ -59,7 +59,7 @@ MechS32 JoystickCloseDevice(InputDeviceInfo* p_info)
 }
 
 // FUNCTION: MW2 0x1004aa59
-MechS32 JoystickCenterAxis(void)
+MechS32 JoystickCenterAxis(void* p_data, MechS32 p_axis)
 {
 	return 0;
 }
@@ -74,7 +74,7 @@ MechS32 JoystickPoll(void* p_data, MechS32* p_axes, MechU32* p_buttons)
 }
 
 // FUNCTION: MW2 0x1004ad42
-MechS32 JoystickReadKeyCode(void)
+MechS32 JoystickReadKeyCode(MechS16* p_keyCode)
 {
 	return 2;
 }

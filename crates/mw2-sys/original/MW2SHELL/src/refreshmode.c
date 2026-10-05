@@ -102,7 +102,7 @@ MechS32 InitRefreshMode(
 }
 
 // FUNCTION: MW2SHELL 0x10010d49
-void ShutdownRefreshMode()
+void ShutdownRefreshMode(void)
 {
 	if (g_currentRefreshMode != NULL) {
 		g_currentRefreshMode->m_end();

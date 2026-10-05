@@ -727,7 +727,7 @@ void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 		}
 	}
 	else if (g_playerDestroyed[player->m_index] == 1) {
-		ReloadPlayerMech(player->m_index, 0, 0, 0);
+		ReloadPlayerMech(player->m_index, 0);
 		sprintf(text2, "'%s' resurrected.", player->m_name);
 		ShowInGameMessage(text2, 1, 0x712, 0x50);
 		g_playerDestroyed[player->m_index] = 0;

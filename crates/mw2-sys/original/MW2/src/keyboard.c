@@ -129,10 +129,10 @@ MechChar* g_keyNames[0x79] = {
 
 MechS32 GetKeyboardDeviceCount(void);
 MechS32 FillKeyboardDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info);
-MechS32 KeyboardOpenDevice(void);
-MechS32 KeyboardCloseDevice(void);
-MechS32 KeyboardCenterAxis(void);
-MechS32 KeyboardPoll(undefined4 p_unk0x00, undefined4 p_unk0x04, undefined4* p_keyStates);
+MechS32 KeyboardOpenDevice(InputDeviceInfo* p_info);
+MechS32 KeyboardCloseDevice(InputDeviceInfo* p_info);
+MechS32 KeyboardCenterAxis(void* p_data, MechS32 p_axis);
+MechS32 KeyboardPoll(void* p_data, MechS32* p_axes, MechU32* p_keyStates);
 MechS32 KeyboardReadKeyCode(MechS16* p_keyCode);
 MechS32 KeyboardFlushKeyCodes(void);
 void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam);
@@ -173,25 +173,25 @@ MechS32 FillKeyboardDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info)
 }
 
 // FUNCTION: MW2 0x10042816
-MechS32 KeyboardOpenDevice(void)
+MechS32 KeyboardOpenDevice(InputDeviceInfo* p_info)
 {
 	return 0;
 }
 
 // FUNCTION: MW2 0x10042828
-MechS32 KeyboardCloseDevice(void)
+MechS32 KeyboardCloseDevice(InputDeviceInfo* p_info)
 {
 	return 0;
 }
 
 // FUNCTION: MW2 0x1004283a
-MechS32 KeyboardCenterAxis(void)
+MechS32 KeyboardCenterAxis(void* p_data, MechS32 p_axis)
 {
 	return 0;
 }
 
 // FUNCTION: MW2 0x1004284c
-MechS32 KeyboardPoll(undefined4 p_unk0x00, undefined4 p_unk0x04, undefined4* p_keyStates)
+MechS32 KeyboardPoll(void* p_data, MechS32* p_axes, MechU32* p_keyStates)
 {
 	MechS32 i;
 

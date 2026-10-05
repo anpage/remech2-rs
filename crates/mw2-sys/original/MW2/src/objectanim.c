@@ -1293,10 +1293,6 @@ static MechS32 ViewRow(MechS32 p_a, MechS32 p_b, MechS32 p_c, Vertex* p_vertex)
 	return PortableS32(PortableShrdRound(sum, 27));
 }
 
-// The call QueueFace makes through g_renderSettings.m_drawFace, which has no prototype: the hook
-// is GetFaceColor in the 3D view, and the map view's SatelliteFaceColor takes three of the arguments.
-typedef MechS32 (*DrawFaceHook)(Face* p_face, Vertex* p_vertices, MechS32 p_flags, MechS32 p_depth);
-
 // A screen offset: p_value shifted left by p_shift (modulo 32, like the shld's count), divided by
 // the depth, and rounded to a quarter.
 static MechS32 ProjectAxis(MechS32 p_value, MechS32 p_shift, MechS32 p_depth)
@@ -1681,7 +1677,7 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 	memcpy(g_polygonPointCursor, g_polygonPoints, g_polygonPointCount * sizeof(g_polygonPoints[0]));
 	g_polygonPointCursor += g_polygonPointCount * sizeof(g_polygonPoints[0]);
 	g_drawBufferBottom = g_polygonPointCursor;
-	poly->m_flags = (MechU16) ((DrawFaceHook) g_renderSettings.m_drawFace)(p_face, p_vertices, p_face->m_color, depth);
+	poly->m_flags = (MechU16) g_renderSettings.m_drawFace(p_face, p_vertices, p_face->m_color, depth);
 	if (g_depthEntryCount < g_depthListCapacity) {
 		g_polygonsQueued++;
 		if (g_polygonPointCount > 1) {

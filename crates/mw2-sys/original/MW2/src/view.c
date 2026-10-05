@@ -563,9 +563,9 @@ MechS32 CullShapeToFrustum(Shape* p_shape)
 }
 
 // FUNCTION: MW2 0x1004c779
-MechS32 CullHiddenShape(MechU16* p_flags)
+MechS32 CullHiddenShape(Shape* p_shape)
 {
-	if (*p_flags & 0x1000) {
+	if (p_shape->m_flags & 0x1000) {
 		return TRUE;
 	}
 

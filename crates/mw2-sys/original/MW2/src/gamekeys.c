@@ -511,7 +511,7 @@ void HandleGameKeys(MechS32 p_unk0x00, MechS32 p_unk0x04, MechU16 p_key)
 			case 0x4f:
 				g_renderSettings.m_wireframe = 0;
 				SetInfrared(0, 0);
-				ReloadPlayerMech(g_localPlayerId, 0, 0, 0);
+				ReloadPlayerMech(g_localPlayerId, 0);
 				SetViewMode(c_viewCockpit);
 				g_sinkPilotTiltReset = 1;
 				g_sinkPilotPanReset = 1;

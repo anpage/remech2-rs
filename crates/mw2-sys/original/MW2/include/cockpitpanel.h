@@ -39,10 +39,10 @@ struct CockpitPanel {
 	void (*m_setDamage)(CockpitPanel*, MechS32);                          // 0x6c
 	void (*m_enable)(CockpitPanel*);                                      // 0x70
 	void (*m_disable)(CockpitPanel*);                                     // 0x74
-	void (*m_drawStartup)();  // 0x78 — while the mech starts up (power state 1)
-	void (*m_draw)();         // 0x7c — while it runs (2)
-	void (*m_drawShutdown)(); // 0x80 — in the other states
-	void (*m_drawStatic)();   // 0x84 — the panel as static; nothing calls it through here
+	void (*m_drawStartup)(CockpitPanel*);  // 0x78 — while the mech starts up (power state 1)
+	void (*m_draw)(CockpitPanel*);         // 0x7c — while it runs (2)
+	void (*m_drawShutdown)(CockpitPanel*); // 0x80 — in the other states
+	void (*m_drawStatic)(CockpitPanel*);   // 0x84 — the panel as static; nothing calls it through here
 };
 
 // The cockpit panels, by index in g_cockpitPanels.

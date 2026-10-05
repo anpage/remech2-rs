@@ -72,7 +72,7 @@ extern "C"
 	MechS32 ProjectWorldPoint(MechS32* p_x, MechS32* p_y, MechS32* p_z);
 	MechS32 CullSceneShape(struct Shape* p_shape);
 	MechS32 CullShapeToFrustum(struct Shape* p_shape);
-	MechS32 CullHiddenShape(MechU16* p_flags);
+	MechS32 CullHiddenShape(struct Shape* p_shape);
 	MechS32 IsLodQualityHigh(undefined4 p_unk0x00);
 	void SetLodQualityHigh(undefined4 p_unk0x00, MechS32 p_enable);
 

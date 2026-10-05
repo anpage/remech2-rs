@@ -62,12 +62,12 @@ MechS32 g_cursorClipped = FALSE;
 undefined4 g_reclipCursor = 0;
 
 MechS32 GetMouseDeviceCount(void);
-MechS32 FillMouseDeviceInfo(MechS32 p_index, MouseDeviceInfo* p_info);
-MechS32 MouseOpenDevice(void);
-MechS32 MouseCloseDevice(void);
-MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis);
-MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons);
-MechS32 MouseReadKeyCode(void);
+MechS32 FillMouseDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info);
+MechS32 MouseOpenDevice(InputDeviceInfo* p_info);
+MechS32 MouseCloseDevice(InputDeviceInfo* p_info);
+MechS32 CenterCursor(void* p_data, MechS32 p_axis);
+MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons);
+MechS32 MouseReadKeyCode(MechS16* p_keyCode);
 MechS32 MouseFlushKeyCodes(void);
 
 // GLOBAL: MW2SHELL 0x10071d50
@@ -98,30 +98,32 @@ MechS32 GetMouseDeviceCount(void)
 }
 
 // FUNCTION: MW2SHELL 0x10046a85
-MechS32 FillMouseDeviceInfo(MechS32 p_index, MouseDeviceInfo* p_info)
+MechS32 FillMouseDeviceInfo(MechS32 p_index, InputDeviceInfo* p_info)
 {
-	p_info->m_axisCount = 2;
-	p_info->m_buttonCount = 3;
-	sprintf(p_info->m_name, g_mouseDeviceName);
-	sprintf(p_info->m_displayName, g_mouseDisplayName);
-	sprintf(p_info->m_typeName, g_mouseTypeName);
-	p_info->m_axisNames = g_mouseAxisNames;
-	p_info->m_axisTypes = g_mouseAxisTypes;
-	p_info->m_buttonNames = g_mouseButtonNames;
-	p_info->m_buttonTypes = g_mouseButtonTypes;
-	p_info->m_driverData = NULL;
+	MouseDeviceInfo* info = (MouseDeviceInfo*) p_info;
+
+	info->m_axisCount = 2;
+	info->m_buttonCount = 3;
+	sprintf(info->m_name, g_mouseDeviceName);
+	sprintf(info->m_displayName, g_mouseDisplayName);
+	sprintf(info->m_typeName, g_mouseTypeName);
+	info->m_axisNames = g_mouseAxisNames;
+	info->m_axisTypes = g_mouseAxisTypes;
+	info->m_buttonNames = g_mouseButtonNames;
+	info->m_buttonTypes = g_mouseButtonTypes;
+	info->m_driverData = NULL;
 
 	return 0;
 }
 
 // FUNCTION: MW2SHELL 0x10046b16
-MechS32 MouseOpenDevice(void)
+MechS32 MouseOpenDevice(InputDeviceInfo* p_info)
 {
 	return 0;
 }
 
 // FUNCTION: MW2SHELL 0x10046b28
-MechS32 MouseCloseDevice(void)
+MechS32 MouseCloseDevice(InputDeviceInfo* p_info)
 {
 	MechMouseGrab(FALSE);
 	g_cursorClipped = FALSE;
@@ -129,7 +131,7 @@ MechS32 MouseCloseDevice(void)
 }
 
 // FUNCTION: MW2SHELL 0x10046b4c
-MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis)
+MechS32 CenterCursor(void* p_data, MechS32 p_axis)
 {
 	MechS32 x;
 	MechS32 y;
@@ -152,7 +154,7 @@ MechS32 CenterCursor(undefined4 p_unk0x00, MechS32 p_axis)
 }
 
 // FUNCTION: MW2SHELL 0x10046bd9
-MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
+MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons)
 {
 	MechPoint point;
 	MechS32 x;
@@ -162,8 +164,8 @@ MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
 		if (!g_cursorClipped || g_reclipCursor) {
 			// The original clipped the cursor to the window's client area.
 			MechMouseGrab(TRUE);
-			CenterCursor(p_unk0x00, 0);
-			CenterCursor(p_unk0x00, 1);
+			CenterCursor(p_data, 0);
+			CenterCursor(p_data, 1);
 			g_cursorClipped = TRUE;
 			g_reclipCursor = 0;
 		}
@@ -196,7 +198,7 @@ MechS32 MousePoll(undefined4 p_unk0x00, MechS32* p_position, MechU32* p_buttons)
 }
 
 // FUNCTION: MW2SHELL 0x10046def
-MechS32 MouseReadKeyCode(void)
+MechS32 MouseReadKeyCode(MechS16* p_keyCode)
 {
 	return 0;
 }

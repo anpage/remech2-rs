@@ -19,8 +19,7 @@ extern "C"
 	extern RememberedMech g_rememberedMechs[60];
 	extern MechSegment* g_mechSegments[60];
 
-	// Declared without a prototype: network.c calls it with two more (zero) arguments.
-	MechS32 ReloadPlayerMech();
+	MechS32 ReloadPlayerMech(MechS32 p_player, MechS32 p_force);
 	void RememberLoadMech(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p_config);
 	void RememberMechSegments(Mech* p_mech);
 	SceneObject* RestoreMechSegments(MechSegment* p_segment);
