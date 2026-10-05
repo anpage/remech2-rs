@@ -4,7 +4,7 @@ use anyhow::{Result, bail};
 use rodio::{Decoder, OutputStream, OutputStreamBuilder, Sink};
 use tracing::{error, info, warn};
 
-use crate::settings::SETTINGS;
+use crate::{files, settings::SETTINGS};
 
 const MAX_CD_VOLUME: i32 = 65535;
 const MAX_TRACK: i32 = 99;
@@ -52,8 +52,8 @@ impl CdAudioPlayer {
     fn scan_for_tracks() -> Result<Vec<TrackInfo>> {
         let mut tracks = vec![];
 
-        let music_dir = PathBuf::from(
-            SETTINGS
+        let music_dir = files::resolve(
+            &SETTINGS
                 .get(Some("audio"), "music_path")
                 .unwrap_or_else(|| "Music".to_owned()),
         );

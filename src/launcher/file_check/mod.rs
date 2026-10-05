@@ -62,10 +62,10 @@ impl FileCheck {
         let status = self.copying_status.clone();
         let missing_files = self.missing_files.clone();
 
-        std::fs::create_dir_all("GIDDI").unwrap();
-        std::fs::create_dir_all("KEATING").unwrap();
-        std::fs::create_dir_all("LAUNCH").unwrap();
-        std::fs::create_dir_all("SMK").unwrap();
+        std::fs::create_dir_all(files::resolve("GIDDI")).unwrap();
+        std::fs::create_dir_all(files::resolve("KEATING")).unwrap();
+        std::fs::create_dir_all(files::resolve("LAUNCH")).unwrap();
+        std::fs::create_dir_all(files::resolve("SMK")).unwrap();
 
         std::thread::spawn(move || {
             let total_files = missing_files.len() as f32;
@@ -304,7 +304,7 @@ struct MissingFile {
 
 fn check_folder<P: AsRef<Path>>(path: P, files: &[GameFile], missing_files: &mut Vec<MissingFile>) {
     for file in files {
-        let path = path.as_ref().join(file.path);
+        let path = files::resolve_in(path.as_ref(), file.path);
         if !path.exists() {
             missing_files.push(MissingFile {
                 path,
@@ -319,22 +319,22 @@ fn check_files<P: AsRef<Path>>(base_path: P) -> Vec<MissingFile> {
 
     check_folder(base_path.as_ref(), list::GAME_FILES, &mut missing_files);
     check_folder(
-        base_path.as_ref().join("GIDDI"),
+        files::resolve_in(base_path.as_ref(), "GIDDI"),
         list::GIDDI_FILES,
         &mut missing_files,
     );
     check_folder(
-        base_path.as_ref().join("KEATING"),
+        files::resolve_in(base_path.as_ref(), "KEATING"),
         list::KEATING_FILES,
         &mut missing_files,
     );
     check_folder(
-        base_path.as_ref().join("LAUNCH"),
+        files::resolve_in(base_path.as_ref(), "LAUNCH"),
         list::LAUNCH_FILES,
         &mut missing_files,
     );
     check_folder(
-        base_path.as_ref().join("SMK"),
+        files::resolve_in(base_path.as_ref(), "SMK"),
         list::SMK_FILES,
         &mut missing_files,
     );

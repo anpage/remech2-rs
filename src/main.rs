@@ -99,7 +99,7 @@ fn main() -> Result<()> {
 
         let cmd_line = {
             let mut buffer = vec![];
-            let mut file = BufReader::new(File::open("mw2prm.cfg")?);
+            let mut file = BufReader::new(File::open(files::resolve("mw2prm.cfg"))?);
             file.seek(SeekFrom::Start(280))?;
             for byte in file.bytes() {
                 let byte = byte?;

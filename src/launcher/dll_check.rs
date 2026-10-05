@@ -17,6 +17,7 @@ use sha2::{Digest, Sha256};
 use unarc_rs::arj::arj_archive::ArjArchieve as ArjArchive;
 
 use super::{Action, Stage};
+use crate::files;
 
 const SIM_DLL_HASH: [u8; 32] =
     hex!("6212d542f8f915a594b278ab189f20a27e522e7c08ac57ce68bf47f45b17bbb5");
@@ -66,13 +67,14 @@ impl DllCheck {
     }
 
     fn check_file(file: &str, hash: &[u8; 32]) -> Result<()> {
-        if !std::path::Path::new(file).exists() {
+        let path = files::resolve(file);
+        if !path.exists() {
             bail!("{} is missing", file);
         }
 
         let file_hash = {
             let mut hasher = Sha256::new();
-            let file = std::fs::read(file)?;
+            let file = std::fs::read(&path)?;
             hasher.update(&file);
             hasher.finalize()
         };
@@ -104,13 +106,14 @@ impl DllCheck {
 
     /// Clears the read-only attribute before writing
     fn write_file(path: &str, buffer: &[u8]) -> std::io::Result<()> {
-        if let Ok(meta) = fs::metadata(path) {
+        let path = files::resolve(path);
+        if let Ok(meta) = fs::metadata(&path) {
             let mut perms = meta.permissions();
             #[allow(clippy::permissions_set_readonly_false)]
             perms.set_readonly(false);
-            let _ = fs::set_permissions(path, perms);
+            let _ = fs::set_permissions(&path, perms);
         }
-        fs::write(path, buffer)
+        fs::write(&path, buffer)
     }
 
     fn start_download(&mut self) {

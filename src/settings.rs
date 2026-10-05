@@ -1,6 +1,11 @@
-use std::sync::{LazyLock, Mutex};
+use std::{
+    path::PathBuf,
+    sync::{LazyLock, Mutex},
+};
 
 use ini::Ini;
+
+use crate::files;
 
 pub static SETTINGS: LazyLock<GlobalSettings> = LazyLock::new(GlobalSettings::load);
 
@@ -11,8 +16,12 @@ pub struct GlobalSettings {
 impl GlobalSettings {
     const SETTINGS_FILE_NAME: &str = "remech2.ini";
 
+    fn path() -> PathBuf {
+        files::resolve(Self::SETTINGS_FILE_NAME)
+    }
+
     fn load() -> Self {
-        let settings = Ini::load_from_file(Self::SETTINGS_FILE_NAME)
+        let settings = Ini::load_from_file(Self::path())
             .unwrap_or_else(|_| Self::generate_default_config());
         Self {
             settings: Mutex::new(settings),
@@ -33,7 +42,7 @@ impl GlobalSettings {
             .with_section(Some("audio"))
             .set("music_path", "Music");
         settings
-            .write_to_file(Self::SETTINGS_FILE_NAME)
+            .write_to_file(Self::path())
             .unwrap_or_else(|_| {
                 tracing::error!(
                     "Couldn't write default config file to {}",
@@ -65,7 +74,7 @@ impl GlobalSettings {
         let mut settings = self.settings.lock().unwrap();
         settings.with_section(section).set(key, value);
         settings
-            .write_to_file(Self::SETTINGS_FILE_NAME)
+            .write_to_file(Self::path())
             .unwrap_or_else(|_| {
                 tracing::error!("Couldn't write config file to {}", Self::SETTINGS_FILE_NAME);
             });
