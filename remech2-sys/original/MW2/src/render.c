@@ -121,29 +121,8 @@ MechS32 g_screenHalfHeight;
 // GLOBAL: MW2 0x10176ef0
 WINDOW g_mainPixelBuffer;
 
-// FUNCTION: MW2 0x10012720
-MechS32 InitGameWindowGeometry(void)
-{
-	g_gameWindowGeometry = MechHeapAllocZeroed(g_primaryHeap, sizeof(GameWindowGeometry));
-	if (g_gameWindowGeometry == NULL) {
-		return 0;
-	}
-
-	g_gameWindowGeometry->m_width = g_gameWindowWidth;
-	g_gameWindowGeometry->m_height = g_gameWindowHeight;
-	g_gameWindowGeometry->m_unk0x08 = 1;
-	g_gameWindowGeometry->m_numColors = 0x100;
-	g_gameWindowGeometry->m_unk0x10 = 1;
-	g_gameWindowGeometry->m_unk0x14 = 0;
-	g_screenPixelCount = g_gameWindowHeight * g_gameWindowWidth;
-	g_screenWidth = g_gameWindowWidth;
-	g_screenHeight = g_gameWindowHeight;
-	g_screenWidthMinus1 = g_gameWindowWidth - 1;
-	g_screenHeightMinus1 = g_gameWindowHeight - 1;
-	g_screenHalfWidth = g_screenWidth / 2;
-	g_screenHalfHeight = g_screenHeight / 2;
-	return 1;
-}
+// InitGameWindowGeometry is implemented on the Rust side (src/sim/window.rs). In widescreen the
+// geometry is the 4:3 box the HUD is laid out in, not the whole frame.
 
 // FUNCTION: MW2 0x10012802
 MechS32 InitDisplayGeometry(void)

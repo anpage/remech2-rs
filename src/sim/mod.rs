@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 
 use crate::ailrs;
 
+mod camera;
 mod cd_audio;
 mod input;
 mod jumpjets;

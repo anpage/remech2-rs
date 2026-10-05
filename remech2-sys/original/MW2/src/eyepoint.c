@@ -314,31 +314,8 @@ MechS32 GetViewMode(void)
 	return g_requestedViewMode;
 }
 
-// Sets the eyepoint's field of view to the normal or the zoomed one (both reset to 1.0 if
-// p_reset), and plays a sound when it changes.
-// FUNCTION: MW2 0x10011455
-void ApplyCameraFov(MechS32 p_reset)
-{
-	MechS32 fov;
-
-	fov = g_eyepoint->m_fovX;
-	if (p_reset) {
-		g_normalFov = 0x10000;
-		g_zoomFov = 0x10000;
-	}
-
-	if (!GetViewMode()) {
-		g_eyepoint->m_fovX = g_normalFov;
-	}
-	else {
-		g_eyepoint->m_fovX = g_zoomFov;
-	}
-
-	if (g_eyepoint->m_fovX != fov) {
-		g_projectionDirty = 1;
-		PlaySoundEffect(0x147, 100, 0x40, 5, 0x50);
-	}
-}
+// ApplyCameraFov is implemented on the Rust side (src/sim/camera.rs). In widescreen it widens the
+// field of view to the frame (Hor+).
 
 // Saves the eyepoint's position and orientation (0x00-0x14) to p_view, marking it (p_view[6])
 // as set. Returns 0 without both.

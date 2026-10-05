@@ -4,6 +4,8 @@
 #include "config.h"
 #include "decomp.h"
 #include "eyepoint.h"
+#include "fixeddiv.h"
+#include "fixedmul.h"
 #include "hud.h"
 #include "muldiv.h"
 #include "overlay.h"
@@ -33,12 +35,7 @@ MechS32 g_pixelAspect;
 // GLOBAL: MW2 0x100e9614
 MechS32 g_artResolution;
 
-// FUNCTION: MW2 0x1005d410
-void SetPixelAspect(GameWindowGeometry* p_geometry)
-{
-	g_eyepoint->m_pixelAspect = g_pixelAspect =
-		MulDiv64(p_geometry->m_height << 16, 0x15555, p_geometry->m_width << 16);
-}
+// SetPixelAspect is implemented on the Rust side (src/sim/window.rs).
 
 // ChooseArtResolution is implemented on the Rust side (src/sim/window.rs). The original only
 // took a resolution within 7 of the window's size, which 320x240 never is.
@@ -49,7 +46,6 @@ void SetPixelAspect(GameWindowGeometry* p_geometry)
 void SetRes(void)
 {
 	MechS32 i;
-	Point point;
 
 	for (i = 0; i < 8; i++) {
 		ScaleRectFromLowRes(&g_panes[i], &g_panes[i]);
@@ -72,11 +68,7 @@ void SetRes(void)
 	UpdateProjection(g_eyepoint);
 	UpdateViewMatrix(g_eyepoint);
 	g_projectionDirty = 0;
-	point.m_x = g_horizonBandHeight;
-	point.m_y = 0;
-	ScalePointFromLowRes(&point, &point);
-	ScalePointToScreen(&g_mainPixelBuffer, &point, &point);
-	g_horizonBandHeight = point.m_x;
+	g_horizonBandHeight = FixedMul16(g_screenWidthMinus1, FixedDiv16(g_horizonBandHeight, 319));
 	ScaleCockpitLayout();
 	LayoutMessageBoxes();
 	ScaleOverlayPositions();

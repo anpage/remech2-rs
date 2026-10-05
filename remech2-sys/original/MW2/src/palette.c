@@ -76,28 +76,8 @@ void InitPanes(PANE* p_target)
 	}
 }
 
-// FUNCTION: MW2 0x1000242f
-void SelectPane(MechS32 p_index)
-{
-	PANE* target;
-
-	if (p_index < 0 || p_index >= 11) {
-		return;
-	}
-
-	if (p_index != g_paneIndex) {
-		target = &g_panes[p_index];
-		g_eyepoint->m_viewLeft = 0;
-		g_eyepoint->m_viewTop = 0;
-		g_eyepoint->m_viewRight = target->m_x1 - target->m_x0;
-		g_eyepoint->m_viewBottom = target->m_y1 - target->m_y0;
-		g_eyepoint->m_offsetX = 0;
-		g_eyepoint->m_offsetY = 0;
-		g_currentPane = *target;
-		g_paneIndex = p_index;
-		g_projectionDirty = 1;
-	}
-}
+// SelectPane is implemented on the Rust side (src/sim/window.rs). In widescreen the 3D views
+// cover the whole frame.
 
 // FUNCTION: MW2 0x100024f0
 void GetViewCenter(Eyepoint* p_eyepoint, MechS32* p_x, MechS32* p_y)

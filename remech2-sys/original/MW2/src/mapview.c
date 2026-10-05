@@ -17,6 +17,7 @@
 #include "targeting.h"
 #include "types.h"
 #include "view.h"
+#include "widescreen.h"
 
 // The map (satellite) view's projection: a top-down view of p_worldSpan units across.
 
@@ -55,6 +56,7 @@ RenderSettings g_savedRenderSettings;
 // FUNCTION: MW2 0x10041fa0
 void BeginMapView(MechS32* p_pose, MechS32 p_slot, MechS32 p_worldSpan, MechS32 p_far)
 {
+	p_worldSpan = MechWidenMapSpan(p_slot, p_worldSpan);
 	g_mapViewScale = p_worldSpan / (g_panes[p_slot].m_x1 - g_panes[p_slot].m_x0 + 1);
 	g_mapViewMaxX = -(g_mapViewMinX = -(p_worldSpan / 2));
 	g_mapViewMinY = -(g_mapViewMaxY = (g_panes[p_slot].m_y1 - g_panes[p_slot].m_y0 + 1) * g_mapViewScale / 2);

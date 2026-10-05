@@ -44,16 +44,9 @@ MechS32 g_pulseTime = 0;
 // GLOBAL: MW2 0x100a9464
 MechS32 g_pulseStep = 0;
 
-// Maps 16.16 fractions of the screen onto pixels.
-// FUNCTION: MW2 0x10056920
-PANE* ScaleRectToScreen(WINDOW* p_buffer, PANE* p_src, PANE* p_dst)
-{
-	p_dst->m_x0 = FixedMul16(g_screenWidthMinus1, p_src->m_x0);
-	p_dst->m_y0 = FixedMul16(g_screenHeightMinus1, p_src->m_y0);
-	p_dst->m_x1 = FixedMul16(g_screenWidthMinus1, p_src->m_x1);
-	p_dst->m_y1 = FixedMul16(g_screenHeightMinus1, p_src->m_y1);
-	return p_dst;
-}
+// ScaleRectToScreen, ScaleBoundsToScreen, ScalePointToScreen and CenterRectOnScreen are
+// implemented on the Rust side (src/sim/window.rs). In widescreen they place the HUD in a 4:3 box
+// centred in the frame.
 
 // Maps 16.16 fractions of p_frame onto pixels.
 // Stack-slot permutation: width and height.
@@ -73,25 +66,6 @@ PANE* ScaleRectToFrame(PANE* p_frame, PANE* p_src, PANE* p_dst)
 	p_dst->m_y0 += p_frame->m_y0;
 	p_dst->m_x1 += p_frame->m_x0;
 	p_dst->m_y1 += p_frame->m_y0;
-	return p_dst;
-}
-
-// ScaleRectToScreen for a Rect.
-// FUNCTION: MW2 0x10056a67
-Rect* ScaleBoundsToScreen(WINDOW* p_buffer, Rect* p_src, Rect* p_dst)
-{
-	p_dst->m_left = FixedMul16(g_screenWidthMinus1, p_src->m_left);
-	p_dst->m_top = FixedMul16(g_screenHeightMinus1, p_src->m_top);
-	p_dst->m_right = FixedMul16(g_screenWidthMinus1, p_src->m_right);
-	p_dst->m_bottom = FixedMul16(g_screenHeightMinus1, p_src->m_bottom);
-	return p_dst;
-}
-
-// FUNCTION: MW2 0x10056ae4
-Point* ScalePointToScreen(WINDOW* p_buffer, Point* p_src, Point* p_dst)
-{
-	p_dst->m_x = FixedMul16(g_screenWidthMinus1, p_src->m_x);
-	p_dst->m_y = FixedMul16(g_screenHeightMinus1, p_src->m_y);
 	return p_dst;
 }
 
@@ -171,28 +145,6 @@ Point* ScalePointFromLowRes(Point* p_src, Point* p_dst)
 {
 	p_dst->m_x = FixedDiv16(p_src->m_x, 319);
 	p_dst->m_y = FixedDiv16(p_src->m_y, 199);
-	return p_dst;
-}
-
-// Centers a rectangle of p_src's size on the screen.
-// FUNCTION: MW2 0x10056e22
-PANE* CenterRectOnScreen(WINDOW* p_buffer, PANE* p_src, PANE* p_dst)
-{
-	PANE rect;
-	MechS32 left;
-	MechS32 top;
-
-	rect = *p_src;
-	rect.m_x1 -= rect.m_x0;
-	rect.m_x0 = 0;
-	rect.m_y1 -= rect.m_y0;
-	rect.m_y0 = 0;
-	left = (g_screenWidthMinus1 - (rect.m_x1 - rect.m_x0 + 1) - 1) / 2;
-	top = (g_screenHeightMinus1 - (rect.m_y1 - rect.m_y0 + 1) - 1) / 2;
-	p_dst->m_x0 = rect.m_x0 + left;
-	p_dst->m_x1 = rect.m_x1 + left;
-	p_dst->m_y0 = top + rect.m_y0;
-	p_dst->m_y1 = top + rect.m_y1;
 	return p_dst;
 }
 

@@ -45,6 +45,7 @@
 #include "vertex.h"
 #include "vfx3d.h"
 #include "vfxa.h"
+#include "widescreen.h"
 
 #include <stdio.h>
 
@@ -233,6 +234,7 @@ void LoadCockpitLayout(MechS32 p_cockpit, CockpitLayout* p_layout)
 	index = MECH_PTR_TO_S32(p_layout->m_gauges[3]);
 	p_layout->m_gauges[3] = g_cockpitGauges[index];
 	ZoomMapView(0);
+	MechWidenCockpitLayout(p_cockpit, p_layout);
 }
 
 // Places every cockpit view's layout on the screen and starts in cockpit view 0, then the text
@@ -765,8 +767,15 @@ void DrawMapViewText(CockpitLayout* p_layout)
 	MechS32 heading;
 	Player* player;
 	MechDouble degrees;
+	PANE saved;
 
 	viewport = p_layout->m_viewport;
+	// In widescreen the satellite view's viewport covers the frame and its readouts stay in the HUD box
+	saved = *viewport;
+	if (g_cockpitLayoutIndex == 4) {
+		MechHudPane(viewport);
+	}
+
 	player = g_players[g_localPlayerId];
 	font = LoadCachedResource(g_mw2PrjHandle, p_layout->m_font + g_artResolution, g_resourceTypeTags[c_resTagFont], 0);
 	if (font) {
@@ -815,6 +824,8 @@ void DrawMapViewText(CockpitLayout* p_layout)
 
 		UnlockCachedResource(p_layout->m_font + g_artResolution, g_resourceTypeTags[c_resTagFont]);
 	}
+
+	*viewport = saved;
 }
 
 // Cycles the three cockpit views.
