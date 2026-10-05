@@ -1879,7 +1879,10 @@ void CpcRemapDeviceSlots(CpcBinding* p_bindings)
 		device = InputGetDevice(i);
 		if (device) {
 			g_cpcDeviceSlots[i].m_deviceId = i;
-			strncpy(g_cpcDeviceSlots[i].m_name, device->m_info.m_matchName, 0x10);
+			// The original copied 0x10 bytes into the 0x0c of m_name, which strncpy fills: the
+			// padding ran into the next slot, and past the array from the last
+			strncpy(g_cpcDeviceSlots[i].m_name, device->m_info.m_matchName, sizeof(g_cpcDeviceSlots[i].m_name) - 1);
+			g_cpcDeviceSlots[i].m_name[sizeof(g_cpcDeviceSlots[i].m_name) - 1] = '\0';
 		}
 		else {
 			g_cpcDeviceSlots[i].m_deviceId = -1;
