@@ -2,7 +2,7 @@ use std::ffi::{c_char, c_void};
 use std::sync::atomic::{AtomicI32, Ordering};
 
 use egui::{Button, Ui};
-use mw2_sys::shell::{self, MissionResults};
+use remech2_sys::shell::{self, MissionResults};
 
 use super::{CAMPAIGN_LENGTH, Campaign, OUTCOME_FAILED, OUTCOME_SUCCESS, ShellMsg};
 use crate::{messages, shell::dialog};

@@ -1,6 +1,6 @@
 use std::ffi::{CStr, c_char};
 
-use mw2_sys::sim::{self, GameWindowGeometry, g_artResolutionSizes};
+use remech2_sys::sim::{self, GameWindowGeometry, g_artResolutionSizes};
 
 /// The game decides which resolution to use based on the DLL name passed to this function.
 /// This is presumably a leftover from the DOS version of the game, possibly to preserve config file compatibility.

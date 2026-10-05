@@ -1,7 +1,7 @@
 use std::{io::Cursor, ptr::NonNull};
 
 use anyhow::Result;
-use mw2_sys::shell;
+use remech2_sys::shell;
 use rodio::Sink;
 
 use crate::{midi_source::MidiSource, xmi::XmiFile};
@@ -49,7 +49,8 @@ impl MidiSequence {
     }
 
     pub fn apply_current_volume(&mut self) {
-        let scaled = unsafe { (shell::g_soundConfig.m_midiVolume as i64 * self.volume as i64) >> 16 };
+        let scaled =
+            unsafe { (shell::g_soundConfig.m_midiVolume as i64 * self.volume as i64) >> 16 };
         let seq_volume = (scaled as f64 * 1.27) as i32;
         self.sink
             .set_volume(seq_volume.clamp(0, 127) as f32 / 127.0);

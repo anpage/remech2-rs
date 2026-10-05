@@ -3,7 +3,7 @@ use std::{
     sync::atomic::{AtomicBool, Ordering},
 };
 
-use mw2_sys::shared::{c_mechMouseLeft, c_mechMouseMiddle, c_mechMouseRight};
+use remech2_sys::shared::{c_mechMouseLeft, c_mechMouseMiddle, c_mechMouseRight};
 use winit::{
     dpi::PhysicalPosition,
     event::{ElementState, MouseButton},

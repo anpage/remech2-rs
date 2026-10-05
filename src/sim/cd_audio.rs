@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use mw2_sys::sim;
+use remech2_sys::sim;
 use tracing::error;
 
 use crate::cd_audio::{AudioCdStatus, CdAudioPlayer};

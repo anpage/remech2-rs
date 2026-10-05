@@ -3,7 +3,7 @@ use std::sync::Mutex;
 
 use egui::{Align, Button, Color32, Context, FontId, Layout, RichText, Vec2};
 
-use mw2_sys::shared::{c_mechMsgKeyFirst, c_mechMsgKeyLast, c_mechMsgMouseMove};
+use remech2_sys::shared::{c_mechMsgKeyFirst, c_mechMsgKeyLast, c_mechMsgMouseMove};
 
 use super::menu::{self, MenuLock};
 use crate::{app, display, messages};

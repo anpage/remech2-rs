@@ -1,6 +1,6 @@
 use std::hint::black_box;
 
-use mw2_sys::{shell, sim};
+use remech2_sys::{shell, sim};
 
 fn main() {
     black_box(sim::SimMain as *const ());

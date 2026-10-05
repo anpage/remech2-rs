@@ -1,6 +1,6 @@
 use std::{sync::RwLock, time::Instant};
 
-use mw2_sys::sim;
+use remech2_sys::sim;
 
 use crate::settings::SETTINGS;
 

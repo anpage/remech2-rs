@@ -3,7 +3,7 @@ use std::ptr::null_mut;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
-use mw2_sys::shell::{self, AudioSample, TMPackDataBase};
+use remech2_sys::shell::{self, AudioSample, TMPackDataBase};
 
 use super::{Campaign, Screen, ScreenArgs, ShellMsg, allocate, delete, run};
 
@@ -53,9 +53,18 @@ impl Screen for MainMenu {
         unsafe {
             shell::CloseAllVideos();
 
-            delete(&raw mut shell::g_mainMenu, shell::ButtonMenu_ButtonMenu_destructor);
-            delete(&raw mut shell::g_mainMenuMusic, shell::AudioSample_AudioSample_destructor);
-            delete(&raw mut shell::g_mainMenuIntro, shell::AudioSample_AudioSample_destructor);
+            delete(
+                &raw mut shell::g_mainMenu,
+                shell::ButtonMenu_ButtonMenu_destructor,
+            );
+            delete(
+                &raw mut shell::g_mainMenuMusic,
+                shell::AudioSample_AudioSample_destructor,
+            );
+            delete(
+                &raw mut shell::g_mainMenuIntro,
+                shell::AudioSample_AudioSample_destructor,
+            );
 
             shell::g_mainMenuMusicStarted = 0;
         }

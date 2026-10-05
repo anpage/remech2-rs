@@ -3,7 +3,7 @@ use std::{
     sync::{LazyLock, Mutex},
 };
 
-use mw2_sys::sim::{self, Mech};
+use remech2_sys::sim::{self, Mech};
 
 /// A full jumpjet tank, in ticks.
 const JUMPJET_FUEL_MAX: i32 = 1810;

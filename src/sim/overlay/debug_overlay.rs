@@ -56,7 +56,7 @@ impl DebugOverlay {
 
     pub fn draw(&mut self, ctx: &Context, window_width: f32, window_height: f32) {
         // calculate recent deltatimes
-        let delta_time = unsafe { mw2_sys::sim::g_deltaTime };
+        let delta_time = unsafe { remech2_sys::sim::g_deltaTime };
         self.recent_deltatimes.rotate_left(1);
         self.recent_deltatimes[199] = Some(delta_time);
 

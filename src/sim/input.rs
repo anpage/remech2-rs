@@ -4,7 +4,7 @@ use std::{
     sync::{LazyLock, Mutex},
 };
 
-use mw2_sys::sim::{self, AnalogBinding, InputAxis};
+use remech2_sys::sim::{self, AnalogBinding, InputAxis};
 
 use crate::sim::timing::TICKS_PER_IDEAL_FRAME;
 

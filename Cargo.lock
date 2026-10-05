@@ -1441,14 +1441,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
-name = "mw2-sys"
-version = "0.1.0"
-dependencies = [
- "bindgen",
- "cc",
-]
-
-[[package]]
 name = "naga"
 version = "27.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2228,9 +2220,9 @@ dependencies = [
  "egui-winit",
  "egui_plot",
  "hex-literal",
- "mw2-sys",
  "pollster",
  "rand",
+ "remech2-sys",
  "rodio",
  "rust-ini",
  "rustysynth",
@@ -2243,6 +2235,14 @@ dependencies = [
  "ureq",
  "wgpu",
  "winit",
+]
+
+[[package]]
+name = "remech2-sys"
+version = "0.1.0"
+dependencies = [
+ "bindgen",
+ "cc",
 ]
 
 [[package]]

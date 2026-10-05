@@ -1,7 +1,7 @@
 use std::ffi::{CStr, c_char};
 use std::ptr;
 
-use mw2_sys::shell::{self, ScreenField, TextGlyph};
+use remech2_sys::shell::{self, ScreenField, TextGlyph};
 
 const DRIVER_NAME_SIZE: usize = 15;
 

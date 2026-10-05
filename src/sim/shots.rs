@@ -1,6 +1,6 @@
 use std::sync::atomic::Ordering;
 
-use mw2_sys::sim::{self, Shot};
+use remech2_sys::sim::{self, Shot};
 
 use crate::sim::{
     stats::{PROXIMITY_FUSES_SUPPRESSED, ZERO_LENGTH_FRAMES_SKIPPED},

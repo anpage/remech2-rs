@@ -3,7 +3,7 @@ use std::fs;
 use std::ptr::null_mut;
 use std::sync::Mutex;
 
-use mw2_sys::shell::{self, ScreenField, TMPackDataBase};
+use remech2_sys::shell::{self, ScreenField, TMPackDataBase};
 use tracing::warn;
 
 use super::{Campaign, Screen, ScreenArgs, ShellMsg, click_field, delete, run};

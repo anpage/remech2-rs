@@ -4,7 +4,7 @@ use egui::{
     Color32, ColorImage, Context, CursorIcon, FontFamily, Order, PointerButton, Rect, TextStyle,
     TextureHandle, Vec2,
 };
-use mw2_sys::{shared::c_mechMsgCommand, shell};
+use remech2_sys::{shared::c_mechMsgCommand, shell};
 
 use crate::drawmode::fit_to_window;
 use crate::shell::dialog;

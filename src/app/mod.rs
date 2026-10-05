@@ -18,7 +18,9 @@ use winit::{
     window::{Fullscreen, Window, WindowId},
 };
 
-use mw2_sys::shared::{c_mechMsgActivateApp, c_mechMsgKeyDown, c_mechMsgKeyUp, c_mechMsgMouseMove};
+use remech2_sys::shared::{
+    c_mechMsgActivateApp, c_mechMsgKeyDown, c_mechMsgKeyUp, c_mechMsgMouseMove,
+};
 
 use crate::{messages, settings::SETTINGS};
 

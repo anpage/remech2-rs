@@ -2,7 +2,7 @@ use std::ffi::c_char;
 use std::ptr::null_mut;
 use std::sync::Mutex;
 
-use mw2_sys::shell::{self, PilotRecord, ScreenField, TMPackDataBase};
+use remech2_sys::shell::{self, PilotRecord, ScreenField, TMPackDataBase};
 
 use super::{Campaign, Screen, ScreenArgs, ShellMsg, delete, field_index, run};
 use crate::mech_rand::rand;
@@ -26,7 +26,7 @@ const CALLSIGN_MAX_WIDTH: i32 = 300;
 
 /// A new pilot starts somewhere in `HONOR..HONOR * 2`
 const HONOR: f64 = 1000.0;
-const RAND_MAX: f64 = mw2_sys::shared::MECH_RAND_MAX as f64;
+const RAND_MAX: f64 = remech2_sys::shared::MECH_RAND_MAX as f64;
 
 /// The selected pilot's stats
 fn pilot_stats() -> *mut ScreenField {
@@ -151,8 +151,14 @@ impl Screen for Roster {
             shell::HideFields(pilot_stats());
             shell::SavePilotRoster();
 
-            delete(&raw mut shell::g_rosterMenu, shell::ButtonMenu_ButtonMenu_destructor);
-            delete(&raw mut shell::g_rosterSound, shell::AudioSample_AudioSample_destructor);
+            delete(
+                &raw mut shell::g_rosterMenu,
+                shell::ButtonMenu_ButtonMenu_destructor,
+            );
+            delete(
+                &raw mut shell::g_rosterSound,
+                shell::AudioSample_AudioSample_destructor,
+            );
 
             shell::HidePilotCallsigns();
         }

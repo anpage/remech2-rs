@@ -1,11 +1,10 @@
 use std::ffi::c_char;
 use std::sync::Mutex;
 
-use mw2_sys::shell::{self, ArchiveReader, ButtonMenu, TMPackDataBase};
+use remech2_sys::shell::{self, ArchiveReader, ButtonMenu, TMPackDataBase};
 
 use super::{
-    CAMPAIGN_LENGTH, Campaign, OUTCOME_SUCCESS, Screen, ScreenArgs, ShellMsg, allocate, delete,
-    run,
+    CAMPAIGN_LENGTH, Campaign, OUTCOME_SUCCESS, Screen, ScreenArgs, ShellMsg, allocate, delete, run,
 };
 use crate::shell::overlay::confirm;
 
@@ -84,8 +83,14 @@ impl Screen for Debrief {
             }
 
             delete(&raw mut shell::g_debriefPage, shell::Page_Page_destructor);
-            delete(&raw mut shell::g_debriefMenu, shell::ButtonMenu_ButtonMenu_destructor);
-            delete(&raw mut shell::g_aftermathReader, shell::ArchiveReader_ArchiveReader_destructor);
+            delete(
+                &raw mut shell::g_debriefMenu,
+                shell::ButtonMenu_ButtonMenu_destructor,
+            );
+            delete(
+                &raw mut shell::g_aftermathReader,
+                shell::ArchiveReader_ArchiveReader_destructor,
+            );
 
             shell::VideoDriver_ClearGlyphs(shell::g_videoDriver, 1);
         }
@@ -119,7 +124,10 @@ impl Debrief {
             shell::Page_Hide(shell::g_debriefPage);
 
             // The original leaves this dangling until the viewer closes.
-            delete(&raw mut shell::g_debriefMenu, shell::ButtonMenu_ButtonMenu_destructor);
+            delete(
+                &raw mut shell::g_debriefMenu,
+                shell::ButtonMenu_ButtonMenu_destructor,
+            );
 
             let layout = &raw const shell::g_aftermathScreens[state as usize];
             let viewer = allocate::<ArchiveReader>();
@@ -153,7 +161,10 @@ impl Debrief {
                 return None;
             }
 
-            delete(&raw mut shell::g_aftermathReader, shell::ArchiveReader_ArchiveReader_destructor);
+            delete(
+                &raw mut shell::g_aftermathReader,
+                shell::ArchiveReader_ArchiveReader_destructor,
+            );
 
             let next = ShellMsg(next as u32);
             if next == ShellMsg::EXIT_TO_DESKTOP || next == ShellMsg::MAIN_MENU {

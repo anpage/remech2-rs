@@ -4,7 +4,7 @@ use std::{
     ffi::c_int,
 };
 
-use mw2_sys::shared::{MechMessage, MechMessageHandler};
+use remech2_sys::shared::{MechMessage, MechMessageHandler};
 
 thread_local! {
     static QUEUE: RefCell<VecDeque<MechMessage>> = const { RefCell::new(VecDeque::new()) };
