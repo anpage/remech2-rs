@@ -197,7 +197,7 @@ void FirstEyepoint(void)
 }
 
 // Updates the camera for the frame in the view mode GetViewMode picks (the free camera without a
-// local player): the cockpit, tracking, external, drop or free camera, driven by INPUT.MAP's
+// local player): the cockpit, tracking, external, drop or free camera, driven by the
 // eyepoint and track sinks.
 // Stack-slot permutation of the locals.
 // FUNCTION: MW2 0x100110f7

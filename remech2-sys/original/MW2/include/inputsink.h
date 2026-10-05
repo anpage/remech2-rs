@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// An INPUT.MAP sink: a named game control and the variable INPUT.MAP's bindings write.
+// A sink: a named game control and the variable the input layer writes.
 // SIZE 0x20
 typedef struct InputSink {
 	MechChar* m_name;      // 0x00

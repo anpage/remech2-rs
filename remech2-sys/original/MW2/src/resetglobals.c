@@ -37,7 +37,6 @@
 #include "hud.h"
 #include "inifile.h"
 #include "inputmap.h"
-#include "joystick.h" // IWYU pragma: keep (sim_names.h renames its globals)
 #include "keyboard.h"
 #include "lancemenu.h"
 #include "loadres.h" // IWYU pragma: keep (sim_names.h renames its globals)
@@ -808,30 +807,8 @@ static const struct {
 	RESET_GLOBAL(g_sinkMenuValueReset),
 	RESET_GLOBAL(g_sinkMenuEnter),
 	RESET_GLOBAL(g_sinkMenuAbort),
-	RESET_GLOBAL(g_analogBindingCount),
-	RESET_GLOBAL(g_inputAxisCount),
-	RESET_GLOBAL(g_discreteBindingCount),
 	RESET_GLOBAL(g_gameplayInputEnabled),
-	RESET_GLOBAL(g_keyboardDeviceIndex),
-	RESET_GLOBAL(g_inputMapLine),
-	RESET_GLOBAL(g_analogBindings),
-	RESET_GLOBAL(g_inputAxes),
-	RESET_GLOBAL(g_discreteBindings),
-	RESET_GLOBAL(g_inputDeviceCount),
-	RESET_GLOBAL(g_inputDriverClasses),
 	RESET_GLOBAL(g_inputSinks),
-	RESET_GLOBAL(g_gameKeyNames),
-	RESET_GLOBAL(g_gameKeyByKeyCode),
-	RESET_GLOBAL(g_gameKeyModifiers),
-	RESET_GLOBAL(g_inputErrorText),
-	RESET_GLOBAL(g_inputDevicePresent),
-	RESET_GLOBAL(g_inputDeviceInfos),
-	RESET_GLOBAL(g_inputDeviceStates),
-	RESET_GLOBAL(g_inputDeviceNames),
-	RESET_GLOBAL(g_inputDrivers),
-
-	// joystick.c
-	RESET_GLOBAL(g_joystickDriver),
 
 	// keyboard.c
 	RESET_GLOBAL(g_keyCodeWriteIndex),
@@ -840,9 +817,6 @@ static const struct {
 	RESET_GLOBAL(g_keyStates),
 	RESET_GLOBAL(g_keyCodeMap),
 	RESET_GLOBAL(g_extendedScanCodeMap),
-	RESET_GLOBAL(g_keyShortNames),
-	RESET_GLOBAL(g_keyNames),
-	RESET_GLOBAL(g_keyboardDriver),
 
 	// lancemenu.c
 	RESET_GLOBAL(g_lanceOrders),
@@ -974,16 +948,8 @@ static const struct {
 	RESET_GLOBAL(g_soundFileDir),
 
 	// mouse.c
-	RESET_GLOBAL(g_mouseAxisNames),
-	RESET_GLOBAL(g_mouseAxisTypes),
-	RESET_GLOBAL(g_mouseButtonNames),
-	RESET_GLOBAL(g_mouseButtonTypes),
 	RESET_GLOBAL(g_cursorClipped),
 	RESET_GLOBAL(g_reclipCursor),
-	RESET_GLOBAL(g_mouseDriver),
-	RESET_GLOBAL(g_mouseDeviceName),
-	RESET_GLOBAL(g_mouseDisplayName),
-	RESET_GLOBAL(g_mouseTypeName),
 
 	// mw2log.c
 	RESET_GLOBAL(g_logFileEnabled),

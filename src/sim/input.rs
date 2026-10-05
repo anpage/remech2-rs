@@ -374,4 +374,5 @@ pub extern "C" fn take_bound_menu_key() -> i16 {
 #[unsafe(export_name = "CloseInputDevices")]
 pub extern "C" fn close_inputs() {
     SIM_INPUT.lock().unwrap().take();
+    unsafe { sim::MouseRelease() };
 }

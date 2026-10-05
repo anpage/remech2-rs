@@ -4,8 +4,8 @@
 #include "decomp.h"
 #include "types.h"
 
-// A player's controls, set each frame by INPUT.MAP for the local player (g_localSteering) and by the
-// AI for the others. The members are INPUT.MAP's sinks of the same names (g_inputSinks); the bytes
+// A player's controls, set each frame by the input layer for the local player (g_localSteering) and
+// by the AI for the others. The members are the sinks of the same names (g_inputSinks); the bytes
 // are buttons, which the mech's update clears once it has acted on them.
 // SIZE 0x48
 typedef struct PlayerSteering {
@@ -14,7 +14,7 @@ typedef struct PlayerSteering {
 	MechS32 m_throttle;               // 0x08
 	MechS32 m_turn;                   // 0x0c
 	MechS32 m_legsPanDelta;           // 0x10 — copied into m_turn
-	MechS16 m_keyCode;                // 0x14 — the local player's: the key INPUT.MAP passed on
+	MechS16 m_keyCode;                // 0x14 — the local player's: the frame's typed key code
 	MechS8 m_torsoTiltPlus;           // 0x16
 	MechS8 m_torsoTiltMinus;          // 0x17
 	MechS8 m_torsoTiltReset;          // 0x18
