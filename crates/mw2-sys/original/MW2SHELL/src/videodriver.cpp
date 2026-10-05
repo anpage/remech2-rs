@@ -114,6 +114,11 @@ VideoDriver::VideoDriver()
 
 	m_unk0x3a2 = 0;
 	m_restoreColor = -1;
+
+	// Reset the palette for when we return from the sim
+	memset(m_palette, 0, sizeof(m_palette));
+	m_paletteChanged = 0;
+	m_fmvFirstFrame = 0;
 }
 
 // FUNCTION: MW2SHELL 0x10006202
