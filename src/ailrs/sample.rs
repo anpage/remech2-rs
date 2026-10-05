@@ -59,12 +59,12 @@ impl Sample {
         self.0.lock().unwrap().alive = false;
     }
 
-    pub fn user_data(&self, index: u32) -> i32 {
+    pub fn user_data(&self, index: u32) -> isize {
         let s = self.0.lock().unwrap();
         s.user_data.get(index as usize).copied().unwrap_or(0)
     }
 
-    pub fn set_user_data(&self, index: u32, value: i32) {
+    pub fn set_user_data(&self, index: u32, value: isize) {
         let mut s = self.0.lock().unwrap();
         if let Some(slot) = s.user_data.get_mut(index as usize) {
             *slot = value;

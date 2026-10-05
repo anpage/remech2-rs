@@ -1,21 +1,15 @@
 use std::{
-    fs::File,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
 };
 
 use anyhow::{Result, bail};
-use windows::{
-    Win32::{
-        Storage::FileSystem::{GetDriveTypeA, GetLogicalDriveStringsA},
-        System::WindowsProgramming::DRIVE_CDROM,
-    },
-    core::PCSTR,
-};
 
 use super::{Action, Stage, dll_check};
+use crate::files;
 
 mod list;
+mod storage;
 
 #[derive(Clone, Debug)]
 struct CopyError {
@@ -54,32 +48,11 @@ impl FileCheck {
         }
     }
 
+    /// The first storage device with the CD's `OLD_HERC.DRV` at its root
     fn cd_check() -> Option<PathBuf> {
-        let mut drive_strings = [0u8; 128];
-        unsafe {
-            GetLogicalDriveStringsA(Some(&mut drive_strings));
-        }
-
-        for drive in drive_strings.split(|&c| c == 0) {
-            if drive.is_empty() {
-                continue;
-            }
-
-            let drive_type = unsafe { GetDriveTypeA(PCSTR(drive.as_ptr())) };
-
-            if drive_type != DRIVE_CDROM {
-                continue;
-            }
-
-            let drive_letter = *drive.first().unwrap() as char;
-            let path = format!("{}:\\OLD_HERC.DRV", drive_letter);
-            if File::open(&path).is_ok() {
-                let drive = format!("{}:\\", drive_letter);
-                return Some(PathBuf::from(drive));
-            }
-        }
-
-        None
+        storage::roots()
+            .into_iter()
+            .find(|root| files::resolve_in(root, "OLD_HERC.DRV").is_file())
     }
 
     fn start_copy(&mut self, cd_drive_path: PathBuf) {
@@ -101,7 +74,7 @@ impl FileCheck {
                 let mut error = Some("File not found on CD".to_string());
 
                 for cd_path in file.cd_paths {
-                    let cd_file = cd_drive_path.join(Path::new(cd_path));
+                    let cd_file = files::resolve_in(&cd_drive_path, cd_path);
                     if cd_file.exists() {
                         if let Err(e) = std::fs::copy(cd_file, &file.path) {
                             tracing::error!(

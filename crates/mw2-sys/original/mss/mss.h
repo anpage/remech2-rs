@@ -5,14 +5,11 @@
 #ifndef MSS_H
 #define MSS_H
 
+#include <stdint.h>
+
 // The sample user data: 32-bit in this Miles, pointer-sized (SINTa) from later versions on. The game
 // keeps pointers there, so it is pointer-sized where pointers are wider than 32 bits.
-#if defined(_MSC_VER) && _MSC_VER < 1200
-#define SINTa int
-#else
-#include <stdint.h>
 #define SINTa intptr_t
-#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -31,8 +28,10 @@ extern "C"
 	// and the PCM format it opens the device with.
 	typedef void* AILWAVEOUT;
 
-	typedef struct _SAMPLE* HSAMPLE;
-	typedef struct _DIG_DRIVER* HDIGDRIVER;
+	// The sample and driver handles: pointers in Miles, 64-bit IDs from the Rust side here, whatever
+	// the pointer size. 0 is no handle.
+	typedef uint64_t HSAMPLE;
+	typedef uint64_t HDIGDRIVER;
 
 #define AILCALLBACK AILCALL
 	typedef void(AILCALLBACK* AILSAMPLECB)(HSAMPLE p_sample);

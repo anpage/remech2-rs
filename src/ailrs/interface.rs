@@ -6,28 +6,28 @@ use crate::ailrs::storage::{create_driver, create_sample, get_sample, release_sa
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
-pub struct DriverHandle(Option<NonZero<u32>>);
+pub struct DriverHandle(Option<NonZero<u64>>);
 
 impl DriverHandle {
-    pub fn new(handle: u32) -> Self {
+    pub fn new(handle: u64) -> Self {
         Self(NonZero::new(handle))
     }
 
-    pub fn id(self) -> Option<NonZero<u32>> {
+    pub fn id(self) -> Option<NonZero<u64>> {
         self.0
     }
 }
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
-pub struct SampleHandle(Option<NonZero<u32>>);
+pub struct SampleHandle(Option<NonZero<u64>>);
 
 impl SampleHandle {
-    pub fn new(handle: u32) -> Self {
+    pub fn new(handle: u64) -> Self {
         Self(NonZero::new(handle))
     }
 
-    pub fn id(self) -> Option<NonZero<u32>> {
+    pub fn id(self) -> Option<NonZero<u64>> {
         self.0
     }
 }
@@ -124,7 +124,7 @@ pub unsafe extern "system" fn sample_buffer_ready(sample: SampleHandle) -> i32 {
 }
 
 #[unsafe(export_name = "AIL_sample_user_data")]
-pub unsafe extern "system" fn sample_user_data(sample: SampleHandle, index: u32) -> i32 {
+pub unsafe extern "system" fn sample_user_data(sample: SampleHandle, index: u32) -> isize {
     let Some(sample) = get_sample(sample) else {
         return 0;
     };
@@ -172,7 +172,7 @@ pub unsafe extern "system" fn set_sample_type(sample: SampleHandle, format: i32,
 pub unsafe extern "system" fn set_sample_user_data(
     sample: SampleHandle,
     index: u32,
-    user_data: i32,
+    user_data: isize,
 ) {
     let Some(sample) = get_sample(sample) else {
         return;

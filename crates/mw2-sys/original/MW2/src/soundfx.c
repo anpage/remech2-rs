@@ -467,6 +467,11 @@ void AILCALLBACK SampleEosCallback(HSAMPLE p_sample)
 		g_audioEngine->m_flags[slot] = 0;
 		done = (MechS32*) AIL_sample_user_data(p_sample, 0);
 		*done = 0;
+		// The original passed &g_speechSample as the speech's done flag, which the 32-bit store
+		// above cleared; the handle is wider now.
+		if (p_sample == g_speechSample) {
+			g_speechSample = 0;
+		}
 	}
 }
 
@@ -672,7 +677,7 @@ void UpdateAmbientSound(AmbientSound* p_sound)
 		}
 
 		if (!p_sound->m_data ||
-			(sample = AIL_allocate_file_sample(g_audioEngine->m_driver, p_sound->m_data, -1)) == NULL) {
+			(sample = AIL_allocate_file_sample(g_audioEngine->m_driver, p_sound->m_data, -1)) == 0) {
 			if (p_sound->m_id != -1) {
 				UnlockCachedResource(p_sound->m_id, g_resourceTypeTags[c_resTagSnds]);
 			}
@@ -719,7 +724,7 @@ void StopAmbientSound(AmbientSound* p_sound)
 	}
 
 	sample = g_audioEngine->m_samples[p_sound->m_slot];
-	g_audioEngine->m_samples[p_sound->m_slot] = NULL;
+	g_audioEngine->m_samples[p_sound->m_slot] = 0;
 	g_audioEngine->m_playing[p_sound->m_slot] = 0;
 	g_audioEngine->m_ids[p_sound->m_slot] = 0;
 	p_sound->m_slot = -1;

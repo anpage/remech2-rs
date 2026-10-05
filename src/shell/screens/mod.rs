@@ -108,7 +108,13 @@ unsafe fn allocate<T>() -> *mut T {
     unsafe { malloc(size_of::<T>()).cast() }
 }
 
-unsafe fn delete<T>(object: *mut *mut T, destructor: unsafe extern "thiscall" fn(*mut T)) {
+/// A C++ destructor as bindgen declares it: `thiscall` exists only on 32-bit Windows
+#[cfg(all(target_arch = "x86", windows))]
+type Destructor<T> = unsafe extern "thiscall" fn(*mut T);
+#[cfg(not(all(target_arch = "x86", windows)))]
+type Destructor<T> = unsafe extern "C" fn(*mut T);
+
+unsafe fn delete<T>(object: *mut *mut T, destructor: Destructor<T>) {
     let ptr = unsafe { object.replace(std::ptr::null_mut()) };
     if !ptr.is_null() {
         unsafe {

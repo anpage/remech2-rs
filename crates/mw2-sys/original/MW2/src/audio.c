@@ -395,7 +395,7 @@ HDIGDRIVER OpenDigitalDriver(void)
 	HDIGDRIVER driver;
 
 	if (AIL_waveOutOpen(&driver, NULL, 0, 2, 11025)) {
-		return NULL;
+		return 0;
 	}
 	else {
 		return driver;

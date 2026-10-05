@@ -39,7 +39,7 @@ pub struct VoiceState {
     pub rate: u32,
     pub volume: u8,
     pub pan: u8,
-    pub user_data: [i32; 16],
+    pub user_data: [isize; 16],
     /// Set by the mixer thread, drained by the hooked `AIL_serve`.
     pub pending_eos: bool,
     pub eos_callback: Option<unsafe extern "system" fn(SampleHandle)>,

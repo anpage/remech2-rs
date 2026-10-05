@@ -19,7 +19,8 @@ pub fn resolve(path: &str) -> PathBuf {
     resolve_in(root(), path)
 }
 
-fn resolve_in(root: &Path, path: &str) -> PathBuf {
+/// `path` under `root`, matching each component's case to what is on disk
+pub fn resolve_in(root: &Path, path: &str) -> PathBuf {
     let native = path.replace(['\\', '/'], MAIN_SEPARATOR_STR);
     let path = Path::new(&native);
 

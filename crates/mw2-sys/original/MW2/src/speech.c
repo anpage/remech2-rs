@@ -159,7 +159,7 @@ SpeechLine g_damageSpeech[39] = {
 SpeechEntry* g_speechQueue = NULL;
 
 // GLOBAL: MW2 0x100a9b68
-HSAMPLE g_speechSample = NULL;
+HSAMPLE g_speechSample = 0;
 
 // GLOBAL: MW2 0x100a9b6c
 MechS32 g_speechLocked = 0;
@@ -348,7 +348,7 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 	MechS32 slot;
 
 	slot = -1;
-	g_speechSample = NULL;
+	g_speechSample = 0;
 	if (!g_audioEngine || !(g_soundConfig.m_simFlags & 2)) {
 		if (p_entry->m_text && p_entry->m_text[0]) {
 			ShowInGameMessage(p_entry->m_text, 0, 0x712, 0x32);
@@ -391,7 +391,7 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 					g_soundConfig.m_voiceVolume,
 					0x40,
 					11025,
-					(MechS32*) &g_speechSample,
+					(MechS32*) -1,
 					0x150
 				);
 				if (slot >= 0) {
@@ -413,7 +413,7 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 			g_soundConfig.m_voiceVolume,
 			0x40,
 			11025,
-			(MechS32*) &g_speechSample,
+			(MechS32*) -1,
 			0x150
 		);
 		if (slot >= 0) {
@@ -424,7 +424,7 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 		ShowInGameMessage(p_entry->m_text, 0, 0x712, 0x32);
 	}
 
-	return g_speechSample != NULL;
+	return g_speechSample != 0;
 }
 
 // FUNCTION: MW2 0x10059b7b
