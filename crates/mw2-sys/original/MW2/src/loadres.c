@@ -1,9 +1,7 @@
-/* Hand-written assembly: MemCopy and MemSet are C functions whose bodies are an __asm block
-   (rep movsd/stosd). Their portable C (PORTABLE_C) is tested against the assembly by
-   tests/asmequiv. */
+/* In the original, MemCopy and MemSet are C functions whose bodies are an __asm block (rep
+   movsd/stosd). This is portable C in their place. */
 #include "loadres.h"
 
-#include "compat.h"
 #include "decomp.h"
 #include "error.h"
 #include "files.h"
@@ -434,7 +432,6 @@ void* MemAlloc(MechU32 p_size)
 // FUNCTION: MW2 0x1001a5bc
 void* MemCopy(void* p_dst, const void* p_src, MechU32 p_size)
 {
-#ifdef PORTABLE_C
 	/* Forwards, a dword at a time and then the remaining bytes, as rep movsd/movsb copy
 	   overlapping blocks. */
 	MechU8* dst = (MechU8*) p_dst;
@@ -452,19 +449,6 @@ void* MemCopy(void* p_dst, const void* p_src, MechU32 p_size)
 	for (count = p_size & 3; count; count--) {
 		*dst++ = *src++;
 	}
-#else
-	__asm {
-		mov eax, p_size
-		mov edi, p_dst
-		mov esi, p_src
-		mov ecx, eax
-		shr ecx, 2
-		rep movsd
-		mov ecx, eax
-		and ecx, 3
-		rep movsb
-	}
-#endif
 
 	return p_dst;
 }
@@ -472,27 +456,7 @@ void* MemCopy(void* p_dst, const void* p_src, MechU32 p_size)
 // FUNCTION: MW2 0x1001a5e6
 void* MemSet(void* p_dst, MechS32 p_value, MechU32 p_size)
 {
-#ifdef PORTABLE_C
 	memset(p_dst, (MechU8) p_value, p_size);
-#else
-	__asm {
-		mov edx, p_size
-		mov eax, p_value
-		mov cl, al
-		mov ch, cl
-		mov cl, al
-		mov eax, ecx
-		shl eax, 16
-		mov ax, cx
-		mov edi, p_dst
-		mov ecx, edx
-		shr ecx, 2
-		rep stosd
-		mov ecx, edx
-		and ecx, 3
-		rep stosb
-	}
-#endif
 
 	return p_dst;
 }

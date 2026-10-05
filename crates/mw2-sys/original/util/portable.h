@@ -3,35 +3,22 @@
 
 #include "types.h"
 
-// Types and helpers for the portable C that replaces hand-written assembly (PORTABLE_C in
-// compat.h). The replacements are standard C with defined behaviour; the register-level
-// operations whose C spelling would be implementation-defined are written here once, in defined
-// terms.
+// Types and helpers for the portable C that replaces the original's hand-written assembly. The
+// replacements are standard C with defined behaviour; the register-level operations whose C
+// spelling would be implementation-defined are written here once, in defined terms.
 
-// 64-bit integers (imul products, edx:eax dividends). VC++ 4.1 has no long long: its type is
-// __int64, and constants are written as casts ((MechS64) 1 << 40). They live here rather than in
-// types.h: every typedef there is a symbol in every unit, and 4.1's stack-slot assignment and
-// operand order react to the symbol count.
-#if defined(_MSC_VER) && _MSC_VER < 1200
-typedef __int64 MechS64;
-typedef unsigned __int64 MechU64;
-#else
+// 64-bit integers (imul products, edx:eax dividends)
 #include <stdint.h>
 typedef int64_t MechS64;
 typedef uint64_t MechU64;
-#endif
 
-#if defined(_MSC_VER) || !defined(__STDC_VERSION__)
-#define PORTABLE_INLINE static __inline
-#else
 #define PORTABLE_INLINE static inline
-#endif
 
 // Preconditions. Inputs where the original faults (an idiv by zero or overflowing), or does what
 // the game never asks of it, are outside a routine's domain: the portable C asserts them, so that
 // a call that breaks one is caught in the tests and debug builds (PORTABLE_ASSERTS, _DEBUG).
 // Elsewhere the assertions compile to nothing, and the C may do anything there.
-#if defined(PORTABLE_C) && (defined(PORTABLE_ASSERTS) || defined(_DEBUG))
+#if defined(PORTABLE_ASSERTS) || defined(_DEBUG)
 #include <stdio.h>
 #include <stdlib.h>
 

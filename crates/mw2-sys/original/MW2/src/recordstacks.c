@@ -2,13 +2,11 @@
    records from the top, AllocQueuedPolygon QueuedPolygon records (0xc bytes in the original) from
    the bottom, and both clear g_queueHasRoom when the gap between them drops to 0xc8 bytes.
 
-   Hand-written assembly: AllocProjectedVertex and AllocQueuedPolygon are C functions whose bodies are
-   mostly an __asm block (eax carries the new top across statements, which /Od never does). Their
-   portable C (PORTABLE_C) is tested against the assembly by tests/asmequiv. */
+   In the original, AllocProjectedVertex and AllocQueuedPolygon are C functions whose bodies are
+   mostly an __asm block. This is portable C in their place. */
 #include "recordstacks.h"
 
 #include "clock.h"
-#include "compat.h"
 #include "decomp.h"
 #include "depthsort.h"
 #include "error.h"
@@ -92,7 +90,6 @@ ProjectedVertex* AllocProjectedVertex(void)
 	ProjectedVertex* record;
 
 	recordSize = 0x20;
-#ifdef PORTABLE_C
 	/* The gap compares as the unsigned addresses do: the two stacks share one buffer. */
 	g_drawBufferTop -= recordSize;
 	record = (ProjectedVertex*) g_drawBufferTop;
@@ -100,23 +97,6 @@ ProjectedVertex* AllocProjectedVertex(void)
 	if (g_drawBufferTop - g_drawBufferBottom <= 0xc8) {
 		g_queueHasRoom = 0;
 	}
-#else
-	__asm {
-		mov ecx, recordSize
-		mov eax, g_drawBufferTop
-		sub eax, ecx
-		mov record, eax
-		mov g_drawBufferTop, eax
-		mov ebx, record
-		mov byte ptr [ebx+0x1d], 0
-		sub eax, 0xc8
-		cmp eax, g_drawBufferBottom
-		ja done
-		xor eax, eax
-		mov g_queueHasRoom, eax
-done:
-	}
-#endif
 
 	return record;
 }
@@ -128,27 +108,11 @@ MechU8* AllocQueuedPolygon(void)
 	MechU8* record;
 
 	recordSize = sizeof(QueuedPolygon);
-#ifdef PORTABLE_C
 	record = g_drawBufferBottom;
 	g_drawBufferBottom += recordSize;
 	if (g_drawBufferTop - g_drawBufferBottom <= 0xc8) {
 		g_queueHasRoom = 0;
 	}
-#else
-	__asm {
-		mov ecx, recordSize
-		mov eax, g_drawBufferBottom
-		mov record, eax
-		add eax, ecx
-		mov g_drawBufferBottom, eax
-		add eax, 0xc8
-		cmp eax, g_drawBufferTop
-		jb done
-		xor eax, eax
-		mov g_queueHasRoom, eax
-done:
-	}
-#endif
 
 	return record;
 }

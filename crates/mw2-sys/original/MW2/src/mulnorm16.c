@@ -1,8 +1,7 @@
-/* Hand-written assembly: MulNormalize16 is a C function whose body is an __asm block. Its portable
-   C (PORTABLE_C) is tested against the assembly by tests/asmequiv. */
+/* In the original, MulNormalize16 is a C function whose body is an __asm block. This is portable C
+   in its place. */
 #include "mulnorm16.h"
 
-#include "compat.h"
 #include "portable.h"
 #include "types.h"
 
@@ -11,7 +10,6 @@
 // FUNCTION: MW2 0x1004c820
 void MulNormalize16(MechS32* p_low, MechS32* p_scaled, MechS16* p_shift, MechU32 p_a, MechU32 p_b)
 {
-#ifdef PORTABLE_C
 	/* bsr of a zero low dword leaves the cleared ecx as it is (the processors' behaviour, which
 	   the xor before it relies on): no shift. */
 	MechU64 product = (MechU64) p_a * p_b;
@@ -28,25 +26,4 @@ void MulNormalize16(MechS32* p_low, MechS32* p_scaled, MechS16* p_shift, MechU32
 	}
 
 	*p_scaled = PortableS32(low);
-#else
-	__asm {
-		mov esi, p_low
-		mov edi, p_scaled
-		mov edx, p_shift
-		mov ebx, p_a
-		mov eax, p_b
-		push edx
-		mul ebx
-		mov [esi], eax
-		pop ebx
-		xor ecx, ecx
-		bsr ecx, eax
-		sub cx, 15
-		jle done
-		add word ptr [ebx], cx
-		shrd eax, edx, cl
-done:
-		mov [edi], eax
-	}
-#endif
 }

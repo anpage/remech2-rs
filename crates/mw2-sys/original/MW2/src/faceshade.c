@@ -1,6 +1,5 @@
 #include "faceshade.h"
 
-#include "compat.h"
 #include "decomp.h"
 #include "face.h"
 #include "fixeddiv.h"

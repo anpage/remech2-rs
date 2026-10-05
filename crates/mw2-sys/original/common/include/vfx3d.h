@@ -7,7 +7,7 @@
 #include "window.h"
 
 // VFX3D, Miles Design VFX's polygon fillers (3rdparty/vfx/VFX3D.ASM; its portable C,
-// common/src/vfx3d.c, in COMPAT_MODE), which both DLLs link.
+// common/src/vfx3d.c), which both DLLs link.
 #ifdef __cplusplus
 extern "C"
 {

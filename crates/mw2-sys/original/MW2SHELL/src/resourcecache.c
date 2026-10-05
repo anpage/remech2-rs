@@ -1,6 +1,5 @@
 #include "resourcecache.h"
 
-#include "compat.h"
 #include "decomp.h"
 #include "files.h"
 #include "prjfile.h"

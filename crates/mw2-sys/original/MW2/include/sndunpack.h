@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// The sound-block decoder of sndunpack.asm (sndunpack.c in COMPAT_MODE).
+// The sound-block decoder of sndunpack.asm, in portable C (sndunpack.c).
 #ifdef __cplusplus
 extern "C"
 {

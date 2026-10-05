@@ -15,7 +15,7 @@ typedef struct VFX_TEXTURE {
 } VFX_TEXTURE;
 
 // VFXREND, Miles Design VFX's polygon renderer (3rdparty/vfx/VFXREND.ASM; common/src/vfxrend.c's
-// portable C in COMPAT_MODE), which both DLLs link. p_cueing and p_translucency are lookaside
+// portable C), which both DLLs link. p_cueing and p_translucency are lookaside
 // tables: p_cueing of 256 bytes for flat shading, of 256 rows of 256 for Gouraud shading (a row
 // per shade), p_translucency of 256 bytes. MW2 draws its textured polygons through
 // VFX_polygon_clip_XY_and_render (DrawTexturedPolygon), and render.c asks GetCodeBlock for the range to

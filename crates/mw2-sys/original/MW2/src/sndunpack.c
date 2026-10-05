@@ -1,13 +1,10 @@
-/* sndunpack.asm's routines and data for builds with other compilers (COMPAT_MODE): portable C,
-   tested against the assembly by tests/asmequiv. The VC++ 4.1 build assembles sndunpack.asm with
-   MASM 6.11 instead.
+/* sndunpack.asm's routines and data, in portable C.
 
    The decoder keeps its frame, its delta table and the upsampling's output in these globals
    between calls, and reads what earlier frames left there: a frame that repeats the previous
    one, and the samples past a short frame's end that the upsampling interpolates towards. */
 #include "sndunpack.h"
 
-#include "compat.h"
 #include "portable.h"
 #include "types.h"
 

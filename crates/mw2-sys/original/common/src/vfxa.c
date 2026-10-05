@@ -1,7 +1,6 @@
-/* VFXA, Miles Design VFX's 2D primitives (3rdparty/vfx/VFXA.ASM), for builds with other compilers
-   (COMPAT_MODE): portable C, tested against the assembly by tests/asmequiv. The VC++ 4.1 build
-   assembles VFXA.ASM with MASM 6.11 instead; both DLLs compile this file in its place, through
-   their own vfxa.h. The names are VFX's; the C's own helpers have names of their own.
+/* VFXA, Miles Design VFX's 2D primitives (3rdparty/vfx/VFXA.ASM), in portable C, which both DLLs
+   compile in place of the assembly through their own vfxa.h. The names are VFX's; the C's own
+   helpers have names of their own.
 
    Most routines start by clipping their pane to its window: a window whose x_max or y_max is
    negative returns -1, a pane that leaves nothing of it -2. Coordinates are relative to the
@@ -18,7 +17,6 @@
    them. Where the DLLs' headers declare a routine void, the C returns nothing. */
 #include "vfxa.h"
 
-#include "compat.h"
 #include "decomp.h"
 #include "pane.h"
 #include "portable.h"

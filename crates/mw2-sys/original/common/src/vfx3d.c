@@ -1,6 +1,5 @@
-/* VFX3D, Miles Design VFX's polygon fillers (3rdparty/vfx/VFX3D.ASM), for builds with other
-   compilers (COMPAT_MODE): portable C, tested against the assembly by tests/asmequiv. The VC++ 4.1
-   build assembles VFX3D.ASM with MASM 6.11 instead; both DLLs compile this file in its place.
+/* VFX3D, Miles Design VFX's polygon fillers (3rdparty/vfx/VFX3D.ASM), in portable C, which both
+   DLLs compile in place of the assembly.
 
    The fillers take a polygon as an array of six-dword vertices: x and y, then the vertex's color
    (16.16) or texture coordinates (16.16, at +0x0c and +0x10). They walk its left and right edges
@@ -17,7 +16,6 @@
    edges stay between their vertices, and so do the spans and the texture coordinates. */
 #include "vfx3d.h"
 
-#include "compat.h"
 #include "decomp.h"
 #include "pane.h"
 #include "portable.h"

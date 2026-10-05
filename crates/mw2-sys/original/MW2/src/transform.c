@@ -1,18 +1,16 @@
-/* Hand-written assembly: MatrixMul29, MatrixDot29 and MultiplyRotations are C functions whose bodies
-   are __asm blocks, and TransformPoint, RotatePoint, OrthogonalizeMatrixColumn and BuildMatrixEx have __asm
-   blocks. Their portable C (PORTABLE_C) is tested against the assembly by tests/asmequiv: it
-   replaces BuildMatrixEx's whole body, whose C wraps where standard C overflows. */
+/* In the original, MatrixMul29, MatrixDot29 and MultiplyRotations are C functions whose bodies are
+   __asm blocks, and TransformPoint, RotatePoint, OrthogonalizeMatrixColumn and BuildMatrixEx have
+   __asm blocks. This is portable C in their place; BuildMatrixEx's wraps where standard C
+   overflows. */
 #include "transform.h"
 
 #include "clock.h"
-#include "compat.h"
 #include "decomp.h"
 #include "fixedtrig.h"
 #include "loadres.h"
 #include "portable.h"
 #include "types.h"
 
-#ifdef PORTABLE_C
 // The 64-bit product of two 32-bit values, as imul leaves it in edx:eax. Sums of products wrap,
 // like the add/adc chains.
 static MechU64 Product(MechS32 p_a, MechS32 p_b)
@@ -46,7 +44,6 @@ static MechS32 TransformRow(Matrix* p_matrix, MechS32 p_row, MechS32 p_x, MechS3
 
 	return Round29(Product(row[0], p_x) + Product(row[1], p_y) + Product(row[2], p_z), p_offset);
 }
-#endif
 
 // Transforms the point (*p_x, *p_y, *p_z) by p_matrix: its 2.29 rotation, then its translation.
 // The products are an __asm block.
@@ -54,7 +51,6 @@ static MechS32 TransformRow(Matrix* p_matrix, MechS32 p_row, MechS32 p_x, MechS3
 // FUNCTION: MW2 0x1000d650
 void TransformPoint(Matrix* p_matrix, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
-#ifdef PORTABLE_C
 	MechS32 x = *p_x;
 	MechS32 y = *p_y;
 	MechS32 z = *p_z;
@@ -62,70 +58,6 @@ void TransformPoint(Matrix* p_matrix, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 	*p_x = TransformRow(p_matrix, 0, x, y, z, p_matrix->m_rows[3][0]);
 	*p_y = TransformRow(p_matrix, 1, x, y, z, p_matrix->m_rows[3][1]);
 	*p_z = TransformRow(p_matrix, 2, x, y, z, p_matrix->m_rows[3][2]);
-#else
-	MechS32 rz;
-	MechS32 x;
-	MechS32 rx;
-	MechS32 y;
-	MechS32 z;
-	MechS32 ry;
-
-	x = *p_x;
-	y = *p_y;
-	z = *p_z;
-	__asm {
-		mov edi, p_matrix
-		mov eax, dword ptr [edi]
-		imul x
-		mov ecx, edx
-		mov ebx, eax
-		mov eax, dword ptr [edi + 0x4]
-		imul y
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [edi + 0x8]
-		imul z
-		add eax, ebx
-		adc edx, ecx
-		shrd eax, edx, 29
-		adc eax, dword ptr [edi + 0x24]
-		mov rx, eax
-		mov eax, dword ptr [edi + 0xc]
-		imul x
-		mov ecx, edx
-		mov ebx, eax
-		mov eax, dword ptr [edi + 0x10]
-		imul y
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [edi + 0x14]
-		imul z
-		add eax, ebx
-		adc edx, ecx
-		shrd eax, edx, 29
-		adc eax, dword ptr [edi + 0x28]
-		mov ry, eax
-		mov eax, dword ptr [edi + 0x18]
-		imul x
-		mov ecx, edx
-		mov ebx, eax
-		mov eax, dword ptr [edi + 0x1c]
-		imul y
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [edi + 0x20]
-		imul z
-		add eax, ebx
-		adc edx, ecx
-		shrd eax, edx, 29
-		adc eax, dword ptr [edi + 0x2c]
-		mov rz, eax
-	}
-
-	*p_x = rx;
-	*p_y = ry;
-	*p_z = rz;
-#endif
 }
 
 // Rotates the point (*p_x, *p_y, *p_z) by p_matrix's 2.29 rotation. The products are an __asm
@@ -134,7 +66,6 @@ void TransformPoint(Matrix* p_matrix, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 // FUNCTION: MW2 0x1000d708
 void RotatePoint(Matrix* p_matrix, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
-#ifdef PORTABLE_C
 	MechS32 x = *p_x;
 	MechS32 y = *p_y;
 	MechS32 z = *p_z;
@@ -142,70 +73,6 @@ void RotatePoint(Matrix* p_matrix, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 	*p_x = TransformRow(p_matrix, 0, x, y, z, 0);
 	*p_y = TransformRow(p_matrix, 1, x, y, z, 0);
 	*p_z = TransformRow(p_matrix, 2, x, y, z, 0);
-#else
-	MechS32 rz;
-	MechS32 x;
-	MechS32 rx;
-	MechS32 y;
-	MechS32 z;
-	MechS32 ry;
-
-	x = *p_x;
-	y = *p_y;
-	z = *p_z;
-	__asm {
-		mov edi, p_matrix
-		mov eax, dword ptr [edi]
-		imul x
-		mov ecx, edx
-		mov ebx, eax
-		mov eax, dword ptr [edi + 0x4]
-		imul y
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [edi + 0x8]
-		imul z
-		add eax, ebx
-		adc edx, ecx
-		shrd eax, edx, 29
-		adc eax, 0
-		mov rx, eax
-		mov eax, dword ptr [edi + 0xc]
-		imul x
-		mov ecx, edx
-		mov ebx, eax
-		mov eax, dword ptr [edi + 0x10]
-		imul y
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [edi + 0x14]
-		imul z
-		add eax, ebx
-		adc edx, ecx
-		shrd eax, edx, 29
-		adc eax, 0
-		mov ry, eax
-		mov eax, dword ptr [edi + 0x18]
-		imul x
-		mov ecx, edx
-		mov ebx, eax
-		mov eax, dword ptr [edi + 0x1c]
-		imul y
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [edi + 0x20]
-		imul z
-		add eax, ebx
-		adc edx, ecx
-		shrd eax, edx, 29
-		adc eax, 0
-		mov rz, eax
-	}
-
-	*p_x = rx;
-	*p_y = ry;
-	*p_z = rz;
-#endif
 }
 
 // Recomputes column p_column of p_matrix's 2.29 rotation as the cross product of the other two,
@@ -214,7 +81,6 @@ void RotatePoint(Matrix* p_matrix, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 // FUNCTION: MW2 0x1000d7c0
 void OrthogonalizeMatrixColumn(Matrix* p_matrix, MechS32 p_column)
 {
-#ifdef PORTABLE_C
 	MechS32 a;
 	MechS32 b;
 	MechS32 cross[3];
@@ -238,126 +104,13 @@ void OrthogonalizeMatrixColumn(Matrix* p_matrix, MechS32 p_column)
 	for (i = 0; i < 3; i++) {
 		p_matrix->m_rows[i][p_column] = cross[i];
 	}
-#else
-	MechS32 a2;
-	MechS32 b2;
-	MechS32 a0;
-	MechS32 x;
-	MechS32 b0;
-	MechS32 y;
-	MechS32 z;
-	MechS32 a1;
-	MechS32 b1;
-
-	switch (p_column) {
-	case 0:
-		a0 = p_matrix->m_rows[0][1];
-		a1 = p_matrix->m_rows[1][1];
-		a2 = p_matrix->m_rows[2][1];
-		b0 = p_matrix->m_rows[0][2];
-		b1 = p_matrix->m_rows[1][2];
-		b2 = p_matrix->m_rows[2][2];
-		break;
-	case 1:
-		a0 = p_matrix->m_rows[0][2];
-		a1 = p_matrix->m_rows[1][2];
-		a2 = p_matrix->m_rows[2][2];
-		b0 = p_matrix->m_rows[0][0];
-		b1 = p_matrix->m_rows[1][0];
-		b2 = p_matrix->m_rows[2][0];
-		break;
-	case 2:
-		a0 = p_matrix->m_rows[0][0];
-		a1 = p_matrix->m_rows[1][0];
-		a2 = p_matrix->m_rows[2][0];
-		b0 = p_matrix->m_rows[0][1];
-		b1 = p_matrix->m_rows[1][1];
-		b2 = p_matrix->m_rows[2][1];
-		break;
-	}
-
-	__asm {
-		mov eax, a1
-		mov edx, b2
-		imul edx
-		mov edi, edx
-		mov esi, eax
-		mov eax, b1
-		mov edx, a2
-		imul edx
-		sub esi, eax
-		sbb edi, edx
-		shrd esi, edi, 29
-		adc esi, 0
-		mov x, esi
-		mov eax, a2
-		mov edx, b0
-		imul edx
-		mov edi, edx
-		mov esi, eax
-		mov eax, b2
-		mov edx, a0
-		imul edx
-		sub esi, eax
-		sbb edi, edx
-		shrd esi, edi, 29
-		adc esi, 0
-		mov y, esi
-		mov eax, a0
-		mov edx, b1
-		imul edx
-		mov edi, edx
-		mov esi, eax
-		mov eax, b0
-		mov edx, a1
-		imul edx
-		sub esi, eax
-		sbb edi, edx
-		shrd esi, edi, 29
-		adc esi, 0
-		mov z, esi
-	}
-
-	switch (p_column)
-	{
-	case 0:
-		p_matrix->m_rows[0][0] = x;
-		p_matrix->m_rows[1][0] = y;
-		p_matrix->m_rows[2][0] = z;
-		break;
-	case 1:
-		p_matrix->m_rows[0][1] = x;
-		p_matrix->m_rows[1][1] = y;
-		p_matrix->m_rows[2][1] = z;
-		break;
-	case 2:
-		p_matrix->m_rows[0][2] = x;
-		p_matrix->m_rows[1][2] = y;
-		p_matrix->m_rows[2][2] = z;
-		break;
-	}
-#endif
 }
 
 // Multiplies two 2.29 fixed-point values. The body is an __asm block.
 // FUNCTION: MW2 0x1000d9a8
 MechS32 MatrixMul29(MechS32 p_a, MechS32 p_b)
 {
-#ifdef PORTABLE_C
 	return Mul29(p_a, p_b);
-#else
-	MechS32 result;
-
-	__asm {
-		mov eax, p_a
-		imul p_b
-		shrd eax, edx, 29
-		adc eax, 0
-		mov result, eax
-	}
-
-	return result;
-#endif
 }
 
 // The dot product of two vectors of 2.29 fixed-point values, with a 64-bit sum. The body is an
@@ -365,31 +118,7 @@ MechS32 MatrixMul29(MechS32 p_a, MechS32 p_b)
 // FUNCTION: MW2 0x1000d9ce
 MechS32 MatrixDot29(MechS32 p_ax, MechS32 p_ay, MechS32 p_az, MechS32 p_bx, MechS32 p_by, MechS32 p_bz)
 {
-#ifdef PORTABLE_C
 	return Round29(Product(p_ax, p_bx) + Product(p_ay, p_by) + Product(p_az, p_bz), 0);
-#else
-	MechS32 result;
-
-	__asm {
-		mov eax, p_ax
-		imul p_bx
-		mov esi, eax
-		mov edi, edx
-		mov eax, p_ay
-		imul p_by
-		add esi, eax
-		adc edi, edx
-		mov eax, p_az
-		imul p_bz
-		add esi, eax
-		adc edi, edx
-		shrd esi, edi, 29
-		adc esi, 0
-		mov result, esi
-	}
-
-	return result;
-#endif
 }
 
 // Multiplies the rotations of p_a and p_b (2.29 fixed point) into p_dst. The
@@ -398,7 +127,6 @@ MechS32 MatrixDot29(MechS32 p_ax, MechS32 p_ay, MechS32 p_az, MechS32 p_bx, Mech
 // FUNCTION: MW2 0x1000da0c
 void MultiplyRotations(Matrix* p_a, Matrix* p_b, Matrix* p_dst)
 {
-#ifdef PORTABLE_C
 	/* Every product is read before the first store: p_dst may be either operand. */
 	MechS32 result[3][3];
 	MechS32 i;
@@ -419,176 +147,6 @@ void MultiplyRotations(Matrix* p_a, Matrix* p_b, Matrix* p_dst)
 			p_dst->m_rows[i][j] = result[i][j];
 		}
 	}
-#else
-	MechS32 m00;
-	MechS32 m01;
-	MechS32 m02;
-	MechS32 m10;
-	MechS32 m11;
-	MechS32 m12;
-	MechS32 m20;
-	MechS32 m21;
-	MechS32 m22;
-
-	__asm {
-		mov esi, p_a
-		mov edi, p_b
-		mov eax, dword ptr [esi]
-		imul dword ptr [edi]
-		mov ebx, eax
-		mov ecx, edx
-		mov eax, dword ptr [esi + 4]
-		imul dword ptr [edi + 0xc]
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [esi + 8]
-		imul dword ptr [edi + 0x18]
-		add ebx, eax
-		adc ecx, edx
-		shrd ebx, ecx, 0x1d
-		adc ebx, 0
-		mov m00, ebx
-		mov eax, dword ptr [esi]
-		imul dword ptr [edi + 4]
-		mov ebx, eax
-		mov ecx, edx
-		mov eax, dword ptr [esi + 4]
-		imul dword ptr [edi + 0x10]
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [esi + 8]
-		imul dword ptr [edi + 0x1c]
-		add ebx, eax
-		adc ecx, edx
-		shrd ebx, ecx, 0x1d
-		adc ebx, 0
-		mov m01, ebx
-		mov eax, dword ptr [esi]
-		imul dword ptr [edi + 8]
-		mov ebx, eax
-		mov ecx, edx
-		mov eax, dword ptr [esi + 4]
-		imul dword ptr [edi + 0x14]
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [esi + 8]
-		imul dword ptr [edi + 0x20]
-		add ebx, eax
-		adc ecx, edx
-		shrd ebx, ecx, 0x1d
-		adc ebx, 0
-		mov m02, ebx
-		mov eax, dword ptr [esi + 0xc]
-		imul dword ptr [edi]
-		mov ebx, eax
-		mov ecx, edx
-		mov eax, dword ptr [esi + 0x10]
-		imul dword ptr [edi + 0xc]
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [esi + 0x14]
-		imul dword ptr [edi + 0x18]
-		add ebx, eax
-		adc ecx, edx
-		shrd ebx, ecx, 0x1d
-		adc ebx, 0
-		mov m10, ebx
-		mov eax, dword ptr [esi + 0xc]
-		imul dword ptr [edi + 4]
-		mov ebx, eax
-		mov ecx, edx
-		mov eax, dword ptr [esi + 0x10]
-		imul dword ptr [edi + 0x10]
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [esi + 0x14]
-		imul dword ptr [edi + 0x1c]
-		add ebx, eax
-		adc ecx, edx
-		shrd ebx, ecx, 0x1d
-		adc ebx, 0
-		mov m11, ebx
-		mov eax, dword ptr [esi + 0xc]
-		imul dword ptr [edi + 8]
-		mov ebx, eax
-		mov ecx, edx
-		mov eax, dword ptr [esi + 0x10]
-		imul dword ptr [edi + 0x14]
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [esi + 0x14]
-		imul dword ptr [edi + 0x20]
-		add ebx, eax
-		adc ecx, edx
-		shrd ebx, ecx, 0x1d
-		adc ebx, 0
-		mov m12, ebx
-		mov eax, dword ptr [esi + 0x18]
-		imul dword ptr [edi]
-		mov ebx, eax
-		mov ecx, edx
-		mov eax, dword ptr [esi + 0x1c]
-		imul dword ptr [edi + 0xc]
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [esi + 0x20]
-		imul dword ptr [edi + 0x18]
-		add ebx, eax
-		adc ecx, edx
-		shrd ebx, ecx, 0x1d
-		adc ebx, 0
-		mov m20, ebx
-		mov eax, dword ptr [esi + 0x18]
-		imul dword ptr [edi + 4]
-		mov ebx, eax
-		mov ecx, edx
-		mov eax, dword ptr [esi + 0x1c]
-		imul dword ptr [edi + 0x10]
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [esi + 0x20]
-		imul dword ptr [edi + 0x1c]
-		add ebx, eax
-		adc ecx, edx
-		shrd ebx, ecx, 0x1d
-		adc ebx, 0
-		mov m21, ebx
-		mov eax, dword ptr [esi + 0x18]
-		imul dword ptr [edi + 8]
-		mov ebx, eax
-		mov ecx, edx
-		mov eax, dword ptr [esi + 0x1c]
-		imul dword ptr [edi + 0x14]
-		add ebx, eax
-		adc ecx, edx
-		mov eax, dword ptr [esi + 0x20]
-		imul dword ptr [edi + 0x20]
-		add ebx, eax
-		adc ecx, edx
-		shrd ebx, ecx, 0x1d
-		adc ebx, 0
-		mov m22, ebx
-		mov edi, p_dst
-		mov eax, m00
-		mov dword ptr [edi], eax
-		mov eax, m01
-		mov dword ptr [edi + 4], eax
-		mov eax, m10
-		mov dword ptr [edi + 0xc], eax
-		mov eax, m11
-		mov dword ptr [edi + 0x10], eax
-		mov eax, m20
-		mov dword ptr [edi + 0x18], eax
-		mov eax, m21
-		mov dword ptr [edi + 0x1c], eax
-		mov eax, m02
-		mov dword ptr [edi + 8], eax
-		mov eax, m12
-		mov dword ptr [edi + 0x14], eax
-		mov eax, m22
-		mov dword ptr [edi + 0x20], eax
-	}
-#endif
 }
 
 // Composes p_b with p_a into p_dst: the rotations' product, and p_b's
@@ -691,7 +249,6 @@ void BuildMatrixEx(
 	MechU32 p_flags
 )
 {
-#ifdef PORTABLE_C
 	MechS32 sa;
 	MechS32 sb;
 	MechS32 sc;
@@ -776,251 +333,6 @@ void BuildMatrixEx(
 			TransposeRotation(p_matrix, p_matrix);
 		}
 	} while (0);
-#else
-	MechS32 t;
-	MechS32 sa;
-	MechS32 sb;
-	MechS32 sc;
-	MechS32 ca;
-	MechS32 cb;
-	MechS32 cc;
-
-	do {
-		if (p_angleX == 0) {
-			if (p_angleY == 0) {
-				SetIdentityMatrix(p_matrix);
-				if (p_angleZ) {
-					p_matrix->m_rows[1][1] = FixedCos(p_angleZ);
-					p_matrix->m_rows[0][0] = p_matrix->m_rows[1][1];
-					p_matrix->m_rows[1][0] = FixedSin(p_angleZ);
-					p_matrix->m_rows[0][1] = -p_matrix->m_rows[1][0];
-				}
-				break;
-			}
-			else if (p_angleZ == 0) {
-				SetIdentityMatrix(p_matrix);
-				p_matrix->m_rows[2][2] = FixedCos(p_angleY);
-				p_matrix->m_rows[0][0] = p_matrix->m_rows[2][2];
-				p_matrix->m_rows[0][2] = FixedSin(p_angleY);
-				p_matrix->m_rows[2][0] = -p_matrix->m_rows[0][2];
-				break;
-			}
-		}
-		else if (p_angleY == 0 && p_angleZ == 0) {
-			SetIdentityMatrix(p_matrix);
-			p_matrix->m_rows[2][2] = FixedCos(p_angleX);
-			p_matrix->m_rows[1][1] = p_matrix->m_rows[2][2];
-			p_matrix->m_rows[2][1] = FixedSin(p_angleX);
-			p_matrix->m_rows[1][2] = -p_matrix->m_rows[2][1];
-			break;
-		}
-
-		ca = FixedCos(p_angleX);
-		cb = FixedCos(p_angleY);
-		cc = FixedCos(p_angleZ);
-		sa = FixedSin(p_angleX);
-		sb = FixedSin(p_angleY);
-		sc = FixedSin(p_angleZ);
-		if (p_flags & 4) {
-			__asm {
-				neg sa
-				neg sb
-				neg sc
-			}
-		}
-
-		switch (p_flags & 3) {
-		case 1:
-			__asm {
-				mov eax, cc
-				imul cb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov t, eax
-			}
-			p_matrix->m_rows[0][0] = t;
-			__asm {
-				mov eax, ca
-				imul sc
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov ecx, eax
-				mov eax, cc
-				imul sa
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				imul sb
-				shrd eax, edx, 0x1d
-				adc ecx, eax
-				mov t, ecx
-			}
-			p_matrix->m_rows[1][0] = t;
-			__asm {
-				mov eax, sc
-				imul sa
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov ecx, eax
-				mov eax, cc
-				imul ca
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				imul sb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				sub ecx, eax
-				mov t, ecx
-			}
-			p_matrix->m_rows[2][0] = t;
-			p_matrix->m_rows[0][2] = sb;
-			__asm {
-				mov eax, cb
-				imul sa
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				neg eax
-				mov t, eax
-			}
-			p_matrix->m_rows[1][2] = t;
-			__asm {
-				mov eax, ca
-				imul cb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov t, eax
-			}
-			p_matrix->m_rows[2][2] = t;
-			OrthogonalizeMatrixColumn(p_matrix, 1);
-			break;
-		case 0:
-			__asm {
-				mov eax, cc
-				imul cb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov ecx, eax
-				mov eax, sc
-				imul sa
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				imul sb
-				shrd eax, edx, 0x1d
-				adc ecx, eax
-				mov t, ecx
-			}
-			p_matrix->m_rows[0][0] = t;
-			__asm {
-				mov eax, ca
-				imul sc
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov t, eax
-			}
-			p_matrix->m_rows[1][0] = t;
-			__asm {
-				mov eax, cb
-				imul sc
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				imul sa
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov ecx, eax
-				mov eax, cc
-				imul sb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				sub ecx, eax
-				mov t, ecx
-			}
-			p_matrix->m_rows[2][0] = t;
-			__asm {
-				mov eax, ca
-				imul sb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov t, eax
-			}
-			p_matrix->m_rows[0][2] = t;
-			p_matrix->m_rows[1][2] = -sa;
-			__asm {
-				mov eax, ca
-				imul cb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov t, eax
-			}
-			p_matrix->m_rows[2][2] = t;
-			OrthogonalizeMatrixColumn(p_matrix, 1);
-			break;
-		case 2:
-			__asm {
-				mov eax, cc
-				imul cb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov t, eax
-			}
-			p_matrix->m_rows[0][0] = t;
-			__asm {
-				mov eax, sa
-				imul sb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov ecx, eax
-				mov eax, ca
-				imul cb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				imul sc
-				shrd eax, edx, 0x1d
-				adc ecx, eax
-				mov t, ecx
-			}
-			p_matrix->m_rows[1][0] = t;
-			__asm {
-				mov eax, cb
-				imul sc
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				imul sa
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov ecx, eax
-				mov eax, ca
-				imul sb
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				sub ecx, eax
-				mov t, ecx
-			}
-			p_matrix->m_rows[2][0] = t;
-			p_matrix->m_rows[0][1] = -sc;
-			__asm {
-				mov eax, cc
-				imul ca
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov t, eax
-			}
-			p_matrix->m_rows[1][1] = t;
-			__asm {
-				mov eax, cc
-				imul sa
-				shrd eax, edx, 0x1d
-				adc eax, 0
-				mov t, eax
-			}
-			p_matrix->m_rows[2][1] = t;
-			OrthogonalizeMatrixColumn(p_matrix, 2);
-			break;
-		}
-
-		if (p_flags & 4) {
-			TransposeRotation(p_matrix, p_matrix);
-		}
-	} while (0);
-#endif
 
 	p_matrix->m_rows[3][0] = p_x;
 	p_matrix->m_rows[3][1] = p_y;

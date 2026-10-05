@@ -9,7 +9,6 @@
 #endif
 
 // The sizes are the originals', where pointers are 32-bit: elsewhere a struct with pointers grows.
-// Decided by the preprocessor: a sizeof(void*) in every assertion changes 4.1's C++ codegen.
 #if defined(_WIN64) || (defined(__SIZEOF_POINTER__) && __SIZEOF_POINTER__ != 4)
 #undef ENABLE_DECOMP_ASSERTS
 #endif

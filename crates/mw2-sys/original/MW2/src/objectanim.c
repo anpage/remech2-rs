@@ -1,14 +1,12 @@
-/* Hand-written assembly: GetViewVertex, ClipEdgeToNearPlane, ProjectVertex and GetFaceShade are C
-   functions with __asm bodies, and QueueFace has __asm blocks. Their portable C (PORTABLE_C)
-   is tested against the assembly by tests/asmequiv: it replaces each whole function, whose C
-   wraps where standard C overflows. */
+/* In the original, GetViewVertex, ClipEdgeToNearPlane, ProjectVertex and GetFaceShade are C
+   functions with __asm bodies, and QueueFace has __asm blocks. The portable C here replaces each
+   whole function, and wraps where standard C overflows. */
 #include "objectanim.h"
 
 #include "ambientsound.h"
 #include "callbacks.h"
 #include "classtable.h"
 #include "clock.h"
-#include "compat.h"
 #include "config.h"
 #include "decomp.h"
 #include "depthsort.h"
@@ -43,15 +41,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
-
-#pragma warning(disable : 4102) /* labels only __asm blocks jump to */
-
-/* The __asm blocks of GetViewVertex, ProjectVertex, GetFaceShade and QueueFace jump to C labels,
-   which newer compilers reject: their reference build (REFERENCE_ASM) compiles those functions'
-   portable C too. */
-#if defined(PORTABLE_C) || !defined(_MSC_VER) || _MSC_VER >= 1100
-#define PORTABLE_C_LABELS
-#endif
 
 // The state of ColorCycleTask's callback: the faces of a shape cycle through up to sixteen colors.
 // SIZE 0x50
@@ -1274,7 +1263,6 @@ MechS32 PathTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_p
 	return 1;
 }
 
-#ifdef PORTABLE_C_LABELS
 // The 64-bit product of two 32-bit values, as imul leaves it in edx:eax. Sums of products wrap,
 // like the add/adc chains.
 static MechU64 Product(MechS32 p_a, MechS32 p_b)
@@ -1317,15 +1305,12 @@ static MechS32 ProjectAxis(MechS32 p_value, MechS32 p_shift, MechS32 p_depth)
 
 	return PortableSar32(Sum(PortableIdiv(scaled, p_depth), 2), 2);
 }
-#endif
 
-#ifdef PORTABLE_C
 // The edge value at the near plane: p_from plus the share p_toPlane / p_span of the way to p_to.
 static MechS32 Interpolate(MechS32 p_from, MechS32 p_to, MechS32 p_toPlane, MechS32 p_span)
 {
 	return Sum(PortableIdiv((MechS64) Difference(p_from, p_to) * p_toPlane, p_span), p_to);
 }
-#endif
 
 // Returns the vertex's projected copy (m_projection), transforming it into view space
 // (g_viewProjX0's rows, from the eyepoint g_viewEyeY) the first time. The transform is an
@@ -1334,7 +1319,6 @@ static MechS32 Interpolate(MechS32 p_from, MechS32 p_to, MechS32 p_toPlane, Mech
 // FUNCTION: MW2 0x10048c50
 ProjectedVertex* GetViewVertex(Vertex* p_vertex)
 {
-#ifdef PORTABLE_C_LABELS
 	ProjectedVertex* result = p_vertex->m_projection;
 	MechS32 x;
 	MechS32 y;
@@ -1353,94 +1337,6 @@ ProjectedVertex* GetViewVertex(Vertex* p_vertex)
 	result->m_u = PortableS32(p_vertex->m_u << 16);
 	result->m_v = PortableS32(p_vertex->m_v << 16);
 	return result;
-#else
-	MechS32 u;
-	MechS32 v;
-	ProjectedVertex* result;
-	MechS32 deltaX;
-	MechS32 deltaY;
-	MechS32 deltaZ;
-
-	__asm {
-		mov ebx, p_vertex
-		mov eax, dword ptr [ebx + 0x24]
-		mov result, eax
-		or eax, eax
-		je jmp_10048c72
-	}
-
-	return result;
-
-jmp_10048c72:
-	result = AllocProjectedVertex();
-	__asm {
-		mov ebx, p_vertex
-		mov eax, dword ptr [ebx + 0xc]
-		sub eax, dword ptr [g_viewEyeX]
-		mov deltaX, eax
-		mov eax, dword ptr [ebx + 0x10]
-		sub eax, dword ptr [g_viewEyeY]
-		mov deltaY, eax
-		mov eax, dword ptr [ebx + 0x14]
-		sub eax, dword ptr [g_viewEyeZ]
-		mov deltaZ, eax
-		mov eax, dword ptr [ebx + 0x18]
-		mov u, eax
-		mov eax, dword ptr [ebx + 0x1c]
-		mov v, eax
-		mov eax, dword ptr [g_viewProjX0]
-		mov edx, deltaX
-		imul edx
-		mov esi, eax
-		mov edi, edx
-		mov eax, dword ptr [g_viewProjX1]
-		mov edx, deltaY
-		imul edx
-		add esi, eax
-		adc edi, edx
-		mov eax, dword ptr [g_viewProjX2]
-		mov edx, deltaZ
-		imul edx
-		add esi, eax
-		adc edi, edx
-		shrd esi, edi, 0x1b
-		adc esi, 0
-		mov ecx, esi
-		mov eax, dword ptr [g_viewProjY0]
-		mov edx, deltaX
-		imul edx
-		mov esi, eax
-		mov edi, edx
-		mov eax, dword ptr [g_viewProjY1]
-		mov edx, deltaY
-		imul edx
-		add esi, eax
-		adc edi, edx
-		mov eax, dword ptr [g_viewProjY2]
-		mov edx, deltaZ
-		imul edx
-		add esi, eax
-		adc edi, edx
-		shrd esi, edi, 0x1b
-		adc esi, 0
-		mov eax, esi
-		mov esi, result
-		mov dword ptr [ebx + 0x24], esi
-		mov esi, dword ptr [ebx + 0x20]
-		mov ebx, result
-		mov dword ptr [ebx], ecx
-		mov dword ptr [ebx + 4], eax
-		mov dword ptr [ebx + 8], esi
-		mov eax, u
-		shl eax, 0x10
-		mov dword ptr [ebx + 0x14], eax
-		mov eax, v
-		shl eax, 0x10
-		mov dword ptr [ebx + 0x18], eax
-	}
-
-	return result;
-#endif
 }
 
 // Returns a new projected vertex where the edge from p_a to p_b crosses the near plane
@@ -1450,7 +1346,6 @@ jmp_10048c72:
 // FUNCTION: MW2 0x10048d46
 ProjectedVertex* ClipEdgeToNearPlane(Vertex* p_a, Vertex* p_b)
 {
-#ifdef PORTABLE_C
 	ProjectedVertex* a;
 	ProjectedVertex* b;
 	ProjectedVertex* result;
@@ -1517,147 +1412,6 @@ ProjectedVertex* ClipEdgeToNearPlane(Vertex* p_a, Vertex* p_b)
 	result->m_u = u0;
 	result->m_v = v0;
 	return result;
-#else
-	MechS32 z0;
-	MechS32 z1;
-	MechS32 u0;
-	MechS32 u1;
-	ProjectedVertex* a;
-	ProjectedVertex* b;
-	MechS32 v0;
-	ProjectedVertex* result;
-	MechS32 v1;
-	MechS32 x0;
-	MechS32 x1;
-	MechS32 y0;
-	MechS32 y1;
-
-	__asm {
-		mov ebx, p_a
-		mov eax, dword ptr [ebx + 0x24]
-		mov a, eax
-		or eax, eax
-		jne jmp_10048d6f
-		mov eax, p_a
-		push eax
-		call GetViewVertex
-		add esp, 4
-		mov a, eax
-jmp_10048d6f:
-		mov ebx, p_b
-		mov eax, dword ptr [ebx + 0x24]
-		mov b, eax
-		or eax, eax
-		jne jmp_10048d8f
-		mov eax, p_b
-		push eax
-		call GetViewVertex
-		add esp, 4
-		mov b, eax
-jmp_10048d8f:
-		call AllocProjectedVertex
-		mov result, eax
-		mov ebx, a
-		mov eax, dword ptr [ebx]
-		mov x0, eax
-		mov eax, dword ptr [ebx + 4]
-		mov y0, eax
-		mov eax, dword ptr [ebx + 0x14]
-		mov u0, eax
-		mov eax, dword ptr [ebx + 0x18]
-		mov v0, eax
-		mov eax, dword ptr [ebx + 8]
-		mov z0, eax
-		mov ebx, b
-		mov eax, dword ptr [ebx]
-		mov x1, eax
-		mov eax, dword ptr [ebx + 4]
-		mov y1, eax
-		mov eax, dword ptr [ebx + 0x14]
-		mov u1, eax
-		mov eax, dword ptr [ebx + 0x18]
-		mov v1, eax
-		mov eax, dword ptr [ebx + 8]
-		mov z1, eax
-		cmp eax, z0
-		jg jmp_10048e3a
-		mov ecx, z0
-		sub ecx, z1
-		je jmp_10048e35
-		mov edi, dword ptr [g_viewNear]
-		sub edi, z1
-		mov eax, x0
-		sub eax, x1
-		imul edi
-		idiv ecx
-		add eax, x1
-		mov x0, eax
-		mov eax, y0
-		sub eax, y1
-		imul edi
-		idiv ecx
-		add eax, y1
-		mov y0, eax
-		mov eax, u0
-		sub eax, u1
-		imul edi
-		idiv ecx
-		add eax, u1
-		mov u0, eax
-		mov eax, v0
-		sub eax, v1
-		imul edi
-		idiv ecx
-		add eax, v1
-		mov v0, eax
-jmp_10048e35:
-		jmp jmp_10048e8f
-jmp_10048e3a:
-		mov ecx, z1
-		sub ecx, z0
-		je jmp_10048e8f
-		mov edi, dword ptr [g_viewNear]
-		sub edi, z0
-		mov eax, x1
-		sub eax, x0
-		imul edi
-		idiv ecx
-		add eax, x0
-		mov x0, eax
-		mov eax, y1
-		sub eax, y0
-		imul edi
-		idiv ecx
-		add eax, y0
-		mov y0, eax
-		mov eax, u1
-		sub eax, u0
-		imul edi
-		idiv ecx
-		add eax, u0
-		mov u0, eax
-		mov eax, v1
-		sub eax, v0
-		imul edi
-		idiv ecx
-		add eax, v0
-		mov v0, eax
-jmp_10048e8f:
-		mov ebx, result
-		mov eax, x0
-		mov dword ptr [ebx], eax
-		mov eax, y0
-		mov dword ptr [ebx + 4], eax
-		mov eax, dword ptr [g_viewNear]
-		mov dword ptr [ebx + 8], eax
-		mov eax, u0
-		mov dword ptr [ebx + 0x14], eax
-		mov eax, v0
-		mov dword ptr [ebx + 0x18], eax
-	}
-
-	return result;
-#endif
 }
 
 // Projects a view-space vertex onto the screen once per frame (m_projected), with its clip
@@ -1666,7 +1420,6 @@ jmp_10048e8f:
 // FUNCTION: MW2 0x10048ebe
 ProjectedVertex* ProjectVertex(ProjectedVertex* p_vertex)
 {
-#ifdef PORTABLE_C_LABELS
 	MechS32 screen;
 	MechU8 outcode;
 
@@ -1704,72 +1457,6 @@ ProjectedVertex* ProjectVertex(ProjectedVertex* p_vertex)
 	}
 
 	return p_vertex;
-#else
-	__asm {
-		mov ebx, p_vertex
-		test byte ptr [ebx + 0x1d], 0xff
-		je jmp_10048ed6
-		jmp jmp_10048f61
-jmp_10048ed6:
-		xor ecx, ecx
-		mov cl, byte ptr [g_viewShiftX]
-		mov esi, dword ptr [ebx + 8]
-		mov eax, dword ptr [ebx]
-		cdq
-		shld edx, eax, cl
-		shl eax, cl
-		idiv esi
-		add eax, 2
-		sar eax, 2
-		add eax, dword ptr [g_viewCenterX]
-		mov dword ptr [ebx + 0xc], eax
-		xor ch, ch
-		cmp eax, dword ptr [g_viewRight]
-		jle jmp_10048f0b
-		or ch, 2
-jmp_10048f0b:
-		cmp eax, dword ptr [g_viewLeft]
-		jge jmp_10048f1a
-		or ch, 1
-jmp_10048f1a:
-		mov cl, byte ptr [g_viewShiftY]
-		mov eax, dword ptr [ebx + 4]
-		cdq
-		shld edx, eax, cl
-		shl eax, cl
-		idiv esi
-		add eax, 2
-		sar eax, 2
-		neg eax
-		add eax, dword ptr [g_viewCenterY]
-		mov dword ptr [ebx + 0x10], eax
-		cmp eax, dword ptr [g_viewBottom]
-		jle jmp_10048f4b
-		or ch, 8
-jmp_10048f4b:
-		cmp eax, dword ptr [g_viewTop]
-		jge jmp_10048f5a
-		or ch, 4
-jmp_10048f5a:
-		mov byte ptr [ebx + 0x1c], ch
-		mov byte ptr [ebx + 0x1d], 1
-jmp_10048f61:
-		mov al, byte ptr [ebx + 0x1c]
-		or byte ptr [g_polygonOrCodes], al
-		and byte ptr [g_polygonAndCodes], al
-		cmp dword ptr [g_polygonPointCount], 0x14
-		jl jmp_10048f8c
-		mov dword ptr [g_queueHasRoom], 0
-		jmp jmp_10048fa2
-jmp_10048f8c:
-		mov eax, p_vertex
-		mov ecx, dword ptr [g_polygonPointCount]
-		mov dword ptr [g_polygonPoints + ecx*4], eax
-		inc dword ptr [g_polygonPointCount]
-	}
-
-	jmp_10048fa2 : return p_vertex;
-#endif
 }
 
 // Returns the shade (0x7f: full) of p_face from the angle between its normal and the direction
@@ -1779,7 +1466,6 @@ jmp_10048f8c:
 // FUNCTION: MW2 0x10048faf
 MechS32 GetFaceShade(Face* p_face, Vertex* p_vertices)
 {
-#ifdef PORTABLE_C_LABELS
 	Vertex* vertex = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset]];
 	MechS32 x = vertex->m_worldX;
 	MechS32 y = vertex->m_worldY;
@@ -1842,125 +1528,6 @@ MechS32 GetFaceShade(Face* p_face, Vertex* p_vertices)
 	squares = (magnitudeX & 0xff) * (magnitudeX & 0xff) + (magnitudeY & 0xff) * (magnitudeY & 0xff) +
 			  (magnitudeZ & 0xff) * (magnitudeZ & 0xff);
 	return PortableS16((MechU16) PortableIdiv(PortableS64(dot), g_sqrtTable[squares >> 8]));
-#else
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS16 shade;
-	MechS32 nx;
-	MechS32 ny;
-	MechS32 nz;
-	Vertex* vertex;
-
-	vertex = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset]];
-	nx = p_face->m_normal[0];
-	ny = p_face->m_normal[1];
-	nz = p_face->m_normal[2];
-	x = vertex->m_worldX;
-	y = vertex->m_worldY;
-	z = vertex->m_worldZ;
-	if (g_directionalLight) {
-		x = y = z = 0;
-	}
-
-	__asm {
-		mov eax, dword ptr [g_viewLightX]
-		sub eax, x
-		mov ecx, eax
-		jge jmp_1004903e
-		neg ecx
-jmp_1004903e:
-		mov x, ecx
-		mov ebx, ecx
-		imul nx
-		mov edi, edx
-		mov esi, eax
-		mov eax, dword ptr [g_viewLightY]
-		sub eax, y
-		mov ecx, eax
-		jge jmp_1004905c
-		neg ecx
-jmp_1004905c:
-		mov y, ecx
-		or ebx, ecx
-		imul ny
-		add esi, eax
-		adc edi, edx
-		mov eax, dword ptr [g_viewLightZ]
-		sub eax, z
-		mov ecx, eax
-		jge jmp_1004907a
-		neg ecx
-jmp_1004907a:
-		mov z, ecx
-		or ebx, ecx
-		jne jmp_10049092
-		mov ax, 0x7f
-		mov shade, ax
-		jmp jmp_10049147
-jmp_10049092:
-		imul nz
-		add esi, eax
-		adc edi, edx
-		shrd esi, edi, 0x10
-		sar edi, 0x10
-		xor ecx, ecx
-		test ebx, 0xff000000
-		je jmp_100490b7
-		add cx, 0x10
-		jmp jmp_100490c7
-jmp_100490b7:
-		test ebx, 0xffff0000
-		je jmp_100490c9
-		add cx, 8
-jmp_100490c7:
-		shr ebx, cl
-jmp_100490c9:
-		bsr ax, bx
-		add cx, ax
-		sub cx, 7
-		je jmp_10049103
-		jl jmp_100490f3
-		shr x, cl
-		shr y, cl
-		shr z, cl
-		shrd esi, edi, cl
-		sar edi, cl
-		jmp jmp_10049103
-jmp_100490f3:
-		neg cl
-		shl x, cl
-		shl y, cl
-		shl z, cl
-		shld edi, esi, cl
-		shl esi, cl
-jmp_10049103:
-		mov al, byte ptr x
-		mul al
-		mov bx, ax
-		xor dx, dx
-		mov al, byte ptr y
-		mul al
-		add bx, ax
-		adc dx, 0
-		mov al, byte ptr z
-		mul al
-		add bx, ax
-		adc dx, 0
-		shrd bx, dx, 7
-		and ebx, 0xfffe
-		add ebx, dword ptr [g_sqrtTable]
-		mov ax, word ptr [ebx]
-		cwde
-		mov ebx, eax
-		mov edx, edi
-		mov eax, esi
-		idiv ebx
-		mov shade, ax
-	}
-
-	jmp_10049147 : return shade;
-#endif
 }
 
 // Queues a face of a model for drawing, unless it faces away: projects the vertices it hasn't
@@ -1973,7 +1540,6 @@ jmp_10049103:
 // FUNCTION: MW2 0x10049155
 void QueueFace(Face* p_face, Vertex* p_vertices)
 {
-#ifdef PORTABLE_C_LABELS
 	Vertex* vertex;
 	Vertex* first;
 	Vertex* previous;
@@ -2129,320 +1695,4 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 	else {
 		g_queueHasRoom = 0;
 	}
-#else
-	MechS32 stride;
-	Vertex* vertex;
-	MechS32 normalY;
-	MechS32 depth;
-	MechS8 andCodes;
-	MechU16 count;
-	MechS8 orCodes;
-	MechU8* index;
-	QueuedPolygon* poly;
-	MechS8 clipped;
-	Vertex* first;
-	Vertex* previous;
-	MechS8 firstClipped;
-	MechU8* cursor;
-	MechS8 previousClipped;
-	ProjectedVertex** points;
-
-	stride = sizeof(Vertex);
-	orCodes = 0;
-	andCodes = 3;
-	g_facesTried++;
-	if (p_face->m_indexCount < 3) {
-		goto project;
-	}
-
-	// clang-format off
-	__asm {
-		mov ebx, p_face
-		mov edx, dword ptr [ebx + 0x14]
-		mov eax, dword ptr [ebx + 0x18]
-		mov normalY, eax
-		mov eax, dword ptr [ebx + 0x1c]
-		mov depth, eax
-		add ebx, dword ptr [ebx + 4]
-		xor eax, eax
-		mov al, byte ptr [ebx]
-		mov ebx, stride
-		mul bl
-		mov ebx, p_vertices
-		add ebx, eax
-		mov eax, dword ptr [ebx + 0xc]
-		sub eax, dword ptr [g_viewEyeX]
-		imul edx
-		mov esi, eax
-		mov edi, edx
-		mov eax, dword ptr [ebx + 0x10]
-		sub eax, dword ptr [g_viewEyeY]
-		imul normalY
-		add esi, eax
-		adc edi, edx
-		mov eax, dword ptr [ebx + 0x14]
-		sub eax, dword ptr [g_viewEyeZ]
-		imul depth
-		add esi, eax
-		adc edi, edx
-		jl project
-		jmp done
-	}
-
-project:
-	__asm {
-		inc dword ptr [g_facesFrontFacing]
-		mov ebx, p_face
-		mov ax, word ptr [ebx + 2]
-		mov count, ax
-		add ebx, dword ptr [ebx + 4]
-		mov index, ebx
-jmp_100491fe:
-		mov esi, index
-		xor eax, eax
-		mov al, byte ptr [esi]
-		mov ebx, stride
-		mul bl
-		mov esi, p_vertices
-		add esi, eax
-		test byte ptr [esi + 0x28], 4
-		jne jmp_1004928f
-		inc dword ptr [g_verticesTransformed]
-		mov eax, dword ptr [g_viewProjZ0]
-		mov edx, dword ptr [esi + 0xc]
-		sub edx, dword ptr [g_viewEyeX]
-		imul edx
-		mov ecx, eax
-		mov edi, edx
-		mov eax, dword ptr [g_viewProjZ1]
-		mov edx, dword ptr [esi + 0x10]
-		sub edx, dword ptr [g_viewEyeY]
-		imul edx
-		add ecx, eax
-		adc edi, edx
-		mov eax, dword ptr [g_viewProjZ2]
-		mov edx, dword ptr [esi + 0x14]
-		sub edx, dword ptr [g_viewEyeZ]
-		imul edx
-		add ecx, eax
-		adc edi, edx
-		shrd ecx, edi, 0x1b
-		adc ecx, 0
-		mov dword ptr [esi + 0x20], ecx
-		or byte ptr [esi + 0x28], 4
-		xor ax, ax
-		cmp ecx, dword ptr [g_viewNear]
-		jge jmp_1004927a
-		or al, 1
-jmp_1004927a:
-		cmp ecx, dword ptr [g_viewFar]
-		jle jmp_10049288
-		or al, 2
-jmp_10049288:
-		and byte ptr [esi + 0x28], 0xfc
-		or byte ptr [esi + 0x28], al
-jmp_1004928f:
-		mov al, byte ptr [esi + 0x28]
-		or orCodes, al
-		and andCodes, al
-		inc index
-		dec count
-		je projected
-		_emit 0xe9 /* jmp jmp_100491fe */
-		_emit 0x54
-		_emit 0xff
-		_emit 0xff
-		_emit 0xff
-	}
-
-projected:
-	if (andCodes == 1 || andCodes == 2) {
-		return;
-	}
-
-	g_polygonOrCodes = 0;
-	g_polygonAndCodes = 0xf;
-	g_polygonPointCount = 0;
-	__asm {
-		mov ebx, p_face
-		mov eax, ebx
-		add eax, dword ptr [ebx + 4]
-		mov cursor, eax
-		mov ax, word ptr [ebx + 2]
-		mov count, ax
-		mov ebx, cursor
-		xor eax, eax
-		mov al, byte ptr [ebx]
-		mov ebx, stride
-		mul bl
-		mov ebx, p_vertices
-		add ebx, eax
-		mov eax, ebx
-		mov first, eax
-		mov previous, eax
-		mov al, byte ptr [ebx + 0x28]
-		and al, 1
-		mov firstClipped, al
-		mov previousClipped, al
-		jne jmp_10049334
-		mov eax, first
-		push eax
-		call GetViewVertex
-		add esp, 4
-		push eax
-		call dword ptr [g_renderSettings + 0x5c]
-		add esp, 4
-jmp_10049334:
-		dec count
-		je closed
-		inc cursor
-		mov ebx, cursor
-		xor eax, eax
-		mov al, byte ptr [ebx]
-		mov ebx, stride
-		mul bl
-		mov ebx, p_vertices
-		add ebx, eax
-		mov vertex, ebx
-		mov al, byte ptr [ebx + 0x28]
-		and al, 1
-		mov clipped, al
-		cmp al, previousClipped
-		je jmp_10049380
-		mov eax, vertex
-		push eax
-		mov eax, previous
-		push eax
-		call ClipEdgeToNearPlane
-		add esp, 8
-		push eax
-		call dword ptr [g_renderSettings + 0x5c]
-		add esp, 4
-jmp_10049380:
-		mov ebx, cursor
-		xor eax, eax
-		mov al, byte ptr [ebx]
-		mov ebx, stride
-		mul bl
-		mov ebx, p_vertices
-		add ebx, eax
-		mov previous, ebx
-		mov al, clipped
-		mov previousClipped, al
-		or al, al
-		jne jmp_100493b8
-		mov eax, previous
-		push eax
-		call GetViewVertex
-		add esp, 4
-		push eax
-		call dword ptr [g_renderSettings + 0x5c]
-		add esp, 4
-jmp_100493b8:
-		_emit 0xe9 /* jmp jmp_10049334 */
-		_emit 0x77
-		_emit 0xff
-		_emit 0xff
-		_emit 0xff
-	}
-
-closed:
-		// clang-format on
-		if (previousClipped != firstClipped)
-	{
-		g_renderSettings.m_projectVertex(ClipEdgeToNearPlane(previous, first));
-	}
-
-	if ((g_polygonPointCount < 3 && p_face->m_indexCount > 2) || g_polygonAndCodes) {
-		return;
-	}
-
-	points = g_polygonPoints;
-	poly = (QueuedPolygon*) AllocQueuedPolygon();
-	poly->m_face = p_face;
-	g_polygonPointCursor = g_drawBufferBottom;
-	poly->m_count = g_polygonPointCount;
-	if (g_queuedShapeFlags & 2) {
-		__asm {
-			mov ebx, poly
-			mov ecx, dword ptr [g_polygonPointCount]
-			mov esi, points
-			xor eax, eax
-jmp_10049462:
-			mov ebx, dword ptr [esi]
-			add eax, dword ptr [ebx + 8]
-			add esi, 4
-			loop jmp_10049462
-			xor edx, edx
-			xor esi, esi
-			mov si, word ptr [g_polygonPointCount]
-			idiv esi
-			mov depth, eax
-		}
-	}
-	else if (g_queuedShapeFlags & 4) {
-		__asm {
-			mov ecx, dword ptr [g_polygonPointCount]
-			mov esi, points
-			mov eax, 0x7fffffff
-jmp_1004949c:
-			mov ebx, dword ptr [esi]
-			cmp eax, dword ptr [ebx + 8]
-			jle jmp_100494aa
-			mov eax, dword ptr [ebx + 8]
-jmp_100494aa:
-			add esi, 4
-			loop jmp_1004949c
-			mov depth, eax
-		}
-	}
-	else {
-		__asm {
-			mov ecx, dword ptr [g_polygonPointCount]
-			mov esi, points
-			mov eax, 0x80000001
-jmp_100494c5:
-			mov ebx, dword ptr [esi]
-			cmp eax, dword ptr [ebx + 8]
-			jge jmp_100494d3
-			mov eax, dword ptr [ebx + 8]
-jmp_100494d3:
-			add esi, 4
-			loop jmp_100494c5
-			mov depth, eax
-		}
-	}
-
-	if (g_queuedShapeFlags & 1) {
-		depth |= 0x40000000;
-	}
-
-	poly->m_depth = depth;
-	__asm {
-		mov edi, dword ptr [g_polygonPointCursor]
-		mov ecx, dword ptr [g_polygonPointCount]
-		mov esi, points
-		rep movsd
-		mov dword ptr [g_polygonPointCursor], edi
-		mov points, esi
-	}
-
-	g_drawBufferBottom = g_polygonPointCursor;
-	poly->m_flags = g_renderSettings.m_drawFace(p_face, p_vertices, p_face->m_color, depth);
-	if (g_depthEntryCount < g_depthListCapacity) {
-		g_polygonsQueued++;
-		if (g_polygonPointCount > 1) {
-			g_polygonCount++;
-		}
-
-		g_depthList[g_depthEntryCount].m_poly = poly;
-		g_depthList[g_depthEntryCount].m_depth = depth;
-		g_depthEntryCount++;
-	}
-	else {
-		g_queueHasRoom = 0;
-	}
-
-done:;
-#endif
 }

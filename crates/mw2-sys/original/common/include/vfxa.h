@@ -6,8 +6,8 @@
 #include "types.h"
 #include "window.h"
 
-// VFXA, Miles Design VFX's 2D primitives (3rdparty/vfx/VFXA.ASM; its portable C, common/src/vfxa.c,
-// in COMPAT_MODE), which both DLLs link.
+// VFXA, Miles Design VFX's 2D primitives (3rdparty/vfx/VFXA.ASM; its portable C, common/src/vfxa.c),
+// which both DLLs link.
 #ifdef __cplusplus
 extern "C"
 {

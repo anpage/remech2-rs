@@ -1,18 +1,14 @@
-/* Hand-written assembly: HashName is a C function whose body is an __asm block. Its portable
-   C (PORTABLE_C) is tested against the assembly by tests/asmequiv. */
+/* In the original, HashName is a C function whose body is an __asm block. This is portable C in its
+   place. */
 #include "namehash.h"
 
-#include "compat.h"
 #include "portable.h"
 #include "types.h"
-
-#pragma warning(disable : 4035) /* no return value: the result is left in eax */
 
 // Hashes a name, ignoring case: each character is added and the low word rotated left.
 // FUNCTION: MW2 0x100074e0
 MechU32 HashName(const MechChar* p_name)
 {
-#ifdef PORTABLE_C
 	MechU32 hash = 0;
 	MechU32 low;
 
@@ -24,21 +20,4 @@ MechU32 HashName(const MechChar* p_name)
 	}
 
 	return hash;
-#else
-	__asm {
-		mov edx, p_name
-		xor eax, eax
-		jmp check
-next:
-		xor ebx, ebx
-		mov bl, [edx]
-		or bl, 0x20
-		add eax, ebx
-		inc edx
-		rol ax, 1
-check:
-		cmp byte ptr [edx], 0
-		jne next
-	}
-#endif
 }

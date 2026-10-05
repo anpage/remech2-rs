@@ -1,6 +1,5 @@
-/* VFXREND, Miles Design VFX's polygon renderer (3rdparty/vfx/VFXREND.ASM), for builds with other
-   compilers (COMPAT_MODE): portable C, tested against the assembly by tests/asmequiv. The VC++ 4.1
-   build assembles VFXREND.ASM with MASM 6.11 instead; both DLLs compile this file in its place.
+/* VFXREND, Miles Design VFX's polygon renderer (3rdparty/vfx/VFXREND.ASM), in portable C, which
+   both DLLs compile in place of the assembly.
 
    VFXREND builds its primitives from one macro, MAKE_POLY, for each set of operation flags
    RENDOPTS.INC lists (MW2's 25, g_primitives), and dispatches on the flags through a table. The C
@@ -34,7 +33,6 @@
    vertices, and a Gouraud fill through p_cueing by a color above 0xffff (beyond the table). */
 #include "vfxrend.h"
 
-#include "compat.h"
 #include "decomp.h"
 #include "pane.h"
 #include "portable.h"
