@@ -245,17 +245,18 @@ MechS32 QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, MechS32 p_priority
 			entry->m_suffixData = p_suffix->m_data;
 		}
 
+		// The original's limits left no room for the terminator, overrunning m_text by a byte
 		if (p_line->m_text) {
-			strncat(entry->m_text, p_line->m_text, sizeof(entry->m_text));
+			strncat(entry->m_text, p_line->m_text, sizeof(entry->m_text) - 1);
 		}
 
 		if (p_suffix && p_suffix->m_text) {
-			strncat(entry->m_text, " ", sizeof(entry->m_text) - strlen(entry->m_text));
-			strncat(entry->m_text, p_suffix->m_text, sizeof(entry->m_text) - strlen(entry->m_text));
+			strncat(entry->m_text, " ", sizeof(entry->m_text) - strlen(entry->m_text) - 1);
+			strncat(entry->m_text, p_suffix->m_text, sizeof(entry->m_text) - strlen(entry->m_text) - 1);
 		}
 
 		if (entry->m_text[0]) {
-			strncat(entry->m_text, ".", sizeof(entry->m_text) - strlen(entry->m_text));
+			strncat(entry->m_text, ".", sizeof(entry->m_text) - strlen(entry->m_text) - 1);
 		}
 
 		if (p_priority == -1 && entry->m_id) {

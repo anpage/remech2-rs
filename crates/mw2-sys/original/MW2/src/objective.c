@@ -297,8 +297,9 @@ MechS32 AnnounceObjective(MechS32 p_star, MechS32 p_objective, MechS32 p_state)
 		line.m_text = "";
 	}
 	else {
-		CollapseWhitespace(line.m_text);
+		// The original collapsed line.m_text after the if, writing into the empty literal too
 		line.m_text = text;
+		CollapseWhitespace(line.m_text);
 	}
 
 	QueueSpeechLine(&line);
