@@ -21,6 +21,7 @@ mod drawmode;
 mod elapsed;
 mod files;
 mod heap;
+mod input;
 mod launcher;
 mod log;
 mod messages;

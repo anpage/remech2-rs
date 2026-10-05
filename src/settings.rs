@@ -80,6 +80,15 @@ impl GlobalSettings {
             });
     }
 
+    pub fn set_string<S, K, V>(&self, section: S, key: K, value: V)
+    where
+        S: Into<String>,
+        K: Into<String>,
+        V: Into<String>,
+    {
+        self.set(Some(section), key, value);
+    }
+
     pub fn get_bool<S, K>(&self, section: S, key: K, default: bool) -> bool
     where
         S: Into<String>,
