@@ -7,8 +7,14 @@
 #include "shellglobals.h"
 #include "types.h"
 
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+
+// MW2REG.CFG's records are 0x3c bytes: a PilotRecord up to m_glyph, then the 32-bit pointer the
+// original saved with it, which nothing reads. The original read and wrote the array whole.
+static const size_t c_savedPilotSize = offsetof(PilotRecord, m_glyph);
+static const long c_savedGlyphSize = 4;
 
 // Stack-slot permutation: file and i swap [ebp-N] slots with the original.
 // FUNCTION: MW2SHELL 0x1002da80
@@ -41,7 +47,11 @@ void LoadPilotRoster()
 		}
 	}
 	else {
-		fread(g_pilotRoster, 0x3c, 20, file);
+		for (i = 0; i < 20; i++) {
+			fread(&g_pilotRoster[i], c_savedPilotSize, 1, file);
+			fseek(file, c_savedGlyphSize, SEEK_CUR);
+		}
+
 		fclose(file);
 	}
 
@@ -54,7 +64,9 @@ void LoadPilotRoster()
 // FUNCTION: MW2SHELL 0x1002dbec
 void SavePilotRoster()
 {
+	static const MechU8 glyph[4] = {0};
 	FILE* file;
+	MechS32 i;
 
 	file = MechFopen("MW2REG.CFG", "wb");
 	if (file == NULL) {
@@ -62,6 +74,10 @@ void SavePilotRoster()
 		return;
 	}
 
-	fwrite(g_pilotRoster, 0x3c, 20, file);
+	for (i = 0; i < 20; i++) {
+		fwrite(&g_pilotRoster[i], c_savedPilotSize, 1, file);
+		fwrite(glyph, c_savedGlyphSize, 1, file);
+	}
+
 	fclose(file);
 }
