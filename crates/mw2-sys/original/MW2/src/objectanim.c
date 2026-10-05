@@ -268,7 +268,7 @@ MechS32 ReelMotionTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS
 		if (token) {
 			*token = '\0';
 			token++;
-			sscanf(token, "%ld,%d,%d", &rate, &enabled, &number);
+			sscanf(token, "%d,%d,%d", &rate, &enabled, &number);
 			number += g_animBase;
 			if (number > g_maxAnimNumber) {
 				g_maxAnimNumber = number;
@@ -655,7 +655,7 @@ MechS32 GetAnimBase(void)
 // FUNCTION: MW2 0x10047477
 MechS32 GetReelMotionSize(void)
 {
-	return 0x2c;
+	return sizeof(ReelMotion);
 }
 
 // A timed callback (TimedCallbackFn) cycling the face colors of a star's shape. Its data is

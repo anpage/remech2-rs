@@ -11,6 +11,8 @@
 #include "types.h"
 #include "vertex.h"
 
+#include <string.h>
+
 DECOMP_SIZE_ASSERT(QuadtreeNode, 0x2c)
 
 // GLOBAL: MW2 0x100a37dc
@@ -210,11 +212,11 @@ QuadtreeNode* AllocQuadtreeNode(
 	MechS32 p_faceCount
 )
 {
-	undefined4* entries;
+	Face** entries;
 	QuadtreeNode* node;
 	MechS32 i;
 
-	node = MechHeapAlloc(g_primaryHeap, p_faceCount * sizeof(undefined4) + sizeof(QuadtreeNode));
+	node = MechHeapAlloc(g_primaryHeap, p_faceCount * sizeof(Face*) + sizeof(QuadtreeNode));
 	if (node) {
 		node->m_minX = p_minX;
 		node->m_maxX = p_maxX;
@@ -229,8 +231,8 @@ QuadtreeNode* AllocQuadtreeNode(
 		}
 
 		if (p_faceCount > 0) {
-			entries = (undefined4*) (node + 1);
-			memset(entries, 0, p_faceCount * sizeof(undefined4));
+			entries = (Face**) (node + 1);
+			memset(entries, 0, p_faceCount * sizeof(Face*));
 		}
 	}
 	else {
@@ -590,7 +592,7 @@ MechS32 GetQuadtreeSize(QuadtreeNode* p_node)
 		return 0;
 	}
 
-	size = p_node->m_faceCount * sizeof(undefined4) + sizeof(QuadtreeNode);
+	size = p_node->m_faceCount * sizeof(Face*) + sizeof(QuadtreeNode);
 	for (i = 0; i < 4; i++) {
 		size += GetQuadtreeSize(p_node->m_children[i]);
 	}

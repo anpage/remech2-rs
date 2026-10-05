@@ -253,7 +253,7 @@ void DrawTargetPanelText(CockpitPanel* p_panel)
 		DrawWrappedText(p_panel->m_target, text, font);
 	}
 	else {
-		sprintf(text, "\n%3ldm", meters);
+		sprintf(text, "\n%3dm", meters);
 		DrawWrappedText(p_panel->m_target, text, font);
 	}
 

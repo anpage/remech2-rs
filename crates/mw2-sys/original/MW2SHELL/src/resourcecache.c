@@ -77,7 +77,7 @@ void LockCacheEntry(ResourceCacheEntry* p_entry)
 // FUNCTION: MW2SHELL 0x100137aa
 void AllocateCacheTable(void)
 {
-	g_cacheTable = (ResourceCacheEntry**) calloc(0x3f1, 4);
+	g_cacheTable = (ResourceCacheEntry**) calloc(0x3f1, sizeof(ResourceCacheEntry*));
 }
 
 // FUNCTION: MW2SHELL 0x100137c9

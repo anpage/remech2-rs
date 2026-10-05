@@ -301,7 +301,7 @@ void ShowFrameRate(void)
 			rate = (g_frameRateFrames * 0x712) / g_frameRateTime;
 			g_frameRate = rate / 10;
 			g_frameRateTenths = rate - g_frameRate * 10;
-			sprintf(text, "Framerate %2.2ld.%1.1ld", g_frameRate, g_frameRateTenths);
+			sprintf(text, "Framerate %2.2d.%1.1d", g_frameRate, g_frameRateTenths);
 			DRAW_DEBUG_TEXT();
 		}
 
@@ -310,7 +310,7 @@ void ShowFrameRate(void)
 	}
 
 	if (g_showFrameRateMain && g_frameRate > 0) {
-		sprintf(text, "%ld.%ld", g_frameRate, g_frameRateTenths);
+		sprintf(text, "%d.%d", g_frameRate, g_frameRateTenths);
 		DrawTextBox(0x4f, 1, text, g_frameRateOrigin.m_x, g_frameRateOrigin.m_y);
 	}
 
@@ -418,11 +418,11 @@ void ShowEyePosition(Eyepoint* p_eyepoint)
 		return;
 	}
 
-	sprintf(text, "txyz: %04.4ld %04.4ld %04.4ld", p_eyepoint->m_x, p_eyepoint->m_y, p_eyepoint->m_z);
+	sprintf(text, "txyz: %04.4d %04.4d %04.4d", p_eyepoint->m_x, p_eyepoint->m_y, p_eyepoint->m_z);
 	DRAW_DEBUG_TEXT();
 	sprintf(
 		text,
-		"rxyz:  %04.4ld %04.4ld %04.4ld",
+		"rxyz:  %04.4d %04.4d %04.4d",
 		(p_eyepoint->m_pitch >> 16) % 360,
 		(p_eyepoint->m_heading >> 16) % 360,
 		(p_eyepoint->m_roll >> 16) % 360
@@ -432,7 +432,7 @@ void ShowEyePosition(Eyepoint* p_eyepoint)
 	if (g_showEyePositionMain) {
 		sprintf(
 			text,
-			"txyz: %5ld %5ld %5ld\nrxyz: %5d %5d %5d ",
+			"txyz: %5d %5d %5d\nrxyz: %5d %5d %5d ",
 			p_eyepoint->m_x,
 			p_eyepoint->m_y,
 			p_eyepoint->m_z,
@@ -464,7 +464,7 @@ void ShowCacheInfo(void)
 {
 	MechChar text[28];
 
-	sprintf(text, "Items in cache: %li     ", g_cacheEntryCount);
+	sprintf(text, "Items in cache: %i     ", g_cacheEntryCount);
 	DRAW_DEBUG_TEXT();
 	g_cacheInfoShown = 1;
 }
@@ -492,7 +492,7 @@ void ShowMemInfo(void)
 		g_memInfoShown = 1;
 	}
 
-	sprintf(text, "%8.8ld", value);
+	sprintf(text, "%8.8d", value);
 	DRAW_DEBUG_TEXT();
 	if (g_showMemInfoMain) {
 		DrawTextBox(0x4f, 1, text, g_memInfoOrigin.m_x, g_memInfoOrigin.m_y);
@@ -623,7 +623,7 @@ void SimEntranceDbug(MechChar* p_mission, MechS32 p_memory)
 
 	sprintf(
 		text,
-		"%s  Res:%dx%d  Mem:%ld",
+		"%s  Res:%dx%d  Mem:%d",
 		p_mission,
 		g_gameWindowGeometry->m_width,
 		g_gameWindowGeometry->m_height,
@@ -635,6 +635,6 @@ void SimEntranceDbug(MechChar* p_mission, MechS32 p_memory)
 		return;
 	}
 
-	sprintf(text, "WarThink / MechWarrior II %s %ld", p_mission, p_memory);
+	sprintf(text, "WarThink / MechWarrior II %s %d", p_mission, p_memory);
 	MonoPrintLine(text);
 }

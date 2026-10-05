@@ -285,7 +285,7 @@ MechS32 LoadMechConfig(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p
 				}
 			}
 
-			sprintf(text, "\nweapon %d- type %d  ammo: %ld  ", i, slot->m_type, slot->m_ammo);
+			sprintf(text, "\nweapon %d- type %d  ammo: %d  ", i, slot->m_type, slot->m_ammo);
 			WriteToMw2Log(text);
 			slot++;
 			weapon++;
@@ -359,7 +359,7 @@ MechS32 LoadMechConfig(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p
 		p_mech->m_jumpThrust = FixedMul16(0x1e50, jumpRatio);
 	}
 
-	sprintf(text, "\njet ddy: %ld", p_mech->m_jumpThrust);
+	sprintf(text, "\njet ddy: %d", p_mech->m_jumpThrust);
 	WriteToMw2Log(text);
 	if (fromResource) {
 		UnlockCachedResource(p_id, g_resourceTypeTags[c_resTagMek]);

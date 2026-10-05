@@ -12,6 +12,7 @@
 #include "vertex.h"
 
 #include <math.h>
+#include <string.h>
 
 // The flags a new shape starts with (CreateShape).
 // GLOBAL: MW2 0x100a5898
@@ -89,7 +90,7 @@ Model* AddModel(
 
 	vertexBytes = p_vertexCount * sizeof(Vertex);
 	faceBytes = p_faceCount * sizeof(Face);
-	size = p_extra + vertexBytes + faceBytes + 0x18;
+	size = p_extra + vertexBytes + faceBytes + sizeof(Model);
 	memory = MechHeapAlloc(g_primaryHeap, size);
 	if (!memory) {
 		return NULL;

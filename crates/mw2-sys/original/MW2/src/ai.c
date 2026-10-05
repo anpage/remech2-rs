@@ -807,7 +807,7 @@ void LogPlayerStatusLines(void)
 
 		sprintf(
 			line,
-			"%c%2.2d/%1.1d % 2.2d/%3.3s/%3.3d  %3.3s %1.1s% 3.3d %1.1s %3.3d %4.4s %6.6ld %4.4d %2.2s %4.4d %5.4d "
+			"%c%2.2d/%1.1d % 2.2d/%3.3s/%3.3d  %3.3s %1.1s% 3.3d %1.1s %3.3d %4.4s %6.6d %4.4d %2.2s %4.4d %5.4d "
 			"%10.10s %c%c%1.1s",
 			player == g_localPlayer ? '>' : ' ',
 			player->m_index,
@@ -843,7 +843,7 @@ void LogPlayerStatusLines(void)
 		if ((player->m_ai.m_goal == 0 || player->m_ai.m_target == 0) && ++g_invalidTargetLogCount < 10) {
 			sprintf(
 				invalidLine,
-				"%6ld : %2d **** Mech %2d has invalid target\n",
+				"%6d : %2d **** Mech %2d has invalid target\n",
 				g_currentClock,
 				player->m_team,
 				player->m_index
@@ -1904,7 +1904,7 @@ void EnterAIState(Player* p_player, MechU16 p_state)
 
 		sprintf(
 			line,
-			"%6ld : %2d Mech %2d : state %8s %4s %2d, objective %4s %-12s\n",
+			"%6d : %2d Mech %2d : state %8s %4s %2d, objective %4s %-12s\n",
 			g_currentClock,
 			logged->m_player->m_team,
 			logged->m_player->m_index,
@@ -2306,7 +2306,7 @@ void RecordAttack(MechS32 p_index, MechU32 p_target)
 		if (player->m_ai.m_target != (p_target | c_aiTargetPlayer) || player->m_ai.m_state != c_aiStateAttack) {
 			sprintf(
 				line,
-				"%6ld : %2d Mech %2d has attacked mech %2d\n",
+				"%6d : %2d Mech %2d has attacked mech %2d\n",
 				g_currentClock,
 				player->m_team,
 				p_index,

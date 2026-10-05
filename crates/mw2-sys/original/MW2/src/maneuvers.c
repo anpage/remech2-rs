@@ -1159,7 +1159,7 @@ MechS32 BrakeFall(Player* p_player)
 	if (mech->m_velocityY < -0x102762) {
 		sprintf(
 			line,
-			"%6ld : %2d Mech %2d has exceded fall damage speed.\n",
+			"%6d : %2d Mech %2d has exceded fall damage speed.\n",
 			g_currentClock,
 			p_player->m_team,
 			p_player->m_index

@@ -145,7 +145,7 @@ MechS32 AllocGeoTables(void)
 	FreeGeoTables();
 	size = GetStaticPoolSize(7);
 	if (size) {
-		g_classCapacity = size >> 3;
+		g_classCapacity = size / sizeof(GeoClass);
 		g_classes = MemAlloc(size);
 		if (g_classes) {
 			size = GetStaticPoolSize(8);

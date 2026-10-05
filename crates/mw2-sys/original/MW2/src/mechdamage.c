@@ -452,7 +452,7 @@ void KillMech(MechS32 p_killer, Mech* p_mech)
 		if (GetTeamLeader(p_mech->m_player->m_team) == p_mech->m_player->m_index) {
 			leader = ChooseTeamLeader(p_mech->m_player->m_team);
 			RetargetGoals(p_mech->m_player->m_team, p_mech->m_player->m_index, leader);
-			sprintf(text, "%6ld : New leader for group %d : %d\n", g_currentClock, p_mech->m_player->m_team, leader);
+			sprintf(text, "%6d : New leader for group %d : %d\n", g_currentClock, p_mech->m_player->m_team, leader);
 			WriteToMw2Log(text);
 		}
 	}

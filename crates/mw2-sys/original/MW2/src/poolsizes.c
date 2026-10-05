@@ -8,10 +8,15 @@
 #include "callbacks.h"
 #include "decomp.h"
 #include "error.h"
+#include "geocache.h"
 #include "includerecord.h"
 #include "includerecord2.h"
 #include "mechclass.h"
 #include "object.h"
+#include "objectanim.h"
+#include "players.h"
+#include "playersteering.h"
+#include "reel.h"
 #include "resource.h"
 #include "scenariotable.h"
 #include "types.h"
@@ -215,11 +220,12 @@ MechS32 CountMissionStream(BwdStream* p_stream)
 	return result;
 }
 
-// Fills the static memory table from the mission's counts: each pool's tag and size.
+// Fills the static memory table from the mission's counts: each pool's tag and size. The original
+// wrote the sizes of Player and PlayerSteering, ReelMotion, Reel and GeoClass as numbers.
 // FUNCTION: MW2 0x100567ed
 StaticPoolSize* BuildStaticMemoryTable(void)
 {
-	g_staticPoolSizes[0].m_size = g_missionPlayers * 0x1f2;
+	g_staticPoolSizes[0].m_size = g_missionPlayers * (sizeof(Player) + sizeof(PlayerSteering));
 	g_staticPoolSizes[0].m_tag = g_staticPoolTags[0];
 	g_staticPoolSizes[1].m_size = GetMechAllocSize() * g_missionPlayers;
 	g_staticPoolSizes[1].m_tag = g_staticPoolTags[1];
@@ -227,13 +233,13 @@ StaticPoolSize* BuildStaticMemoryTable(void)
 	g_staticPoolSizes[2].m_tag = g_staticPoolTags[2];
 	g_staticPoolSizes[3].m_size = GetTimedCallbackSize() * g_missionAnims;
 	g_staticPoolSizes[3].m_tag = g_staticPoolTags[3];
-	g_staticPoolSizes[4].m_size = g_missionAnims * 0x2c;
+	g_staticPoolSizes[4].m_size = g_missionAnims * GetReelMotionSize();
 	g_staticPoolSizes[4].m_tag = g_staticPoolTags[4];
-	g_staticPoolSizes[5].m_size = g_missionAnimTracks * 0x14;
+	g_staticPoolSizes[5].m_size = g_missionAnimTracks * sizeof(Reel);
 	g_staticPoolSizes[5].m_tag = g_staticPoolTags[5];
 	g_staticPoolSizes[6].m_size = g_missionAnimFrameBytes;
 	g_staticPoolSizes[6].m_tag = g_staticPoolTags[6];
-	g_staticPoolSizes[7].m_size = g_missionClassEntries * 8;
+	g_staticPoolSizes[7].m_size = g_missionClassEntries * sizeof(GeoClass);
 	g_staticPoolSizes[7].m_tag = g_staticPoolTags[7];
 	g_staticPoolSizes[8].m_size = g_missionClassEntries * 4;
 	g_staticPoolSizes[8].m_tag = g_staticPoolTags[8];

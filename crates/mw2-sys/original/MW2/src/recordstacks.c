@@ -1,6 +1,6 @@
 /* A buffer split into two stacks that grow towards each other: AllocProjectedVertex takes 0x20-byte
-   records from the top, AllocQueuedPolygon 0xc-byte records from the bottom, and both clear
-   g_queueHasRoom when the gap between them drops to 0xc8 bytes.
+   records from the top, AllocQueuedPolygon QueuedPolygon records (0xc bytes in the original) from
+   the bottom, and both clear g_queueHasRoom when the gap between them drops to 0xc8 bytes.
 
    Hand-written assembly: AllocProjectedVertex and AllocQueuedPolygon are C functions whose bodies are
    mostly an __asm block (eax carries the new top across statements, which /Od never does). Their
@@ -13,6 +13,7 @@
 #include "depthsort.h"
 #include "error.h"
 #include "loadres.h"
+#include "queuedpolygon.h"
 #include "types.h"
 
 // GLOBAL: MW2 0x100ba5cc
@@ -52,7 +53,7 @@ void ShutdownDrawBuffer(void)
 }
 
 // Operand order: the original computes g_depthListCapacity << 4 before p_kilobytes << 10 in size
-// (both front ends reorder commutative operands).
+// (both front ends reorder commutative operands). The << 4 was two lists of 8-byte DepthEntry.
 // FUNCTION: MW2 0x1007d150
 void InitializeDrawBuffer(MechS32 p_kilobytes, MechS32 p_entries)
 {
@@ -60,7 +61,7 @@ void InitializeDrawBuffer(MechS32 p_kilobytes, MechS32 p_entries)
 
 	g_depthListCapacity = p_entries;
 	g_drawBufferSize = p_kilobytes << 10;
-	size = (g_depthListCapacity << 4) + (p_kilobytes << 10);
+	size = (g_depthListCapacity * 2 * sizeof(DepthEntry)) + (p_kilobytes << 10);
 	g_drawBufferMemory = MemAlloc(size);
 	if (g_drawBufferMemory == NULL) {
 		Error(0x18, NULL);
@@ -126,7 +127,7 @@ MechU8* AllocQueuedPolygon(void)
 	MechS32 recordSize;
 	MechU8* record;
 
-	recordSize = 0xc;
+	recordSize = sizeof(QueuedPolygon);
 #ifdef PORTABLE_C
 	record = g_drawBufferBottom;
 	g_drawBufferBottom += recordSize;
