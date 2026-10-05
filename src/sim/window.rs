@@ -8,7 +8,7 @@ use remech2_sys::{
     sim::{self, CockpitLayout, FixedMul16, GameWindowGeometry, Point, Rect, g_artResolutionSizes},
 };
 
-use crate::settings::SETTINGS;
+use crate::resolution::Resolution;
 
 /// The satellite view's index in `g_cockpitLayouts`
 const SATELLITE_LAYOUT: i32 = 4;
@@ -21,20 +21,9 @@ pub unsafe extern "C" fn set_game_resolution(driver: *mut c_char) {
     let driver = if driver.is_null() {
         String::new()
     } else {
-        unsafe { CStr::from_ptr(driver) }
-            .to_string_lossy()
-            .to_ascii_uppercase()
+        unsafe { CStr::from_ptr(driver) }.to_string_lossy().into_owned()
     };
-    let widescreen = SETTINGS.get_bool("video", "widescreen", false);
-    let (width, height) = match (driver.as_str(), widescreen) {
-        ("VESA480.DLL", false) => (640, 480),
-        ("VESA480.DLL", true) => (854, 480),
-        ("VESA768.DLL", false) => (1024, 768),
-        ("VESA768.DLL", true) => (1366, 768),
-        // "MCGA.DLL"
-        (_, false) => (320, 240),
-        (_, true) => (427, 240),
-    };
+    let (width, height) = Resolution::from_driver(&driver).frame_size();
     unsafe {
         sim::g_gameWindowWidth = width;
         sim::g_gameWindowHeight = height;

@@ -27,7 +27,7 @@
 #include <string.h>
 
 void OptionsCallback(MechS32);
-extern ScreenField g_optionFields[16];
+extern ScreenField g_optionFields[18];
 
 // A button with a centered caption. Nothing calls its two functions.
 // SIZE 0x9c
@@ -393,12 +393,15 @@ void OptionsCallback(MechS32 p_active)
 	}
 }
 
-// Callbacks and value pointers come from the original 15-entry options table.
+// Callbacks and value pointers come from the original 15-entry options table. The widescreen row
+// is new, in the empty row below the resolution, with a label the screen's art doesn't have.
 #define OPTION_ROW(x, y, width, draw, click, value) {x, y, width, -1, 0, NULL, NULL, draw, click, value, NULL}
 #define OPTION_BAR(x, y, width, height, draw, click, value)                                                            \
 	{x, y, width, height, 0, NULL, NULL, draw, click, value, NULL}
+// A label right-aligned at x 0x16a, where the art's labels end
+#define OPTION_LABEL(y, text) {0xb4, y, 0xb6, 0x13, 0, NULL, NULL, DrawOptionLabel, NULL, (void*) text, NULL}
 // GLOBAL: MW2SHELL 0x10070da8
-ScreenField g_optionFields[16] = {
+ScreenField g_optionFields[18] = {
 	OPTION_ROW(0x189, 0xdb, 100, DrawSkillOption, CycleByteOption, &g_difficultyConfig.m_enemySkill),
 	OPTION_ROW(0x189, 0xef, 100, DrawByteToggle, ToggleByteOption, &g_difficultyConfig.m_heatTracking),
 	OPTION_ROW(0x189, 0x115, 100, DrawIntToggle, ToggleIntOption, &g_soundConfig.m_objectTextmaps),
@@ -407,6 +410,8 @@ ScreenField g_optionFields[16] = {
 	OPTION_ROW(0x189, 0x151, 100, DrawHighLowToggle, ToggleIntOption, &g_soundConfig.m_objectDensity),
 	OPTION_ROW(0x189, 0x165, 100, DrawIntToggle, ToggleIntOption, &g_soundConfig.m_explosionChunks),
 	OPTION_ROW(0x189, 0x179, 100, DrawResolutionOption, ToggleVesaDriver, g_soundConfig.m_videoDriver),
+	OPTION_ROW(0x189, 0x18d, 100, DrawWidescreenOption, ToggleWidescreen, NULL),
+	OPTION_LABEL(0x18d, "WIDESCREEN"),
 	OPTION_ROW(0x189, 0x1a0, 100, DrawDishonorableToggle, ToggleByteOption, &g_difficultyConfig.m_invulnerability),
 	OPTION_ROW(0x189, 0x1b4, 100, DrawDishonorableToggle, ToggleByteOption, &g_difficultyConfig.m_unlimitedAmmo),
 	OPTION_ROW(
@@ -425,3 +430,4 @@ ScreenField g_optionFields[16] = {
 };
 #undef OPTION_ROW
 #undef OPTION_BAR
+#undef OPTION_LABEL
