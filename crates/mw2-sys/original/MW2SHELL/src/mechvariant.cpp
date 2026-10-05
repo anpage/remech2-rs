@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 // The two stars of a custom battle: the player's and the enemy's.
 
@@ -218,7 +219,7 @@ MechS32 SetStarMech(MechS32 p_index, MechChar* p_variant, MechChar* p_name)
 
 	if (p_variant) {
 		for (type = 0; g_mechChassis[type].m_prefix; type++) {
-			if (!_strnicmp(p_variant, g_mechChassis[type].m_prefix, 3)) {
+			if (!strncasecmp(p_variant, g_mechChassis[type].m_prefix, 3)) {
 				break;
 			}
 		}

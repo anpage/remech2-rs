@@ -127,7 +127,7 @@ void DebugPrintInternal(MechChar* p_message, ...)
 	va_list args;
 
 	va_start(args, p_message);
-	_vsnprintf(message, sizeof(message), p_message, args);
+	vsnprintf(message, sizeof(message), p_message, args);
 	va_end(args);
 
 	switch (g_debugOutputMode) {

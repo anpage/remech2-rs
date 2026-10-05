@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 DECOMP_SIZE_ASSERT(ProjectArchive, 0x10)
 DECOMP_SIZE_ASSERT(MechChassis, 0x18)
@@ -384,7 +385,7 @@ void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, MechS32 p_index,
 	MechS16 variant;
 
 	for (i = 0; g_mechChassis[i].m_prefix; i++) {
-		if (!_strnicmp(p_mech, g_mechChassis[i].m_prefix, 3)) {
+		if (!strncasecmp(p_mech, g_mechChassis[i].m_prefix, 3)) {
 			break;
 		}
 	}
@@ -413,7 +414,7 @@ void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, MechS32 p_index,
 	strncpy(node.m_variant, p_variant, 15);
 	node.m_variant[15] = '\0';
 	node.m_unk0x22 = 0x400;
-	if (_strnicmp(p_mech + 5, "std", 3)) {
+	if (strncasecmp(p_mech + 5, "std", 3)) {
 		variant = -2;
 	}
 	else {

@@ -6,7 +6,6 @@
 #include "prjfile.h"
 #include "types.h"
 
-#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -201,7 +200,8 @@ void FreeCacheEntry(ResourceCacheEntry* p_entry)
 	g_cacheEntryCount--;
 }
 
-// Writes the cache to dbugcch<n>.log: every entry by bucket, then the purge list.
+// Writes the cache to dbugcch<n>.log: every entry by bucket, then the purge list. The original also
+// printed each entry's block size (_msize).
 // Not 100%: the stack slots of the locals are permuted.
 // FUNCTION: MW2SHELL 0x10013b11
 void DumpResourceCache(void)
@@ -219,14 +219,14 @@ void DumpResourceCache(void)
 	for (i = 0; i < 0x3f1; i++) {
 		for (entry = g_cacheTable[i]; entry != NULL; entry = entry->m_next) {
 			*(undefined4*) type = entry->m_type;
-			fprintf(file, "ID=%5d  Type=%4s  Lock=%d  Size=%7d\n", entry->m_id, type, entry->m_lock, _msize(entry));
+			fprintf(file, "ID=%5d  Type=%4s  Lock=%d\n", entry->m_id, type, entry->m_lock);
 		}
 	}
 
 	fprintf(file, "\nPurge list\n-----------------------\n");
 	for (entry = g_purgeListHead; entry != NULL; entry = entry->m_purgeNext) {
 		*(undefined4*) type = entry->m_type;
-		fprintf(file, "ID=%5d  Type=%4s  Lock=%d  Size=%7d\n", entry->m_id, type, entry->m_lock, _msize(entry));
+		fprintf(file, "ID=%5d  Type=%4s  Lock=%d\n", entry->m_id, type, entry->m_lock);
 	}
 
 	fclose(file);

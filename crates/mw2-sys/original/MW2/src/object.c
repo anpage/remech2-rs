@@ -14,8 +14,8 @@
 #include "transform.h"
 #include "types.h"
 
-#include <mbstring.h>
 #include <string.h>
+#include <strings.h>
 
 DECOMP_SIZE_ASSERT(SceneObject, 0x7c)
 
@@ -143,7 +143,7 @@ MechChar* GetObjName(SceneObject* p_obj)
 // FUNCTION: MW2 0x10001579
 void SetObjName(SceneObject* p_obj, MechChar* p_name)
 {
-	p_obj->m_name = (MechChar*) _mbsdup((unsigned char*) p_name);
+	p_obj->m_name = strdup(p_name);
 }
 
 // FUNCTION: MW2 0x10001596
@@ -578,7 +578,7 @@ SceneObject* FindObjByName(SceneObject* p_obj, const MechChar* p_name)
 {
 	SceneObject* child;
 
-	if (p_obj->m_name && _strcmpi(p_obj->m_name, p_name) == 0) {
+	if (p_obj->m_name && strcasecmp(p_obj->m_name, p_name) == 0) {
 		return p_obj;
 	}
 

@@ -71,9 +71,9 @@
 #include "weapons.h"
 #include "world.h"
 
-#include <excpt.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 DECOMP_SIZE_ASSERT(SoundConfig, 0x3c)
 DECOMP_SIZE_ASSERT(StarMission, 0x3c0a)
@@ -181,7 +181,7 @@ int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 	g_videoDriverChoice.m_flags = 0;
 	if (g_mw2SndCfgData->m_videoDriver[0]) {
 		g_videoDriverChoice.m_flags |= 1;
-		if (_stricmp(g_mw2SndCfgData->m_videoDriver, "scan") == 0) {
+		if (strcasecmp(g_mw2SndCfgData->m_videoDriver, "scan") == 0) {
 			g_videoDriverChoice.m_name[0] = 0;
 		}
 		else {

@@ -6,8 +6,8 @@
 #include "resourcefile.h"
 #include "types.h"
 
-#include <mbstring.h>
 #include <stdlib.h>
+#include <string.h>
 
 void* Mw2PrjAlloc(undefined4 p_size);
 void Mw2PrjFree(void* p_mem);
@@ -39,7 +39,7 @@ MechS32 InitializeMw2Prj(void)
 	InitializeResourceCache();
 
 	if (g_mw2PrjPath == NULL) {
-		g_mw2PrjPath = (char*) _mbsdup((unsigned char*) MakeResourcePath("mw2.prj"));
+		g_mw2PrjPath = strdup(MakeResourcePath("mw2.prj"));
 	}
 
 	g_mw2PrjHandle = OpenArchive(g_mw2PrjPath, 0);

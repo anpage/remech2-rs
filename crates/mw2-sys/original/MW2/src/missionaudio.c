@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 DECOMP_SIZE_ASSERT(ProjectFileEntry, 0x14)
 
@@ -39,7 +40,7 @@ ProjectFileEntry* FindSoundFile(MechChar* p_name, MechS32 p_add)
 
 	slot = HashName(p_name) % 0x65;
 	for (entry = g_soundFileTable[slot]; entry; entry = entry->m_next) {
-		if (!_strcmpi(entry->m_name, p_name)) {
+		if (!strcasecmp(entry->m_name, p_name)) {
 			return entry;
 		}
 	}

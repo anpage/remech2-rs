@@ -9,7 +9,7 @@
 #include "types.h"
 #include "weapons.h"
 
-#include <mbstring.h>
+#include <string.h>
 
 // The resource type tags in the mw2.prj archive and their file extensions, as MW2SHELL's mw2prj.c
 // has them. In the original this object's data (the tables, their strings, then FirstResource's
@@ -39,7 +39,7 @@ MechS32 FirstResource(void)
 	SetPrjAllocator(Mw2PrjAlloc, Mw2PrjFree);
 	InitializeResourceCache();
 	if (!g_mw2PrjPath) {
-		g_mw2PrjPath = (MechChar*) _mbsdup((unsigned char*) BuildGamePath("mw2.prj"));
+		g_mw2PrjPath = strdup(BuildGamePath("mw2.prj"));
 	}
 
 	g_mw2PrjHandle = OpenPrjFile(g_mw2PrjPath, 0);

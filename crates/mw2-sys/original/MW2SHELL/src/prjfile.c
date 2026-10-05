@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 DECOMP_SIZE_ASSERT(ArchiveEntry, 0x18)
 DECOMP_SIZE_ASSERT(ArchiveSlot, 0x14a)
@@ -115,7 +116,7 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 		}
 		else {
 			MechRead(fd, tag, sizeof(tag));
-			if (_strnicmp((char*) tag, "PROJ", 4)) {
+			if (strncasecmp((char*) tag, "PROJ", 4)) {
 				return -1;
 			}
 
@@ -132,7 +133,7 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 		}
 		else {
 			MechRead(fd, tag, sizeof(tag));
-			if (_strnicmp((char*) tag, "PROJ", 4)) {
+			if (strncasecmp((char*) tag, "PROJ", 4)) {
 				return -1;
 			}
 		}
@@ -161,7 +162,7 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 	g_archiveSlots[slot].m_fd = fd;
 	g_archiveSlots[slot].m_header = header;
 	g_archiveSlots[slot].m_open = 1;
-	_strnset(g_archiveSlots[slot].m_name, 0, sizeof(g_archiveSlots[slot].m_name));
+	memset(g_archiveSlots[slot].m_name, 0, sizeof(g_archiveSlots[slot].m_name));
 	strncpy(g_archiveSlots[slot].m_name, p_name, sizeof(g_archiveSlots[slot].m_name));
 	return slot;
 }
@@ -186,7 +187,7 @@ MechS32 CloseArchive(MechS32 p_handle)
 	}
 
 	g_archiveSlots[p_handle].m_open = 0;
-	_strnset(g_archiveSlots[p_handle].m_name, 0, 0x20);
+	memset(g_archiveSlots[p_handle].m_name, 0, 0x20);
 	return MechClose(g_archiveSlots[p_handle].m_fd);
 }
 

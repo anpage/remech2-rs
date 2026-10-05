@@ -35,7 +35,6 @@
 #include "wtbshapes.h"
 
 #include <math.h>
-#include <mbstring.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>

@@ -13,6 +13,7 @@
 #include "types.h"
 
 #include <string.h>
+#include <strings.h>
 
 // Returns the id of the resource named p_name in TABL resource p_table, or -1. The table's entries
 // are 12 bytes from 0x0c: a name of 10 bytes, each stored as 0x100 minus the character, and the id.
@@ -41,7 +42,7 @@ MechS32 FindResourceIdByName(MechS32 p_table, MechChar* p_name)
 		}
 
 		i = 0;
-		while (i < *(MechS16*) (header + 8) && _strcmpi(name, p_name)) {
+		while (i < *(MechS16*) (header + 8) && strcasecmp(name, p_name)) {
 			entry += 0xc;
 			i++;
 			for (j = 0; j < 10; j++) {
@@ -51,7 +52,7 @@ MechS32 FindResourceIdByName(MechS32 p_table, MechChar* p_name)
 			}
 		}
 
-		if (!_strcmpi(name, p_name)) {
+		if (!strcasecmp(name, p_name)) {
 			result = *(MechS16*) (entry + 0xa);
 		}
 

@@ -38,6 +38,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 void SendStateMsg(void);
 void ReceiveChatMsg(NetChatMsg* p_msg, MechS32 p_slot);
@@ -296,25 +297,25 @@ MechS32 UpdateNetwork(void)
 			ElectMaster();
 		}
 
-		if (_strcmpi(tag, "DA") == 0) {
+		if (strcasecmp(tag, "DA") == 0) {
 			ReceiveStateMsg((NetStateMsg*) g_netRecvBuffer, slot);
 		}
-		else if (_strcmpi(tag, "WE") == 0) {
+		else if (strcasecmp(tag, "WE") == 0) {
 			ReceiveWeaponsMsg((NetWeaponsMsg*) g_netRecvBuffer, slot);
 		}
-		else if (_strcmpi(tag, "CO") == 0) {
+		else if (strcasecmp(tag, "CO") == 0) {
 			ReceiveCollisionMsg((NetCollisionMsg*) g_netRecvBuffer, slot);
 		}
-		else if (_strcmpi(tag, "GO") == 0) {
+		else if (strcasecmp(tag, "GO") == 0) {
 			ReceiveGoMsg(g_netRecvBuffer, slot);
 		}
-		else if (_strcmpi(tag, "SN") == 0) {
+		else if (strcasecmp(tag, "SN") == 0) {
 			ReceiveThingsMsg((MechU8*) g_netRecvBuffer, slot);
 		}
-		else if (_strcmpi(tag, "SU") == 0) {
+		else if (strcasecmp(tag, "SU") == 0) {
 			ReceiveSuccessMsg(g_netRecvBuffer, slot);
 		}
-		else if (_strcmpi(tag, "SS") == 0) {
+		else if (strcasecmp(tag, "SS") == 0) {
 			if (!g_missionResolved) {
 				KillMech(-2, player->m_mech);
 			}
@@ -324,7 +325,7 @@ MechS32 UpdateNetwork(void)
 			ShowInGameMessage(text, 1, 0x712, 0x50);
 			break;
 		}
-		else if (_strcmpi(tag, "CH") == 0) {
+		else if (strcasecmp(tag, "CH") == 0) {
 			ReceiveChatMsg((NetChatMsg*) g_netRecvBuffer, slot);
 		}
 		else {

@@ -5,6 +5,7 @@
 #include "types.h"
 
 #include <string.h>
+#include <strings.h>
 
 // PROJ resource files: a header listing resource types, each with an index of resources by ID.
 // One file can be open at a time. Memory comes from the allocator SetPrjAllocator installs.
@@ -118,7 +119,7 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 		}
 		else {
 			MechRead(fd, tag, 12);
-			if (_strnicmp(tag, "PROJ", 4)) {
+			if (strncasecmp(tag, "PROJ", 4)) {
 				return -1;
 			}
 
@@ -135,7 +136,7 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 		}
 		else {
 			MechRead(fd, tag, 12);
-			if (_strnicmp(tag, "PROJ", 4)) {
+			if (strncasecmp(tag, "PROJ", 4)) {
 				return -1;
 			}
 		}
@@ -164,7 +165,7 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 	g_prjFiles[slot].m_fd = fd;
 	g_prjFiles[slot].m_header = header;
 	g_prjFiles[slot].m_open = TRUE;
-	_strnset(g_prjFiles[slot].m_name, 0, 0x20);
+	memset(g_prjFiles[slot].m_name, 0, 0x20);
 	strncpy(g_prjFiles[slot].m_name, p_name, 0x20);
 	return slot;
 }
@@ -189,7 +190,7 @@ MechS32 ClosePrjFile(MechS32 p_file)
 	}
 
 	g_prjFiles[p_file].m_open = FALSE;
-	_strnset(g_prjFiles[p_file].m_name, 0, 0x20);
+	memset(g_prjFiles[p_file].m_name, 0, 0x20);
 	return MechClose(g_prjFiles[p_file].m_fd);
 }
 

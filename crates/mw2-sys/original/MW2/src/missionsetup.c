@@ -11,6 +11,7 @@
 #include "types.h"
 
 #include <string.h>
+#include <strings.h>
 
 DECOMP_SIZE_ASSERT(MissionEntry, 0x97)
 
@@ -131,7 +132,7 @@ MechU32 FindEventList(MechChar* p_name)
 				state = g_objectiveTable[i].m_objectives[j].m_state;
 				if (state == 0 || state == 1 || state == 7) {
 					unk0x04 = (MechU8) g_objectiveTable[i].m_objectives[j].m_targets[0];
-					if (!_strcmpi(p_name, g_missionTables[i]->m_entries[j].m_name)) {
+					if (!strcasecmp(p_name, g_missionTables[i]->m_entries[j].m_name)) {
 						lists |= 1 << j;
 						lists |= (1 << i) << 16;
 						g_objectiveTable[i].m_objectives[j].m_state = 7;
@@ -160,7 +161,7 @@ void PostEventToList(MechChar* p_name, MechS32 p_types, MechU16 p_target)
 		if (g_missionTables[i]) {
 			for (j = 0; j < 48; j++) {
 				state = g_objectiveTable[i].m_objectives[j].m_state;
-				if (state == 7 && !_strcmpi(p_name, g_missionTables[i]->m_entries[j].m_name) &&
+				if (state == 7 && !strcasecmp(p_name, g_missionTables[i]->m_entries[j].m_name) &&
 					(p_types & g_objectiveTable[i].m_objectives[j].m_type) &&
 					g_objectiveTable[i].m_objectives[j].m_targetCount < 40) {
 					count = g_objectiveTable[i].m_objectives[j].m_targetCount;

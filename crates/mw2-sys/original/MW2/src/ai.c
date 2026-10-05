@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // The AI: each AI player runs a state machine (c_aiState…) driven by scripts, AIT resources
 // of rules. A script lists, for each state, the rules that apply in it; a rule waits for a
@@ -1898,7 +1899,7 @@ void EnterAIState(Player* p_player, MechU16 p_state)
 			goalType += strlen(goalType);
 		}
 		else {
-			_itoa(logged->m_player->m_ai.m_goal & 0xff, goalName, 10);
+			sprintf(goalName, "%d", logged->m_player->m_ai.m_goal & 0xff);
 		}
 
 		sprintf(

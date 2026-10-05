@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 // The mech bay: the variant being edited, its engine, weapons and armor, and the fields that
 // show them.
@@ -2397,7 +2398,7 @@ void* LoadMekImage(MechChar* p_name)
 	FILE* file;
 	MechChar path[0x20];
 
-	if (_strnicmp(p_name + 5, "std", 3)) {
+	if (strncasecmp(p_name + 5, "std", 3)) {
 		strcpy(path, "mek\\");
 		strcat(path, p_name);
 		if (strchr(p_name, '.') == NULL) {
@@ -2420,7 +2421,7 @@ void* LoadMekImage(MechChar* p_name)
 // FUNCTION: MW2SHELL 0x1000be09
 void ReleaseMekImage(MechChar* p_name)
 {
-	if (!_strnicmp(p_name + 5, "std", 3)) {
+	if (!strncasecmp(p_name + 5, "std", 3)) {
 		g_projectArchive->ReleaseResourceByName(p_name, 6, "MEK");
 	}
 }
@@ -3456,7 +3457,7 @@ void DrawMechBay(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam
 	if (g_selectedChassis >= 0) {
 		variant = GetStarMechVariant(-1);
 		g_selectedVariant = (variant[3] - '0') * 10 + variant[4] - '0';
-		if (_strnicmp(variant + 5, "std", 3)) {
+		if (strncasecmp(variant + 5, "std", 3)) {
 			g_selectedVariant += 100;
 		}
 	}

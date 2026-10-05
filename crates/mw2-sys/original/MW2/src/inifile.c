@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 // Where FindIniSection found the section's entries in mw2.ini, or -1.
 // GLOBAL: MW2 0x100ad46c
@@ -50,7 +51,7 @@ MechS32 FindIniSection(MechChar* p_section)
 		}
 
 		*end = '\0';
-		if (!_strcmpi(TrimWhitespace(line), p_section)) {
+		if (!strcasecmp(TrimWhitespace(line), p_section)) {
 			break;
 		}
 	}
@@ -95,7 +96,7 @@ MechChar* GetIniValue(MechChar* p_key)
 
 		*value = '\0';
 		value++;
-		if (!_strcmpi(TrimWhitespace(line), p_key)) {
+		if (!strcasecmp(TrimWhitespace(line), p_key)) {
 			break;
 		}
 	}

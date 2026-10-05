@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 // The local player's steering: the outputs of INPUT.MAP's sinks.
 // GLOBAL: MW2 0x100b2500
@@ -508,7 +509,7 @@ MechS32 RegisterInputDevice(MechChar* p_name)
 					}
 
 					if (!g_inputDriverClasses[driver]->m_fillDeviceInfo(i, &g_inputDeviceInfos[index])) {
-						if (!_strcmpi(g_inputDeviceInfos[index].m_shortName, p_name)) {
+						if (!strcasecmp(g_inputDeviceInfos[index].m_shortName, p_name)) {
 							strcpy(g_inputDeviceNames[index], p_name);
 							g_inputDrivers[index] = g_inputDriverClasses[driver];
 							g_inputDeviceCount++;
@@ -549,13 +550,13 @@ MechS32 FindInputDevice(MechChar* p_name)
 	MechS32 i;
 
 	for (i = 0; i < g_inputDeviceCount; i++) {
-		if (!_strcmpi(g_inputDeviceNames[i], p_name)) {
+		if (!strcasecmp(g_inputDeviceNames[i], p_name)) {
 			return g_inputDevicePresent[i] ? i : -1;
 		}
 	}
 
 	index = RegisterInputDevice(p_name);
-	if (!_strcmpi(p_name, "keyboard")) {
+	if (!strcasecmp(p_name, "keyboard")) {
 		if (index != -1) {
 			g_keyboardDeviceIndex = index;
 		}
@@ -589,7 +590,7 @@ MechS32 FindInputAxis(MechS32 p_device, MechChar* p_name)
 
 	for (i = 0; i < g_inputDeviceInfos[p_device].m_axisCount; i++) {
 		if (g_inputDeviceInfos[p_device].m_axisShortNames[i] &&
-			!_strcmpi(g_inputDeviceInfos[p_device].m_axisShortNames[i], p_name)) {
+			!strcasecmp(g_inputDeviceInfos[p_device].m_axisShortNames[i], p_name)) {
 			return i;
 		}
 	}
@@ -620,7 +621,7 @@ MechS32 FindInputButton(MechS32 p_device, MechChar* p_name)
 
 	for (i = 0; i < g_inputDeviceInfos[p_device].m_buttonCount; i++) {
 		if (g_inputDeviceInfos[p_device].m_buttonShortNames[i] &&
-			!_strcmpi(g_inputDeviceInfos[p_device].m_buttonShortNames[i], p_name)) {
+			!strcasecmp(g_inputDeviceInfos[p_device].m_buttonShortNames[i], p_name)) {
 			return i;
 		}
 	}
@@ -636,7 +637,7 @@ InputSink* FindInputSink(MechChar* p_name)
 	MechS32 i;
 
 	for (i = 0; i < sizeof(g_inputSinks) / sizeof(g_inputSinks[0]); i++) {
-		if (!_strcmpi(g_inputSinks[i].m_name, p_name)) {
+		if (!strcasecmp(g_inputSinks[i].m_name, p_name)) {
 			return &g_inputSinks[i];
 		}
 	}
@@ -1118,7 +1119,7 @@ MechS32 LoadGamekeyMap(void)
 		while (token) {
 			code = 0;
 			for (i = 0; i < sizeof(g_gameKeyModifiers) / sizeof(g_gameKeyModifiers[0]); i++) {
-				if (!_strcmpi(g_gameKeyModifiers[i].m_name, token)) {
+				if (!strcasecmp(g_gameKeyModifiers[i].m_name, token)) {
 					code = g_gameKeyModifiers[i].m_code;
 					break;
 				}
@@ -1135,7 +1136,7 @@ MechS32 LoadGamekeyMap(void)
 		}
 
 		for (i = 0; i < sizeof(g_gameKeyNames) / sizeof(g_gameKeyNames[0]); i++) {
-			if (!_strcmpi(g_gameKeyNames[i].m_name, action)) {
+			if (!strcasecmp(g_gameKeyNames[i].m_name, action)) {
 				break;
 			}
 		}

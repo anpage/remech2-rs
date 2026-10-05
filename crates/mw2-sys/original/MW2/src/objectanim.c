@@ -42,6 +42,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 #pragma warning(disable : 4102) /* labels only __asm blocks jump to */
 
@@ -1081,17 +1082,17 @@ MechS32 PathTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_p
 			*token = '\0';
 			token++;
 			sscanf(token, "%[^,],%[^,],%[^,]", mode, rotate, name);
-			if (_strcmpi(mode, "loop") == 0) {
+			if (strcasecmp(mode, "loop") == 0) {
 				follower->m_mode = 0;
 			}
-			else if (_strcmpi(mode, "repeat") == 0) {
+			else if (strcasecmp(mode, "repeat") == 0) {
 				follower->m_mode = 1;
 			}
 			else {
 				follower->m_mode = 2;
 			}
 
-			if (_strcmpi(rotate, "rotate") == 0) {
+			if (strcasecmp(rotate, "rotate") == 0) {
 				follower->m_rotate = 1;
 			}
 			else {
@@ -1099,7 +1100,7 @@ MechS32 PathTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_p
 			}
 
 			for (i = 0; i < g_pathCount; i++) {
-				if (_strcmpi(name, g_paths[i].m_name) == 0) {
+				if (strcasecmp(name, g_paths[i].m_name) == 0) {
 					follower->m_path = &g_paths[i];
 					break;
 				}

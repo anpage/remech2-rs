@@ -3,6 +3,8 @@
 
 #include "types.h"
 
+#include <stdarg.h>
+
 // The functions and globals of error.c that other units use.
 #ifdef __cplusplus
 extern "C"
@@ -16,9 +18,9 @@ extern "C"
 
 	void Error(MechS32 p_code, const char* p_format, ...);
 	void ShutdownOnError(void);
-	void ShowFatalError(const char** p_args);
-	MechChar* FormatErrorMessage(MechChar* p_title, MechS32 p_code, const char** p_args);
-	void LogWarning(const char** p_args);
+	void ShowFatalError(const char* p_format, va_list p_args);
+	MechChar* FormatErrorMessage(MechChar* p_title, MechS32 p_code, const char* p_format, va_list p_args);
+	void LogWarning(const char* p_format, va_list p_args);
 
 #ifdef __cplusplus
 }

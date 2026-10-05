@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 // The cockpit controls screen: four configurations of bindings from the game's controls to
 // device axes and buttons, and the fields that show and edit them. The configurations are
@@ -1813,7 +1814,7 @@ void CpcRemapDeviceSlots(CpcBinding* p_bindings)
 				break;
 			}
 
-			if (!_strcmpi(g_cpcDeviceSlots[j].m_name, device->m_info.m_matchName) &&
+			if (!strcasecmp(g_cpcDeviceSlots[j].m_name, device->m_info.m_matchName) &&
 				g_cpcDeviceSlots[i].m_deviceId == -1) {
 				g_cpcDeviceSlots[j].m_deviceId = i;
 				break;

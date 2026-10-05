@@ -6,6 +6,7 @@
 #include "types.h"
 
 #include <string.h>
+#include <strings.h>
 
 // Resource names: each resource type has a TABL resource listing its entries' names
 // (stored negated) and ids.
@@ -47,7 +48,7 @@ MechS32 FindResourceIdByName(MechS32 p_type, char* p_name)
 		}
 
 		i = 0;
-		while (i < table->m_count && _strcmpi(name, p_name)) {
+		while (i < table->m_count && strcasecmp(name, p_name)) {
 			entry++;
 			i++;
 			for (j = 0; j < 10; j++) {
@@ -57,7 +58,7 @@ MechS32 FindResourceIdByName(MechS32 p_type, char* p_name)
 			}
 		}
 
-		if (!_strcmpi(name, p_name)) {
+		if (!strcasecmp(name, p_name)) {
 			id = entry->m_id;
 		}
 

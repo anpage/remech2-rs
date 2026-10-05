@@ -23,7 +23,9 @@
 #include "vfxa.h"
 
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // GLOBAL: MW2 0x100a59e0
 MechS32 g_menuRepeatTimer = -1;
@@ -777,7 +779,7 @@ void RunMenuItems(MenuDefinition* p_menu)
 				n++;
 			}
 
-			_itoa(n, number, 10);
+			sprintf(number, "%d", n);
 			VFX_string_draw(target, textPos.m_x, textPos.m_y, font, number, g_textColors);
 		}
 

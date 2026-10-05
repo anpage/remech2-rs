@@ -41,6 +41,9 @@ MechChar g_errorMessage[0x400];
 // FUNCTION: MW2 0x1003b8c0
 void Error(MechS32 p_code, const char* p_format, ...)
 {
+	va_list args;
+
+	va_start(args, p_format);
 	g_errorCode = p_code;
 	switch (g_errorCode) {
 	case 1:
@@ -72,7 +75,7 @@ void Error(MechS32 p_code, const char* p_format, ...)
 	case 0x46:
 	case 0x47:
 	case 0x4b:
-		LogWarning(&p_format);
+		LogWarning(p_format, args);
 		break;
 	case 2:
 	case 3:
@@ -127,11 +130,13 @@ void Error(MechS32 p_code, const char* p_format, ...)
 	case 0x45:
 	case 0x4c:
 	case 0x54:
-		ShowFatalError(&p_format);
+		ShowFatalError(p_format, args);
 		break;
 	default:
 		break;
 	}
+
+	va_end(args);
 }
 
 // Shuts the subsystems down before the game exits on an error.
@@ -150,36 +155,38 @@ void ShutdownOnError(void)
 
 // Shows a fatal error's message, logs it, and exits.
 // FUNCTION: MW2 0x1003ba3a
-void ShowFatalError(const char** p_args)
+void ShowFatalError(const char* p_format, va_list p_args)
 {
+	va_list args;
+
 	ShutdownRender();
 	StopTimers();
 	CloseInputDevices();
 	MechMouseShowCursor(TRUE);
 
 	// The original minimised the window and showed it in a message box
-	MechLogError(FormatErrorMessage(g_fatalErrorTitle, g_errorCode, p_args));
-	DebugPrint(FormatErrorMessage(g_fatalErrorTitle, g_errorCode, p_args));
+	va_copy(args, p_args);
+	MechLogError(FormatErrorMessage(g_fatalErrorTitle, g_errorCode, p_format, args));
+	va_end(args);
+	DebugPrint(FormatErrorMessage(g_fatalErrorTitle, g_errorCode, p_format, p_args));
 	exit(g_errorCode);
 }
 
 // Formats an error's message: p_title, the code, the code's text from the "SystemError" section,
-// and the printf-style message p_args points at, if any. The message is logged and shown.
+// and the printf-style message p_format, if any. The message is logged and shown. The original
+// took a pointer to p_format on Error's stack and read the arguments from the slots after it.
 // Stack-slot permutation of code and args.
 // FUNCTION: MW2 0x1003bad1
-MechChar* FormatErrorMessage(MechChar* p_title, MechS32 p_code, const char** p_args)
+MechChar* FormatErrorMessage(MechChar* p_title, MechS32 p_code, const char* p_format, va_list p_args)
 {
 	MechChar code[4];
-	va_list args;
 
 	sprintf(code, "%02X", p_code);
 	FindIniSection("SystemError");
 	sprintf(g_errorMessage, "%s #%02X: %s", p_title, p_code, GetIniValue(code));
-	if (*p_args) {
-		args = (va_list) (p_args + 1);
+	if (p_format) {
 		strcat(g_errorMessage, ": ");
-		vsprintf(g_errorMessage + strlen(g_errorMessage), *p_args, args);
-		va_end(args);
+		vsprintf(g_errorMessage + strlen(g_errorMessage), p_format, p_args);
 	}
 
 	WriteToMw2Log(g_errorMessage);
@@ -189,8 +196,8 @@ MechChar* FormatErrorMessage(MechChar* p_title, MechS32 p_code, const char** p_a
 
 // Logs a warning's message and clears the error code.
 // FUNCTION: MW2 0x1003bbb1
-void LogWarning(const char** p_args)
+void LogWarning(const char* p_format, va_list p_args)
 {
-	FormatErrorMessage(g_warningTitle, g_errorCode, p_args);
+	FormatErrorMessage(g_warningTitle, g_errorCode, p_format, p_args);
 	g_errorCode = 0;
 }

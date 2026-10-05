@@ -11,6 +11,7 @@
 #include "types.h"
 
 #include <string.h>
+#include <strings.h>
 
 // Teams of players: each has a leader and up to eight members, a side, and a formation that
 // places each member (by its slot) relative to the leader. Formations are copied from a
@@ -62,7 +63,7 @@ MechS32 SetTeamFormationByName(MechS32 p_team, const MechChar* p_name)
 	}
 
 	for (i = 0; i < g_formationTemplateCount; i++) {
-		if (_strcmpi(g_formationTemplates[i].m_name, p_name) == 0) {
+		if (strcasecmp(g_formationTemplates[i].m_name, p_name) == 0) {
 			g_teams[p_team].m_formation = i;
 			g_teamFormations[p_team] = g_formationTemplates[i];
 			result = TRUE;
