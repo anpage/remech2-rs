@@ -8,9 +8,17 @@ use crate::input::controls;
 /// Set by `build.rs`.
 const VERSION: &str = env!("REMECH2_VERSION");
 
+const NOTICE: &str = "ReMech2
+Copyright (C) 2024-2026 Alex Page
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License below for more details.";
+
 /// Everything whose license has to ship with the binary, in display order.
 const LICENSES: &[(&str, &str)] = &[
-    ("ReMech2", include_str!("../LICENSE")),
+    ("ReMech2", NOTICE),
+    ("GNU General Public License", include_str!("../LICENSE")),
     ("demech2", include_str!("../remech2-sys/original/LICENSE")),
     (
         "GeneralUser GS",

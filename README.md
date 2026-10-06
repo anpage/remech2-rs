@@ -122,7 +122,7 @@ The Rust code, this README, and all documentation included in this project are w
 
 ## License
 
-The source code provided in this repository is licensed under the [GNU General Public License, version 3 or later](COPYING).
+ReMech2 is free software: you can redistribute it and/or modify it under the terms of the [GNU General Public License](LICENSE) as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 The decompiled source code in `remech2-sys/original` comes from the [demech2 project](https://github.com/anpage/demech2) and is licensed under the [GNU Lesser General Public License, version 3 or later](remech2-sys/original/LICENSE).
 
