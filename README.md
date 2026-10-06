@@ -123,10 +123,7 @@ insufficient or irrelevant context in a very verbose way.
 ## License
 
 The source code provided in this repository is licensed under the
-[MIT License](LICENSE.md).
-
-ReMech dynamically links with the proprietary code within the original game's
-DLL files in order to fill in the gaps until everything is 100% reimplemented.
+[GNU General Public License, version 3 or later](LICENSE.md).
 
 GeneralUser GS by S. Christian Collins is included as the default soundfont.
 See `LICENSE-GUGS.txt` for more information.
