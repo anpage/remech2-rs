@@ -23,6 +23,9 @@ opt-level = 3
 [profile.release.package."*"]
 debug = false
 
+[profile.dev.package."*"]
+debug = false
+
 [dependencies]
 anyhow = "1.0.98"
 bytemuck = { version = "1.25", features = ["derive"] }
