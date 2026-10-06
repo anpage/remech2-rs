@@ -60,7 +60,7 @@ Any disc with the software-rendered release, either for DOS or Windows 95:
 - S3 ViRGE
 - Matrox Mystique
 - ATI 3D RAGE / RAGE II
-- 3Dfx Voodoo/Diamond Monster 3D
+- 3Dfx Voodoo/Diamond Monster 3D/STB Velocity
 - PowerVR
 - Battlepack
 - Titanium
