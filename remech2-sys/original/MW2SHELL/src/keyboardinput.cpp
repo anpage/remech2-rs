@@ -1,7 +1,6 @@
 #include "keyboardinput.h"
 
 #include "font.h"
-#include "inputdriver.h"
 #include "keyboard.h"
 #include "mousestate.h"
 #include "shellglobals.h"
@@ -46,7 +45,7 @@ KeyboardInput::~KeyboardInput()
 // FUNCTION: MW2SHELL 0x100440ed
 void KeyboardInput::FlushKeys()
 {
-	g_keyboardDriver.m_flushKeyCodes();
+	KeyboardFlushKeyCodes();
 	m_key = 0;
 }
 

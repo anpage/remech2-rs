@@ -4,14 +4,11 @@
 #include "briefing.h"
 #include "cadettraining.h"
 #include "clanhall.h"
-#include "cockpitcontrols.h"
 #include "credits.h"
 #include "debrief.h"
 #include "debugout.h"
 #include "debugprint.h"
 #include "hallofhonor.h"
-#include "input.h"
-#include "inputdriver.h"
 #include "keyboard.h"
 #include "keyboardinput.h"
 #include "mainmenu.h"
@@ -19,7 +16,6 @@
 #include "mechvariant.h"
 #include "menudata.h"
 #include "missionui.h"
-#include "mouse.h"
 #include "mousestate.h"
 #include "mw2prj.h"
 #include "options.h"
@@ -88,42 +84,6 @@ static const struct {
 	RESET_GLOBAL(g_clanHallExitVideo),
 	RESET_GLOBAL(g_clanHallExitMessage),
 
-	// cockpitcontrols.cpp
-	RESET_GLOBAL(g_cpcSelectedBinding),
-	RESET_GLOBAL(g_cpcSelectedPart),
-	RESET_GLOBAL(g_curInputDeviceIdx),
-	RESET_GLOBAL(g_cpcControlLabels),
-	RESET_GLOBAL(g_cpcSimControlNames),
-	RESET_GLOBAL(g_cpcConfigShown),
-	RESET_GLOBAL(g_cpcBindings),
-	RESET_GLOBAL(g_cpcShownBindings),
-	RESET_GLOBAL(g_cpcFirstButton),
-	RESET_GLOBAL(g_curCpcConfigSlot),
-	RESET_GLOBAL(g_cpcConfigured),
-	RESET_GLOBAL(g_inputConfigChanged),
-	RESET_GLOBAL(g_cpcBindingsPage),
-	RESET_GLOBAL(g_activeInputDeviceCount),
-	RESET_GLOBAL(g_cpcLegsPanSlot),
-	RESET_GLOBAL(g_cpcConfigNames),
-	RESET_GLOBAL(g_cpcAxisDirections),
-	RESET_GLOBAL(g_cpcModifierNames),
-	RESET_GLOBAL(g_cpcSlotNames),
-	RESET_GLOBAL(g_cpcConfigName),
-	RESET_GLOBAL(g_cpcMessageText),
-	RESET_GLOBAL(g_cpcLogoMovie),
-	RESET_GLOBAL(g_cpcSlotText),
-	RESET_GLOBAL(g_cpcDeviceFileBindings),
-	RESET_GLOBAL(g_inputDeviceActive),
-	RESET_GLOBAL(g_cpcFieldText),
-	RESET_GLOBAL(g_cpcDeviceSlots),
-	RESET_GLOBAL(g_cpcDisabledColors),
-	RESET_GLOBAL(g_cpcSelectedColors),
-	RESET_GLOBAL(g_cpcBindingsFields),
-	RESET_GLOBAL(g_cpcDevicesFields),
-	RESET_GLOBAL(g_cpcAnalogCount),
-	RESET_GLOBAL(g_cpcDiscreteCount),
-	RESET_GLOBAL(g_cpcEditText),
-
 	// credits.cpp
 	RESET_GLOBAL(g_creditLines),
 	RESET_GLOBAL(g_creditsMovie),
@@ -165,18 +125,6 @@ static const struct {
 	RESET_GLOBAL(g_hallOfHonorMovie),
 	RESET_GLOBAL(g_hallOfHonorText),
 
-	// input.c
-	RESET_GLOBAL(g_inputMapFile),
-	RESET_GLOBAL(g_inputDeviceCount),
-	RESET_GLOBAL(g_inputDeviceCapacity),
-	RESET_GLOBAL(g_inputDevices),
-	RESET_GLOBAL(g_inputDrivers),
-	RESET_GLOBAL(g_inputModifiers),
-	RESET_GLOBAL(g_inputControls),
-
-	// joystick.c
-	RESET_GLOBAL(g_joystickDriver),
-
 	// keyboard.c
 	RESET_GLOBAL(g_keyCodeWriteIndex),
 	RESET_GLOBAL(g_keyCodeReadIndex),
@@ -184,9 +132,6 @@ static const struct {
 	RESET_GLOBAL(g_keyStates),
 	RESET_GLOBAL(g_keyCodeMap),
 	RESET_GLOBAL(g_extendedScanCodeMap),
-	RESET_GLOBAL(g_keyShortNames),
-	RESET_GLOBAL(g_keyNames),
-	RESET_GLOBAL(g_keyboardDriver),
 
 	// keyboardinput.cpp
 	RESET_GLOBAL(g_editTextBuffer),
@@ -566,18 +511,6 @@ static const struct {
 	RESET_GLOBAL(g_enemyFormation),
 	RESET_GLOBAL(g_briefingLine),
 	RESET_GLOBAL(g_briefingMission),
-
-	// mouse.c
-	RESET_GLOBAL(g_mouseAxisNames),
-	RESET_GLOBAL(g_mouseAxisTypes),
-	RESET_GLOBAL(g_mouseButtonNames),
-	RESET_GLOBAL(g_mouseButtonTypes),
-	RESET_GLOBAL(g_cursorClipped),
-	RESET_GLOBAL(g_reclipCursor),
-	RESET_GLOBAL(g_mouseDriver),
-	RESET_GLOBAL(g_mouseDeviceName),
-	RESET_GLOBAL(g_mouseDisplayName),
-	RESET_GLOBAL(g_mouseTypeName),
 
 	// mousestate.cpp
 	RESET_GLOBAL(g_cursorPositionText),

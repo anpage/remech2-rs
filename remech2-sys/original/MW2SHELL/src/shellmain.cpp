@@ -5,7 +5,6 @@
 #include "briefing.h"
 #include "cadettraining.h"
 #include "clanhall.h"
-#include "cockpitcontrols.h"
 #include "credits.h"
 #include "debrief.h"
 #include "debugout.h"
@@ -197,12 +196,6 @@ MECH_INTPTR ShellHandleMessageC(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lP
 			CloseMenuFunction();
 			EnableShellMenuCommand(c_menuCombatVariables, FALSE);
 			DrawOptions();
-			g_menuDialogOpen = TRUE;
-			break;
-		case c_menuCockpitControls:
-			CloseMenuFunction();
-			EnableShellMenuCommand(c_menuCockpitControls, FALSE);
-			OpenCockpitControls();
 			g_menuDialogOpen = TRUE;
 			break;
 		case c_menuKeshik:

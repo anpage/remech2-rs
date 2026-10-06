@@ -2,8 +2,6 @@
 
 #include "elapsed.h"
 #include "font.h"
-#include "inputdeviceinfo.h"
-#include "inputdriver.h"
 #include "pointer.h"
 #include "refreshmode.h"
 #include "shellglobals.h"

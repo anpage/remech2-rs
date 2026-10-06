@@ -17,8 +17,6 @@ macro_rules! key_codes {
         }
 
         impl KeyCode {
-            pub const ALL: &[KeyCode] = &[$(KeyCode::$key),*];
-
             pub fn name(self) -> &'static str {
                 match self {
                     $(KeyCode::$key => stringify!($key)),*

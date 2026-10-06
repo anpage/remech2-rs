@@ -91,10 +91,6 @@ impl Store {
         Self { root: root.into() }
     }
 
-    pub fn root(&self) -> &Path {
-        &self.root
-    }
-
     pub fn profiles(&self) -> Vec<String> {
         let mut names = names_in(&self.root);
         names.retain(|name| !is_default(name));
