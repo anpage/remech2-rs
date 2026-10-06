@@ -1,4 +1,6 @@
-# ReMech2
+<p align="center">
+  <img width="560" height="184" alt="image" src="assets/remech2.png" />
+</p>
 
 ReMech2 is an **unofficial** open-source replacement executable for the game _MechWarrior 2: 31st Century Combat_, built for modern operating systems.
 
