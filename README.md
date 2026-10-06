@@ -2,12 +2,16 @@
   <img width="560" height="184" alt="image" src="assets/remech2.png" />
 </p>
 
-ReMech2 is an **unofficial** open-source replacement executable for the game _MechWarrior 2: 31st Century Combat_, built for modern operating systems.
+ReMech2 is an **unofficial** open-source reimplementation of the game _MechWarrior 2: 31st Century Combat_, built for modern operating systems.
 
 This is still a work-in-progress and things are rough and hacky, but the game currently works well enough to play on Windows 11 or Linux.
 
 > [!IMPORTANT]
 > **This project does not include the original game data at all.** You must supply your own copy of the game to run it.
+
+<p align="center">
+<img width="1366" height="768" alt="image" src="assets/screenshot1.png" />
+</p>
 
 ## Features
 
