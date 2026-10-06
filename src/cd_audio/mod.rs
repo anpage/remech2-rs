@@ -74,7 +74,8 @@ impl CdAudioPlayer {
                 .and_then(|e| e.to_str())
                 .map(|e| e.to_ascii_lowercase())
                 .unwrap_or_default();
-            if extension != "wav" && extension != "ogg" && extension != "mp3" {
+            if extension != "wav" && extension != "ogg" && extension != "mp3" && extension != "flac"
+            {
                 continue;
             }
 
