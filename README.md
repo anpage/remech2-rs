@@ -19,7 +19,7 @@ This is still a work-in-progress and things are rough and hacky, but the game cu
 - An internal MIDI synthesizer and soundfont
 - Music playback from files instead of CD audio
 - Wgpu-based, aspect-correct drawing and upscaling (Vulkan/DirectX/OpenGL)
-- Optionally allows 16:9 widescreen versions of the internal video modes, preserving the HUD and FoV
+- 16:9 Hor+ widescreen support
 - Unlocked framerates (up to 181 FPS, experimental)
 
 And more...
@@ -120,7 +120,9 @@ Under Windows:
 The decompiled source code in `remech2-sys/original` comes from the [demech2 project](https://github.com/anpage/demech2), which used an LLM and assembly-diffing scripts to convert an annotated Ghidra project into C/C++ code that closely matches the original game's behavior.
 Over time, this decompiled code will be replaced with Rust.
 
-The Rust code, this README, and all documentation included in this project are written by hand.
+The majority of the Rust code is written by hand.
+
+This README and all documentation included in this project are written by hand.
 
 ## License
 
