@@ -2,6 +2,8 @@ use std::sync::Mutex;
 
 use egui::{Context, FontFamily, FontId, RichText, ScrollArea, TextWrapMode};
 
+use crate::input::controls;
+
 /// The version for a tagged release, otherwise a description of the commit.
 /// Set by `build.rs`.
 const VERSION: &str = env!("REMECH2_VERSION");
@@ -124,7 +126,9 @@ pub fn window(ctx: &Context, open: &mut bool, scale_factor: f32) {
                         subsidiaries. MechWarrior is a trademark of its respective owner. No original \
                         game content is distributed with this project.",
                     )
-                    .size(6.0 * scale_factor),
+                    .size(6.0 * scale_factor)
+                    .line_height(Some(7.0 * scale_factor))
+                    .family(FontFamily::Name(controls::FONT_FAMILY.into())),
                 );
             });
 
