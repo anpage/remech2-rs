@@ -19,6 +19,8 @@ extern MechChar* g_skillNames[3];
 extern ScreenField g_optionFields[18];
 void LoadSoundConfig();
 void LoadDifficultyConfig();
+void SaveDifficultyConfig();
+void SaveSoundConfig();
 void DrawOptions();
 // The resolution and widescreen rows' ScreenField functions, implemented on the Rust side
 // (src/shell/screens/settings.rs)

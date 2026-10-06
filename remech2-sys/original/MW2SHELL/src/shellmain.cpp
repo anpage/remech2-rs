@@ -386,6 +386,10 @@ extern "C" int ShellMain(char* p_cmdLine)
 	g_mw2Database = new TMPackDataBase(g_databaseName);
 	// The original left the saved volumes unread until the options screen was opened.
 	LoadSoundConfig();
+	LoadDifficultyConfig();
+	// Writes the defaults for the simulator when the files are missing
+	SaveSoundConfig();
+	SaveDifficultyConfig();
 	g_audioSubsystem = new AudioSubsystem();
 	g_windowWidth = 640;
 	g_windowHeight = 480;

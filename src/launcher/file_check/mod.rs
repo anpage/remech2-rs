@@ -62,7 +62,6 @@ impl FileCheck {
         let status = self.copying_status.clone();
         let missing_files = self.missing_files.clone();
 
-        std::fs::create_dir_all(files::resolve("GIDDI")).unwrap();
         std::fs::create_dir_all(files::resolve("KEATING")).unwrap();
         std::fs::create_dir_all(files::resolve("LAUNCH")).unwrap();
         std::fs::create_dir_all(files::resolve("SMK")).unwrap();
@@ -318,11 +317,6 @@ fn check_files<P: AsRef<Path>>(base_path: P) -> Vec<MissingFile> {
     let mut missing_files = Vec::new();
 
     check_folder(base_path.as_ref(), list::GAME_FILES, &mut missing_files);
-    check_folder(
-        files::resolve_in(base_path.as_ref(), "GIDDI"),
-        list::GIDDI_FILES,
-        &mut missing_files,
-    );
     check_folder(
         files::resolve_in(base_path.as_ref(), "KEATING"),
         list::KEATING_FILES,

@@ -1,155 +1,29 @@
 use super::GameFile;
 
 pub const GAME_FILES: &[GameFile] = &[
+    // The Jade Falcon clan archive
     GameFile {
         path: "ARCHJF.MW2",
         cd_paths: &["ARCHJF.MW2", "MECH2/ARCHJF.MW2"],
     },
+    // The Wolf clan archive
     GameFile {
         path: "ARCHWO.MW2",
         cd_paths: &["ARCHWO.MW2", "MECH2/ARCHWO.MW2"],
     },
+    // The shell's screens, sounds and music
     GameFile {
         path: "DATABASE.MW2",
         cd_paths: &["DATABASE.MW2", "MECH2/DATABASE.MW2"],
     },
-    GameFile {
-        path: "EN00STAR.BWD",
-        cd_paths: &["EN00STAR.BWD"],
-    },
-    GameFile {
-        path: "EN01STAR.BWD",
-        cd_paths: &["EN01STAR.BWD"],
-    },
-    GameFile {
-        path: "EN02STAR.BWD",
-        cd_paths: &["EN02STAR.BWD"],
-    },
-    GameFile {
-        path: "EN03STAR.BWD",
-        cd_paths: &["EN03STAR.BWD"],
-    },
-    GameFile {
-        path: "EN04STAR.BWD",
-        cd_paths: &["EN04STAR.BWD"],
-    },
-    GameFile {
-        path: "EN05STAR.BWD",
-        cd_paths: &["EN05STAR.BWD"],
-    },
-    GameFile {
-        path: "EN06STAR.BWD",
-        cd_paths: &["EN06STAR.BWD"],
-    },
-    GameFile {
-        path: "EN07STAR.BWD",
-        cd_paths: &["EN07STAR.BWD"],
-    },
-    GameFile {
-        path: "GAMEKEY.MAP",
-        cd_paths: &["GAMEKEY.MAP"],
-    },
-    GameFile {
-        path: "INPUT.MAP",
-        cd_paths: &["INPUT.MAP"],
-    },
-    GameFile {
-        path: "INSTMAP1.BWD",
-        cd_paths: &["INSTMAP1.BWD"],
-    },
+    // Missions, mechs, terrain, sounds and the simulator's art
     GameFile {
         path: "MW2.PRJ",
         cd_paths: &["MW2.PRJ", "MECH2/MW2.PRJ"],
     },
-    GameFile {
-        path: "MW2CAR.CFG",
-        cd_paths: &["MW2CAR.CFG"],
-    },
-    GameFile {
-        path: "MW2DIF.CFG",
-        cd_paths: &["MW2DIF.CFG"],
-    },
-    GameFile {
-        path: "MW2MSN.CFG",
-        cd_paths: &["MW2MSN.CFG"],
-    },
-    GameFile {
-        path: "MW2NET.CFG",
-        cd_paths: &["MW2NET.CFG"],
-    },
-    GameFile {
-        path: "MW2PRM.CFG",
-        cd_paths: &["MW2PRM.CFG"],
-    },
-    GameFile {
-        path: "MW2REG.CFG",
-        cd_paths: &["MW2REG.CFG"],
-    },
-    GameFile {
-        path: "MW2SND.CFG",
-        cd_paths: &["MW2SND.CFG"],
-    },
-    GameFile {
-        path: "USERSTAR.BWD",
-        cd_paths: &["USERSTAR.BWD"],
-    },
 ];
 
-pub const GIDDI_FILES: &[GameFile] = &[
-    GameFile {
-        path: "CONFIG00.CPC",
-        cd_paths: &["GIDDI/CONFIG00.CPC"],
-    },
-    GameFile {
-        path: "DEFAULT.CPC",
-        cd_paths: &["GIDDI/DEFAULT.CPC"],
-    },
-    GameFile {
-        path: "FILES.TXT",
-        cd_paths: &["GIDDI/FILES.TXT"],
-    },
-    GameFile {
-        path: "FLTSTICK.CPC",
-        cd_paths: &["GIDDI/FLTSTICK.CPC"],
-    },
-    GameFile {
-        path: "JOYSTICK.CPC",
-        cd_paths: &["GIDDI/JOYSTICK.CPC"],
-    },
-    GameFile {
-        path: "JOYSTICK.STD",
-        cd_paths: &["GIDDI/JOYSTICK.STD"],
-    },
-    GameFile {
-        path: "KEYBOARD.CPC",
-        cd_paths: &["GIDDI/KEYBOARD.CPC"],
-    },
-    GameFile {
-        path: "MOUSE.CPC",
-        cd_paths: &["GIDDI/MOUSE.CPC"],
-    },
-    GameFile {
-        path: "MOUSE.STD",
-        cd_paths: &["GIDDI/MOUSE.STD"],
-    },
-    GameFile {
-        path: "SIDEWIND.CPC",
-        cd_paths: &["GIDDI/SIDEWIND.CPC"],
-    },
-    GameFile {
-        path: "TMASTER.CPC",
-        cd_paths: &["GIDDI/TMASTER.CPC"],
-    },
-    GameFile {
-        path: "VIO1.CPC",
-        cd_paths: &["GIDDI/VIO1.CPC"],
-    },
-    GameFile {
-        path: "VIO2.CPC",
-        cd_paths: &["GIDDI/VIO2.CPC"],
-    },
-];
-
+/// Cadet training voice-overs
 pub const KEATING_FILES: &[GameFile] = &[
     GameFile {
         path: "GENETR1F.SFL",
@@ -357,282 +231,127 @@ pub const KEATING_FILES: &[GameFile] = &[
     },
 ];
 
+/// The dropship loading screens shown before a mission
 pub const LAUNCH_FILES: &[GameFile] = &[
-    GameFile {
-        path: "LAUNCH.SHP",
-        cd_paths: &["LAUNCH/LAUNCH.SHP"],
-    },
     GameFile {
         path: "LAUNCH6.SHP",
         cd_paths: &["LAUNCH/LAUNCH6.SHP"],
-    },
-    GameFile {
-        path: "LIABJAR.SHP",
-        cd_paths: &["LAUNCH/LIABJAR.SHP"],
     },
     GameFile {
         path: "LIABJAR6.SHP",
         cd_paths: &["LAUNCH/LIABJAR6.SHP"],
     },
     GameFile {
-        path: "LIABONE.SHP",
-        cd_paths: &["LAUNCH/LIABONE.SHP"],
-    },
-    GameFile {
         path: "LIABONE6.SHP",
         cd_paths: &["LAUNCH/LIABONE6.SHP"],
-    },
-    GameFile {
-        path: "LIADAWN.SHP",
-        cd_paths: &["LAUNCH/LIADAWN.SHP"],
     },
     GameFile {
         path: "LIADAWN6.SHP",
         cd_paths: &["LAUNCH/LIADAWN6.SHP"],
     },
     GameFile {
-        path: "LIADEVI.SHP",
-        cd_paths: &["LAUNCH/LIADEVI.SHP"],
-    },
-    GameFile {
         path: "LIADEVI6.SHP",
         cd_paths: &["LAUNCH/LIADEVI6.SHP"],
-    },
-    GameFile {
-        path: "LIAENGA.SHP",
-        cd_paths: &["LAUNCH/LIAENGA.SHP"],
-    },
-    GameFile {
-        path: "LIAENGA6.SHP",
-        cd_paths: &["LAUNCH/LIAENGA6.SHP"],
-    },
-    GameFile {
-        path: "LIAGARS.SHP",
-        cd_paths: &["LAUNCH/LIAGARS.SHP"],
-    },
-    GameFile {
-        path: "LIAGARS6.SHP",
-        cd_paths: &["LAUNCH/LIAGARS6.SHP"],
-    },
-    GameFile {
-        path: "LIAGOAT.SHP",
-        cd_paths: &["LAUNCH/LIAGOAT.SHP"],
     },
     GameFile {
         path: "LIAGOAT6.SHP",
         cd_paths: &["LAUNCH/LIAGOAT6.SHP"],
     },
     GameFile {
-        path: "LIAGRAU.SHP",
-        cd_paths: &["LAUNCH/LIAGRAU.SHP"],
-    },
-    GameFile {
         path: "LIAGRAU6.SHP",
         cd_paths: &["LAUNCH/LIAGRAU6.SHP"],
-    },
-    GameFile {
-        path: "LIAKAES.SHP",
-        cd_paths: &["LAUNCH/LIAKAES.SHP"],
-    },
-    GameFile {
-        path: "LIAKAES6.SHP",
-        cd_paths: &["LAUNCH/LIAKAES6.SHP"],
-    },
-    GameFile {
-        path: "LIAKANO.SHP",
-        cd_paths: &["LAUNCH/LIAKANO.SHP"],
     },
     GameFile {
         path: "LIAKANO6.SHP",
         cd_paths: &["LAUNCH/LIAKANO6.SHP"],
     },
     GameFile {
-        path: "LIAMANN.SHP",
-        cd_paths: &["LAUNCH/LIAMANN.SHP"],
-    },
-    GameFile {
         path: "LIAMANN6.SHP",
         cd_paths: &["LAUNCH/LIAMANN6.SHP"],
-    },
-    GameFile {
-        path: "LIAPORT.SHP",
-        cd_paths: &["LAUNCH/LIAPORT.SHP"],
     },
     GameFile {
         path: "LIAPORT6.SHP",
         cd_paths: &["LAUNCH/LIAPORT6.SHP"],
     },
     GameFile {
-        path: "LJFBAKE.SHP",
-        cd_paths: &["LAUNCH/LJFBAKE.SHP"],
-    },
-    GameFile {
-        path: "LJFBAKE6.SHP",
-        cd_paths: &["LAUNCH/LJFBAKE6.SHP"],
-    },
-    GameFile {
-        path: "LJFEVCI.SHP",
-        cd_paths: &["LAUNCH/LJFEVCI.SHP"],
-    },
-    GameFile {
         path: "LJFEVCI6.SHP",
         cd_paths: &["LAUNCH/LJFEVCI6.SHP"],
-    },
-    GameFile {
-        path: "LJFMACD.SHP",
-        cd_paths: &["LAUNCH/LJFMACD.SHP"],
     },
     GameFile {
         path: "LJFMACD6.SHP",
         cd_paths: &["LAUNCH/LJFMACD6.SHP"],
     },
     GameFile {
-        path: "LJFMORG.SHP",
-        cd_paths: &["LAUNCH/LJFMORG.SHP"],
-    },
-    GameFile {
         path: "LJFMORG6.SHP",
         cd_paths: &["LAUNCH/LJFMORG6.SHP"],
-    },
-    GameFile {
-        path: "LJFSUDE.SHP",
-        cd_paths: &["LAUNCH/LJFSUDE.SHP"],
     },
     GameFile {
         path: "LJFSUDE6.SHP",
         cd_paths: &["LAUNCH/LJFSUDE6.SHP"],
     },
     GameFile {
-        path: "LJFTRAI.SHP",
-        cd_paths: &["LAUNCH/LJFTRAI.SHP"],
-    },
-    GameFile {
         path: "LJFTRAI6.SHP",
         cd_paths: &["LAUNCH/LJFTRAI6.SHP"],
-    },
-    GameFile {
-        path: "LJFTRIA.SHP",
-        cd_paths: &["LAUNCH/LJFTRIA.SHP"],
     },
     GameFile {
         path: "LJFTRIA6.SHP",
         cd_paths: &["LAUNCH/LJFTRIA6.SHP"],
     },
     GameFile {
-        path: "LJFTWYC.SHP",
-        cd_paths: &["LAUNCH/LJFTWYC.SHP"],
-    },
-    GameFile {
         path: "LJFTWYC6.SHP",
         cd_paths: &["LAUNCH/LJFTWYC6.SHP"],
-    },
-    GameFile {
-        path: "LJFVANT.SHP",
-        cd_paths: &["LAUNCH/LJFVANT.SHP"],
     },
     GameFile {
         path: "LJFVANT6.SHP",
         cd_paths: &["LAUNCH/LJFVANT6.SHP"],
     },
     GameFile {
-        path: "LJFWOTA.SHP",
-        cd_paths: &["LAUNCH/LJFWOTA.SHP"],
-    },
-    GameFile {
         path: "LJFWOTA6.SHP",
         cd_paths: &["LAUNCH/LJFWOTA6.SHP"],
-    },
-    GameFile {
-        path: "LJFZOET.SHP",
-        cd_paths: &["LAUNCH/LJFZOET.SHP"],
     },
     GameFile {
         path: "LJFZOET6.SHP",
         cd_paths: &["LAUNCH/LJFZOET6.SHP"],
     },
     GameFile {
-        path: "LWOBAKE.SHP",
-        cd_paths: &["LAUNCH/LWOBAKE.SHP"],
-    },
-    GameFile {
         path: "LWOBAKE6.SHP",
         cd_paths: &["LAUNCH/LWOBAKE6.SHP"],
-    },
-    GameFile {
-        path: "LWOCOLM.SHP",
-        cd_paths: &["LAUNCH/LWOCOLM.SHP"],
     },
     GameFile {
         path: "LWOCOLM6.SHP",
         cd_paths: &["LAUNCH/LWOCOLM6.SHP"],
     },
     GameFile {
-        path: "LWOEVCI.SHP",
-        cd_paths: &["LAUNCH/LWOEVCI.SHP"],
-    },
-    GameFile {
         path: "LWOEVCI6.SHP",
         cd_paths: &["LAUNCH/LWOEVCI6.SHP"],
-    },
-    GameFile {
-        path: "LWOMACD.SHP",
-        cd_paths: &["LAUNCH/LWOMACD.SHP"],
     },
     GameFile {
         path: "LWOMACD6.SHP",
         cd_paths: &["LAUNCH/LWOMACD6.SHP"],
     },
     GameFile {
-        path: "LWOMORG.SHP",
-        cd_paths: &["LAUNCH/LWOMORG.SHP"],
-    },
-    GameFile {
         path: "LWOMORG6.SHP",
         cd_paths: &["LAUNCH/LWOMORG6.SHP"],
-    },
-    GameFile {
-        path: "LWOSUDE.SHP",
-        cd_paths: &["LAUNCH/LWOSUDE.SHP"],
     },
     GameFile {
         path: "LWOSUDE6.SHP",
         cd_paths: &["LAUNCH/LWOSUDE6.SHP"],
     },
     GameFile {
-        path: "LWOTRAI.SHP",
-        cd_paths: &["LAUNCH/LWOTRAI.SHP"],
-    },
-    GameFile {
         path: "LWOTRAI6.SHP",
         cd_paths: &["LAUNCH/LWOTRAI6.SHP"],
-    },
-    GameFile {
-        path: "LWOTRIA.SHP",
-        cd_paths: &["LAUNCH/LWOTRIA.SHP"],
     },
     GameFile {
         path: "LWOTRIA6.SHP",
         cd_paths: &["LAUNCH/LWOTRIA6.SHP"],
     },
     GameFile {
-        path: "LWOTWYC.SHP",
-        cd_paths: &["LAUNCH/LWOTWYC.SHP"],
-    },
-    GameFile {
         path: "LWOTWYC6.SHP",
         cd_paths: &["LAUNCH/LWOTWYC6.SHP"],
     },
     GameFile {
-        path: "LWOWOTA.SHP",
-        cd_paths: &["LAUNCH/LWOWOTA.SHP"],
-    },
-    GameFile {
         path: "LWOWOTA6.SHP",
         cd_paths: &["LAUNCH/LWOWOTA6.SHP"],
-    },
-    GameFile {
-        path: "LWOZOET.SHP",
-        cd_paths: &["LAUNCH/LWOZOET.SHP"],
     },
     GameFile {
         path: "LWOZOET6.SHP",
@@ -659,15 +378,12 @@ pub const LAUNCH_FILES: &[GameFile] = &[
         cd_paths: &["LAUNCH/NETWAITK.SHP"],
     },
     GameFile {
-        path: "SUPANM.SHP",
-        cd_paths: &["LAUNCH/SUPANM.SHP"],
-    },
-    GameFile {
         path: "SUPANM6.SHP",
         cd_paths: &["LAUNCH/SUPANM6.SHP"],
     },
 ];
 
+/// The shell's Smacker videos and graphics
 pub const SMK_FILES: &[GameFile] = &[
     GameFile {
         path: "AIAGRID.SMK",

@@ -181,7 +181,7 @@ PaletteColor g_savedScreenPalette[0x100] = {0};
 
 // The sound settings (MW2SND.CFG).
 // GLOBAL: MW2SHELL 0x10071678
-SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 0x10000, 0xf, 1, 1, 1, 1, 1, 8, {0}};
+SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 0x10000, 0xf, 1, 1, 1, 1, 1, 9, "vesa480.dll"};
 
 // The difficulty settings (MW2DIF.CFG).
 // GLOBAL: MW2SHELL 0x100716b8
