@@ -358,26 +358,6 @@ pub const LAUNCH_FILES: &[GameFile] = &[
         cd_paths: &["LAUNCH/LWOZOET6.SHP"],
     },
     GameFile {
-        path: "NETMECH.SHP",
-        cd_paths: &["LAUNCH/NETMECH.SHP"],
-    },
-    GameFile {
-        path: "NETMECH6.SHP",
-        cd_paths: &["LAUNCH/NETMECH6.SHP"],
-    },
-    GameFile {
-        path: "NETWAIT.SHP",
-        cd_paths: &["LAUNCH/NETWAIT.SHP"],
-    },
-    GameFile {
-        path: "NETWAIT6.SHP",
-        cd_paths: &["LAUNCH/NETWAIT6.SHP"],
-    },
-    GameFile {
-        path: "NETWAITK.SHP",
-        cd_paths: &["LAUNCH/NETWAITK.SHP"],
-    },
-    GameFile {
         path: "SUPANM6.SHP",
         cd_paths: &["LAUNCH/SUPANM6.SHP"],
     },
