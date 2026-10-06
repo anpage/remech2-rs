@@ -24,9 +24,9 @@ mod heap;
 mod input;
 mod launcher;
 mod log;
+mod mech_rand;
 mod messages;
 mod midi_source;
-mod mech_rand;
 mod resolution;
 mod settings;
 mod shell;
@@ -35,7 +35,7 @@ mod xmi;
 
 fn start_shell(intro_or_sim: &str) -> Result<i32> {
     display::set_overlay(app::with(|app| {
-        Overlay::Shell(shell::OverlayUi::new(app.egui_ctx()))
+        Overlay::Shell(Box::new(shell::OverlayUi::new(app.egui_ctx())))
     }));
     let result = shell::run(intro_or_sim);
     display::set_overlay(None);
@@ -44,7 +44,7 @@ fn start_shell(intro_or_sim: &str) -> Result<i32> {
 
 fn start_sim(cmd_line: &str) -> Result<i32> {
     display::set_overlay(app::with(|app| {
-        Overlay::Sim(sim::OverlayUi::new(app.egui_ctx()))
+        Overlay::Sim(Box::new(sim::OverlayUi::new(app.egui_ctx())))
     }));
     let result = sim::run(cmd_line);
     display::set_overlay(None);

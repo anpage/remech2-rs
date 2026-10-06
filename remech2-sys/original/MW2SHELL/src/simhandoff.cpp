@@ -4,8 +4,6 @@
 #include "files.h"
 #include "mechvariant.h"
 #include "messages.h"
-#include "pilotrecord.h"
-#include "refreshmode.h"
 #include "shellglobals.h"
 #include "shellmain.h"
 #include "simhandoffstate.h"

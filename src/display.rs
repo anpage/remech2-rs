@@ -12,8 +12,8 @@ struct Display {
 }
 
 pub enum Overlay {
-    Shell(shell::OverlayUi),
-    Sim(sim::OverlayUi),
+    Shell(Box<shell::OverlayUi>),
+    Sim(Box<sim::OverlayUi>),
 }
 
 thread_local! {

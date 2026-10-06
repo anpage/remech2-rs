@@ -1,5 +1,5 @@
 use std::{
-    ffi::{CStr, CString, OsStr, c_char, c_int, c_long, c_uint, c_void},
+    ffi::{CStr, CString, OsStr, c_char, c_int, c_uint, c_void},
     fs::{self, File, OpenOptions},
     io::{ErrorKind, Read, Seek, SeekFrom, Write},
     path::{Component, MAIN_SEPARATOR_STR, Path, PathBuf},
@@ -278,7 +278,7 @@ pub unsafe extern "C" fn mech_write(file: c_int, buffer: *const c_void, count: c
 }
 
 #[unsafe(export_name = "MechSeek")]
-pub extern "C" fn mech_seek(file: c_int, offset: c_long, origin: c_int) -> c_long {
+pub extern "C" fn mech_seek(file: c_int, offset: i32, origin: c_int) -> i32 {
     let offset = i64::from(offset);
     let from = match origin {
         SEEK_SET => match u64::try_from(offset) {
@@ -290,7 +290,7 @@ pub extern "C" fn mech_seek(file: c_int, offset: c_long, origin: c_int) -> c_lon
         _ => return -1,
     };
     with_file(file, |file| match file.seek(from) {
-        Ok(position) => c_long::try_from(position).unwrap_or(-1),
+        Ok(position) => i32::try_from(position).unwrap_or(-1),
         Err(_) => -1,
     })
 }
@@ -311,9 +311,9 @@ pub extern "C" fn mech_close(file: c_int) -> c_int {
 }
 
 #[unsafe(export_name = "MechFileLength")]
-pub extern "C" fn mech_file_length(file: c_int) -> c_long {
+pub extern "C" fn mech_file_length(file: c_int) -> i32 {
     with_file(file, |file| match file.metadata() {
-        Ok(metadata) => c_long::try_from(metadata.len()).unwrap_or(-1),
+        Ok(metadata) => i32::try_from(metadata.len()).unwrap_or(-1),
         Err(_) => -1,
     })
 }

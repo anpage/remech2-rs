@@ -1,7 +1,6 @@
 #include "shellglobals.h"
 
 #include "audiosubsystem.h"
-#include "decomp.h"
 #include "difficultyconfig.h"
 #include "font.h"
 #include "keyboardinput.h"

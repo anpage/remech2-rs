@@ -2,6 +2,8 @@ If:
   PathMatch: MW2/.*
 CompileFlags:
   Add: [-IMW2/include, -include, MW2/sim_names.h]
+Diagnostics:
+  UnusedIncludes: None
 ---
 If:
   PathMatch: MW2SHELL/.*
@@ -14,5 +16,6 @@ CompileFlags:
   Add: [-xc++]
 ---
 Diagnostics:
+  MissingIncludes: Strict
   Suppress:
     - writable-strings

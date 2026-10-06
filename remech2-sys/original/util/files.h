@@ -6,6 +6,8 @@
 // disk whatever their case: a file about to be created takes the place of one whose name differs
 // only by case.
 
+#include "types.h"
+
 #include <stddef.h>
 #include <stdio.h>
 
@@ -29,11 +31,11 @@ extern "C"
 	int MechRead(int p_file, void* p_buffer, unsigned int p_count);
 	int MechWrite(int p_file, const void* p_buffer, unsigned int p_count);
 	// lseek, with stdio's SEEK_SET, SEEK_CUR or SEEK_END. Returns the new position, or -1.
-	long MechSeek(int p_file, long p_offset, int p_origin);
+	MechS32 MechSeek(int p_file, MechS32 p_offset, int p_origin);
 	// close. Returns 0, or -1 for a handle that isn't open.
 	int MechClose(int p_file);
 	// The file's size, or -1
-	long MechFileLength(int p_file);
+	MechS32 MechFileLength(int p_file);
 	// remove, rename and mkdir. Return 0, or -1 on failure.
 	int MechRemove(const char* p_path);
 	int MechRename(const char* p_from, const char* p_to);
