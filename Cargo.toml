@@ -36,6 +36,7 @@ gilrs-core = "0.6.8"
 remech2-sys = { path = "remech2-sys" }
 pollster = "0.4.0"
 rand = "0.9.1"
+rfd = "0.17.2"
 rodio = { version = "0.21.1", default-features = false, features = [
     "mp3",
     "playback",

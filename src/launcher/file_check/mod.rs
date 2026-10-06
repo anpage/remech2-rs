@@ -1,6 +1,9 @@
 use std::{
     path::{Path, PathBuf},
-    sync::{Arc, Mutex},
+    sync::{
+        Arc, Mutex,
+        mpsc::{self, Receiver, TryRecvError},
+    },
 };
 
 use anyhow::{Result, bail};
@@ -9,7 +12,6 @@ use super::{Action, Stage};
 use crate::files;
 
 mod list;
-mod storage;
 
 #[derive(Clone, Debug)]
 struct CopyError {
@@ -25,7 +27,7 @@ enum CopyStatus {
 }
 
 pub struct FileCheck {
-    cd_drive_path: Option<PathBuf>,
+    picked_folder: Option<Receiver<Option<PathBuf>>>,
     missing_files: Vec<MissingFile>,
     copying_files: bool,
     copying_status: Arc<Mutex<CopyStatus>>,
@@ -34,28 +36,27 @@ pub struct FileCheck {
 
 impl FileCheck {
     pub fn new() -> Self {
-        let missing_files = check_files(".");
         Self {
-            cd_drive_path: if missing_files.is_empty() {
-                None
-            } else {
-                Self::cd_check()
-            },
-            missing_files,
+            picked_folder: None,
+            missing_files: check_files("."),
             copying_files: false,
             copying_status: Arc::new(Mutex::new(CopyStatus::Copying((None, 0.0)))),
             copying_error: None,
         }
     }
 
-    /// The first storage device with the CD's `OLD_HERC.DRV` at its root
-    fn cd_check() -> Option<PathBuf> {
-        storage::roots()
-            .into_iter()
-            .find(|root| files::resolve_in(root, "OLD_HERC.DRV").is_file())
+    fn pick_folder(&mut self) {
+        let (sender, receiver) = mpsc::channel();
+        std::thread::spawn(move || {
+            let folder = rfd::FileDialog::new()
+                .set_title("Locate the MechWarrior 2 files")
+                .pick_folder();
+            let _ = sender.send(folder);
+        });
+        self.picked_folder = Some(receiver);
     }
 
-    fn start_copy(&mut self, cd_drive_path: PathBuf) {
+    fn start_copy(&mut self, source: PathBuf) {
         self.copying_error = None;
         self.copying_status = Arc::new(Mutex::new(CopyStatus::Copying((None, 0.0))));
 
@@ -70,10 +71,10 @@ impl FileCheck {
             let total_files = missing_files.len() as f32;
             for (i, file) in missing_files.into_iter().enumerate() {
                 let progress = (i as f32) / total_files;
-                let mut error = Some("File not found on CD".to_string());
+                let mut error = Some("File not found in the chosen folder".to_string());
 
                 for cd_path in file.cd_paths {
-                    let cd_file = files::resolve_in(&cd_drive_path, cd_path);
+                    let cd_file = files::resolve_in(&source, cd_path);
                     if cd_file.exists() {
                         if let Err(e) = std::fs::copy(cd_file, &file.path) {
                             tracing::error!(
@@ -139,16 +140,10 @@ impl FileCheck {
                     if ui.button("Quit").clicked() {
                         quit = true;
                     }
-                    if ui.button("Retry").clicked() {
-                        self.cd_drive_path = Self::cd_check();
-                        match self.cd_drive_path.clone() {
-                            Some(cd_drive_path) => self.start_copy(cd_drive_path),
-                            None => {
-                                self.copying_files = false;
-                                self.copying_error = None;
-                                self.missing_files = check_files(".");
-                            }
-                        }
+                    if ui.button("Back").clicked() {
+                        self.copying_files = false;
+                        self.copying_error = None;
+                        self.missing_files = check_files(".");
                     }
                 });
             });
@@ -209,10 +204,22 @@ impl FileCheck {
             Quit,
             Retry,
             Skip,
-            Install,
+            Locate,
         }
 
-        let has_cd = self.cd_drive_path.is_some();
+        if let Some(receiver) = &self.picked_folder {
+            match receiver.try_recv() {
+                Ok(Some(folder)) => {
+                    self.picked_folder = None;
+                    self.start_copy(folder);
+                    return Ok(Action::Nothing);
+                }
+                Ok(None) | Err(TryRecvError::Disconnected) => self.picked_folder = None,
+                Err(TryRecvError::Empty) => {}
+            }
+        }
+
+        let picking = self.picked_folder.is_some();
         let mut choice = None;
         egui::Window::new("⚠ Missing Files")
             .resizable(false)
@@ -232,14 +239,13 @@ impl FileCheck {
                         }
                     });
                 ui.add_space(10.0);
-                if has_cd {
-                    ui.label("Would you like to install them from CD?");
-                } else {
-                    ui.label("Insert your MechWarrior 2 CD to install the missing files.");
-                }
+                ui.label("Locate your MechWarrior 2 CD or install folder to copy them from.");
                 ui.add_space(5.0);
                 ui.label("Continuing without them will likely crash.");
                 ui.add_space(10.0);
+                if picking {
+                    ui.disable();
+                }
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
                     if ui.button("Quit").clicked() {
                         choice = Some(Choice::Quit);
@@ -250,8 +256,8 @@ impl FileCheck {
                     if ui.button("Continue").clicked() {
                         choice = Some(Choice::Skip);
                     }
-                    if has_cd && ui.button("Install").clicked() {
-                        choice = Some(Choice::Install);
+                    if ui.button("Locate…").clicked() {
+                        choice = Some(Choice::Locate);
                     }
                 });
             });
@@ -260,14 +266,11 @@ impl FileCheck {
             Some(Choice::Quit) => bail!("User chose to quit"),
             Some(Choice::Retry) => {
                 self.missing_files = check_files(".");
-                self.cd_drive_path = Self::cd_check();
                 Ok(Action::Nothing)
             }
             Some(Choice::Skip) => Ok(Action::Break),
-            Some(Choice::Install) => {
-                if let Some(cd_drive_path) = self.cd_drive_path.clone() {
-                    self.start_copy(cd_drive_path);
-                }
+            Some(Choice::Locate) => {
+                self.pick_folder();
                 Ok(Action::Nothing)
             }
             None => Ok(Action::Nothing),
