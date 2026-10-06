@@ -5,8 +5,7 @@
 			"label": "build",
 			"args": [
 				"build",
-				"-v",
-				"--target=i686-pc-windows-gnu"
+				"-v"
 			],
 			"command": "cargo",
 			"group": {
@@ -34,48 +33,15 @@
 			]
 		},
 		{
-			"label": "Launch Debugger",
-			"dependsOn": "build",
-			"type": "shell",
-			"command": "/home/alex/.local/share/lutris/runners/wine/raw-wine-10.3-stg/bin/wine",
+			"label": "run",
 			"args": [
-				"Z:/usr/share/win32/gdbserver.exe",
-				"localhost:12345",
-				"${workspaceFolder}/target/i686-pc-windows-gnu/debug/remech2.exe"
+				"run"
 			],
+			"command": "cargo",
 			"options": {
-				"cwd": "${workspaceFolder}/data",
-				"env": {
-					"DISPLAY": ":0",
-					"WINEPREFIX": "${workspaceFolder}/wineprefix",
-				}
+				"cwd": "${workspaceFolder}/data"
 			},
-			"problemMatcher": [
-				{
-					"owner": "rust",
-					"fileLocation": [
-						"relative",
-						"${workspaceRoot}"
-					],
-					"pattern": {
-						"regexp": "^(.*):(\\d+):(\\d+):\\s+(\\d+):(\\d+)\\s+(warning|error):\\s+(.*)$",
-						"file": 1,
-						"line": 2,
-						"column": 3,
-						"endLine": 4,
-						"endColumn": 5,
-						"severity": 6,
-						"message": 7
-					},
-					"background": {
-						"activeOnStart": true,
-						"beginsPattern": ".",
-						"endsPattern": "."
-					}
-				}
-			],
-			"isBackground": true,
-			"hide": true
+			"problemMatcher": []
 		}
 	]
 }

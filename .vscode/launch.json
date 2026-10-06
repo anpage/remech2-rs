@@ -2,24 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach to gdbserver",
+            "name": "Debug ReMech2",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/target/i686-pc-windows-gnu/debug/remech2.exe",
-            "miDebuggerServerAddress": "localhost:12345",
-            "cwd": "${workspaceFolder}",
-            "environment": [
-                {
-                    "name": "DISPLAY",
-                    "value": ":0"
-                },
-                {
-                    "name": "WINEPREFIX",
-                    "value": "${workspaceFolder}/wineprefix"
-                }
-            ],
+            "program": "${workspaceFolder}/target/debug/remech2",
+            "cwd": "${workspaceFolder}/data",
+            "preLaunchTask": "build",
             "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -31,27 +20,7 @@
                     "text": "-gdb-set disassembly-flavor intel",
                     "ignoreFailures": true
                 }
-            ],
-            "presentation": {
-                "hidden": true,
-                "group": "",
-                "order": 1
-            }
-        },
-    ],
-    "compounds": [
-        {
-            "name": "Launch and Attach",
-            "configurations": [
-                "Attach to gdbserver"
-            ],
-            "preLaunchTask": "Launch Debugger",
-            "stopAll": true,
-            "presentation": {
-                "hidden": false,
-                "group": "Build",
-                "order": 1
-            }
+            ]
         }
     ]
 }
