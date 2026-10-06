@@ -249,7 +249,7 @@ impl OverlayUi {
                                     handle_menu_button(40082);
                                 }
                                 ui.separator();
-                                if ui.button("About ReMech 2").clicked() {
+                                if ui.button("About ReMech2").clicked() {
                                     self.about_dialog_open = true;
                                 }
                             })

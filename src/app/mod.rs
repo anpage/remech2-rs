@@ -151,7 +151,7 @@ impl State {
         let height = SETTINGS.get_int("video", "height", 768).max(1) as u32;
 
         let attributes = Window::default_attributes()
-            .with_title("REMECH 2")
+            .with_title("REMECH2")
             .with_inner_size(PhysicalSize::new(width, height))
             .with_fullscreen(fullscreen.then_some(Fullscreen::Borderless(None)));
         let window = Arc::new(event_loop.create_window(attributes)?);

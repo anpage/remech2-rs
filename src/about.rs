@@ -8,7 +8,7 @@ const VERSION: &str = env!("REMECH2_VERSION");
 
 /// Everything whose license has to ship with the binary, in display order.
 const LICENSES: &[(&str, &str)] = &[
-    ("ReMech 2", include_str!("../LICENSE.md")),
+    ("ReMech2", include_str!("../LICENSE.md")),
     ("demech2", include_str!("../remech2-sys/original/LICENSE")),
     (
         "GeneralUser GS",
@@ -114,12 +114,12 @@ pub fn window(ctx: &Context, open: &mut bool, scale_factor: f32) {
             ui.set_width(240.0 * scale_factor);
 
             ui.vertical_centered(|ui| {
-                ui.label(RichText::new("ReMech 2").size(16.0 * scale_factor).strong());
+                ui.label(RichText::new("ReMech2").size(16.0 * scale_factor).strong());
                 ui.label(RichText::new(VERSION).size(8.0 * scale_factor));
                 ui.add_space(8.0 * scale_factor);
                 ui.label(
                     RichText::new(
-                        "ReMech 2 is an unofficial, fan-made project. It is not affiliated with, \
+                        "ReMech2 is an unofficial, fan-made project. It is not affiliated with, \
                         endorsed by, or associated with Microsoft, Activision, or any of their \
                         subsidiaries. MechWarrior is a trademark of its respective owner. No original \
                         game content is distributed with this project.",
