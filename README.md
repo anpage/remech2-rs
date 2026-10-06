@@ -53,6 +53,7 @@ Any disc with the software-rendered release, either for DOS or Windows 95:
 - Pentium Edition
 - Windows 95/MS-DOS
 - SideWinder 3D Pro
+- SoftKey
 
 ### Not Supported
 
