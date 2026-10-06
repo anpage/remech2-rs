@@ -122,7 +122,7 @@ The Rust code, this README, and all documentation included in this project are w
 
 ## License
 
-The source code provided in this repository is licensed under the [GNU General Public License, version 3 or later](LICENSE.md).
+The source code provided in this repository is licensed under the [GNU General Public License, version 3 or later](COPYING).
 
 The decompiled source code in `remech2-sys/original` comes from the [demech2 project](https://github.com/anpage/demech2) and is licensed under the [GNU Lesser General Public License, version 3 or later](remech2-sys/original/LICENSE).
 

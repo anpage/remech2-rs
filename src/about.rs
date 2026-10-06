@@ -10,7 +10,7 @@ const VERSION: &str = env!("REMECH2_VERSION");
 
 /// Everything whose license has to ship with the binary, in display order.
 const LICENSES: &[(&str, &str)] = &[
-    ("ReMech2", include_str!("../LICENSE.md")),
+    ("ReMech2", include_str!("../LICENSE")),
     ("demech2", include_str!("../remech2-sys/original/LICENSE")),
     (
         "GeneralUser GS",
