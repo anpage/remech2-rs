@@ -23,7 +23,11 @@ use remech2_sys::shared::{
     c_mechMsgActivateApp, c_mechMsgKeyDown, c_mechMsgKeyUp, c_mechMsgMouseMove,
 };
 
-use crate::{input::pad::Controllers, messages, settings::SETTINGS};
+use crate::{
+    input::{controls, pad::Controllers},
+    messages,
+    settings::SETTINGS,
+};
 
 use mouse::Mouse;
 pub use mouse::{capture_pointer, cursor_hidden, show_cursor};
@@ -235,7 +239,14 @@ impl ApplicationHandler for State {
         event: WindowEvent,
     ) {
         let mut consumed = false;
-        if let (Some(window), Some(egui_input)) = (&self.window, &mut self.egui_input) {
+        let capture_key = controls::capturing()
+            && matches!(
+                event,
+                WindowEvent::KeyboardInput { .. } | WindowEvent::Ime(_)
+            );
+        if let (Some(window), Some(egui_input), false) =
+            (&self.window, &mut self.egui_input, capture_key)
+        {
             consumed = egui_input.on_window_event(window, &event).consumed;
         }
         self.input.window_event(&event);
@@ -270,7 +281,8 @@ impl ApplicationHandler for State {
             } if self.modifiers.alt_key() => self.toggle_fullscreen(),
             // Releases always reach the game so that no key is left held down
             WindowEvent::KeyboardInput { event, .. }
-                if !consumed || event.state == ElementState::Released =>
+                if !(consumed || controls::has_keyboard())
+                    || event.state == ElementState::Released =>
             {
                 post_key(&event);
             }

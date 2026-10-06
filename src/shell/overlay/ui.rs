@@ -7,8 +7,13 @@ use egui::{
 use remech2_sys::{shared::c_mechMsgCommand, shell};
 
 use crate::drawmode::fit_to_window;
+use crate::input::controls::{self, ControlsWindow};
 use crate::shell::dialog;
-use crate::shell::overlay::{confirm, menu, mouse::OverlayMouseState};
+use crate::shell::overlay::{
+    confirm,
+    menu::{self, MenuLock},
+    mouse::OverlayMouseState,
+};
 use crate::{about, app, messages, shell::screens};
 
 const CURSOR_GRAPHIC_SIZE: usize = 423;
@@ -24,22 +29,40 @@ pub struct OverlayUi {
     cursor_texture: Option<TextureHandle>,
     exit_dialog_open: bool,
     about_dialog_open: bool,
+    controls: ControlsWindow,
+    controls_menu_lock: Option<MenuLock>,
 }
 
 impl OverlayUi {
     pub fn new(ctx: &Context) -> Self {
-        // Load the Squarish Sans font
-        let font =
-            egui::FontData::from_static(include_bytes!("../../../Squarish_Sans_CT_Regular_SC.ttf"));
         let mut fonts = egui::FontDefinitions::default();
+
+        let squarish =
+            egui::FontData::from_static(include_bytes!("../../../Squarish_Sans_CT_Regular_SC.ttf"));
+
         fonts
             .font_data
-            .insert("SquarishSans".to_owned(), Arc::new(font));
+            .insert("SquarishSans".to_owned(), Arc::new(squarish));
+        if let Some(f) = fonts.families.get_mut(&egui::FontFamily::Proportional) {
+            f.insert(0, "SquarishSans".to_owned())
+        }
+
+        let swansea = egui::FontData::from_static(include_bytes!("../../../SWANSE_B.ttf")).tweak(
+            egui::FontTweak {
+                y_offset_factor: -0.1,
+                ..Default::default()
+            },
+        );
+
         fonts
-            .families
-            .get_mut(&egui::FontFamily::Proportional)
-            .unwrap()
-            .insert(0, "SquarishSans".to_owned());
+            .font_data
+            .insert("SwanseaBold".to_owned(), Arc::new(swansea));
+        let mut controls_family = vec!["SwanseaBold".to_owned()];
+        controls_family.extend(fonts.families[&FontFamily::Proportional].iter().cloned());
+        fonts.families.insert(
+            FontFamily::Name(controls::FONT_FAMILY.into()),
+            controls_family,
+        );
 
         ctx.set_fonts(fonts);
 
@@ -49,6 +72,8 @@ impl OverlayUi {
             cursor_texture: None,
             exit_dialog_open: false,
             about_dialog_open: false,
+            controls: ControlsWindow::default(),
+            controls_menu_lock: None,
         }
     }
 
@@ -207,8 +232,9 @@ impl OverlayUi {
                                 if menu_button(ui, "Combat Variables...", 40084) {
                                     handle_menu_button(40084);
                                 }
+                                // Our Controls window replaces the original screen
                                 if menu_button(ui, "Cockpit Controls...", 40011) {
-                                    handle_menu_button(40011);
+                                    controls::request_open();
                                 }
                             })
                             .inner
@@ -256,6 +282,10 @@ impl OverlayUi {
         }
 
         about::window(ctx, &mut self.about_dialog_open, scale_factor);
+        self.controls.window(ctx, scale_factor);
+        if self.controls.is_open() != self.controls_menu_lock.is_some() {
+            self.controls_menu_lock = self.controls.is_open().then(menu::lock);
+        }
         confirm::window(ctx, scale_factor);
         dialog::replay_transition();
 
@@ -324,6 +354,6 @@ impl OverlayUi {
             }
         }
 
-        app::capture_pointer(confirm::is_open());
+        app::capture_pointer(confirm::is_open() || self.controls.is_open());
     }
 }

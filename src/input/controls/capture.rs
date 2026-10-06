@@ -43,12 +43,6 @@ pub struct Captured {
     pub modifiers: Vec<Input>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum Outcome {
-    Captured(Captured),
-    Cancelled,
-}
-
 #[derive(Clone, Copy, Debug)]
 pub struct Wanted {
     pub axes: bool,
@@ -117,18 +111,14 @@ impl Capture {
         kbm: &KbmState,
         devices: &[Device],
         wanted: Wanted,
-    ) -> Option<Outcome> {
+    ) -> Option<Captured> {
         let outcome = self.look(kbm, devices, wanted);
         self.last_kbm = kbm.clone();
         self.last_devices = devices.to_vec();
         outcome
     }
 
-    fn look(&mut self, kbm: &KbmState, devices: &[Device], wanted: Wanted) -> Option<Outcome> {
-        if kbm.key_presses(KeyCode::Escape) != self.last_kbm.key_presses(KeyCode::Escape) {
-            return Some(Outcome::Cancelled);
-        }
-
+    fn look(&mut self, kbm: &KbmState, devices: &[Device], wanted: Wanted) -> Option<Captured> {
         let mut tapped = None;
         let mut press = |held: &mut Vec<Input>, input: Input, still_held: bool| {
             if still_held {
@@ -141,7 +131,7 @@ impl Capture {
         };
 
         for (key, presses) in kbm.all_key_presses() {
-            if key != KeyCode::Escape && presses != self.last_kbm.key_presses(key) {
+            if presses != self.last_kbm.key_presses(key) {
                 press(
                     &mut self.held,
                     Input::Key(key),
@@ -224,7 +214,7 @@ impl Capture {
         {
             let input = self.held.pop()?;
             let modifiers = std::mem::take(&mut self.held);
-            return Some(Outcome::Captured(Captured { input, modifiers }));
+            return Some(Captured { input, modifiers });
         }
 
         for device in devices.iter().filter(|device| device.connected) {
@@ -259,7 +249,7 @@ impl Capture {
         None
     }
 
-    fn finish(&self, input: Input, kbm: &KbmState, devices: &[Device], wanted: Wanted) -> Outcome {
+    fn finish(&self, input: Input, kbm: &KbmState, devices: &[Device], wanted: Wanted) -> Captured {
         let mut modifiers: Vec<Input> = self
             .held
             .iter()
@@ -282,7 +272,7 @@ impl Capture {
                 }
             }
         }
-        Outcome::Captured(Captured { input, modifiers })
+        Captured { input, modifiers }
     }
 }
 

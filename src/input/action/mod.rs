@@ -25,20 +25,20 @@ pub enum Category {
 impl Category {
     pub fn label(self) -> &'static str {
         match self {
-            Category::Movement => "Movement",
-            Category::Torso => "Torso",
-            Category::JumpJets => "Jump jets",
-            Category::Weapons => "Weapons",
-            Category::Targeting => "Targeting",
-            Category::Navigation => "Navigation",
-            Category::MechSystems => "Mech systems",
-            Category::Displays => "Displays",
-            Category::Views => "Views",
-            Category::Camera => "External camera",
-            Category::Lance => "Lance",
-            Category::Game => "Game",
-            Category::SimMenu => "In-mission menu",
-            Category::Debug => "Debug",
+            Category::Movement => "MOVEMENT",
+            Category::Torso => "TORSO",
+            Category::JumpJets => "JUMP JETS",
+            Category::Weapons => "WEAPONS",
+            Category::Targeting => "TARGETING",
+            Category::Navigation => "NAVIGATION",
+            Category::MechSystems => "MECH SYSTEMS",
+            Category::Displays => "DISPLAYS",
+            Category::Views => "VIEWS",
+            Category::Camera => "EXTERNAL CAMERA",
+            Category::Lance => "LANCE",
+            Category::Game => "GAME",
+            Category::SimMenu => "IN-MISSION MENU",
+            Category::Debug => "DEBUG",
         }
     }
 }
