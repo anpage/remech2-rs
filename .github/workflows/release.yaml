@@ -5,34 +5,70 @@ on:
     tags: ["v*"]
 
 jobs:
-  release:
+  build:
+    name: Build (${{ matrix.name }})
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - name: Linux
+            target: x86_64-unknown-linux-gnu
+            packages: mold libasound2-dev libudev-dev
+            exe: remech2
+            archive: ReMech2-linux-x64.tar.gz
+          - name: Windows
+            target: x86_64-pc-windows-gnu
+            packages: gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
+            exe: remech2.exe
+            archive: ReMech2-windows-x64.zip
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MinGW cross-compiler
-        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-i686
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y ${{ matrix.packages }}
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@stable
         with:
-          targets: i686-pc-windows-gnu
+          targets: ${{ matrix.target }}
 
-      - name: Build Release (GNU)
-        run: cargo build --release --no-default-features --target i686-pc-windows-gnu
+      - name: Build Release
+        run: cargo build --release --no-default-features --target ${{ matrix.target }}
         env:
           REMECH2_VERSION: ${{ github.ref_name }}
 
       - name: Package
         run: |
           mkdir ReMech2
-          cp target/i686-pc-windows-gnu/release/remech2.exe ReMech2/
-          zip -r ReMech2.zip ReMech2
+          cp target/${{ matrix.target }}/release/${{ matrix.exe }} ReMech2/
+          case "${{ matrix.archive }}" in
+            *.zip) zip -r "${{ matrix.archive }}" ReMech2 ;;
+            *) tar -czf "${{ matrix.archive }}" ReMech2 ;;
+          esac
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.archive }}
+          path: ${{ matrix.archive }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ReMech2.zip
+          files: |
+            ReMech2-linux-x64.tar.gz
+            ReMech2-windows-x64.zip
           prerelease: true
           generate_release_notes: true

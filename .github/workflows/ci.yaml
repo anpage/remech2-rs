@@ -8,35 +8,47 @@ on:
 
 jobs:
   build:
+    name: Build (${{ matrix.name }})
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            target: x86_64-unknown-linux-gnu
+            packages: mold libasound2-dev libudev-dev
+            exe: remech2
+          - name: Windows
+            target: x86_64-pc-windows-gnu
+            packages: gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
+            exe: remech2.exe
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MinGW cross-compiler
-        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-i686
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y ${{ matrix.packages }}
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@stable
         with:
-          targets: i686-pc-windows-gnu
+          targets: ${{ matrix.target }}
 
       - name: Build Debug
-        run: cargo build --target i686-pc-windows-gnu
+        run: cargo build --target ${{ matrix.target }}
 
       - name: Build Release
-        run: cargo build --release --no-default-features --target i686-pc-windows-gnu
+        run: cargo build --release --no-default-features --target ${{ matrix.target }}
 
       - name: Archive Debug Build
         uses: actions/upload-artifact@v4
         with:
-          name: ReMech2-Debug
-          path: |
-            target/i686-pc-windows-gnu/debug/remech2.exe
+          name: ReMech2-${{ matrix.name }}-Debug
+          path: target/${{ matrix.target }}/debug/${{ matrix.exe }}
 
       - name: Archive Release Build
         uses: actions/upload-artifact@v4
         with:
-          name: ReMech2-Release
-          path: |
-            target/i686-pc-windows-gnu/release/remech2.exe
+          name: ReMech2-${{ matrix.name }}-Release
+          path: target/${{ matrix.target }}/release/${{ matrix.exe }}
