@@ -37,8 +37,9 @@ impl OverlayUi {
     pub fn new(ctx: &Context) -> Self {
         let mut fonts = egui::FontDefinitions::default();
 
-        let squarish =
-            egui::FontData::from_static(include_bytes!("../../../Squarish_Sans_CT_Regular_SC.ttf"));
+        let squarish = egui::FontData::from_static(include_bytes!(
+            "../../../assets/Squarish_Sans_CT_Regular_SC.ttf"
+        ));
 
         fonts
             .font_data
@@ -47,12 +48,11 @@ impl OverlayUi {
             f.insert(0, "SquarishSans".to_owned())
         }
 
-        let swansea = egui::FontData::from_static(include_bytes!("../../../SWANSE_B.ttf")).tweak(
-            egui::FontTweak {
+        let swansea = egui::FontData::from_static(include_bytes!("../../../assets/SWANSE_B.ttf"))
+            .tweak(egui::FontTweak {
                 y_offset_factor: -0.1,
                 ..Default::default()
-            },
-        );
+            });
 
         fonts
             .font_data

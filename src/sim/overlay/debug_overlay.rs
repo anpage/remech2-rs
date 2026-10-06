@@ -35,8 +35,9 @@ pub struct DebugOverlay {
 impl DebugOverlay {
     pub fn new(ctx: &Context) -> Self {
         // Load the Squarish Sans font
-        let font =
-            egui::FontData::from_static(include_bytes!("../../../Squarish_Sans_CT_Regular_SC.ttf"));
+        let font = egui::FontData::from_static(include_bytes!(
+            "../../../assets/Squarish_Sans_CT_Regular_SC.ttf"
+        ));
         let mut fonts = egui::FontDefinitions::default();
         fonts
             .font_data
