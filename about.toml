@@ -1,4 +1,4 @@
-targets = ["i686-pc-windows-gnu"]
+targets = ["x86_64-unknown-linux-gnu", "x86_64-pc-windows-gnu"]
 ignore-build-dependencies = true
 ignore-dev-dependencies = true
 private = { ignore = true }
@@ -19,4 +19,5 @@ accepted = [
     "MPL-2.0",
     "OFL-1.1",
     "Ubuntu-font-1.0",
+    "LGPL-2.1-or-later",
 ]

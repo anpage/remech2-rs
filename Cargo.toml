@@ -3,6 +3,7 @@ name = "remech2"
 version = "0.1.0-alpha.1"
 edition = "2024"
 license = "GPL-3.0-or-later"
+publish = false
 
 [workspace]
 members = ["remech2-sys"]

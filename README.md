@@ -1,96 +1,107 @@
-# ReMech 2
+# ReMech2
 
-ReMech 2 is an **unofficial** open-source replacement executable for the Windows
-95 version of the game _MechWarrior 2: 31st Century Combat_, built for modern
-Windows.
+ReMech2 is an **unofficial** open-source replacement executable for the game _MechWarrior 2: 31st Century Combat_, built for modern operating systems.
 
-The goal is to reimplement the entire engine function-by-function, focusing on
-fixing bugs and adjusting for modern versions of Windows on the way.
+This is still a work-in-progress and things are rough and hacky, but the game currently works well enough to play on Windows 11 or Linux.
 
-In the interest of getting the game working on modern machines, there are
-temporarily some shims for Win32 libraries that will be removed once enough of
-the game's code can be replaced to no longer need them.
+> [!IMPORTANT]
+> **This project does not include the original game data at all.** You must supply your own copy of the game to run it.
 
-This is still a work-in-progress and things are very rough and hacky, but the
-game currently works well enough to play on Windows 11.
+## Features
 
-## Features and Fixes
-
-The fixes from Chris Porter's [Windows XP patch](https://www.warp13.co.uk/mech2) are reimplemented:
-
-- Fixes crash when launching the shell
-- Fixes Mech Lab crash
-- Fixes many heap-related crashes during gameplay
-- Limits the framerate to 45 FPS to fix problems with physics and jump jet fuel recharging
-
-Additionally:
-
-- Adds a "launcher" that runs before the sim
+- A new "launcher" that runs before the sim
   - Checks the game's files
-  - Can install the game from CD
-  - Can download and install the required v1.1 patch
-- Fixes an issue where it was sometimes impossible to explode from overheating
-- Fixes stuttering when using a mouse with a high poll rate
-- Fixes the background music restarting when the game is paused
-- Fixes an error in Windows 11 that broke CD audio playback
-- Plays back music from files if present
-- Fixes freezing related to flawed multithreading
-- Fixes problems accessing registry keys without running as admin
-- Fixes an issue where the intro video could cause a freeze
-- Restores the 1024x768 in-game resolution option from the DOS version
-- Restores the custom cursor image from the DOS version
-- Replaces MIDI playback with an internal synthesizer
-- Replaces Miles Sound System (WAIL32.DLL) with a modern library
-- Allows arbitrary window sizes
-- Upscales the game with the correct aspect ratio using a configurable sharp-bilinear shader
-- Replaces the Windows menu bar with one that's rendered on top of the shell
-- Replaces Win32 dialog boxes with custom egui dialogs
-- Optionally allows framerates up to 181 FPS with experimental fixes
+  - Can install the game from CD or folder
+- Improved mouse input
+- Advanced support for joysticks and other devices (HOTAS/HOSAS)
+- An internal MIDI synthesizer and soundfont
+- Music playback from files instead of CD audio
+- Wgpu-based, aspect-correct drawing and upscaling (Vulkan/DirectX/OpenGL)
 - Optionally allows 16:9 widescreen versions of the internal video modes, preserving the HUD and FoV
+- Unlocked framerates (up to 181 FPS, experimental)
 
-There is more to come as reimplementation progresses.
+And more...
+
+## Bug Fixes
+
+- Jump jet fuel now recharges regardless of framerate
+- Missiles no longer explode in your face at high framerates
+- Your mech's heat no longer creeps higher when the game is paused
+- It is no longer impossible to explode from overheating
+- The background music no longer restarts when the game is paused
+
+There is more to come as work progresses.
 
 ## Running
 
-**ReMech 2 does not include any part of the original game data.**
+Documentation is forthcoming. You'll need an installed copy of the **English** version of the original game.
 
-Documentation is forthcoming. You'll need an installed copy of the orginal
-Windows 95 version (a.k.a. Pentium Edition) and a specific version of the game's
-DLL files contained in the
-[Windows 95 1.1 _patch_](https://archive.org/details/mw2patch), not the 1.1 CD.
+If you don't currently have the game installed, run ReMech2 from within its own (writable) folder with the CD inserted or mounted.
+You will be prompted to copy the necessary files from the CD or an existing installation.
 
-If you don't currently have the game installed, run Remech 2 from within its own
-(writable) folder with the CD inserted. It can pull all the necessary files
-from the CD and install the 1.1 patch from the internet automatically.
+### Supported Versions
+
+Any disc with the software-rendered release, either for DOS or Windows 95:
+
+- IBM CD-ROM
+- Pentium Edition
+- Windows 95/MS-DOS
+- SideWinder 3D Pro
+
+### Not Supported
+
+- S3 ViRGE
+- Matrox Mystique
+- ATI 3D RAGE / RAGE II
+- 3Dfx Voodoo/Diamond Monster 3D
+- PowerVR
+- Battlepack
+- Titanium
+
+Ghost Bear's Legacy and Mercenaries are also **not supported**.
 
 ### Music
 
-ReMech 2 plays the game's background music from files rather than from the CD.
-Put them in a `Music` folder in the game's working directory, named `track02.wav`
-through `track99.wav`. The numbering matches the CD's original track numbers,
-which is why it starts at 2. Track 1 on the disc is always game data. OGG and
-MP3 files work as well and file names are matched case-insensitively.
+The original game played its background music from the Red Book audio on the CD.
+ReMech2 plays the game's background music from files instead.
+Put the tracks in a `Music` folder in the game's working directory, named `track02.wav` through `track27.wav`, case insensitive.
+The numbering matches the CD's original track numbers, which is why it starts at 2. Track 1 on the disc is always game data.
 
-If the folder is missing, or contains no files matching that pattern, the game
-has no music.
+OGG, MP3, and FLAC files are also supported.
 
-The folder can be changed in the `remech2.ini` that is created in the working
-directory the first time the game is run.
+If the folder is missing or contains no files matching that pattern, the game has no music.
+
+The folder can be changed in the `remech2.ini` that is created the first time the game is run.
 
 ```toml
 [audio]
 music_path="Music"
 ```
 
-`music_path` can either be relative to the working directory or an absolute
-path.
+`music_path` can either be relative to the working directory or an absolute path.
 
 ## Building
 
 ### Requirements
 
 - [The Rust toolchain](https://rustup.rs/)
-- **Nightly**, Windows
+- A C/C++ compiler
+- `libclang`
+
+#### Linux
+
+- `clang`
+- `mold` (by default)
+- `libasound2-dev`
+- `libudev-dev`
+
+#### Windows
+
+MSVC isn't currently supported.
+
+- MinGW-w64
+- `x86_64-pc-windows-gnu`
+- `rustup target add x86_64-pc-windows-gnu`
 
 ### Steps
 
@@ -98,41 +109,33 @@ Nothing special for a Rust project. Just:
 
 `cargo build`
 
-Until the dependency on the original game's DLLs is lifted, a 32-bit build
-target is required.
+Under Windows:
+
+`cargo build --target x86_64-pc-windows-gnu`
 
 ## AI Disclaimer
 
-The vast majority of the Rust code included in this project is written by hand,
-but starting in 2026, the reverse engineering is assisted by LLMs operating a
-Ghidra MCP. Everything before then was reverse engineered manually.
+The decompiled source code in `remech2-sys/original` comes from the [demech2 project](https://github.com/anpage/demech2), which used an LLM and assembly-diffing scripts to convert an annotated Ghidra project into C/C++ code that closely matches the original game's behavior.
+Over time, this decompiled code will be replaced with Rust.
 
-The only exceptions to this are the crates in the `crates/` folder, which are
-mostly LLM-generated. I've isolated them to keep them separate from the rest of
-the project, and they only contain either boilerplate or the SMK2 decoder.
-
-The SMK2 decoder was outside of the scope of my goal to learn how the game
-works, but I needed one to replace the proprietary DLL and other existing
-options had licenses that made static linking them while also linking the games'
-DLLs a problem.
-
-Outside of those crates, this README and other documentation is written by hand.
-I have a hard time reading AI-generated documentation because it tends to give
-insufficient or irrelevant context in a very verbose way.
+The Rust code, this README, and all documentation included in this project are written by hand.
 
 ## License
 
-The source code provided in this repository is licensed under the
-[GNU General Public License, version 3 or later](LICENSE.md).
+The source code provided in this repository is licensed under the [GNU General Public License, version 3 or later](LICENSE.md).
+
+The decompiled source code in `remech2-sys/original` comes from the [demech2 project](https://github.com/anpage/demech2) and is licensed under the [GNU Lesser General Public License, version 3 or later](remech2-sys/original/LICENSE).
 
 GeneralUser GS by S. Christian Collins is included as the default soundfont.
-See `LICENSE-GUGS.txt` for more information.
+See [its license](assets/GeneralUser-GS-v2.0.3-license.txt) for more information.
 
-The Squarish Sans font embedded for the overlay UI is licensed under the SIL
-Open Font License, Version 1.1.
-See `LICENSE-SquarishSans.txt` for more information.
+The Squarish Sans font embedded for the overlay UI is licensed under the [SIL Open Font License, Version 1.1](assets/Squarish_Sans_CT_Regular_SC-license.txt).
 
-**ReMech 2 is an unofficial, fan-made project. It is not affiliated with,
-endorsed by, or associated with Microsoft, Activision, or any of their
-subsidiaries. MechWarrior is a trademark of its respective owner. No original
-game content is distributed with this project.**
+The Swansea Bold font embedded for the overlay UI is public domain.
+
+This project stands on the shoulders of giants and relies on many open-source dependencies. See [the full list](THIRD-PARTY.txt) for their licensing terms.
+
+**ReMech2 is an unofficial, fan-made project.
+It is not affiliated with, endorsed by, or associated with Microsoft, Activision, or any of their subsidiaries.
+MechWarrior, Windows, and MS-DOS are trademarks of their respective owners.
+No original game content is distributed with this project.**
