@@ -1,5 +1,6 @@
 pub mod action;
 pub mod binding;
+pub mod controls;
 pub mod defaults;
 pub mod eval;
 pub mod kbm;
