@@ -7,16 +7,65 @@ use std::{
     sync::{Mutex, OnceLock},
 };
 
+use directories::ProjectDirs;
 use tracing::warn;
 
-/// The game's root directory. For now, this is just the current working directory.
-fn root() -> &'static Path {
-    static ROOT: OnceLock<PathBuf> = OnceLock::new();
-    ROOT.get_or_init(|| std::env::current_dir().unwrap_or_default())
+pub struct Root {
+    pub game: PathBuf,
+    pub user: PathBuf,
+}
+
+/// The game's data and user directories.
+///
+/// ## Windows
+/// - `%LOCALAPPDATA%\ReMech2\data\game`
+/// - `%APPDATA%\ReMech2\data\user`
+///
+/// ## Linux
+/// - `~/.local/share/remech2/game`
+/// - `~/.local/share/remech2/user`
+pub fn root() -> &'static Root {
+    static ROOT: OnceLock<Root> = OnceLock::new();
+    ROOT.get_or_init(|| {
+        let cwd = std::env::current_dir().unwrap_or_default();
+
+        if is_portable(&cwd) {
+            return Root {
+                game: cwd.clone(),
+                user: cwd,
+            };
+        }
+
+        let dirs = match ProjectDirs::from("", "", "ReMech2") {
+            Some(dirs) => Root {
+                game: dirs.data_local_dir().join("game"),
+                user: dirs.data_dir().join("user"),
+            },
+            None => Root {
+                game: cwd.clone(),
+                user: cwd,
+            },
+        };
+
+        for dir in [&dirs.game, &dirs.user] {
+            if !dir.exists() {
+                std::fs::create_dir_all(dir).ok();
+            }
+        }
+
+        dirs
+    })
+}
+
+fn is_portable(cwd: &Path) -> bool {
+    if cwd.join("portable.txt").exists() {
+        return true;
+    }
+    resolve_in(cwd, "MW2.PRJ").is_file()
 }
 
 pub fn resolve(path: &str) -> PathBuf {
-    resolve_in(root(), path)
+    resolve_in(&root().game, path)
 }
 
 /// `path` under `root`, matching each component's case to what is on disk
@@ -81,7 +130,7 @@ fn pick(names: impl Iterator<Item = String>, wanted: &str) -> Option<String> {
 pub fn find(pattern: &str) -> Vec<String> {
     let (dir, pattern) = match pattern.rfind(['\\', '/']) {
         Some(at) => (resolve(&pattern[..at]), &pattern[at + 1..]),
-        None => (root().to_path_buf(), pattern),
+        None => (root().game.clone(), pattern),
     };
 
     let mut names: Vec<String> = names_in(&dir)

@@ -9,7 +9,7 @@ use std::{
 use anyhow::{Result, bail};
 
 use super::{Action, Stage};
-use crate::files;
+use crate::files::{self};
 
 mod list;
 
@@ -38,7 +38,7 @@ impl FileCheck {
     pub fn new() -> Self {
         Self {
             picked_folder: None,
-            missing_files: check_files("."),
+            missing_files: check_files(),
             copying_files: false,
             copying_status: Arc::new(Mutex::new(CopyStatus::Copying((None, 0.0)))),
             copying_error: None,
@@ -143,7 +143,7 @@ impl FileCheck {
                     if ui.button("Back").clicked() {
                         self.copying_files = false;
                         self.copying_error = None;
-                        self.missing_files = check_files(".");
+                        self.missing_files = check_files();
                     }
                 });
             });
@@ -166,7 +166,7 @@ impl FileCheck {
                 CopyStatus::Copying(ref progress) => progress.clone(),
                 CopyStatus::Done => {
                     self.copying_files = false;
-                    self.missing_files = check_files(".");
+                    self.missing_files = check_files();
                     return Ok(Action::Nothing);
                 }
                 CopyStatus::Error(ref file) => {
@@ -265,7 +265,7 @@ impl FileCheck {
         match choice {
             Some(Choice::Quit) => bail!("User chose to quit"),
             Some(Choice::Retry) => {
-                self.missing_files = check_files(".");
+                self.missing_files = check_files();
                 Ok(Action::Nothing)
             }
             Some(Choice::Skip) => Ok(Action::Break),
@@ -316,22 +316,23 @@ fn check_folder<P: AsRef<Path>>(path: P, files: &[GameFile], missing_files: &mut
     }
 }
 
-fn check_files<P: AsRef<Path>>(base_path: P) -> Vec<MissingFile> {
+fn check_files() -> Vec<MissingFile> {
+    let base_path = &files::root().game;
     let mut missing_files = Vec::new();
 
-    check_folder(base_path.as_ref(), list::GAME_FILES, &mut missing_files);
+    check_folder(base_path, list::GAME_FILES, &mut missing_files);
     check_folder(
-        files::resolve_in(base_path.as_ref(), "KEATING"),
+        files::resolve_in(base_path, "KEATING"),
         list::KEATING_FILES,
         &mut missing_files,
     );
     check_folder(
-        files::resolve_in(base_path.as_ref(), "LAUNCH"),
+        files::resolve_in(base_path, "LAUNCH"),
         list::LAUNCH_FILES,
         &mut missing_files,
     );
     check_folder(
-        files::resolve_in(base_path.as_ref(), "SMK"),
+        files::resolve_in(base_path, "SMK"),
         list::SMK_FILES,
         &mut missing_files,
     );

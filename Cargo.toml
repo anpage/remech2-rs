@@ -56,6 +56,7 @@ tracing-subscriber = "0.3.18"
 wgpu = { version = "27.0.1", default-features = false, features = ["gles", "dx12", "vulkan", "wgsl"] }
 winit = "0.30.12"
 egui_plot = { version = "0.34.1", optional = true }
+directories = "6.0.0"
 
 [features]
 default = ["debug-overlay"]
