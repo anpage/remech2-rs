@@ -1,4 +1,4 @@
-use crate::settings::SETTINGS;
+use crate::settings;
 
 #[derive(Clone, Copy)]
 pub enum Resolution {
@@ -20,7 +20,7 @@ impl Resolution {
     }
 
     pub fn frame_size(self) -> (i32, i32) {
-        let widescreen = SETTINGS.get_bool("video", "widescreen", false);
+        let widescreen = settings::get().video.widescreen;
         match (self, widescreen) {
             (Self::Low, false) => (320, 240),
             (Self::Low, true) => (427, 240),

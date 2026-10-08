@@ -1,9 +1,12 @@
 use std::num::NonZeroU64;
 
-use crate::settings::SETTINGS;
+use serde::{Deserialize, Serialize};
+
+use crate::settings;
 
 /// How the framebuffer is filtered when we scale it to the window size
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Default)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum ScalingMode {
     /// Plain bilinear.
     /// Smooth, but could be considered blurry.
@@ -19,19 +22,7 @@ pub enum ScalingMode {
 
 impl ScalingMode {
     pub fn from_settings() -> Self {
-        match SETTINGS
-            .get(Some("video"), "scaling")
-            .as_deref()
-            .map(str::trim)
-        {
-            Some("bilinear") => Self::Bilinear,
-            Some("nearest") => Self::Nearest,
-            Some("sharp-bilinear") | None => Self::SharpBilinear,
-            Some(other) => {
-                tracing::warn!("unknown video.scaling value {other:?}, using sharp-bilinear");
-                Self::SharpBilinear
-            }
-        }
+        settings::get().video.scaling
     }
 
     /// Prescale factor to force on the shader.

@@ -6,7 +6,10 @@ use std::{
 use anyhow::{Context as _, Result, bail};
 
 use super::{defaults, profile::Profile};
-use crate::{files, settings::SETTINGS};
+use crate::{
+    files::{self, write_atomically},
+    settings,
+};
 
 const INPUT_DIR: &str = "input";
 const EXTENSION: &str = "toml";
@@ -62,18 +65,6 @@ fn names_in(dir: &Path) -> Vec<String> {
         .collect();
     names.sort_by_key(|name| name.to_lowercase());
     names
-}
-
-fn write_atomically(path: &Path, text: &str) -> Result<()> {
-    if let Some(dir) = path.parent() {
-        fs::create_dir_all(dir).with_context(|| format!("Couldn't create {}", dir.display()))?;
-    }
-    let mut temporary = path.as_os_str().to_owned();
-    temporary.push(".tmp");
-    let temporary = PathBuf::from(temporary);
-    fs::write(&temporary, text)
-        .with_context(|| format!("Couldn't write {}", temporary.display()))?;
-    fs::rename(&temporary, path).with_context(|| format!("Couldn't replace {}", path.display()))
 }
 
 pub struct Store {
@@ -182,14 +173,13 @@ impl Store {
 }
 
 pub fn active_profile_name() -> String {
-    SETTINGS
-        .get(Some("input"), "profile")
+    Some(settings::get().input.profile.clone())
         .filter(|name| valid_name(name))
         .unwrap_or_else(|| DEFAULT_PROFILE.to_owned())
 }
 
 pub fn set_active_profile_name(name: &str) {
-    SETTINGS.set_string("input", "profile", name);
+    settings::update(|settings| settings.input.profile = name.to_owned());
 }
 
 pub fn load_active_profile() -> (String, Profile) {

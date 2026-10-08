@@ -10,7 +10,7 @@ use std::{
 use tracing::Level;
 use tracing_subscriber::{filter, prelude::*};
 
-use crate::{display::Overlay, settings::SETTINGS};
+use crate::display::Overlay;
 
 mod about;
 mod ailrs;
@@ -51,30 +51,15 @@ fn start_sim(cmd_line: &str) -> Result<i32> {
     result
 }
 
-fn str_to_level(loglevel: &str) -> Level {
-    match loglevel {
-        "trace" => Level::TRACE,
-        "debug" => Level::DEBUG,
-        "info" => Level::INFO,
-        "warn" => Level::WARN,
-        "error" => Level::ERROR,
-        _ => Level::WARN,
-    }
-}
-
 fn main() -> Result<()> {
-    let loglevel = SETTINGS
-        .get(Some("debug"), "loglevel")
-        .unwrap_or("warn".to_string())
-        .to_ascii_lowercase();
-
-    let loglevel = str_to_level(&loglevel);
+    let loglevel = Level::from(settings::get().debug.log_level);
 
     let filter = filter::Targets::new().with_target("remech2", loglevel);
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
         .with(filter)
         .init();
+    settings::log_load_problems();
 
     let args: Vec<String> = env::args().collect();
 

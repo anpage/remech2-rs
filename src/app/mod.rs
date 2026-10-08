@@ -25,8 +25,7 @@ use remech2_sys::shared::{
 
 use crate::{
     input::{controls, pad::Controllers},
-    messages,
-    settings::SETTINGS,
+    messages, settings,
 };
 
 use mouse::Mouse;
@@ -146,9 +145,11 @@ impl State {
     }
 
     fn create_window(&mut self, event_loop: &ActiveEventLoop) -> Result<()> {
-        let fullscreen = SETTINGS.get_bool("video", "fullscreen", true);
-        let width = SETTINGS.get_int("video", "width", 1024).max(1) as u32;
-        let height = SETTINGS.get_int("video", "height", 768).max(1) as u32;
+        let settings = settings::get();
+        let video = &settings.video;
+        let fullscreen = video.fullscreen;
+        let width = video.window_width.unwrap_or(1024).max(1);
+        let height = video.window_height.unwrap_or(768).max(1);
 
         let attributes = Window::default_attributes()
             .with_title("REMECH2")
@@ -216,7 +217,7 @@ impl State {
             return;
         };
         let fullscreen = window.fullscreen().is_none();
-        SETTINGS.set_bool("video", "fullscreen", fullscreen);
+        settings::update(|settings| settings.video.fullscreen = fullscreen);
         window.set_fullscreen(fullscreen.then_some(Fullscreen::Borderless(None)));
     }
 }

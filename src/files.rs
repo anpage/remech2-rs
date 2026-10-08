@@ -7,6 +7,7 @@ use std::{
     sync::{Mutex, OnceLock},
 };
 
+use anyhow::{Context, Result};
 use directories::ProjectDirs;
 use tracing::warn;
 
@@ -460,4 +461,16 @@ pub unsafe extern "C" fn mech_read_file(heap: *mut MechHeap, path: *const c_char
             ptr::null_mut()
         }
     }
+}
+
+pub fn write_atomically(path: &Path, text: &str) -> Result<()> {
+    if let Some(dir) = path.parent() {
+        fs::create_dir_all(dir).with_context(|| format!("Couldn't create {}", dir.display()))?;
+    }
+    let mut temporary = path.as_os_str().to_owned();
+    temporary.push(".tmp");
+    let temporary = PathBuf::from(temporary);
+    fs::write(&temporary, text)
+        .with_context(|| format!("Couldn't write {}", temporary.display()))?;
+    fs::rename(&temporary, path).with_context(|| format!("Couldn't replace {}", path.display()))
 }

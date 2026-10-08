@@ -3,7 +3,8 @@ use std::ptr;
 
 use remech2_sys::shell::{self, ScreenField, TextGlyph};
 
-use crate::{resolution::Resolution, settings::SETTINGS};
+use crate::resolution::Resolution;
+use crate::settings;
 
 const DRIVER_NAME_SIZE: usize = 15;
 
@@ -70,7 +71,7 @@ pub unsafe extern "C" fn draw_widescreen_option(row: *mut ScreenField) -> *mut T
     let Some(row) = (unsafe { row.as_ref() }) else {
         return ptr::null_mut();
     };
-    let label = if SETTINGS.get_bool("video", "widescreen", false) {
+    let label = if settings::get().video.widescreen {
         c"~ON"
     } else {
         c"~OFF"
@@ -88,8 +89,7 @@ pub unsafe extern "C" fn draw_widescreen_option(row: *mut ScreenField) -> *mut T
 
 #[unsafe(export_name = "ToggleWidescreen")]
 pub unsafe extern "C" fn toggle_widescreen(_row: *mut ScreenField) {
-    let widescreen = SETTINGS.get_bool("video", "widescreen", false);
-    SETTINGS.set_bool("video", "widescreen", !widescreen);
+    settings::update(|settings| settings.video.widescreen = !settings.video.widescreen);
 }
 
 #[unsafe(export_name = "DrawOptionLabel")]
