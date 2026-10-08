@@ -1117,25 +1117,6 @@ MechS32 ReadGameFile(MechChar* p_name, void** p_data)
 	return file;
 }
 
-// FUNCTION: MW2 0x100712b0
-MechS32 WriteCareerRecordFile(MechChar* p_name, void* p_data)
-{
-	MechS32 file;
-	MechS32 result;
-
-	file = MechOpen(BuildGamePath(p_name), c_mechOpenCreate);
-	if (file != -1) {
-		MechWrite(file, p_data, 0xd6);
-		MechClose(file);
-		result = 0;
-	}
-	else {
-		result = -1;
-	}
-
-	return result;
-}
-
 // Reads the difficulty settings into a new block, then overrides some of them in network games.
 // Returns 1, or -1 if there is no block.
 // Stack-slot permutation: file and data.

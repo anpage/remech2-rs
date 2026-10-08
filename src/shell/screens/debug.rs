@@ -1,8 +1,9 @@
-use std::ffi::{c_char, c_void};
+use std::ffi::c_char;
 use std::sync::atomic::{AtomicI32, Ordering};
 
 use egui::{Button, Ui};
-use remech2_sys::shell::{self, MissionResults};
+use remech2_sys::shared::MissionReport;
+use remech2_sys::shell;
 
 use super::{CAMPAIGN_LENGTH, Campaign, OUTCOME_FAILED, OUTCOME_SUCCESS, ShellMsg};
 use crate::{messages, shell::dialog};
@@ -90,7 +91,7 @@ pub fn menu(ui: &mut Ui) {
     ui.separator();
     ui.label("Debrief outcome");
     let mut outcome = OUTCOME_OVERRIDE.load(Ordering::Relaxed);
-    ui.radio_value(&mut outcome, 0, "From MW2MSN.CFG");
+    ui.radio_value(&mut outcome, 0, "From the mission");
     ui.radio_value(&mut outcome, OUTCOME_SUCCESS, "Won");
     ui.radio_value(&mut outcome, OUTCOME_FAILED, "Lost");
     OUTCOME_OVERRIDE.store(outcome, Ordering::Relaxed);
@@ -109,14 +110,16 @@ pub unsafe extern "C" fn shell_handle_message(message: u32, wparam: usize, lpara
     unsafe { shell::ShellHandleMessageC(message, wparam, lparam) }
 }
 
-/// Reads `MW2MSN.CFG` for the debrief's entry function
-#[unsafe(export_name = "ReadMissionResults")]
-pub unsafe extern "C" fn read_mission_results(results: *mut c_void) {
-    unsafe { shell::ReadMissionResultsC(results) };
+/// The last mission's report with the outcome override applied
+#[unsafe(export_name = "ReadMissionReport")]
+pub unsafe extern "C" fn read_mission_report(report: *mut MissionReport) {
+    let Some(report) = (unsafe { report.as_mut() }) else {
+        return;
+    };
+
+    *report = crate::shell::mission_report();
     let outcome = OUTCOME_OVERRIDE.load(Ordering::Relaxed);
-    if outcome != 0
-        && let Some(results) = unsafe { results.cast::<MissionResults>().as_mut() }
-    {
-        results.m_outcome = outcome;
+    if outcome != 0 {
+        report.m_result.m_outcome = outcome;
     }
 }

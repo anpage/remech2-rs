@@ -5,7 +5,6 @@
 #include "clock.h"
 #include "config.h"
 #include "decomp.h"
-#include "files.h"
 #include "gamekeys.h"
 #include "gamething.h"
 #include "geocache.h"
@@ -931,9 +930,7 @@ void EndTheMission1(void)
 	return;
 }
 
-// Writes the local team's mission result to mw2msn.cfg for the shell: the mission's times and
-// status and the objectives listed on the objectives panel. Returns whether it could.
-// The only diff is a stack-slot permutation of the locals.
+// Hands the local team's mission result to the shell. Returns whether it could.
 // FUNCTION: MW2 0x1001c9f7
 MechS32 EndTheMission2(void)
 {
@@ -948,7 +945,7 @@ MechS32 EndTheMission2(void)
 	result.m_tag = g_missionResultTag;
 	result.m_startTime = mission->m_startTime;
 	result.m_endTime = mission->m_endTime;
-	result.m_status = mission->m_status;
+	result.m_outcome = mission->m_status;
 	for (i = 0; i < mission->m_objectiveCount; i++) {
 		if (!mission->m_objectives[i].m_listed) {
 			continue;
@@ -961,7 +958,7 @@ MechS32 EndTheMission2(void)
 			result.m_objectives[count].m_succeeded = 0;
 		}
 
-		result.m_objectives[count].m_priority = mission->m_objectives[i].m_priority;
+		result.m_objectives[count].m_type = mission->m_objectives[i].m_priority;
 		result.m_objectives[count].m_startTime = mission->m_objectives[i].m_startTime;
 		result.m_objectives[count].m_endTime = mission->m_objectives[i].m_endTime;
 		result.m_objectives[count].m_mandatory = mission->m_objectives[i].m_mandatory;
@@ -974,15 +971,13 @@ MechS32 EndTheMission2(void)
 		count++;
 	}
 
-	result.m_count = count;
+	result.m_objectiveCount = count;
 
-	MechS32 file = MechOpen("mw2msn.cfg", c_mechOpenWrite);
-	if (file == -1) {
+	if (g_missionReport == NULL) {
 		return FALSE;
 	}
-	MechWrite(file, &result, sizeof(result));
-	MechClose(file);
 
+	g_missionReport->m_result = result;
 	return TRUE;
 }
 

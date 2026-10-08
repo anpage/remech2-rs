@@ -72,7 +72,6 @@ extern "C"
 
 	MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_poolTag);
 	MechS32 LoadDifficultyCfg(MechChar* p_name, DifficultyCfg** p_cfg);
-	MechS32 WriteCareerRecordFile(MechChar* p_name, void* p_data);
 	MechS32 LoadSndCfg(MechChar* p_name, SoundConfig** p_cfg);
 	MechS32 SaveSndCfg(MechChar* p_name, SoundConfig* p_cfg);
 	MechChar* BuildGamePath(MechChar* p_name);

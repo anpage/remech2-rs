@@ -47,7 +47,6 @@
 DECOMP_SIZE_ASSERT(Shot, 0x50)
 DECOMP_SIZE_ASSERT(Effect, 0x28)
 DECOMP_SIZE_ASSERT(EffectInfo, 0x1c)
-DECOMP_SIZE_ASSERT(CareerRecord, 0xd6)
 
 // GLOBAL: MW2 0x100ad440
 MechS32 g_effectCameraActive = 0;
@@ -1184,7 +1183,9 @@ void ScatterDebris(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_count)
 // FUNCTION: MW2 0x1006c345
 void SaveCareerRecord(void)
 {
-	WriteCareerRecordFile("MW2CAR.CFG", &g_careerRecord);
+	if (g_missionReport != NULL) {
+		g_missionReport->m_career = g_careerRecord;
+	}
 }
 
 // Heats up the mechs near burning game things (shapes of type 0x10), the more the closer.

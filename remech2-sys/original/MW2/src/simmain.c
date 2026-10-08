@@ -131,6 +131,8 @@ MechS32 g_goLaunch = 0;
 // GLOBAL: MW2 0x1012b7c0
 VideoDriverChoice g_videoDriverChoice;
 
+MissionReport* g_missionReport = NULL;
+
 static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
 
 // Matches except for the stack slots of seven locals (a consistent permutation; the original
@@ -138,7 +140,7 @@ static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR 
 // operand order of the DoFirstObjtv loop test and of the network start test follows the unit's
 // symbol table: both have flipped back and forth as declarations moved between units.
 // FUNCTION: MW2 0x10066a50
-int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
+int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch, MissionReport* p_report)
 {
 	MechMessage msg;
 	int result;
@@ -151,6 +153,7 @@ int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 
 	// The original was loaded fresh for each mission.
 	ResetSimGlobals();
+	g_missionReport = p_report;
 
 	quitLatched = 0;
 	seed = 0;
@@ -458,6 +461,8 @@ int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 	MechHeapDestroy(g_primaryHeap);
 	g_primaryHeap = NULL;
 	MechMouseShowCursor(TRUE);
+
+	g_missionReport = NULL;
 
 	result = g_fledToWindows ? 0xff : 0;
 	return result;

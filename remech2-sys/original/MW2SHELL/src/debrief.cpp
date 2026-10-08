@@ -6,7 +6,6 @@
 #include "collection.h"
 #include "customstar.h"
 #include "decomp.h"
-#include "files.h"
 #include "font.h"
 #include "keyboardinput.h"
 #include "mechbay.h"
@@ -29,33 +28,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#pragma pack(1)
-// SIZE 0x50
-// The simulator's career record (MW2CAR.CFG): the last mission's statistics. The simulator
-// counts a kill in the "direct" members when the player made it, and in the totals for every
-// enemy destroyed; the debriefing prints them in that order.
-struct CareerRecord {
-	undefined m_unk0x00[0x07 - 0x00]; // 0x00 — the simulator's; the debriefing doesn't read it
-	MechU16 m_directMechKills;        // 0x07
-	undefined m_unk0x09[0x13 - 0x09]; // 0x09 — the simulator's; the debriefing doesn't read it
-	MechU16 m_shotsFired;             // 0x13
-	MechU16 m_hits;                   // 0x15
-	undefined m_unk0x17[0x1e - 0x17]; // 0x17 — the simulator's; the debriefing doesn't read it
-	MechU16 m_mechKills;              // 0x1e
-	undefined m_unk0x20[0x34 - 0x20]; // 0x20 — the simulator's; the debriefing doesn't read it
-	MechU16 m_wingmenLost;            // 0x34
-	undefined m_unk0x36[0x44 - 0x36]; // 0x36 — the simulator's; the debriefing doesn't read it
-	MechU16 m_directVehicleKills;     // 0x44
-	undefined m_unk0x46[0x4a - 0x46]; // 0x46 — the simulator's; the debriefing doesn't read it
-	MechU16 m_vehicleKills;           // 0x4a
-	undefined m_unk0x4c[0x50 - 0x4c]; // 0x4c — the simulator's; the debriefing doesn't read it
-};
-#pragma pack()
-
-DECOMP_SIZE_ASSERT(MissionObjective, 0x34)
-DECOMP_SIZE_ASSERT(MissionResults, 0x9d4)
-DECOMP_SIZE_ASSERT(CareerRecord, 0x50)
 
 // The debriefing screen.
 // GLOBAL: MW2SHELL 0x1005b040
@@ -80,7 +52,7 @@ MechChar g_debriefText[0x1000];
 
 // The mission's objectives, in the order CompareObjectives sorts them.
 // GLOBAL: MW2SHELL 0x100778e0
-MissionObjective* g_sortedObjectives[48];
+MissionResultObjective* g_sortedObjectives[48];
 
 // GLOBAL: MW2SHELL 0x100779a0
 MechChar g_objectiveLine[0x400];
@@ -97,7 +69,7 @@ PilotRecord g_pilotBeforeMission;
 undefined g_unk0x10077fe0[0x100];
 
 // GLOBAL: MW2SHELL 0x100780e0
-MissionResults g_missionResults;
+MissionResult g_missionResults;
 
 // GLOBAL: MW2SHELL 0x10078ab8
 MechChar g_objectiveDescription[0x80];
@@ -143,21 +115,21 @@ MechU8 HasEasyOptions()
 // FUNCTION: MW2SHELL 0x10001056
 int CompareObjectives(const void* p_a, const void* p_b)
 {
-	MissionObjective** a = (MissionObjective**) p_a;
-	MissionObjective** b = (MissionObjective**) p_b;
-	MissionObjective* first = *a;
-	MissionObjective* second = *b;
+	MissionResultObjective** a = (MissionResultObjective**) p_a;
+	MissionResultObjective** b = (MissionResultObjective**) p_b;
+	MissionResultObjective* first = *a;
+	MissionResultObjective* second = *b;
 
-	if (first->m_time < 0) {
+	if (first->m_endTime < 0) {
 		return 1;
 	}
-	if (second->m_time < 0) {
+	if (second->m_endTime < 0) {
 		return -1;
 	}
-	if (second->m_time < first->m_time) {
+	if (second->m_endTime < first->m_endTime) {
 		return 1;
 	}
-	if (second->m_time > first->m_time) {
+	if (second->m_endTime > first->m_endTime) {
 		return -1;
 	}
 
@@ -170,12 +142,12 @@ int CompareObjectives(const void* p_a, const void* p_b)
 MechS32 AppendHonorBreakdown(
 	DifficultyConfig* p_difficulty,
 	CareerRecord* p_career,
-	MissionResults* p_results,
+	MissionResult* p_results,
 	MechChar* p_text
 )
 {
 	MechS32 honor = 0;
-	MissionObjective* objective = NULL;
+	MissionResultObjective* objective = NULL;
 	MechS32 points = 5000;
 	MechS32 i;
 	MechS32 width;
@@ -190,7 +162,7 @@ MechS32 AppendHonorBreakdown(
 
 	for (i = 0; i < p_results->m_objectiveCount; i++) {
 		objective = &p_results->m_objectives[i];
-		if (objective->m_type == 1 && objective->m_status == 0) {
+		if (objective->m_type == 1 && objective->m_succeeded == 0) {
 			points = 0;
 		}
 	}
@@ -207,12 +179,12 @@ MechS32 AppendHonorBreakdown(
 		objective = &p_results->m_objectives[i];
 		switch (objective->m_type) {
 		case 2:
-			if (objective->m_status == 1) {
+			if (objective->m_succeeded == 1) {
 				secondary++;
 			}
 			break;
 		case 4:
-			if (objective->m_status == 1) {
+			if (objective->m_succeeded == 1) {
 				tertiary++;
 			}
 			break;
@@ -455,7 +427,7 @@ void CollapseWhitespace(MechChar* p_dst, MechChar* p_src)
 // FUNCTION: MW2SHELL 0x10001ca0
 void BuildDebriefText(
 	CareerRecord* p_career,
-	MissionResults* p_results,
+	MissionResult* p_results,
 	MechChar* p_text,
 	DifficultyConfig* p_difficulty
 )
@@ -477,7 +449,7 @@ void BuildDebriefText(
 	for (i = 0; i < p_results->m_objectiveCount; i++) {
 		g_sortedObjectives[i] = &p_results->m_objectives[i];
 	}
-	qsort(g_sortedObjectives, p_results->m_objectiveCount, sizeof(MissionObjective*), CompareObjectives);
+	qsort(g_sortedObjectives, p_results->m_objectiveCount, sizeof(MissionResultObjective*), CompareObjectives);
 
 	strcat(p_text, "Time\\g050Type\\g170Objective\\g370Status\\n\\n");
 	for (i = 0; i < p_results->m_objectiveCount; i++) {
@@ -502,7 +474,7 @@ void BuildDebriefText(
 			break;
 		}
 
-		switch (g_sortedObjectives[i]->m_status) {
+		switch (g_sortedObjectives[i]->m_succeeded) {
 		case 1:
 			strcpy(g_objectiveStatus, "Successful");
 			break;
@@ -514,13 +486,13 @@ void BuildDebriefText(
 			break;
 		}
 
-		CollapseWhitespace(g_objectiveDescription, g_sortedObjectives[i]->m_description);
+		CollapseWhitespace(g_objectiveDescription, g_sortedObjectives[i]->m_name);
 
-		if (g_sortedObjectives[i]->m_time < 0) {
+		if (g_sortedObjectives[i]->m_endTime < 0) {
 			strcpy(g_objectiveTime, "DNF");
 		}
 		else {
-			time = g_sortedObjectives[i]->m_time;
+			time = g_sortedObjectives[i]->m_endTime;
 			seconds = time % 60;
 			time /= 60;
 			minutes = time % 60;
@@ -558,28 +530,12 @@ void BuildDebriefText(
 	strcat(p_text, g_careerHonorLine);
 }
 
-// Reads the simulator's mission results.
-// ReadMissionResults on the Rust side (src/shell/screens/debug.rs) wraps it, for the debug menu's
-// outcome override.
-// FUNCTION: MW2SHELL 0x100021a6
-void ReadMissionResultsC(void* p_results)
-{
-	MechS32 file = MechOpen("MW2MSN.CFG", c_mechOpenRead);
-
-	if (file == -1) {
-		return;
-	}
-
-	MechRead(file, p_results, 0x9d4);
-	MechClose(file);
-}
-
 // Lays out the debriefing's text on pages, under the scenario's debriefing project (its first four
 // letters and DBFS after a completed mission, DBFF otherwise; a pilot of the highest rank gets
 // the clan's own).
 // FUNCTION: MW2SHELL 0x10002207
 void LayoutDebriefPages(
-	MissionResults* p_results,
+	MissionResult* p_results,
 	MechChar* p_name,
 	ButtonMenu*,
 	MechS32 p_left,
@@ -630,7 +586,7 @@ void LayoutDebriefPages(
 // completed a trial without the options that make it easier (p_difficulty, g_difficultyConfig).
 // Not 100%: the stack slots of count and i are permuted.
 // FUNCTION: MW2SHELL 0x100023bf
-MechS32 GetTrialRank(MissionResults* p_results, DifficultyConfig* p_difficulty)
+MechS32 GetTrialRank(MissionResult* p_results, DifficultyConfig* p_difficulty)
 {
 	MechS32 count;
 	MechS32 i;
@@ -640,7 +596,7 @@ MechS32 GetTrialRank(MissionResults* p_results, DifficultyConfig* p_difficulty)
 		p_results->m_outcome == 2 && p_difficulty->m_heatTracking == 1) {
 		count = 0;
 		for (i = 0; i < p_results->m_objectiveCount; i++) {
-			if (p_results->m_objectives[i].m_type == 1 && p_results->m_objectives[i].m_status == 1) {
+			if (p_results->m_objectives[i].m_type == 1 && p_results->m_objectives[i].m_succeeded == 1) {
 				count++;
 			}
 		}
@@ -653,7 +609,6 @@ MechS32 GetTrialRank(MissionResults* p_results, DifficultyConfig* p_difficulty)
 
 // Opens the debriefing screen: reads the mission's results and statistics, scores them for the
 // pilot and lays the text out on pages under the menu.
-// Not 100%: the stack slots of file, left, top, width, height, career and name are permuted.
 // FUNCTION: MW2SHELL 0x100024a3
 void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scenario)
 {
@@ -661,7 +616,7 @@ void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p
 	MechS32 top;
 	MechS32 width;
 	MechS32 height;
-	CareerRecord career;
+	MissionReport report;
 	MechChar name[0x10];
 
 	g_videoDriver->LoadBackground(p_database, g_debriefScreens[p_campaign].m_picture);
@@ -687,12 +642,8 @@ void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p
 	}
 
 	LoadPilotRoster();
-	MechS32 file = MechOpen("MW2CAR.CFG", c_mechOpenRead);
-	if (file != -1) {
-		MechRead(file, &career, 0x50);
-		MechClose(file);
-	}
-	ReadMissionResults(&g_missionResults);
+	ReadMissionReport(&report);
+	g_missionResults = report.m_result;
 
 	CreateCollection(&g_debriefPages, 10, NULL, 4, NULL);
 	g_keyboardInput->FlushKeys();
@@ -707,7 +658,7 @@ void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p
 	if (p_campaign != 2) {
 		g_pilotBeforeMission = *g_currentPilot;
 	}
-	BuildDebriefText(&career, &g_missionResults, g_debriefText, &g_difficultyConfig);
+	BuildDebriefText(&report.m_career, &g_missionResults, g_debriefText, &g_difficultyConfig);
 
 	if (p_campaign != 2) {
 		g_currentPilot->m_rank += GetTrialRank(&g_missionResults, &g_difficultyConfig);

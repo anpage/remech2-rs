@@ -10,6 +10,8 @@ use std::{
 use tracing::Level;
 use tracing_subscriber::{filter, prelude::*};
 
+use remech2_sys::shared::MissionReport;
+
 use crate::display::Overlay;
 
 mod about;
@@ -42,11 +44,11 @@ fn start_shell(intro_or_sim: &str) -> Result<i32> {
     result
 }
 
-fn start_sim(cmd_line: &str) -> Result<i32> {
+fn start_sim(cmd_line: &str, report: &mut MissionReport) -> Result<i32> {
     display::set_overlay(app::with(|app| {
         Overlay::Sim(Box::new(sim::OverlayUi::new(app.egui_ctx())))
     }));
-    let result = sim::run(cmd_line);
+    let result = sim::run(cmd_line, report);
     display::set_overlay(None);
     result
 }
@@ -74,7 +76,7 @@ fn main() -> Result<()> {
 
     if args.len() > 1 {
         // launch the sim with the given cmdline
-        start_sim(&args[1..].join(" "))?;
+        start_sim(&args[1..].join(" "), &mut MissionReport::default())?;
         return Ok(());
     }
 
@@ -100,7 +102,9 @@ fn main() -> Result<()> {
             format!("{} {}", cmd_line, "/V=5")
         };
 
-        result = start_sim(&cmd_line)?;
+        let mut report = MissionReport::default();
+        result = start_sim(&cmd_line, &mut report)?;
+        shell::set_mission_report(report);
 
         if result == 255 {
             return Ok(());

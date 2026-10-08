@@ -3,6 +3,7 @@
 
 #include "decomp.h"
 #include "heap.h"
+#include "mission.h"
 #include "types.h"
 
 struct DifficultyCfg;
@@ -16,6 +17,7 @@ extern "C"
 {
 #endif
 
+	extern MissionReport* g_missionReport;
 	extern struct DifficultyCfg* g_difficulty;
 	extern struct TimedCallback* g_detachedTasks;
 	extern MechS32 g_shouldQuit;
@@ -34,7 +36,7 @@ extern "C"
 	extern MechS32 g_remoteWaitTime;
 	extern MechS32 g_drawModeReady;
 
-	int SimMain(char* p_cmdLine, struct NetLaunchInfo* p_netLaunch);
+	int SimMain(char* p_cmdLine, struct NetLaunchInfo* p_netLaunch, MissionReport* p_report);
 	void HandleMessages(void);
 	void UpdatePauseState(void);
 	// Implemented on the Rust side (src/sim/window.rs)
