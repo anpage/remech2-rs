@@ -34,6 +34,32 @@ MechS32 g_logStreams = 0;
 // GLOBAL: MW2 0x10109c40
 MechChar g_unk0x10109c40[1];
 
+// Copies a BWD file from the buffer passed in from the shell
+static void* CopyLaunchBwd(const MechChar* p_name, MechS32* p_size)
+{
+	const BwdBuffer* bwd;
+	void* data;
+	MechU32 i;
+
+	if (g_missionLaunch == NULL) {
+		return NULL;
+	}
+
+	for (i = 0; i < g_missionLaunch->m_bwdCount; i++) {
+		bwd = &g_missionLaunch->m_bwds[i];
+		if (strcasecmp(bwd->m_name, p_name) == 0) {
+			data = MechHeapAlloc(g_primaryHeap, bwd->m_size);
+			if (data != NULL) {
+				memcpy(data, bwd->m_data, bwd->m_size);
+				*p_size = bwd->m_size;
+			}
+			return data;
+		}
+	}
+
+	return NULL;
+}
+
 // Opens the BWD stream p_key names into p_stream: from a file when the key has no resource id
 // (a name without an extension gets ".BWD"), or always with g_streamsFromFiles, and otherwise, or
 // when there is no such file, from the resource file. Returns p_stream, or NULL.
@@ -82,16 +108,19 @@ BwdStream* OpenBwdStream(BwdStreamKey* p_key, BwdStream* p_stream)
 			strcat(p_key->m_name, g_bwdExtension);
 		}
 
-		file = LoadFile(BuildGamePath(p_key->m_name), &size, &data, NULL);
-		if (file != -1) {
-			MechClose(file);
-		}
-		else {
-			if (!g_streamsFromFiles) {
-				Error(0x29, "%s ID %d", p_key->m_name, p_key->m_id, 0);
+		data = CopyLaunchBwd(p_key->m_name, &size);
+		if (data == NULL) {
+			file = LoadFile(BuildGamePath(p_key->m_name), &size, &data, NULL);
+			if (file != -1) {
+				MechClose(file);
 			}
+			else {
+				if (!g_streamsFromFiles) {
+					Error(0x29, "%s ID %d", p_key->m_name, p_key->m_id, 0);
+				}
 
-			data = NULL;
+				data = NULL;
+			}
 		}
 	}
 

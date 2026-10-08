@@ -17,6 +17,7 @@ extern "C"
 {
 #endif
 
+	extern const MissionLaunch* g_missionLaunch;
 	extern MissionReport* g_missionReport;
 	extern struct DifficultyCfg* g_difficulty;
 	extern struct TimedCallback* g_detachedTasks;
@@ -36,7 +37,12 @@ extern "C"
 	extern MechS32 g_remoteWaitTime;
 	extern MechS32 g_drawModeReady;
 
-	int SimMain(char* p_cmdLine, struct NetLaunchInfo* p_netLaunch, MissionReport* p_report);
+	int SimMain(
+		char* p_cmdLine,
+		const MissionLaunch* p_launch,
+		struct NetLaunchInfo* p_netLaunch,
+		MissionReport* p_report
+	);
 	void HandleMessages(void);
 	void UpdatePauseState(void);
 	// Implemented on the Rust side (src/sim/window.rs)

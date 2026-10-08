@@ -6,7 +6,7 @@
 #include "types.h"
 
 // SIZE 0x218
-// The shell's state across a mission, saved to mw2prm.cfg before the simulator runs and read
+// The shell's state across a mission, kept by the Rust side before the simulator runs and read
 // back after it.
 struct SimHandoffState {
 	undefined4 m_msg;             // 0x00 — the message to post on return

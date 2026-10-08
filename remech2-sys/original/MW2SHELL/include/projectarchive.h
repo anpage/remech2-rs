@@ -39,4 +39,7 @@ extern MechS32 g_bwdTemplateRegistry[0x200];
 void PrjWriteStarTemplates(MechS32 p_count, StarMech* p_mechs, MechS32 p_enemyCount, StarMech* p_enemies);
 void PrjBuildPlayerStarTemplates(MechS32 p_clan, MechS32 p_rival);
 
+// Implemented on the Rust side (src/shell/handoff.rs). Keeps a .bwd file for the next mission
+extern "C" void MechKeepBwd(const char* p_name, const void* p_data, MechU32 p_size);
+
 #endif // PROJECTARCHIVE_H

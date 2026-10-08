@@ -363,13 +363,7 @@ void BwdInitRegistry()
 void BwdWriteRegistry(char* p_fileName)
 {
 	g_bwdTemplateRegistry[1] = g_bwdRegistrySize;
-	MechS32 file = MechOpen(p_fileName, c_mechOpenWrite);
-	if (file == -1) {
-		return;
-	}
-
-	MechWrite(file, g_bwdTemplateRegistry, g_bwdRegistrySize);
-	MechClose(file);
+	MechKeepBwd(p_fileName, g_bwdTemplateRegistry, g_bwdRegistrySize);
 }
 
 // Adds the template of one mech of a star to the registry: its chassis and variant, and the

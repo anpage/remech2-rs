@@ -1,7 +1,6 @@
 #include "simhandoff.h"
 
 #include "decomp.h"
-#include "files.h"
 #include "mechvariant.h"
 #include "messages.h"
 #include "shellglobals.h"
@@ -22,7 +21,7 @@ MechChar g_missionName[0x10] = "xxxxxxxx.xxx";
 // GLOBAL: MW2SHELL 0x10090288
 SimHandoffState g_simHandoff;
 
-// Reads the shell's state back from mw2prm.cfg after a mission. With p_fromSim, posts the saved
+// Reads the shell's state back from Rust after a mission. With p_fromSim, posts the saved
 // message to the shell window; otherwise it returns to the campaign's start (2, no pilot, no
 // scenario).
 // FUNCTION: MW2SHELL 0x10039b50
@@ -30,16 +29,9 @@ void ReadSimHandoff(MechS32 p_fromSim, MechS32* p_campaign, MechU8* p_pilotChose
 {
 	MechS32 i;
 
-	MechS32 file = MechOpen("mw2prm.cfg", c_mechOpenRead);
-	if (file == -1) {
+	if (!MechLoadSimHandoff(&g_simHandoff)) {
 		return;
 	}
-
-	if (MechRead(file, &g_simHandoff, sizeof(g_simHandoff)) != (int) sizeof(g_simHandoff)) {
-		MechClose(file);
-		return;
-	}
-	MechClose(file);
 
 	*p_campaign = g_simHandoff.m_campaign;
 	*p_pilotChosen = g_simHandoff.m_pilotChosen;
@@ -66,7 +58,7 @@ void ReadSimHandoff(MechS32 p_fromSim, MechS32* p_campaign, MechU8* p_pilotChose
 	}
 }
 
-// Saves the shell's state to mw2prm.cfg before a mission: the message to post on return, the
+// Saves the shell's state to Rust before a mission: the message to post on return, the
 // campaign, the pilot, and the simulator's command line (the scenario and "-b=" the mission's
 // name).
 // FUNCTION: MW2SHELL 0x10039c92
@@ -91,11 +83,5 @@ void WriteSimHandoff(MechU32 p_msg, MechS32 p_campaign, MechU8 p_pilotChosen, co
 		WriteStarFiles();
 	}
 
-	MechS32 file = MechOpen("mw2prm.cfg", c_mechOpenWrite);
-	if (file == -1) {
-		return;
-	}
-
-	MechWrite(file, &g_simHandoff, sizeof(g_simHandoff));
-	MechClose(file);
+	MechSaveSimHandoff(&g_simHandoff);
 }

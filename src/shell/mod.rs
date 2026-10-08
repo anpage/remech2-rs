@@ -6,10 +6,12 @@ use remech2_sys::shared::MissionReport;
 
 mod audio;
 mod dialog;
+mod handoff;
 mod overlay;
 mod screens;
 mod smacker;
 
+pub use handoff::with_mission_launch;
 pub use overlay::OverlayUi;
 
 static MISSION_REPORT: Mutex<Option<MissionReport>> = Mutex::new(None);

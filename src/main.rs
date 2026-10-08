@@ -10,7 +10,7 @@ use std::{
 use tracing::Level;
 use tracing_subscriber::{filter, prelude::*};
 
-use remech2_sys::shared::MissionReport;
+use remech2_sys::shared::{MissionLaunch, MissionReport};
 
 use crate::display::Overlay;
 
@@ -44,11 +44,11 @@ fn start_shell(intro_or_sim: &str) -> Result<i32> {
     result
 }
 
-fn start_sim(cmd_line: &str, report: &mut MissionReport) -> Result<i32> {
+fn start_sim(cmd_line: &str, launch: &MissionLaunch, report: &mut MissionReport) -> Result<i32> {
     display::set_overlay(app::with(|app| {
         Overlay::Sim(Box::new(sim::OverlayUi::new(app.egui_ctx())))
     }));
-    let result = sim::run(cmd_line, report);
+    let result = sim::run(cmd_line, launch, report);
     display::set_overlay(None);
     result
 }
@@ -76,7 +76,11 @@ fn main() -> Result<()> {
 
     if args.len() > 1 {
         // launch the sim with the given cmdline
-        start_sim(&args[1..].join(" "), &mut MissionReport::default())?;
+        start_sim(
+            &args[1..].join(" "),
+            &MissionLaunch::default(),
+            &mut MissionReport::default(),
+        )?;
         return Ok(());
     }
 
@@ -87,23 +91,10 @@ fn main() -> Result<()> {
             return Ok(());
         }
 
-        let cmd_line = {
-            let mut buffer = vec![];
-            let mut file = BufReader::new(File::open(files::resolve("mw2prm.cfg"))?);
-            file.seek(SeekFrom::Start(280))?;
-            for byte in file.bytes() {
-                let byte = byte?;
-                if byte == 0 {
-                    break;
-                }
-                buffer.push(byte);
-            }
-            let cmd_line = String::from_utf8_lossy(&buffer).to_string();
-            format!("{} {}", cmd_line, "/V=5")
-        };
-
         let mut report = MissionReport::default();
-        result = start_sim(&cmd_line, &mut report)?;
+        result = shell::with_mission_launch(|cmd_line, launch| {
+            start_sim(&format!("{cmd_line} /V=5"), launch, &mut report)
+        })??;
         shell::set_mission_report(report);
 
         if result == 255 {
