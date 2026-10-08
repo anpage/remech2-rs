@@ -44,10 +44,6 @@ MechS32 g_initDrawModeParam2 = 1;
 // GLOBAL: MW2 0x100a2454
 MechS32 g_showBoundingSpheres = 0;
 
-// The banner's file name, instead of sbannr (ShowBanner).
-// GLOBAL: MW2 0x100a2458
-MechChar* g_bannerName = NULL;
-
 // GLOBAL: MW2 0x100a245c
 void* g_bannerBuffer = NULL;
 
@@ -345,59 +341,6 @@ undefined4 FUN_10012f14(void)
 void FUN_10012f29(undefined4 p_unk0x00, undefined4 p_value)
 {
 	g_unk0x10176eb0 = p_value;
-}
-
-// Shows the banner GIF (sbannr, or g_bannerName's name, with the art resolution's suffix) and
-// fades its palette in. Nothing calls it.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10012f3c
-void ShowBanner(void)
-{
-	void* gif;
-	PANE target;
-	MechU8* state;
-	MechChar path[256];
-	PaletteColor* palette;
-
-	if (g_bannerName == NULL || *g_bannerName == '\0') {
-		strcpy(path, "sbannr");
-		strcat(path, g_artResolutionSuffixes[g_artResolution]);
-		strcat(path, ".");
-		strcat(path, "gif");
-	}
-	else {
-		strcpy(path, g_bannerName);
-		strcat(path, g_artResolutionSuffixes[g_artResolution]);
-		strcat(path, ".");
-		strcat(path, "gif");
-	}
-
-	gif = MechReadFile(g_primaryHeap, path);
-	if (gif) {
-		state = MechHeapAlloc(g_primaryHeap, 0x502e);
-		if (state) {
-			palette = MechHeapAllocZeroed(g_primaryHeap, 0x100 * sizeof(PaletteColor));
-			if (palette) {
-				g_currentDisplayBackend->m_setPalette(0, 0x100, palette, 1);
-				target = g_currentPane;
-				FitRectToGif(&target, &target, gif);
-				if ((g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1) == 0) {
-					VFX_GIF_draw(&target, gif, state);
-					if (g_windowActive) {
-						g_currentRefreshMode->m_flip();
-					}
-				}
-
-				VFX_GIF_palette(gif, (MechU8*) palette);
-				g_currentDisplayBackend->m_blendPalettes(palette, 30);
-				MechHeapFree(g_primaryHeap, palette);
-			}
-
-			MechHeapFree(g_primaryHeap, state);
-		}
-
-		MechHeapFree(g_primaryHeap, gif);
-	}
 }
 
 // Draws the bounding spheres (the "michelin" cheat) of the list p_root's colliding mech shapes

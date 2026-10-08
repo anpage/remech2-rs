@@ -24,7 +24,6 @@ extern "C"
 {
 #endif
 
-	extern MechChar* g_bannerName;
 	extern void* g_bannerBuffer;
 	extern MechS32 g_projectionDirty;
 	extern MechS32 g_displayReady;

@@ -21,10 +21,6 @@
 
 #include <stdlib.h>
 
-// The file name suffixes of the art resolutions (ShowBanner).
-// GLOBAL: MW2 0x100aa710
-MechChar g_artResolutionSuffixes[4][2] = {"", "6", "k", ""};
-
 // The largest coordinates of the three resolutions the art comes in.
 // GLOBAL: MW2 0x100aa718
 Point g_artResolutionSizes[3] = {{319, 199}, {639, 479}, {1023, 767}};

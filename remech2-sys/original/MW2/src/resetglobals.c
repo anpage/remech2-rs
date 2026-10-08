@@ -38,7 +38,7 @@
 #include "inputmap.h"
 #include "keyboard.h"
 #include "lancemenu.h"
-#include "loadres.h" // IWYU pragma: keep (sim_names.h renames its globals)
+#include "loadres.h"   // IWYU pragma: keep (sim_names.h renames its globals)
 #include "logwindow.h" // IWYU pragma: keep (sim_names.h renames its globals)
 #include "mainmenu.h"
 #include "maneuvers.h"
@@ -1188,7 +1188,6 @@ static const struct {
 	RESET_GLOBAL(g_drawModeIndex),
 	RESET_GLOBAL(g_initDrawModeParam2),
 	RESET_GLOBAL(g_showBoundingSpheres),
-	RESET_GLOBAL(g_bannerName),
 	RESET_GLOBAL(g_bannerBuffer),
 	RESET_GLOBAL(g_projectionDirty),
 	RESET_GLOBAL(g_displayReady),
@@ -1242,7 +1241,6 @@ static const struct {
 	RESET_GLOBAL(g_screenshotTarget),
 
 	// setres.c
-	RESET_GLOBAL(g_artResolutionSuffixes),
 	RESET_GLOBAL(g_artResolutionSizes),
 	RESET_GLOBAL(g_pixelAspect),
 	RESET_GLOBAL(g_artResolution),

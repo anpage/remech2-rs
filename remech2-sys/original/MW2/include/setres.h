@@ -12,7 +12,6 @@ extern "C"
 #endif
 
 	extern MechS32 g_artResolution;
-	extern MechChar g_artResolutionSuffixes[4][2];
 	extern Point g_artResolutionSizes[3];
 	extern MechS32 g_pixelAspect;
 
