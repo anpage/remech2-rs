@@ -2,6 +2,7 @@
 
 #include "decomp.h"
 #include "files.h"
+#include "log.h"
 #include "prjfile.h"
 #include "types.h"
 
@@ -211,24 +212,21 @@ void DumpResourceCache(void)
 	MechS32 i;
 	FILE* file;
 
-	sprintf(name, "dbugcch%d.log", g_cacheDumpNumber++);
-	file = MechFopen(name, "w");
+	snprintf(name, sizeof(name), "dbugcch%d.log", g_cacheDumpNumber++);
+	MechLogDebugf("%s: Cache table", name);
 	type[4] = '\0';
-	fprintf(file, "Cache table\n-----------------------\n");
 	for (i = 0; i < 0x3f1; i++) {
-		for (entry = g_cacheTable[i]; entry != NULL; entry = entry->m_next) {
-			*(undefined4*) type = entry->m_type;
-			fprintf(file, "ID=%5d  Type=%4s  Lock=%d\n", entry->m_id, type, entry->m_lock);
+		for (entry = g_cacheTable[i]; entry; entry = entry->m_next) {
+			*(MechS32*) type = entry->m_type;
+			MechLogDebugf("%s: bucket=%d ID=%5d Type=%4s Lock=%d", name, i, entry->m_id, type, entry->m_lock);
 		}
 	}
 
-	fprintf(file, "\nPurge list\n-----------------------\n");
-	for (entry = g_purgeListHead; entry != NULL; entry = entry->m_purgeNext) {
-		*(undefined4*) type = entry->m_type;
-		fprintf(file, "ID=%5d  Type=%4s  Lock=%d\n", entry->m_id, type, entry->m_lock);
+	MechLogDebugf("%s: Purge list", name);
+	for (entry = g_purgeListHead; entry; entry = entry->m_purgeNext) {
+		*(MechS32*) type = entry->m_type;
+		MechLogDebugf("%s: purge ID=%5d Type=%4s Lock=%d", name, entry->m_id, type, entry->m_lock);
 	}
-
-	fclose(file);
 }
 
 // Empty and never called: there is nothing to name it after.
@@ -259,8 +257,6 @@ void* LoadCachedResource(MechS32 p_handle, MechS32 p_id, char* p_type, MechS32 p
 	ResourceCacheEntry* block;
 	MechS32 bucket;
 	MechS32 size;
-	FILE* log;
-	FILE* file;
 
 	if (p_id < 0) {
 		return NULL;
@@ -283,11 +279,7 @@ void* LoadCachedResource(MechS32 p_handle, MechS32 p_id, char* p_type, MechS32 p
 
 	size = GetArchiveItemSize(p_handle, p_type, p_id);
 	if (size <= 0) {
-		log = MechFopen("symlog.txt", "a");
-		if (log != NULL) {
-			fprintf(log, "Couldn't load ID=%d Type=%s\n", p_id, p_type);
-		}
-		fclose(log);
+		MechLogErrorf("symlog.txt: Couldn't load ID=%d Type=%s\n", p_id, p_type);
 		return NULL;
 	}
 
@@ -301,11 +293,7 @@ void* LoadCachedResource(MechS32 p_handle, MechS32 p_id, char* p_type, MechS32 p
 	}
 
 	if (ReadArchiveItem(p_handle, p_type, p_id, block + 1) == -1) {
-		file = MechFopen("symlog.txt", "a");
-		if (file != NULL) {
-			fprintf(file, "Couldn't load ID=%d Type=%s\n", p_id, p_type);
-		}
-		fclose(file);
+		MechLogErrorf("symlog.txt: Couldn't load ID=%d Type=%s\n", p_id, p_type);
 		return NULL;
 	}
 

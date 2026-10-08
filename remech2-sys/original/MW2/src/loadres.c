@@ -236,7 +236,6 @@ void DumpResourceCache(void)
 	snprintf(name, sizeof(name), "dbugcch%d.log", g_cacheDumpNumber++);
 	MechLogDebugf("%s: Cache table", name);
 	type[4] = '\0';
-
 	for (i = 0; i < 0x3f1; i++) {
 		for (item = g_cacheTable[i]; item; item = item->m_next) {
 			*(MechS32*) type = item->m_type;

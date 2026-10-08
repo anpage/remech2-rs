@@ -2,7 +2,6 @@
 
 #include "collection.h"
 #include "decomp.h"
-#include "files.h"
 #include "font.h"
 #include "page.h"
 #include "pilotrecord.h"
@@ -10,7 +9,6 @@
 #include "shellglobals.h"
 #include "stringutil.h"
 #include "types.h"
-#include "videodriver.h"
 #include "windowstate.h"
 
 #include <stdio.h>
@@ -27,13 +25,11 @@ enum {
 MechU8 g_textPageColors[0x100];
 
 // The text with its escapes expanded: \\Q the quote, \\R0 to \\R2 the pilot's rank and the next
-// two, \\H the pilot's honor. The original also writes the unexpanded text to tmp.out.
+// two, \\H the pilot's honor.
 // GLOBAL: MW2SHELL 0x1008d658
 MechChar g_expandedText[0x2000];
 
 // Expands the escapes of p_text into g_expandedText and returns a copy of the result.
-// Not 100%: the stack slots of the locals are permuted (i and length move past the buffer, which
-// lengthens their encodings).
 // FUNCTION: MW2SHELL 0x1002dc60
 MechChar* ExpandTextEscapes(MechChar* p_text, MechChar* p_quote)
 {
@@ -42,7 +38,6 @@ MechChar* ExpandTextEscapes(MechChar* p_text, MechChar* p_quote)
 	MechChar number[0x80];
 	MechS32 textLength;
 	MechS32 rank;
-	FILE* file;
 
 	textLength = strlen(p_text);
 	i = 0;
@@ -116,9 +111,6 @@ MechChar* ExpandTextEscapes(MechChar* p_text, MechChar* p_quote)
 	}
 
 	g_expandedText[length] = '\0';
-	file = MechFopen("tmp.out", "wb");
-	fwrite(p_text, 1, strlen(p_text), file);
-	fclose(file);
 	return AllocateString(g_expandedText);
 }
 
