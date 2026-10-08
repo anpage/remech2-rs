@@ -15,7 +15,7 @@
 #include "types.h"
 #include "view.h"
 
-// The display performance settings of MW2SND.CFG (SoundConfig): a getter and a setter each,
+// The player's display performance settings: a getter and a setter each,
 // with the unused leading argument of the in-mission menu's callbacks.
 
 MechS32 ApplyPerfSettings(MenuDefinition* p_menu, MenuPage* p_page);

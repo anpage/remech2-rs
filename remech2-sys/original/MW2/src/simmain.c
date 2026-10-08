@@ -167,17 +167,12 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 		snprintf(g_gameDir, sizeof(g_gameDir), "%s", getenv("MECHWARRIOR"));
 	}
 
-	if (LoadSndCfg("mw2snd.cfg", &g_mw2SndCfgData) == -1) {
-		if (g_mw2SndCfgData == NULL) {
-			Error(0x11, "%s", "mw2snd.cfg");
-		}
-		else {
-			*g_mw2SndCfgData = g_soundConfig;
-		}
+	g_mw2SndCfgData = MechHeapAlloc(g_primaryHeap, sizeof(SoundConfig));
+	if (g_mw2SndCfgData == NULL) {
+		Error(0x11, "%s", "the sound settings");
 	}
-	else {
-		g_soundConfig = *g_mw2SndCfgData;
-	}
+	LoadSndCfg(g_mw2SndCfgData);
+	g_soundConfig = *g_mw2SndCfgData;
 
 	g_displayBrightness = g_brightnessSetting = g_mw2SndCfgData->m_displayBrightness;
 
@@ -218,8 +213,8 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 		}
 	}
 	else {
-		if (LoadDifficultyCfg("mw2dif.cfg", &g_difficulty) == -1 || g_difficulty == NULL) {
-			Error(0x11, "%s", "mw2dif.cfg");
+		if (LoadDifficultyCfg(NULL, &g_difficulty) == -1 || g_difficulty == NULL) {
+			Error(0x11, "%s", "the difficulty settings");
 		}
 	}
 

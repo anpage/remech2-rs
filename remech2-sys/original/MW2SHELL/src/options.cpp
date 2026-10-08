@@ -4,8 +4,8 @@
 #include "audiosubsystem.h"
 #include "decomp.h"
 #include "difficultyconfig.h"
-#include "files.h"
 #include "font.h"
+#include "gamesettings.h"
 #include "keyboardinput.h"
 #include "loopingmovie.h"
 #include "mechbay.h"
@@ -266,41 +266,67 @@ void DragVolumeSlider(ScreenField* p_option)
 // FUNCTION: MW2SHELL 0x10043926
 void LoadSoundConfig()
 {
-	MechS32 file = MechOpen("MW2SND.CFG", c_mechOpenRead);
-	if (file != -1) {
-		MechRead(file, &g_soundConfig, sizeof(g_soundConfig));
-		MechClose(file);
-	}
+	SoundSettings sound;
+	DisplaySettings display;
+
+	MechGetSoundSettings(&sound);
+	MechGetDisplaySettings(&display);
+	g_soundConfig.m_effectsVolume = sound.m_effectsVolume;
+	g_soundConfig.m_voiceVolume = sound.m_voiceVolume;
+	g_soundConfig.m_midiVolume = sound.m_musicVolume;
+	g_soundConfig.m_objectTextmaps = display.m_objectTextmaps;
+	g_soundConfig.m_terrainTextmaps = display.m_terrainTextmaps;
+	g_soundConfig.m_displayDetail = display.m_highDetail;
+	g_soundConfig.m_objectDensity = display.m_highObjectDensity;
+	g_soundConfig.m_explosionChunks = display.m_explosionChunks;
+	g_soundConfig.m_displayBrightness = display.m_brightness;
 }
 
 // FUNCTION: MW2SHELL 0x10043979
 void LoadDifficultyConfig()
 {
-	MechS32 file = MechOpen("MW2DIF.CFG", c_mechOpenRead);
-	if (file != -1) {
-		MechRead(file, &g_difficultyConfig, sizeof(g_difficultyConfig));
-		MechClose(file);
-	}
+	DifficultySettings settings;
+
+	MechGetDifficultySettings(&settings);
+	g_difficultyConfig.m_unlimitedAmmo = settings.m_unlimitedAmmo;
+	g_difficultyConfig.m_invulnerability = settings.m_invulnerable;
+	g_difficultyConfig.m_splashDamage = settings.m_splashDamage;
+	g_difficultyConfig.m_collisionDamage = settings.m_collisionDamage;
+	g_difficultyConfig.m_heatTracking = settings.m_heatTracking;
+	g_difficultyConfig.m_enemySkill = settings.m_enemySkill;
 }
 
 // FUNCTION: MW2SHELL 0x100439cc
 void SaveDifficultyConfig()
 {
-	MechS32 file = MechOpen("MW2DIF.CFG", c_mechOpenWrite);
-	if (file != -1) {
-		MechWrite(file, &g_difficultyConfig, sizeof(g_difficultyConfig));
-		MechClose(file);
-	}
+	DifficultySettings settings;
+
+	settings.m_unlimitedAmmo = g_difficultyConfig.m_unlimitedAmmo;
+	settings.m_invulnerable = g_difficultyConfig.m_invulnerability;
+	settings.m_splashDamage = g_difficultyConfig.m_splashDamage;
+	settings.m_collisionDamage = g_difficultyConfig.m_collisionDamage;
+	settings.m_heatTracking = g_difficultyConfig.m_heatTracking;
+	settings.m_enemySkill = g_difficultyConfig.m_enemySkill;
+	MechSetDifficultySettings(&settings);
 }
 
 // FUNCTION: MW2SHELL 0x10043a1f
 void SaveSoundConfig()
 {
-	MechS32 file = MechOpen("MW2SND.CFG", c_mechOpenWrite);
-	if (file != -1) {
-		MechWrite(file, &g_soundConfig, sizeof(g_soundConfig));
-		MechClose(file);
-	}
+	SoundSettings sound;
+	DisplaySettings display;
+
+	sound.m_effectsVolume = g_soundConfig.m_effectsVolume;
+	sound.m_voiceVolume = g_soundConfig.m_voiceVolume;
+	sound.m_musicVolume = g_soundConfig.m_midiVolume;
+	display.m_objectTextmaps = g_soundConfig.m_objectTextmaps;
+	display.m_terrainTextmaps = g_soundConfig.m_terrainTextmaps;
+	display.m_highDetail = g_soundConfig.m_displayDetail;
+	display.m_highObjectDensity = g_soundConfig.m_objectDensity;
+	display.m_explosionChunks = g_soundConfig.m_explosionChunks;
+	display.m_brightness = g_soundConfig.m_displayBrightness;
+	MechSetSoundSettings(&sound);
+	MechSetDisplaySettings(&display);
 }
 
 // Stack-slot permutation: original paletteSize is at [ebp-0x10] and audioSize at

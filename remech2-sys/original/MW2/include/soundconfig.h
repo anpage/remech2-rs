@@ -4,8 +4,7 @@
 #include "decomp.h"
 #include "types.h"
 
-// The sound settings, read from and written to MW2SND.CFG as one block: the shell's SoundConfig,
-// whose names come from the simulator's in-mission menus ("SET AUDIO VOLUME", "COMBAT VARIABLES").
+// The sound settings, read from and written to the player's settings: the shell's SoundConfig,
 struct SoundConfig {
 	MechS32 m_unk0x00;
 	MechS32 m_effectsVolume;

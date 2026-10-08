@@ -3,6 +3,7 @@
 #include "ammobin.h"
 #include "anim2d.h"
 #include "approxlen.h"
+#include "audio.h"
 #include "bargauges.h"
 #include "cockpit.h"
 #include "cockpitframe.h"
@@ -14,6 +15,7 @@
 #include "fadepal.h"
 #include "files.h"
 #include "gamekeys.h"
+#include "gamesettings.h"
 #include "hud.h"
 #include "loadres.h"
 #include "log.h"
@@ -1117,9 +1119,8 @@ MechS32 ReadGameFile(MechChar* p_name, void** p_data)
 	return file;
 }
 
-// Reads the difficulty settings into a new block, then overrides some of them in network games.
-// Returns 1, or -1 if there is no block.
-// Stack-slot permutation: file and data.
+// Builds the difficulty settings from the player’s (p_name NULL) or from file p_name, then overrides some of them in
+// network games. Returns 1 or -1 if there is no block.
 // FUNCTION: MW2 0x10071326
 MechS32 LoadDifficultyCfg(MechChar* p_name, DifficultyCfg** p_cfg)
 {
@@ -1128,15 +1129,28 @@ MechS32 LoadDifficultyCfg(MechChar* p_name, DifficultyCfg** p_cfg)
 	void* data;
 
 	*p_cfg = MechHeapAllocZeroed(g_primaryHeap, sizeof(DifficultyCfg));
-	file = LoadFile(BuildGamePath(p_name), &size, &data, NULL);
-	if (file != -1) {
-		memcpy(*p_cfg, data, size);
-	}
-	else if (*p_cfg == NULL) {
+	if (*p_cfg == NULL) {
 		return -1;
 	}
 
-	MechClose(file);
+	DifficultySettings settings;
+	if (p_name == NULL) {
+		MechGetDifficultySettings(&settings);
+		(*p_cfg)->m_unlimitedAmmo = settings.m_unlimitedAmmo;
+		(*p_cfg)->m_invulnerable = settings.m_invulnerable;
+		(*p_cfg)->m_splashDamage = settings.m_splashDamage;
+		(*p_cfg)->m_collisionDamage = settings.m_collisionDamage;
+		(*p_cfg)->m_heatTracking = settings.m_heatTracking;
+		(*p_cfg)->m_enemySkill = settings.m_enemySkill;
+	}
+	else {
+		file = LoadFile(BuildGamePath(p_name), &size, &data, NULL);
+		if (file != -1) {
+			memcpy(*p_cfg, data, size);
+			MechClose(file);
+		}
+	}
+
 	if (g_isNetworkGame) {
 		(*p_cfg)->m_enemySkill = 2;
 		(*p_cfg)->m_invulnerable = 0;
@@ -1158,64 +1172,57 @@ MechS32 LoadDifficultyCfg(MechChar* p_name, DifficultyCfg** p_cfg)
 	return 1;
 }
 
-// FUNCTION: MW2 0x10071440
-MechS32 SaveDifficultyCfg(MechChar* p_name, DifficultyCfg* p_cfg)
-{
-	MechS32 file;
-	MechS32 result;
-
-	file = MechOpen(BuildGamePath(p_name), c_mechOpenCreate);
-	if (file != -1) {
-		MechWrite(file, p_cfg, sizeof(DifficultyCfg));
-		MechClose(file);
-		result = 0;
-	}
-	else {
-		result = -1;
-	}
-
-	return result;
-}
-
-// Reads the sound settings, or allocates cleared ones. Returns 1, or -1 if it couldn't read them.
-// Stack-slot permutation: file and data.
+// Fills p_cfg from g_soundConfig's defaults and the player's sound and display settings. The
+// speech and music flags follow their volumes.
 // FUNCTION: MW2 0x100714b3
-MechS32 LoadSndCfg(MechChar* p_name, SoundConfig** p_cfg)
+void LoadSndCfg(SoundConfig* p_cfg)
 {
-	MechS32 size;
-	MechS32 file;
-	void* data;
+	SoundSettings sound;
+	DisplaySettings display;
 
-	file = LoadFile(BuildGamePath(p_name), &size, &data, NULL);
-	if (file != -1) {
-		*p_cfg = data;
+	MechGetSoundSettings(&sound);
+	MechGetDisplaySettings(&display);
+	*p_cfg = g_soundConfig;
+	p_cfg->m_effectsVolume = sound.m_effectsVolume;
+	p_cfg->m_voiceVolume = sound.m_voiceVolume;
+	p_cfg->m_midiVolume = sound.m_musicVolume;
+	if (p_cfg->m_voiceVolume) {
+		p_cfg->m_simFlags |= 2;
 	}
 	else {
-		*p_cfg = MechHeapAllocZeroed(g_primaryHeap, sizeof(SoundConfig));
-		return -1;
+		p_cfg->m_simFlags &= ~2;
 	}
-
-	MechClose(file);
-	return 1;
+	if (p_cfg->m_midiVolume) {
+		p_cfg->m_simFlags |= 8 | 4;
+	}
+	else {
+		p_cfg->m_simFlags &= ~(8 | 4);
+	}
+	p_cfg->m_objectTextmaps = display.m_objectTextmaps;
+	p_cfg->m_terrainTextmaps = display.m_terrainTextmaps;
+	p_cfg->m_displayDetail = display.m_highDetail;
+	p_cfg->m_objectDensity = display.m_highObjectDensity;
+	p_cfg->m_explosionChunks = display.m_explosionChunks;
+	p_cfg->m_displayBrightness = display.m_brightness;
 }
 
 // FUNCTION: MW2 0x1007152f
-MechS32 SaveSndCfg(MechChar* p_name, SoundConfig* p_cfg)
+void SaveSndCfg(const SoundConfig* p_cfg)
 {
-	MechS32 file;
-	MechS32 result;
+	SoundSettings sound;
+	DisplaySettings display;
 
-	file = MechOpen(BuildGamePath(p_name), c_mechOpenCreate);
-	if (file != -1) {
-		MechWrite(file, p_cfg, sizeof(SoundConfig));
-		MechClose(file);
-		result = 0;
-	}
-	else {
-		result = -1;
-	}
-
-	return result;
+	sound.m_effectsVolume = p_cfg->m_effectsVolume;
+	sound.m_voiceVolume = p_cfg->m_voiceVolume;
+	sound.m_musicVolume = p_cfg->m_midiVolume;
+	display.m_objectTextmaps = p_cfg->m_objectTextmaps;
+	display.m_terrainTextmaps = p_cfg->m_terrainTextmaps;
+	display.m_highDetail = p_cfg->m_displayDetail;
+	display.m_highObjectDensity = p_cfg->m_objectDensity;
+	display.m_explosionChunks = p_cfg->m_explosionChunks;
+	display.m_brightness = p_cfg->m_displayBrightness;
+	MechSetSoundSettings(&sound);
+	MechSetDisplaySettings(&display);
 }
 
 // Returns the path of a game file: in g_gameDir unless the name has a directory already.

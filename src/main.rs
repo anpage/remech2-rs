@@ -2,11 +2,7 @@
 #![recursion_limit = "256"]
 
 use anyhow::Result;
-use std::{
-    env,
-    fs::File,
-    io::{BufReader, Read, Seek, SeekFrom},
-};
+use std::env;
 use tracing::Level;
 use tracing_subscriber::{filter, prelude::*};
 

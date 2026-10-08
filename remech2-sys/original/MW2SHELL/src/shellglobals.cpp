@@ -179,13 +179,13 @@ MechS32 g_newPilotRegistered = 0;
 // GLOBAL: MW2SHELL 0x10071378
 PaletteColor g_savedScreenPalette[0x100] = {0};
 
-// The sound settings (MW2SND.CFG).
+// The sound settings.
 // GLOBAL: MW2SHELL 0x10071678
 SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 0x10000, 0xf, 1, 1, 1, 1, 1, 9};
 
-// The difficulty settings (MW2DIF.CFG).
+// The difficulty settings.
 // GLOBAL: MW2SHELL 0x100716b8
-DifficultyConfig g_difficultyConfig = {0, 0, 1, 1, 1, 1, {0, 0, 0, 1}};
+DifficultyConfig g_difficultyConfig = {0, 0, 1, 1, 1, 1};
 
 // GLOBAL: MW2SHELL 0x100946d0
 PilotRecord g_pilotRoster[20];

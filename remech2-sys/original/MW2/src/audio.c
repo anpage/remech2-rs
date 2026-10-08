@@ -150,7 +150,7 @@ void PreviewSoundSetting(MechS32 p_setting, MechS32 p_value)
 	}
 }
 
-// Sets setting p_setting to p_value, in the settings MW2SND.CFG saves too.
+// Sets setting p_setting to p_value, in the player's settings too.
 // FUNCTION: MW2 0x100069c9
 void SetSoundSetting(MechS32 p_setting, MechS32 p_value)
 {
@@ -204,7 +204,7 @@ void SetSoundSetting(MechS32 p_setting, MechS32 p_value)
 	}
 }
 
-// Restores setting p_setting from the settings MW2SND.CFG saves.
+// Restores setting p_setting from the player's settings.
 // FUNCTION: MW2 0x10006b3a
 void RestoreSoundSetting(MechS32 p_setting)
 {
@@ -369,7 +369,7 @@ void ShutdownAudio(void)
 	StopMusic();
 	DeInitCdAudio();
 	ShutdownDigitalAudio();
-	SaveSndCfg("mw2snd.cfg", g_mw2SndCfgData);
+	SaveSndCfg(g_mw2SndCfgData);
 	MechHeapFree(g_primaryHeap, g_mw2SndCfgData);
 }
 

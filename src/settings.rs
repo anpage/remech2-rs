@@ -4,9 +4,10 @@ use std::{
     sync::{Arc, LazyLock, Mutex},
 };
 
+use remech2_sys::shared;
 use serde::{Deserialize, Serialize};
 use toml_edit::{DocumentMut, Item, Table, TableLike, Value, de::from_document, ser::to_document};
-use tracing::{Level, error, warn};
+use tracing::{Level as TracingLevel, error, warn};
 
 use crate::{
     drawmode::ScalingMode, files, input::store::DEFAULT_PROFILE, resolution::RenderResolution,
@@ -19,6 +20,7 @@ const FILE_NAME: &str = "remech2.toml";
 pub struct Settings {
     pub video: VideoSettings,
     pub audio: AudioSettings,
+    pub difficulty: DifficultySettings,
     pub input: InputSettings,
     pub debug: DebugSettings,
 }
@@ -36,6 +38,12 @@ pub struct VideoSettings {
     pub widescreen: bool,
     pub framerate_limit: u32,
     pub scaling: ScalingMode,
+    pub object_textmaps: bool,
+    pub terrain_textmaps: bool,
+    pub detail: Level,
+    pub object_density: Level,
+    pub explosion_chunks: bool,
+    pub brightness: UpTo<15>,
 }
 
 impl Default for VideoSettings {
@@ -48,6 +56,12 @@ impl Default for VideoSettings {
             widescreen: false,
             framerate_limit: 60,
             scaling: Default::default(),
+            object_textmaps: true,
+            terrain_textmaps: true,
+            detail: Level::High,
+            object_density: Level::High,
+            explosion_chunks: true,
+            brightness: UpTo(9),
         }
     }
 }
@@ -56,12 +70,42 @@ impl Default for VideoSettings {
 #[serde(default)]
 pub struct AudioSettings {
     pub music_path: String,
+    pub effects_volume: UpTo<100>,
+    pub voice_volume: UpTo<100>,
+    pub music_volume: UpTo<100>,
 }
 
 impl Default for AudioSettings {
     fn default() -> Self {
         Self {
             music_path: "Music".to_owned(),
+            effects_volume: UpTo(100),
+            voice_volume: UpTo(100),
+            music_volume: UpTo(100),
+        }
+    }
+}
+
+#[derive(Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct DifficultySettings {
+    pub enemy_skill: Skill,
+    pub unlimited_ammo: bool,
+    pub invulnerable: bool,
+    pub splash_damage: bool,
+    pub collision_damage: bool,
+    pub heat_tracking: bool,
+}
+
+impl Default for DifficultySettings {
+    fn default() -> Self {
+        Self {
+            enemy_skill: Skill::Medium,
+            unlimited_ammo: false,
+            invulnerable: false,
+            splash_damage: true,
+            collision_damage: true,
+            heat_tracking: true,
         }
     }
 }
@@ -97,16 +141,77 @@ pub enum LogLevel {
     Error,
 }
 
-impl From<LogLevel> for Level {
+impl From<LogLevel> for TracingLevel {
     fn from(level: LogLevel) -> Self {
         match level {
-            LogLevel::Trace => Level::TRACE,
-            LogLevel::Debug => Level::DEBUG,
-            LogLevel::Info => Level::INFO,
-            LogLevel::Warn => Level::WARN,
-            LogLevel::Error => Level::ERROR,
+            LogLevel::Trace => TracingLevel::TRACE,
+            LogLevel::Debug => TracingLevel::DEBUG,
+            LogLevel::Info => TracingLevel::INFO,
+            LogLevel::Warn => TracingLevel::WARN,
+            LogLevel::Error => TracingLevel::ERROR,
         }
     }
+}
+
+#[derive(Clone, Copy, PartialEq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Level {
+    Low,
+    #[default]
+    High,
+}
+
+#[derive(Clone, Copy, PartialEq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Skill {
+    Easy,
+    #[default]
+    Medium,
+    Hard,
+}
+
+/// A whole number from 0 to `MAX`
+#[derive(Clone, Copy, PartialEq, Debug, Serialize, Deserialize)]
+#[serde(try_from = "u8", into = "u8")]
+pub struct UpTo<const MAX: u8>(u8);
+
+impl<const MAX: u8> UpTo<MAX> {
+    pub fn get(self) -> u8 {
+        self.0
+    }
+
+    /// `value`, clamped to 0 to `MAX`
+    pub fn saturating(value: i32) -> Self {
+        Self(value.clamp(0, i32::from(MAX)) as u8)
+    }
+}
+
+impl<const MAX: u8> TryFrom<u8> for UpTo<MAX> {
+    type Error = String;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        if value <= MAX {
+            Ok(Self(value))
+        } else {
+            Err(format!("{value} is more than {MAX}"))
+        }
+    }
+}
+
+impl<const MAX: u8> From<UpTo<MAX>> for u8 {
+    fn from(value: UpTo<MAX>) -> Self {
+        value.0
+    }
+}
+
+/// A volume percentage in the game's fixed point format
+fn volume_fraction(percent: UpTo<100>) -> i32 {
+    (i32::from(percent.get()) << 16) / 100
+}
+
+/// A fixed point volume value as a rounded percentage
+fn volume_percent(fraction: i32) -> UpTo<100> {
+    UpTo::saturating((fraction.clamp(0, 0x10000) * 100 + 0x8000) >> 16)
 }
 
 enum Problem {
@@ -311,4 +416,111 @@ fn set(table: &mut dyn TableLike, key: &str, mut value: Value) {
             table.insert(key, Item::Value(value));
         }
     }
+}
+
+#[unsafe(export_name = "MechGetSoundSettings")]
+pub unsafe extern "C" fn get_sound_settings(out: *mut shared::SoundSettings) {
+    let Some(out) = (unsafe { out.as_mut() }) else {
+        return;
+    };
+
+    let settings = get();
+    let audio = &settings.audio;
+
+    *out = shared::SoundSettings {
+        m_effectsVolume: volume_fraction(audio.effects_volume),
+        m_voiceVolume: volume_fraction(audio.voice_volume),
+        m_musicVolume: volume_fraction(audio.music_volume),
+    };
+}
+
+#[unsafe(export_name = "MechSetSoundSettings")]
+pub unsafe extern "C" fn set_sound_settings(new: *const shared::SoundSettings) {
+    let Some(new) = (unsafe { new.as_ref() }) else {
+        return;
+    };
+
+    update(|settings| {
+        let audio = &mut settings.audio;
+        audio.effects_volume = volume_percent(new.m_effectsVolume);
+        audio.voice_volume = volume_percent(new.m_voiceVolume);
+        audio.music_volume = volume_percent(new.m_musicVolume);
+    });
+}
+
+#[unsafe(export_name = "MechGetDisplaySettings")]
+pub unsafe extern "C" fn get_display_settings(out: *mut shared::DisplaySettings) {
+    let Some(out) = (unsafe { out.as_mut() }) else {
+        return;
+    };
+
+    let settings = get();
+    let video = &settings.video;
+
+    *out = shared::DisplaySettings {
+        m_objectTextmaps: video.object_textmaps.into(),
+        m_terrainTextmaps: video.terrain_textmaps.into(),
+        m_highDetail: (video.detail == Level::High).into(),
+        m_highObjectDensity: (video.object_density == Level::High).into(),
+        m_explosionChunks: video.explosion_chunks.into(),
+        m_brightness: video.brightness.get().into(),
+    };
+}
+
+#[unsafe(export_name = "MechSetDisplaySettings")]
+pub unsafe extern "C" fn set_display_settings(new: *const shared::DisplaySettings) {
+    let Some(new) = (unsafe { new.as_ref() }) else {
+        return;
+    };
+
+    let level = |high: i32| if high != 0 { Level::High } else { Level::Low };
+
+    update(|settings| {
+        let video = &mut settings.video;
+        video.object_textmaps = new.m_objectTextmaps != 0;
+        video.terrain_textmaps = new.m_terrainTextmaps != 0;
+        video.detail = level(new.m_highDetail);
+        video.object_density = level(new.m_highObjectDensity);
+        video.explosion_chunks = new.m_explosionChunks != 0;
+        video.brightness = UpTo::saturating(new.m_brightness);
+    });
+}
+
+#[unsafe(export_name = "MechGetDifficultySettings")]
+pub unsafe extern "C" fn get_difficulty_settings(out: *mut shared::DifficultySettings) {
+    let Some(out) = (unsafe { out.as_mut() }) else {
+        return;
+    };
+    let settings = get();
+    let difficulty = &settings.difficulty;
+    *out = shared::DifficultySettings {
+        m_unlimitedAmmo: difficulty.unlimited_ammo.into(),
+        m_invulnerable: difficulty.invulnerable.into(),
+        m_splashDamage: difficulty.splash_damage.into(),
+        m_collisionDamage: difficulty.collision_damage.into(),
+        m_heatTracking: difficulty.heat_tracking.into(),
+        m_enemySkill: difficulty.enemy_skill as u8,
+    };
+}
+
+#[unsafe(export_name = "MechSetDifficultySettings")]
+pub unsafe extern "C" fn set_difficulty_settings(new: *const shared::DifficultySettings) {
+    let Some(new) = (unsafe { new.as_ref() }) else {
+        return;
+    };
+    let skill = match new.m_enemySkill {
+        0 => Skill::Easy,
+        2 => Skill::Hard,
+        _ => Skill::Medium,
+    };
+    update(|settings| {
+        settings.difficulty = DifficultySettings {
+            enemy_skill: skill,
+            unlimited_ammo: new.m_unlimitedAmmo != 0,
+            invulnerable: new.m_invulnerable != 0,
+            splash_damage: new.m_splashDamage != 0,
+            collision_damage: new.m_collisionDamage != 0,
+            heat_tracking: new.m_heatTracking != 0,
+        }
+    });
 }

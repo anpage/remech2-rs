@@ -8,7 +8,7 @@
 #include "types.h"
 
 // The brightness setting (0-15) as a 16.16 fraction: read, previewed, set (and saved to
-// MW2SND.CFG's record), and the preview undone.
+// the player's settings), and the preview undone.
 
 // FUNCTION: MW2 0x100745e0
 MechS32 GetBrightnessFraction(MechS32 p_arg)
