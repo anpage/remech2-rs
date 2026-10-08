@@ -68,11 +68,9 @@ extern "C"
 	extern MechS32 g_lockedTonePlayed;
 	extern MechS32 g_lockingTonePlayed;
 	extern MechS32 g_hitFadeCount;
-	extern MechS32 g_screenshotCount;
 	extern MechChar g_gamePath[0x50];
 
 	MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_poolTag);
-	void SaveScreenshot(void);
 	MechS32 LoadDifficultyCfg(MechChar* p_name, DifficultyCfg** p_cfg);
 	MechS32 WriteCareerRecordFile(MechChar* p_name, void* p_data);
 	MechS32 LoadSndCfg(MechChar* p_name, SoundConfig** p_cfg);

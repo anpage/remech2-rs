@@ -973,11 +973,8 @@ void RunGameKey(MechS32 p_key)
 		}
 		break;
 	case 0x5b:
-		PauseTimer(0x80, 1);
-		g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1;
-		SaveScreenshot();
-		PauseTimer(0x80, 0);
-		sprintf(text, "GIF saved - MW2000?.GIF");
+		// TODO: Reimplement screenshots
+		sprintf(text, "Screenshots not implemented");
 		ShowInGameMessage(text, 1, 0x16a, 0x32);
 		break;
 	default:

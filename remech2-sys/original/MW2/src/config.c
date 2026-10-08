@@ -34,7 +34,6 @@
 #include "resourcename.h"
 #include "resourceref.h"
 #include "screenscale.h"
-#include "screenshot.h"
 #include "simmain.h"
 #include "soundconfig.h"
 #include "soundfx.h"
@@ -191,10 +190,6 @@ MechS32 g_hitFadeCount = 0;
 // The game directory (the MECHWARRIOR environment variable).
 // GLOBAL: MW2 0x100ae400
 MechChar g_gameDir[256] = {0};
-
-// The number of the next screenshot SaveScreenshot saves.
-// GLOBAL: MW2 0x100ae500
-MechS32 g_screenshotCount = 0;
 
 // The path BuildGamePath returns.
 // GLOBAL: MW2 0x100bef58
@@ -1240,29 +1235,6 @@ MechS32 SaveSndCfg(MechChar* p_name, SoundConfig* p_cfg)
 	}
 
 	return result;
-}
-
-// Saves the screen as the next of mw2NNNN.gif, up to 1000 of them.
-// FUNCTION: MW2 0x100715a2
-void SaveScreenshot(void)
-{
-	MechS32 count;
-	PANE target;
-	MechChar name[16];
-
-	target.m_window = &g_mainPixelBuffer;
-	target.m_x0 = 0;
-	target.m_y0 = 0;
-	target.m_x1 = g_screenWidthMinus1;
-	target.m_y1 = g_screenHeightMinus1;
-	if (g_screenshotCount < 1000) {
-		count = g_screenshotCount++;
-		snprintf(name, sizeof(name), "mw2%04d.gif", count);
-		ScreenshotBegin(name);
-		ScreenshotWritePalette();
-		ScreenshotWriteImage(&target);
-		ScreenshotEnd();
-	}
 }
 
 // Returns the path of a game file: in g_gameDir unless the name has a directory already.

@@ -31,7 +31,6 @@
 #include "faceshade.h"
 #include "gamekeys.h"
 #include "geocache.h"
-#include "gifsave.h"
 #include "gpanim.h"
 #include "gridobject.h"
 #include "hud.h"
@@ -74,7 +73,6 @@
 #include "render.h"
 #include "resource.h"
 #include "screenscale.h"
-#include "screenshot.h"
 #include "setres.h"
 #include "settings.h"
 #include "shape.h"
@@ -444,7 +442,6 @@ static const struct {
 	RESET_GLOBAL(g_lockingTonePlayed),
 	RESET_GLOBAL(g_hitFadeCount),
 	RESET_GLOBAL(g_gameDir),
-	RESET_GLOBAL(g_screenshotCount),
 	RESET_GLOBAL(g_gamePath),
 	RESET_GLOBAL(g_torsoTwistDegrees),
 	RESET_GLOBAL(g_headingDegrees),
@@ -700,28 +697,6 @@ static const struct {
 	RESET_GLOBAL(g_thingCapacity),
 	RESET_GLOBAL(g_blockBoxesShown),
 	RESET_GLOBAL(g_starCount),
-
-	// gifsave.c
-	RESET_GLOBAL(g_outFile),
-	RESET_GLOBAL(g_gifBuffer),
-	RESET_GLOBAL(g_gifIndex),
-	RESET_GLOBAL(g_bitsLeft),
-	RESET_GLOBAL(g_strChr),
-	RESET_GLOBAL(g_strNxt),
-	RESET_GLOBAL(g_strHsh),
-	RESET_GLOBAL(g_numStrings),
-	RESET_GLOBAL(g_bitsPrPrimColor),
-	RESET_GLOBAL(g_numColors),
-	RESET_GLOBAL(g_colorTable),
-	RESET_GLOBAL(g_gifScreenHeight),
-	RESET_GLOBAL(g_gifScreenWidth),
-	RESET_GLOBAL(g_imageHeight),
-	RESET_GLOBAL(g_imageWidth),
-	RESET_GLOBAL(g_imageLeft),
-	RESET_GLOBAL(g_imageTop),
-	RESET_GLOBAL(g_relPixX),
-	RESET_GLOBAL(g_relPixY),
-	RESET_GLOBAL(g_getPixel),
 
 	// gpanim.c
 	RESET_GLOBAL(g_motionSounds),
@@ -1226,10 +1201,6 @@ static const struct {
 	RESET_GLOBAL(g_pulseColor),
 	RESET_GLOBAL(g_pulseTime),
 	RESET_GLOBAL(g_pulseStep),
-
-	// screenshot.c
-	RESET_GLOBAL(g_screenshotState),
-	RESET_GLOBAL(g_screenshotTarget),
 
 	// setres.c
 	RESET_GLOBAL(g_artResolutionSizes),
