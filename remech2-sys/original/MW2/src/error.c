@@ -4,7 +4,6 @@
 #include "clock.h"
 #include "debugprint.h"
 #include "decomp.h"
-#include "inifile.h"
 #include "inputmap.h"
 #include "loadres.h"
 #include "log.h"
@@ -179,14 +178,21 @@ void ShowFatalError(const char* p_format, va_list p_args)
 // FUNCTION: MW2 0x1003bad1
 MechChar* FormatErrorMessage(MechChar* p_title, MechS32 p_code, const char* p_format, va_list p_args)
 {
-	MechChar code[4];
+	int written;
 
-	sprintf(code, "%02X", p_code);
-	FindIniSection("SystemError");
-	sprintf(g_errorMessage, "%s #%02X: %s", p_title, p_code, GetIniValue(code));
-	if (p_format) {
-		strcat(g_errorMessage, ": ");
-		vsprintf(g_errorMessage + strlen(g_errorMessage), p_format, p_args);
+	written = snprintf(
+		g_errorMessage,
+		sizeof(g_errorMessage),
+		"%s #%02X: %s",
+		p_title,
+		p_code,
+		p_format ? "Details: " : "No description available"
+	);
+	if (written < 0) {
+		g_errorMessage[0] = '\0';
+	}
+	else if (p_format && (size_t) written < sizeof(g_errorMessage)) {
+		vsnprintf(g_errorMessage + written, sizeof(g_errorMessage) - (size_t) written, p_format, p_args);
 	}
 
 	WriteToMw2Log(g_errorMessage);

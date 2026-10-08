@@ -35,7 +35,6 @@
 #include "gpanim.h"
 #include "gridobject.h"
 #include "hud.h"
-#include "inifile.h"
 #include "inputmap.h"
 #include "keyboard.h"
 #include "lancemenu.h"
@@ -761,10 +760,6 @@ static const struct {
 	RESET_GLOBAL(g_compassTapeAbove),
 	RESET_GLOBAL(g_altimeterLevelX),
 	RESET_GLOBAL(g_compassTapeBelow),
-
-	// inifile.c
-	RESET_GLOBAL(g_iniSectionOffset),
-	RESET_GLOBAL(g_iniLine),
 
 	// inputmap.c
 	RESET_GLOBAL(g_localSteering),
