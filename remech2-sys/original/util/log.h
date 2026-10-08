@@ -17,6 +17,10 @@ extern "C"
 	void MechLogDebug(const char* p_text);
 	// Same as MechLogDebug except it formats the input
 	void MechLogDebugf(const char* p_format, ...);
+	// Logs p_text at the trace level
+	void MechLogTrace(const char* p_text);
+	// Same as MechLogTrace except it formats the input
+	void MechLogTracef(const char* p_format, ...);
 
 #ifdef __cplusplus
 }

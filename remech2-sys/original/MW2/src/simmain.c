@@ -200,9 +200,7 @@ int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 	}
 
 	SetGameResolution(g_videoDriverChoice.m_name);
-	if (g_logFileEnabled) {
-		OpenMw2Log();
-	}
+	OpenMw2Log();
 
 	InitRefreshMode(5, 0, &g_mainPixelBuffer, 640, 480, 0);
 	// The original sent the launcher's window 0x41f, to have it pass its messages to SimWindowProc,
@@ -443,9 +441,7 @@ int SimMain(char* p_cmdLine, NetLaunchInfo* p_netLaunch)
 		ShutdownMw2Prj();
 		ShutdownRender();
 		CloseInputDevices();
-		if (g_logFileEnabled) {
-			CloseMw2Log();
-		}
+		CloseMw2Log();
 
 		DebugPrint("Calling EndTheMission()\n");
 		EndTheMission1();

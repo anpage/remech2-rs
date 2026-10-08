@@ -4,7 +4,7 @@ use printf_compat::{
     argument::{Argument, Specifier},
     output,
 };
-use tracing::{debug, error};
+use tracing::{debug, error, trace};
 
 fn text(text: *const c_char) -> Option<String> {
     if text.is_null() {
@@ -68,5 +68,19 @@ pub unsafe extern "C" fn log_debug(message: *const c_char) {
 pub unsafe extern "C" fn log_debugf(format: *const c_char, args: ...) {
     if let Some(message) = formatted_text(format, args) {
         debug!("{message}");
+    }
+}
+
+#[unsafe(export_name = "MechLogTrace")]
+pub unsafe extern "C" fn log_trace(message: *const c_char) {
+    if let Some(message) = text(message) {
+        trace!("{message}");
+    }
+}
+
+#[unsafe(export_name = "MechLogTracef")]
+pub unsafe extern "C" fn log_tracef(format: *const c_char, args: ...) {
+    if let Some(message) = formatted_text(format, args) {
+        trace!("{message}");
     }
 }

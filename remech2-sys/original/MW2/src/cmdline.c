@@ -82,9 +82,6 @@ MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, undefined4* p_flags, MechChar* p
 				if (arg[2] == '=') {
 					g_mw2PrjPath = arg + 3;
 				}
-			case 'L':
-				g_logFileEnabled = 1;
-				break;
 			case 'M':
 				InitializeMono();
 				g_missionTimerStopped = 1;

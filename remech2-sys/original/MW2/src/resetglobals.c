@@ -941,10 +941,6 @@ static const struct {
 	RESET_GLOBAL(g_cursorClipped),
 	RESET_GLOBAL(g_reclipCursor),
 
-	// mw2log.c
-	RESET_GLOBAL(g_logFileEnabled),
-	RESET_GLOBAL(g_mw2Log),
-
 	// mw2prj.c
 	RESET_GLOBAL(g_resourceTypeTags),
 	RESET_GLOBAL(g_resourceTypeExtensions),

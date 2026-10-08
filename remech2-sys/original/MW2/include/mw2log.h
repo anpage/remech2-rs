@@ -11,9 +11,6 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_logFileEnabled;
-	extern FILE* g_mw2Log;
-
 	MechS32 OpenMw2Log(void);
 	MechS32 CloseMw2Log(void);
 	MechS32 WriteToMw2Log(MechChar* p_text);
