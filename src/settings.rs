@@ -8,7 +8,9 @@ use serde::{Deserialize, Serialize};
 use toml_edit::{DocumentMut, Item, Table, TableLike, Value, de::from_document, ser::to_document};
 use tracing::{Level, error, warn};
 
-use crate::{drawmode::ScalingMode, files, input::store::DEFAULT_PROFILE};
+use crate::{
+    drawmode::ScalingMode, files, input::store::DEFAULT_PROFILE, resolution::RenderResolution,
+};
 
 const FILE_NAME: &str = "remech2.toml";
 
@@ -29,6 +31,8 @@ pub struct VideoSettings {
     pub window_width: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub window_height: Option<u32>,
+    /// The game's internal resolution
+    pub render_resolution: RenderResolution,
     pub widescreen: bool,
     pub framerate_limit: u32,
     pub scaling: ScalingMode,
@@ -40,9 +44,10 @@ impl Default for VideoSettings {
             fullscreen: true,
             window_width: None,
             window_height: None,
+            render_resolution: Default::default(),
             widescreen: false,
             framerate_limit: 60,
-            scaling: ScalingMode::default(),
+            scaling: Default::default(),
         }
     }
 }

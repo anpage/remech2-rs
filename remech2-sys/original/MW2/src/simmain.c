@@ -67,7 +67,6 @@
 #include "ticks.h"
 #include "timedoverlays.h"
 #include "types.h"
-#include "videodriverchoice.h"
 #include "weapons.h"
 #include "world.h"
 
@@ -128,9 +127,6 @@ MechS32 g_mouseOutsideClientWindow = 0;
 // GLOBAL: MW2 0x100acb98
 MechS32 g_goLaunch = 0;
 
-// GLOBAL: MW2 0x1012b7c0
-VideoDriverChoice g_videoDriverChoice;
-
 const MissionLaunch* g_missionLaunch = NULL;
 MissionReport* g_missionReport = NULL;
 
@@ -184,17 +180,6 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 	}
 
 	g_displayBrightness = g_brightnessSetting = g_mw2SndCfgData->m_displayBrightness;
-	g_videoDriverChoice.m_flags = 0;
-	if (g_mw2SndCfgData->m_videoDriver[0]) {
-		g_videoDriverChoice.m_flags |= 1;
-		if (strcasecmp(g_mw2SndCfgData->m_videoDriver, "scan") == 0) {
-			g_videoDriverChoice.m_name[0] = 0;
-		}
-		else {
-			strncpy(g_videoDriverChoice.m_name, g_mw2SndCfgData->m_videoDriver, 12);
-			g_videoDriverChoice.m_name[12] = 0;
-		}
-	}
 
 	if (!ProcessCmdLineArgs(p_cmdLine, &unk0x28, missionName)) {
 		return 0;
@@ -204,7 +189,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 		Error(0x51, NULL);
 	}
 
-	SetGameResolution(g_videoDriverChoice.m_name);
+	SetGameResolution();
 	OpenMw2Log();
 
 	InitRefreshMode(5, 0, &g_mainPixelBuffer, 640, 480, 0);

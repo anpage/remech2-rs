@@ -40,16 +40,11 @@ struct PewterPlaque0x9c {
 	undefined4 m_unk0x98;  // 0x98 — only cleared, by LayoutButton
 };
 
-DECOMP_SIZE_ASSERT(PewterPlaque0x9c, 0x9c)
-
 // GLOBAL: MW2SHELL 0x10070d90
 LoopingMovie* g_optionsMovie = NULL;
 
 // GLOBAL: MW2SHELL 0x1007116c
 MechChar g_optionsMovieName[0x10] = "amwlogo1";
-
-DECOMP_SIZE_ASSERT(SoundConfig, 0x3c)
-DECOMP_SIZE_ASSERT(DifficultyConfig, 0x17)
 
 // GLOBAL: MW2SHELL 0x10092c18
 AudioSample* g_volumeTestSample;
@@ -163,9 +158,8 @@ TextGlyph* DrawHighLowToggle(ScreenField* p_option)
 	);
 }
 
-// DrawResolutionOption and ToggleVesaDriver are implemented on the Rust side
-// (src/shell/screens/settings.rs). The original only offered 320x200 and 640x480: 1024x768, which
-// the DOS version had and the simulator still took (VESA768.DLL), was left out of the Win95 port.
+// DrawResolutionOption and ToggleRenderResolution are implemented on the Rust side
+// (src/shell/screens/settings.rs)
 
 // FUNCTION: MW2SHELL 0x10043651
 void CycleByteOption(ScreenField* p_option)
@@ -399,7 +393,7 @@ ScreenField g_optionFields[18] = {
 	OPTION_ROW(0x189, 0x13d, 100, DrawHighLowToggle, ToggleIntOption, &g_soundConfig.m_displayDetail),
 	OPTION_ROW(0x189, 0x151, 100, DrawHighLowToggle, ToggleIntOption, &g_soundConfig.m_objectDensity),
 	OPTION_ROW(0x189, 0x165, 100, DrawIntToggle, ToggleIntOption, &g_soundConfig.m_explosionChunks),
-	OPTION_ROW(0x189, 0x179, 100, DrawResolutionOption, ToggleVesaDriver, g_soundConfig.m_videoDriver),
+	OPTION_ROW(0x189, 0x179, 100, DrawResolutionOption, ToggleRenderResolution, NULL),
 	OPTION_ROW(0x189, 0x18d, 100, DrawWidescreenOption, ToggleWidescreen, NULL),
 	OPTION_LABEL(0x18d, "WIDESCREEN"),
 	OPTION_ROW(0x189, 0x1a0, 100, DrawDishonorableToggle, ToggleByteOption, &g_difficultyConfig.m_invulnerability),

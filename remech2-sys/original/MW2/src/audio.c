@@ -26,7 +26,7 @@
 MechS32 g_cdTrack = -1;
 
 // GLOBAL: MW2 0x100a1498
-SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 0x10000, 11, 1, 1, 1, 1, 1, 9, "mcga.dll"};
+SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 0x10000, 11, 1, 1, 1, 1, 1, 9};
 
 // GLOBAL: MW2 0x100a14d4
 SoundConfig* g_mw2SndCfgData = NULL;

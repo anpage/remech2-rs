@@ -17,7 +17,6 @@
 #include "simmain.h"
 #include "supanim.h"
 #include "types.h"
-#include "videodriverchoice.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -116,19 +115,7 @@ MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, undefined4* p_flags, MechChar* p
 				p_flags[1] = 0;
 				break;
 			case 'V':
-				if (toupper(arg[2]) == 'G') {
-					g_videoDriverChoice.m_flags |= 1;
-					value = strchr(arg, '=');
-					if (!value) {
-						g_videoDriverChoice.m_name[0] = '\0';
-					}
-					else {
-						value++;
-						strncpy(g_videoDriverChoice.m_name, value, 12);
-						g_videoDriverChoice.m_name[12] = '\0';
-					}
-				}
-				else if (arg[2] == '=' && isdigit(arg[3])) {
+				if (arg[2] == '=' && isdigit(arg[3])) {
 					g_drawModeIndex = atoi(arg + 3);
 				}
 				break;

@@ -1,42 +1,23 @@
-use std::ffi::{CStr, CString, c_char};
+use std::ffi::{CString, c_char};
 use std::ptr;
 
 use remech2_sys::shell::{self, ScreenField, TextGlyph};
 
-use crate::resolution::Resolution;
 use crate::settings;
-
-const DRIVER_NAME_SIZE: usize = 15;
-
-/// The video mode a row's value names, as its fifth character.
-const VESA_640: c_char = b'4' as c_char;
-const VESA_1024: c_char = b'7' as c_char;
-
-/// The resolution row's video driver name
-unsafe fn driver_name<'a>(row: *mut ScreenField) -> Option<&'a mut [c_char; DRIVER_NAME_SIZE]> {
-    unsafe {
-        row.as_ref()?
-            .m_data
-            .cast::<[c_char; DRIVER_NAME_SIZE]>()
-            .as_mut()
-    }
-}
 
 #[unsafe(export_name = "DrawResolutionOption")]
 pub unsafe extern "C" fn draw_resolution_option(row: *mut ScreenField) -> *mut TextGlyph {
-    let Some(name) = (unsafe { driver_name(row) }) else {
+    let Some(row) = (unsafe { row.as_ref() }) else {
         return ptr::null_mut();
     };
-    let driver = CStr::from_bytes_until_nul(name.map(|c| c as u8).as_slice())
-        .map(|name| name.to_string_lossy().into_owned())
-        .unwrap_or_default();
-    let (width, height) = Resolution::from_driver(&driver).frame_size();
+
+    let (width, height) = settings::get().video.render_resolution.frame_size();
+
     let Ok(label) = CString::new(format!("~{width}x{height}")) else {
         return ptr::null_mut();
     };
 
     unsafe {
-        let row = &*row;
         shell::Font_AddText(
             shell::g_titleFont,
             row.m_left + row.m_width / 2,
@@ -48,22 +29,11 @@ pub unsafe extern "C" fn draw_resolution_option(row: *mut ScreenField) -> *mut T
 }
 
 /// Cycles the resolution row
-#[unsafe(export_name = "ToggleVesaDriver")]
-pub unsafe extern "C" fn toggle_vesa_driver(row: *mut ScreenField) {
-    let Some(name) = (unsafe { driver_name(row) }) else {
-        return;
-    };
-    let next: &CStr = match name[4] {
-        VESA_640 => c"vesa768.dll",
-        VESA_1024 => c"",
-        _ => c"vesa480.dll",
-    };
-
-    // As strncpy: the rest of the buffer is zeroed
-    name.fill(0);
-    for (dst, &src) in name.iter_mut().zip(next.to_bytes()) {
-        *dst = src as c_char;
-    }
+#[unsafe(export_name = "ToggleRenderResolution")]
+pub unsafe extern "C" fn toggle_render_resolution(_row: *mut ScreenField) {
+    settings::update(|settings| {
+        settings.video.render_resolution = settings.video.render_resolution.next();
+    });
 }
 
 #[unsafe(export_name = "DrawWidescreenOption")]

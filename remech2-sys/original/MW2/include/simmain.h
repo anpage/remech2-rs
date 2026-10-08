@@ -9,7 +9,6 @@
 struct DifficultyCfg;
 struct NetLaunchInfo;
 struct TimedCallback;
-struct VideoDriverChoice;
 
 // The functions and globals of simmain.c that other units use.
 #ifdef __cplusplus
@@ -26,7 +25,6 @@ extern "C"
 	extern MechS32 g_quitStage;
 	extern MechS32 g_localPlayerId;
 	extern MechS32 g_startOnAutopilot;
-	extern struct VideoDriverChoice g_videoDriverChoice;
 	extern MechHeap* g_primaryHeap;
 	extern MechS32 g_gameWindowWidth;
 	extern MechS32 g_gameWindowHeight;
@@ -46,7 +44,7 @@ extern "C"
 	void HandleMessages(void);
 	void UpdatePauseState(void);
 	// Implemented on the Rust side (src/sim/window.rs)
-	void SetGameResolution(char* p_driverName);
+	void SetGameResolution(void);
 
 #ifdef __cplusplus
 }

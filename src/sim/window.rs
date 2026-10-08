@@ -1,29 +1,20 @@
-use std::{
-    ffi::{CStr, c_char},
-    mem::size_of,
-};
+use std::mem::size_of;
 
 use remech2_sys::{
     shared::{MechHeapAllocZeroed, PANE, WINDOW},
     sim::{self, CockpitLayout, FixedMul16, GameWindowGeometry, Point, Rect, g_artResolutionSizes},
 };
 
-use crate::resolution::Resolution;
+use crate::settings;
 
 /// The satellite view's index in `g_cockpitLayouts`
 const SATELLITE_LAYOUT: i32 = 4;
 
-/// The game decides which resolution to use based on the DLL name passed to this function.
-/// This is presumably a leftover from the DOS version of the game, possibly to preserve config file compatibility.
+/// Sizes the game's frame for the render resolution.
 /// When widescreen is enabled, the frame is 16:9 and the HUD stays in a 4:3 box centred within it.
 #[unsafe(export_name = "SetGameResolution")]
-pub unsafe extern "C" fn set_game_resolution(driver: *mut c_char) {
-    let driver = if driver.is_null() {
-        String::new()
-    } else {
-        unsafe { CStr::from_ptr(driver) }.to_string_lossy().into_owned()
-    };
-    let (width, height) = Resolution::from_driver(&driver).frame_size();
+pub extern "C" fn set_game_resolution() {
+    let (width, height) = settings::get().video.render_resolution.frame_size();
     unsafe {
         sim::g_gameWindowWidth = width;
         sim::g_gameWindowHeight = height;

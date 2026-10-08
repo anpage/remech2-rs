@@ -92,7 +92,6 @@
 #include "team.h"
 #include "timedoverlays.h"
 #include "types.h"
-#include "videodriverchoice.h" // IWYU pragma: keep (completes g_videoDriverChoice for sizeof)
 #include "view.h"
 #include "weapondata.h"
 #include "weapons.h"
@@ -1279,7 +1278,6 @@ static const struct {
 	RESET_GLOBAL(g_pauseRequested),
 	RESET_GLOBAL(g_mouseOutsideClientWindow),
 	RESET_GLOBAL(g_goLaunch),
-	RESET_GLOBAL(g_videoDriverChoice),
 
 	// sndunpack.c
 	RESET_GLOBAL(g_soundUpsampleBuffer),

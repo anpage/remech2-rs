@@ -25,7 +25,7 @@ void DrawOptions();
 // The resolution and widescreen rows' ScreenField functions, implemented on the Rust side
 // (src/shell/screens/settings.rs)
 extern "C" TextGlyph* DrawResolutionOption(ScreenField* p_option);
-extern "C" void ToggleVesaDriver(ScreenField* p_option);
+extern "C" void ToggleRenderResolution(ScreenField* p_option);
 extern "C" TextGlyph* DrawWidescreenOption(ScreenField* p_option);
 extern "C" void ToggleWidescreen(ScreenField* p_option);
 // Draws p_label's text (m_data) against its right edge, for a row the screen's art has no label for
