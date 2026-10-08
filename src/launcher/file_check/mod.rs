@@ -7,6 +7,7 @@ use std::{
 };
 
 use anyhow::{Result, bail};
+use tracing::warn;
 
 use super::{Action, Stage};
 use crate::files::{self};
@@ -296,6 +297,10 @@ impl Stage for FileCheck {
 #[derive(Copy, Clone, Debug)]
 struct GameFile {
     path: &'static str,
+    /// Size of the reference copy
+    size: u64,
+    /// CRC32 of the reference copy
+    crc32: u32,
     cd_paths: &'static [&'static str],
 }
 
@@ -305,7 +310,12 @@ struct MissingFile {
     cd_paths: &'static [&'static str],
 }
 
-fn check_folder<P: AsRef<Path>>(path: P, files: &[GameFile], missing_files: &mut Vec<MissingFile>) {
+fn check_folder<P: AsRef<Path>>(
+    path: P,
+    files: &[GameFile],
+    missing_files: &mut Vec<MissingFile>,
+    differing: &mut usize,
+) {
     for file in files {
         let path = files::resolve_in(path.as_ref(), file.path);
         if !path.exists() {
@@ -313,30 +323,83 @@ fn check_folder<P: AsRef<Path>>(path: P, files: &[GameFile], missing_files: &mut
                 path,
                 cd_paths: file.cd_paths,
             });
+        } else if !matches_reference(&path, file) {
+            *differing += 1;
         }
     }
+}
+
+fn matches_reference(path: &Path, file: &GameFile) -> bool {
+    let data = match std::fs::read(path) {
+        Ok(data) => data,
+        Err(e) => {
+            warn!("file check: couldn't read {}: {e}", path.display());
+            return false;
+        }
+    };
+
+    let size = data.len() as u64;
+    if size != file.size {
+        warn!(
+            "file check: {} is {size} bytes, expected {}",
+            path.display(),
+            file.size
+        );
+        return false;
+    }
+
+    let crc32 = crc32fast::hash(&data);
+    if crc32 != file.crc32 {
+        warn!(
+            "file check: {} has CRC32 {crc32:08X}, expected {:08X}",
+            path.display(),
+            file.crc32
+        );
+        return false;
+    }
+
+    true
 }
 
 fn check_files() -> Vec<MissingFile> {
     let base_path = &files::root().game;
     let mut missing_files = Vec::new();
+    let mut differing = 0;
 
-    check_folder(base_path, list::GAME_FILES, &mut missing_files);
+    check_folder(
+        base_path,
+        list::GAME_FILES,
+        &mut missing_files,
+        &mut differing,
+    );
     check_folder(
         files::resolve_in(base_path, "KEATING"),
         list::KEATING_FILES,
         &mut missing_files,
+        &mut differing,
     );
     check_folder(
         files::resolve_in(base_path, "LAUNCH"),
         list::LAUNCH_FILES,
         &mut missing_files,
+        &mut differing,
     );
     check_folder(
         files::resolve_in(base_path, "SMK"),
         list::SMK_FILES,
         &mut missing_files,
+        &mut differing,
     );
+
+    if differing > 0 {
+        warn!(
+            "file check: {differing} files in {} differ from the reference set",
+            base_path.display()
+        );
+    }
+    for file in &missing_files {
+        warn!("file check: {} is missing", file.path.display());
+    }
 
     missing_files
 }

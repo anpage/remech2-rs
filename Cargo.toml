@@ -20,6 +20,10 @@ debug = true
 [profile.dev.package.smk]
 opt-level = 3
 
+# Keep the game file check quick in debug builds
+[profile.dev.package.crc32fast]
+opt-level = 3
+
 # Disable debug symbols for dependencies in release builds
 [profile.release.package."*"]
 debug = false
@@ -58,6 +62,7 @@ winit = "0.30.12"
 egui_plot = { version = "0.34.1", optional = true }
 directories = "6.0.0"
 printf-compat = "0.5.0"
+crc32fast = "1.5.2"
 
 [features]
 default = ["debug-overlay"]
