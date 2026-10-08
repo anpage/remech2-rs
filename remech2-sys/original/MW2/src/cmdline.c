@@ -61,7 +61,6 @@ MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, undefined4* p_flags, MechChar* p
 				g_missionTimerStopped = 1;
 				break;
 			case 'E':
-				MechRemove("mw2debug.txt");
 				g_logStreams = 1;
 				break;
 			case 'F':

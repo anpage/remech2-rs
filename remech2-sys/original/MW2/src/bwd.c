@@ -26,7 +26,7 @@ DECOMP_SIZE_ASSERT(BwdStream, 0x1f)
 // GLOBAL: MW2 0x100a5bec
 MechS32 g_streamsFromFiles = 0;
 
-// Set by a command-line switch: OpenBwdStream logs each stream it opens to mw2debug.txt.
+// Set by a command-line switch: OpenBwdStream logs each stream it opens
 // GLOBAL: MW2 0x100a5bf0
 MechS32 g_logStreams = 0;
 
