@@ -8,17 +8,14 @@
 #include "files.h"
 #include "font.h"
 #include "keyboardinput.h"
-#include "mainmenubutton.h"
 #include "mechchassis.h"
 #include "mechvariant.h"
 #include "menudata.h"
 #include "menuscreen.h"
-#include "messages.h"
 #include "missionui.h"
 #include "mousestate.h"
 #include "options.h"
 #include "projectarchive.h"
-#include "refreshmode.h"
 #include "screenfield.h"
 #include "shellglobals.h"
 #include "shellmain.h"
@@ -27,7 +24,6 @@
 #include "types.h"
 #include "video.h"
 #include "videodriver.h"
-#include "windowstate.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -2281,7 +2277,6 @@ MechS32 SaveMekFile(MechChar* p_name)
 	MechS32 i;
 	MechS32 j;
 	MechS32 k;
-	FILE* file;
 
 	memset(&g_mekHeader, 0, sizeof(g_mekHeader));
 	memset(g_mekLocations, 0, sizeof(g_mekLocations));
@@ -2366,8 +2361,8 @@ MechS32 SaveMekFile(MechChar* p_name)
 	strcpy(g_mekVariantName, g_variant.m_variantName);
 
 	sprintf(g_mekPath, "mek\\%s", p_name);
-	file = MechFopen(g_mekPath, "wb");
-	if (file == NULL) {
+	MechS32 file = MechOpen(g_mekPath, c_mechOpenWrite);
+	if (file == -1) {
 		sprintf(g_mekPath, "mek\\");
 		if (MechMakeDir(g_mekPath) != 0) {
 			DebugPrint("Creating the mek directory failed\n");
@@ -2375,18 +2370,18 @@ MechS32 SaveMekFile(MechChar* p_name)
 		}
 
 		sprintf(g_mekPath, "mek\\%s", p_name);
-		file = MechFopen(g_mekPath, "wb");
-		if (file == NULL) {
+		file = MechOpen(g_mekPath, c_mechOpenWrite);
+		if (file == -1) {
 			return 0;
 		}
 	}
 
-	fwrite(&g_mekHeader, 0x18, 1, file);
-	fwrite(g_mekLocations, 0x28, 8, file);
-	fwrite(g_mekWeapons, 8, g_mekHeader.m_weaponCount, file);
-	fwrite(g_mekAmmo, 8, g_mekHeader.m_ammoCount, file);
-	fwrite(g_mekVariantName, 0x32, 1, file);
-	fclose(file);
+	MechWrite(file, &g_mekHeader, 0x18);
+	MechWrite(file, g_mekLocations, 0x28 * 8);
+	MechWrite(file, g_mekWeapons, 8 * g_mekHeader.m_weaponCount);
+	MechWrite(file, g_mekAmmo, 8 * g_mekHeader.m_ammoCount);
+	MechWrite(file, g_mekVariantName, 0x32);
+	MechClose(file);
 	return 1;
 }
 
@@ -2395,7 +2390,6 @@ MechS32 SaveMekFile(MechChar* p_name)
 // FUNCTION: MW2SHELL 0x1000bce5
 void* LoadMekImage(MechChar* p_name)
 {
-	FILE* file;
 	MechChar path[0x20];
 
 	if (strncasecmp(p_name + 5, "std", 3)) {
@@ -2405,13 +2399,13 @@ void* LoadMekImage(MechChar* p_name)
 			strcat(path, ".mek");
 		}
 
-		file = MechFopen(path, "rb");
-		if (file == NULL) {
+		MechS32 file = MechOpen(path, c_mechOpenRead);
+		if (file == -1) {
 			return NULL;
 		}
 
-		fread(g_mekFileBuffer, 1, sizeof(g_mekFileBuffer), file);
-		fclose(file);
+		MechRead(file, g_mekFileBuffer, sizeof(g_mekFileBuffer));
+		MechClose(file);
 		return g_mekFileBuffer;
 	}
 

@@ -362,16 +362,14 @@ void BwdInitRegistry()
 // FUNCTION: MW2SHELL 0x1002e7cb
 void BwdWriteRegistry(char* p_fileName)
 {
-	FILE* file;
-
 	g_bwdTemplateRegistry[1] = g_bwdRegistrySize;
-	file = MechFopen(p_fileName, "wb");
-	if (file == NULL) {
+	MechS32 file = MechOpen(p_fileName, c_mechOpenWrite);
+	if (file == -1) {
 		return;
 	}
 
-	fwrite(g_bwdTemplateRegistry, 1, g_bwdRegistrySize, file);
-	fclose(file);
+	MechWrite(file, g_bwdTemplateRegistry, g_bwdRegistrySize);
+	MechClose(file);
 }
 
 // Adds the template of one mech of a star to the registry: its chassis and variant, and the
@@ -452,7 +450,6 @@ void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, MechS32 p_index,
 // FUNCTION: MW2SHELL 0x1002ea62
 void PrjWriteStarTemplates(MechS32 p_count, StarMech* p_mechs, MechS32 p_enemyCount, StarMech* p_enemies)
 {
-	FILE* file;
 	MechS32 i;
 	MechS32 level;
 	MechS32 difficulty;
@@ -468,10 +465,10 @@ void PrjWriteStarTemplates(MechS32 p_count, StarMech* p_mechs, MechS32 p_enemyCo
 	BwdWriteRegistry("userstar.bwd");
 
 	difficulty = g_enemyStarDifficulty - 2;
-	file = MechFopen("MW2DIF.CFG", "rb");
-	if (file != NULL) {
-		fread(&settings, sizeof(settings), 1, file);
-		fclose(file);
+	MechS32 file = MechOpen("MW2DIF.CFG", c_mechOpenRead);
+	if (file != -1) {
+		MechRead(file, &settings, sizeof(settings));
+		MechClose(file);
 		if (settings.m_enemySkill == 0) {
 			difficulty++;
 		}

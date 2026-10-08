@@ -1,13 +1,13 @@
-#include "files.h"
 #include "tmpackdatabase.h"
 
+#include "files.h"
+#include "log.h"
 #include "windowstate.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(TMPackDataBase, 0x8c)
 DECOMP_SIZE_ASSERT(TMPackDataBase::TMPackDBEntry, 0x08)
 
 // The ring buffer of GetDBItemLZ's LZSS decoder.
@@ -35,42 +35,44 @@ void TMPackDataBase::DumpEntries()
 	}
 }
 
-// Stack-slot permutation: result, entry, fileSize, next, current, count, i and offset.
 // FUNCTION: MW2SHELL 0x10047c6c
 TMPackDataBase::TMPackDataBase(char* p_name)
 {
 	MechS32 result;
 	TMPackDBEntry* entry;
-	MechS32 fileSize;
 	TMPackDBEntry* next;
 	TMPackDBEntry* current;
-	size_t count;
-	MechS32 i;
 	undefined4 offset;
 
 	strcpy(m_name, p_name);
-	m_file = MechFopen(m_name, "rb");
-	if (m_file == NULL) {
-		fprintf(stderr, "Could not open mpack DB: %s\n", m_name);
-		fflush(stderr);
+	m_data = (MechU8*) MechReadFile(g_primaryHeap, m_name);
+	if (m_data == NULL) {
+		MechLogErrorf("Could not open mpack DB: %s\n", m_name);
 		exit(1);
 	}
 
-	setvbuf(m_file, NULL, _IOFBF, 0x4000);
-	count = fread(&m_numEntries, 4, 1, m_file);
-	result = CreateCollection(&m_entries, m_numEntries, NULL, 4, NULL);
+	m_size = MechHeapSize(g_primaryHeap, m_data);
+	if (m_size < 4) {
+		MechLogErrorf("mpack DB file too small: %s", m_name);
+		exit(1);
+	}
 
-	for (i = 0; i < m_numEntries; i++) {
-		count = fread(&offset, 4, 1, m_file);
+	memcpy(&m_numEntries, m_data, 4);
+	if (m_numEntries < 1 || m_numEntries > (m_size - 4) / 4) {
+		MechLogErrorf("mpack DB has a bad entry count: %s", m_name);
+		exit(1);
+	}
+
+	result = CreateCollection(&m_entries, m_numEntries, NULL, 4, NULL);
+	for (MechS32 i = 0; i < m_numEntries; i++) {
+		memcpy(&offset, m_data + 4 + i * 4, 4);
 		entry = new TMPackDBEntry(offset, 0);
 		result = ExpandCollection(m_entries, entry);
 	}
 
-	fseek(m_file, 0, SEEK_END);
-	fileSize = ftell(m_file);
-
 	current = (TMPackDBEntry*) CollectionGet(m_entries, 0);
-	for (i = 1; i < m_numEntries; i++) {
+	next = current;
+	for (MechS32 i = 1; i < m_numEntries; i++) {
 		next = (TMPackDBEntry*) CollectionGet(m_entries, i);
 		current->m_size = next->m_offset - current->m_offset;
 		if (i < m_numEntries - 1) {
@@ -78,7 +80,7 @@ TMPackDataBase::TMPackDataBase(char* p_name)
 		}
 	}
 
-	next->m_size = fileSize - next->m_offset;
+	next->m_size = m_size - next->m_offset;
 }
 
 // Stack-slot permutation: entry and i.
@@ -95,7 +97,7 @@ TMPackDataBase::~TMPackDataBase()
 
 	MechHeapFree(g_primaryHeap, m_entries->m_items);
 	MechHeapFree(g_primaryHeap, m_entries);
-	fclose(m_file);
+	MechHeapFree(g_primaryHeap, m_data);
 }
 
 // FUNCTION: MW2SHELL 0x10047fd4
@@ -126,7 +128,8 @@ MechS32 TMPackDataBase::GetDBItem(MechS32 p_id, void** p_data, MechS32* p_size)
 	void* data;
 
 	entry = GetEntry(p_id);
-	if (entry == NULL) {
+	if (entry == NULL || entry->m_offset > (undefined4) m_size ||
+		entry->m_size > (undefined4) m_size - entry->m_offset) {
 		*p_data = NULL;
 		*p_size = 0;
 		return 1;
@@ -141,8 +144,8 @@ MechS32 TMPackDataBase::GetDBItem(MechS32 p_id, void** p_data, MechS32* p_size)
 
 	*p_data = data;
 	*p_size = entry->m_size;
-	fseek(m_file, entry->m_offset, SEEK_SET);
-	fread(data, 1, entry->m_size, m_file);
+
+	memcpy(data, m_data + entry->m_offset, entry->m_size);
 	return 0;
 }
 
@@ -157,21 +160,20 @@ MechS32 TMPackDataBase::GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size
 	MechU8* src;
 	MechU8* out;
 	MechS32 n;
+	MechS32 pos;
 
 	entry = GetEntry(p_id);
 	if (entry == NULL) {
 		return 1;
 	}
 
-	n = fseek(m_file, entry->m_offset, SEEK_SET);
-	if (n != 0) {
+	pos = entry->m_offset;
+	if (pos < 0 || pos > m_size - 4) {
 		return 1;
 	}
 
-	n = fread(&remaining, 4, 1, m_file);
-	if (n != 1) {
-		return 1;
-	}
+	memcpy(&remaining, m_data + pos, 4);
+	pos += 4;
 
 	out = (MechU8*) MechHeapAlloc(g_primaryHeap, remaining);
 	if (out == NULL) {
@@ -192,21 +194,21 @@ MechS32 TMPackDataBase::GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size
 	while (remaining > 0) {
 		flags >>= 1;
 		if (flags == 1) {
-			flags = fgetc(m_file);
+			flags = ByteAt(pos++);
 			flags |= 0x100;
 		}
 
 		if (flags & 1) {
 			remaining--;
-			*dst = fgetc(m_file);
+			*dst = ByteAt(pos++);
 			*out++ = *dst++;
 			if (dst == g_lzWindow + c_lzWindowSize) {
 				dst = g_lzWindow;
 			}
 		}
 		else {
-			n = fgetc(m_file);
-			n += fgetc(m_file) << 8;
+			n = ByteAt(pos++);
+			n += ByteAt(pos++) << 8;
 			src = g_lzWindow + (n & (c_lzWindowSize - 1));
 			n = (((MechU32) n >> 12) & 0xf) + 3;
 			n &= c_lzWindowSize - 1;
@@ -231,15 +233,18 @@ MechS32 TMPackDataBase::GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size
 // FUNCTION: MW2SHELL 0x100483c8
 MechS32 TMPackDataBase::ReadDBItemData(MechS32 p_id, MechS32 p_offset, void* p_buffer, size_t p_size)
 {
-	TMPackDBEntry* entry;
-
-	entry = GetEntry(p_id);
+	TMPackDBEntry* entry = GetEntry(p_id);
 	if (entry == NULL) {
 		return 1;
 	}
 
-	fseek(m_file, entry->m_offset + p_offset, SEEK_SET);
-	fread(p_buffer, 1, p_size, m_file);
+	MechS32 pos = entry->m_offset + p_offset;
+
+	if (pos < 0 || p_size > (size_t) m_size || pos > m_size - (MechS32) p_size) {
+		return 1;
+	}
+
+	memcpy(p_buffer, m_data + pos, p_size);
 	return 0;
 }
 
@@ -251,15 +256,16 @@ MechS32 TMPackDataBase::ReadDBItemLine(MechS32 p_id, MechS32 p_offset, MechChar*
 	TMPackDBEntry* entry;
 	MechChar c;
 	MechS32 i;
+	MechS32 pos;
 
 	entry = GetEntry(p_id);
 	if (entry == NULL) {
 		return 1;
 	}
 
-	fseek(m_file, entry->m_offset + p_offset, SEEK_SET);
+	pos = entry->m_offset + p_offset;
 	i = 0;
-	while ((c = fgetc(m_file)) != '\n' && c != '\0') {
+	while ((c = ByteAt(pos++)) != '\n' && c != '\0') {
 		p_buffer[i] = c;
 		i++;
 	}
@@ -280,21 +286,27 @@ MechS32 TMPackDataBase::ReadDBItemString(MechS32 p_id, MechS32 p_offset, MechCha
 	TMPackDBEntry* entry;
 	MechChar c;
 	MechS32 i;
+	MechS32 pos;
 
 	entry = GetEntry(p_id);
 	if (entry == NULL) {
 		return 1;
 	}
 
-	fseek(m_file, entry->m_offset + p_offset, SEEK_SET);
+	pos = entry->m_offset + p_offset;
 	i = 0;
-	while ((c = fgetc(m_file)) != '\0') {
+	while ((c = ByteAt(pos++)) != '\0') {
 		p_buffer[i] = c;
 		i++;
 	}
 
 	p_buffer[i] = '\0';
 	return 0;
+}
+
+MechS32 TMPackDataBase::ByteAt(MechS32 p_offset)
+{
+	return p_offset >= 0 && p_offset < m_size ? m_data[p_offset] : -1;
 }
 
 // FUNCTION: MW2SHELL 0x100485a1

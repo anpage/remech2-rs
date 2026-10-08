@@ -10,20 +10,18 @@
 #include "types.h"
 
 #include <stddef.h>
-#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-	// fopen
-	FILE* MechFopen(const char* p_path, const char* p_mode);
 	// How MechOpen opens a file: always as binary
 	enum {
 		c_mechOpenRead,      // to read
 		c_mechOpenReadWrite, // to read and write
-		c_mechOpenCreate     // to write, creating it if it isn't there, without truncating it
+		c_mechOpenCreate,    // to write, creating it if it isn't there, without truncating it
+		c_mechOpenWrite      // to write, creating or emptying it
 	};
 
 	// open. Returns a handle for the functions below, or -1 on failure.

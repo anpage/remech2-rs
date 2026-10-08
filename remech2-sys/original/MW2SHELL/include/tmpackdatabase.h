@@ -37,10 +37,13 @@ public:
 	MechS32 ReadDBItemString(MechS32 p_id, MechS32 p_offset, MechChar* p_buffer);
 
 private:
-	MechChar m_name[0x80]; // 0x00
-	FILE* m_file;          // 0x80
-	MechS32 m_numEntries;  // 0x84
-	Collection* m_entries; // 0x88
+	MechS32 ByteAt(MechS32 p_offset);
+
+	MechChar m_name[0x80];
+	MechU8* m_data;
+	MechS32 m_size;
+	MechS32 m_numEntries;
+	Collection* m_entries;
 };
 
 // The globals of tmpackdatabase.cpp that other units use.

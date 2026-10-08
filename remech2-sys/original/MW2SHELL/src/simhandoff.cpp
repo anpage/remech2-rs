@@ -29,18 +29,17 @@ SimHandoffState g_simHandoff;
 void ReadSimHandoff(MechS32 p_fromSim, MechS32* p_campaign, MechU8* p_pilotChosen, char** p_scenario)
 {
 	MechS32 i;
-	FILE* file;
 
-	file = MechFopen("mw2prm.cfg", "rb");
-	if (!file) {
+	MechS32 file = MechOpen("mw2prm.cfg", c_mechOpenRead);
+	if (file == -1) {
 		return;
 	}
 
-	if (fread(&g_simHandoff, sizeof(g_simHandoff), 1, file) != 1) {
-		fclose(file);
+	if (MechRead(file, &g_simHandoff, sizeof(g_simHandoff)) != (int) sizeof(g_simHandoff)) {
+		MechClose(file);
 		return;
 	}
-	fclose(file);
+	MechClose(file);
 
 	*p_campaign = g_simHandoff.m_campaign;
 	*p_pilotChosen = g_simHandoff.m_pilotChosen;
@@ -73,8 +72,6 @@ void ReadSimHandoff(MechS32 p_fromSim, MechS32* p_campaign, MechU8* p_pilotChose
 // FUNCTION: MW2SHELL 0x10039c92
 void WriteSimHandoff(MechU32 p_msg, MechS32 p_campaign, MechU8 p_pilotChosen, const char* p_scenario)
 {
-	FILE* file;
-
 	g_simHandoff.m_msg = p_msg;
 	g_simHandoff.m_campaign = p_campaign;
 	g_simHandoff.m_pilotChosen = p_pilotChosen;
@@ -94,11 +91,11 @@ void WriteSimHandoff(MechU32 p_msg, MechS32 p_campaign, MechU8 p_pilotChosen, co
 		WriteStarFiles();
 	}
 
-	file = MechFopen("mw2prm.cfg", "wb");
-	if (!file) {
+	MechS32 file = MechOpen("mw2prm.cfg", c_mechOpenWrite);
+	if (file == -1) {
 		return;
 	}
 
-	fwrite(&g_simHandoff, sizeof(g_simHandoff), 1, file);
-	fclose(file);
+	MechWrite(file, &g_simHandoff, sizeof(g_simHandoff));
+	MechClose(file);
 }

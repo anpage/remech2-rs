@@ -8,10 +8,8 @@
 #include "font.h"
 #include "keyboardinput.h"
 #include "loopingmovie.h"
-#include "mainmenu.h"
 #include "mechbay.h"
 #include "mousestate.h"
-#include "refreshmode.h"
 #include "screenfield.h"
 #include "shellglobals.h"
 #include "shellmain.h"
@@ -274,48 +272,40 @@ void DragVolumeSlider(ScreenField* p_option)
 // FUNCTION: MW2SHELL 0x10043926
 void LoadSoundConfig()
 {
-	FILE* file;
-
-	file = MechFopen("MW2SND.CFG", "rb");
-	if (file != NULL) {
-		fread(&g_soundConfig, sizeof(g_soundConfig), 1, file);
-		fclose(file);
+	MechS32 file = MechOpen("MW2SND.CFG", c_mechOpenRead);
+	if (file != -1) {
+		MechRead(file, &g_soundConfig, sizeof(g_soundConfig));
+		MechClose(file);
 	}
 }
 
 // FUNCTION: MW2SHELL 0x10043979
 void LoadDifficultyConfig()
 {
-	FILE* file;
-
-	file = MechFopen("MW2DIF.CFG", "rb");
-	if (file != NULL) {
-		fread(&g_difficultyConfig, sizeof(g_difficultyConfig), 1, file);
-		fclose(file);
+	MechS32 file = MechOpen("MW2DIF.CFG", c_mechOpenRead);
+	if (file != -1) {
+		MechRead(file, &g_difficultyConfig, sizeof(g_difficultyConfig));
+		MechClose(file);
 	}
 }
 
 // FUNCTION: MW2SHELL 0x100439cc
 void SaveDifficultyConfig()
 {
-	FILE* file;
-
-	file = MechFopen("MW2DIF.CFG", "wb");
-	if (file != NULL) {
-		fwrite(&g_difficultyConfig, sizeof(g_difficultyConfig), 1, file);
-		fclose(file);
+	MechS32 file = MechOpen("MW2DIF.CFG", c_mechOpenWrite);
+	if (file != -1) {
+		MechWrite(file, &g_difficultyConfig, sizeof(g_difficultyConfig));
+		MechClose(file);
 	}
 }
 
 // FUNCTION: MW2SHELL 0x10043a1f
 void SaveSoundConfig()
 {
-	FILE* file;
-
-	file = MechFopen("MW2SND.CFG", "wb");
-	if (file != NULL) {
-		fwrite(&g_soundConfig, sizeof(g_soundConfig), 1, file);
-		fclose(file);
+	MechS32 file = MechOpen("MW2SND.CFG", c_mechOpenWrite);
+	if (file != -1) {
+		MechWrite(file, &g_soundConfig, sizeof(g_soundConfig));
+		MechClose(file);
 	}
 }
 

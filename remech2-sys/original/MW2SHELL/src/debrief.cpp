@@ -9,26 +9,21 @@
 #include "files.h"
 #include "font.h"
 #include "keyboardinput.h"
-#include "mainmenubutton.h"
 #include "mechbay.h"
 #include "mechchassis.h"
 #include "mechvariant.h"
 #include "menudata.h"
 #include "menuscreen.h"
-#include "messages.h"
 #include "mousestate.h"
-#include "options.h"
 #include "page.h"
 #include "pilotrecord.h"
 #include "pilotroster.h"
-#include "refreshmode.h"
 #include "shellglobals.h"
 #include "shellmain.h"
 #include "stringutil.h"
 #include "textpages.h"
 #include "tmpackdatabase.h"
 #include "types.h"
-#include "video.h"
 #include "videodriver.h"
 
 #include <stdio.h>
@@ -124,7 +119,6 @@ MechChar g_honorLine[0x200];
 
 // GLOBAL: MW2SHELL 0x100793b8
 MechChar g_objectiveTime[0x80];
-
 
 // Returns TRUE when one of the options that makes a trial easier is set.
 // FUNCTION: MW2SHELL 0x10001000
@@ -553,7 +547,14 @@ void BuildDebriefText(
 
 	sprintf(g_careerHonor, "%d", g_currentPilot->m_honor);
 	width = g_bodyFont->GetTextWidth(g_careerHonor);
-	snprintf(g_careerHonorLine, sizeof(g_careerHonorLine), "\\nCareer Honor:\\g%03d\\b%03d%s\\n", 350, width, g_careerHonor);
+	snprintf(
+		g_careerHonorLine,
+		sizeof(g_careerHonorLine),
+		"\\nCareer Honor:\\g%03d\\b%03d%s\\n",
+		350,
+		width,
+		g_careerHonor
+	);
 	strcat(p_text, g_careerHonorLine);
 }
 
@@ -563,15 +564,14 @@ void BuildDebriefText(
 // FUNCTION: MW2SHELL 0x100021a6
 void ReadMissionResultsC(void* p_results)
 {
-	FILE* file = NULL;
+	MechS32 file = MechOpen("MW2MSN.CFG", c_mechOpenRead);
 
-	file = MechFopen("MW2MSN.CFG", "rb");
-	if (file == NULL) {
+	if (file == -1) {
 		return;
 	}
 
-	fread(p_results, 0x9d4, 1, file);
-	fclose(file);
+	MechRead(file, p_results, 0x9d4);
+	MechClose(file);
 }
 
 // Lays out the debriefing's text on pages, under the scenario's debriefing project (its first four
@@ -657,7 +657,6 @@ MechS32 GetTrialRank(MissionResults* p_results, DifficultyConfig* p_difficulty)
 // FUNCTION: MW2SHELL 0x100024a3
 void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scenario)
 {
-	FILE* file = NULL;
 	MechS32 left;
 	MechS32 top;
 	MechS32 width;
@@ -688,10 +687,10 @@ void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p
 	}
 
 	LoadPilotRoster();
-	file = MechFopen("MW2CAR.CFG", "rb");
-	if (file) {
-		fread(&career, 0x50, 1, file);
-		fclose(file);
+	MechS32 file = MechOpen("MW2CAR.CFG", c_mechOpenRead);
+	if (file != -1) {
+		MechRead(file, &career, 0x50);
+		MechClose(file);
 	}
 	ReadMissionResults(&g_missionResults);
 

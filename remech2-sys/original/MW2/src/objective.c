@@ -937,7 +937,6 @@ void EndTheMission1(void)
 // FUNCTION: MW2 0x1001c9f7
 MechS32 EndTheMission2(void)
 {
-	FILE* file;
 	MissionResult result;
 	StarMission* mission;
 	MechS32 i;
@@ -976,13 +975,14 @@ MechS32 EndTheMission2(void)
 	}
 
 	result.m_count = count;
-	file = MechFopen("mw2msn.cfg", "wb");
-	if (!file) {
+
+	MechS32 file = MechOpen("mw2msn.cfg", c_mechOpenWrite);
+	if (file == -1) {
 		return FALSE;
 	}
+	MechWrite(file, &result, sizeof(result));
+	MechClose(file);
 
-	fwrite(&result, sizeof(result), 1, file);
-	fclose(file);
 	return TRUE;
 }
 

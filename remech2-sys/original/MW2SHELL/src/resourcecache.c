@@ -1,7 +1,6 @@
 #include "resourcecache.h"
 
 #include "decomp.h"
-#include "files.h"
 #include "log.h"
 #include "prjfile.h"
 #include "types.h"

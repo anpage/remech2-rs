@@ -1,7 +1,6 @@
 #include "pilotroster.h"
 
 #include "debugprint.h"
-#include "decomp.h"
 #include "files.h"
 #include "pilotrecord.h"
 #include "shellglobals.h"
@@ -16,16 +15,14 @@
 static const size_t c_savedPilotSize = offsetof(PilotRecord, m_glyph);
 static const long c_savedGlyphSize = 4;
 
-// Stack-slot permutation: file and i swap [ebp-N] slots with the original.
 // FUNCTION: MW2SHELL 0x1002da80
 void LoadPilotRoster()
 {
 	PilotRecord* pilot;
-	FILE* file;
 	MechS32 i;
 
-	file = MechFopen("MW2REG.CFG", "rb");
-	if (file == NULL) {
+	MechS32 file = MechOpen("MW2REG.CFG", c_mechOpenRead);
+	if (file == -1) {
 		for (i = 0; i < 20; i++) {
 			pilot = &g_pilotRoster[i];
 			pilot->m_inUse = 0;
@@ -48,11 +45,11 @@ void LoadPilotRoster()
 	}
 	else {
 		for (i = 0; i < 20; i++) {
-			fread(&g_pilotRoster[i], c_savedPilotSize, 1, file);
-			fseek(file, c_savedGlyphSize, SEEK_CUR);
+			MechRead(file, &g_pilotRoster[i], c_savedPilotSize);
+			MechSeek(file, c_savedGlyphSize, SEEK_CUR);
 		}
 
-		fclose(file);
+		MechClose(file);
 	}
 
 	for (i = 0; i < 20; i++) {
@@ -65,19 +62,18 @@ void LoadPilotRoster()
 void SavePilotRoster()
 {
 	static const MechU8 glyph[4] = {0};
-	FILE* file;
 	MechS32 i;
 
-	file = MechFopen("MW2REG.CFG", "wb");
-	if (file == NULL) {
+	MechS32 file = MechOpen("MW2REG.CFG", c_mechOpenWrite);
+	if (file == -1) {
 		ShowMessage("Error Writing Career File\n");
 		return;
 	}
 
 	for (i = 0; i < 20; i++) {
-		fwrite(&g_pilotRoster[i], c_savedPilotSize, 1, file);
-		fwrite(glyph, c_savedGlyphSize, 1, file);
+		MechWrite(file, &g_pilotRoster[i], c_savedPilotSize);
+		MechWrite(file, glyph, c_savedGlyphSize);
 	}
 
-	fclose(file);
+	MechClose(file);
 }

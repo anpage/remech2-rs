@@ -175,48 +175,11 @@ unsafe fn game_path(path: *const c_char) -> Option<PathBuf> {
     }
 }
 
-#[cfg(windows)]
-unsafe extern "C" {
-    fn _wfopen(path: *const u16, mode: *const u16) -> *mut c_void;
-}
-
-#[cfg(not(windows))]
-unsafe extern "C" {
-    fn fopen(path: *const c_char, mode: *const c_char) -> *mut c_void;
-}
-
-#[cfg(windows)]
-fn wide(text: &OsStr) -> Vec<u16> {
-    use std::os::windows::ffi::OsStrExt;
-
-    text.encode_wide().chain([0]).collect()
-}
-
-#[cfg(not(windows))]
-fn narrow(path: &Path) -> Option<CString> {
-    use std::os::unix::ffi::OsStrExt;
-
-    CString::new(path.as_os_str().as_bytes()).ok()
-}
-
-#[cfg(windows)]
-unsafe fn c_fopen(path: &Path, mode: &CStr) -> *mut c_void {
-    let mode = wide(OsStr::new(&*mode.to_string_lossy()));
-    unsafe { _wfopen(wide(path.as_os_str()).as_ptr(), mode.as_ptr()) }
-}
-
-#[cfg(not(windows))]
-unsafe fn c_fopen(path: &Path, mode: &CStr) -> *mut c_void {
-    match narrow(path) {
-        Some(path) => unsafe { fopen(path.as_ptr(), mode.as_ptr()) },
-        None => ptr::null_mut(),
-    }
-}
-
 /// `MechOpen`'s modes
 const OPEN_READ: c_int = 0;
 const OPEN_READ_WRITE: c_int = 1;
 const OPEN_CREATE: c_int = 2;
+const OPEN_WRITE: c_int = 3;
 
 const SEEK_SET: c_int = 0;
 const SEEK_CUR: c_int = 1;
@@ -249,18 +212,6 @@ fn status(what: &str, path: &Path, result: std::io::Result<()>) -> c_int {
     }
 }
 
-#[unsafe(export_name = "MechFopen")]
-pub unsafe extern "C" fn mech_fopen(path: *const c_char, mode: *const c_char) -> *mut c_void {
-    let Some(path) = (unsafe { game_path(path) }) else {
-        return ptr::null_mut();
-    };
-    if mode.is_null() {
-        return ptr::null_mut();
-    }
-
-    unsafe { c_fopen(&path, CStr::from_ptr(mode)) }
-}
-
 #[unsafe(export_name = "MechOpen")]
 pub unsafe extern "C" fn mech_open(path: *const c_char, mode: c_int) -> c_int {
     let mut options = OpenOptions::new();
@@ -268,6 +219,7 @@ pub unsafe extern "C" fn mech_open(path: *const c_char, mode: c_int) -> c_int {
         OPEN_READ => options.read(true),
         OPEN_READ_WRITE => options.read(true).write(true),
         OPEN_CREATE => options.write(true).create(true),
+        OPEN_WRITE => options.write(true).create(true).truncate(true),
         _ => return -1,
     };
     let Some(path) = (unsafe { game_path(path) }) else {
