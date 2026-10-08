@@ -2,11 +2,8 @@
 #define SIM_NAMES_H
 
 #define AllocateCacheTable Sim_AllocateCacheTable
-#define AppendDebugLog Sim_AppendDebugLog
 #define CenterCursor Sim_CenterCursor
-#define ClearMonoLastLine Sim_ClearMonoLastLine
 #define CopyPaletteColorWithBrightness Sim_CopyPaletteColorWithBrightness
-#define CreateDebugLog Sim_CreateDebugLog
 #define DebugPrint Sim_DebugPrint
 #define DebugPrintInternal Sim_DebugPrintInternal
 #define DumpResourceCache Sim_DumpResourceCache
@@ -33,14 +30,9 @@
 #define Mw2PrjFree Sim_Mw2PrjFree
 #define PauseTimer Sim_PauseTimer
 #define PreviewBrightness Sim_PreviewBrightness
-#define PrintMono Sim_PrintMono
-#define PrintMonoLine Sim_PrintMonoLine
 #define PurgeOldestCacheEntry Sim_PurgeOldestCacheEntry
 #define RebuildPurgeList Sim_RebuildPurgeList
 #define SavePreBrightnessPalette Sim_SavePreBrightnessPalette
-#define ScrollMonoDisplay Sim_ScrollMonoDisplay
-#define SetDebugLogName Sim_SetDebugLogName
-#define SetDebugOutputMode Sim_SetDebugOutputMode
 #define ShowMessage Sim_ShowMessage
 #define ShutdownMw2Prj Sim_ShutdownMw2Prj
 #define ShutdownRefreshMode Sim_ShutdownRefreshMode
@@ -53,9 +45,6 @@
 #define g_currentDisplayBackend Sim_g_currentDisplayBackend
 #define g_currentRefreshMode Sim_g_currentRefreshMode
 #define g_cursorClipped Sim_g_cursorClipped
-#define g_debugLogFile Sim_g_debugLogFile
-#define g_debugLogName Sim_g_debugLogName
-#define g_debugOutputMode Sim_g_debugOutputMode
 #define g_debugPrintBuffer Sim_g_debugPrintBuffer
 #define g_displayBackend Sim_g_displayBackend
 #define g_displayBrightness Sim_g_displayBrightness

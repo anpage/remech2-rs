@@ -136,25 +136,6 @@ MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, undefined4* p_flags, MechChar* p
 					g_drawModeIndex = atoi(arg + 3);
 				}
 				break;
-			case 'X':
-				if (arg[2] == '=') {
-					switch (toupper(arg[3])) {
-					case 'F':
-						SetDebugOutputMode(4);
-						break;
-					case 'S':
-						SetDebugOutputMode(2);
-						break;
-					case 'M':
-						SetDebugOutputMode(1);
-						break;
-					}
-				}
-
-				InitializeMono();
-				g_missionTimerStopped = 1;
-				p_flags[1] = 0;
-				break;
 			case '1':
 				g_netRole = 1;
 				if (arg[2] == '=') {

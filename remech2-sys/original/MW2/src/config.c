@@ -16,6 +16,7 @@
 #include "gamekeys.h"
 #include "hud.h"
 #include "loadres.h"
+#include "log.h"
 #include "mech.h"
 #include "mechdamage.h"
 #include "mechviewpanel.h"
@@ -775,7 +776,6 @@ MechS32 LoadMgdFile(
 	MechS32 size;
 	MechS32* data;
 	MechS32* cursor;
-	FILE* file;
 
 	data = LoadResourceByRef(
 		p_ref,
@@ -786,12 +786,7 @@ MechS32 LoadMgdFile(
 		NULL
 	);
 	if (!data) {
-		file = MechFopen("symlog.txt", "a");
-		if (file) {
-			fprintf(file, "Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagMgeo]);
-			fclose(file);
-		}
-
+		MechLogErrorf("symlog.txt: Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagMgeo]);
 		return FALSE;
 	}
 
@@ -838,7 +833,6 @@ MechS32 LoadReels(ResourceRef* p_ref)
 	MechS32 stride;
 	MechU8* end;
 	MechS32 index;
-	FILE* file;
 
 	offset = 0;
 	stride = sizeof(MechS32);
@@ -851,12 +845,7 @@ MechS32 LoadReels(ResourceRef* p_ref)
 		&g_staticPoolTags[6]
 	);
 	if (!data) {
-		file = MechFopen("symlog.txt", "a");
-		if (file) {
-			fprintf(file, "Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagAnim]);
-		}
-
-		fclose(file);
+		MechLogErrorf("symlog.txt: Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagAnim]);
 		return FALSE;
 	}
 
@@ -922,7 +911,6 @@ MechS32 LoadHudFile(ResourceRef* p_ref)
 	MechS32 bottom;
 	MechS32 left;
 	MechS32 top;
-	FILE* file;
 
 	data = LoadResourceByRef(
 		p_ref,
@@ -933,12 +921,7 @@ MechS32 LoadHudFile(ResourceRef* p_ref)
 		NULL
 	);
 	if (!data) {
-		file = MechFopen("symlog.txt", "a");
-		if (file) {
-			fprintf(file, "Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagHud]);
-		}
-
-		fclose(file);
+		MechLogErrorf("symlog.txt: Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagHud]);
 		return FALSE;
 	}
 
@@ -997,7 +980,6 @@ MechS32 LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels, Point* p
 	CockpitFrame* frame;
 	void* data;
 	MechS16* value;
-	FILE* file;
 
 	if (!p_gauges || !p_panels || !p_point) {
 		return FALSE;
@@ -1012,12 +994,7 @@ MechS32 LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels, Point* p
 		NULL
 	);
 	if (!data) {
-		file = MechFopen("symlog.txt", "a");
-		if (file) {
-			fprintf(file, "Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagCpit]);
-		}
-
-		fclose(file);
+		MechLogErrorf("symlog.txt: Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagCpit]);
 		return FALSE;
 	}
 
@@ -1094,16 +1071,11 @@ MechS32 WriteScreenPicture(MechChar* p_path, void* p_palette)
 // FUNCTION: MW2 0x10071108
 MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_poolTag)
 {
-	FILE* log;
 	MechS32 file;
 
 	file = MechOpen(p_path, c_mechOpenRead);
 	if (file == -1) {
-		log = MechFopen("symlog.txt", "a");
-		if (log) {
-			fprintf(log, "Couldn't load ID=%s\n", p_path);
-		}
-		fclose(log);
+		MechLogErrorf("symlog.txt: Couldn't load ID=%s\n", p_path);
 		return -1;
 	}
 

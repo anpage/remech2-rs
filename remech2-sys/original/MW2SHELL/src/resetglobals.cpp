@@ -113,11 +113,6 @@ static const struct {
 	RESET_GLOBAL(g_honorLine),
 	RESET_GLOBAL(g_objectiveTime),
 
-	// debugout.c
-	RESET_GLOBAL(g_debugOutputMode),
-	RESET_GLOBAL(g_debugLogFile),
-	RESET_GLOBAL(g_debugLogName),
-
 	// debugprint.c
 	RESET_GLOBAL(g_debugPrintBuffer),
 

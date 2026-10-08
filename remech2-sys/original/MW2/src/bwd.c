@@ -7,6 +7,7 @@
 #include "error.h"
 #include "files.h"
 #include "loadres.h"
+#include "log.h"
 #include "mw2prj.h"
 #include "overlay.h"
 #include "resourcename.h"
@@ -190,13 +191,9 @@ MechChar* GetKeywordName(MechU32 p_code)
 // FUNCTION: MW2 0x1003ff75
 void LogDebugLine(MechChar* p_text)
 {
-	FILE* file;
+	// We send it to the Rust side to log with tracing instead
+	MechLogDebugf("mw2debug.txt: %s", p_text);
 
-	file = MechFopen("mw2debug.txt", "a");
-	if (file) {
-		fprintf(file, "%s", p_text);
-	}
-	fclose(file);
 	MonoPrint(p_text);
 }
 

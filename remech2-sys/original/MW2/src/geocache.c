@@ -11,6 +11,7 @@
 #include "files.h"
 #include "gamething.h"
 #include "loadres.h"
+#include "log.h"
 #include "mw2prj.h"
 #include "object.h"
 #include "players.h"
@@ -1028,7 +1029,6 @@ MechS32 ToggleBlockBoxes(void)
 	ResourceRef local;
 	Matrix matrix;
 	MechU8* data;
-	FILE* file;
 
 	result = FALSE;
 	if (!g_blockBoxesShown) {
@@ -1084,12 +1084,7 @@ MechS32 ToggleBlockBoxes(void)
 			}
 		}
 		else {
-			file = MechFopen("symlog.txt", "a");
-			if (file) {
-				fprintf(file, "Couldn't load ID=%s Type=%s\n", ref->m_name, g_resourceTypeTags[c_resTagPoly]);
-			}
-
-			fclose(file);
+			MechLogErrorf("symlog.txt: Couldn't load ID=%s Type=%s\n", ref->m_name, g_resourceTypeTags[c_resTagPoly]);
 		}
 	}
 	else {
@@ -1115,7 +1110,6 @@ void ShowQuadtreeBoxes(QuadtreeNode* p_root)
 	ResourceRef* ref;
 	ResourceRef local;
 	MechU8* data;
-	FILE* file;
 
 	ref = &local;
 	ref->m_id = -1;
@@ -1133,12 +1127,7 @@ void ShowQuadtreeBoxes(QuadtreeNode* p_root)
 		}
 	}
 	else {
-		file = MechFopen("symlog.txt", "a");
-		if (file) {
-			fprintf(file, "Couldn't load ID=%s Type=%s\n", ref->m_name, g_resourceTypeTags[c_resTagPoly]);
-		}
-
-		fclose(file);
+		MechLogErrorf("symlog.txt: Couldn't load ID=%s Type=%s\n", ref->m_name, g_resourceTypeTags[c_resTagPoly]);
 	}
 }
 

@@ -823,11 +823,6 @@ static const struct {
 	RESET_GLOBAL(g_purgeListHead),
 	RESET_GLOBAL(g_purgeListTail),
 
-	// logwindow.c
-	RESET_GLOBAL(g_debugOutputMode),
-	RESET_GLOBAL(g_debugLogFile),
-	RESET_GLOBAL(g_debugLogName),
-
 	// mainmenu.c
 	RESET_GLOBAL(g_mainMenuTitle),
 	RESET_GLOBAL(g_abortMissionItem),

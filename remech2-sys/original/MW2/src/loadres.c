@@ -6,6 +6,7 @@
 #include "error.h"
 #include "files.h"
 #include "gamekeys.h"
+#include "log.h"
 #include "prjfile.h"
 #include "simmain.h"
 #include "timedoverlays.h"
@@ -227,22 +228,22 @@ void FreeCacheEntry(ResourceCacheEntry* p_item)
 // FUNCTION: MW2 0x10019fef
 void DumpResourceCache(void)
 {
-	FILE* file;
 	MechS32 i;
 	MechChar type[5];
 	ResourceCacheEntry* item;
 	MechChar name[100];
 
-	sprintf(name, "dbugcch%d.log", g_cacheDumpNumber++);
-	file = MechFopen(name, "w");
+	snprintf(name, sizeof(name), "dbugcch%d.log", g_cacheDumpNumber++);
+	MechLogDebugf("%s: Cache table", name);
 	type[4] = '\0';
-	fprintf(file, "Cache table\n-----------------------\n");
+
 	for (i = 0; i < 0x3f1; i++) {
 		for (item = g_cacheTable[i]; item; item = item->m_next) {
 			*(MechS32*) type = item->m_type;
-			fprintf(
-				file,
-				"ID=%5d  Type=%4s  Lock=%d  Size=%7d\n",
+			MechLogDebugf(
+				"%s: bucket=%d ID=%5d Type=%4s Lock=%d Size=%7d",
+				name,
+				i,
 				item->m_id,
 				type,
 				item->m_lock,
@@ -251,20 +252,18 @@ void DumpResourceCache(void)
 		}
 	}
 
-	fprintf(file, "\nPurge list\n-----------------------\n");
+	MechLogDebugf("%s: Purge list", name);
 	for (item = g_purgeListHead; item; item = item->m_purgeNext) {
 		*(MechS32*) type = item->m_type;
-		fprintf(
-			file,
-			"ID=%5d  Type=%4s  Lock=%d  Size=%7d\n",
+		MechLogDebugf(
+			"%s: purge ID=%5d Type=%4s Lock=%d Size=%7d",
+			name,
 			item->m_id,
 			type,
 			item->m_lock,
 			(MechS32) MechHeapSize(g_primaryHeap, item)
 		);
 	}
-
-	fclose(file);
 }
 
 // FUNCTION: MW2 0x1001a158
@@ -296,9 +295,7 @@ void* LoadCachedResource(MechS32 p_file, MechS32 p_id, const char* p_type, undef
 	ResourceCacheEntry* item;
 	MechS32 hash;
 	MechS32 size;
-	FILE* file;
 	MechChar message[100];
-	FILE* file2;
 	MechChar message2[100];
 
 	if (p_id < 0) {
@@ -329,11 +326,7 @@ void* LoadCachedResource(MechS32 p_file, MechS32 p_id, const char* p_type, undef
 
 	size = GetPrjResourceSize(p_file, p_type, p_id);
 	if (size <= 0) {
-		file = MechFopen("symlog.txt", "a");
-		if (file) {
-			fprintf(file, "Couldn't load ID=%d Type=%s\n", p_id, p_type);
-			fclose(file);
-		}
+		MechLogErrorf("symlog.txt: Couldn't load ID=%d Type=%s\n", p_id, p_type);
 
 		Error(0x20, "Non-existant resource (type: %s  id: %i)\n", p_type, p_id);
 		if (g_missionTimerStopped) {
@@ -355,11 +348,7 @@ void* LoadCachedResource(MechS32 p_file, MechS32 p_id, const char* p_type, undef
 	}
 
 	if (ReadPrjResource(p_file, p_type, p_id, item + 1) == -1) {
-		file2 = MechFopen("symlog.txt", "a");
-		if (file2) {
-			fprintf(file2, "Couldn't load ID=%d Type=%s\n", p_id, p_type);
-			fclose(file2);
-		}
+		MechLogErrorf("symlog.txt: Couldn't load ID=%d Type=%s\n", p_id, p_type);
 
 		Error(0x20, "Non-existant resource (type: %s  id: %i)\n", p_type, p_id);
 		if (g_missionTimerStopped) {

@@ -1,5 +1,6 @@
 #include "shellmain.h"
 
+#include "app.h"
 #include "archivereader.h"
 #include "audiosubsystem.h"
 #include "briefing.h"
@@ -12,7 +13,6 @@
 #include "decomp.h"
 #include "font.h"
 #include "formation.h"
-#include "app.h"
 #include "hallofhonor.h"
 #include "keyboard.h"
 #include "keyboardinput.h"
@@ -90,7 +90,6 @@ MechS32 g_selectedCampaign;
 MechU8 g_pilotChosen;
 
 void PlayMidiSong(MechU32 p_msg, MechS32 p_campaign);
-void ParseCommandLineFlags(char* p_cmdLine);
 void RunScreenFrame();
 void CloseMenuFunction();
 
@@ -379,8 +378,6 @@ extern "C" int ShellMain(char* p_cmdLine)
 		fromSim = TRUE;
 	}
 
-	ParseCommandLineFlags(p_cmdLine);
-
 	InitTextColorMaps();
 
 	g_mw2Database = new TMPackDataBase(g_databaseName);
@@ -596,36 +593,6 @@ void PlayMidiSong(MechU32 p_msg, MechS32 p_campaign)
 	if (result != 1) {
 		g_midiBackgroundMusic = new MidiSequence(g_audioSubsystem, data, size);
 		g_midiBackgroundMusic->Start();
-	}
-}
-
-// FUNCTION: MW2SHELL 0x10010137
-void ParseCommandLineFlags(char* p_cmdLine)
-{
-	char* token;
-
-	token = strtok(p_cmdLine, " ");
-	while (token != NULL) {
-		if (token[0] == '-') {
-			switch (toupper(token[1])) {
-			case 'X':
-				if (token[2] == '=') {
-					switch (toupper(token[3])) {
-					case 'F':
-						SetDebugOutputMode(4);
-						break;
-					case 'S':
-						SetDebugOutputMode(2);
-						break;
-					case 'M':
-						SetDebugOutputMode(1);
-						break;
-					}
-				}
-				break;
-			}
-		}
-		token = strtok(NULL, " ");
 	}
 }
 
