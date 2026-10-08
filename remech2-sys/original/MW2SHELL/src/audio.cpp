@@ -21,12 +21,6 @@ AudioSubsystem::~AudioSubsystem()
 	ShellAudioSubsystem_Delete(m_impl);
 }
 
-// FUNCTION: MW2SHELL 0x1003d032
-void AudioSubsystem::CloseDigitalDriver()
-{
-	ShellAudioSubsystem_CloseDigitalDriver(m_impl);
-}
-
 // FUNCTION: MW2SHELL 0x1003d0fc
 void AudioSubsystem::ApplyMidiVolume()
 {

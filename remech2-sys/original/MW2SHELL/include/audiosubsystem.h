@@ -10,7 +10,6 @@ public:
 	AudioSubsystem();
 	~AudioSubsystem();
 
-	void CloseDigitalDriver();
 	void ApplyMidiVolume();
 
 	friend class MidiSequence;

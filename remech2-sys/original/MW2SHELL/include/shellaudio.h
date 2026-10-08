@@ -13,7 +13,6 @@ extern "C"
 
 	ShellAudioSubsystem* ShellAudioSubsystem_New(void);
 	void ShellAudioSubsystem_Delete(ShellAudioSubsystem* p_subsystem);
-	void ShellAudioSubsystem_CloseDigitalDriver(ShellAudioSubsystem* p_subsystem);
 	void ShellAudioSubsystem_ApplyMidiVolume(ShellAudioSubsystem* p_subsystem);
 
 	// Both copy p_data, and return NULL when it can't be played

@@ -27,13 +27,6 @@ pub unsafe extern "C" fn audio_subsystem_delete(subsystem: *mut AudioSubsystem) 
     }
 }
 
-#[unsafe(export_name = "ShellAudioSubsystem_CloseDigitalDriver")]
-pub unsafe extern "C" fn audio_subsystem_close_digital_driver(subsystem: *mut AudioSubsystem) {
-    if let Some(subsystem) = unsafe { subsystem.as_mut() } {
-        subsystem.close_digital_driver();
-    }
-}
-
 #[unsafe(export_name = "ShellAudioSubsystem_ApplyMidiVolume")]
 pub unsafe extern "C" fn audio_subsystem_apply_midi_volume(subsystem: *mut AudioSubsystem) {
     if let Some(subsystem) = unsafe { subsystem.as_mut() } {

@@ -627,7 +627,6 @@ MechS32 LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 
 	if (g_audioSubsystem && SmackSoundInTrack(p_slot->m_smack, 0x200)) {
 		SmackClose(p_slot->m_smack);
-		g_audioSubsystem->CloseDigitalDriver();
 		p_slot->m_smack = SmackOpen(GetPathToVideo(p_name), ((p_slot->m_flags & 0x40) >> 1) | 0xfe00, 0);
 		if (!p_slot->m_smack) {
 			return FALSE;

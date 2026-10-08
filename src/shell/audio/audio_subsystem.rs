@@ -29,10 +29,6 @@ impl AudioSubsystem {
         }
     }
 
-    pub fn close_digital_driver(&mut self) {
-        self.stream_handle.take();
-    }
-
     pub fn apply_midi_volume(&mut self) {
         if let Some(mut midi_sequence) = self.current_midi_sequence {
             unsafe { midi_sequence.as_mut().apply_current_volume() }
