@@ -17,11 +17,11 @@ impl GlobalSettings {
     const SETTINGS_FILE_NAME: &str = "remech2.ini";
 
     fn path() -> PathBuf {
-        files::resolve(Self::SETTINGS_FILE_NAME)
+        files::resolve_user(Self::SETTINGS_FILE_NAME)
     }
 
     fn load() -> Self {
-        let settings = Ini::load_from_file(Self::path())
+        let settings = Ini::load_from_file(files::resolve(Self::SETTINGS_FILE_NAME))
             .unwrap_or_else(|_| Self::generate_default_config());
         Self {
             settings: Mutex::new(settings),
@@ -41,14 +41,12 @@ impl GlobalSettings {
         settings
             .with_section(Some("audio"))
             .set("music_path", "Music");
-        settings
-            .write_to_file(Self::path())
-            .unwrap_or_else(|_| {
-                tracing::error!(
-                    "Couldn't write default config file to {}",
-                    Self::SETTINGS_FILE_NAME
-                );
-            });
+        settings.write_to_file(Self::path()).unwrap_or_else(|_| {
+            tracing::error!(
+                "Couldn't write default config file to {}",
+                Self::SETTINGS_FILE_NAME
+            );
+        });
         settings
     }
 
@@ -73,11 +71,9 @@ impl GlobalSettings {
     {
         let mut settings = self.settings.lock().unwrap();
         settings.with_section(section).set(key, value);
-        settings
-            .write_to_file(Self::path())
-            .unwrap_or_else(|_| {
-                tracing::error!("Couldn't write config file to {}", Self::SETTINGS_FILE_NAME);
-            });
+        settings.write_to_file(Self::path()).unwrap_or_else(|_| {
+            tracing::error!("Couldn't write config file to {}", Self::SETTINGS_FILE_NAME);
+        });
     }
 
     pub fn set_string<S, K, V>(&self, section: S, key: K, value: V)

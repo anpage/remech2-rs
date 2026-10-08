@@ -6,7 +6,7 @@ use std::{
 use anyhow::{Context as _, Result, bail};
 
 use super::{defaults, profile::Profile};
-use crate::settings::SETTINGS;
+use crate::{files, settings::SETTINGS};
 
 const INPUT_DIR: &str = "input";
 const EXTENSION: &str = "toml";
@@ -82,7 +82,7 @@ pub struct Store {
 
 impl Default for Store {
     fn default() -> Self {
-        Self::new(INPUT_DIR)
+        Self::new(files::root().user.join(INPUT_DIR))
     }
 }
 

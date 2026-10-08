@@ -412,7 +412,7 @@ impl Mechbay {
             let slot = &raw mut (*variant_files())[shell::g_selectedVariant as usize];
             match CStr::from_ptr((*slot).as_ptr()).to_str() {
                 Ok(name) => {
-                    let path = files::resolve(&format!("mek\\{name}.mek"));
+                    let path = files::resolve_user(&format!("mek\\{name}.mek"));
                     if let Err(e) = fs::remove_file(&path) {
                         warn!("mechbay: deleting {}: {e}", path.display());
                     }

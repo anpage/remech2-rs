@@ -49,10 +49,8 @@ pub fn root() -> &'static Root {
             },
         };
 
-        for dir in [&dirs.game, &dirs.user] {
-            if !dir.exists() {
-                std::fs::create_dir_all(dir).ok();
-            }
+        if let Err(e) = fs::create_dir_all(&dirs.game) {
+            warn!("files: couldn't create {}: {e}", dirs.game.display());
         }
 
         dirs
@@ -66,8 +64,27 @@ fn is_portable(cwd: &Path) -> bool {
     resolve_in(cwd, "MW2.PRJ").is_file()
 }
 
+fn bases() -> impl Iterator<Item = &'static Path> {
+    let root = root();
+    let game = (root.game != root.user).then_some(root.game.as_path());
+    [root.user.as_path()].into_iter().chain(game)
+}
+
 pub fn resolve(path: &str) -> PathBuf {
-    resolve_in(&root().game, path)
+    let mut candidates = bases().map(|base| resolve_in(base, path));
+    let user = candidates.next().unwrap();
+    if user.exists() {
+        return user;
+    }
+    candidates.next().unwrap_or(user)
+}
+
+pub fn resolve_user(path: &str) -> PathBuf {
+    let user = &root().user;
+    if let Err(e) = fs::create_dir_all(user) {
+        warn!("files: couldn't create {}: {e}", user.display());
+    }
+    resolve_in(user, path)
 }
 
 /// `path` under `root`, matching each component's case to what is on disk
@@ -127,17 +144,26 @@ fn pick(names: impl Iterator<Item = String>, wanted: &str) -> Option<String> {
     matches.into_iter().next()
 }
 
-/// The names of the files matching `pattern`, sorted.
+/// The names of the files matching `pattern` in `user/` and `game/`
 /// Only the pattern's last component may have wildcards.
 pub fn find(pattern: &str) -> Vec<String> {
     let (dir, pattern) = match pattern.rfind(['\\', '/']) {
-        Some(at) => (resolve(&pattern[..at]), &pattern[at + 1..]),
-        None => (root().game.clone(), pattern),
+        Some(at) => (&pattern[..at], &pattern[at + 1..]),
+        None => ("", pattern),
     };
 
-    let mut names: Vec<String> = names_in(&dir)
-        .filter(|name| matches_wildcards(pattern, name) && dir.join(name).is_file())
-        .collect();
+    let mut names: Vec<String> = Vec::new();
+    for base in bases() {
+        let dir = resolve_in(base, dir);
+        for name in names_in(&dir) {
+            let seen = names
+                .iter()
+                .any(|seen| seen.to_lowercase() == name.to_lowercase());
+            if !seen && matches_wildcards(pattern, &name) && dir.join(&name).is_file() {
+                names.push(name);
+            }
+        }
+    }
     names.sort();
     names
 }
@@ -160,8 +186,8 @@ fn matches_wildcards(pattern: &str, name: &str) -> bool {
     matches(&pattern, &name)
 }
 
-/// Resolve a path the game passed in
-unsafe fn game_path(path: *const c_char) -> Option<PathBuf> {
+/// Resolve a path the game passed in with `resolve` or `resolve_user`
+unsafe fn game_path(path: *const c_char, resolve: fn(&str) -> PathBuf) -> Option<PathBuf> {
     if path.is_null() {
         return None;
     }
@@ -222,7 +248,12 @@ pub unsafe extern "C" fn mech_open(path: *const c_char, mode: c_int) -> c_int {
         OPEN_WRITE => options.write(true).create(true).truncate(true),
         _ => return -1,
     };
-    let Some(path) = (unsafe { game_path(path) }) else {
+    let resolver: fn(&str) -> PathBuf = if mode == OPEN_READ {
+        resolve
+    } else {
+        resolve_user
+    };
+    let Some(path) = (unsafe { game_path(path, resolver) }) else {
         return -1;
     };
     let file = match options.open(&path) {
@@ -323,7 +354,7 @@ pub extern "C" fn mech_file_length(file: c_int) -> i32 {
 
 #[unsafe(export_name = "MechRemove")]
 pub unsafe extern "C" fn mech_remove(path: *const c_char) -> c_int {
-    let Some(path) = (unsafe { game_path(path) }) else {
+    let Some(path) = (unsafe { game_path(path, resolve_user) }) else {
         return -1;
     };
 
@@ -332,7 +363,9 @@ pub unsafe extern "C" fn mech_remove(path: *const c_char) -> c_int {
 
 #[unsafe(export_name = "MechRename")]
 pub unsafe extern "C" fn mech_rename(from: *const c_char, to: *const c_char) -> c_int {
-    let (Some(from), Some(to)) = (unsafe { (game_path(from), game_path(to)) }) else {
+    let (Some(from), Some(to)) =
+        (unsafe { (game_path(from, resolve_user), game_path(to, resolve_user)) })
+    else {
         return -1;
     };
 
@@ -341,7 +374,7 @@ pub unsafe extern "C" fn mech_rename(from: *const c_char, to: *const c_char) -> 
 
 #[unsafe(export_name = "MechMakeDir")]
 pub unsafe extern "C" fn mech_make_dir(path: *const c_char) -> c_int {
-    let Some(path) = (unsafe { game_path(path) }) else {
+    let Some(path) = (unsafe { game_path(path, resolve_user) }) else {
         return -1;
     };
 
@@ -350,7 +383,7 @@ pub unsafe extern "C" fn mech_make_dir(path: *const c_char) -> c_int {
 
 #[unsafe(export_name = "MechFileExists")]
 pub unsafe extern "C" fn mech_file_exists(path: *const c_char) -> c_int {
-    let exists = unsafe { game_path(path) }.is_some_and(|path| path.exists());
+    let exists = unsafe { game_path(path, resolve) }.is_some_and(|path| path.exists());
     c_int::from(exists)
 }
 
@@ -397,7 +430,7 @@ pub unsafe extern "C" fn mech_file_list_free(list: *mut FileList) {
 
 #[unsafe(export_name = "MechReadFile")]
 pub unsafe extern "C" fn mech_read_file(heap: *mut MechHeap, path: *const c_char) -> *mut c_void {
-    let Some(path) = (unsafe { game_path(path) }) else {
+    let Some(path) = (unsafe { game_path(path, resolve) }) else {
         return ptr::null_mut();
     };
 

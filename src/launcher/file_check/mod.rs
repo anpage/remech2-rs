@@ -63,9 +63,10 @@ impl FileCheck {
         let status = self.copying_status.clone();
         let missing_files = self.missing_files.clone();
 
-        std::fs::create_dir_all(files::resolve("KEATING")).unwrap();
-        std::fs::create_dir_all(files::resolve("LAUNCH")).unwrap();
-        std::fs::create_dir_all(files::resolve("SMK")).unwrap();
+        let game = &files::root().game;
+        std::fs::create_dir_all(files::resolve_in(game, "KEATING")).unwrap();
+        std::fs::create_dir_all(files::resolve_in(game, "LAUNCH")).unwrap();
+        std::fs::create_dir_all(files::resolve_in(game, "SMK")).unwrap();
 
         std::thread::spawn(move || {
             let total_files = missing_files.len() as f32;
