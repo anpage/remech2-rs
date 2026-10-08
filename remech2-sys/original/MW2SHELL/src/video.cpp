@@ -11,7 +11,6 @@
 #include "messages.h"
 #include "mousestate.h"
 #include "mss.h"
-#include "readfile.h"
 #include "refreshmode.h"
 #include "shellglobals.h"
 #include "shellmain.h"

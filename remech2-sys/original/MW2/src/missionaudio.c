@@ -6,7 +6,6 @@
 #include "error.h"
 #include "files.h"
 #include "namehash.h"
-#include "readfile.h"
 #include "simmain.h"
 #include "types.h"
 

@@ -10,6 +10,8 @@ use std::{
 use directories::ProjectDirs;
 use tracing::warn;
 
+use crate::heap::{self, MechHeap};
+
 pub struct Root {
     pub game: PathBuf,
     pub user: PathBuf,
@@ -438,5 +440,39 @@ pub unsafe extern "C" fn mech_file_list_name(list: *const FileList, index: usize
 pub unsafe extern "C" fn mech_file_list_free(list: *mut FileList) {
     if !list.is_null() {
         drop(unsafe { Box::from_raw(list) });
+    }
+}
+
+#[unsafe(export_name = "MechReadFile")]
+pub unsafe extern "C" fn mech_read_file(heap: *mut MechHeap, path: *const c_char) -> *mut c_void {
+    let Some(path) = (unsafe { game_path(path) }) else {
+        return ptr::null_mut();
+    };
+
+    let read = File::open(&path).and_then(|mut file| {
+        let size = usize::try_from(file.metadata()?.len()).map_err(std::io::Error::other)?;
+        let block = unsafe { heap::alloc(heap, size) };
+
+        if block.is_null() {
+            return Err(ErrorKind::OutOfMemory.into());
+        }
+
+        let buffer = unsafe { slice::from_raw_parts_mut(block.cast::<u8>(), size) };
+
+        match file.read_exact(buffer) {
+            Ok(()) => Ok(block),
+            Err(e) => {
+                unsafe { heap::free(heap, block) };
+                Err(e)
+            }
+        }
+    });
+
+    match read {
+        Ok(block) => block,
+        Err(e) => {
+            warn!("files: couldn't read {}: {e}", path.display());
+            ptr::null_mut()
+        }
     }
 }

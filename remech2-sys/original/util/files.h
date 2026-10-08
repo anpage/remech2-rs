@@ -6,6 +6,7 @@
 // disk whatever their case: a file about to be created takes the place of one whose name differs
 // only by case.
 
+#include "heap.h"
 #include "types.h"
 
 #include <stddef.h>
@@ -53,6 +54,8 @@ extern "C"
 	// NULL past the end
 	const char* MechFileListName(const MechFileList* p_list, size_t p_index);
 	void MechFileListFree(MechFileList* p_list);
+
+	void* MechReadFile(MechHeap* p_heap, const char* p_path);
 
 #ifdef __cplusplus
 }

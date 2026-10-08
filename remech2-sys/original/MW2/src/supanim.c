@@ -3,7 +3,7 @@
 #include "debugprint.h"
 #include "decomp.h"
 #include "displaybackend.h"
-#include "readfile.h"
+#include "files.h"
 #include "network.h"
 #include "palettecolor.h"
 #include "refreshmode.h"
@@ -70,10 +70,9 @@ PANE g_supAnimTarget;
 WINDOW g_supAnimBuffer;
 
 // Starts the dropship loading screen: loads the backdrop (launch\\supanm6.shp, netmech6.shp
-// in a network game, or the command line's override), draws it and fades its palette in (slowly with p_slowFade), then loads the dropship
-// (launch6.shp) and draws its first frame.
-// Stack-slot permutation: backdropPath, shapePath and palette.
-// FUNCTION: MW2 0x10003a70
+// in a network game, or the command line's override), draws it and fades its palette in (slowly with p_slowFade), then
+// loads the dropship (launch6.shp) and draws its first frame. Stack-slot permutation: backdropPath, shapePath and
+// palette. FUNCTION: MW2 0x10003a70
 void StartSupAnim(MechS32 p_slowFade)
 {
 	MechChar backdropPath[256];
@@ -84,13 +83,7 @@ void StartSupAnim(MechS32 p_slowFade)
 		sprintf(backdropPath, "%s\\%s6.%s", "launch", !g_isNetworkGame ? "supanm" : "netmech", "shp");
 	}
 	else {
-		sprintf(
-			backdropPath,
-			"%s\\%s6.%s",
-			"launch",
-			!g_isNetworkGame ? g_supAnimBackdropName : "netmech",
-			"shp"
-		);
+		sprintf(backdropPath, "%s\\%s6.%s", "launch", !g_isNetworkGame ? g_supAnimBackdropName : "netmech", "shp");
 	}
 
 	if (g_supAnimShapeName == NULL || *g_supAnimShapeName == '\0') {

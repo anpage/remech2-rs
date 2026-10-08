@@ -5,6 +5,7 @@
 #include "cockpit.h"
 #include "config.h"
 #include "displaybackend.h"
+#include "files.h"
 #include "gamekeys.h"
 #include "hud.h"
 #include "mechdamage.h"
@@ -13,7 +14,6 @@
 #include "menucontrols.h"
 #include "menupage.h"
 #include "menutextbox.h"
-#include "readfile.h"
 #include "palette.h"
 #include "palettecolor.h"
 #include "players.h"
@@ -747,8 +747,7 @@ void UpdateDorcs(void)
 		g_dorcsGifTarget = g_currentPane;
 		g_dorcsGifState = MechHeapAlloc(g_primaryHeap, 0x502e);
 		if (g_dorcsGifState) {
-			g_dorcsPalette =
-				MechHeapAllocZeroed(g_primaryHeap, 0x100 * sizeof(PaletteColor));
+			g_dorcsPalette = MechHeapAllocZeroed(g_primaryHeap, 0x100 * sizeof(PaletteColor));
 			if (g_dorcsPalette) {
 				g_currentDisplayBackend->m_setPalette(0, 0x100, g_dorcsPalette, 1);
 				g_dorcsGif = ReadVfxBin("vfxjk");
