@@ -1,6 +1,7 @@
 #include "page.h"
 
 #include "audiosample.h"
+#include "elapsed.h"
 #include "font.h"
 #include "menudata.h"
 #include "popuppicture.h"
@@ -37,10 +38,15 @@ MechChar g_pageLine[0x400];
 // GLOBAL: MW2SHELL 0x10094278
 MechChar g_pageTemp[0x400];
 
+#define c_typeCharsPerSecond 1200
+
+MechU32 g_typeLastTime;
+MechU32 g_typeOwed;
+
 // Records the area of the link word just placed. Layout does this in three places.
 #define PAGE_ADD_LINK(WORD_WIDTH)                                                                                      \
 	if (link != -1) {                                                                                                  \
-		rect = (Link*) MechHeapAlloc(g_primaryHeap, sizeof(Link));                                      \
+		rect = (Link*) MechHeapAlloc(g_primaryHeap, sizeof(Link));                                                     \
 		if (wrapped == TRUE) {                                                                                         \
 			rect->m_left = m_left;                                                                                     \
 			rect->m_top = m_top;                                                                                       \
@@ -473,20 +479,35 @@ void Page::Restart()
 		glyph->m_textIndex = -1;
 		glyph->SetTyped(1);
 	}
+
+	g_typeLastTime = MechMilliseconds();
+	g_typeOwed = 0;
 }
 
-// Advances the first glyph that is still typing; once all are done, stops the sound.
+// Advances the glyphs still typing and stops the sound when done.
+// The original advanced one character per call.
 // FUNCTION: MW2SHELL 0x10045a2b
 void Page::TypeStep()
 {
 	TextGlyph* glyph;
 	MechS32 i;
+	MechU32 now;
+	MechU32 steps;
+
+	now = MechMilliseconds();
+	g_typeOwed += (now - g_typeLastTime) * c_typeCharsPerSecond;
+	g_typeLastTime = now;
+	steps = g_typeOwed / 1000;
+	g_typeOwed %= 1000;
 
 	for (i = 0; i < m_glyphs->m_count; i++) {
 		glyph = (TextGlyph*) CollectionGet(m_glyphs, i);
-		if (!glyph->m_done) {
+		while (!glyph->m_done) {
+			if (!steps) {
+				return;
+			}
 			glyph->TypeStep();
-			return;
+			steps--;
 		}
 	}
 
