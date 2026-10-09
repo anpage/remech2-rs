@@ -69,4 +69,4 @@ default = ["debug-overlay"]
 debug-overlay = ["dep:egui_plot"]
 
 [patch.crates-io]
-smk = { git = "https://github.com/anpage/smk", branch = "fix-missing-tree" }
+smk = { git = "https://github.com/anpage/smk", branch = "fix-small-tree" }

@@ -2376,7 +2376,7 @@ dependencies = [
 [[package]]
 name = "smk"
 version = "0.1.0"
-source = "git+https://github.com/anpage/smk?branch=fix-missing-tree#a02cb63921eac500e0346bbe3be3d5c92034d226"
+source = "git+https://github.com/anpage/smk?branch=fix-small-tree#450154e516119c6cb33a0e3e4a03de288ef57f9e"
 dependencies = [
  "log",
 ]
