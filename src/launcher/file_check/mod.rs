@@ -7,7 +7,7 @@ use std::{
 };
 
 use anyhow::{Result, bail};
-use tracing::warn;
+use tracing::{debug, warn};
 
 use super::{Action, Stage};
 use crate::files::{self};
@@ -338,6 +338,8 @@ fn matches_reference(path: &Path, file: &GameFile) -> bool {
         }
     };
 
+    let mut result = true;
+
     let size = data.len() as u64;
     if size != file.size {
         warn!(
@@ -345,7 +347,7 @@ fn matches_reference(path: &Path, file: &GameFile) -> bool {
             path.display(),
             file.size
         );
-        return false;
+        result = false;
     }
 
     let crc32 = crc32fast::hash(&data);
@@ -355,10 +357,10 @@ fn matches_reference(path: &Path, file: &GameFile) -> bool {
             path.display(),
             file.crc32
         );
-        return false;
+        result = false;
     }
 
-    true
+    result
 }
 
 fn check_files() -> Vec<MissingFile> {
@@ -399,6 +401,10 @@ fn check_files() -> Vec<MissingFile> {
     }
     for file in &missing_files {
         warn!("file check: {} is missing", file.path.display());
+    }
+
+    if differing == 0 && missing_files.is_empty() {
+        debug!("file check passed")
     }
 
     missing_files
