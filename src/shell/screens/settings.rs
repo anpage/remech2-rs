@@ -11,7 +11,9 @@ pub unsafe extern "C" fn draw_resolution_option(row: *mut ScreenField) -> *mut T
         return ptr::null_mut();
     };
 
-    let (width, height) = settings::get().video.render_resolution.frame_size();
+    let video = settings::get().video.clone();
+
+    let (width, height) = (video.render_width, video.render_height);
 
     let Ok(label) = CString::new(format!("~{width}x{height}")) else {
         return ptr::null_mut();
@@ -32,7 +34,9 @@ pub unsafe extern "C" fn draw_resolution_option(row: *mut ScreenField) -> *mut T
 #[unsafe(export_name = "ToggleRenderResolution")]
 pub unsafe extern "C" fn toggle_render_resolution(_row: *mut ScreenField) {
     settings::update(|settings| {
-        settings.video.render_resolution = settings.video.render_resolution.next();
+        let (width, height) = settings.video.next_render_resolution();
+        settings.video.render_width = width;
+        settings.video.render_height = height;
     });
 }
 
@@ -59,7 +63,7 @@ pub unsafe extern "C" fn draw_widescreen_option(row: *mut ScreenField) -> *mut T
 
 #[unsafe(export_name = "ToggleWidescreen")]
 pub unsafe extern "C" fn toggle_widescreen(_row: *mut ScreenField) {
-    settings::update(|settings| settings.video.widescreen = !settings.video.widescreen);
+    settings::update(|settings| settings.video.toggle_widescreen());
 }
 
 #[unsafe(export_name = "DrawOptionLabel")]

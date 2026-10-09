@@ -14,10 +14,11 @@ const SATELLITE_LAYOUT: i32 = 4;
 /// When widescreen is enabled, the frame is 16:9 and the HUD stays in a 4:3 box centred within it.
 #[unsafe(export_name = "SetGameResolution")]
 pub extern "C" fn set_game_resolution() {
-    let (width, height) = settings::get().video.render_resolution.frame_size();
+    let video = settings::get().video.clone();
+    let (width, height) = (video.render_width, video.render_height);
     unsafe {
-        sim::g_gameWindowWidth = width;
-        sim::g_gameWindowHeight = height;
+        sim::g_gameWindowWidth = width as i32;
+        sim::g_gameWindowHeight = height as i32;
     }
 }
 

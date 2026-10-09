@@ -9,9 +9,7 @@ use serde::{Deserialize, Serialize};
 use toml_edit::{DocumentMut, Item, Table, TableLike, Value, de::from_document, ser::to_document};
 use tracing::{Level as TracingLevel, error, warn};
 
-use crate::{
-    drawmode::ScalingMode, files, input::store::DEFAULT_PROFILE, resolution::RenderResolution,
-};
+use crate::{drawmode::ScalingMode, files, input::store::DEFAULT_PROFILE};
 
 const FILE_NAME: &str = "remech2.toml";
 
@@ -35,7 +33,8 @@ pub struct VideoSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub window_height: Option<u32>,
     /// The game's internal resolution
-    pub render_resolution: RenderResolution,
+    pub render_width: u32,
+    pub render_height: u32,
     pub widescreen: bool,
     pub vsync: bool,
     pub framerate_limit: u32,
@@ -54,7 +53,8 @@ impl Default for VideoSettings {
             fullscreen: true,
             window_width: None,
             window_height: None,
-            render_resolution: Default::default(),
+            render_width: 1024,
+            render_height: 768,
             widescreen: false,
             vsync: true,
             framerate_limit: 180,
@@ -66,6 +66,43 @@ impl Default for VideoSettings {
             explosion_chunks: true,
             brightness: UpTo(9),
         }
+    }
+}
+
+impl VideoSettings {
+    pub fn next_render_resolution(&self) -> (u32, u32) {
+        if self.widescreen {
+            match (self.render_width, self.render_height) {
+                (320, 240) | (427, 240) => (854, 480),
+                (640, 480) | (854, 480) => (1366, 768),
+                _ => (427, 240),
+            }
+        } else {
+            match (self.render_width, self.render_height) {
+                (320, 240) | (427, 240) => (640, 480),
+                (640, 480) | (854, 480) => (1024, 768),
+                _ => (320, 240),
+            }
+        }
+    }
+
+    pub fn toggle_widescreen(&mut self) {
+        self.widescreen = !self.widescreen;
+        let (width, height) = if self.widescreen {
+            match (self.render_width, self.render_height) {
+                (1024, 768) | (1366, 768) => (1366, 768),
+                (640, 480) | (854, 480) => (854, 480),
+                _ => (427, 240),
+            }
+        } else {
+            match (self.render_width, self.render_height) {
+                (1024, 768) | (1366, 768) => (1024, 768),
+                (640, 480) | (854, 480) => (640, 480),
+                _ => (320, 240),
+            }
+        };
+        self.render_width = width;
+        self.render_height = height;
     }
 }
 
