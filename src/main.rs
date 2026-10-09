@@ -2,9 +2,9 @@
 #![recursion_limit = "256"]
 
 use anyhow::Result;
-use std::env;
+use std::{env, fs::File, io, sync::Mutex};
 use tracing::Level;
-use tracing_subscriber::{filter, prelude::*};
+use tracing_subscriber::{filter, fmt::writer::BoxMakeWriter, prelude::*};
 
 use remech2_sys::shared::{MissionLaunch, MissionReport};
 
@@ -50,13 +50,38 @@ fn start_sim(cmd_line: &str, launch: &MissionLaunch, report: &mut MissionReport)
 }
 
 fn main() -> Result<()> {
-    let loglevel = Level::from(settings::get().debug.log_level);
+    let debug = settings::get().debug.clone().unwrap_or_default();
+    let loglevel: Level = debug.log_level.unwrap_or_default().into();
+
+    let mut log_file_error = None;
+    let log_file = debug.log_file.and_then(|lf| {
+        (!lf.is_empty())
+            .then(|| files::resolve_user(&lf))
+            .and_then(|path| {
+                File::create(&path)
+                    .inspect_err(|e| {
+                        log_file_error = Some(format!("couldn't open {}: {e}", path.display()))
+                    })
+                    .ok()
+            })
+    });
+    let (writer, ansi) = match log_file {
+        Some(file) => (BoxMakeWriter::new(Mutex::new(file)), false),
+        None => (BoxMakeWriter::new(io::stdout), true),
+    };
 
     let filter = filter::Targets::new().with_target("remech2", loglevel);
     tracing_subscriber::registry()
-        .with(tracing_subscriber::fmt::layer())
+        .with(
+            tracing_subscriber::fmt::layer()
+                .with_writer(writer)
+                .with_ansi(ansi),
+        )
         .with(filter)
         .init();
+    if let Some(message) = log_file_error {
+        tracing::error!("log: {message}");
+    }
     settings::log_load_problems();
 
     let args: Vec<String> = env::args().collect();

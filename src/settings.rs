@@ -22,7 +22,8 @@ pub struct Settings {
     pub audio: AudioSettings,
     pub difficulty: DifficultySettings,
     pub input: InputSettings,
-    pub debug: DebugSettings,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub debug: Option<DebugSettings>,
 }
 
 #[derive(Clone, PartialEq, Serialize, Deserialize)]
@@ -129,7 +130,10 @@ impl Default for InputSettings {
 #[derive(Clone, PartialEq, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DebugSettings {
-    pub log_level: LogLevel,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub log_level: Option<LogLevel>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub log_file: Option<String>,
 }
 
 #[derive(Clone, Copy, PartialEq, Default, Serialize, Deserialize)]
@@ -368,6 +372,7 @@ fn default_document() -> DocumentMut {
 
 fn overlay(document: &DocumentMut) -> (Settings, Vec<Problem>) {
     let mut merged = to_document(&Settings::default()).expect("the defaults serialize");
+    merged.insert("debug", Item::Table(Table::new()));
     let mut settings = Settings::default();
     let mut problems = Vec::new();
 
