@@ -333,7 +333,7 @@ fn matches_reference(path: &Path, file: &GameFile) -> bool {
     let data = match std::fs::read(path) {
         Ok(data) => data,
         Err(e) => {
-            warn!("file check: couldn't read {}: {e}", path.display());
+            warn!("couldn't read {}: {e}", path.display());
             return false;
         }
     };
@@ -342,18 +342,14 @@ fn matches_reference(path: &Path, file: &GameFile) -> bool {
 
     let size = data.len() as u64;
     if size != file.size {
-        warn!(
-            "file check: {} is {size} bytes, expected {}",
-            path.display(),
-            file.size
-        );
+        warn!("{} is {size} bytes, expected {}", path.display(), file.size);
         result = false;
     }
 
     let crc32 = crc32fast::hash(&data);
     if crc32 != file.crc32 {
         warn!(
-            "file check: {} has CRC32 {crc32:08X}, expected {:08X}",
+            "{} has CRC32 {crc32:08X}, expected {:08X}",
             path.display(),
             file.crc32
         );
@@ -395,12 +391,12 @@ fn check_files() -> Vec<MissingFile> {
 
     if differing > 0 {
         warn!(
-            "file check: {differing} files in {} differ from the reference set",
+            "{differing} files in {} differ from the reference set",
             base_path.display()
         );
     }
     for file in &missing_files {
-        warn!("file check: {} is missing", file.path.display());
+        warn!("{} is missing", file.path.display());
     }
 
     if differing == 0 && missing_files.is_empty() {
