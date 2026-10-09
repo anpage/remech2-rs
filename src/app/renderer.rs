@@ -5,9 +5,12 @@ use egui::{ClippedPrimitive, TexturesDelta};
 use egui_wgpu::{RendererOptions, ScreenDescriptor};
 use winit::window::Window;
 
-use crate::drawmode::{
-    ScalingMode, frame_rect,
-    scaler::{PaletteData, Scaler},
+use crate::{
+    drawmode::{
+        ScalingMode, frame_rect,
+        scaler::{PaletteData, Scaler},
+    },
+    settings,
 };
 
 /// A frame of the game's 8-bit output
@@ -52,7 +55,11 @@ impl Renderer {
         if let Some(format) = formats.iter().find(|format| !format.is_srgb()) {
             config.format = *format;
         }
-        config.present_mode = wgpu::PresentMode::AutoVsync;
+        config.present_mode = if settings::get().video.vsync {
+            wgpu::PresentMode::AutoVsync
+        } else {
+            wgpu::PresentMode::AutoNoVsync
+        };
         surface.configure(&device, &config);
 
         let scaler = Scaler::new(&device, config.format);

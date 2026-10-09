@@ -36,6 +36,7 @@ pub struct VideoSettings {
     /// The game's internal resolution
     pub render_resolution: RenderResolution,
     pub widescreen: bool,
+    pub vsync: bool,
     pub framerate_limit: u32,
     pub scaling: ScalingMode,
     pub object_textmaps: bool,
@@ -54,7 +55,8 @@ impl Default for VideoSettings {
             window_height: None,
             render_resolution: Default::default(),
             widescreen: false,
-            framerate_limit: 60,
+            vsync: true,
+            framerate_limit: 180,
             scaling: Default::default(),
             object_textmaps: true,
             terrain_textmaps: true,
