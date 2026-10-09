@@ -1,6 +1,7 @@
 #include "credits.h"
 
 #include "decomp.h"
+#include "elapsed.h"
 #include "font.h"
 #include "keyboardinput.h"
 #include "loopingmovie.h"
@@ -580,9 +581,14 @@ MechS32 g_creditsFirstLine;
 // GLOBAL: MW2SHELL 0x10094b88
 undefined g_creditsTitleColors[0x100];
 
-// The screen position of line 0, a pixel higher each frame.
+// The screen position of line 0.
 // GLOBAL: MW2SHELL 0x10094c88
 MechS32 g_creditsScrollTop;
+
+#define c_creditsPixelsPerSecond 60
+
+MechU32 g_creditsLastTime;
+MechU32 g_creditsOwed;
 
 // FUNCTION: MW2SHELL 0x10046e80
 void DrawCredits()
@@ -602,6 +608,8 @@ void DrawCredits()
 		g_creditsTitleColors[i] = (MechU8) i;
 	}
 	g_creditsScrollTop = 0x1cc;
+	g_creditsLastTime = MechMilliseconds();
+	g_creditsOwed = 0;
 	RegisterMenuFunction(CreditsCallback);
 }
 
@@ -616,7 +624,11 @@ void CreditsCallback(MechS32 p_active)
 	if (p_active) {
 		g_videoDriver->RestoreBackground(0, 0x7d, 0x280, 0x14f);
 		top = g_creditsFirstLine * 0x14 + g_creditsScrollTop;
-		g_creditsScrollTop--;
+		MechU32 now = MechMilliseconds();
+		g_creditsOwed += (now - g_creditsLastTime) * c_creditsPixelsPerSecond;
+		g_creditsLastTime = now;
+		g_creditsScrollTop -= (MechS32) (g_creditsOwed / 1000);
+		g_creditsOwed %= 1000;
 		for (index = g_creditsFirstLine; index < 0x21f && top < 0x1cc; index++) {
 			if (top >= 0x69) {
 				if (g_creditLines[index] == NULL) {
