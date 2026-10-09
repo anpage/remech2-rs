@@ -33,7 +33,8 @@ impl MidiSource {
         )?);
 
         let settings = SynthesizerSettings::new(44100);
-        let synthesizer = Synthesizer::new(&sound_font, &settings)?;
+        let mut synthesizer = Synthesizer::new(&sound_font, &settings)?;
+        synthesizer.set_master_volume(1.0);
         let mut sequencer = MidiFileSequencer::new(synthesizer);
 
         // All of the shell's background songs are intended to loop, so just always do it.
