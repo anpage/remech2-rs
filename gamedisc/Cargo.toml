@@ -1,0 +1,14 @@
+[package]
+name = "gamedisc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+cd-da-reader = "1.0.0"
+flacenc = "0.5.1"
+hadris-iso = "2.5.0"
+thiserror = "2.0.21"
+tracing = "0.1.44"
+
+[dev-dependencies]
+hadris-iso = { version = "2.5.0", features = ["write"] }
