@@ -2,7 +2,7 @@ use std::{io::Cursor, ptr::NonNull};
 
 use anyhow::Result;
 use remech2_sys::shell;
-use rodio::Sink;
+use rodio::Player;
 
 use crate::{midi_source::MidiSource, xmi::XmiFile};
 
@@ -10,7 +10,7 @@ use super::audio_subsystem::AudioSubsystem;
 
 pub struct MidiSequence {
     subsystem: *mut AudioSubsystem,
-    sink: Sink,
+    sink: Player,
 
     /// Volume as a percentage, 0..=100
     volume: i32,

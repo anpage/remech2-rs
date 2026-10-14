@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use rodio::Source;
+use rodio::{ChannelCount, SampleRate, Source, nz};
 
 use crate::ailrs::interface::SampleHandle;
 
@@ -230,7 +230,7 @@ const BLOCK: usize = 1024;
 
 pub struct Voice {
     state: Arc<Mutex<VoiceState>>,
-    out_rate: u32,
+    out_rate: SampleRate,
     buf: Vec<f32>,
     pos: usize,
 
@@ -253,8 +253,8 @@ pub struct Voice {
 }
 
 impl Voice {
-    pub fn new(state: Arc<Mutex<VoiceState>>, out_rate: u32) -> Self {
-        let fs = out_rate as f32;
+    pub fn new(state: Arc<Mutex<VoiceState>>, out_rate: SampleRate) -> Self {
+        let fs = out_rate.get() as f32;
         Self {
             state,
             out_rate,
@@ -289,11 +289,11 @@ impl Voice {
         let target_r = gain * pan;
 
         let rate = state.rate.max(1);
-        let step = rate as f64 / self.out_rate as f64;
+        let step = rate as f64 / self.out_rate.get() as f64;
 
         if rate != self.lpf_rate {
             let fc = CUTOFF_RATIO * rate as f32;
-            let fs = self.out_rate as f32;
+            let fs = self.out_rate.get() as f32;
             for (biquad, q) in self.lpf.iter_mut().zip(BUTTERWORTH_Q) {
                 biquad.set_low_pass(fc, fs, q);
             }
@@ -361,11 +361,11 @@ impl Source for Voice {
         None
     }
 
-    fn channels(&self) -> u16 {
-        2
+    fn channels(&self) -> ChannelCount {
+        nz!(2)
     }
 
-    fn sample_rate(&self) -> u32 {
+    fn sample_rate(&self) -> SampleRate {
         self.out_rate
     }
 

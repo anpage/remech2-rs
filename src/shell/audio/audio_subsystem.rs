@@ -1,12 +1,12 @@
 use std::ptr::NonNull;
 
 use anyhow::Result;
-use rodio::{OutputStream, OutputStreamBuilder, Sink};
+use rodio::{DeviceSinkBuilder, MixerDeviceSink, Player};
 
 use super::midi_sequence::MidiSequence;
 
 pub struct AudioSubsystem {
-    stream_handle: Option<OutputStream>,
+    stream_handle: Option<MixerDeviceSink>,
     current_midi_sequence: Option<NonNull<MidiSequence>>,
 }
 
@@ -18,12 +18,12 @@ impl AudioSubsystem {
         }
     }
 
-    pub fn get_sink(&mut self) -> Result<Sink> {
+    pub fn get_sink(&mut self) -> Result<Player> {
         if let Some(stream_handle) = &self.stream_handle {
-            Ok(Sink::connect_new(stream_handle.mixer()))
+            Ok(Player::connect_new(stream_handle.mixer()))
         } else {
-            let stream_handle = OutputStreamBuilder::open_default_stream()?;
-            let sink = Sink::connect_new(stream_handle.mixer());
+            let stream_handle = DeviceSinkBuilder::open_default_sink()?;
+            let sink = Player::connect_new(stream_handle.mixer());
             self.stream_handle = Some(stream_handle);
             Ok(sink)
         }

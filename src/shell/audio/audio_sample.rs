@@ -1,12 +1,12 @@
 use anyhow::Result;
 use remech2_sys::shell;
-use rodio::{Decoder, Sink, Source};
+use rodio::{Decoder, Player, Source};
 
 use super::audio_subsystem::AudioSubsystem;
 
 pub struct AudioSample {
     data: Vec<u8>,
-    sink: Sink,
+    sink: Player,
 
     /// Volume in the range 0..128
     volume: i32,

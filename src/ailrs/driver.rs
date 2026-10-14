@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use rodio::{
-    OutputStream, OutputStreamBuilder, Source,
+    ChannelCount, DeviceSinkBuilder, MixerDeviceSink, SampleRate, Source,
     mixer::Mixer,
     source::{LimitSettings, Zero},
 };
@@ -9,7 +9,7 @@ use rodio::{
 struct Inner {
     // Keep stream alive inside the driver
     #[allow(dead_code)]
-    stream: OutputStream,
+    stream: MixerDeviceSink,
     mixer: Mixer,
     mono: bool,
 }
@@ -19,7 +19,8 @@ pub struct Driver(Arc<Mutex<Inner>>);
 
 impl Driver {
     pub fn new(channels: u16, _sample_rate: u32) -> Option<Self> {
-        let stream = OutputStreamBuilder::from_default_device()
+        let channels = ChannelCount::new(channels)?;
+        let stream = DeviceSinkBuilder::from_default_device()
             .and_then(|b| b.with_channels(channels).open_stream())
             .inspect_err(|e| tracing::error!("failed to open audio stream: {e}"))
             .ok()?;
@@ -32,7 +33,7 @@ impl Driver {
         Some(Driver(Arc::new(Mutex::new(Inner {
             stream,
             mixer,
-            mono: channels == 1,
+            mono: channels.get() == 1,
         }))))
     }
 
@@ -45,7 +46,7 @@ impl Driver {
     }
 
     /// The device's actual output rate. Voices handle resampling to this.
-    pub fn sample_rate(&self) -> u32 {
+    pub fn sample_rate(&self) -> SampleRate {
         self.0.lock().unwrap().stream.config().sample_rate()
     }
 }

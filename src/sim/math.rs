@@ -1,6 +1,6 @@
 use std::sync::atomic::Ordering;
 
-use rand::Rng;
+use rand::RngExt;
 
 use crate::sim::stats::ZERO_DIVISORS_SUPPRESSED;
 

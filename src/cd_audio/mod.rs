@@ -1,7 +1,7 @@
 use std::{fs, path::PathBuf};
 
 use anyhow::{Result, bail};
-use rodio::{Decoder, OutputStream, OutputStreamBuilder, Sink};
+use rodio::{Decoder, DeviceSinkBuilder, MixerDeviceSink, Player, nz};
 use tracing::{error, info, warn};
 
 use crate::{files, settings};
@@ -25,8 +25,8 @@ pub struct TrackInfo {
 }
 
 pub struct CdAudioPlayer {
-    stream: OutputStream,
-    sink: Sink,
+    stream: MixerDeviceSink,
+    sink: Player,
     tracks: Vec<TrackInfo>,
     state: AudioCdStatus,
     volume: i32,
@@ -34,10 +34,10 @@ pub struct CdAudioPlayer {
 
 impl CdAudioPlayer {
     pub fn new() -> Result<Self> {
-        let stream = OutputStreamBuilder::from_default_device()
-            .and_then(|b| b.with_channels(2).open_stream())
+        let stream = DeviceSinkBuilder::from_default_device()
+            .and_then(|b| b.with_channels(nz!(2)).open_stream())
             .inspect_err(|e| error!("failed to open audio stream for bg music: {e}"))?;
-        let sink = Sink::connect_new(stream.mixer());
+        let sink = Player::connect_new(stream.mixer());
         let tracks = Self::scan_for_tracks()
             .inspect_err(|e| error!("failed to scan for music tracks: {e}"))?;
         Ok(Self {
@@ -129,7 +129,7 @@ impl CdAudioPlayer {
         let decoder = Decoder::try_from(fs::File::open(&track.path)?)?;
 
         self.sink.stop();
-        self.sink = Sink::connect_new(self.stream.mixer());
+        self.sink = Player::connect_new(self.stream.mixer());
         self.sink.set_volume(self.sink_volume());
         self.sink.append(decoder);
         self.sink.play();

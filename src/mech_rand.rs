@@ -1,6 +1,6 @@
 use std::sync::{LazyLock, Mutex};
 
-use rand::{Rng, SeedableRng, rngs::StdRng};
+use rand::{RngExt, SeedableRng, rngs::StdRng};
 use remech2_sys::shared::MECH_RAND_MAX;
 
 static RNG: LazyLock<Mutex<StdRng>> = LazyLock::new(|| Mutex::new(StdRng::seed_from_u64(1)));

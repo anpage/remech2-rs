@@ -1,7 +1,7 @@
 use std::{io::Read, sync::Arc};
 
 use anyhow::Result;
-use rodio::Source;
+use rodio::{ChannelCount, SampleRate, Source, nz};
 use rustysynth::{
     MidiFile, MidiFileLoopType, MidiFileSequencer, SoundFont, Synthesizer, SynthesizerSettings,
 };
@@ -81,14 +81,14 @@ impl Source for MidiSource {
         None
     }
 
-    fn channels(&self) -> u16 {
+    fn channels(&self) -> ChannelCount {
         // Always stereo.
-        2
+        nz!(2)
     }
 
-    fn sample_rate(&self) -> u32 {
+    fn sample_rate(&self) -> SampleRate {
         // Always 44.1 kHz.
-        44100
+        nz!(44100)
     }
 
     fn total_duration(&self) -> Option<std::time::Duration> {
@@ -100,13 +100,13 @@ impl Source for MidiSource {
 #[cfg(test)]
 mod tests {
     use crate::{midi_source::MidiSource, xmi::XmiFile};
-    use rodio::{OutputStreamBuilder, Sink};
+    use rodio::{DeviceSinkBuilder, Player};
     use std::{fs::File, io::BufReader};
 
     #[test]
     fn test_midi() {
-        let stream_handle = OutputStreamBuilder::open_default_stream().unwrap();
-        let sink = Sink::connect_new(stream_handle.mixer());
+        let stream_handle = DeviceSinkBuilder::open_default_sink().unwrap();
+        let sink = Player::connect_new(stream_handle.mixer());
 
         let midi_file = {
             // TODO: Get the test data from the DATABASE.MW2 file.
