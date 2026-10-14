@@ -178,7 +178,7 @@ impl OverlayUi {
 
         let shell_rect = Rect::from_center_size(window_rect.center(), size);
         self.shell_hovered = shell_rect.contains(egui::pos2(mouse_state.pos_x, mouse_state.pos_y))
-            && !ctx.is_pointer_over_area();
+            && !ctx.is_pointer_over_egui();
 
         if self.menu_visible {
             let handle_menu_button = |id: u16| {

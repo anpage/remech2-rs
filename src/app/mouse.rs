@@ -188,7 +188,7 @@ pub fn cursor_hidden() -> bool {
 impl State {
     fn game_has_pointer(&self) -> bool {
         self.mouse.grab
-            || !(CAPTURED.load(Ordering::Relaxed) || self.egui_ctx.is_pointer_over_area())
+            || !(CAPTURED.load(Ordering::Relaxed) || self.egui_ctx.is_pointer_over_egui())
     }
 }
 

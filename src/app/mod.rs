@@ -145,6 +145,7 @@ impl State {
     fn new() -> Self {
         let egui_ctx = egui::Context::default();
         egui_ctx.set_theme(egui::Theme::Dark);
+        egui_ctx.options_mut(|o| o.quit_shortcuts.clear());
         Self {
             renderer: None,
             window: None,
@@ -209,7 +210,8 @@ impl State {
         let raw_input = egui_input.take_egui_input(window);
         let cursor_hidden = mouse::cursor_hidden();
         let mut ui = ui;
-        let full_output = self.egui_ctx.run(raw_input, |ctx| {
+        let full_output = self.egui_ctx.run_ui(raw_input, |root| {
+            let ctx = root.ctx();
             ui(ctx);
             if cursor_hidden {
                 ctx.set_cursor_icon(egui::CursorIcon::None);
@@ -223,7 +225,7 @@ impl State {
         renderer.render(
             frame,
             &primitives,
-            &full_output.textures_delta,
+            full_output.textures_delta,
             full_output.pixels_per_point,
         );
     }

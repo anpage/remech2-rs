@@ -38,7 +38,9 @@ impl Renderer {
     pub fn new(window: Arc<Window>) -> Result<Self> {
         let size = window.inner_size();
 
-        let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor::default());
+        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::new_with_display_handle(
+            Box::new(window.clone()),
+        ));
         let surface = instance.create_surface(window.clone())?;
         let adapter = pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
             compatible_surface: Some(&surface),
@@ -107,17 +109,39 @@ impl Renderer {
         &mut self,
         frame: Option<Frame>,
         primitives: &[ClippedPrimitive],
-        textures_delta: &TexturesDelta,
+        mut textures_delta: TexturesDelta,
         pixels_per_point: f32,
     ) {
+        for (id, deltas) in &textures_delta.set {
+            for delta in deltas {
+                self.egui
+                    .update_texture(&self.device, &self.queue, *id, delta);
+            }
+        }
+        self.draw(frame, primitives, pixels_per_point);
+        for id in &textures_delta.free {
+            self.egui.free_texture(id);
+        }
+        textures_delta.clear();
+    }
+
+    fn draw(
+        &mut self,
+        frame: Option<Frame>,
+        primitives: &[ClippedPrimitive],
+        pixels_per_point: f32,
+    ) {
+        use wgpu::CurrentSurfaceTexture as Current;
         let surface_texture = match self.surface.get_current_texture() {
-            Ok(surface_texture) => surface_texture,
-            Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => {
+            Current::Success(surface_texture) | Current::Suboptimal(surface_texture) => {
+                surface_texture
+            }
+            Current::Lost | Current::Outdated => {
                 self.surface.configure(&self.device, &self.config);
                 return;
             }
-            Err(error) => {
-                tracing::warn!("couldn't acquire the next frame: {error}");
+            other => {
+                tracing::warn!("couldn't acquire the next frame: {other:?}");
                 return;
             }
         };
@@ -158,10 +182,6 @@ impl Renderer {
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
 
-        for (id, delta) in &textures_delta.set {
-            self.egui
-                .update_texture(&self.device, &self.queue, *id, delta);
-        }
         let mut command_buffers = self.egui.update_buffers(
             &self.device,
             &self.queue,
@@ -185,6 +205,7 @@ impl Renderer {
                 depth_stencil_attachment: None,
                 timestamp_writes: None,
                 occlusion_query_set: None,
+                multiview_mask: None,
             });
             // egui's renderer requires it
             let mut render_pass = render_pass.forget_lifetime();
@@ -198,10 +219,6 @@ impl Renderer {
 
         command_buffers.push(encoder.finish());
         self.queue.submit(command_buffers);
-        surface_texture.present();
-
-        for id in &textures_delta.free {
-            self.egui.free_texture(id);
-        }
+        self.queue.present(surface_texture);
     }
 }

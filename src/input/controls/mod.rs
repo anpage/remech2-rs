@@ -235,8 +235,8 @@ impl ControlsWindow {
             self.confirm = None;
         }
 
-        let outside = ctx.style();
-        ctx.style_mut(|style| style.text_styles = text_styles(scale));
+        let outside = ctx.global_style();
+        ctx.global_style_mut(|style| style.text_styles = text_styles(scale));
 
         let mut close = false;
         let response = Modal::new(Id::new("controls_window")).show(ctx, |ui| {
@@ -257,7 +257,7 @@ impl ControlsWindow {
 
         self.capture_prompt(ctx, &mut editor, scale);
         self.identify_prompt(ctx, &editor, scale);
-        ctx.set_style(outside);
+        ctx.set_global_style(outside);
 
         if close {
             self.close();
