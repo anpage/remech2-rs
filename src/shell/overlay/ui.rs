@@ -1,4 +1,4 @@
-use std::{process::exit, sync::Arc};
+use std::sync::Arc;
 
 use egui::{
     Color32, ColorImage, Context, CursorIcon, FontFamily, Order, PointerButton, Rect, TextStyle,
@@ -27,7 +27,6 @@ pub struct OverlayUi {
     shell_hovered: bool,
     menu_visible: bool,
     cursor_texture: Option<TextureHandle>,
-    exit_dialog_open: bool,
     about_dialog_open: bool,
     controls: ControlsWindow,
     controls_menu_lock: Option<MenuLock>,
@@ -70,7 +69,6 @@ impl OverlayUi {
             shell_hovered: false,
             menu_visible: false,
             cursor_texture: None,
-            exit_dialog_open: false,
             about_dialog_open: false,
             controls: ControlsWindow::default(),
             controls_menu_lock: None,
@@ -216,9 +214,8 @@ impl OverlayUi {
                                     handle_menu_button(40002);
                                 }
                                 ui.separator();
-                                if ui.button("Flee to Desktop").clicked() {
-                                    // Originally menu item 40003
-                                    self.exit_dialog_open = true;
+                                if menu_button(ui, "Flee to Desktop", 40003) {
+                                    handle_menu_button(40003);
                                 }
                             })
                             .inner
@@ -272,14 +269,6 @@ impl OverlayUi {
                     });
                 });
         };
-
-        if self.exit_dialog_open {
-            match confirm::dialog(ctx, &["Embrace Cowardice?"], scale_factor) {
-                Some(true) => exit(0),
-                Some(false) => self.exit_dialog_open = false,
-                None => {}
-            }
-        }
 
         about::window(ctx, &mut self.about_dialog_open, scale_factor);
         self.controls.window(ctx, scale_factor);

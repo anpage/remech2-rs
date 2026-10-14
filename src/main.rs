@@ -93,7 +93,12 @@ fn main() -> Result<()> {
     }
 
     app::install(app);
+    let result = run_game(&args);
+    drop(app::uninstall());
+    result
+}
 
+fn run_game(args: &[String]) -> Result<()> {
     if args.len() > 1 {
         // launch the sim with the given cmdline
         start_sim(
@@ -107,7 +112,7 @@ fn main() -> Result<()> {
     let mut result = start_shell("intro")?;
 
     loop {
-        if result == 255 {
+        if result == 255 || app::quit_requested() {
             return Ok(());
         }
 
@@ -117,7 +122,7 @@ fn main() -> Result<()> {
         })??;
         shell::set_mission_report(report);
 
-        if result == 255 {
+        if result == 255 || app::quit_requested() {
             return Ok(());
         }
 

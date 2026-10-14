@@ -85,6 +85,9 @@ pub fn run(lines: &[&str]) -> bool {
 
     let answer = loop {
         app::pump();
+        if app::quit_requested() {
+            break false;
+        }
         display::present_frame();
         if let Some(answer) = answer() {
             break answer;
@@ -147,11 +150,6 @@ fn text_width(ctx: &Context, text: &str, font: FontId) -> f32 {
             .size()
             .x
     })
-}
-
-/// A Yes/No dialog. Returns the button clicked this frame.
-pub(super) fn dialog(ctx: &Context, lines: &[&str], scale: f32) -> Option<bool> {
-    render(ctx, lines, Buttons::YesNo, scale)
 }
 
 /// Draws a dialog sized to its contents. Returns `true` for the leftmost button.

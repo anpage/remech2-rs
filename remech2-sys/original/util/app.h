@@ -10,8 +10,7 @@ extern "C"
 {
 #endif
 
-	// Lets the window handle the events that are waiting for it, without blocking. Does not return
-	// once the window is closed.
+	// Lets the window handle the events that are waiting for it without blocking.
 	void MechAppPump(void);
 	// The same, after waiting for an event
 	void MechAppWait(void);

@@ -3,7 +3,7 @@ mod keyboard;
 mod mouse;
 mod renderer;
 
-use std::{cell::RefCell, ffi::c_int, process::exit, sync::Arc, thread, time::Duration};
+use std::{cell::RefCell, ffi::c_int, sync::Arc, thread, time::Duration};
 
 use anyhow::{Result, bail};
 use winit::{
@@ -20,7 +20,8 @@ use winit::{
 };
 
 use remech2_sys::shared::{
-    c_mechMsgActivateApp, c_mechMsgKeyDown, c_mechMsgKeyUp, c_mechMsgMouseMove,
+    c_mechMsgActivateApp, c_mechMsgClose, c_mechMsgDestroy, c_mechMsgKeyDown, c_mechMsgKeyUp,
+    c_mechMsgMouseMove,
 };
 
 use crate::{
@@ -41,6 +42,14 @@ pub fn install(app: App) {
     APP.set(Some(app));
 }
 
+pub fn uninstall() -> Option<App> {
+    APP.take()
+}
+
+pub fn quit_requested() -> bool {
+    with(|app| app.state.quit).unwrap_or(false)
+}
+
 pub fn with<R>(f: impl FnOnce(&mut App) -> R) -> Option<R> {
     APP.with(|app| match app.try_borrow_mut() {
         Ok(mut app) => app.as_mut().map(f),
@@ -53,8 +62,9 @@ pub fn with<R>(f: impl FnOnce(&mut App) -> R) -> Option<R> {
 
 /// The app's one window
 pub struct App {
-    event_loop: EventLoop<()>,
+    // The window and its resources need to drop before the event loop
     state: State,
+    event_loop: EventLoop<()>,
 }
 
 impl App {
@@ -87,6 +97,11 @@ impl App {
     }
 
     fn pump_events(&mut self, timeout: Option<Duration>) -> bool {
+        let timeout = if self.state.quit {
+            Some(Duration::ZERO)
+        } else {
+            timeout
+        };
         let status = self.event_loop.pump_app_events(timeout, &mut self.state);
         self.state.controllers.poll();
         // One for however many times the cursor moved
@@ -112,8 +127,9 @@ impl App {
 }
 
 struct State {
-    window: Option<Arc<Window>>,
+    // The renderer's surface needs to drop before the window
     renderer: Option<Renderer>,
+    window: Option<Arc<Window>>,
     egui_ctx: egui::Context,
     egui_input: Option<egui_winit::State>,
     modifiers: ModifiersState,
@@ -130,8 +146,8 @@ impl State {
         let egui_ctx = egui::Context::default();
         egui_ctx.set_theme(egui::Theme::Dark);
         Self {
-            window: None,
             renderer: None,
+            window: None,
             egui_ctx,
             egui_input: None,
             modifiers: ModifiersState::empty(),
@@ -253,7 +269,11 @@ impl ApplicationHandler for State {
         self.input.window_event(&event);
 
         match event {
-            WindowEvent::CloseRequested => self.quit = true,
+            WindowEvent::CloseRequested => {
+                self.quit = true;
+                messages::post_to_game(c_mechMsgClose, 0, 0);
+                messages::post_to_game(c_mechMsgDestroy, 0, 0);
+            }
             WindowEvent::Focused(focused) => {
                 self.focused = focused;
                 if let Some(window) = &self.window {
@@ -330,16 +350,12 @@ fn post_key(event: &KeyEvent) {
 
 #[unsafe(export_name = "MechAppPump")]
 pub extern "C" fn pump() {
-    if with(App::pump) == Some(true) {
-        exit(0);
-    }
+    with(App::pump);
 }
 
 #[unsafe(export_name = "MechAppWait")]
 pub extern "C" fn wait() {
-    if with(App::wait) == Some(true) {
-        exit(0);
-    }
+    with(App::wait);
 }
 
 #[unsafe(export_name = "MechAppActive")]
