@@ -7,4 +7,4 @@ publish = false
 
 [build-dependencies]
 bindgen = "0.73.2"
-cc = { version = "1.6.0", features = ["parallel"] }
+cc = { version = "1.8.0", features = ["parallel"] }
