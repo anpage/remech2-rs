@@ -1,3 +1,6 @@
+pub mod cue;
+
+#[derive(Debug, thiserror::Error)]
 pub enum Error {}
 
 pub trait SectorSource {

@@ -9,6 +9,7 @@ flacenc = "0.5.1"
 hadris-iso = "2.5.0"
 thiserror = "2.0.21"
 tracing = "0.1.44"
+winnow = "1.0.4"
 
 [dev-dependencies]
 hadris-iso = { version = "2.5.0", features = ["write"] }
