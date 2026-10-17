@@ -41,7 +41,7 @@ There is more to come as work progresses.
 
 ## Running
 
-You'll need a copy of the **English** version of the original game. See "Supported Versions" below. This can either be a real CD or your own backup in .ISO or .BIN/.CUE format.
+You'll need a copy of the **English** version of the original game. See [Supported Versions](#supported-versions) below. This can either be a real CD or your own backup in .ISO or .BIN/.CUE format.
 
 ### Game Not Installed
 
@@ -53,7 +53,7 @@ The game data will be installed to one of these locations, depending on system s
 - Linux: `~/.local/share/remech2/game`
 
 If installing from a source that includes CD audio, the music will be automatically ripped to the correct location as FLAC files.
-See "Music" below.
+See [Music](#music) below.
 
 #### Portable Mode
 
