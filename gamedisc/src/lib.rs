@@ -112,18 +112,6 @@ pub fn open_image(path: impl AsRef<Path>) -> Result<IsoFs<Box<dyn ReadSeek>>, Er
     IsoFs::open(data)
 }
 
-/// Opens a `.cue` image's sectors for ripping
-pub fn open_image_audio(
-    path: impl AsRef<Path>,
-) -> Result<Option<Box<dyn SectorSource + Send>>, Error> {
-    let path = path.as_ref();
-    match image_extension(path).as_deref() {
-        Some("cue") => Ok(Some(Box::new(BinCueSource::open(path)?))),
-        Some("iso") => Ok(None),
-        _ => Err(Error::UnsupportedImage(path.to_owned())),
-    }
-}
-
 fn image_extension(path: &Path) -> Option<String> {
     path.extension()?.to_str().map(str::to_ascii_lowercase)
 }

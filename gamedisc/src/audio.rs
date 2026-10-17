@@ -1,11 +1,13 @@
-use std::io::Write;
+use std::{io::Write, path::Path};
 
 use cd_da_reader::{
-    AudioSectorReader, Toc, TrackBounds, lba_to_msf, open_track_stream_with_bounds,
+    AudioSectorReader, CdReader, Toc, TrackBounds, lba_to_msf, open_track_stream_with_bounds,
 };
 use flacenc::{component::BitRepr, error::Verify};
 
-use crate::{Error, RAW_SECTOR, SectorSource, Track, TrackKind};
+use crate::{
+    Error, RAW_SECTOR, SectorSource, Track, TrackKind, bincue::BinCueSource, image_extension,
+};
 
 /// One second of audio
 const CHUNK_SECTORS: u32 = 75;
@@ -128,4 +130,69 @@ pub fn rip_track<R: AudioSectorReader>(
     }
 
     sink.finish()
+}
+
+enum Reader {
+    Image(Box<dyn SectorSource + Send>),
+    Drive(CdReader),
+}
+
+/// The audio tracks to rip from a disc image or a drive
+pub struct AudioSource {
+    reader: Reader,
+    toc: Toc,
+}
+
+impl AudioSource {
+    /// A `.cue` image's audio or `None` if given an `.iso`
+    pub fn open_image(path: impl AsRef<Path>) -> Result<Option<Self>, Error> {
+        let path = path.as_ref();
+
+        match image_extension(path).as_deref() {
+            Some("cue") => {
+                let source: Box<dyn SectorSource + Send> = Box::new(BinCueSource::open(path)?);
+                let toc = toc_from_tracks(source.tracks());
+
+                Ok(Some(Self {
+                    reader: Reader::Image(source),
+                    toc,
+                }))
+            }
+            Some("iso") => Ok(None),
+            _ => Err(Error::UnsupportedImage(path.to_owned())),
+        }
+    }
+
+    /// Opens a disc currently in a drive
+    pub fn open_drive(device: &str) -> Result<Self, Error> {
+        let reader = CdReader::open_path(device)?;
+        let toc = reader.read_toc()?;
+
+        Ok(Self {
+            reader: Reader::Drive(reader),
+            toc,
+        })
+    }
+
+    /// Numbers of the audio tracks in disc order
+    pub fn audio_tracks(&self) -> Vec<u8> {
+        self.toc
+            .tracks
+            .iter()
+            .filter(|t| t.is_audio)
+            .map(|t| t.number)
+            .collect()
+    }
+
+    pub fn rip(
+        &self,
+        track: u8,
+        sink: &mut dyn AudioSink,
+        progress: &mut dyn FnMut(u32, u32),
+    ) -> Result<(), Error> {
+        match &self.reader {
+            Reader::Image(source) => rip_track(&Audio(&**source), &self.toc, track, sink, progress),
+            Reader::Drive(reader) => rip_track(reader, &self.toc, track, sink, progress),
+        }
+    }
 }

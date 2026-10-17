@@ -5,9 +5,9 @@ use std::io::Cursor;
 use std::path::{Path, PathBuf};
 
 use cd_da_reader::{AudioSectorReader, CdReaderError};
-use gamedisc::audio::{Audio, AudioSink, FlacSink, rip_track, toc_from_tracks};
+use gamedisc::audio::{Audio, AudioSink, AudioSource, FlacSink, rip_track, toc_from_tracks};
 use gamedisc::bincue::BinCueSource;
-use gamedisc::{Error, SectorSource, Track, TrackKind, open_image_audio};
+use gamedisc::{Error, SectorSource, Track, TrackKind};
 
 const RAW: usize = 2352;
 
@@ -361,37 +361,111 @@ fn bin_cue_to_flac() {
     assert_eq!(decode_flac(&flac.into_inner()), samples);
 }
 
-// open_image_audio
+// AudioSource
+
+fn open_source(path: &Path) -> AudioSource {
+    AudioSource::open_image(path)
+        .unwrap_or_else(|e| panic!("{e:?}"))
+        .expect("a .cue can carry audio")
+}
+
+/// Data at 0..10, then two audio tracks of 120 and 40 sectors
+fn write_two_track_disc(dir: &Path, two: &[u8], three: &[u8]) -> PathBuf {
+    let data = vec![0; 10 * RAW];
+    fs::write(dir.join("game.bin"), [&data[..], two, three].concat()).unwrap();
+    let cue = dir.join("game.cue");
+    fs::write(
+        &cue,
+        "FILE \"game.bin\" BINARY\n  TRACK 01 MODE1/2352\n    INDEX 01 00:00:00\n  TRACK 02 AUDIO\n    INDEX 01 00:00:10\n  TRACK 03 AUDIO\n    INDEX 00 00:01:50\n    INDEX 01 00:01:55\n",
+    )
+    .unwrap();
+    cue
+}
+
+fn rip_to_samples(source: &AudioSource, track: u8) -> Vec<i16> {
+    let mut flac = FlacSink::new(vec![]);
+    source
+        .rip(track, &mut flac, &mut |_, _| {})
+        .unwrap_or_else(|e| panic!("rip({track}) failed: {e:?}"));
+    decode_flac(&flac.into_inner())
+}
 
 #[test]
 fn audio_sources_can_move_between_threads() {
     fn assert_send<T: Send>() {}
-    assert_send::<Box<dyn SectorSource + Send>>();
+    assert_send::<AudioSource>();
 }
 
 #[test]
-fn open_image_audio_reads_a_cue() {
-    let dir = scratch("open_image_audio_reads_a_cue");
+fn audio_tracks_leave_out_data() {
+    let dir = scratch("audio_tracks_leave_out_data");
+    let cue = write_two_track_disc(&dir, &to_bytes(&sine(120)), &to_bytes(&sine(40)));
+
+    assert_eq!(open_source(&cue).audio_tracks(), [2, 3]);
+}
+
+#[test]
+fn rip_follows_track_bounds() {
+    // Track 3 starts at 10 + 120 = 130; its pregap at 125 belongs to track 2
+    let dir = scratch("rip_follows_track_bounds");
+    let two = sine(120);
+    let three: Vec<i16> = sine(40).iter().map(|s| s / 2).collect();
+    let cue = write_two_track_disc(&dir, &to_bytes(&two), &to_bytes(&three));
+    let source = open_source(&cue);
+
+    assert_eq!(rip_to_samples(&source, 2), two);
+    assert_eq!(rip_to_samples(&source, 3), three);
+}
+
+#[test]
+fn rip_reports_progress_and_finishes_once() {
+    let dir = scratch("rip_reports_progress_and_finishes_once");
+    let cue = write_two_track_disc(&dir, &to_bytes(&sine(120)), &to_bytes(&sine(40)));
+    let source = open_source(&cue);
+
+    let mut sink = VecSink::default();
+    let mut progress = vec![];
+    source
+        .rip(2, &mut sink, &mut |done, total| {
+            progress.push((done, total))
+        })
+        .unwrap();
+
+    assert_eq!(progress, [(75, 120), (120, 120)]);
+    assert_eq!(sink.finished, 1);
+    assert_eq!(sink.pcm.len(), 120 * RAW);
+}
+
+#[test]
+fn rip_refuses_data_and_missing_tracks() {
+    let dir = scratch("rip_refuses_data_and_missing_tracks");
+    let cue = write_two_track_disc(&dir, &to_bytes(&sine(120)), &to_bytes(&sine(40)));
+    let source = open_source(&cue);
+
+    let mut sink = VecSink::default();
+    let data = source.rip(1, &mut sink, &mut |_, _| {});
+    assert!(
+        matches!(data, Err(Error::NotAudioTrack { track: 1 })),
+        "{data:?}"
+    );
+
+    let missing = source.rip(9, &mut sink, &mut |_, _| {});
+    assert!(matches!(missing, Err(Error::Drive(_))), "{missing:?}");
+
+    assert_eq!((sink.writes, sink.finished), (0, 0));
+}
+
+#[test]
+fn open_image_reads_a_cue_in_any_case() {
+    let dir = scratch("open_image_reads_a_cue_in_any_case");
     let samples = sine(160);
     let cue = write_disc(&dir, &to_bytes(&samples));
     let upper = dir.join("GAME.CUE");
     fs::rename(&cue, &upper).unwrap();
 
-    let source = open_image_audio(&upper)
-        .unwrap_or_else(|e| panic!("{e:?}"))
-        .expect("a .cue can carry audio");
-    assert_eq!(
-        source.tracks(),
-        [
-            track(1, TrackKind::Mode1, 0, 10),
-            track(2, TrackKind::Audio, 10, 160),
-        ]
-    );
-
-    let toc = toc_from_tracks(source.tracks());
-    let mut flac = FlacSink::new(vec![]);
-    rip_track(&Audio(&*source), &toc, 2, &mut flac, &mut |_, _| {}).unwrap();
-    assert_eq!(decode_flac(&flac.into_inner()), samples);
+    let source = open_source(&upper);
+    assert_eq!(source.audio_tracks(), [2]);
+    assert_eq!(rip_to_samples(&source, 2), samples);
 }
 
 #[test]
@@ -400,19 +474,19 @@ fn iso_images_have_no_audio() {
     for name in ["game.iso", "GAME.ISO"] {
         fs::write(dir.join(name), vec![0; 40 * 2048]).unwrap();
 
-        let result = open_image_audio(dir.join(name));
+        let result = AudioSource::open_image(dir.join(name));
         assert!(matches!(result, Ok(None)), "{name}");
     }
 }
 
 #[test]
-fn open_image_audio_rejects_other_extensions() {
-    let dir = scratch("open_image_audio_rejects_other_extensions");
+fn open_image_rejects_other_extensions() {
+    let dir = scratch("open_image_rejects_other_extensions");
     for name in ["game.bin", "game.mds", "game"] {
         let path = dir.join(name);
         fs::write(&path, pcm(0, 10)).unwrap();
 
-        let result = open_image_audio(&path);
+        let result = AudioSource::open_image(&path);
         assert!(
             matches!(result, Err(Error::UnsupportedImage(ref p)) if *p == path),
             "{name}"
@@ -421,9 +495,16 @@ fn open_image_audio_rejects_other_extensions() {
 }
 
 #[test]
-fn open_image_audio_missing_cue() {
-    let dir = scratch("open_image_audio_missing_cue");
+fn open_image_missing_cue() {
+    let dir = scratch("open_image_missing_cue");
 
-    let result = open_image_audio(dir.join("missing.cue"));
+    let result = AudioSource::open_image(dir.join("missing.cue"));
     assert!(matches!(result, Err(Error::Io(_))));
+}
+
+#[test]
+fn open_drive_on_a_missing_device() {
+    // The only drive behaviour testable without hardware
+    let result = AudioSource::open_drive("/dev/remech2-no-such-drive");
+    assert!(matches!(result, Err(Error::Drive(_))));
 }

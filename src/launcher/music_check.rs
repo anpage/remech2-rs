@@ -9,10 +9,7 @@ use std::{
 };
 
 use anyhow::{Context, Result, bail};
-use gamedisc::{
-    TrackKind,
-    audio::{Audio, FlacSink, rip_track, toc_from_tracks},
-};
+use gamedisc::audio::{AudioSource, FlacSink};
 use tracing::warn;
 
 use crate::{
@@ -273,10 +270,10 @@ impl Stage for MusicCheck {
 }
 
 fn has_audio(image: &Path) -> bool {
-    gamedisc::open_image_audio(image)
+    AudioSource::open_image(image)
         .ok()
         .flatten()
-        .is_some_and(|source| source.tracks().iter().any(|t| t.kind == TrackKind::Audio))
+        .is_some_and(|source| !source.audio_tracks().is_empty())
 }
 
 fn rip_music(image: &Path, report: &dyn Fn(String, f32)) -> Result<()> {
@@ -284,15 +281,13 @@ fn rip_music(image: &Path, report: &dyn Fn(String, f32)) -> Result<()> {
         bail!("This is not a supported disc image");
     }
 
-    let source = gamedisc::open_image_audio(image)?.context("This image has no audio tracks")?;
-    let toc = toc_from_tracks(source.tracks());
+    let source = AudioSource::open_image(image)?.context("This image has no audio tracks")?;
 
     let present = cd_audio::present_tracks();
-    let tracks: Vec<u8> = toc
-        .tracks
-        .iter()
-        .filter(|t| t.is_audio && !present.contains(&i32::from(t.number)))
-        .map(|t| t.number)
+    let tracks: Vec<u8> = source
+        .audio_tracks()
+        .into_iter()
+        .filter(|n| !present.contains(&i32::from(*n)))
         .collect();
 
     let music_dir = files::resolve(&settings::get().audio.music_path);
@@ -305,16 +300,10 @@ fn rip_music(image: &Path, report: &dyn Fn(String, f32)) -> Result<()> {
         let result = (|| -> Result<()> {
             let mut sink = FlacSink::new(BufWriter::new(fs::File::create(&path)?));
 
-            rip_track(
-                &Audio(&*source),
-                &toc,
-                number,
-                &mut sink,
-                &mut |done, total| {
-                    let within = done as f32 / total as f32;
-                    report(label.clone(), (i as f32 + within) / tracks.len() as f32);
-                },
-            )?;
+            source.rip(number, &mut sink, &mut |done, total| {
+                let within = done as f32 / total as f32;
+                report(label.clone(), (i as f32 + within) / tracks.len() as f32);
+            })?;
 
             sink.into_inner().flush()?;
 
