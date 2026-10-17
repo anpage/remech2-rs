@@ -9,16 +9,13 @@ use std::{
 };
 
 use anyhow::{Context, Result, bail};
-use gamedisc::{
-    audio::{AudioSource, FlacSink},
-    volumes::OpticalVolume,
-};
+use gamedisc::audio::{AudioSource, FlacSink};
 use tracing::warn;
 
 use crate::{
     cd_audio, files,
     launcher::{
-        Action, CD_MARKER_FILE, DiscPick, MusicSource, Stage, centered_window, detect_discs,
+        Action, CD_MARKER_FILE, Disc, DiscPick, MusicSource, Stage, centered_window, detect_discs,
         disc_picker_ui,
     },
     settings,
@@ -42,7 +39,7 @@ pub struct MusicCheck {
     missing: Vec<i32>,
     dont_ask: bool,
     picked_image: Option<Receiver<Option<PathBuf>>>,
-    discs: Vec<OpticalVolume>,
+    discs: Vec<Disc>,
     choosing_disc: bool,
 }
 
@@ -323,8 +320,8 @@ fn rip_music(source: &MusicSource, report: &dyn Fn(String, f32)) -> Result<()> {
             }
             AudioSource::open_image(path)?.context("This image has no audio tracks")?
         }
-        MusicSource::Disc(volume) => {
-            let audio = AudioSource::open_drive(&volume.device)
+        MusicSource::Disc(disc) => {
+            let audio = AudioSource::open_drive(&disc.volume.device)
                 .map_err(|e| with_permission_hint(e.into()))?;
             if audio.audio_tracks().is_empty() {
                 bail!("This disc has no audio tracks");

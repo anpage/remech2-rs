@@ -66,7 +66,7 @@ impl Launcher {
 #[derive(Clone)]
 enum MusicSource {
     Image(PathBuf),
-    Disc(OpticalVolume),
+    Disc(Disc),
 }
 
 impl MusicSource {
@@ -85,10 +85,20 @@ fn has_audio(image: &Path) -> bool {
         .is_some_and(|source| !source.audio_tracks().is_empty())
 }
 
-fn detect_discs() -> Vec<OpticalVolume> {
+#[derive(Clone)]
+struct Disc {
+    volume: OpticalVolume,
+    label: Option<String>,
+}
+
+fn detect_discs() -> Vec<Disc> {
     volumes::optical_volumes()
         .into_iter()
         .filter(|v| files::resolve_in(&v.mount_point, CD_MARKER_FILE).exists())
+        .map(|volume| Disc {
+            label: volume.label(),
+            volume,
+        })
         .collect()
 }
 
@@ -97,18 +107,20 @@ enum DiscPick {
     Cancel,
 }
 
-fn disc_picker_ui(
-    ctx: &egui::Context,
-    discs: &[OpticalVolume],
-    question: &str,
-) -> Option<DiscPick> {
+fn disc_picker_ui(ctx: &egui::Context, discs: &[Disc], question: &str) -> Option<DiscPick> {
     let mut pick = None;
 
     centered_window("💿 Choose a Disc", ctx).show(ctx, |ui| {
         ui.label(question);
         ui.add_space(10.0);
         for (i, disc) in discs.iter().enumerate() {
-            if ui.button(disc.mount_point.display().to_string()).clicked() {
+            if ui
+                .button(match &disc.label {
+                    Some(label) => format!("{label}: {}", disc.volume.mount_point.display()),
+                    None => disc.volume.mount_point.display().to_string(),
+                })
+                .clicked()
+            {
                 pick = Some(DiscPick::Disc(i));
             }
         }

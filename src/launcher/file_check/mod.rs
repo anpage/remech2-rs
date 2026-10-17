@@ -9,14 +9,14 @@ use std::{
 };
 
 use anyhow::{Result, bail};
-use gamedisc::{ReadSeek, iso::IsoFs, volumes::OpticalVolume};
+use gamedisc::{ReadSeek, iso::IsoFs};
 use tracing::{debug, warn};
 
 use super::{Action, Stage};
 use crate::{
     files::{self},
     launcher::{
-        CD_MARKER_FILE, DiscPick, MusicSource, centered_window, detect_discs,
+        CD_MARKER_FILE, Disc, DiscPick, MusicSource, centered_window, detect_discs,
         music_check::MusicCheck,
     },
 };
@@ -39,7 +39,7 @@ enum CopyStatus {
 enum Source {
     Folder(PathBuf),
     Image(PathBuf),
-    Disc(OpticalVolume),
+    Disc(Disc),
 }
 
 enum Copier {
@@ -53,7 +53,7 @@ pub struct FileCheck {
     copying_files: bool,
     copying_status: Arc<Mutex<CopyStatus>>,
     copying_error: Option<CopyError>,
-    discs: Vec<OpticalVolume>,
+    discs: Vec<Disc>,
     choosing_disc: bool,
     installed_from: Option<MusicSource>,
 }
@@ -114,7 +114,7 @@ impl FileCheck {
 
         self.installed_from = match &source {
             Source::Image(path) => Some(MusicSource::Image(path.clone())),
-            Source::Disc(volume) => Some(MusicSource::Disc(volume.clone())),
+            Source::Disc(disc) => Some(MusicSource::Disc(disc.clone())),
             Source::Folder(_) => None,
         };
 
@@ -129,7 +129,7 @@ impl FileCheck {
 
             let copier = match source {
                 Source::Folder(folder) => Copier::Folder(folder),
-                Source::Disc(volume) => Copier::Folder(volume.mount_point),
+                Source::Disc(disc) => Copier::Folder(disc.volume.mount_point),
                 Source::Image(path) => match gamedisc::open_image(&path) {
                     Ok(image) if image.has_file(CD_MARKER_FILE).unwrap_or(false) => {
                         Copier::Image(image)

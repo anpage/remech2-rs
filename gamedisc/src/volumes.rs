@@ -9,6 +9,13 @@ pub struct OpticalVolume {
     pub mount_point: PathBuf,
 }
 
+impl OpticalVolume {
+    /// The volume label
+    pub fn label(&self) -> Option<String> {
+        platform_volume_label(self)
+    }
+}
+
 /// Mounted optical discs
 pub fn optical_volumes() -> Vec<OpticalVolume> {
     platform_optical_volumes()
@@ -89,4 +96,68 @@ fn unescape(field: &str) -> String {
 
     out.push_str(rest);
     out
+}
+
+/// The trimmed volume identifier from an ISO 9660 primary volume descriptor
+pub fn label_from_descriptor(sector: &[u8]) -> Option<String> {
+    let field = sector.get(40..72)?;
+
+    if sector[0] != 1 || &sector[1..6] != b"CD001" {
+        return None;
+    }
+
+    let label = String::from_utf8_lossy(field);
+    let label = label.trim_end_matches([' ', '\0']);
+
+    (!label.is_empty()).then(|| label.to_owned())
+}
+
+#[cfg(target_os = "linux")]
+fn platform_volume_label(volume: &OpticalVolume) -> Option<String> {
+    use std::io::{Read, Seek, SeekFrom};
+
+    let mut device = std::fs::File::open(&volume.device).ok()?;
+    device.seek(SeekFrom::Start(16 * 2048)).ok()?;
+
+    let mut sector = vec![0; 2048];
+    device.read_exact(&mut sector).ok()?;
+
+    label_from_descriptor(&sector)
+}
+
+#[cfg(windows)]
+fn platform_volume_label(volume: &OpticalVolume) -> Option<String> {
+    use std::os::windows::ffi::OsStrExt;
+    use windows_sys::Win32::Storage::FileSystem::GetVolumeInformationW;
+
+    let root: Vec<u16> = volume
+        .mount_point
+        .as_os_str()
+        .encode_wide()
+        .chain([0])
+        .collect();
+
+    let mut name = [0u16; 261];
+
+    let ok = unsafe {
+        GetVolumeInformationW(
+            root.as_ptr(),
+            name.as_mut_ptr(),
+            name.len() as u32,
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+            0,
+        )
+    };
+
+    if ok == 0 {
+        return None;
+    }
+
+    let len = name.iter().position(|&c| c == 0).unwrap_or(name.len());
+    let label = String::from_utf16_lossy(&name[..len]);
+
+    (!label.is_empty()).then_some(label)
 }
