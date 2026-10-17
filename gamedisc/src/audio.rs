@@ -72,7 +72,12 @@ fn encode_flac(samples: &[i32]) -> Result<Vec<u8>, Error> {
 
     let source = flacenc::source::MemSource::from_samples(samples, 2, 16, 44_100);
 
-    let stream = flacenc::encode_with_fixed_block_size(&config, source, config.block_size)
+    let mut stream = flacenc::encode_with_fixed_block_size(&config, source, config.block_size)
+        .map_err(|e| Error::Flac(format!("{e:?}")))?;
+
+    let info = stream.stream_info_mut();
+
+    info.set_block_sizes(info.max_block_size(), info.max_block_size())
         .map_err(|e| Error::Flac(format!("{e:?}")))?;
 
     let mut sink = flacenc::bitsink::ByteSink::new();

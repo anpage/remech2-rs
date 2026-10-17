@@ -312,6 +312,28 @@ fn flac_of_a_partial_block() {
     assert_eq!(decode_flac(&flac.into_inner()), samples);
 }
 
+/// STREAMINFO's minimum and maximum block sizes, which follow the 4-byte marker and 4-byte block header
+fn block_sizes(flac: &[u8]) -> (u16, u16) {
+    (
+        u16::from_be_bytes([flac[8], flac[9]]),
+        u16::from_be_bytes([flac[10], flac[11]]),
+    )
+}
+
+#[test]
+fn flac_declares_fixed_block_size() {
+    // The short last block must not count as the minimum: Symphonia, which rodio plays FLAC with,
+    // then reads the stream as variable-size and rejects every frame. claxon does not care.
+    for (sectors, what) in [(160, "several blocks"), (1, "one short block")] {
+        let mut flac = FlacSink::new(vec![]);
+        flac.write_pcm(&to_bytes(&sine(sectors))).unwrap();
+        flac.finish().unwrap();
+        let (min, max) = block_sizes(&flac.into_inner());
+
+        assert_eq!(min, max, "{what}: minimum and maximum block size");
+    }
+}
+
 // From a disc image
 
 fn write_disc(dir: &Path, music: &[u8]) -> PathBuf {
