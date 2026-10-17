@@ -1,6 +1,7 @@
 //! Parser for cue sheet files
 
 use std::{
+    ffi::OsString,
     fs,
     path::{Path, PathBuf},
 };
@@ -516,31 +517,30 @@ impl CueSheet {
 pub fn resolve_file(cue_dir: &Path, name: &str) -> Result<PathBuf, CueError> {
     let name = name.rsplit(['/', '\\']).next().unwrap_or(name);
 
-    let exact = cue_dir.join(name);
-    if exact.is_file() {
-        return Ok(exact);
-    }
-
     let listing = if cue_dir.as_os_str().is_empty() {
         Path::new(".")
     } else {
         cue_dir
     };
 
-    let wanted = name.to_lowercase();
-
-    let found = fs::read_dir(listing)
+    let entries: Vec<OsString> = fs::read_dir(listing)
         .into_iter()
         .flatten()
         .flatten()
         .map(|entry| entry.file_name())
-        .find(|file_name| {
-            file_name
-                .to_str()
-                .is_some_and(|n| n.to_lowercase() == wanted)
-        })
-        .map(|file_name| cue_dir.join(file_name))
-        .filter(|path| path.is_file());
+        .collect();
 
-    found.ok_or(CueError::FileNotFound(exact))
+    let wanted = name.to_lowercase();
+
+    entries
+        .iter()
+        .find(|entry| *entry == name)
+        .or_else(|| {
+            entries
+                .iter()
+                .find(|entry| entry.to_str().is_some_and(|e| e.to_lowercase() == wanted))
+        })
+        .map(|entry| cue_dir.join(entry))
+        .filter(|path| path.is_file())
+        .ok_or_else(|| CueError::FileNotFound(cue_dir.join(name)))
 }
