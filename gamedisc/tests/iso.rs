@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 
 use gamedisc::bincue::BinCueSource;
 use gamedisc::iso::{IsoFs, LogicalBlocks};
-use gamedisc::{Error, SectorSource, Track, TrackKind};
+use gamedisc::{Error, ReadSeek, SectorSource, Track, TrackKind, open_image};
 use hadris_iso::file::EntryType;
 use hadris_iso::joliet::JolietLevel;
 use hadris_iso::read::{IsoImage, PathSeparator};
@@ -613,4 +613,81 @@ fn file_past_the_track_end_fails() {
     assert!(fs.has_file("MECH2/BIG.DAT").unwrap());
     let mut out = vec![];
     assert!(fs.extract("MECH2/BIG.DAT", &mut out).is_err());
+}
+
+// open_image
+
+#[test]
+fn opened_images_can_move_between_threads() {
+    fn assert_send<T: Send>() {}
+    assert_send::<IsoFs<Box<dyn ReadSeek>>>();
+}
+
+#[test]
+fn open_image_reads_an_iso() {
+    let dir = scratch("open_image_reads_an_iso");
+    fs::write(dir.join("MECH2.ISO"), mech2_iso()).unwrap();
+
+    let fs = open_image(dir.join("MECH2.ISO")).unwrap_or_else(|e| panic!("{e:?}"));
+    assert_mech2_contents(&fs);
+}
+
+#[test]
+fn open_image_reads_a_cue() {
+    let dir = scratch("open_image_reads_a_cue");
+    let iso = mech2_iso();
+    let sectors = (iso.len() / BLOCK) as u32;
+    fs::write(
+        dir.join("mech2.bin"),
+        [raw_track(&iso, 1, 0, true), audio(300)].concat(),
+    )
+    .unwrap();
+    fs::write(
+        dir.join("Mech2.Cue"),
+        format!(
+            "FILE \"mech2.bin\" BINARY\n  TRACK 01 MODE1/2352\n    INDEX 01 00:00:00\n  TRACK 02 AUDIO\n    INDEX 01 {}\n",
+            msf(sectors),
+        ),
+    )
+    .unwrap();
+
+    let fs = open_image(dir.join("Mech2.Cue")).unwrap_or_else(|e| panic!("{e:?}"));
+    assert_mech2_contents(&fs);
+}
+
+#[test]
+fn open_image_rejects_other_extensions() {
+    let dir = scratch("open_image_rejects_other_extensions");
+    for name in ["game.mds", "game.bin", "game"] {
+        let path = dir.join(name);
+        fs::write(&path, mech2_iso()).unwrap();
+
+        let result = open_image(&path);
+        assert!(
+            matches!(result, Err(Error::UnsupportedImage(ref p)) if *p == path),
+            "{name}"
+        );
+    }
+}
+
+#[test]
+fn open_image_errors() {
+    let dir = scratch("open_image_errors");
+
+    let missing = open_image(dir.join("missing.iso"));
+    assert!(matches!(missing, Err(Error::Io(_))), "missing .iso");
+
+    let missing = open_image(dir.join("missing.cue"));
+    assert!(matches!(missing, Err(Error::Io(_))), "missing .cue");
+
+    fs::write(dir.join("music.bin"), audio(300)).unwrap();
+    fs::write(
+        dir.join("music.cue"),
+        "FILE \"music.bin\" BINARY\n  TRACK 01 AUDIO\n    INDEX 01 00:00:00\n",
+    )
+    .unwrap();
+    assert!(matches!(open_image(dir.join("music.cue")), Err(Error::NoDataTrack)));
+
+    fs::write(dir.join("zeros.iso"), vec![0; 40 * BLOCK]).unwrap();
+    assert!(matches!(open_image(dir.join("zeros.iso")), Err(Error::Iso(_))));
 }

@@ -2509,6 +2509,7 @@ dependencies = [
  "egui-wgpu",
  "egui-winit",
  "egui_plot",
+ "gamedisc",
  "gilrs-core",
  "pollster 1.0.1",
  "printf-compat",

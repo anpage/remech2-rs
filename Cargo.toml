@@ -40,6 +40,7 @@ bytemuck = { version = "1.25", features = ["derive"] }
 egui = "0.36.2"
 egui-wgpu = "0.36.2"
 egui-winit = { version = "0.36.2", default-features = false }
+gamedisc = { path = "gamedisc" }
 gilrs-core = "0.6.8"
 remech2-sys = { path = "remech2-sys" }
 pollster = "1.0.1"

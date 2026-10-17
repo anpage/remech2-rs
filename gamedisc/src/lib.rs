@@ -1,6 +1,14 @@
-use std::{io, path::PathBuf};
+use std::{
+    fs::File,
+    io,
+    path::{Path, PathBuf},
+};
 
-use crate::cue::{CueError, CueMode};
+use crate::{
+    bincue::BinCueSource,
+    cue::{CueError, CueMode},
+    iso::{IsoFs, LogicalBlocks},
+};
 
 pub mod audio;
 pub mod bincue;
@@ -36,6 +44,8 @@ pub enum Error {
     NotAudioTrack { track: u8 },
     #[error("FLAC encoder error: {0}")]
     Flac(String),
+    #[error("{0} is not a supported disc image")]
+    UnsupportedImage(PathBuf),
 }
 
 pub trait SectorSource {
@@ -80,4 +90,23 @@ pub struct Track {
     pub start_lba: u32,
     /// The number of sectors from `start_lba` up to the next track's `start_lba` or the lead-out
     pub sectors: u32,
+}
+
+/// Read + Seek that can be moved to another thread
+pub trait ReadSeek: io::Read + io::Seek + Send {}
+
+impl<T: io::Read + io::Seek + Send> ReadSeek for T {}
+
+/// Opens the data track of a `.cue` or `.iso` image
+pub fn open_image(path: impl AsRef<Path>) -> Result<IsoFs<Box<dyn ReadSeek>>, Error> {
+    let path = path.as_ref();
+    let extension = path.extension().map(|e| e.to_ascii_lowercase());
+
+    let data: Box<dyn ReadSeek> = match extension.as_ref().and_then(|e| e.to_str()) {
+        Some("iso") => Box::new(io::BufReader::new(File::open(path)?)),
+        Some("cue") => Box::new(LogicalBlocks::new(BinCueSource::open(path)?)?),
+        _ => return Err(Error::UnsupportedImage(path.to_owned())),
+    };
+
+    IsoFs::open(data)
 }

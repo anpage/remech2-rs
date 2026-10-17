@@ -1,4 +1,6 @@
 use std::{
+    fs,
+    io::{BufWriter, Write},
     path::{Path, PathBuf},
     sync::{
         Arc, Mutex,
@@ -7,12 +9,15 @@ use std::{
 };
 
 use anyhow::{Result, bail};
+use gamedisc::{ReadSeek, iso::IsoFs};
 use tracing::{debug, warn};
 
 use super::{Action, Stage};
 use crate::files::{self};
 
 mod list;
+
+const CD_MARKER_FILE: &str = "OLD_HERC.DRV";
 
 #[derive(Clone, Debug)]
 struct CopyError {
@@ -27,8 +32,18 @@ enum CopyStatus {
     Error(CopyError),
 }
 
+enum Source {
+    Folder(PathBuf),
+    Image(PathBuf),
+}
+
+enum Copier {
+    Folder(PathBuf),
+    Image(IsoFs<Box<dyn ReadSeek>>),
+}
+
 pub struct FileCheck {
-    picked_folder: Option<Receiver<Option<PathBuf>>>,
+    picked_source: Option<Receiver<Option<Source>>>,
     missing_files: Vec<MissingFile>,
     copying_files: bool,
     copying_status: Arc<Mutex<CopyStatus>>,
@@ -38,7 +53,7 @@ pub struct FileCheck {
 impl FileCheck {
     pub fn new() -> Self {
         Self {
-            picked_folder: None,
+            picked_source: None,
             missing_files: check_files(),
             copying_files: false,
             copying_status: Arc::new(Mutex::new(CopyStatus::Copying((None, 0.0)))),
@@ -52,12 +67,24 @@ impl FileCheck {
             let folder = rfd::FileDialog::new()
                 .set_title("Locate the MechWarrior 2 files")
                 .pick_folder();
-            let _ = sender.send(folder);
+            let _ = sender.send(folder.map(Source::Folder));
         });
-        self.picked_folder = Some(receiver);
+        self.picked_source = Some(receiver);
     }
 
-    fn start_copy(&mut self, source: PathBuf) {
+    fn pick_image(&mut self) {
+        let (sender, receiver) = mpsc::channel();
+        std::thread::spawn(move || {
+            let file = rfd::FileDialog::new()
+                .set_title("Locate a MechWarrior 2 disc image")
+                .add_filter("Disc images", &["cue", "iso"])
+                .pick_file();
+            let _ = sender.send(file.map(Source::Image));
+        });
+        self.picked_source = Some(receiver);
+    }
+
+    fn start_copy(&mut self, source: Source) {
         self.copying_error = None;
         self.copying_status = Arc::new(Mutex::new(CopyStatus::Copying((None, 0.0))));
 
@@ -65,39 +92,38 @@ impl FileCheck {
         let missing_files = self.missing_files.clone();
 
         let game = &files::root().game;
-        std::fs::create_dir_all(files::resolve_in(game, "KEATING")).unwrap();
-        std::fs::create_dir_all(files::resolve_in(game, "LAUNCH")).unwrap();
-        std::fs::create_dir_all(files::resolve_in(game, "SMK")).unwrap();
+        fs::create_dir_all(files::resolve_in(game, "KEATING")).unwrap();
+        fs::create_dir_all(files::resolve_in(game, "LAUNCH")).unwrap();
+        fs::create_dir_all(files::resolve_in(game, "SMK")).unwrap();
 
         std::thread::spawn(move || {
+            let fail = |path: &Path, error: String| {
+                let mut status = status.lock().unwrap();
+                *status = CopyStatus::Error(CopyError {
+                    file: path.to_string_lossy().to_string(),
+                    error,
+                });
+            };
+
+            let copier = match source {
+                Source::Folder(folder) => Copier::Folder(folder),
+                Source::Image(path) => match gamedisc::open_image(&path) {
+                    Ok(image) if image.has_file(CD_MARKER_FILE).unwrap_or(false) => {
+                        Copier::Image(image)
+                    }
+                    Ok(_) => return fail(&path, "This is not a MechWarrior 2 disc image".into()),
+                    Err(e) => return fail(&path, e.to_string()),
+                },
+            };
+
             let total_files = missing_files.len() as f32;
             for (i, file) in missing_files.into_iter().enumerate() {
                 let progress = (i as f32) / total_files;
-                let mut error = Some("File not found in the chosen folder".to_string());
 
-                for cd_path in file.cd_paths {
-                    let cd_file = files::resolve_in(&source, cd_path);
-                    if cd_file.exists() {
-                        if let Err(e) = std::fs::copy(cd_file, &file.path) {
-                            tracing::error!(
-                                "Error copying file {}: {:?}",
-                                &file.path.to_string_lossy(),
-                                e
-                            );
-                            error = Some(format!("{}", e));
-                        } else {
-                            // fs::copy preserves attributes and everything on a CD is read-only
-                            if let Ok(meta) = std::fs::metadata(&file.path) {
-                                let mut perms = meta.permissions();
-                                #[allow(clippy::permissions_set_readonly_false)]
-                                perms.set_readonly(false);
-                                let _ = std::fs::set_permissions(&file.path, perms);
-                            }
-                            error = None;
-                            break;
-                        }
-                    }
-                }
+                let error = match &copier {
+                    Copier::Folder(folder) => copy_from_folder(folder, file.cd_paths, &file.path),
+                    Copier::Image(image) => extract_from_image(image, file.cd_paths, &file.path),
+                };
 
                 {
                     let mut status = status.lock().unwrap();
@@ -206,22 +232,23 @@ impl FileCheck {
             Quit,
             Retry,
             Skip,
-            Locate,
+            LocateFolder,
+            LocateImage,
         }
 
-        if let Some(receiver) = &self.picked_folder {
+        if let Some(receiver) = &self.picked_source {
             match receiver.try_recv() {
-                Ok(Some(folder)) => {
-                    self.picked_folder = None;
-                    self.start_copy(folder);
+                Ok(Some(source)) => {
+                    self.picked_source = None;
+                    self.start_copy(source);
                     return Ok(Action::Nothing);
                 }
-                Ok(None) | Err(TryRecvError::Disconnected) => self.picked_folder = None,
+                Ok(None) | Err(TryRecvError::Disconnected) => self.picked_source = None,
                 Err(TryRecvError::Empty) => {}
             }
         }
 
-        let picking = self.picked_folder.is_some();
+        let picking = self.picked_source.is_some();
         let mut choice = None;
         egui::Window::new("⚠ Missing Files")
             .resizable(false)
@@ -241,7 +268,7 @@ impl FileCheck {
                         }
                     });
                 ui.add_space(10.0);
-                ui.label("Locate your MechWarrior 2 CD or install folder to copy them from.");
+                ui.label("Locate your MechWarrior 2 CD, disc image, or install folder to copy them from.");
                 ui.add_space(5.0);
                 ui.label("Continuing without them will likely crash.");
                 ui.add_space(10.0);
@@ -258,8 +285,11 @@ impl FileCheck {
                     if ui.button("Continue").clicked() {
                         choice = Some(Choice::Skip);
                     }
-                    if ui.button("Locate…").clicked() {
-                        choice = Some(Choice::Locate);
+                    if ui.button("Folder…").clicked() {
+                        choice = Some(Choice::LocateFolder);
+                    }
+                    if ui.button("Image…").clicked() {
+                        choice = Some(Choice::LocateImage);
                     }
                 });
             });
@@ -271,8 +301,12 @@ impl FileCheck {
                 Ok(Action::Nothing)
             }
             Some(Choice::Skip) => Ok(Action::Break),
-            Some(Choice::Locate) => {
+            Some(Choice::LocateFolder) => {
                 self.pick_folder();
+                Ok(Action::Nothing)
+            }
+            Some(Choice::LocateImage) => {
+                self.pick_image();
                 Ok(Action::Nothing)
             }
             None => Ok(Action::Nothing),
@@ -310,6 +344,53 @@ struct MissingFile {
     cd_paths: &'static [&'static str],
 }
 
+fn copy_from_folder(source: &Path, cd_paths: &[&str], path: &Path) -> Option<String> {
+    let mut error = Some("File not found in the chosen folder".to_string());
+    for cd_path in cd_paths {
+        let cd_file = files::resolve_in(source, cd_path);
+        if cd_file.exists() {
+            if let Err(e) = fs::copy(cd_file, path) {
+                tracing::error!("Error copying file {}: {:?}", &path.to_string_lossy(), e);
+                error = Some(format!("{}", e));
+            } else {
+                // fs::copy preserves attributes and everything on a CD is read-only
+                if let Ok(meta) = fs::metadata(path) {
+                    let mut perms = meta.permissions();
+                    #[allow(clippy::permissions_set_readonly_false)]
+                    perms.set_readonly(false);
+                    let _ = fs::set_permissions(path, perms);
+                }
+                error = None;
+                break;
+            }
+        }
+    }
+    error
+}
+
+fn extract_from_image(
+    image: &IsoFs<Box<dyn ReadSeek>>,
+    cd_paths: &[&str],
+    path: &Path,
+) -> Option<String> {
+    let Some(cd_path) = cd_paths.iter().find(|p| image.has_file(p).unwrap_or(false)) else {
+        return Some("File not found in the chosen image".to_string());
+    };
+    let result = (|| -> Result<()> {
+        let mut out = BufWriter::new(fs::File::create(path)?);
+        image.extract(cd_path, &mut out)?;
+        out.flush()?;
+        Ok(())
+    })();
+    match result {
+        Ok(_) => None,
+        Err(e) => {
+            let _ = fs::remove_file(path);
+            Some(e.to_string())
+        }
+    }
+}
+
 fn check_folder<P: AsRef<Path>>(
     path: P,
     files: &[GameFile],
@@ -330,7 +411,7 @@ fn check_folder<P: AsRef<Path>>(
 }
 
 fn matches_reference(path: &Path, file: &GameFile) -> bool {
-    let data = match std::fs::read(path) {
+    let data = match fs::read(path) {
         Ok(data) => data,
         Err(e) => {
             warn!("couldn't read {}: {e}", path.display());
