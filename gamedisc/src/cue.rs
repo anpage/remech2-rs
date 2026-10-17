@@ -1,6 +1,9 @@
 //! Parser for cue sheet files
 
-use std::path::Path;
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use winnow::{
     ascii::{Caseless, digit1, space1},
@@ -8,6 +11,8 @@ use winnow::{
     prelude::*,
     token::{rest, take_till, take_while},
 };
+
+use crate::Track;
 
 #[derive(Debug, thiserror::Error)]
 pub enum CueError {
@@ -37,12 +42,90 @@ pub enum CueError {
     TrackOrder { line: usize, number: u8 },
     #[error("line {line}: INDEX {index} is a duplicate")]
     DuplicateIndex { line: usize, index: u8 },
+    #[error("line {line}: TRACK uses a different sector size")]
+    MixedSectorSizes { line: usize },
+    #[error("TRACK {track} has an INDEX 01 past the end of its file")]
+    TrackPastEndOfFile { track: u8 },
+    #[error("referenced file not found: {0}")]
+    FileNotFound(PathBuf),
+    #[error("TRACK {track} is empty")]
+    EmptyTrack { track: u8 },
 }
 
 /// A parsed cue sheet with its listed files and their tracks
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CueSheet {
     pub files: Vec<CueFile>,
+}
+
+impl CueSheet {
+    /// Maps the files end-to-end in a continuous LBA space
+    ///
+    /// # Errors
+    //
+    /// `TrackPastEndOfFile` if a track's INDEX 01 is not inside its file
+    ///
+    /// # Panics
+    //
+    /// If `file_sectors` and `files` differ in length.
+    pub fn layout(&self, file_sectors: &[u32]) -> Result<Layout, CueError> {
+        assert_eq!(file_sectors.len(), self.files.len());
+        let mut tracks = vec![];
+        let mut files = vec![];
+
+        let mut file_start_lba = 0;
+        for (file, &sectors) in self.files.iter().zip(file_sectors) {
+            files.push(FileSpan {
+                start_lba: file_start_lba,
+                sectors,
+            });
+
+            for track in &file.tracks {
+                if track.index01 >= sectors {
+                    return Err(CueError::TrackPastEndOfFile {
+                        track: track.number,
+                    });
+                }
+
+                tracks.push(Track {
+                    number: track.number,
+                    kind: track.mode.into(),
+                    start_lba: file_start_lba + track.index01,
+                    sectors: 0,
+                })
+            }
+
+            file_start_lba += sectors;
+        }
+
+        let mut tracks_iter = tracks.iter_mut().peekable();
+        while let Some(track) = tracks_iter.next() {
+            let next_start_lba = tracks_iter
+                .peek()
+                .map(|t| t.start_lba)
+                .unwrap_or(file_start_lba);
+            track.sectors = next_start_lba - track.start_lba;
+        }
+
+        Ok(Layout {
+            tracks,
+            files,
+            leadout_lba: file_start_lba,
+        })
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct Layout {
+    pub tracks: Vec<Track>,
+    pub files: Vec<FileSpan>,
+    pub leadout_lba: u32,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct FileSpan {
+    pub start_lba: u32,
+    pub sectors: u32,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -85,6 +168,15 @@ pub enum CueMode {
     Mode1Cooked,
     /// 2352-byte XA sectors with user data at offset 24
     Mode2Raw,
+}
+
+impl CueMode {
+    pub fn sector_size(self) -> u32 {
+        match self {
+            CueMode::Audio | CueMode::Mode1Raw | CueMode::Mode2Raw => 2352,
+            CueMode::Mode1Cooked => 2048,
+        }
+    }
 }
 
 enum Command<'a> {
@@ -224,10 +316,13 @@ fn flush_track(file: &mut PendingFile, track: &mut Option<PendingTrack>) -> Resu
     let line = t.line;
     let t = t.finish()?;
 
-    if let Some(prev) = file.tracks.last()
-        && t.index00.unwrap_or(t.index01) < prev.index01
-    {
-        return Err(CueError::IndexOrder { line });
+    if let Some(prev) = file.tracks.last() {
+        if t.index00.unwrap_or(t.index01) < prev.index01 {
+            return Err(CueError::IndexOrder { line });
+        }
+        if t.index01 == prev.index01 {
+            return Err(CueError::EmptyTrack { track: prev.number });
+        }
     }
 
     if !matches!(t.mode, CueMode::Audio) && !matches!(file.kind, CueFileKind::Binary) {
@@ -235,6 +330,12 @@ fn flush_track(file: &mut PendingFile, track: &mut Option<PendingTrack>) -> Resu
             line,
             number: t.number,
         });
+    }
+
+    if let Some(track) = file.tracks.first()
+        && t.mode.sector_size() != track.mode.sector_size()
+    {
+        return Err(CueError::MixedSectorSizes { line });
     }
 
     file.tracks.push(t);
@@ -410,4 +511,36 @@ impl CueSheet {
 
         Ok(Self { files })
     }
+}
+
+pub fn resolve_file(cue_dir: &Path, name: &str) -> Result<PathBuf, CueError> {
+    let name = name.rsplit(['/', '\\']).next().unwrap_or(name);
+
+    let exact = cue_dir.join(name);
+    if exact.is_file() {
+        return Ok(exact);
+    }
+
+    let listing = if cue_dir.as_os_str().is_empty() {
+        Path::new(".")
+    } else {
+        cue_dir
+    };
+
+    let wanted = name.to_lowercase();
+
+    let found = fs::read_dir(listing)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|entry| entry.file_name())
+        .find(|file_name| {
+            file_name
+                .to_str()
+                .is_some_and(|n| n.to_lowercase() == wanted)
+        })
+        .map(|file_name| cue_dir.join(file_name))
+        .filter(|path| path.is_file());
+
+    found.ok_or(CueError::FileNotFound(exact))
 }

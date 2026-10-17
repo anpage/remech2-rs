@@ -367,21 +367,67 @@ fn higher_indices_are_ignored() {
 }
 
 #[test]
-fn equal_index01_on_consecutive_tracks_is_allowed() {
-    let sheet = parse(
+fn equal_index01_on_consecutive_tracks_leaves_an_empty_track() {
+    // The error names the empty track, not the one that starts on top of it
+    assert_err!(
         r#"FILE "game.bin" BINARY
   TRACK 01 AUDIO
     INDEX 01 01:00:00
   TRACK 02 AUDIO
     INDEX 01 01:00:00
 "#,
+        CueError::EmptyTrack { track: 1 }
+    );
+    assert_err!(
+        r#"FILE "game.bin" BINARY
+  TRACK 01 MODE1/2352
+    INDEX 01 00:00:00
+  TRACK 02 AUDIO
+    INDEX 01 01:00:00
+  TRACK 03 AUDIO
+    INDEX 00 01:00:00
+    INDEX 01 01:00:00
+"#,
+        CueError::EmptyTrack { track: 2 }
+    );
+}
+
+#[test]
+fn next_pregap_may_start_at_index01() {
+    // Track 1 still holds the pregap's sectors
+    let sheet = parse(
+        r#"FILE "game.bin" BINARY
+  TRACK 01 AUDIO
+    INDEX 01 01:00:00
+  TRACK 02 AUDIO
+    INDEX 00 01:00:00
+    INDEX 01 01:02:00
+"#,
     );
 
-    let start = msf(1, 0, 0);
     assert_eq!(
         sheet.files[0].tracks,
-        [audio(1, None, start), audio(2, None, start)]
+        [
+            audio(1, None, msf(1, 0, 0)),
+            audio(2, Some(msf(1, 0, 0)), msf(1, 2, 0))
+        ]
     );
+}
+
+#[test]
+fn equal_index01_across_files_is_allowed() {
+    // Each file restarts at 00:00:00
+    let sheet = parse(
+        r#"FILE "a.bin" BINARY
+  TRACK 01 AUDIO
+    INDEX 01 00:00:00
+FILE "b.bin" BINARY
+  TRACK 02 AUDIO
+    INDEX 01 00:00:00
+"#,
+    );
+
+    assert_eq!(sheet.files[1].tracks, [audio(2, None, 0)]);
 }
 
 #[test]
@@ -476,26 +522,53 @@ fn missing_extension() {
 
 #[test]
 fn supported_modes() {
-    let sheet = parse(
+    for (mode, expected) in [
+        ("MODE1/2352", CueMode::Mode1Raw),
+        ("MODE1/2048", CueMode::Mode1Cooked),
+        ("MODE2/2352", CueMode::Mode2Raw),
+        ("AUDIO", CueMode::Audio),
+    ] {
+        let text = format!("FILE \"game.bin\" BINARY\n  TRACK 01 {mode}\n    INDEX 01 00:00:00\n");
+        assert_eq!(parse(&text).files[0].tracks, [track(1, expected, None, 0)]);
+    }
+}
+
+#[test]
+fn mixed_sector_sizes_in_one_binary_file() {
+    // Offsets after a size change would depend on every earlier track's length
+    assert_err!(
+        r#"FILE "game.bin" BINARY
+  TRACK 01 MODE1/2048
+    INDEX 01 00:00:00
+  TRACK 02 AUDIO
+    INDEX 01 01:00:00
+"#,
+        CueError::MixedSectorSizes { line: 4 }
+    );
+    assert_err!(
         r#"FILE "game.bin" BINARY
   TRACK 01 MODE1/2352
     INDEX 01 00:00:00
-  TRACK 02 MODE1/2048
+  TRACK 02 MODE2/2352
     INDEX 01 01:00:00
-  TRACK 03 MODE2/2352
+  TRACK 03 MODE1/2048
     INDEX 01 02:00:00
-  TRACK 04 AUDIO
-    INDEX 01 03:00:00
+"#,
+        CueError::MixedSectorSizes { line: 6 }
+    );
+}
+
+#[test]
+fn sector_sizes_may_differ_between_files() {
+    parse(
+        r#"FILE "data.iso" BINARY
+  TRACK 01 MODE1/2048
+    INDEX 01 00:00:00
+FILE "audio.bin" BINARY
+  TRACK 02 AUDIO
+    INDEX 01 00:00:00
 "#,
     );
-
-    let tracks = [
-        track(1, CueMode::Mode1Raw, None, 0),
-        track(2, CueMode::Mode1Cooked, None, msf(1, 0, 0)),
-        track(3, CueMode::Mode2Raw, None, msf(2, 0, 0)),
-        audio(4, None, msf(3, 0, 0)),
-    ];
-    assert_eq!(sheet.files[0].tracks, tracks);
 }
 
 #[test]
