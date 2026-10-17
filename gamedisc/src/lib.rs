@@ -2,6 +2,7 @@ use std::{io, path::PathBuf};
 
 use crate::cue::{CueError, CueMode};
 
+pub mod audio;
 pub mod bincue;
 pub mod cue;
 pub mod iso;
@@ -29,6 +30,12 @@ pub enum Error {
     NoDirectoryTree,
     #[error("ISO 9660 error")]
     Iso(#[from] hadris_iso::sync::Error),
+    #[error("drive error")]
+    Drive(#[from] cd_da_reader::CdReaderError),
+    #[error("track {track} is not an audio track")]
+    NotAudioTrack { track: u8 },
+    #[error("FLAC encoder error: {0}")]
+    Flac(String),
 }
 
 pub trait SectorSource {
