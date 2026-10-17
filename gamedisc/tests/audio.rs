@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use cd_da_reader::{AudioSectorReader, CdReaderError};
 use gamedisc::audio::{Audio, AudioSink, FlacSink, rip_track, toc_from_tracks};
 use gamedisc::bincue::BinCueSource;
-use gamedisc::{Error, SectorSource, Track, TrackKind};
+use gamedisc::{Error, SectorSource, Track, TrackKind, open_image_audio};
 
 const RAW: usize = 2352;
 
@@ -337,4 +337,71 @@ fn bin_cue_to_flac() {
     rip_track(&Audio(&source), &toc, 2, &mut flac, &mut |_, _| {}).unwrap();
 
     assert_eq!(decode_flac(&flac.into_inner()), samples);
+}
+
+// open_image_audio
+
+#[test]
+fn audio_sources_can_move_between_threads() {
+    fn assert_send<T: Send>() {}
+    assert_send::<Box<dyn SectorSource + Send>>();
+}
+
+#[test]
+fn open_image_audio_reads_a_cue() {
+    let dir = scratch("open_image_audio_reads_a_cue");
+    let samples = sine(160);
+    let cue = write_disc(&dir, &to_bytes(&samples));
+    let upper = dir.join("GAME.CUE");
+    fs::rename(&cue, &upper).unwrap();
+
+    let source = open_image_audio(&upper)
+        .unwrap_or_else(|e| panic!("{e:?}"))
+        .expect("a .cue can carry audio");
+    assert_eq!(
+        source.tracks(),
+        [
+            track(1, TrackKind::Mode1, 0, 10),
+            track(2, TrackKind::Audio, 10, 160),
+        ]
+    );
+
+    let toc = toc_from_tracks(source.tracks());
+    let mut flac = FlacSink::new(vec![]);
+    rip_track(&Audio(&*source), &toc, 2, &mut flac, &mut |_, _| {}).unwrap();
+    assert_eq!(decode_flac(&flac.into_inner()), samples);
+}
+
+#[test]
+fn iso_images_have_no_audio() {
+    let dir = scratch("iso_images_have_no_audio");
+    for name in ["game.iso", "GAME.ISO"] {
+        fs::write(dir.join(name), vec![0; 40 * 2048]).unwrap();
+
+        let result = open_image_audio(dir.join(name));
+        assert!(matches!(result, Ok(None)), "{name}");
+    }
+}
+
+#[test]
+fn open_image_audio_rejects_other_extensions() {
+    let dir = scratch("open_image_audio_rejects_other_extensions");
+    for name in ["game.bin", "game.mds", "game"] {
+        let path = dir.join(name);
+        fs::write(&path, pcm(0, 10)).unwrap();
+
+        let result = open_image_audio(&path);
+        assert!(
+            matches!(result, Err(Error::UnsupportedImage(ref p)) if *p == path),
+            "{name}"
+        );
+    }
+}
+
+#[test]
+fn open_image_audio_missing_cue() {
+    let dir = scratch("open_image_audio_missing_cue");
+
+    let result = open_image_audio(dir.join("missing.cue"));
+    assert!(matches!(result, Err(Error::Io(_))));
 }

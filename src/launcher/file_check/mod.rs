@@ -8,12 +8,20 @@ use std::{
     },
 };
 
-use anyhow::{Result, bail};
-use gamedisc::{ReadSeek, iso::IsoFs};
+use anyhow::{Context, Result, bail};
+use gamedisc::{
+    ReadSeek, TrackKind,
+    audio::{Audio, FlacSink, rip_track, toc_from_tracks},
+    iso::IsoFs,
+};
 use tracing::{debug, warn};
 
 use super::{Action, Stage};
-use crate::files::{self};
+use crate::{
+    cd_audio,
+    files::{self},
+    settings,
+};
 
 mod list;
 
@@ -28,7 +36,7 @@ struct CopyError {
 #[derive(Debug)]
 enum CopyStatus {
     Copying((Option<String>, f32)),
-    Done,
+    Done { rip_from: Option<PathBuf> },
     Error(CopyError),
 }
 
@@ -51,6 +59,7 @@ pub struct FileCheck {
     copying_error: Option<CopyError>,
     discs: Vec<PathBuf>,
     choosing_disc: bool,
+    rip_offer: Option<PathBuf>,
 }
 
 impl FileCheck {
@@ -63,6 +72,7 @@ impl FileCheck {
             copying_error: None,
             discs: detect_discs(),
             choosing_disc: false,
+            rip_offer: None,
         }
     }
 
@@ -115,6 +125,11 @@ impl FileCheck {
                 });
             };
 
+            let image = match &source {
+                Source::Image(path) => Some(path.clone()),
+                _ => None,
+            };
+
             let copier = match source {
                 Source::Folder(folder) | Source::Disc(folder) => Copier::Folder(folder),
                 Source::Image(path) => match gamedisc::open_image(&path) {
@@ -139,22 +154,42 @@ impl FileCheck {
                     let mut status = status.lock().unwrap();
                     if let Some(error) = error {
                         *status = CopyStatus::Error(CopyError {
-                            file: file.path.to_string_lossy().into(),
+                            file: format!("{}", file.path.display()),
                             error,
                         });
                         return;
                     } else {
                         *status = CopyStatus::Copying((
-                            Some(file.path.to_string_lossy().into()),
+                            Some(format!("Copying {}", file.path.display())),
                             progress,
                         ));
                     }
                 }
             }
-            let mut status = status.lock().unwrap();
-            *status = CopyStatus::Done;
+            let rip_from = image.filter(|path| should_offer_rip(path));
+            *status.lock().unwrap() = CopyStatus::Done { rip_from };
         });
 
+        self.copying_files = true;
+    }
+
+    fn start_rip(&mut self, image: PathBuf) {
+        self.copying_error = None;
+        self.copying_status = Arc::new(Mutex::new(CopyStatus::Copying((None, 0.0))));
+        let status = self.copying_status.clone();
+
+        std::thread::spawn(move || {
+            let report = |label: String, progress: f32| {
+                *status.lock().unwrap() = CopyStatus::Copying((Some(label), progress));
+            };
+            *status.lock().unwrap() = match rip_music(&image, &report) {
+                Ok(()) => CopyStatus::Done { rip_from: None },
+                Err(e) => CopyStatus::Error(CopyError {
+                    file: image.to_string_lossy().into(),
+                    error: format!("{e:#}"),
+                }),
+            };
+        });
         self.copying_files = true;
     }
 
@@ -198,13 +233,14 @@ impl FileCheck {
             return self.copy_error_ui(ctx);
         }
 
-        let (file, progress) = {
+        let (status, progress) = {
             let status = self.copying_status.lock().unwrap();
             match *status {
                 CopyStatus::Copying(ref progress) => progress.clone(),
-                CopyStatus::Done => {
+                CopyStatus::Done { ref rip_from } => {
                     self.copying_files = false;
                     self.missing_files = check_files();
+                    self.rip_offer = rip_from.clone();
                     return Ok(Action::Nothing);
                 }
                 CopyStatus::Error(ref file) => {
@@ -214,16 +250,16 @@ impl FileCheck {
             }
         };
 
-        egui::Window::new("🗐 Copying Files")
+        egui::Window::new("🗐 Installing")
             .resizable(false)
             .collapsible(false)
             .pivot(egui::Align2::CENTER_CENTER)
             .fixed_pos(ctx.content_rect().center())
             .show(ctx, |ui| {
-                ui.label("Please wait while the game files are copied.");
+                ui.label("Please wait while the game data is installed.");
                 ui.add_space(10.0);
-                if let Some(file) = file {
-                    ui.label(format!("Copying: {}", file));
+                if let Some(status) = status {
+                    ui.label(status);
                 } else {
                     ui.label("Copying...");
                 }
@@ -269,6 +305,48 @@ impl FileCheck {
         } else if cancel {
             self.choosing_disc = false;
         }
+        Ok(Action::Nothing)
+    }
+
+    fn rip_offer_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
+        enum Choice {
+            Rip,
+            Skip,
+        }
+
+        let mut choice: Option<Choice> = None;
+        egui::Window::new("💿 Rip Music")
+            .resizable(false)
+            .collapsible(false)
+            .pivot(egui::Align2::CENTER_CENTER)
+            .fixed_pos(ctx.content_rect().center())
+            .show(ctx, |ui| {
+                ui.label("This disc image contains CD audio music. Rip it now?");
+                ui.add_space(5.0);
+                ui.label("This will take a minute or two.");
+                ui.add_space(10.0);
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
+                    if ui.button("Rip").clicked() {
+                        choice = Some(Choice::Rip);
+                    }
+                    if ui.button("Skip").clicked() {
+                        choice = Some(Choice::Skip);
+                    }
+                });
+            });
+
+        match choice {
+            Some(Choice::Rip) => {
+                if let Some(image) = self.rip_offer.take() {
+                    self.start_rip(image)
+                }
+            }
+            Some(Choice::Skip) => {
+                self.rip_offer = None;
+            }
+            None => (),
+        }
+
         Ok(Action::Nothing)
     }
 
@@ -393,6 +471,10 @@ impl Stage for FileCheck {
     fn ui(&mut self, ctx: &egui::Context) -> Result<Action> {
         if self.copying_files {
             return self.copy_ui(ctx);
+        }
+
+        if self.rip_offer.is_some() {
+            return self.rip_offer_ui(ctx);
         }
 
         if self.missing_files.is_empty() {
@@ -572,4 +654,58 @@ fn detect_discs() -> Vec<PathBuf> {
         .map(|volume| volume.mount_point)
         .filter(|mount_point| files::resolve_in(mount_point, CD_MARKER_FILE).exists())
         .collect()
+}
+
+fn should_offer_rip(image: &Path) -> bool {
+    !cd_audio::missing_used_tracks().is_empty()
+        && gamedisc::open_image_audio(image)
+            .ok()
+            .flatten()
+            .is_some_and(|source| source.tracks().iter().any(|t| t.kind == TrackKind::Audio))
+}
+
+fn rip_music(image: &Path, report: &dyn Fn(String, f32)) -> Result<()> {
+    let source = gamedisc::open_image_audio(image)?.context("the image has no audio")?;
+    let toc = toc_from_tracks(source.tracks());
+
+    let tracks: Vec<u8> = toc
+        .tracks
+        .iter()
+        .filter(|t| t.is_audio)
+        .map(|t| t.number)
+        .collect();
+
+    let music_dir = files::resolve(&settings::get().audio.music_path);
+    fs::create_dir_all(&music_dir)?;
+
+    for (i, &number) in tracks.iter().enumerate() {
+        let label = format!("Ripping track {} of {}", i + 1, tracks.len());
+        let path = music_dir.join(format!("track{number:02}.flac"));
+
+        let result = (|| -> Result<()> {
+            let mut sink = FlacSink::new(BufWriter::new(fs::File::create(&path)?));
+
+            rip_track(
+                &Audio(&*source),
+                &toc,
+                number,
+                &mut sink,
+                &mut |done, total| {
+                    let within = done as f32 / total as f32;
+                    report(label.clone(), (i as f32 + within) / tracks.len() as f32);
+                },
+            )?;
+
+            sink.into_inner().flush()?;
+
+            Ok(())
+        })();
+
+        if let Err(e) = result {
+            let _ = fs::remove_file(&path);
+            return Err(e);
+        }
+    }
+
+    Ok(())
 }

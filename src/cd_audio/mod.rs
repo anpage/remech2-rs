@@ -9,6 +9,23 @@ use crate::{files, settings};
 const MAX_CD_VOLUME: i32 = 65535;
 const MAX_TRACK: i32 = 99;
 
+/// These are the tracks I verified that the game uses.
+/// 22 and 25 are leftover Alper tracks and 27 is either a leftover Hwang track or
+/// a few seconds of track 5, depending on the disc.
+/// Kerensky help you if you have a SoftKey disc, which lacks music entirely.
+const USED_TRACKS: [i32; 23] = [
+    2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 26,
+];
+
+/// Used tracks with no matching file in the music folder
+pub fn missing_used_tracks() -> Vec<i32> {
+    let found = CdAudioPlayer::scan_for_tracks().unwrap_or_default();
+    USED_TRACKS
+        .into_iter()
+        .filter(|&number| !found.iter().any(|track| track.number == number))
+        .collect()
+}
+
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum AudioCdStatus {
