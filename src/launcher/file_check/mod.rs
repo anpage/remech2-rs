@@ -9,13 +9,16 @@ use std::{
 };
 
 use anyhow::{Result, bail};
-use gamedisc::{ReadSeek, iso::IsoFs};
+use gamedisc::{ReadSeek, iso::IsoFs, volumes::OpticalVolume};
 use tracing::{debug, warn};
 
 use super::{Action, Stage};
 use crate::{
     files::{self},
-    launcher::{CD_MARKER_FILE, centered_window, detect_discs, music_check::MusicCheck},
+    launcher::{
+        CD_MARKER_FILE, DiscPick, MusicSource, centered_window, detect_discs,
+        music_check::MusicCheck,
+    },
 };
 
 mod list;
@@ -36,7 +39,7 @@ enum CopyStatus {
 enum Source {
     Folder(PathBuf),
     Image(PathBuf),
-    Disc(PathBuf),
+    Disc(OpticalVolume),
 }
 
 enum Copier {
@@ -50,9 +53,9 @@ pub struct FileCheck {
     copying_files: bool,
     copying_status: Arc<Mutex<CopyStatus>>,
     copying_error: Option<CopyError>,
-    discs: Vec<PathBuf>,
+    discs: Vec<OpticalVolume>,
     choosing_disc: bool,
-    installed_from: Option<PathBuf>,
+    installed_from: Option<MusicSource>,
 }
 
 impl FileCheck {
@@ -110,8 +113,9 @@ impl FileCheck {
         fs::create_dir_all(files::resolve_in(game, "SMK")).unwrap();
 
         self.installed_from = match &source {
-            Source::Image(path) => Some(path.clone()),
-            _ => None,
+            Source::Image(path) => Some(MusicSource::Image(path.clone())),
+            Source::Disc(volume) => Some(MusicSource::Disc(volume.clone())),
+            Source::Folder(_) => None,
         };
 
         std::thread::spawn(move || {
@@ -124,7 +128,8 @@ impl FileCheck {
             };
 
             let copier = match source {
-                Source::Folder(folder) | Source::Disc(folder) => Copier::Folder(folder),
+                Source::Folder(folder) => Copier::Folder(folder),
+                Source::Disc(volume) => Copier::Folder(volume.mount_point),
                 Source::Image(path) => match gamedisc::open_image(&path) {
                     Ok(image) if image.has_file(CD_MARKER_FILE).unwrap_or(false) => {
                         Copier::Image(image)
@@ -237,30 +242,19 @@ impl FileCheck {
     }
 
     fn disc_picker_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
-        let mut picked = None;
-        let mut cancel = false;
-        centered_window("💿 Choose a Disc", ctx).show(ctx, |ui| {
-            ui.label("Several game discs were found. Which one should the files be copied from?");
-            ui.add_space(10.0);
-            for disc in &self.discs {
-                if ui.button(disc.display().to_string()).clicked() {
-                    picked = Some(disc.clone());
-                }
+        match super::disc_picker_ui(
+            ctx,
+            &self.discs,
+            "Several game discs were found. Which one should the files be copied from?",
+        ) {
+            Some(DiscPick::Disc(i)) => {
+                self.choosing_disc = false;
+                self.start_copy(Source::Disc(self.discs[i].clone()));
             }
-            ui.add_space(10.0);
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
-                if ui.button("Cancel").clicked() {
-                    cancel = true;
-                }
-            });
-        });
-
-        if let Some(disc) = picked {
-            self.choosing_disc = false;
-            self.start_copy(Source::Disc(disc));
-        } else if cancel {
-            self.choosing_disc = false;
+            Some(DiscPick::Cancel) => self.choosing_disc = false,
+            None => {}
         }
+
         Ok(Action::Nothing)
     }
 

@@ -1,6 +1,10 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
+use gamedisc::{
+    audio::AudioSource,
+    volumes::{self, OpticalVolume},
+};
 
 use crate::{app::App, files};
 
@@ -59,12 +63,64 @@ impl Launcher {
     }
 }
 
-fn detect_discs() -> Vec<PathBuf> {
-    gamedisc::volumes::optical_volumes()
+#[derive(Clone)]
+enum MusicSource {
+    Image(PathBuf),
+    Disc(OpticalVolume),
+}
+
+impl MusicSource {
+    fn may_have_music(&self) -> bool {
+        match self {
+            Self::Image(path) => has_audio(path),
+            Self::Disc(_) => true,
+        }
+    }
+}
+
+fn has_audio(image: &Path) -> bool {
+    AudioSource::open_image(image)
+        .ok()
+        .flatten()
+        .is_some_and(|source| !source.audio_tracks().is_empty())
+}
+
+fn detect_discs() -> Vec<OpticalVolume> {
+    volumes::optical_volumes()
         .into_iter()
-        .map(|volume| volume.mount_point)
-        .filter(|mount_point| files::resolve_in(mount_point, CD_MARKER_FILE).exists())
+        .filter(|v| files::resolve_in(&v.mount_point, CD_MARKER_FILE).exists())
         .collect()
+}
+
+enum DiscPick {
+    Disc(usize),
+    Cancel,
+}
+
+fn disc_picker_ui(
+    ctx: &egui::Context,
+    discs: &[OpticalVolume],
+    question: &str,
+) -> Option<DiscPick> {
+    let mut pick = None;
+
+    centered_window("💿 Choose a Disc", ctx).show(ctx, |ui| {
+        ui.label(question);
+        ui.add_space(10.0);
+        for (i, disc) in discs.iter().enumerate() {
+            if ui.button(disc.mount_point.display().to_string()).clicked() {
+                pick = Some(DiscPick::Disc(i));
+            }
+        }
+        ui.add_space(10.0);
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
+            if ui.button("Cancel").clicked() {
+                pick = Some(DiscPick::Cancel);
+            }
+        });
+    });
+
+    pick
 }
 
 fn centered_window(title: &str, ctx: &egui::Context) -> egui::Window<'static> {
