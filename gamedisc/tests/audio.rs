@@ -110,16 +110,24 @@ impl AudioSink for VecSink {
 }
 
 /// Rips into a VecSink and returns it with every progress report
-fn rip<R: AudioSectorReader>(reader: &R, tracks: &[Track], number: u8) -> Result<(VecSink, Vec<(u32, u32)>), Error> {
+fn rip<R: AudioSectorReader>(
+    reader: &R,
+    tracks: &[Track],
+    number: u8,
+) -> Result<(VecSink, Vec<(u32, u32)>), Error> {
     let toc = toc_from_tracks(tracks);
     let mut sink = VecSink::default();
     let mut progress = vec![];
-    rip_track(reader, &toc, number, &mut sink, &mut |done, total| progress.push((done, total)))?;
+    rip_track(reader, &toc, number, &mut sink, &mut |done, total| {
+        progress.push((done, total))
+    })?;
     Ok((sink, progress))
 }
 
 fn scratch(name: &str) -> PathBuf {
-    let dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join("audio").join(name);
+    let dir = Path::new(env!("CARGO_TARGET_TMPDIR"))
+        .join("audio")
+        .join(name);
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir
@@ -129,12 +137,19 @@ fn scratch(name: &str) -> PathBuf {
 fn decode_flac(bytes: &[u8]) -> Vec<i16> {
     let mut reader = claxon::FlacReader::new(Cursor::new(bytes)).expect("not a FLAC stream");
     let info = reader.streaminfo();
-    assert_eq!((info.sample_rate, info.channels, info.bits_per_sample), (44_100, 2, 16));
+    assert_eq!(
+        (info.sample_rate, info.channels, info.bits_per_sample),
+        (44_100, 2, 16)
+    );
     let samples: Vec<i16> = reader
         .samples()
         .map(|s| i16::try_from(s.unwrap()).expect("sample out of 16-bit range"))
         .collect();
-    assert_eq!(info.samples, Some(samples.len() as u64 / 2), "STREAMINFO sample count");
+    assert_eq!(
+        info.samples,
+        Some(samples.len() as u64 / 2),
+        "STREAMINFO sample count"
+    );
     samples
 }
 
@@ -145,7 +160,10 @@ fn toc_mirrors_the_tracks() {
     let source = MemSource::disc();
     let toc = toc_from_tracks(source.tracks());
 
-    assert_eq!((toc.first_track, toc.last_track, toc.leadout_lba), (1, 3, 260));
+    assert_eq!(
+        (toc.first_track, toc.last_track, toc.leadout_lba),
+        (1, 3, 260)
+    );
     let tracks: Vec<_> = toc
         .tracks
         .iter()
@@ -164,9 +182,15 @@ fn toc_mirrors_the_tracks() {
 
 #[test]
 fn toc_keeps_the_first_track_number() {
-    let toc = toc_from_tracks(&[track(5, TrackKind::Audio, 0, 100), track(6, TrackKind::Audio, 100, 50)]);
+    let toc = toc_from_tracks(&[
+        track(5, TrackKind::Audio, 0, 100),
+        track(6, TrackKind::Audio, 100, 50),
+    ]);
 
-    assert_eq!((toc.first_track, toc.last_track, toc.leadout_lba), (5, 6, 150));
+    assert_eq!(
+        (toc.first_track, toc.last_track, toc.leadout_lba),
+        (5, 6, 150)
+    );
 }
 
 // Audio wrapper
@@ -226,7 +250,10 @@ fn data_track_is_refused() {
     let mut sink = VecSink::default();
 
     let result = rip_track(&Audio(&source), &toc, 1, &mut sink, &mut |_, _| {});
-    assert!(matches!(result, Err(Error::NotAudioTrack { track: 1 })), "{result:?}");
+    assert!(
+        matches!(result, Err(Error::NotAudioTrack { track: 1 })),
+        "{result:?}"
+    );
     assert_eq!((sink.writes, sink.finished), (0, 0));
 }
 
@@ -247,7 +274,10 @@ fn source_errors_stop_the_rip_unfinished() {
 
     let result = rip_track(&Audio(&source), &toc, 2, &mut sink, &mut |_, _| {});
     // cd-da-reader wraps our error as its backend error
-    assert!(matches!(result, Err(Error::Drive(CdReaderError::Backend(_)))), "{result:?}");
+    assert!(
+        matches!(result, Err(Error::Drive(CdReaderError::Backend(_)))),
+        "{result:?}"
+    );
     assert_eq!(sink.finished, 0);
 }
 
@@ -264,7 +294,10 @@ fn flac_round_trips_sample_exact() {
     let bytes = flac.into_inner();
 
     assert_eq!(&bytes[..4], b"fLaC");
-    assert!(bytes.len() < samples.len() * 2, "FLAC should be smaller than the PCM");
+    assert!(
+        bytes.len() < samples.len() * 2,
+        "FLAC should be smaller than the PCM"
+    );
     assert_eq!(decode_flac(&bytes), samples);
 }
 

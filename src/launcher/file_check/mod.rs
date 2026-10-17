@@ -35,6 +35,7 @@ enum CopyStatus {
 enum Source {
     Folder(PathBuf),
     Image(PathBuf),
+    Disc(PathBuf),
 }
 
 enum Copier {
@@ -48,6 +49,8 @@ pub struct FileCheck {
     copying_files: bool,
     copying_status: Arc<Mutex<CopyStatus>>,
     copying_error: Option<CopyError>,
+    discs: Vec<PathBuf>,
+    choosing_disc: bool,
 }
 
 impl FileCheck {
@@ -58,14 +61,21 @@ impl FileCheck {
             copying_files: false,
             copying_status: Arc::new(Mutex::new(CopyStatus::Copying((None, 0.0)))),
             copying_error: None,
+            discs: detect_discs(),
+            choosing_disc: false,
         }
+    }
+
+    fn refresh(&mut self) {
+        self.missing_files = check_files();
+        self.discs = detect_discs();
     }
 
     fn pick_folder(&mut self) {
         let (sender, receiver) = mpsc::channel();
         std::thread::spawn(move || {
             let folder = rfd::FileDialog::new()
-                .set_title("Locate the MechWarrior 2 files")
+                .set_title("Locate the original game's data files")
                 .pick_folder();
             let _ = sender.send(folder.map(Source::Folder));
         });
@@ -76,7 +86,7 @@ impl FileCheck {
         let (sender, receiver) = mpsc::channel();
         std::thread::spawn(move || {
             let file = rfd::FileDialog::new()
-                .set_title("Locate a MechWarrior 2 disc image")
+                .set_title("Locate a game disc image")
                 .add_filter("Disc images", &["cue", "iso"])
                 .pick_file();
             let _ = sender.send(file.map(Source::Image));
@@ -106,12 +116,12 @@ impl FileCheck {
             };
 
             let copier = match source {
-                Source::Folder(folder) => Copier::Folder(folder),
+                Source::Folder(folder) | Source::Disc(folder) => Copier::Folder(folder),
                 Source::Image(path) => match gamedisc::open_image(&path) {
                     Ok(image) if image.has_file(CD_MARKER_FILE).unwrap_or(false) => {
                         Copier::Image(image)
                     }
-                    Ok(_) => return fail(&path, "This is not a MechWarrior 2 disc image".into()),
+                    Ok(_) => return fail(&path, "This is not a supported disc image".into()),
                     Err(e) => return fail(&path, e.to_string()),
                 },
             };
@@ -171,7 +181,7 @@ impl FileCheck {
                     if ui.button("Back").clicked() {
                         self.copying_files = false;
                         self.copying_error = None;
-                        self.missing_files = check_files();
+                        self.refresh();
                     }
                 });
             });
@@ -227,6 +237,41 @@ impl FileCheck {
         Ok(Action::Nothing)
     }
 
+    fn disc_picker_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
+        let mut picked = None;
+        let mut cancel = false;
+        egui::Window::new("💿 Choose a Disc")
+            .resizable(false)
+            .collapsible(false)
+            .pivot(egui::Align2::CENTER_CENTER)
+            .fixed_pos(ctx.content_rect().center())
+            .show(ctx, |ui| {
+                ui.label(
+                    "Several game discs were found. Which one should the files be copied from?",
+                );
+                ui.add_space(10.0);
+                for disc in &self.discs {
+                    if ui.button(disc.display().to_string()).clicked() {
+                        picked = Some(disc.clone());
+                    }
+                }
+                ui.add_space(10.0);
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
+                    if ui.button("Cancel").clicked() {
+                        cancel = true;
+                    }
+                });
+            });
+
+        if let Some(disc) = picked {
+            self.choosing_disc = false;
+            self.start_copy(Source::Disc(disc));
+        } else if cancel {
+            self.choosing_disc = false;
+        }
+        Ok(Action::Nothing)
+    }
+
     fn missing_files_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
         enum Choice {
             Quit,
@@ -234,6 +279,7 @@ impl FileCheck {
             Skip,
             LocateFolder,
             LocateImage,
+            LocateDisc,
         }
 
         if let Some(receiver) = &self.picked_source {
@@ -256,21 +302,39 @@ impl FileCheck {
             .pivot(egui::Align2::CENTER_CENTER)
             .fixed_pos(ctx.content_rect().center())
             .show(ctx, |ui| {
-                ui.label("These required game files are missing:");
+                egui::CollapsingHeader::new(format!(
+                    "{} required game files are missing",
+                    self.missing_files.len()
+                ))
+                .id_salt("missing_files")
+                .default_open(false)
+                .show(ui, |ui| {
+                    egui::ScrollArea::vertical()
+                        .auto_shrink(true)
+                        .max_height(100.0)
+                        .show(ui, |ui| {
+                            ui.allocate_space(egui::Vec2::new(ui.available_width(), 0.0));
+                            for file in &self.missing_files {
+                                ui.label(file.path.to_string_lossy());
+                            }
+                        });
+                });
                 ui.add_space(10.0);
-                egui::ScrollArea::vertical()
-                    .auto_shrink(true)
-                    .max_height(100.0)
-                    .show(ui, |ui| {
-                        ui.allocate_space(egui::Vec2::new(ui.available_width(), 0.0));
-                        for file in &self.missing_files {
-                            ui.label(file.path.to_string_lossy());
-                        }
-                    });
-                ui.add_space(10.0);
-                ui.label("Locate your MechWarrior 2 CD, disc image, or install folder to copy them from.");
+                ui.label("Locate a CD, disc image, or folder to install the original game's data.");
                 ui.add_space(5.0);
-                ui.label("Continuing without them will likely crash.");
+                ui.colored_label(
+                    ui.visuals().warn_fg_color,
+                    "⚠ Continuing without them will likely crash.",
+                );
+                ui.add_space(5.0);
+                ui.label("The original game played its music from CD audio tracks.");
+                ui.add_space(5.0);
+                ui.label("ReMech2 can rip the audio from a real disc or from a .bin/.cue image.");
+                ui.add_space(5.0);
+                ui.colored_label(
+                    ui.visuals().warn_fg_color,
+                    "⚠ Installing from a folder or .iso image will not include the music.",
+                );
                 ui.add_space(10.0);
                 if picking {
                     ui.disable();
@@ -291,13 +355,16 @@ impl FileCheck {
                     if ui.button("Image…").clicked() {
                         choice = Some(Choice::LocateImage);
                     }
+                    if !self.discs.is_empty() && ui.button("Disc…").clicked() {
+                        choice = Some(Choice::LocateDisc);
+                    }
                 });
             });
 
         match choice {
             Some(Choice::Quit) => bail!("User chose to quit"),
             Some(Choice::Retry) => {
-                self.missing_files = check_files();
+                self.refresh();
                 Ok(Action::Nothing)
             }
             Some(Choice::Skip) => Ok(Action::Break),
@@ -307,6 +374,14 @@ impl FileCheck {
             }
             Some(Choice::LocateImage) => {
                 self.pick_image();
+                Ok(Action::Nothing)
+            }
+            Some(Choice::LocateDisc) => {
+                if let [disc] = self.discs.as_slice() {
+                    self.start_copy(Source::Disc(disc.clone()));
+                } else {
+                    self.choosing_disc = true;
+                }
                 Ok(Action::Nothing)
             }
             None => Ok(Action::Nothing),
@@ -322,6 +397,10 @@ impl Stage for FileCheck {
 
         if self.missing_files.is_empty() {
             return Ok(Action::Break);
+        }
+
+        if self.choosing_disc {
+            return self.disc_picker_ui(ctx);
         }
 
         self.missing_files_ui(ctx)
@@ -485,4 +564,12 @@ fn check_files() -> Vec<MissingFile> {
     }
 
     missing_files
+}
+
+fn detect_discs() -> Vec<PathBuf> {
+    gamedisc::volumes::optical_volumes()
+        .into_iter()
+        .map(|volume| volume.mount_point)
+        .filter(|mount_point| files::resolve_in(mount_point, CD_MARKER_FILE).exists())
+        .collect()
 }

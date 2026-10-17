@@ -11,6 +11,12 @@ thiserror = "2.0.21"
 tracing = "0.1.44"
 winnow = "1.0.4"
 
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = [
+    "Win32_Storage_FileSystem",
+    "Win32_System_WindowsProgramming",
+] }
+
 [dev-dependencies]
 claxon = "0.4.3"
 hadris-iso = { version = "2.5.0", features = ["write"] }

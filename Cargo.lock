@@ -967,6 +967,7 @@ dependencies = [
  "hadris-iso",
  "thiserror 2.0.21",
  "tracing",
+ "windows-sys 0.61.2",
  "winnow",
 ]
 

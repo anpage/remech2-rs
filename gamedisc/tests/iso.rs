@@ -216,7 +216,11 @@ fn extract<D: Read + Seek>(fs: &IsoFs<D>, path: &str) -> Option<Vec<u8>> {
             Some(out)
         }
         None => {
-            assert!(out.is_empty(), "{path}: wrote {} bytes but found nothing", out.len());
+            assert!(
+                out.is_empty(),
+                "{path}: wrote {} bytes but found nothing",
+                out.len()
+            );
             None
         }
     }
@@ -233,14 +237,21 @@ fn assert_mech2_contents<D: Read + Seek>(fs: &IsoFs<D>) {
 // Files on disk
 
 fn scratch(name: &str) -> PathBuf {
-    let dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join("iso").join(name);
+    let dir = Path::new(env!("CARGO_TARGET_TMPDIR"))
+        .join("iso")
+        .join(name);
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir
 }
 
 fn msf(sectors: u32) -> String {
-    format!("{:02}:{:02}:{:02}", sectors / 4500, sectors / 75 % 60, sectors % 75)
+    format!(
+        "{:02}:{:02}:{:02}",
+        sectors / 4500,
+        sectors / 75 % 60,
+        sectors % 75
+    )
 }
 
 fn find(haystack: &[u8], needle: &[u8]) -> usize {
@@ -255,7 +266,10 @@ fn find(haystack: &[u8], needle: &[u8]) -> usize {
 #[test]
 fn mode1_user_data() {
     let user = blocks(1, 4);
-    let source = MemSource::new(vec![track(1, TrackKind::Mode1, 0, 4)], raw_track(&user, 1, 0, true));
+    let source = MemSource::new(
+        vec![track(1, TrackKind::Mode1, 0, 4)],
+        raw_track(&user, 1, 0, true),
+    );
 
     assert_eq!(read_all(&mut logical(&source)), user);
 }
@@ -275,21 +289,35 @@ fn mode2_form1_user_data() {
 fn sector_header_wins_over_track_kind() {
     let user = blocks(1, 4);
 
-    let source = MemSource::new(vec![track(1, TrackKind::Mode1, 0, 4)], raw_track(&user, 2, 0, true));
-    assert_eq!(read_all(&mut logical(&source)), user, "mode 2 sectors on a MODE1 track");
+    let source = MemSource::new(
+        vec![track(1, TrackKind::Mode1, 0, 4)],
+        raw_track(&user, 2, 0, true),
+    );
+    assert_eq!(
+        read_all(&mut logical(&source)),
+        user,
+        "mode 2 sectors on a MODE1 track"
+    );
 
     let source = MemSource::new(
         vec![track(1, TrackKind::Mode2Form1, 0, 4)],
         raw_track(&user, 1, 0, true),
     );
-    assert_eq!(read_all(&mut logical(&source)), user, "mode 1 sectors on a MODE2 track");
+    assert_eq!(
+        read_all(&mut logical(&source)),
+        user,
+        "mode 1 sectors on a MODE2 track"
+    );
 }
 
 #[test]
 fn track_kind_is_the_fallback_without_sync() {
     let user = blocks(1, 4);
 
-    let source = MemSource::new(vec![track(1, TrackKind::Mode1, 0, 4)], raw_track(&user, 1, 0, false));
+    let source = MemSource::new(
+        vec![track(1, TrackKind::Mode1, 0, 4)],
+        raw_track(&user, 1, 0, false),
+    );
     assert_eq!(read_all(&mut logical(&source)), user, "MODE1");
 
     let source = MemSource::new(
@@ -315,7 +343,11 @@ fn first_data_track_is_used() {
     );
 
     assert_eq!(read_all(&mut logical(&source)), user);
-    assert!(source.reads_within(3..7), "{:?}", source.reads.lock().unwrap());
+    assert!(
+        source.reads_within(3..7),
+        "{:?}",
+        source.reads.lock().unwrap()
+    );
 }
 
 #[test]
@@ -331,20 +363,30 @@ fn reads_stop_at_the_track_end() {
     );
 
     assert_eq!(read_all(&mut logical(&source)), user);
-    assert!(source.reads_within(0..4), "{:?}", source.reads.lock().unwrap());
+    assert!(
+        source.reads_within(0..4),
+        "{:?}",
+        source.reads.lock().unwrap()
+    );
 }
 
 #[test]
 fn no_data_track() {
     let source = MemSource::new(vec![track(1, TrackKind::Audio, 0, 3)], audio(3));
 
-    assert!(matches!(LogicalBlocks::new(&source), Err(Error::NoDataTrack)));
+    assert!(matches!(
+        LogicalBlocks::new(&source),
+        Err(Error::NoDataTrack)
+    ));
 }
 
 #[test]
 fn source_errors_become_io_errors() {
     let user = blocks(1, 4);
-    let mut source = MemSource::new(vec![track(1, TrackKind::Mode1, 0, 4)], raw_track(&user, 1, 0, true));
+    let mut source = MemSource::new(
+        vec![track(1, TrackKind::Mode1, 0, 4)],
+        raw_track(&user, 1, 0, true),
+    );
     source.fail_at = Some(2);
     let mut blocks = logical(&source);
 
@@ -358,11 +400,17 @@ fn source_errors_become_io_errors() {
 #[test]
 fn reads_cross_sector_boundaries() {
     let user = blocks(1, 4);
-    let source = MemSource::new(vec![track(1, TrackKind::Mode1, 0, 4)], raw_track(&user, 1, 0, true));
+    let source = MemSource::new(
+        vec![track(1, TrackKind::Mode1, 0, 4)],
+        raw_track(&user, 1, 0, true),
+    );
     let mut blocks = logical(&source);
 
     let start = 2 * BLOCK - 3;
-    assert_eq!(blocks.seek(SeekFrom::Start(start as u64)).unwrap(), start as u64);
+    assert_eq!(
+        blocks.seek(SeekFrom::Start(start as u64)).unwrap(),
+        start as u64
+    );
     let mut buf = [0; 3000];
     blocks.read_exact(&mut buf).unwrap();
     assert_eq!(buf[..], user[start..start + 3000]);
@@ -372,7 +420,10 @@ fn reads_cross_sector_boundaries() {
 #[test]
 fn seeking() {
     let user = blocks(1, 4);
-    let source = MemSource::new(vec![track(1, TrackKind::Mode1, 0, 4)], raw_track(&user, 1, 0, true));
+    let source = MemSource::new(
+        vec![track(1, TrackKind::Mode1, 0, 4)],
+        raw_track(&user, 1, 0, true),
+    );
     let mut blocks = logical(&source);
     let len = 4 * BLOCK as u64;
     let mut buf = [0; 10];
@@ -381,7 +432,10 @@ fn seeking() {
     assert_eq!(blocks.read(&mut buf).unwrap(), 0);
 
     assert_eq!(blocks.seek(SeekFrom::End(-5)).unwrap(), len - 5);
-    assert_eq!(blocks.read_exact(&mut buf).unwrap_err().kind(), ErrorKind::UnexpectedEof);
+    assert_eq!(
+        blocks.read_exact(&mut buf).unwrap_err().kind(),
+        ErrorKind::UnexpectedEof
+    );
 
     assert_eq!(blocks.seek(SeekFrom::Start(100)).unwrap(), 100);
     assert_eq!(blocks.seek(SeekFrom::Current(-40)).unwrap(), 60);
@@ -389,12 +443,18 @@ fn seeking() {
     assert_eq!(buf[..], user[60..70]);
 
     // Past the end is allowed and reads nothing
-    assert_eq!(blocks.seek(SeekFrom::Start(len + 1000)).unwrap(), len + 1000);
+    assert_eq!(
+        blocks.seek(SeekFrom::Start(len + 1000)).unwrap(),
+        len + 1000
+    );
     assert_eq!(blocks.read(&mut buf).unwrap(), 0);
 
     // Before the start is not
     assert_eq!(
-        blocks.seek(SeekFrom::Current(-10_000_000)).unwrap_err().kind(),
+        blocks
+            .seek(SeekFrom::Current(-10_000_000))
+            .unwrap_err()
+            .kind(),
         ErrorKind::InvalidInput
     );
 }
@@ -686,8 +746,14 @@ fn open_image_errors() {
         "FILE \"music.bin\" BINARY\n  TRACK 01 AUDIO\n    INDEX 01 00:00:00\n",
     )
     .unwrap();
-    assert!(matches!(open_image(dir.join("music.cue")), Err(Error::NoDataTrack)));
+    assert!(matches!(
+        open_image(dir.join("music.cue")),
+        Err(Error::NoDataTrack)
+    ));
 
     fs::write(dir.join("zeros.iso"), vec![0; 40 * BLOCK]).unwrap();
-    assert!(matches!(open_image(dir.join("zeros.iso")), Err(Error::Iso(_))));
+    assert!(matches!(
+        open_image(dir.join("zeros.iso")),
+        Err(Error::Iso(_))
+    ));
 }

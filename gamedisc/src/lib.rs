@@ -14,6 +14,7 @@ pub mod audio;
 pub mod bincue;
 pub mod cue;
 pub mod iso;
+pub mod volumes;
 
 const RAW_SECTOR: usize = 2352;
 const SYNC: [u8; 12] = [
