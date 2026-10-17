@@ -4,6 +4,12 @@ use crate::cue::{CueError, CueMode};
 
 pub mod bincue;
 pub mod cue;
+pub mod iso;
+
+const RAW_SECTOR: usize = 2352;
+const SYNC: [u8; 12] = [
+    0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00,
+];
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -17,12 +23,28 @@ pub enum Error {
     PartialSector(PathBuf),
     #[error("sectors {lba}..+{count} are past the end of the disc")]
     OutOfRange { lba: u32, count: u32 },
+    #[error("disc has no data track")]
+    NoDataTrack,
+    #[error("image has no ISO 9660 directory tree")]
+    NoDirectoryTree,
+    #[error("ISO 9660 error")]
+    Iso(#[from] hadris_iso::sync::Error),
 }
 
 pub trait SectorSource {
     fn tracks(&self) -> &[Track];
     /// Read `count` raw 2352-byte sectors starting at `lba` into `out`
     fn read_raw(&self, lba: u32, count: u32, out: &mut [u8]) -> Result<(), Error>;
+}
+
+impl<S: SectorSource + ?Sized> SectorSource for &S {
+    fn tracks(&self) -> &[Track] {
+        (**self).tracks()
+    }
+
+    fn read_raw(&self, lba: u32, count: u32, out: &mut [u8]) -> Result<(), Error> {
+        (**self).read_raw(lba, count, out)
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

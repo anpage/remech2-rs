@@ -6,7 +6,7 @@ use std::{
 };
 
 use crate::{
-    Error, SectorSource,
+    Error, RAW_SECTOR, SYNC, SectorSource,
     cue::{CueFileKind, CueSheet, Layout, resolve_file},
 };
 
@@ -85,11 +85,6 @@ impl SectorSource for BinCueSource {
     }
 
     fn read_raw(&self, lba: u32, count: u32, out: &mut [u8]) -> Result<(), Error> {
-        const RAW_SECTOR: usize = 2352;
-        const SYNC: [u8; 12] = [
-            0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00,
-        ];
-
         let end = lba
             .checked_add(count)
             .filter(|&end| end <= self.layout.leadout_lba)
