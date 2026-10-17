@@ -7,7 +7,7 @@ ReMech2 is an **unofficial** open-source reimplementation of the game _MechWarri
 This is still a work-in-progress and things are rough and hacky, but the game currently works well enough to play on Windows 11 or Linux.
 
 > [!IMPORTANT]
-> **This project does not include the original game data at all.** You must supply your own copy of the game to run it.
+> **This project does not include the original game data at all.** You must supply your own copy of the game to run it. See [Running](#running).
 
 <p align="center">
 <img width="1366" height="768" alt="image" src="assets/screenshot1.png" />
