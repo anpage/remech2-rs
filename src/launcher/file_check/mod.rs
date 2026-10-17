@@ -8,24 +8,17 @@ use std::{
     },
 };
 
-use anyhow::{Context, Result, bail};
-use gamedisc::{
-    ReadSeek, TrackKind,
-    audio::{Audio, FlacSink, rip_track, toc_from_tracks},
-    iso::IsoFs,
-};
+use anyhow::{Result, bail};
+use gamedisc::{ReadSeek, iso::IsoFs};
 use tracing::{debug, warn};
 
 use super::{Action, Stage};
 use crate::{
-    cd_audio,
     files::{self},
-    settings,
+    launcher::{CD_MARKER_FILE, centered_window, detect_discs, music_check::MusicCheck},
 };
 
 mod list;
-
-const CD_MARKER_FILE: &str = "OLD_HERC.DRV";
 
 #[derive(Clone, Debug)]
 struct CopyError {
@@ -36,7 +29,7 @@ struct CopyError {
 #[derive(Debug)]
 enum CopyStatus {
     Copying((Option<String>, f32)),
-    Done { rip_from: Option<PathBuf> },
+    Done,
     Error(CopyError),
 }
 
@@ -59,7 +52,7 @@ pub struct FileCheck {
     copying_error: Option<CopyError>,
     discs: Vec<PathBuf>,
     choosing_disc: bool,
-    rip_offer: Option<PathBuf>,
+    installed_from: Option<PathBuf>,
 }
 
 impl FileCheck {
@@ -72,7 +65,7 @@ impl FileCheck {
             copying_error: None,
             discs: detect_discs(),
             choosing_disc: false,
-            rip_offer: None,
+            installed_from: None,
         }
     }
 
@@ -116,6 +109,11 @@ impl FileCheck {
         fs::create_dir_all(files::resolve_in(game, "LAUNCH")).unwrap();
         fs::create_dir_all(files::resolve_in(game, "SMK")).unwrap();
 
+        self.installed_from = match &source {
+            Source::Image(path) => Some(path.clone()),
+            _ => None,
+        };
+
         std::thread::spawn(move || {
             let fail = |path: &Path, error: String| {
                 let mut status = status.lock().unwrap();
@@ -123,11 +121,6 @@ impl FileCheck {
                     file: path.to_string_lossy().to_string(),
                     error,
                 });
-            };
-
-            let image = match &source {
-                Source::Image(path) => Some(path.clone()),
-                _ => None,
             };
 
             let copier = match source {
@@ -166,60 +159,35 @@ impl FileCheck {
                     }
                 }
             }
-            let rip_from = image.filter(|path| should_offer_rip(path));
-            *status.lock().unwrap() = CopyStatus::Done { rip_from };
+
+            *status.lock().unwrap() = CopyStatus::Done;
         });
 
-        self.copying_files = true;
-    }
-
-    fn start_rip(&mut self, image: PathBuf) {
-        self.copying_error = None;
-        self.copying_status = Arc::new(Mutex::new(CopyStatus::Copying((None, 0.0))));
-        let status = self.copying_status.clone();
-
-        std::thread::spawn(move || {
-            let report = |label: String, progress: f32| {
-                *status.lock().unwrap() = CopyStatus::Copying((Some(label), progress));
-            };
-            *status.lock().unwrap() = match rip_music(&image, &report) {
-                Ok(()) => CopyStatus::Done { rip_from: None },
-                Err(e) => CopyStatus::Error(CopyError {
-                    file: image.to_string_lossy().into(),
-                    error: format!("{e:#}"),
-                }),
-            };
-        });
         self.copying_files = true;
     }
 
     fn copy_error_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
         let mut quit = false;
-        egui::Window::new("🚫 Error Copying Files")
-            .resizable(false)
-            .collapsible(false)
-            .pivot(egui::Align2::CENTER_CENTER)
-            .fixed_pos(ctx.content_rect().center())
-            .show(ctx, |ui| {
-                ui.label("An error occurred while copying the game files.");
-                ui.add_space(10.0);
-                ui.label(format!(
-                    "Error copying {}:",
-                    self.copying_error.as_ref().unwrap().file
-                ));
-                ui.label(&self.copying_error.as_ref().unwrap().error);
-                ui.add_space(10.0);
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
-                    if ui.button("Quit").clicked() {
-                        quit = true;
-                    }
-                    if ui.button("Back").clicked() {
-                        self.copying_files = false;
-                        self.copying_error = None;
-                        self.refresh();
-                    }
-                });
+        centered_window("🚫 Error Copying Files", ctx).show(ctx, |ui| {
+            ui.label("An error occurred while copying the game files.");
+            ui.add_space(10.0);
+            ui.label(format!(
+                "Error copying {}:",
+                self.copying_error.as_ref().unwrap().file
+            ));
+            ui.label(&self.copying_error.as_ref().unwrap().error);
+            ui.add_space(10.0);
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
+                if ui.button("Quit").clicked() {
+                    quit = true;
+                }
+                if ui.button("Back").clicked() {
+                    self.copying_files = false;
+                    self.copying_error = None;
+                    self.refresh();
+                }
             });
+        });
 
         if quit {
             bail!("User chose to quit");
@@ -237,38 +205,33 @@ impl FileCheck {
             let status = self.copying_status.lock().unwrap();
             match *status {
                 CopyStatus::Copying(ref progress) => progress.clone(),
-                CopyStatus::Done { ref rip_from } => {
+                CopyStatus::Done => {
                     self.copying_files = false;
                     self.missing_files = check_files();
-                    self.rip_offer = rip_from.clone();
                     return Ok(Action::Nothing);
                 }
                 CopyStatus::Error(ref file) => {
                     self.copying_error = Some(file.clone());
+                    self.installed_from = None;
                     return Ok(Action::Nothing);
                 }
             }
         };
 
-        egui::Window::new("🗐 Installing")
-            .resizable(false)
-            .collapsible(false)
-            .pivot(egui::Align2::CENTER_CENTER)
-            .fixed_pos(ctx.content_rect().center())
-            .show(ctx, |ui| {
-                ui.label("Please wait while the game data is installed.");
-                ui.add_space(10.0);
-                if let Some(status) = status {
-                    ui.label(status);
-                } else {
-                    ui.label("Copying...");
-                }
-                ui.add_space(10.0);
-                let progress_bar = egui::ProgressBar::new(progress)
-                    .show_percentage()
-                    .animate(true);
-                ui.add(progress_bar);
-            });
+        centered_window("🗐 Installing", ctx).show(ctx, |ui| {
+            ui.label("Please wait while the game data is installed.");
+            ui.add_space(10.0);
+            if let Some(status) = status {
+                ui.label(status);
+            } else {
+                ui.label("Copying...");
+            }
+            ui.add_space(10.0);
+            let progress_bar = egui::ProgressBar::new(progress)
+                .show_percentage()
+                .animate(true);
+            ui.add(progress_bar);
+        });
 
         Ok(Action::Nothing)
     }
@@ -276,28 +239,21 @@ impl FileCheck {
     fn disc_picker_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
         let mut picked = None;
         let mut cancel = false;
-        egui::Window::new("💿 Choose a Disc")
-            .resizable(false)
-            .collapsible(false)
-            .pivot(egui::Align2::CENTER_CENTER)
-            .fixed_pos(ctx.content_rect().center())
-            .show(ctx, |ui| {
-                ui.label(
-                    "Several game discs were found. Which one should the files be copied from?",
-                );
-                ui.add_space(10.0);
-                for disc in &self.discs {
-                    if ui.button(disc.display().to_string()).clicked() {
-                        picked = Some(disc.clone());
-                    }
+        centered_window("💿 Choose a Disc", ctx).show(ctx, |ui| {
+            ui.label("Several game discs were found. Which one should the files be copied from?");
+            ui.add_space(10.0);
+            for disc in &self.discs {
+                if ui.button(disc.display().to_string()).clicked() {
+                    picked = Some(disc.clone());
                 }
-                ui.add_space(10.0);
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
-                    if ui.button("Cancel").clicked() {
-                        cancel = true;
-                    }
-                });
+            }
+            ui.add_space(10.0);
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
+                if ui.button("Cancel").clicked() {
+                    cancel = true;
+                }
             });
+        });
 
         if let Some(disc) = picked {
             self.choosing_disc = false;
@@ -305,48 +261,6 @@ impl FileCheck {
         } else if cancel {
             self.choosing_disc = false;
         }
-        Ok(Action::Nothing)
-    }
-
-    fn rip_offer_ui(&mut self, ctx: &egui::Context) -> Result<Action> {
-        enum Choice {
-            Rip,
-            Skip,
-        }
-
-        let mut choice: Option<Choice> = None;
-        egui::Window::new("💿 Rip Music")
-            .resizable(false)
-            .collapsible(false)
-            .pivot(egui::Align2::CENTER_CENTER)
-            .fixed_pos(ctx.content_rect().center())
-            .show(ctx, |ui| {
-                ui.label("This disc image contains CD audio music. Rip it now?");
-                ui.add_space(5.0);
-                ui.label("This will take a minute or two.");
-                ui.add_space(10.0);
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
-                    if ui.button("Rip").clicked() {
-                        choice = Some(Choice::Rip);
-                    }
-                    if ui.button("Skip").clicked() {
-                        choice = Some(Choice::Skip);
-                    }
-                });
-            });
-
-        match choice {
-            Some(Choice::Rip) => {
-                if let Some(image) = self.rip_offer.take() {
-                    self.start_rip(image)
-                }
-            }
-            Some(Choice::Skip) => {
-                self.rip_offer = None;
-            }
-            None => (),
-        }
-
         Ok(Action::Nothing)
     }
 
@@ -374,70 +288,65 @@ impl FileCheck {
 
         let picking = self.picked_source.is_some();
         let mut choice = None;
-        egui::Window::new("⚠ Missing Files")
-            .resizable(false)
-            .collapsible(false)
-            .pivot(egui::Align2::CENTER_CENTER)
-            .fixed_pos(ctx.content_rect().center())
-            .show(ctx, |ui| {
-                egui::CollapsingHeader::new(format!(
-                    "{} required game files are missing",
-                    self.missing_files.len()
-                ))
-                .id_salt("missing_files")
-                .default_open(false)
-                .show(ui, |ui| {
-                    egui::ScrollArea::vertical()
-                        .auto_shrink(true)
-                        .max_height(100.0)
-                        .show(ui, |ui| {
-                            ui.allocate_space(egui::Vec2::new(ui.available_width(), 0.0));
-                            for file in &self.missing_files {
-                                ui.label(file.path.to_string_lossy());
-                            }
-                        });
-                });
-                ui.add_space(10.0);
-                ui.label("Locate a CD, disc image, or folder to install the original game's data.");
-                ui.add_space(5.0);
-                ui.colored_label(
-                    ui.visuals().warn_fg_color,
-                    "⚠ Continuing without them will likely crash.",
-                );
-                ui.add_space(5.0);
-                ui.label("The original game played its music from CD audio tracks.");
-                ui.add_space(5.0);
-                ui.label("ReMech2 can rip the audio from a real disc or from a .bin/.cue image.");
-                ui.add_space(5.0);
-                ui.colored_label(
-                    ui.visuals().warn_fg_color,
-                    "⚠ Installing from a folder or .iso image will not include the music.",
-                );
-                ui.add_space(10.0);
-                if picking {
-                    ui.disable();
-                }
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
-                    if ui.button("Quit").clicked() {
-                        choice = Some(Choice::Quit);
-                    }
-                    if ui.button("Retry").clicked() {
-                        choice = Some(Choice::Retry);
-                    }
-                    if ui.button("Continue").clicked() {
-                        choice = Some(Choice::Skip);
-                    }
-                    if ui.button("Folder…").clicked() {
-                        choice = Some(Choice::LocateFolder);
-                    }
-                    if ui.button("Image…").clicked() {
-                        choice = Some(Choice::LocateImage);
-                    }
-                    if !self.discs.is_empty() && ui.button("Disc…").clicked() {
-                        choice = Some(Choice::LocateDisc);
-                    }
-                });
+        centered_window("⚠ Missing Files", ctx).show(ctx, |ui| {
+            egui::CollapsingHeader::new(format!(
+                "{} required game files are missing",
+                self.missing_files.len()
+            ))
+            .id_salt("missing_files")
+            .default_open(false)
+            .show(ui, |ui| {
+                egui::ScrollArea::vertical()
+                    .auto_shrink(true)
+                    .max_height(100.0)
+                    .show(ui, |ui| {
+                        ui.allocate_space(egui::Vec2::new(ui.available_width(), 0.0));
+                        for file in &self.missing_files {
+                            ui.label(file.path.to_string_lossy());
+                        }
+                    });
             });
+            ui.add_space(10.0);
+            ui.label("Locate a CD, disc image, or folder to install the original game's data.");
+            ui.add_space(5.0);
+            ui.colored_label(
+                ui.visuals().warn_fg_color,
+                "⚠ Continuing without them will likely crash.",
+            );
+            ui.add_space(5.0);
+            ui.label("The original game played its music from CD audio tracks.");
+            ui.add_space(5.0);
+            ui.label("ReMech2 can rip the audio from a real disc or from a .bin/.cue image.");
+            ui.add_space(5.0);
+            ui.colored_label(
+                ui.visuals().warn_fg_color,
+                "⚠ Installing from a folder or .iso image will not include the music.",
+            );
+            ui.add_space(10.0);
+            if picking {
+                ui.disable();
+            }
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
+                if ui.button("Quit").clicked() {
+                    choice = Some(Choice::Quit);
+                }
+                if ui.button("Retry").clicked() {
+                    choice = Some(Choice::Retry);
+                }
+                if ui.button("Continue").clicked() {
+                    choice = Some(Choice::Skip);
+                }
+                if ui.button("Folder…").clicked() {
+                    choice = Some(Choice::LocateFolder);
+                }
+                if ui.button("Image…").clicked() {
+                    choice = Some(Choice::LocateImage);
+                }
+                if !self.discs.is_empty() && ui.button("Disc…").clicked() {
+                    choice = Some(Choice::LocateDisc);
+                }
+            });
+        });
 
         match choice {
             Some(Choice::Quit) => bail!("User chose to quit"),
@@ -445,7 +354,7 @@ impl FileCheck {
                 self.refresh();
                 Ok(Action::Nothing)
             }
-            Some(Choice::Skip) => Ok(Action::Break),
+            Some(Choice::Skip) => Ok(self.next_stage()),
             Some(Choice::LocateFolder) => {
                 self.pick_folder();
                 Ok(Action::Nothing)
@@ -465,6 +374,10 @@ impl FileCheck {
             None => Ok(Action::Nothing),
         }
     }
+
+    fn next_stage(&mut self) -> Action {
+        Action::Continue(Box::new(MusicCheck::new(self.installed_from.take())))
+    }
 }
 
 impl Stage for FileCheck {
@@ -473,12 +386,8 @@ impl Stage for FileCheck {
             return self.copy_ui(ctx);
         }
 
-        if self.rip_offer.is_some() {
-            return self.rip_offer_ui(ctx);
-        }
-
         if self.missing_files.is_empty() {
-            return Ok(Action::Break);
+            return Ok(self.next_stage());
         }
 
         if self.choosing_disc {
@@ -646,66 +555,4 @@ fn check_files() -> Vec<MissingFile> {
     }
 
     missing_files
-}
-
-fn detect_discs() -> Vec<PathBuf> {
-    gamedisc::volumes::optical_volumes()
-        .into_iter()
-        .map(|volume| volume.mount_point)
-        .filter(|mount_point| files::resolve_in(mount_point, CD_MARKER_FILE).exists())
-        .collect()
-}
-
-fn should_offer_rip(image: &Path) -> bool {
-    !cd_audio::missing_used_tracks().is_empty()
-        && gamedisc::open_image_audio(image)
-            .ok()
-            .flatten()
-            .is_some_and(|source| source.tracks().iter().any(|t| t.kind == TrackKind::Audio))
-}
-
-fn rip_music(image: &Path, report: &dyn Fn(String, f32)) -> Result<()> {
-    let source = gamedisc::open_image_audio(image)?.context("the image has no audio")?;
-    let toc = toc_from_tracks(source.tracks());
-
-    let tracks: Vec<u8> = toc
-        .tracks
-        .iter()
-        .filter(|t| t.is_audio)
-        .map(|t| t.number)
-        .collect();
-
-    let music_dir = files::resolve(&settings::get().audio.music_path);
-    fs::create_dir_all(&music_dir)?;
-
-    for (i, &number) in tracks.iter().enumerate() {
-        let label = format!("Ripping track {} of {}", i + 1, tracks.len());
-        let path = music_dir.join(format!("track{number:02}.flac"));
-
-        let result = (|| -> Result<()> {
-            let mut sink = FlacSink::new(BufWriter::new(fs::File::create(&path)?));
-
-            rip_track(
-                &Audio(&*source),
-                &toc,
-                number,
-                &mut sink,
-                &mut |done, total| {
-                    let within = done as f32 / total as f32;
-                    report(label.clone(), (i as f32 + within) / tracks.len() as f32);
-                },
-            )?;
-
-            sink.into_inner().flush()?;
-
-            Ok(())
-        })();
-
-        if let Err(e) = result {
-            let _ = fs::remove_file(&path);
-            return Err(e);
-        }
-    }
-
-    Ok(())
 }

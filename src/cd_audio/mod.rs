@@ -13,17 +13,23 @@ const MAX_TRACK: i32 = 99;
 /// 22 and 25 are leftover Alper tracks and 27 is either a leftover Hwang track or
 /// a few seconds of track 5, depending on the disc.
 /// Kerensky help you if you have a SoftKey disc, which lacks music entirely.
-const USED_TRACKS: [i32; 23] = [
+pub(crate) const USED_TRACKS: [i32; 23] = [
     2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 26,
 ];
 
 /// Used tracks with no matching file in the music folder
 pub fn missing_used_tracks() -> Vec<i32> {
-    let found = CdAudioPlayer::scan_for_tracks().unwrap_or_default();
+    let present = present_tracks();
     USED_TRACKS
         .into_iter()
-        .filter(|&number| !found.iter().any(|track| track.number == number))
+        .filter(|n| !present.contains(n))
         .collect()
+}
+
+pub fn present_tracks() -> Vec<i32> {
+    CdAudioPlayer::scan_for_tracks()
+        .map(|tracks| tracks.iter().map(|t| t.number).collect())
+        .unwrap_or_default()
 }
 
 #[repr(C)]

@@ -110,6 +110,7 @@ impl VideoSettings {
 #[serde(default)]
 pub struct AudioSettings {
     pub music_path: String,
+    pub ask_for_music: bool,
     pub effects_volume: UpTo<100>,
     pub voice_volume: UpTo<100>,
     pub music_volume: UpTo<100>,
@@ -119,6 +120,7 @@ impl Default for AudioSettings {
     fn default() -> Self {
         Self {
             music_path: "Music".to_owned(),
+            ask_for_music: true,
             effects_volume: UpTo(100),
             voice_volume: UpTo(100),
             music_volume: UpTo(100),
