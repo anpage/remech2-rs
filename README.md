@@ -77,7 +77,7 @@ Any disc with the software-rendered release, either for DOS or Windows 95:
 
 > [!NOTE]
 > Some later releases of the Windows and DOS combo discs have a few duplicated music tracks that overwrite the intended songs.
-> ReMech 2 has no way to account for this, so ideally you'll want to use the MS-DOS-only, "Pentium Edition," or SideWinder 3D Pro discs.
+> ReMech2 has no way to account for this, so ideally you'll want to use the MS-DOS-only, "Pentium Edition," or SideWinder 3D Pro discs.
 
 > [!CAUTION]
 > The SoftKey release lacks CD audio completely.
