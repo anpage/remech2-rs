@@ -15,13 +15,14 @@ This is still a work-in-progress and things are rough and hacky, but the game cu
 
 ## Features
 
-- A new "launcher" that runs before the sim
-  - Checks the game's files
-  - Can install the game from CD or folder
+- A new installer that runs before the sim
+  - Checks the game's files and music
+  - Can install the game from CD-ROM, .ISO or .BIN/.CUE image, or folder
 - Improved mouse input
 - Advanced support for joysticks and other devices (HOTAS/HOSAS)
 - An internal MIDI synthesizer and soundfont
 - Music playback from files instead of CD audio
+- Optional automatic ripping of CD audio to FLAC
 - Wgpu-based, aspect-correct drawing and upscaling (Vulkan/DirectX/OpenGL)
 - 16:9 Hor+ widescreen support
 - Unlocked framerates (up to 181 FPS, experimental)
@@ -40,10 +41,29 @@ There is more to come as work progresses.
 
 ## Running
 
-Documentation is forthcoming. You'll need an installed copy of the **English** version of the original game.
+You'll need a copy of the **English** version of the original game. See "Supported Versions" below. This can either be a real CD or your own backup in .ISO or .BIN/.CUE format.
 
-If you don't currently have the game installed, run ReMech2 from within its own (writable) folder with the CD inserted or mounted.
-You will be prompted to copy the necessary files from the CD or an existing installation.
+### Game Not Installed
+
+If you don't currently have the game installed, simply run ReMech2.
+You will be prompted to install the necessary data from CD, a disc image, or a folder.
+The game data will be installed to one of these locations, depending on system settings:
+
+- Windows: `%LOCALAPPDATA%\ReMech2\data\game`
+- Linux: `~/.local/share/remech2/game`
+
+If installing from a source that includes CD audio, the music will be automatically ripped to the correct location as FLAC files.
+See "Music" below.
+
+#### Portable Mode
+
+If you want ReMech2 to install the game files into the game's working directory, create a file called `portable.txt`.
+All game data, configuration files, save files, and logs will be written to this folder.
+
+### Game Already Installed
+
+If you do currently have an installed copy of the game, ReMech2 can be dropped into the same folder as `MW2.PRJ`.
+It will run in portable mode in this case as well.
 
 ### Supported Versions
 
@@ -54,6 +74,14 @@ Any disc with the software-rendered release, either for DOS or Windows 95:
 - Windows 95/MS-DOS
 - SideWinder 3D Pro
 - SoftKey
+
+> [!NOTE]
+> Some later releases of the Windows and DOS combo discs have a few duplicated music tracks that overwrite the intended songs.
+> ReMech 2 has no way to account for this, so ideally you'll want to use the MS-DOS-only, "Pentium Edition," or SideWinder 3D Pro discs.
+
+> [!CAUTION]
+> The SoftKey release lacks CD audio completely.
+> If that's what you have, you'll need to go without in-game music or source the tracks from elsewhere.
 
 ### Not Supported
 
@@ -69,23 +97,28 @@ Ghost Bear's Legacy and Mercenaries are also **not supported**.
 
 ### Music
 
-The original game played its background music from the Red Book audio on the CD.
-ReMech2 plays the game's background music from files instead.
-Put the tracks in a `Music` folder in the game's working directory, named `track02.wav` through `track27.wav`, case insensitive.
-The numbering matches the CD's original track numbers, which is why it starts at 2. Track 1 on the disc is always game data.
+> [!IMPORTANT]
+> The original game played its background music from the Red Book audio on the CD.
+> **ReMech2 plays the game's background music from files instead.**
 
-OGG, MP3, and FLAC files are also supported.
+Put the tracks in a `Music` folder in the game data directory (next to `MW2.PRJ`), named `track02` through `track27`, case insensitive.
+If any tracks are missing, ReMech2 will prompt you to rip them, or you can open the configured music folder from a button in the UI.
+
+> [!NOTE]
+> **WAV**, **OGG**, **MP3**, and **FLAC** files are supported.
+
+The numbering matches the CD's original track numbers, which is why it starts at 2. Track 1 on the disc is always game data.
 
 If the folder is missing or contains no files matching that pattern, the game has no music.
 
-The folder can be changed in the `remech2.ini` that is created the first time the game is run.
+The folder can be changed in the `remech2.toml` that is created the first time the game is run.
 
 ```toml
 [audio]
 music_path="Music"
 ```
 
-`music_path` can either be relative to the working directory or an absolute path.
+`music_path` can either be relative to the game data directory or an absolute path.
 
 ## Building
 
@@ -125,7 +158,7 @@ Under Windows:
 The decompiled source code in `remech2-sys/original` comes from the [demech2 project](https://github.com/anpage/demech2), which used an LLM and assembly-diffing scripts to convert an annotated Ghidra project into C/C++ code that closely matches the original game's behavior.
 Over time, this decompiled code will be replaced with Rust.
 
-The majority of the Rust code is written by hand.
+The majority of the Rust code is written by hand, while many automated tests were witten by an LLM.
 
 This README and all documentation included in this project are written by hand.
 
