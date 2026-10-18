@@ -2,9 +2,9 @@ use std::time::Duration;
 
 use anyhow::Result;
 use remech2_sys::shell;
-use rodio::{
-    ChannelCount, DeviceSinkBuilder, MixerDeviceSink, Player, SampleRate, buffer::SamplesBuffer, nz,
-};
+use rodio::{ChannelCount, Player, SampleRate, buffer::SamplesBuffer, nz};
+
+use crate::audio;
 
 /// How an audio track's samples are laid out
 #[derive(Clone, Copy)]
@@ -15,17 +15,15 @@ pub struct AudioFormat {
 }
 
 pub struct Sound {
-    _stream: MixerDeviceSink,
     sink: Player,
 }
 
 impl Sound {
-    /// Open a stream and play `pcm`.
+    /// Play `pcm`.
     /// Interleaved unsigned 8-bit or signed little-endian 16-bit samples, depending on the track's format.
     pub fn start(pcm: &[u8], format: AudioFormat) -> Result<Self> {
         let samples = to_f32(pcm, format.bits);
-        let stream = DeviceSinkBuilder::open_default_sink()?;
-        let sink = Player::connect_new(stream.mixer());
+        let sink = Player::connect_new(&audio::primary()?);
 
         // Set volume based on the global effects volume
         // The original game didn't do this and FMVs were always full volume
@@ -39,10 +37,7 @@ impl Sound {
             samples,
         ));
         sink.play();
-        Ok(Self {
-            _stream: stream,
-            sink,
-        })
+        Ok(Self { sink })
     }
 
     pub fn position(&self) -> Duration {

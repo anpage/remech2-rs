@@ -1,52 +1,47 @@
-use std::sync::{Arc, Mutex};
-
 use rodio::{
-    ChannelCount, DeviceSinkBuilder, MixerDeviceSink, SampleRate, Source,
-    mixer::Mixer,
-    source::{LimitSettings, Zero},
+    ChannelCount, SampleRate, Source,
+    mixer::{self, Mixer},
+    source::Zero,
 };
+use tracing::error;
 
-struct Inner {
-    // Keep stream alive inside the driver
-    #[allow(dead_code)]
-    stream: MixerDeviceSink,
-    mixer: Mixer,
-    mono: bool,
-}
+use crate::audio;
 
 #[derive(Clone)]
-pub struct Driver(Arc<Mutex<Inner>>);
+pub struct Driver {
+    mixer: Mixer,
+    rate: SampleRate,
+    mono: bool,
+}
 
 impl Driver {
     pub fn new(channels: u16, _sample_rate: u32) -> Option<Self> {
         let channels = ChannelCount::new(channels)?;
-        let stream = DeviceSinkBuilder::from_default_device()
-            .and_then(|b| b.with_channels(channels).open_stream())
-            .inspect_err(|e| tracing::error!("failed to open audio stream: {e}"))
+        let primary = audio::primary()
+            .inspect_err(|e| error!("failed to open audio stream: {e}"))
             .ok()?;
-        let out_rate = stream.config().sample_rate();
-        let (mixer, mix_source) = rodio::mixer::mixer(channels, out_rate);
-        let master = mix_source
-            .mix(Zero::new(channels, out_rate))
-            .limit(LimitSettings::gaming());
-        stream.mixer().add(master);
-        Some(Driver(Arc::new(Mutex::new(Inner {
-            stream,
+        let rate = audio::sample_rate()?;
+        let (mixer, mix_source) = mixer::mixer(channels, rate);
+
+        primary.add(mix_source.mix(Zero::new(channels, rate)));
+
+        Some(Self {
             mixer,
+            rate,
             mono: channels.get() == 1,
-        }))))
+        })
     }
 
     pub fn mixer(&self) -> Mixer {
-        self.0.lock().unwrap().mixer.clone()
+        self.mixer.clone()
     }
 
     pub fn is_mono(&self) -> bool {
-        self.0.lock().unwrap().mono
+        self.mono
     }
 
     /// The device's actual output rate. Voices handle resampling to this.
     pub fn sample_rate(&self) -> SampleRate {
-        self.0.lock().unwrap().stream.config().sample_rate()
+        self.rate
     }
 }

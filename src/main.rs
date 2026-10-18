@@ -13,6 +13,7 @@ use crate::display::Overlay;
 mod about;
 mod ailrs;
 mod app;
+mod audio;
 mod cd_audio;
 mod display;
 mod drawmode;
