@@ -32,6 +32,8 @@ pub struct VideoSettings {
     pub window_width: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub window_height: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub backend: Option<GraphicsBackend>,
     /// The game's internal resolution
     pub render_width: u32,
     pub render_height: u32,
@@ -55,6 +57,7 @@ impl Default for VideoSettings {
             window_height: None,
             render_width: 1024,
             render_height: 768,
+            backend: None,
             widescreen: false,
             vsync: true,
             framerate_limit: 180,
@@ -213,6 +216,24 @@ pub enum Skill {
     #[default]
     Medium,
     Hard,
+}
+
+#[derive(Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum GraphicsBackend {
+    Vulkan,
+    Dx12,
+    Gl,
+}
+
+impl From<GraphicsBackend> for wgpu::Backends {
+    fn from(backend: GraphicsBackend) -> Self {
+        match backend {
+            GraphicsBackend::Vulkan => Self::VULKAN,
+            GraphicsBackend::Dx12 => Self::DX12,
+            GraphicsBackend::Gl => Self::GL,
+        }
+    }
 }
 
 /// A whole number from 0 to `MAX`

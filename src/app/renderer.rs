@@ -38,9 +38,17 @@ impl Renderer {
     pub fn new(window: Arc<Window>) -> Result<Self> {
         let size = window.inner_size();
 
-        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::new_with_display_handle(
-            Box::new(window.clone()),
-        ));
+        let mut descriptor =
+            wgpu::InstanceDescriptor::new_with_display_handle(Box::new(window.clone()));
+
+        descriptor.backends = match settings::get().video.backend {
+            Some(backend) => backend.into(),
+            // Exclude auto-Vulkan on Windows. Thanks, Intel.
+            None if cfg!(windows) => wgpu::Backends::DX12 | wgpu::Backends::GL,
+            None => descriptor.backends,
+        };
+
+        let instance = wgpu::Instance::new(descriptor.with_env());
         let surface = instance.create_surface(window.clone())?;
         let adapter = pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
             compatible_surface: Some(&surface),
