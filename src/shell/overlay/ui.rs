@@ -171,7 +171,7 @@ impl OverlayUi {
 
         let mut menu_open = false;
 
-        let menu_locked = menu::locked();
+        let menu_locked = menu::locked() || app::cursor_hidden();
         if menu_locked {
             self.menu_visible = false;
         }
