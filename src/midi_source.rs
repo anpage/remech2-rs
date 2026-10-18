@@ -6,6 +6,8 @@ use rustysynth::{
     MidiFile, MidiFileLoopType, MidiFileSequencer, SoundFont, Synthesizer, SynthesizerSettings,
 };
 
+use crate::audio;
+
 enum StereoChannel {
     Left,
     Right,
@@ -16,6 +18,7 @@ enum StereoChannel {
 /// A little specialized for ReMech2 because it explicitly uses the XMI-style loop events and always loops.
 pub struct MidiSource {
     sequencer: MidiFileSequencer,
+    rate: SampleRate,
     last_channel: StereoChannel,
     right_sample: f32,
 }
@@ -32,7 +35,8 @@ impl MidiSource {
             MidiFileLoopType::FinalFantasy,
         )?);
 
-        let settings = SynthesizerSettings::new(44100);
+        let rate = audio::sample_rate().unwrap_or(nz!(44100));
+        let settings = SynthesizerSettings::new(rate.get() as i32);
         let mut synthesizer = Synthesizer::new(&sound_font, &settings)?;
         synthesizer.set_master_volume(1.0);
         let mut sequencer = MidiFileSequencer::new(synthesizer);
@@ -42,6 +46,7 @@ impl MidiSource {
 
         Ok(Self {
             sequencer,
+            rate,
             last_channel: StereoChannel::Right,
             right_sample: 0.0,
         })
@@ -87,8 +92,7 @@ impl Source for MidiSource {
     }
 
     fn sample_rate(&self) -> SampleRate {
-        // Always 44.1 kHz.
-        nz!(44100)
+        self.rate
     }
 
     fn total_duration(&self) -> Option<std::time::Duration> {

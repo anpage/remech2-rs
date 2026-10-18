@@ -23,8 +23,9 @@ impl MidiSequence {
             xmi_file.to_smf_file()
         };
 
-        let source = MidiSource::new(&midi_file[..])?;
         let sink = unsafe { (*subsystem).get_sink()? };
+        let source = MidiSource::new(&midi_file[..])?;
+
         sink.pause();
         sink.append(source);
 
