@@ -685,7 +685,7 @@ void UpdateDropView(void)
 	IntegrateMidpoint(&g_eyepoint->m_y, &g_dropSpeed, g_dropAcceleration, g_deltaTime);
 	g_eyepoint->m_x = x;
 	g_eyepoint->m_z = z;
-	g_eyepoint->m_heading += (g_currentClock - g_dropStartClock) * 300;
+	g_eyepoint->m_heading += (g_currentClock - g_dropStartClock) * 75 * g_deltaTime;
 }
 
 // Moves the free camera (mode 2): p_climb raises it, p_speed drives it forward (eased),
