@@ -46,6 +46,8 @@ fn present(source: Option<[usize; 4]>) {
                         Some(Overlay::Sim(overlay)) => overlay.ui(ctx),
                         None => {}
                     });
+                    // Hide the cursor everywhere but the launcher
+                    ctx.set_cursor_icon(egui::CursorIcon::None);
                 })
             });
         });

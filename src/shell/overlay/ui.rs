@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use egui::{
-    Color32, ColorImage, Context, CursorIcon, FontFamily, Order, PointerButton, Rect, TextStyle,
-    TextureHandle, Vec2,
+    Color32, ColorImage, Context, FontFamily, Order, PointerButton, Rect, TextStyle, TextureHandle,
+    Vec2,
 };
 use remech2_sys::{shared::c_mechMsgCommand, shell};
 
@@ -312,27 +312,25 @@ impl OverlayUi {
                 });
         }
 
-        if let Some(cursor_texture) = &self.cursor_texture {
-            ctx.set_cursor_icon(CursorIcon::None);
-
-            if !app::cursor_hidden() {
-                let cursor_pos_1 = egui::pos2(mouse_state.pos_x, mouse_state.pos_y);
-                let cursor_pos_2 = egui::pos2(
-                    mouse_state.pos_x + 29.0 * scale_factor,
-                    mouse_state.pos_y + 25.0 * scale_factor,
-                );
-                let cursor_image = egui::Shape::image(
-                    cursor_texture.id(),
-                    egui::Rect::from_two_pos(cursor_pos_1, cursor_pos_2),
-                    egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
-                    egui::Color32::WHITE,
-                );
-                ctx.layer_painter(egui::LayerId::new(
-                    Order::Foreground,
-                    egui::Id::new("cursor_layer"),
-                ))
-                .add(cursor_image);
-            }
+        if let Some(cursor_texture) = &self.cursor_texture
+            && !app::cursor_hidden()
+        {
+            let cursor_pos_1 = egui::pos2(mouse_state.pos_x, mouse_state.pos_y);
+            let cursor_pos_2 = egui::pos2(
+                mouse_state.pos_x + 29.0 * scale_factor,
+                mouse_state.pos_y + 25.0 * scale_factor,
+            );
+            let cursor_image = egui::Shape::image(
+                cursor_texture.id(),
+                egui::Rect::from_two_pos(cursor_pos_1, cursor_pos_2),
+                egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
+                egui::Color32::WHITE,
+            );
+            ctx.layer_painter(egui::LayerId::new(
+                Order::Foreground,
+                egui::Id::new("cursor_layer"),
+            ))
+            .add(cursor_image);
         }
 
         if !menu_locked {

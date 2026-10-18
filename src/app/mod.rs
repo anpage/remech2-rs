@@ -199,14 +199,9 @@ impl State {
         }
 
         let raw_input = egui_input.take_egui_input(window);
-        let cursor_hidden = mouse::cursor_hidden();
         let mut ui = ui;
         let full_output = self.egui_ctx.run_ui(raw_input, |root| {
-            let ctx = root.ctx();
-            ui(ctx);
-            if cursor_hidden {
-                ctx.set_cursor_icon(egui::CursorIcon::None);
-            }
+            ui(root.ctx());
         });
         egui_input.handle_platform_output(window, full_output.platform_output);
 
