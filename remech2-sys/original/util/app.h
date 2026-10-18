@@ -12,8 +12,6 @@ extern "C"
 
 	// Lets the window handle the events that are waiting for it without blocking.
 	void MechAppPump(void);
-	// The same, after waiting for an event
-	void MechAppWait(void);
 	// Non-zero while the window has the keyboard focus
 	int MechAppActive(void);
 

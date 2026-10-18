@@ -444,9 +444,7 @@ MechS32 PlotCenteredPixel(CenteredDraw* p_draw, MechS32 p_width, MechS32 p_heigh
 	pos.m_y = -(pos.m_y / 2) + 0x8000;
 	ScalePointToFrame(target, &pos, &pos);
 	VFX_pixel_write(target, pos.m_x, pos.m_y, p_draw->m_color);
-	if (g_windowActive) {
-		g_currentRefreshMode->m_flip();
-	}
+	g_currentRefreshMode->m_flip();
 
 	if (KeyboardPollKeyCode() == 0x1b) {
 		result = FALSE;

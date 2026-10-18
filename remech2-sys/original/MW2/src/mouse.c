@@ -31,19 +31,17 @@ MechS32 CenterCursor(void* p_data, MechS32 p_axis)
 	MechS32 x;
 	MechS32 y;
 
-	if (g_windowActive) {
-		x = g_gameWindowWidth / 2;
+	x = g_gameWindowWidth / 2;
+	y = g_gameWindowHeight / 2;
+	MechMouseGetPosition(&x, &y);
+	if (p_axis == 0) {
 		y = g_gameWindowHeight / 2;
-		MechMouseGetPosition(&x, &y);
-		if (p_axis == 0) {
-			y = g_gameWindowHeight / 2;
-		}
-		else if (p_axis == 1) {
-			x = g_gameWindowWidth / 2;
-		}
-
-		MechMouseSetPosition(x, y);
 	}
+	else if (p_axis == 1) {
+		x = g_gameWindowWidth / 2;
+	}
+
+	MechMouseSetPosition(x, y);
 
 	return 0;
 }
@@ -55,38 +53,27 @@ MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons)
 	MechS32 x;
 	MechS32 y;
 
-	if (g_windowActive) {
-		if (!g_cursorClipped || g_reclipCursor) {
-			// The original clipped the cursor to the window's client area.
-			MechMouseGrab(TRUE);
-			CenterCursor(p_data, 0);
-			CenterCursor(p_data, 1);
-			g_cursorClipped = TRUE;
-			g_reclipCursor = 0;
-		}
-
-		if (p_buttons) {
-			// Bit 0 is the left button, bit 1 the middle one and bit 2 the right one.
-			*p_buttons = MechMouseButtons();
-		}
-
-		if (p_position && MechMouseGetPosition(&x, &y)) {
-			point.x = x;
-			point.y = y;
-			if (IsInsideWindow(point.x, point.y)) {
-				p_position[0] = ((point.y * 2 - g_gameWindowHeight) << 16) / g_gameWindowHeight;
-				p_position[1] = ((point.x * 2 - g_gameWindowWidth) << 16) / g_gameWindowWidth;
-			}
-		}
+	if (!g_cursorClipped || g_reclipCursor) {
+		// The original clipped the cursor to the window's client area.
+		MechMouseGrab(TRUE);
+		CenterCursor(p_data, 0);
+		CenterCursor(p_data, 1);
+		g_cursorClipped = TRUE;
+		g_reclipCursor = 0;
 	}
-	else {
-		if (g_cursorClipped) {
-			MechMouseGrab(FALSE);
-			g_cursorClipped = FALSE;
-		}
 
-		*p_buttons = 0;
-		return 0;
+	if (p_buttons) {
+		// Bit 0 is the left button, bit 1 the middle one and bit 2 the right one.
+		*p_buttons = MechMouseButtons();
+	}
+
+	if (p_position && MechMouseGetPosition(&x, &y)) {
+		point.x = x;
+		point.y = y;
+		if (IsInsideWindow(point.x, point.y)) {
+			p_position[0] = ((point.y * 2 - g_gameWindowHeight) << 16) / g_gameWindowHeight;
+			p_position[1] = ((point.x * 2 - g_gameWindowWidth) << 16) / g_gameWindowWidth;
+		}
 	}
 
 	return 0;

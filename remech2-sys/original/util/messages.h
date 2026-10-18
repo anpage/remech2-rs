@@ -2,8 +2,8 @@
 #define MESSAGES_H
 
 // The game's message queue, implemented on the Rust side (src/messages.rs). Originally the
-// window's: the shell's screens post their transitions to it, and the window's input and
-// activation arrive through it. There is one queue and one handler, the running module's.
+// window's: the shell's screens post their transitions to it, and the window's input
+// arrives through it. There is one queue and one handler, the running module's.
 // Nothing here waits or looks at the window.
 
 #include "types.h"
@@ -22,7 +22,6 @@ extern "C"
 		c_mechMsgPaint = 0x000f,
 		c_mechMsgClose = 0x0010,
 		c_mechMsgQuit = 0x0012, // wParam is the exit code
-		c_mechMsgActivateApp = 0x001c,
 		// Key messages: wParam is the Windows virtual key. lParam has the character the key types
 		// without modifiers in bits 0 to 7 (0 if it isn't ASCII), the key's scan code in bits 16 to
 		// 23 and whether that is an extended one in bit 24.

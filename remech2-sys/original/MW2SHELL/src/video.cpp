@@ -1,6 +1,5 @@
 #include "video.h"
 
-#include "audiosubsystem.h"
 #include "decomp.h"
 #include "displaybackend.h"
 #include "elapsed.h"
@@ -137,12 +136,7 @@ LoopingMovie::LoopingMovie(MechChar* p_name, MechS32 p_left, MechS32 p_top)
 	m_height = m_smack->Height;
 	m_frame = 1;
 
-	if (g_windowActive != 0) {
-		result = g_currentDisplayBackend->m_acquireFramebuffer();
-	}
-	else {
-		result = -1;
-	}
+	result = g_currentDisplayBackend->m_acquireFramebuffer();
 
 	if (result == 0) {
 		SmackToBuffer(m_smack, m_left, m_top, 0x280, 0x1e0, g_videoDriver->m_screenBuffer.m_buffer, 0);
@@ -179,12 +173,7 @@ void LoopingMovie::MoveTo(MechS32 p_left, MechS32 p_top)
 	g_videoDriver->RestoreBackground(m_left, m_top, m_width, m_height);
 	m_left = p_left;
 	m_top = p_top;
-	if (g_windowActive != 0) {
-		result = g_currentDisplayBackend->m_acquireFramebuffer();
-	}
-	else {
-		result = -1;
-	}
+	result = g_currentDisplayBackend->m_acquireFramebuffer();
 
 	if (result == 0) {
 		SmackToBuffer(m_smack, m_left, m_top, 0x280, 0x1e0, g_videoDriver->m_screenBuffer.m_buffer, 0);
@@ -219,7 +208,7 @@ void LoopingMovie::Update()
 		return;
 	}
 
-	if ((g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1) == 0) {
+	if (g_currentDisplayBackend->m_acquireFramebuffer() == 0) {
 		m_frame++;
 		if (m_smack->Frames < m_frame) {
 			m_frame = 1;
@@ -278,12 +267,7 @@ void PlayFullscreenVideoFrame()
 			g_videoDriver->SetPalette(palette, 0);
 		}
 
-		if (g_windowActive) {
-			result = g_currentDisplayBackend->m_acquireFramebuffer();
-		}
-		else {
-			result = -1;
-		}
+		result = g_currentDisplayBackend->m_acquireFramebuffer();
 
 		if (result == 0) {
 			SmackDoFrame(video->m_smack);
@@ -498,46 +482,6 @@ MechS32 IsFullscreenVideoPlaying()
 	return 0;
 }
 
-// Pauses the full-screen video when the shell loses the focus: steps back a frame and keeps the
-// screen as the background.
-// FUNCTION: MW2SHELL 0x10016c1d
-void PauseFullscreenVideo()
-{
-	g_fmvSlots[0].m_frame--;
-	g_videoDriver->CopyScreenToBackground();
-}
-
-// Resumes the full-screen video when the shell gets the focus back: restores the screen and
-// redraws the frame PauseFullscreenVideo stepped back to. The original didn't take the frame's
-// palette, which lost the intro's when the focus came as it started.
-// FUNCTION: MW2SHELL 0x10016c3e
-void ResumeFullscreenVideo()
-{
-	MechS32 result;
-	Smack* smack;
-
-	smack = g_fmvSlots[0].m_smack;
-	SmackGoto(smack, g_fmvSlots[0].m_frame);
-	if (smack->NewPalette) {
-		g_videoDriver->SetPalette((PaletteColor*) (smack->PalType == 1 ? smack->Palette : smack->AlternatePalette), 0);
-	}
-
-	g_videoDriver->CopyBackgroundToScreen();
-	if (g_windowActive != 0) {
-		result = g_currentDisplayBackend->m_acquireFramebuffer();
-	}
-	else {
-		result = -1;
-	}
-
-	if (result == 0) {
-		SmackDoFrame(g_fmvSlots[0].m_smack);
-	}
-
-	SmackNextFrame(g_fmvSlots[0].m_smack);
-	g_fmvSlots[0].m_frame++;
-}
-
 // The original loads p_mask before p_value in p_mask & p_value; swapping the operands didn't flip it.
 // The first statement reloads and stores the flags instead of and-ing them in place: an unsigned
 // operation on a signed field does that, which is why the mask is cast.
@@ -656,12 +600,7 @@ MechS32 LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 
 	if (p_slot->m_flags & 0x1000) {
 		p_slot->m_frame = 1;
-		if (g_windowActive != 0) {
-			result = g_currentDisplayBackend->m_acquireFramebuffer();
-		}
-		else {
-			result = -1;
-		}
+		result = g_currentDisplayBackend->m_acquireFramebuffer();
 
 		if (result == 0) {
 			SmackToBuffer(

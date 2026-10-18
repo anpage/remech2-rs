@@ -20,8 +20,7 @@ use winit::{
 };
 
 use remech2_sys::shared::{
-    c_mechMsgActivateApp, c_mechMsgClose, c_mechMsgDestroy, c_mechMsgKeyDown, c_mechMsgKeyUp,
-    c_mechMsgMouseMove,
+    c_mechMsgClose, c_mechMsgDestroy, c_mechMsgKeyDown, c_mechMsgKeyUp, c_mechMsgMouseMove,
 };
 
 use crate::{
@@ -88,21 +87,13 @@ impl App {
     /// Handles the window events that are waiting, without blocking.
     /// Returns whether the window was closed and the caller should quit.
     pub fn pump(&mut self) -> bool {
-        self.pump_events(Some(Duration::ZERO))
+        self.pump_events()
     }
 
-    /// Like `pump`, but waits for an event first
-    pub fn wait(&mut self) -> bool {
-        self.pump_events(None)
-    }
-
-    fn pump_events(&mut self, timeout: Option<Duration>) -> bool {
-        let timeout = if self.state.quit {
-            Some(Duration::ZERO)
-        } else {
-            timeout
-        };
-        let status = self.event_loop.pump_app_events(timeout, &mut self.state);
+    fn pump_events(&mut self) -> bool {
+        let status = self
+            .event_loop
+            .pump_app_events(Some(Duration::ZERO), &mut self.state);
         self.state.controllers.poll();
         // One for however many times the cursor moved
         if let Some(window) = &self.state.window
@@ -281,7 +272,6 @@ impl ApplicationHandler for State {
                 if let Some(window) = &self.window {
                     self.mouse.focused(window, focused);
                 }
-                messages::post_to_game(c_mechMsgActivateApp, focused.into(), 0);
             }
             WindowEvent::CursorMoved { position, .. } => self.mouse.cursor_moved(Some(position)),
             WindowEvent::CursorLeft { .. } => self.mouse.cursor_moved(None),
@@ -353,11 +343,6 @@ fn post_key(event: &KeyEvent) {
 #[unsafe(export_name = "MechAppPump")]
 pub extern "C" fn pump() {
     with(App::pump);
-}
-
-#[unsafe(export_name = "MechAppWait")]
-pub extern "C" fn wait() {
-    with(App::wait);
 }
 
 #[unsafe(export_name = "MechAppActive")]

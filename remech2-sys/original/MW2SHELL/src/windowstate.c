@@ -6,13 +6,6 @@
 // The shell window's state. The original keeps these in this object's data, between joystick.c's
 // and mw2prj.c's.
 
-// The window class name.
-// GLOBAL: MW2SHELL 0x1006a9c0
-char g_windowClassName[0x10] = "MECHWARRIOR 2";
-
-// GLOBAL: MW2SHELL 0x1006a9d0
-MechS32 g_windowActive = 1;
-
 // Whether the game is paused: ToggleFullScreen then leaves the timer paused, and
 // AdjustWindowSize shows the cursor in a window and hides it full screen. The simulator's copy of
 // the refresh mode code reads its pause flag here (g_simPaused); the shell never sets it.

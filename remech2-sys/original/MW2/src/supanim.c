@@ -110,7 +110,7 @@ void StartSupAnim(MechS32 p_slowFade)
 	g_supAnimTarget.m_window = &g_supAnimBuffer;
 	g_supAnimTarget.m_x1 = g_refreshModeWidth - 1;
 	g_supAnimTarget.m_y1 = g_refreshModeHeight - 1;
-	if ((g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1) != 0) {
+	if (g_currentDisplayBackend->m_acquireFramebuffer() != 0) {
 		DebugPrint("StartSupanim: LockDisplayBuffer failed.\n");
 		return;
 	}
@@ -118,9 +118,7 @@ void StartSupAnim(MechS32 p_slowFade)
 	g_supAnimBuffer.m_buffer = g_mainPixelBuffer.m_buffer;
 	VFX_pane_wipe(&g_supAnimTarget, 0);
 	VFX_shape_draw(&g_supAnimTarget, g_supAnimBackdrop, 0, 0, 0);
-	if (g_windowActive) {
-		g_currentRefreshMode->m_flip();
-	}
+	g_currentRefreshMode->m_flip();
 
 	VFX_shape_palette(g_supAnimBackdrop, 0, (MechU8*) palette);
 	if (p_slowFade) {
@@ -144,12 +142,10 @@ void StartSupAnim(MechS32 p_slowFade)
 	g_supAnimX = (g_supAnimTarget.m_x1 - g_supAnimTarget.m_x0) * 0.55;
 	g_supAnimY = 0;
 	if (!g_isNetworkGame) {
-		if ((g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1) == 0) {
+		if (g_currentDisplayBackend->m_acquireFramebuffer() == 0) {
 			VFX_shape_draw(&g_supAnimTarget, g_supAnimBackdrop, 0, 0, 0);
 			VFX_shape_draw(&g_supAnimTarget, g_supAnimShape, 0, g_supAnimX, g_supAnimY);
-			if (g_windowActive) {
-				g_currentRefreshMode->m_flip();
-			}
+			g_currentRefreshMode->m_flip();
 		}
 	}
 }

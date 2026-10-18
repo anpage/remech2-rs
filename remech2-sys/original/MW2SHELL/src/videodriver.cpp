@@ -1,6 +1,5 @@
 #include "videodriver.h"
 
-#include "audiosubsystem.h"
 #include "debugprint.h"
 #include "displaybackend.h"
 #include "refreshmode.h"
@@ -40,8 +39,8 @@ PaletteColor g_tempPalette[0x100];
 // GLOBAL: MW2SHELL 0x10079998
 MechU8 g_defaultColorMap[0x100];
 
-// 0 once the framebuffer can be drawn to; -1 while the window is inactive.
-#define ACQUIRE_FRAMEBUFFER() (g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1)
+// 0 once the framebuffer can be drawn to.
+#define ACQUIRE_FRAMEBUFFER() (g_currentDisplayBackend->m_acquireFramebuffer())
 
 // FUNCTION: MW2SHELL 0x10005e70
 void QuitWithVDriverError(MechS32 p_code)
@@ -84,8 +83,7 @@ VideoDriver::VideoDriver()
 	m_screenBuffer.m_xMax = m_backBuffer.m_xMax = m_width - 1;
 	m_screenBuffer.m_yMax = m_backBuffer.m_yMax = m_height - 1;
 
-	m_backBuffer.m_buffer =
-		(undefined*) MechHeapAllocZeroed(g_primaryHeap, m_width * m_height);
+	m_backBuffer.m_buffer = (undefined*) MechHeapAllocZeroed(g_primaryHeap, m_width * m_height);
 	if (!m_backBuffer.m_buffer) {
 		QuitWithVDriverError(1);
 	}

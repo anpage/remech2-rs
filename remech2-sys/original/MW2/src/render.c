@@ -306,7 +306,7 @@ void Blit(void)
 		g_showHud = g_savedShowHud;
 		g_stretchPending = 0;
 	}
-	else if (g_windowActive) {
+	else {
 		g_currentRefreshMode->m_flip();
 	}
 }
@@ -318,9 +318,7 @@ void ShutdownRender(void)
 	ShutdownDrawBuffer();
 	if (g_bannerBuffer && g_currentPane.m_window) {
 		VFX_pane_wipe(&g_currentPane, 0);
-		if (g_windowActive) {
-			g_currentRefreshMode->m_flip();
-		}
+		g_currentRefreshMode->m_flip();
 	}
 
 	if (g_bannerBuffer) {

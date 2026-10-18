@@ -231,16 +231,6 @@ void KeyboardRecordKeyState(size_t p_virtualKey, MechU32 p_lParam, MechS32 p_pre
 	}
 }
 
-// FUNCTION: MW2 0x10042d55
-void KeyboardClearKeyStates(void)
-{
-	MechS32 i;
-
-	for (i = 0; i < 4; i++) {
-		g_keyStates[i] = 0;
-	}
-}
-
 // FUNCTION: MW2 0x10042d8f
 MechS16 KeyboardPollKeyCode(void)
 {

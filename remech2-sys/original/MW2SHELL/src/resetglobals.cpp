@@ -665,8 +665,6 @@ static const struct {
 	RESET_GLOBAL(g_defaultColorMap),
 
 	// windowstate.c
-	RESET_GLOBAL(g_windowClassName),
-	RESET_GLOBAL(g_windowActive),
 	RESET_GLOBAL(g_paused),
 	RESET_GLOBAL(g_menuDialogOpen),
 	RESET_GLOBAL(g_primaryHeap),

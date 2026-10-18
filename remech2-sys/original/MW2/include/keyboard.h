@@ -26,7 +26,6 @@ extern "C"
 	void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
 	MechS32 KeyboardReadKeyCode(MechS16* p_keyCode);
 	MechS32 KeyboardFlushKeyCodes(void);
-	void KeyboardClearKeyStates(void);
 	MechS16 KeyboardPollKeyCode(void);
 
 #ifdef __cplusplus

@@ -16,7 +16,6 @@
 #define InitGammaTable Sim_InitGammaTable
 #define InitRefreshMode Sim_InitRefreshMode
 #define InitializeResourceCache Sim_InitializeResourceCache
-#define KeyboardClearKeyStates Sim_KeyboardClearKeyStates
 #define KeyboardFlushKeyCodes Sim_KeyboardFlushKeyCodes
 #define KeyboardPollKeyCode Sim_KeyboardPollKeyCode
 #define KeyboardQueueKeyCode Sim_KeyboardQueueKeyCode
@@ -75,7 +74,6 @@
 #define g_resourceTypeTags Sim_g_resourceTypeTags
 #define g_soundConfig Sim_g_soundConfig
 #define g_textColors Sim_g_textColors
-#define g_windowActive Sim_g_windowActive
 #define g_windowMode Sim_g_windowMode
 
 #endif // SIM_NAMES_H

@@ -755,9 +755,7 @@ void UpdateDorcs(void)
 					FitRectToGif(&g_dorcsGifTarget, &g_dorcsGifTarget, g_dorcsGif);
 					VFX_pane_wipe(&g_currentPane, 0);
 					VFX_GIF_draw(&g_dorcsGifTarget, g_dorcsGif, g_dorcsGifState);
-					if (g_windowActive) {
-						g_currentRefreshMode->m_flip();
-					}
+					g_currentRefreshMode->m_flip();
 
 					VFX_GIF_palette(g_dorcsGif, (MechU8*) g_dorcsPalette);
 					g_currentDisplayBackend->m_blendPalettes(g_dorcsPalette, 0xb5);
@@ -775,9 +773,7 @@ void UpdateDorcs(void)
 		if (g_currentClock < g_dorcsTime) {
 			if (g_dorcsGifLoaded) {
 				VFX_GIF_draw(&g_dorcsGifTarget, g_dorcsGif, g_dorcsGifState);
-				if (g_windowActive) {
-					g_currentRefreshMode->m_flip();
-				}
+				g_currentRefreshMode->m_flip();
 			}
 		}
 		else {
@@ -794,9 +790,7 @@ void UpdateDorcs(void)
 				g_currentDisplayBackend->m_blendPalettes(g_dorcsPalette, 0x5a);
 				VFX_pane_wipe(&g_currentPane, 0);
 				VFX_GIF_draw(&g_dorcsGifTarget, g_dorcsGif, g_dorcsGifState);
-				if (g_windowActive) {
-					g_currentRefreshMode->m_flip();
-				}
+				g_currentRefreshMode->m_flip();
 
 				VFX_GIF_palette(g_dorcsGif, (MechU8*) g_dorcsPalette);
 				g_currentDisplayBackend->m_blendPalettes(g_dorcsPalette, 0xb5);
@@ -848,9 +842,7 @@ void UpdateDorcs(void)
 		}
 		else {
 			VFX_pane_wipe(&g_currentPane, 0);
-			if (g_windowActive) {
-				g_currentRefreshMode->m_flip();
-			}
+			g_currentRefreshMode->m_flip();
 
 			ApplyPaletteResource(g_currentPalette);
 			if (g_dorcsGif) {

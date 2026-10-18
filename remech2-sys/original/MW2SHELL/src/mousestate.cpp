@@ -3,7 +3,6 @@
 #include "elapsed.h"
 #include "font.h"
 #include "pointer.h"
-#include "refreshmode.h"
 #include "shellglobals.h"
 #include "videodriver.h"
 #include "windowstate.h"
@@ -144,10 +143,6 @@ void MouseState::ReadMouseState()
 	undefined4 middleDown;
 	undefined4 leftDown;
 	undefined4 rightDown;
-
-	if (!g_windowActive) {
-		return;
-	}
 
 	if (!g_runSim) {
 		DrawCursorPosition();

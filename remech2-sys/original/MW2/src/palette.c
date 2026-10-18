@@ -337,16 +337,12 @@ void StartPalettes(MechS32 p_dissolve)
 						if (ticks > last) {
 							last = ticks + 1;
 							seed = VFX_pixel_fade(&target, src, count, seed);
-							if (g_windowActive) {
-								g_currentRefreshMode->m_flip();
-							}
+							g_currentRefreshMode->m_flip();
 						}
 					}
 
 					VFX_pane_wipe(src, 0);
-					if (g_windowActive) {
-						g_currentRefreshMode->m_flip();
-					}
+					g_currentRefreshMode->m_flip();
 
 					g_currentDisplayBackend->m_setPaletteWithBrightness((PaletteColor*) palette);
 					MechHeapFree(g_primaryHeap, pixels);

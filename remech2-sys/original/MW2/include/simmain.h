@@ -28,7 +28,6 @@ extern "C"
 	extern MechHeap* g_primaryHeap;
 	extern MechS32 g_gameWindowWidth;
 	extern MechS32 g_gameWindowHeight;
-	extern MechS32 g_windowActive;
 	extern MechS32 g_simPaused;
 	extern MechS32 g_pauseRequested;
 	extern MechS32 g_mouseOutsideClientWindow;

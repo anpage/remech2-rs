@@ -16,8 +16,6 @@ MechS32 PlayFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam)
 void UpdateVideos();
 MechS32 IsVideoPlaying(MechS32 p_index);
 MechS32 IsFullscreenVideoPlaying();
-void PauseFullscreenVideo();
-void ResumeFullscreenVideo();
 void SetVideoFlags(MechS32 p_index, MechS32 p_mask, MechS32 p_value);
 void ShowVideo(MechS32 p_index);
 void CloseVideo(MechS32 p_index);

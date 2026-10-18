@@ -1272,7 +1272,6 @@ static const struct {
 	RESET_GLOBAL(g_primaryHeap),
 	RESET_GLOBAL(g_gameWindowWidth),
 	RESET_GLOBAL(g_gameWindowHeight),
-	RESET_GLOBAL(g_windowActive),
 	RESET_GLOBAL(g_drawModeReady),
 	RESET_GLOBAL(g_simPaused),
 	RESET_GLOBAL(g_pauseRequested),

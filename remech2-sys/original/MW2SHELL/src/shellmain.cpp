@@ -8,11 +8,8 @@
 #include "clanhall.h"
 #include "credits.h"
 #include "debrief.h"
-#include "debugout.h"
 #include "debugprint.h"
-#include "decomp.h"
 #include "font.h"
-#include "formation.h"
 #include "hallofhonor.h"
 #include "keyboard.h"
 #include "keyboardinput.h"
@@ -26,12 +23,10 @@
 #include "missionui.h"
 #include "mousestate.h"
 #include "options.h"
-#include "pilotrecord.h"
 #include "pilotroster.h"
 #include "pointer.h"
 #include "projectarchive.h"
 #include "readyroom.h"
-#include "refreshmode.h"
 #include "resetglobals.h"
 #include "rosterscreen.h"
 #include "shellglobals.h"
@@ -43,7 +38,6 @@
 #include "videodriver.h"
 #include "windowstate.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -107,27 +101,6 @@ MECH_INTPTR ShellHandleMessageC(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lP
 	}
 
 	switch (p_msg) {
-	case c_mechMsgActivateApp:
-		g_windowActive = p_wParam;
-		if (g_windowActive) {
-			if (IsFullscreenVideoPlaying()) {
-				ResumeFullscreenVideo();
-			}
-
-			if (g_midiBackgroundMusic) {
-				g_midiBackgroundMusic->Start();
-			}
-		}
-		else {
-			if (IsFullscreenVideoPlaying()) {
-				PauseFullscreenVideo();
-			}
-
-			if (g_midiBackgroundMusic) {
-				g_midiBackgroundMusic->Stop();
-			}
-		}
-		return 0;
 	// On WM_PALETTECHANGED and WM_QUERYNEWPALETTE the original reloaded the palette and redrew
 	// the whole screen.
 	case c_mechMsgPaint:
@@ -432,10 +405,8 @@ extern "C" int ShellMain(char* p_cmdLine)
 		g_cursorHidden = TRUE;
 	}
 
-	// The original sent the launcher's window c_msgActivateShell, to have it pass its messages to
-	// ShellWindowProc. Windows then told it whether the window was active.
+	// The original sent the launcher's window c_msgActivateShell, to have it pass its messages to ShellWindowProc.
 	MechSetMessageHandler(ShellHandleMessage);
-	g_windowActive = MechAppActive();
 
 	for (;;) {
 		MechAppPump();
@@ -447,15 +418,13 @@ extern "C" int ShellMain(char* p_cmdLine)
 			MechSendMessage(msg.m_message, msg.m_wParam, msg.m_lParam);
 		}
 
-		if (g_windowActive) {
-			g_mouseState->ReadMouseState();
-			RunScreenFrame();
-			if (g_drawFmv) {
-				g_videoDriver->DrawFmv();
-			}
-			else {
-				g_videoDriver->DrawShell();
-			}
+		g_mouseState->ReadMouseState();
+		RunScreenFrame();
+		if (g_drawFmv) {
+			g_videoDriver->DrawFmv();
+		}
+		else {
+			g_videoDriver->DrawShell();
 		}
 	}
 
@@ -499,19 +468,13 @@ extern "C" int ShellMain(char* p_cmdLine)
 	}
 }
 
-// Handles one pending message, waiting for one while the window is inactive. Returns 0 on
-// c_mechMsgQuit (posting it again), 1 otherwise.
+// Handles one pending message. Returns 0 on c_mechMsgQuit (posting it again), 1 otherwise.
 // FUNCTION: MW2SHELL 0x1000fe0d
 MechS32 PumpMessage()
 {
 	MechMessage msg;
 
-	if (!g_windowActive) {
-		MechAppWait();
-	}
-	else {
-		MechAppPump();
-	}
+	MechAppPump();
 
 	if (MechPeekMessage(&msg, 0, 0, TRUE)) {
 		if (msg.m_message == c_mechMsgQuit) {

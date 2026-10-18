@@ -13,8 +13,6 @@ extern "C"
 
 	extern MechS32 g_windowHeight;
 	extern MechS32 g_windowWidth;
-	extern char g_windowClassName[0x10];
-	extern MechS32 g_windowActive;
 	extern MechS32 g_paused;
 	extern MechS32 g_menuDialogOpen;
 	extern MechHeap* g_primaryHeap;

@@ -109,9 +109,6 @@ MechS32 g_gameWindowWidth = 0;
 // GLOBAL: MW2 0x100acb70
 MechS32 g_gameWindowHeight = 0;
 
-// GLOBAL: MW2 0x100acb74
-MechS32 g_windowActive = 0;
-
 // GLOBAL: MW2 0x100acb78
 MechS32 g_drawModeReady = 0;
 
@@ -188,12 +185,10 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 	OpenMw2Log();
 
 	InitRefreshMode(5, 0, &g_mainPixelBuffer, 640, 480, 0);
-	// The original sent the launcher's window 0x41f, to have it pass its messages to SimWindowProc,
-	// and then told itself the window was active.
+	// The original sent the launcher's window 0x41f, to have it pass its messages to SimWindowProc
 	while (MechPeekMessage(&msg, 0, 0, TRUE)) {
 	}
 	MechSetMessageHandler(SimHandleMessage);
-	MechSendMessage(c_mechMsgActivateApp, MechAppActive(), 0);
 	if (!InitDisplayGeometry()) {
 		Error(0x50, NULL);
 	}
@@ -375,7 +370,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 			AdvanceAnimations();
 			UpdatePaletteFade();
 			ApplyPendingPalette();
-			if ((g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1) == 0) {
+			if (g_currentDisplayBackend->m_acquireFramebuffer() == 0) {
 				g_renderSettings.m_frameDrawCallback();
 				DrawLocalPlayer();
 				UpdateMenus();
@@ -406,7 +401,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 		}
 
 		FadeToEndPalette(g_careerRecord.m_outcome & 4);
-		if ((g_windowActive ? g_currentDisplayBackend->m_acquireFramebuffer() : -1) == 0) {
+		if (g_currentDisplayBackend->m_acquireFramebuffer() == 0) {
 			VFX_pane_wipe(&g_currentPane, 0);
 		}
 
@@ -461,23 +456,6 @@ static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR 
 	}
 
 	switch (p_msg) {
-	case c_mechMsgActivateApp:
-		if (g_shouldQuit) {
-			break;
-		}
-
-		g_windowActive = p_wParam;
-		if (g_windowActive == TRUE) {
-			KeyboardClearKeyStates();
-		}
-
-		// The original also restored or minimized the window here when it was full screen, and on a
-		// 640x480 desktop left and returned to DirectDraw's full screen mode or showed and hid
-		// DisplayDib's window.
-		if (g_currentDisplayBackend) {
-			g_currentDisplayBackend->m_setPalette(0, 0x100, g_paletteColors, 1);
-		}
-		return 0;
 	case c_mechMsgPaint:
 		if (g_drawModeReady && g_windowMode == c_windowModeWindowed) {
 			g_currentRefreshMode->m_flip();
@@ -517,12 +495,7 @@ void HandleMessages(void)
 {
 	MechMessage msg;
 
-	if (!g_windowActive) {
-		MechAppWait();
-	}
-	else {
-		MechAppPump();
-	}
+	MechAppPump();
 
 	if (!g_shouldQuit && MechPeekMessage(&msg, 0, 0, TRUE)) {
 		// The original skipped every mouse message here, and without looking at whether there was
@@ -556,7 +529,7 @@ void UpdatePauseState(void)
 		}
 	}
 
-	if (!GetMenuSlotState(4) && g_windowActive && !g_pauseRequested) {
+	if (!GetMenuSlotState(4) && MechAppActive() && !g_pauseRequested) {
 		if (g_simPaused) {
 			MechMouseShowCursor(FALSE);
 
