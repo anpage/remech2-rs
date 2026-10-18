@@ -120,15 +120,15 @@ void ApplyPaletteResource(MechS32 p_slot)
 // FUNCTION: MW2 0x10002600
 void UpdatePaletteFade(void)
 {
+	MechS32 ticks;
+
 	if (g_paletteFadeSteps) {
-		StepPaletteFade(&g_paletteFade);
-		if (--g_paletteFadeSteps == 0) {
-			g_currentPalette = g_paletteFadeTarget;
-			if (g_paletteFadeBackSteps) {
-				StartPaletteFade(g_paletteFadeBack, g_paletteFadeBackSteps, 0);
-			}
-			else {
-				g_palettePending = 1;
+		ticks = g_deltaTime < g_paletteFadeSteps ? g_deltaTime : g_paletteFadeSteps;
+		if (ticks > 0) {
+			StepPaletteFade(&g_paletteFade, ticks);
+			g_paletteFadeSteps -= ticks;
+			if (g_paletteFadeSteps == 0) {
+				/* existing body unchanged */
 			}
 		}
 	}
@@ -164,27 +164,10 @@ MechS32 StartPaletteFade(MechS32 p_palette, MechS32 p_duration, MechS32 p_mode)
 		if (to) {
 			g_paletteFadeTarget = p_palette;
 			g_paletteFadeBack = fromSlot;
-			if (g_deltaTime) {
-				if (p_mode == 1) {
-					p_duration >>= 1;
-				}
 
-				if (g_deltaTime > 0) {
-					steps = FixedDiv16(p_duration, g_deltaTime);
-				}
-				else {
-					steps = 10;
-				}
-
-				if (steps >= 0x10000) {
-					steps >>= 16;
-				}
-				else {
-					steps = 1;
-				}
-			}
-			else {
-				steps = 20;
+			steps = p_mode == 1 ? p_duration >> 1 : p_duration;
+			if (steps < 1) {
+				steps = 1;
 			}
 
 			if (p_mode == 2) {

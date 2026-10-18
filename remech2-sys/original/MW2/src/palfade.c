@@ -114,7 +114,7 @@ MechS32 InitPaletteFade(
 
 // Matches except for the stack slots of i and accum (a consistent permutation).
 // FUNCTION: MW2 0x10010d99
-void StepPaletteFade(PaletteFade* p_fade)
+void StepPaletteFade(PaletteFade* p_fade, MechS32 p_count)
 {
 	MechU8* palette;
 	MechS16* accum;
@@ -125,16 +125,20 @@ void StepPaletteFade(PaletteFade* p_fade)
 		return;
 	}
 
-	for (i = 0, accum = p_fade->m_accum, delta = p_fade->m_delta, palette = p_fade->m_palette + p_fade->m_first;
-		 i < p_fade->m_count * 3;
-		 i++, accum++, delta++, palette++) {
-		*accum += *delta;
-		*palette += *accum / p_fade->m_steps;
-		*accum %= p_fade->m_steps;
+	while (p_count-- > 0 && p_fade->m_step < p_fade->m_steps) {
+		for (i = 0, accum = p_fade->m_accum, delta = p_fade->m_delta, palette = p_fade->m_palette + p_fade->m_first;
+			 i < p_fade->m_count * 3;
+			 i++, accum++, delta++, palette++) {
+			*accum += *delta;
+			*palette += *accum / p_fade->m_steps;
+			*accum %= p_fade->m_steps;
+		}
+
+		p_fade->m_step++;
 	}
 
 	g_currentDisplayBackend->m_setPaletteWithBrightness((PaletteColor*) p_fade->m_palette);
-	p_fade->m_step++;
+
 	if (p_fade->m_step >= p_fade->m_steps && p_fade->m_palette) {
 		if (p_fade->m_palette) {
 			MechHeapFree(g_primaryHeap, p_fade->m_palette);

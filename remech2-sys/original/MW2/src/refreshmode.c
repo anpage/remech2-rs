@@ -200,7 +200,6 @@ static MechS32 DisplaySetPaletteWithBrightness(PaletteColor* p_palette)
 	}
 
 	MechDisplaySetPalette((MechU8*) g_paletteColors);
-	MechDisplayPresent();
 	g_refreshModeBuffer->m_buffer = g_frame;
 	return 0;
 }

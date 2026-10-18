@@ -38,7 +38,7 @@ extern "C"
 		MechS32 p_count,
 		MechS32 p_steps
 	);
-	void StepPaletteFade(PaletteFade* p_fade);
+	void StepPaletteFade(PaletteFade* p_fade, MechS32 p_count);
 
 #ifdef __cplusplus
 }
