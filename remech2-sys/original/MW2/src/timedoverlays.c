@@ -12,6 +12,7 @@
 #include "targeting.h"
 #include "timedoverlay.h"
 #include "types.h"
+#include "widescreen.h"
 
 #include <string.h>
 
@@ -86,6 +87,7 @@ void LayoutMessageBoxes(void)
 		target->m_y0 += dy;
 		target->m_x1 += dx;
 		target->m_y1 += dy;
+		MechCenterMessagePane(target);
 		ScalePointToFrame(target, &overlay->m_textPos, &overlay->m_textPos);
 
 		font =

@@ -20,6 +20,8 @@ extern "C"
 	MechS32 MechWidenMapSpan(MechS32 p_slot, MechS32 p_span);
 	// Narrows p_pane to the HUD box
 	void MechHudPane(PANE* p_pane);
+	// Centers a message box pane horizontally in the frame
+	void MechCenterMessagePane(PANE* p_pane);
 
 #ifdef __cplusplus
 }

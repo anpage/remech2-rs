@@ -278,3 +278,20 @@ pub unsafe extern "C" fn hud_pane(pane: *mut PANE) {
         pane.m_y1 = y0 + geometry.m_height - 1;
     }
 }
+
+#[unsafe(export_name = "MechCenterMessagePane")]
+pub unsafe extern "C" fn center_message_pane(pane: *mut PANE) {
+    if !widescreen() {
+        return;
+    }
+
+    let Some(pane) = (unsafe { pane.as_mut() }) else {
+        return;
+    };
+
+    unsafe {
+        let width = pane.m_x1 - pane.m_x0 + 1;
+        pane.m_x0 = (sim::g_gameWindowWidth - width) / 2;
+        pane.m_x1 = pane.m_x0 + width - 1;
+    }
+}
