@@ -92,7 +92,6 @@ public:
 	// ShellWindowProc clears m_backBuffer.m_pixels directly: an inline accessor would leave a jmp at /Ob1.
 	WINDOW m_backBuffer; // 0x42
 
-private:
 	PANE m_screenView; // 0x56
 
 public:

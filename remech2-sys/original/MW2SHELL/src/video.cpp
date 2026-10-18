@@ -73,6 +73,10 @@ void FullscreenVideoCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32
 		p_msg != c_msgScreenFrame) {
 		CloseVideo(0);
 		UnregisterScreenFunction(FullscreenVideoCallback);
+
+		// Clear the screen when the video ends to avoid showing a stale frame with the video's palette
+		VFX_pane_wipe(&g_videoDriver->m_screenView, 0);
+
 		if (p_msg == c_msgScreenFrame) {
 			msg = g_fullscreenVideoMsg;
 		}
