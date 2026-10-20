@@ -4,6 +4,7 @@ version = "0.1.0-alpha.1"
 edition = "2024"
 license = "GPL-3.0-or-later"
 publish = false
+rust-version = "1.99"
 
 [workspace]
 members = ["gamedisc", "remech2-sys"]
