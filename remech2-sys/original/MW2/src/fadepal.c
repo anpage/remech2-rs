@@ -181,7 +181,6 @@ void BreakUpMech(Mech* p_mech)
 }
 
 // Sets off the flames of the jump jets and plays their sound.
-// Stack-slot permutation: x, y, z, player, jet and fired.
 // FUNCTION: MW2 0x1004ccba
 void FireJumpJetEffects(Mech* p_mech)
 {
@@ -214,8 +213,10 @@ void FireJumpJetEffects(Mech* p_mech)
 		x -= g_eyepoint->m_x;
 		y -= g_eyepoint->m_y;
 		z -= g_eyepoint->m_z;
+		// The original game used > for the previous-fuel check. Changing it to >= makes it reliable.
 		if (p_mech->m_player->m_index == g_localPlayerId && p_mech->m_jumpFuel < 0x1c4 &&
-			p_mech->m_jumpFuel + g_deltaTime > 0x1c4) {
+			p_mech->m_jumpFuel + g_deltaTime >= 0x1c4) {
+			// "Low fuel" warning beeps
 			PlaySoundEffect(0xde, 100, 0x40, 5, 0x50);
 		}
 		else {
