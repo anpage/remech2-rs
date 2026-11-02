@@ -25,3 +25,16 @@ pub extern "C" fn next_clock() {
 
     unsafe { sim::NextClockC() };
 }
+
+/// The constant used everywhere in the original code to scale by deltaTime
+const SIM_TICKS_PER_SECOND: i64 = 181;
+
+#[unsafe(export_name = "SinkStep")]
+pub extern "C" fn sink_step(delta: i32, shift: i32) -> i32 {
+    let (now, delta_time) = unsafe { (sim::g_currentClock, sim::g_deltaTime) };
+
+    let unit = SIM_TICKS_PER_SECOND << shift.clamp(0, 32);
+    let at = |clock: i32| i64::from(delta) * i64::from(clock) / unit;
+
+    (at(now) - at(now.wrapping_sub(delta_time))) as i32
+}

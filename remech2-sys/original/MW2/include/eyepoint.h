@@ -138,6 +138,9 @@ extern "C"
 	void UpdateFreeEyeView(MechS32 p_climb, MechS32 p_speed, MechS32 p_strafe, MechS32 p_turn, MechS32 p_pitch);
 	void TurnBillboards(void);
 
+	// Implemented in Rust (src/sim/timing.rs)
+	MechS32 SinkStep(MechS32 p_delta, MechS32 p_shift);
+
 #ifdef __cplusplus
 }
 #endif

@@ -236,8 +236,8 @@ void UpdateEyepoint(void)
 		UpdateOrdinanceView();
 		break;
 	case c_viewTrack:
-		speed = MulDiv64(g_sinkTrackDistanceDelta, g_deltaTime, 0xb5) >> 16;
-		strafe = MulDiv64(g_sinkTrackHeightDelta, g_deltaTime, 0xb5) >> 16;
+		speed = SinkStep(g_sinkTrackDistanceDelta, 16);
+		strafe = SinkStep(g_sinkTrackHeightDelta, 16);
 		turn = g_sinkEyepointTilt;
 		pan = MulDiv64(g_sinkEyepointPanDelta, g_deltaTime, 0xb5);
 		if (g_localMechLost && !g_spectating) {
@@ -254,9 +254,9 @@ void UpdateEyepoint(void)
 		UpdateDropView();
 		break;
 	default:
-		climb = MulDiv64(g_sinkTrackHeightDelta, g_deltaTime, 0xb5) >> 15;
-		speed = MulDiv64(g_sinkTrackDistanceDelta, g_deltaTime, 0xb5) >> 15;
-		strafe = MulDiv64(g_sinkEyepointSlideDelta, g_deltaTime, 0xb5) >> 16;
+		climb = SinkStep(g_sinkTrackHeightDelta, 15);
+		speed = SinkStep(g_sinkTrackDistanceDelta, 15);
+		strafe = SinkStep(g_sinkEyepointSlideDelta, 16);
 		turn = MulDiv64(g_sinkEyepointPanDelta, g_deltaTime, 0xb5);
 		if (g_sinkEyepointTilt > 0) {
 			pitch = g_deltaTime * 0x2d0000 / 0xb5;
