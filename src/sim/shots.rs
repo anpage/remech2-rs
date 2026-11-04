@@ -4,23 +4,16 @@ use remech2_sys::sim::{self, Shot};
 
 use crate::sim::{
     stats::{PROXIMITY_FUSES_SUPPRESSED, ZERO_LENGTH_FRAMES_SKIPPED},
-    timing::TICKS_PER_IDEAL_FRAME,
+    timing::crossed_ideal_frame,
 };
 
 /// Set when a guided missile is within 101 units of its lock.
 /// It makes the shot detonate on the locked target without running any collision test.
 const SHOT_PROXIMITY_FUSE: u32 = 32768;
 
-/// Whether a shot that has just aged to `age` ticks crossed a 4-tick boundary doing so.
-/// Baiscally, whether a 45 FPS sim would have sampled it on this frame.
-fn crossed_ideal_frame_boundary(age: i32) -> bool {
-    let previous_age = age.saturating_sub(unsafe { sim::g_deltaTime });
-    age.div_euclid(TICKS_PER_IDEAL_FRAME) != previous_age.div_euclid(TICKS_PER_IDEAL_FRAME)
-}
-
 /// Steers a guided missile toward its lock and arms its proximity fuse.
-/// We keep the 45 FPS sampling density: let the fuse arm only on the frame where the
-/// shot's age crosses a 4-tick boundary. At `DeltaTime >= 4` every frame crosses one,
+/// We keep the 45 FPS sampling density: let the fuse arm only on frames where the game
+/// clock crosses a 4-tick boundary. At `DeltaTime >= 4` every frame crosses one,
 /// which leaves the "ideal" 45 FPS framerate and anything below it untouched.
 #[unsafe(export_name = "GuideMissileToTarget")]
 pub unsafe extern "C" fn guide_missile_to_target(shot: *mut Shot, x: i32, y: i32, z: i32) {
@@ -30,7 +23,7 @@ pub unsafe extern "C" fn guide_missile_to_target(shot: *mut Shot, x: i32, y: i32
     unsafe { sim::GuideMissileToTargetC(shot, x, y, z) };
 
     let shot = unsafe { &mut *shot };
-    if shot.m_flags & SHOT_PROXIMITY_FUSE != 0 && !crossed_ideal_frame_boundary(shot.m_age) {
+    if shot.m_flags & SHOT_PROXIMITY_FUSE != 0 && !crossed_ideal_frame() {
         shot.m_flags &= !SHOT_PROXIMITY_FUSE;
         PROXIMITY_FUSES_SUPPRESSED.fetch_add(1, Ordering::Relaxed);
     }

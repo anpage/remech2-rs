@@ -144,7 +144,7 @@ void EmitWreckSmoke(Mech* p_mech)
 	if (!p_mech->m_stateTime) {
 		SpawnEffect(p_mech->m_player->m_killer, 0xd, x, y, z, x, y, z);
 	}
-	else if (RandomIntBelow(100) <= 20) {
+	else if (CrossedIdealFrame() && RandomIntBelow(100) <= 20) {
 		x += RandomNormal() / 2;
 		z += RandomNormal() / 2;
 		if (RandomIntBelow(100) < 0x3c) {
@@ -220,7 +220,9 @@ void FireJumpJetEffects(Mech* p_mech)
 			PlaySoundEffect(0xde, 100, 0x40, 5, 0x50);
 		}
 		else {
-			PlaySoundAt(x, y, z, 0xdf, g_inCockpitView);
+			if (CrossedIdealFrame()) {
+				PlaySoundAt(x, y, z, 0xdf, g_inCockpitView);
+			}
 		}
 	}
 }

@@ -296,7 +296,7 @@ void DrawTargetPanel(CockpitPanel* p_panel)
 	p_panel->m_lastPowerState = g_cockpitPowerState;
 	if (p_panel->m_damage == 1) {
 		if (g_targetPanelStatic) {
-			if (RandomIntBelow(10) < 7) {
+			if (CrossedIdealFrame() && RandomIntBelow(10) < 7) {
 				g_targetPanelStatic = 0;
 			}
 
@@ -304,7 +304,7 @@ void DrawTargetPanel(CockpitPanel* p_panel)
 			return;
 		}
 		else {
-			if (RandomIntBelow(10) < 3) {
+			if (CrossedIdealFrame() && RandomIntBelow(10) < 3) {
 				g_targetPanelStatic = 1;
 			}
 		}

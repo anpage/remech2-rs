@@ -1,5 +1,6 @@
 #include "mechviewpanel.h"
 
+#include "clock.h"
 #include "cockpitpanel.h"
 #include "config.h"
 #include "damagepanel.h"
@@ -54,7 +55,7 @@ void DrawMechViewPanel(CockpitPanel* p_panel)
 	p_panel->m_lastPowerState = g_cockpitPowerState;
 	if (p_panel->m_damage == 1 && g_mechViewMode != 1 && g_mechViewMode != 2) {
 		if (g_mechViewStatic) {
-			if (RandomIntBelow(10) < 7) {
+			if (CrossedIdealFrame() && RandomIntBelow(10) < 7) {
 				g_mechViewStatic = 0;
 			}
 
@@ -62,7 +63,7 @@ void DrawMechViewPanel(CockpitPanel* p_panel)
 			return;
 		}
 
-		if (RandomIntBelow(10) < 3) {
+		if (CrossedIdealFrame() && RandomIntBelow(10) < 3) {
 			g_mechViewStatic = 1;
 		}
 	}

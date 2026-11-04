@@ -1252,11 +1252,8 @@ void DrawDamagedMapView(void)
 				threshold = 3;
 			}
 
-			if (RandomIntBelow(10) < threshold) {
-				g_mapDamageAnimShown = 1;
-			}
-			else {
-				g_mapDamageAnimShown = 0;
+			if (CrossedIdealFrame()) {
+				g_mapDamageAnimShown = RandomIntBelow(10) < threshold;
 			}
 		}
 		else if (g_cockpitPanels[c_panelRadar]->m_damage == 2) {

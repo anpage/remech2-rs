@@ -115,15 +115,3 @@ MechS32 SetWrappedRampTarget(WrappedRamp* p_ramp, MechS32 p_target)
 	p_ramp->m_target = target;
 	return target;
 }
-
-// FUNCTION: MW2 0x10049871
-MechS32 UpdateEasedValue(EasedValue* p_value)
-{
-	MechS32 delta;
-	MechS32 step;
-
-	delta = p_value->m_target - p_value->m_value;
-	step = delta >> p_value->m_shift;
-	p_value->m_value += step;
-	return p_value->m_value;
-}

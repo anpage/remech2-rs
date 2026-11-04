@@ -46,6 +46,7 @@ extern "C"
 	);
 	MechS32 UpdateWrappedRamp(WrappedRamp* p_ramp);
 	MechS32 SetWrappedRampTarget(WrappedRamp* p_ramp, MechS32 p_target);
+	// Implemented on the Rust side (src/sim/timing.rs)
 	MechS32 UpdateEasedValue(EasedValue* p_value);
 
 #ifdef __cplusplus
