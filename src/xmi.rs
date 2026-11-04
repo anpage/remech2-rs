@@ -562,6 +562,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_parse_xmi() {
         // TODO: Get the test data from the DATABASE.MW2 file.
         const SONG_FILENAMES: [&str; 8] = [

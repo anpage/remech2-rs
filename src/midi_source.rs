@@ -108,6 +108,7 @@ mod tests {
     use std::{fs::File, io::BufReader};
 
     #[test]
+    #[ignore]
     fn test_midi() {
         let stream_handle = DeviceSinkBuilder::open_default_sink().unwrap();
         let sink = Player::connect_new(stream_handle.mixer());
