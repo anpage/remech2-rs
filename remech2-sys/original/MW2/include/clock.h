@@ -45,6 +45,7 @@ extern "C"
 	void NextClockC(void);
 	// Implemented on the Rust side (src/sim/timing.rs)
 	MechS32 CrossedIdealFrame(void);
+	MechS32 IdealFrameTicks(void);
 	void StopTimers(void);
 	MechS32 GetGameClock(void);
 	MechS32 GetTicksSinceSync(void);

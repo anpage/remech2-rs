@@ -949,6 +949,11 @@ void DamageMechsInRadius(MechS32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z,
 	MechS32 dz;
 	MechS32 damage;
 
+	MechS32 ticks = IdealFrameTicks();
+	if (!ticks) {
+		return;
+	}
+
 	i = g_playerCount;
 	while (i--) {
 		if (g_netRole && i != g_localPlayerId) {
@@ -966,7 +971,7 @@ void DamageMechsInRadius(MechS32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z,
 		dz = player->m_position.m_z - p_z;
 		reach = mech->m_radius + p_radius;
 		if (ApproximateVectorLength(dx, dy, dz) < reach) {
-			damage = p_rate * g_deltaTime;
+			damage = p_rate * ticks;
 			if (mech->m_powerState == 4) {
 				damage <<= 1;
 			}

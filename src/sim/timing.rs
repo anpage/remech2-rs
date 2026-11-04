@@ -39,15 +39,28 @@ pub extern "C" fn sink_step(delta: i32, shift: i32) -> i32 {
     (at(now) - at(now.wrapping_sub(delta_time))) as i32
 }
 
+/// Ideal 4-tick intervals completed during this frame.
+/// Sums to the elapsed ticks over time.
+pub(super) fn ideal_frame_ticks() -> i32 {
+    let (now, delta_time) = unsafe { (sim::g_currentClock, sim::g_deltaTime) };
+
+    let crossed = now.div_euclid(TICKS_PER_IDEAL_FRAME)
+        - now
+            .wrapping_sub(delta_time)
+            .div_euclid(TICKS_PER_IDEAL_FRAME);
+
+    crossed * TICKS_PER_IDEAL_FRAME
+}
+
+#[unsafe(export_name = "IdealFrameTicks")]
+pub extern "C" fn ideal_frame_ticks_c() -> i32 {
+    ideal_frame_ticks()
+}
+
 /// Whether the game clock crossed a 4-tick boundary this frame.
 /// Basically, whether a 45 FPS sim would have run a frame here.
 pub(super) fn crossed_ideal_frame() -> bool {
-    let (now, delta_time) = unsafe { (sim::g_currentClock, sim::g_deltaTime) };
-
-    now.div_euclid(TICKS_PER_IDEAL_FRAME)
-        != now
-            .wrapping_sub(delta_time)
-            .div_euclid(TICKS_PER_IDEAL_FRAME)
+    ideal_frame_ticks() != 0
 }
 
 #[unsafe(export_name = "CrossedIdealFrame")]
