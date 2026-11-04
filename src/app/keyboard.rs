@@ -1,4 +1,10 @@
+use remech2_sys::{
+    shared::{c_mechMsgKeyFirst, c_mechMsgKeyLast},
+    shell, sim,
+};
 use winit::keyboard::KeyCode;
+
+use crate::messages;
 
 /// The Windows virtual key, scan code and extended flag of the keys the game knows
 #[rustfmt::skip]
@@ -121,4 +127,14 @@ pub fn params(code: KeyCode, character: Option<char>) -> Option<(usize, isize)> 
     let lparam =
         isize::from(character) | isize::from(scan_code) << 16 | isize::from(extended) << 24;
     Some((virtual_key.into(), lparam))
+}
+
+/// Clears all held keys on the C side. Used to clear modifiers when the window loses focus.
+pub fn release_keys() {
+    messages::discard(c_mechMsgKeyFirst, c_mechMsgKeyLast);
+
+    unsafe {
+        sim::g_keyStates = [0; 4];
+        shell::g_keyStates = [0; 4];
+    }
 }

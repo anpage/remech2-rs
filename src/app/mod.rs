@@ -264,6 +264,9 @@ impl ApplicationHandler for State {
             }
             WindowEvent::Focused(focused) => {
                 self.focused = focused;
+                if !focused {
+                    keyboard::release_keys();
+                }
                 if let Some(window) = &self.window {
                     self.mouse.focused(window, focused);
                 }
