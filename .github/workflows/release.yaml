@@ -43,6 +43,9 @@ jobs:
         run: |
           mkdir ReMech2
           cp target/${{ matrix.target }}/release/${{ matrix.exe }} ReMech2/
+          cp README.md LICENSE THIRD-PARTY.txt ReMech2/
+          cp remech2-sys/original/LICENSE ReMech2/LICENSE-demech2.txt
+          cp assets/*-license.txt ReMech2/
           case "${{ matrix.archive }}" in
             *.zip) zip -r "${{ matrix.archive }}" ReMech2 ;;
             *) tar -czf "${{ matrix.archive }}" ReMech2 ;;
