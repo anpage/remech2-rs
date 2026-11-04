@@ -158,7 +158,7 @@ Under Windows:
 The decompiled source code in `remech2-sys/original` comes from the [demech2 project](https://github.com/anpage/demech2), which used an LLM and assembly-diffing scripts to convert an annotated Ghidra project into C/C++ code that closely matches the original game's behavior.
 Over time, this decompiled code will be replaced with Rust.
 
-The majority of the Rust code is written by hand, while many automated tests were witten by an LLM.
+The majority of the Rust code is written by hand, while many automated tests were written by an LLM.
 
 This README and all documentation included in this project are written by hand.
 
