@@ -60,7 +60,7 @@ impl Default for VideoSettings {
             backend: None,
             widescreen: false,
             vsync: true,
-            framerate_limit: 180,
+            framerate_limit: 60,
             scaling: Default::default(),
             object_textmaps: true,
             terrain_textmaps: true,
