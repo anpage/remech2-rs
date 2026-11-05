@@ -78,6 +78,8 @@ pub fn drain_pending_eos() -> Vec<(SampleHandle, unsafe extern "system" fn(Sampl
 }
 
 pub fn shutdown() {
-    SAMPLES.lock().unwrap().clear();
+    for (_, sample) in SAMPLES.lock().unwrap().drain() {
+        sample.release();
+    }
     DRIVERS.lock().unwrap().clear();
 }
