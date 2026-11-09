@@ -1,5 +1,6 @@
 #include "options.h"
 
+#include "app.h"
 #include "audiosample.h"
 #include "audiosubsystem.h"
 #include "decomp.h"
@@ -236,6 +237,7 @@ void DragVolumeSlider(ScreenField* p_option)
 	value = (MechS32*) p_option->m_data;
 	previous = *value;
 	do {
+		MechAppPump();
 		*value = g_mouseState->m_x - (p_option->m_left + 0xf);
 		if (*value < 0) {
 			*value = 0;
