@@ -9,37 +9,37 @@ struct MenuPage;
 
 // An in-mission menu's definition, one of the eleven in g_menuDefinitions.
 typedef struct MenuDefinition {
-	PANE* m_target;                // 0x00 — where the menu draws
-	uint32_t m_flags;              // 0x04 — 1: takes navigation keys, 0x20: clears its target
-	struct MenuPage** m_pageStack; // 0x08 — the open pages, up to 8
-	int32_t m_pageDepth;           // 0x0c
-	int32_t m_backgroundId;        // 0x10 — a SHP resource, -1: none
-	void* m_background;            // 0x14
-	PANE* m_backgroundTarget;      // 0x18
-	int32_t m_cursorShapeId;       // 0x1c — a SHP resource, -1: none
-	void* m_cursorShape;           // 0x20
-	int32_t m_openSound;           // 0x24 — played on opening a subpage, -1: none
-	int32_t m_moveSound;           // 0x28 — played on moving the selection, -1: none
-	int32_t m_fontId;              // 0x2c — a FONT resource
-	void* m_font;                  // 0x30
-	int32_t m_color;               // 0x34
-	int32_t m_highlightColor;      // 0x38 — the selected item's
-	int32_t m_lineCount;           // 0x3c — lines, for the line spacing
-	Point m_textOrigin;            // 0x40 — the text origin, in pixels; m_y: the line spacing
-	Point m_titleOrigin;           // 0x48 — the title; m_y: half the line spacing
-	Point m_cursorOrigin;          // 0x50 — the selection cursor; m_y: the line spacing
-	Point m_itemOrigin;            // 0x58 — the items' numbers and texts; m_y: the line spacing
-	Point m_controlOrigin;         // 0x60 — the items' controls; m_y: the line spacing
-	struct MenuPage* m_rootPage;   // 0x68
+	PANE* m_target;                // where the menu draws
+	uint32_t m_flags;              // 1: takes navigation keys, 0x20: clears its target
+	struct MenuPage** m_pageStack; // the open pages, up to 8
+	int32_t m_pageDepth;
+	int32_t m_backgroundId; // a SHP resource, -1: none
+	void* m_background;
+	PANE* m_backgroundTarget;
+	int32_t m_cursorShapeId; // a SHP resource, -1: none
+	void* m_cursorShape;
+	int32_t m_openSound; // played on opening a subpage, -1: none
+	int32_t m_moveSound; // played on moving the selection, -1: none
+	int32_t m_fontId;    // a FONT resource
+	void* m_font;
+	int32_t m_color;
+	int32_t m_highlightColor; // the selected item's
+	int32_t m_lineCount;      // lines, for the line spacing
+	Point m_textOrigin;       // the text origin, in pixels; m_y: the line spacing
+	Point m_titleOrigin;      // the title; m_y: half the line spacing
+	Point m_cursorOrigin;     // the selection cursor; m_y: the line spacing
+	Point m_itemOrigin;       // the items' numbers and texts; m_y: the line spacing
+	Point m_controlOrigin;    // the items' controls; m_y: the line spacing
+	struct MenuPage* m_rootPage;
 } MenuDefinition;
 
 // A registered menu: RegisterMenu adds one per menu ID to g_menuSlots.
 typedef struct MenuSlot {
-	int32_t m_id;                 // 0x00 — the index in g_menuDefinitions
-	int32_t m_state;              // 0x04 — 1: open
-	int32_t m_requested;          // 0x08 — the state UpdateMenus moves it to
-	MenuDefinition* m_definition; // 0x0c — while open
-	struct MenuSlot* m_next;      // 0x14
+	int32_t m_id;                 // the index in g_menuDefinitions
+	int32_t m_state;              // 1: open
+	int32_t m_requested;          // the state UpdateMenus moves it to
+	MenuDefinition* m_definition; // while open
+	struct MenuSlot* m_next;
 } MenuSlot;
 
 // The functions and globals of menu.c that other units use.

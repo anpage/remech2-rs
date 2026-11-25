@@ -17,8 +17,8 @@ public:
 		TMPackDBEntry(uint32_t p_offset, uint32_t p_size);
 		~TMPackDBEntry();
 
-		uint32_t m_offset; // 0x00
-		uint32_t m_size;   // 0x04
+		uint32_t m_offset;
+		uint32_t m_size;
 	};
 
 	TMPackDataBase(char* p_name);

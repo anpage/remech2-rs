@@ -13,15 +13,15 @@ typedef void (*ObjectCallback)(SceneObject* p_obj);
 /* A node of the scene tree: its transform relative to the parent, the world transform
    UpdateObjWorld derives from it, and an optional shape. CreateObj allocates it. */
 struct SceneObject {
-	SceneObject* m_parent;           // 0x00
-	SceneObject* m_firstChild;       // 0x04
-	SceneObject* m_nextSibling;      // 0x08
-	Matrix m_local;                  // 0x0c
-	Matrix m_world;                  // 0x3c
-	Shape* m_shape;                  // 0x6c
-	char* m_name;                    // 0x70
-	uint32_t m_flags;                // 0x74
-	uint32_t m_renormalizeCountdown; // 0x78 — rotations left before NormalizeRotation (64 to 191, staggered)
+	SceneObject* m_parent;
+	SceneObject* m_firstChild;
+	SceneObject* m_nextSibling;
+	Matrix m_local;
+	Matrix m_world;
+	Shape* m_shape;
+	char* m_name;
+	uint32_t m_flags;
+	uint32_t m_renormalizeCountdown; // rotations left before NormalizeRotation (64 to 191, staggered)
 };
 
 enum {

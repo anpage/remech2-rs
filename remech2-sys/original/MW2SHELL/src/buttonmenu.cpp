@@ -11,20 +11,20 @@
 
 #include <string.h>
 
-// The menu's collection owns 0x2a-byte entries with a hit rectangle and two text glyphs.
+// The menu's collection owns MenuEntry records: a hit rectangle and two text glyphs each.
 #pragma pack(1)
 struct MenuEntry {
-	char* m_text;        // 0x00
-	MechPoint m_textPos; // 0x04
-	int32_t m_bottom;    // 0x0c
-	Font* m_font;        // 0x10
-	uint8_t* m_colors;   // 0x14
-	HitRect* m_rect;     // 0x18
-	TextGlyph* m_hover;  // 0x1c
-	TextGlyph* m_label;  // 0x20
-	int32_t m_id;        // 0x24
-	uint8_t m_drawRect;  // 0x28
-	uint8_t m_enabled;   // 0x29
+	char* m_text;
+	MechPoint m_textPos;
+	int32_t m_bottom;
+	Font* m_font;
+	uint8_t* m_colors;
+	HitRect* m_rect;
+	TextGlyph* m_hover;
+	TextGlyph* m_label;
+	int32_t m_id;
+	uint8_t m_drawRect;
+	uint8_t m_enabled;
 
 	MenuEntry(
 		int32_t p_left,

@@ -4,8 +4,8 @@
 #include "types.h"
 
 typedef struct TimeOfDayPhase {
-	int32_t m_palette;  // 0x00
-	int32_t m_duration; // 0x04
+	int32_t m_palette;
+	int32_t m_duration;
 } TimeOfDayPhase;
 
 // The functions and globals of environment.c that other units use.

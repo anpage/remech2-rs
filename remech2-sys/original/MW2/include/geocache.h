@@ -17,8 +17,8 @@ struct BwdStream;
 
 // An entry of the class table: an ID and its class.
 typedef struct GeoClass {
-	int32_t m_id;          // 0x00
-	struct Shape* m_class; // 0x04
+	int32_t m_id;
+	struct Shape* m_class;
 } GeoClass;
 
 // The functions and globals of geocache.c that other units use.

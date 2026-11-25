@@ -7,14 +7,14 @@
 // A kind of player a world stream's gamepiece record creates (g_playerTypes): its callbacks,
 // copied into the Player.
 typedef struct PlayerType {
-	int32_t m_type;                           // 0x00 — Player::m_type
-	PlayerCreatedFn m_create;                 // 0x04 — CreateSimPlayer's
-	void (*m_firstClassFn)(Player* p_player); // 0x08
-	PlayerMechFn m_updateFn;                  // 0x0c
-	PlayerMechFn m_lateUpdateFn;              // 0x10
-	PlayerMechFn m_localUpdateFn;             // 0x14 — the local player's only
-	PlayerMechFn m_drawFn;                    // 0x18 — the local player's only
-	PlayerMechFn m_shutdownFn;                // 0x1c
+	int32_t m_type;           // Player::m_type
+	PlayerCreatedFn m_create; // CreateSimPlayer's
+	void (*m_firstClassFn)(Player* p_player);
+	PlayerMechFn m_updateFn;
+	PlayerMechFn m_lateUpdateFn;
+	PlayerMechFn m_localUpdateFn; // the local player's only
+	PlayerMechFn m_drawFn;        // the local player's only
+	PlayerMechFn m_shutdownFn;
 } PlayerType;
 
 // The table of players.c.

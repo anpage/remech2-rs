@@ -8,12 +8,12 @@
 typedef int32_t (*TimedCallbackFn)(int32_t p_event, char* p_data, int32_t p_clock, int32_t p_period);
 
 typedef struct TimedCallback {
-	TimedCallbackFn m_fn;         // 0x00
-	void* m_data;                 // 0x04
-	int32_t m_period;             // 0x08
-	int32_t m_lastTime;           // 0x0c
-	int32_t m_nextTime;           // 0x10
-	struct TimedCallback* m_next; // 0x14
+	TimedCallbackFn m_fn;
+	void* m_data;
+	int32_t m_period;
+	int32_t m_lastTime;
+	int32_t m_nextTime;
+	struct TimedCallback* m_next;
 } TimedCallback;
 
 // The functions and globals of callbacks.c that other units use.

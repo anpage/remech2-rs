@@ -27,36 +27,36 @@ typedef Point* (*CockpitNeedleAtFn)(PANE* p_target, int32_t p_angle, Point* p_ou
 
 // The layout of one cockpit view (4: the satellite view).
 typedef struct CockpitLayout {
-	PANE* m_viewport;             // 0x00 — in 16.16 fractions of the screen
-	PANE* m_savedViewport;        // 0x04 — the viewport, saved while a transition moves it
-	int32_t m_paneSlot;           // 0x08 — in g_panes
-	int32_t m_sounds[2];          // 0x0c — the sounds of entering and leaving the view, -1: none
-	RectTransition* m_transition; // 0x14
-	int32_t m_range;              // 0x18 — the range the readout shows
-	int32_t m_formattedRange;     // 0x1c — the range it last formatted
-	int32_t m_startRange;         // 0x20 — the range to start at
-	int32_t m_minRange;           // 0x24 — the shortest range
-	int32_t m_maxRange;           // 0x28 — the longest range
-	int32_t m_zoom;               // 0x2c — the zoom: m_startRange over m_range
-	int32_t m_font;               // 0x30 — its font, from g_artResolution
-	char* m_extraLabel;           // 0x34 — a third label and text, which nothing draws
-	char* m_extraText;            // 0x38
-	char* m_rangeLabel;           // 0x3c — the range label
-	char* m_rangeText;            // 0x40 — the range text
-	char* m_headingLabel;         // 0x44 — the heading label
-	char* m_headingText;          // 0x48 — the heading text
-	int32_t m_formattedHeading;   // 0x4c — the heading it last formatted
-	char* m_shortUnit;            // 0x50 — the unit of short ranges
-	char* m_longUnit;             // 0x54 — the unit of long ranges
-	Point m_extraTextOrigin;      // 0x58
-	Point m_rangeTextOrigin;      // 0x60
-	Point m_headingTextOrigin;    // 0x68
-	int32_t (*m_icons)[3];        // 0x70 — SHP ids by row and side: 0 the center, 1 players
-	int32_t* m_colors;            // 0x74
-	int32_t* m_anims;             // 0x78 — 2D animations; [2] plays over a damaged map view
-	CockpitGaugeFn m_gauges[4];   // 0x7c — indices in g_cockpitGauges until loaded; in the
-								  // map view, 1 tests a point, 2 clamps it to the view
-								  // and 3 projects a bearing to its edge
+	PANE* m_viewport;      // in 16.16 fractions of the screen
+	PANE* m_savedViewport; // the viewport, saved while a transition moves it
+	int32_t m_paneSlot;    // in g_panes
+	int32_t m_sounds[2];   // the sounds of entering and leaving the view, -1: none
+	RectTransition* m_transition;
+	int32_t m_range;          // the range the readout shows
+	int32_t m_formattedRange; // the range it last formatted
+	int32_t m_startRange;     // the range to start at
+	int32_t m_minRange;       // the shortest range
+	int32_t m_maxRange;       // the longest range
+	int32_t m_zoom;           // the zoom: m_startRange over m_range
+	int32_t m_font;           // its font, from g_artResolution
+	char* m_extraLabel;       // a third label and text, which nothing draws
+	char* m_extraText;
+	char* m_rangeLabel;         // the range label
+	char* m_rangeText;          // the range text
+	char* m_headingLabel;       // the heading label
+	char* m_headingText;        // the heading text
+	int32_t m_formattedHeading; // the heading it last formatted
+	char* m_shortUnit;          // the unit of short ranges
+	char* m_longUnit;           // the unit of long ranges
+	Point m_extraTextOrigin;
+	Point m_rangeTextOrigin;
+	Point m_headingTextOrigin;
+	int32_t (*m_icons)[3]; // SHP ids by row and side: 0 the center, 1 players
+	int32_t* m_colors;
+	int32_t* m_anims;           // 2D animations; [2] plays over a damaged map view
+	CockpitGaugeFn m_gauges[4]; // indices in g_cockpitGauges until loaded; in the
+								// map view, 1 tests a point, 2 clamps it to the view
+								// and 3 projects a bearing to its edge
 } CockpitLayout;
 
 // The functions and globals of cockpit.c that other units use.

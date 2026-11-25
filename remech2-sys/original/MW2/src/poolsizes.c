@@ -26,22 +26,22 @@
 
 // A mission stream's first record: the BWD version it was written for.
 typedef struct RevRecord {
-	BwdRecord m_header; // 0x00
-	uint32_t m_version; // 0x08 — four characters, "1.22"
+	BwdRecord m_header;
+	uint32_t m_version; // four characters, "1.22"
 } RevRecord;
 
 // A mission stream's data table: the counts its static memory pools are sized for.
 typedef struct DtblRecord {
-	BwdRecord m_header;       // 0x00
-	int16_t m_players;        // 0x08
-	int16_t m_reserved0x0a;   // 0x0a
-	int16_t m_objects;        // 0x0c
-	int16_t m_classEntries;   // 0x0e
-	int16_t m_reserved0x10;   // 0x10
-	int16_t m_reserved0x12;   // 0x12
-	int16_t m_anims;          // 0x14
-	int16_t m_animTracks;     // 0x16
-	int32_t m_animFrameBytes; // 0x18
+	BwdRecord m_header;
+	int16_t m_players;
+	int16_t m_reserved0x0a;
+	int16_t m_objects;
+	int16_t m_classEntries;
+	int16_t m_reserved0x10;
+	int16_t m_reserved0x12;
+	int16_t m_anims;
+	int16_t m_animTracks;
+	int32_t m_animFrameBytes;
 } DtblRecord;
 
 // A four-character tag read as a big-endian number, so that versions compare in order.

@@ -16,12 +16,12 @@ public:
 	void Update();
 
 private:
-	Smack* m_smack;   // 0x00
-	int32_t m_left;   // 0x04
-	int32_t m_top;    // 0x08
-	int32_t m_width;  // 0x0c
-	int32_t m_height; // 0x10
-	int32_t m_frame;  // 0x14
+	Smack* m_smack;
+	int32_t m_left;
+	int32_t m_top;
+	int32_t m_width;
+	int32_t m_height;
+	int32_t m_frame;
 };
 
 #endif // LOOPINGMOVIE_H

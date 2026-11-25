@@ -52,37 +52,37 @@ public:
 	void ActivateFramebuffer();
 
 private:
-	TextGlyphList* m_overlayGlyphs; // 0x16 — redrawn after the videos' frames
-	TextGlyphList* m_glyphs;        // 0x1a — redrawn before them
-	uint32_t m_paletteChanged;      // 0x1e — the next draw loads m_palette
-	uint32_t m_allColors;           // 0x22 — for m_setPalette
+	TextGlyphList* m_overlayGlyphs; // redrawn after the videos' frames
+	TextGlyphList* m_glyphs;        // redrawn before them
+	uint32_t m_paletteChanged;      // the next draw loads m_palette
+	uint32_t m_allColors;           // for m_setPalette
 
 public:
 	// LoopingMovie decodes into m_screenBuffer.m_pixels directly.
-	WINDOW m_screenBuffer; // 0x2e
+	WINDOW m_screenBuffer;
 
-	WINDOW m_backBuffer; // 0x42
+	WINDOW m_backBuffer;
 
-	PANE m_screenView; // 0x56
+	PANE m_screenView;
 
 public:
 	// PopupPicture draws into m_backView directly.
-	PANE m_backView; // 0x6a
+	PANE m_backView;
 
 private:
-	PANE m_dirtyView;              // 0x7e
-	PaletteColor m_palette[0x100]; // 0x92
-	int32_t m_width;               // 0x392
-	int32_t m_height;              // 0x396
+	PANE m_dirtyView;
+	PaletteColor m_palette[0x100];
+	int32_t m_width;
+	int32_t m_height;
 
 public:
 	// The color RestoreBackground fills with instead of copying the background, -1 to copy.
 	// The options, leaderboard, credits and cockpit controls screens set it to 0 directly.
-	int32_t m_restoreColor; // 0x3a6
+	int32_t m_restoreColor;
 
 	// Set by the full-screen video player on its first frame: the next draw keeps the frame as
 	// the background before loading the palette.
-	uint32_t m_fmvFirstFrame; // 0x3aa
+	uint32_t m_fmvFirstFrame;
 };
 #pragma pack()
 

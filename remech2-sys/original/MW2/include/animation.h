@@ -9,12 +9,12 @@
 
 // An animated texture: which frame set it plays, where it is, and how fast.
 typedef struct Animation {
-	int16_t m_set;      // 0x00 — in g_animFrames
-	int16_t m_frame;    // 0x02
-	uint16_t m_delay;   // 0x04 — ticks per frame; 0 stops it
-	uint16_t m_mode;    // 0x06 — 0 stopped, 1 looping, 2 playing once
-	int16_t m_flags;    // 0x08 — -2 for a free slot
-	int32_t m_lastTime; // 0x0a
+	int16_t m_set; // in g_animFrames
+	int16_t m_frame;
+	uint16_t m_delay; // ticks per frame; 0 stops it
+	uint16_t m_mode;  // 0 stopped, 1 looping, 2 playing once
+	int16_t m_flags;  // -2 for a free slot
+	int32_t m_lastTime;
 } Animation;
 
 #pragma pack(pop)

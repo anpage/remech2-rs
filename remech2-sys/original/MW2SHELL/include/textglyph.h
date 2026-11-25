@@ -21,34 +21,34 @@ public:
 	void Shutdown();
 
 private:
-	Font* m_font;               // 0x00
-	uint8_t* m_colors;          // 0x04
-	uint8_t* m_currentColors;   // 0x08 — m_colors, or the "\A" escape's map
-	VideoDriver* m_videoDriver; // 0x0c
-	uint32_t m_typed;           // 0x10 — 1: drawn one character per TypeStep
-	uint8_t m_registered;       // 0x14 — in the video driver's typed glyph list
-	char* m_text;               // 0x19
+	Font* m_font;
+	uint8_t* m_colors;
+	uint8_t* m_currentColors; // m_colors, or the "\A" escape's map
+	VideoDriver* m_videoDriver;
+	uint32_t m_typed;     // 1: drawn one character per TypeStep
+	uint8_t m_registered; // in the video driver's typed glyph list
+	char* m_text;
 
 public:
-	int32_t m_height; // 0x1d
-	int32_t m_width;  // 0x21
+	int32_t m_height;
+	int32_t m_width;
 
 private:
-	int32_t m_left; // 0x25
-	int32_t m_top;  // 0x29
+	int32_t m_left;
+	int32_t m_top;
 
 public:
 	// The cockpit controls screen places a field after the previous one's glyph.
-	int32_t m_right; // 0x2d
+	int32_t m_right;
 
 private:
-	int32_t m_bottom; // 0x31
+	int32_t m_bottom;
 
 public:
 	// Page restarts the typing and checks for the end directly.
-	uint8_t m_done;      // 0x35 — every character drawn
-	int32_t m_cursorX;   // 0x36
-	int32_t m_textIndex; // 0x3a
+	uint8_t m_done; // every character drawn
+	int32_t m_cursorX;
+	int32_t m_textIndex;
 };
 #pragma pack()
 

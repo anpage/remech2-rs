@@ -10,9 +10,9 @@ struct Vertex;
 
 // A shape type's collision tests: a point, a ray, and the height of the surface under a point.
 typedef struct ShapeCollisionFns {
-	int32_t (*m_testPoint)(Shape*, int32_t, int32_t, int32_t);           // 0x00
-	int32_t (*m_testRay)(Shape*, Ray*);                                  // 0x04
-	int32_t (*m_getHeight)(Shape*, int32_t, int32_t, int32_t, int32_t*); // 0x08
+	int32_t (*m_testPoint)(Shape*, int32_t, int32_t, int32_t);
+	int32_t (*m_testRay)(Shape*, Ray*);
+	int32_t (*m_getHeight)(Shape*, int32_t, int32_t, int32_t, int32_t*);
 } ShapeCollisionFns;
 
 // The functions and globals of collision.c that other units use.

@@ -62,8 +62,8 @@ enum {
 
 // A name for a value, for the AI's log.
 struct AiName {
-	const char* m_name; // 0x00
-	int32_t m_value;    // 0x04
+	const char* m_name;
+	int32_t m_value;
 };
 
 // For each script slot, the script (by resource index) for a player that leads its team

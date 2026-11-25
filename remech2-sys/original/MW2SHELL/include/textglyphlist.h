@@ -17,7 +17,7 @@ public:
 	void DrawAll();
 
 private:
-	Collection* m_items; // 0x00
+	Collection* m_items;
 };
 
 #endif // TEXTGLYPHLIST_H

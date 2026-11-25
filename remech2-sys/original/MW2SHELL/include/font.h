@@ -22,14 +22,14 @@ public:
 	void ResetTyping();
 
 private:
-	void* m_data;                // 0x00
-	int32_t m_typedRight[0x100]; // 0x04
-	int32_t m_typedCount;        // 0x404
+	void* m_data;
+	int32_t m_typedRight[0x100];
+	int32_t m_typedCount;
 
 public:
-	void* m_dataCopy;           // 0x408 — m_data, for VideoDriver::DrawString
-	int32_t m_height;           // 0x40c
-	VideoDriver* m_videoDriver; // 0x410
+	void* m_dataCopy; // m_data, for VideoDriver::DrawString
+	int32_t m_height;
+	VideoDriver* m_videoDriver;
 };
 
 #endif // FONT_H

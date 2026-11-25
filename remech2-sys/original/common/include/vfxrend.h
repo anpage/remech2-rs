@@ -7,9 +7,9 @@
 // The texture a polygon maps (VFXREND.H's VFX_TEXTURE): the table of row ("V-baseline") addresses
 // and the tiling limits (DrawTexturedPolygon sets both to the texture's height).
 typedef struct VFX_TEXTURE {
-	uint8_t** m_vAddrs; // 0x00
-	int32_t m_width;    // 0x04
-	int32_t m_height;   // 0x08
+	uint8_t** m_vAddrs;
+	int32_t m_width;
+	int32_t m_height;
 } VFX_TEXTURE;
 
 // VFXREND, Miles Design VFX's polygon renderer, reimplemented in C (common/src/vfxrend.c), which

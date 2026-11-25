@@ -5,10 +5,10 @@
 
 // A rectangle without a pixel buffer: PANE's last four fields.
 typedef struct Rect {
-	int32_t m_left;   // 0x00
-	int32_t m_top;    // 0x04
-	int32_t m_right;  // 0x08
-	int32_t m_bottom; // 0x0c
+	int32_t m_left;
+	int32_t m_top;
+	int32_t m_right;
+	int32_t m_bottom;
 } Rect;
 
 #endif // RECT_H

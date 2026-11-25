@@ -12,8 +12,8 @@ class TextGlyph;
 
 // A mech's name on the briefing screen: its glyph and the mech type it shows.
 struct MechNameTag {
-	TextGlyph* m_glyph; // 0x00
-	int32_t m_type;     // 0x04 — an index into g_mechChassis, negative for none
+	TextGlyph* m_glyph;
+	int32_t m_type; // an index into g_mechChassis, negative for none
 };
 
 // The functions and globals of missionui.cpp that other units use.

@@ -43,66 +43,66 @@
 
 // The state of ColorCycleTask's callback: the faces of a shape cycle through up to sixteen colors.
 typedef struct ColorCycle {
-	Shape** m_shape;      // 0x00 — the star's shape (GetStaticShapeSlot)
-	Shape* m_model;       // 0x04
-	int32_t m_faceCount;  // 0x08 — -1 until counted
-	int32_t m_colorCount; // 0x0c
-	int32_t m_colors[16]; // 0x10
+	Shape** m_shape; // the star's shape (GetStaticShapeSlot)
+	Shape* m_model;
+	int32_t m_faceCount; // -1 until counted
+	int32_t m_colorCount;
+	int32_t m_colors[16];
 } ColorCycle;
 
 // The state of SpinTask's callback: an object turning at constant rates.
 typedef struct ObjectSpin {
-	Shape** m_shape;       // 0x00
-	SceneObject* m_object; // 0x04
-	int32_t m_rateX;       // 0x08 — 16.16 per period
-	int32_t m_rateY;       // 0x0c
-	int32_t m_rateZ;       // 0x10
-	int32_t m_period;      // 0x14 — clock ticks
-	int32_t m_lastClock;   // 0x18
+	Shape** m_shape;
+	SceneObject* m_object;
+	int32_t m_rateX; // 16.16 per period
+	int32_t m_rateY;
+	int32_t m_rateZ;
+	int32_t m_period; // clock ticks
+	int32_t m_lastClock;
 } ObjectSpin;
 
 // The state of OrbitTask's callback: an object circling while it turns.
 typedef struct ObjectOrbit {
-	Shape** m_shape;       // 0x00
-	SceneObject* m_object; // 0x04
-	int32_t m_angle;       // 0x08 — 16.16 degrees
-	int32_t m_turnRate;    // 0x0c
-	int32_t m_speed;       // 0x10
-	int32_t m_enabled;     // 0x14
-	int32_t m_lastClock;   // 0x18
+	Shape** m_shape;
+	SceneObject* m_object;
+	int32_t m_angle; // 16.16 degrees
+	int32_t m_turnRate;
+	int32_t m_speed;
+	int32_t m_enabled;
+	int32_t m_lastClock;
 } ObjectOrbit;
 
 // The state of ReelMotionTask's callback: an object moving through an animation (Reel)
 // in step with its player's animation state (m_animFlags to m_animRate).
 typedef struct ReelMotion {
-	Reel* m_reel;          // 0x00
-	Reel* m_initial;       // 0x04
-	SceneObject* m_object; // 0x08
-	Player* m_player;      // 0x0c
-	int32_t m_rate;        // 0x10 — clock ticks per frame
-	int32_t m_timer;       // 0x14 — until the next frame
-	int32_t m_amount;      // 0x18 — left to move in this frame
-	int32_t m_lastClock;   // 0x1c
-	int32_t m_enabled;     // 0x20
-	int32_t m_frame;       // 0x24 — -1 before the first
-	uint32_t m_flags;      // 0x28 — 1: drives the player's animation state
+	Reel* m_reel;
+	Reel* m_initial;
+	SceneObject* m_object;
+	Player* m_player;
+	int32_t m_rate;   // clock ticks per frame
+	int32_t m_timer;  // until the next frame
+	int32_t m_amount; // left to move in this frame
+	int32_t m_lastClock;
+	int32_t m_enabled;
+	int32_t m_frame;  // -1 before the first
+	uint32_t m_flags; // 1: drives the player's animation state
 } ReelMotion;
 
 // The state of PathTask's callback: a star's object following a path, eased by the ramps.
 typedef struct PathFollower {
-	Shape** m_shape;       // 0x00 — the star's shape (GetStaticShapeSlot)
-	SceneObject* m_object; // 0x04
-	Path* m_path;          // 0x08
-	int32_t m_startClock;  // 0x0c
-	int32_t m_duration;    // 0x10 — the points' times added up
-	int32_t m_rotate;      // 0x14 — turns along the path
-	int32_t m_mode;        // 0x18 — at the end: 0 "loop" runs on, 1 "repeat" restarts, 2 stops
-	Ramp m_x;              // 0x1c
-	Ramp m_y;              // 0x2c
-	Ramp m_z;              // 0x3c
-	WrappedRamp m_pitch;   // 0x4c
-	WrappedRamp m_heading; // 0x60
-	WrappedRamp m_roll;    // 0x74
+	Shape** m_shape; // the star's shape (GetStaticShapeSlot)
+	SceneObject* m_object;
+	Path* m_path;
+	int32_t m_startClock;
+	int32_t m_duration; // the points' times added up
+	int32_t m_rotate;   // turns along the path
+	int32_t m_mode;     // at the end: 0 "loop" runs on, 1 "repeat" restarts, 2 stops
+	Ramp m_x;
+	Ramp m_y;
+	Ramp m_z;
+	WrappedRamp m_pitch;
+	WrappedRamp m_heading;
+	WrappedRamp m_roll;
 } PathFollower;
 
 // Why ReelMotionTask last failed: 1 no player, 2 disabled, 3 no object, 4-7 missing state.

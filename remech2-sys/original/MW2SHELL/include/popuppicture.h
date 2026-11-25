@@ -26,17 +26,17 @@ public:
 	void Hide();
 
 private:
-	void* m_data;               // 0x00
-	int32_t m_size;             // 0x04
-	VideoDriver* m_videoDriver; // 0x08
-	int32_t m_left;             // 0x0c
-	int32_t m_top;              // 0x10
-	int32_t m_width;            // 0x14
-	int32_t m_height;           // 0x18
-	PANE m_savedView;           // 0x1c
-	PANE m_screenView;          // 0x30
-	WINDOW m_saved;             // 0x44
-	AudioSample* m_sample;      // 0x358
+	void* m_data;
+	int32_t m_size;
+	VideoDriver* m_videoDriver;
+	int32_t m_left;
+	int32_t m_top;
+	int32_t m_width;
+	int32_t m_height;
+	PANE m_savedView;
+	PANE m_screenView;
+	WINDOW m_saved;
+	AudioSample* m_sample;
 };
 
 #endif // POPUPPICTURE_H

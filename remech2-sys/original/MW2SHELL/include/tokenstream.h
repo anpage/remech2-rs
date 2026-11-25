@@ -21,11 +21,11 @@ extern "C"
 	// Whitespace-separated tokens read ahead from a text file, up to 100 at a time. Line ends and
 	// '=' are tokens of their own, and trailing commas are dropped.
 	typedef struct TokenStream {
-		int32_t m_capacity; // 0x00
-		int32_t m_count;    // 0x04
-		int32_t m_index;    // 0x08 — next token to hand out
-		FILE* m_file;       // 0x0c
-		char** m_tokens;    // 0x10
+		int32_t m_capacity;
+		int32_t m_count;
+		int32_t m_index; // next token to hand out
+		FILE* m_file;
+		char** m_tokens;
 	} TokenStream;
 
 	int32_t ReadTokens(TokenStream* p_stream);

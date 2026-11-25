@@ -7,8 +7,8 @@
 // animation jumps between (see ReelMotionTask), and the values they compare with the player's
 // animation state.
 typedef struct ReelEvent {
-	uint32_t m_flags;   // 0x00 — 1: a jump target (m_values[0]), 2: a loop start
-	int8_t m_values[4]; // 0x04
+	uint32_t m_flags; // 1: a jump target (m_values[0]), 2: a loop start
+	int8_t m_values[4];
 } ReelEvent;
 
 #endif // REELEVENT_H

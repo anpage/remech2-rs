@@ -40,49 +40,49 @@
 
 // A bitmap record: its size and palette-sized data.
 typedef struct BitmapRecord {
-	BwdRecord m_header; // 0x00
-	int32_t m_width;    // 0x08
-	int32_t m_height;   // 0x0c
-	int32_t m_data[1];  // 0x10 — up to the record's end
+	BwdRecord m_header;
+	int32_t m_width;
+	int32_t m_height;
+	int32_t m_data[1]; // up to the record's end
 } BitmapRecord;
 
 // A path record: the path's name and its waypoints.
 typedef struct PathRecord {
-	BwdRecord m_header;    // 0x00
-	char m_name[0x40];     // 0x08
-	PathPoint m_points[1]; // 0x48 — up to the record's end
+	BwdRecord m_header;
+	char m_name[0x40];
+	PathPoint m_points[1]; // up to the record's end
 } PathRecord;
 
 // A formation record's slot: its offset from the leader and its heading.
 typedef struct FormationSlot {
-	int32_t m_x;       // 0x00
-	int32_t m_z;       // 0x04
-	int32_t m_heading; // 0x08
+	int32_t m_x;
+	int32_t m_z;
+	int32_t m_heading;
 } FormationSlot;
 
 // A formation record: the formation's name and its slots.
 typedef struct FormationRecord {
-	BwdRecord m_header;       // 0x00
-	char m_name[0x10];        // 0x08
-	FormationSlot m_slots[1]; // 0x18 — up to the record's end
+	BwdRecord m_header;
+	char m_name[0x10];
+	FormationSlot m_slots[1]; // up to the record's end
 } FormationRecord;
 
 // A star record's entry: a team's two values and its formation's name.
 typedef struct StarEntry {
-	int32_t m_affiliation; // 0x00
-	int32_t m_side;        // 0x04
-	char m_name[0x10];     // 0x08
+	int32_t m_affiliation;
+	int32_t m_side;
+	char m_name[0x10];
 } StarEntry;
 
 typedef struct StarTable {
-	BwdRecord m_header;   // 0x00
-	StarEntry m_stars[1]; // 0x08 — up to the record's end
+	BwdRecord m_header;
+	StarEntry m_stars[1]; // up to the record's end
 } StarTable;
 
 // A formation-name record: the sixteen teams' formations.
 typedef struct FormationNames {
-	BwdRecord m_header;     // 0x00
-	char m_names[16][0x11]; // 0x08
+	BwdRecord m_header;
+	char m_names[16][0x11];
 } FormationNames;
 
 ScenarioTable* g_scenarios = NULL;

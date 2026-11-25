@@ -7,12 +7,12 @@
 // "ID %5d Type %4s Lock %d Size %7d"), its hash chain in g_cacheTable and its place in the
 // purge list of unlocked items. The resource data follows.
 typedef struct ResourceCacheEntry {
-	int16_t m_id;                           // 0x00
-	int16_t m_lock;                         // 0x02
-	int32_t m_type;                         // 0x04 — four characters
-	struct ResourceCacheEntry* m_next;      // 0x08
-	struct ResourceCacheEntry* m_purgeNext; // 0x0c
-	struct ResourceCacheEntry* m_purgePrev; // 0x10
+	int16_t m_id;
+	int16_t m_lock;
+	int32_t m_type; // four characters
+	struct ResourceCacheEntry* m_next;
+	struct ResourceCacheEntry* m_purgeNext;
+	struct ResourceCacheEntry* m_purgePrev;
 } ResourceCacheEntry;
 
 // The functions and globals of loadres.c that other units use.

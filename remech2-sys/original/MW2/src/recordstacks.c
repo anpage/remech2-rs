@@ -1,6 +1,6 @@
-/* A buffer split into two stacks that grow towards each other: AllocProjectedVertex takes 0x20-byte
-   records from the top, AllocQueuedPolygon QueuedPolygon records (0xc bytes in the original) from
-   the bottom, and both clear g_queueHasRoom when the gap between them drops to 0xc8 bytes.
+/* A buffer split into two stacks that grow towards each other: AllocProjectedVertex takes
+   ProjectedVertex records from the top, AllocQueuedPolygon QueuedPolygon records from the bottom,
+   and both clear g_queueHasRoom when the gap between them drops to 0xc8 bytes.
 
    In the original, AllocProjectedVertex and AllocQueuedPolygon are C functions whose bodies are
    mostly an __asm block. This is portable C in their place. */

@@ -5,10 +5,10 @@
 
 // An entry of the sound table InitSoundInfo unpacks into g_soundInfo.
 typedef struct SoundTableEntry {
-	int16_t m_id;       // 0x00 — the sound resource
-	int16_t m_priority; // 0x02
-	int16_t m_maxCount; // 0x04
-	int16_t m_rate;     // 0x06
+	int16_t m_id; // the sound resource
+	int16_t m_priority;
+	int16_t m_maxCount;
+	int16_t m_rate;
 } SoundTableEntry;
 
 // The functions and globals of soundlimits.c that other units use.

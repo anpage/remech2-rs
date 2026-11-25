@@ -27,21 +27,21 @@ enum {
 
 // A projectile in flight.
 typedef struct Shot {
-	int32_t m_type;        // 0x00 — 7 for a shot that knocks mechs down
-	int32_t m_impact;      // 0x04 — the effect it sets off, with c_impactMech etc.
-	int32_t m_velocity[3]; // 0x08
-	int32_t m_steering[3]; // 0x14
-	int32_t m_age;         // 0x20 — ticks since launch
-	int32_t m_lifetime;    // 0x24 — ticks left
-	int32_t m_swayPhase;   // 0x28 — an angle (SwayShot)
-	SceneObject* m_object; // 0x2c
-	int32_t m_target;      // 0x30
-	int32_t m_targetKind;  // 0x34
-	uint32_t m_flags;      // 0x38
-	int32_t m_shooter;     // 0x40 — a player index
-	int32_t m_damage;      // 0x44
-	int32_t m_heat;        // 0x48 — added to the heat of the mech it hits
-	int32_t m_tracked;     // 0x4c — the tracked-shot view follows it
+	int32_t m_type;   // 7 for a shot that knocks mechs down
+	int32_t m_impact; // the effect it sets off, with c_impactMech etc.
+	int32_t m_velocity[3];
+	int32_t m_steering[3];
+	int32_t m_age;       // ticks since launch
+	int32_t m_lifetime;  // ticks left
+	int32_t m_swayPhase; // an angle (SwayShot)
+	SceneObject* m_object;
+	int32_t m_target;
+	int32_t m_targetKind;
+	uint32_t m_flags;
+	int32_t m_shooter; // a player index
+	int32_t m_damage;
+	int32_t m_heat;    // added to the heat of the mech it hits
+	int32_t m_tracked; // the tracked-shot view follows it
 } Shot;
 
 struct Player;

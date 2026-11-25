@@ -13,29 +13,29 @@ struct Vertex;
 typedef struct Shape Shape;
 
 struct Shape {
-	uint16_t m_flags; // 0x00 — 0x10f: the load flags (SetShapeLoadFlags), 0xf0: the damage level
+	uint16_t m_flags; // 0x10f: the load flags (SetShapeLoadFlags), 0xf0: the damage level
 					  // (RaisePartDamageLevel), 0x200: transformed bounds current, 0x800: not in the collision list,
 					  // 0x1000: hidden (in g_hiddenShapes)
-	uint16_t m_kind;  // 0x02 — 0xf00: the owner class (0x100 player, 0x200 thing), 0xf0: the type
-	struct Shape* m_prev;         // 0x04 — the previous shape in its list
-	struct Shape* m_next;         // 0x08 — the next shape in its list
-	struct Shape* m_prevCollider; // 0x0c — the collision list
-	struct Shape* m_nextCollider; // 0x10
-	uint16_t m_owner;             // 0x14 — a player index (kind 0x100) or thing index (0x200)
-	uint16_t m_partId;            // 0x16 — the part a scene-tree search looks for (a mech section)
-	struct SceneObject* m_object; // 0x18
-	Model* m_models;              // 0x1c
-	Model* m_model;               // 0x20
-	int32_t m_collisionType;      // 0x24 — indexes g_shapeCollisionFns; picks m_collisionData
-	int32_t m_modelCenterX;       // 0x28 — the center ComputeShapeBounds computes
-	int32_t m_modelCenterY;       // 0x2c
-	int32_t m_modelCenterZ;       // 0x30
-	int32_t m_centerX;            // 0x34 — the center transformed (TransformShapeCenter)
-	int32_t m_centerY;            // 0x38
-	int32_t m_centerZ;            // 0x3c
-	int32_t m_radius;             // 0x40 — the bounding sphere around the center
-	void* m_collisionData;        // 0x44 — a BoundBox (type 0) or a QuadtreeNode (type 5)
-	uint32_t m_transformCount;    // 0x48 — bumped per transform; Model::m_transformCount stamps it
+	uint16_t m_kind;  // 0xf00: the owner class (0x100 player, 0x200 thing), 0xf0: the type
+	struct Shape* m_prev;         // the previous shape in its list
+	struct Shape* m_next;         // the next shape in its list
+	struct Shape* m_prevCollider; // the collision list
+	struct Shape* m_nextCollider;
+	uint16_t m_owner;  // a player index (kind 0x100) or thing index (0x200)
+	uint16_t m_partId; // the part a scene-tree search looks for (a mech section)
+	struct SceneObject* m_object;
+	Model* m_models;
+	Model* m_model;
+	int32_t m_collisionType; // indexes g_shapeCollisionFns; picks m_collisionData
+	int32_t m_modelCenterX;  // the center ComputeShapeBounds computes
+	int32_t m_modelCenterY;
+	int32_t m_modelCenterZ;
+	int32_t m_centerX; // the center transformed (TransformShapeCenter)
+	int32_t m_centerY;
+	int32_t m_centerZ;
+	int32_t m_radius;          // the bounding sphere around the center
+	void* m_collisionData;     // a BoundBox (type 0) or a QuadtreeNode (type 5)
+	uint32_t m_transformCount; // bumped per transform; Model::m_transformCount stamps it
 };
 
 // The functions and globals of shape.c that other units use.

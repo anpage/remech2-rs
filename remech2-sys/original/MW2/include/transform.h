@@ -8,7 +8,7 @@
 typedef struct Matrix Matrix;
 
 struct Matrix {
-	int32_t m_rows[4][3]; // 0x00
+	int32_t m_rows[4][3];
 };
 
 // The functions and globals of transform.c that other units use.

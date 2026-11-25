@@ -20,12 +20,12 @@ typedef void (*MenuItemRunFn)(
 
 // An item of a menu page.
 typedef struct MenuItem {
-	int32_t m_type; // 0x00 — 0: opens m_subpage, 2: accepts (and goes back), 3: a heading without a
+	int32_t m_type; // 0: opens m_subpage, 2: accepts (and goes back), 3: a heading without a
 					// number, 5 and 6: close the page (ApplyMenuKey)
-	char* m_text;                  // 0x04
-	MenuItemRunFn m_run;           // 0x08
-	struct MenuControl* m_control; // 0x0c — passed to m_run
-	struct MenuPage* m_subpage;    // 0x10
+	char* m_text;
+	MenuItemRunFn m_run;
+	struct MenuControl* m_control; // passed to m_run
+	struct MenuPage* m_subpage;
 } MenuItem;
 
 #endif // MENUITEM_H

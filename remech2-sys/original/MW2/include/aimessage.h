@@ -7,8 +7,8 @@
 // the player's rules match before their own conditions. Posted to a star's leader, it is an
 // order (HandleStarOrder).
 typedef struct AiMessage {
-	int16_t m_message; // 0x00
-	uint16_t m_target; // 0x02
+	int16_t m_message;
+	uint16_t m_target;
 } AiMessage;
 
 #endif // AIMESSAGE_H

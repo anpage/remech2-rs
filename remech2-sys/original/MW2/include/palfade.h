@@ -9,13 +9,13 @@
 // channel, carrying the remainders in m_accum, and frees the block after the last step.
 #pragma pack(push, 1)
 typedef struct PaletteFade {
-	uint8_t* m_palette; // 0x00
-	int8_t* m_delta;    // 0x04
-	int16_t* m_accum;   // 0x08
-	int32_t m_steps;    // 0x0c
-	int32_t m_step;     // 0x10
-	uint8_t m_first;    // 0x14
-	int32_t m_count;    // 0x15
+	uint8_t* m_palette;
+	int8_t* m_delta;
+	int16_t* m_accum;
+	int32_t m_steps;
+	int32_t m_step;
+	uint8_t m_first;
+	int32_t m_count;
 } PaletteFade;
 #pragma pack(pop)
 

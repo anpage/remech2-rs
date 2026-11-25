@@ -33,11 +33,11 @@
 // A star in a mission's BWD file (node type 0x46). Its mechs' variant names follow, one per
 // mech of the star's size.
 struct BwdStar {
-	int32_t m_difficulty;     // 0x00 — the enemy star's, see g_enemyStarDifficulty
-	int32_t m_tonnage;        // 0x04
-	int32_t m_count;          // 0x08
-	int32_t m_size;           // 0x0c
-	char m_variants[1][0x10]; // 0x10
+	int32_t m_difficulty; // the enemy star's, see g_enemyStarDifficulty
+	int32_t m_tonnage;
+	int32_t m_count;
+	int32_t m_size;
+	char m_variants[1][0x10];
 };
 
 void MissionBriefingCallback(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t);

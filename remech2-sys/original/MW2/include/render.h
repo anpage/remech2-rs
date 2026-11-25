@@ -6,8 +6,8 @@
 #include "window.h"
 
 typedef struct GameWindowGeometry {
-	int32_t m_width;  // 0x00
-	int32_t m_height; // 0x04
+	int32_t m_width;
+	int32_t m_height;
 } GameWindowGeometry;
 
 struct Shape;

@@ -11,22 +11,22 @@ class TextGlyph;
 
 // A formation: its label and its simulator option.
 struct FormationOption {
-	char* m_label;  // 0x00
-	char* m_option; // 0x04
+	char* m_label;
+	char* m_option;
 };
 
 // A mech's place in a formation on the star screen: the star's mech it shows, where its video
 // plays and which label position its name takes.
 struct FormationSlot {
-	int32_t m_mech;  // 0x00
-	int32_t m_left;  // 0x04
-	int32_t m_top;   // 0x08
-	int32_t m_label; // 0x0c
+	int32_t m_mech;
+	int32_t m_left;
+	int32_t m_top;
+	int32_t m_label;
 };
 
 // A formation's three positions.
 struct FormationPositions {
-	FormationSlot m_posts[3]; // 0x00
+	FormationSlot m_posts[3];
 };
 
 // The functions and globals of mechvariant.cpp that other units use.

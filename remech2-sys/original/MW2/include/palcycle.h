@@ -7,10 +7,10 @@
 // copy, and the range of entries RotatePaletteCycle rotates.
 #pragma pack(push, 1)
 typedef struct PaletteCycle {
-	uint8_t* m_original; // 0x00
-	uint8_t* m_working;  // 0x04
-	uint8_t m_first;     // 0x08
-	int32_t m_count;     // 0x09
+	uint8_t* m_original;
+	uint8_t* m_working;
+	uint8_t m_first;
+	int32_t m_count;
 } PaletteCycle;
 #pragma pack(pop)
 

@@ -11,8 +11,8 @@
 
 // An animation file LoadAnimFile has loaded: its id and the base of its animation numbers.
 typedef struct AnimFile {
-	int32_t m_id;   // 0x00
-	int32_t m_base; // 0x04
+	int32_t m_id;
+	int32_t m_base;
 } AnimFile;
 
 // The functions and globals of objectanim.c that other units use.

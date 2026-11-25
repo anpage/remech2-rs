@@ -4,25 +4,25 @@
 #include "types.h"
 
 typedef struct Ramp {
-	int32_t m_time;     // 0x00 — the clock at the last update
-	int32_t m_target;   // 0x04
-	int32_t m_value;    // 0x08
-	int32_t m_duration; // 0x0c — in clock ticks
+	int32_t m_time; // the clock at the last update
+	int32_t m_target;
+	int32_t m_value;
+	int32_t m_duration; // in clock ticks
 } Ramp;
 
 // A ramp whose value wraps around a period (an angle).
 typedef struct WrappedRamp {
-	int32_t m_time;     // 0x00
-	int32_t m_target;   // 0x04
-	int32_t m_value;    // 0x08
-	int32_t m_duration; // 0x0c
-	int32_t m_period;   // 0x10
+	int32_t m_time;
+	int32_t m_target;
+	int32_t m_value;
+	int32_t m_duration;
+	int32_t m_period;
 } WrappedRamp;
 
 typedef struct EasedValue {
-	int32_t m_value;  // 0x00
-	int32_t m_target; // 0x04
-	int32_t m_shift;  // 0x08 — each step closes 1 / 2^m_shift of the distance
+	int32_t m_value;
+	int32_t m_target;
+	int32_t m_shift; // each step closes 1 / 2^m_shift of the distance
 } EasedValue;
 
 // The functions of ramp.c that other units use.

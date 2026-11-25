@@ -18,13 +18,13 @@ public:
 	void SetText(uint32_t p_maxLength, const char* p_text);
 	int32_t EditText(char* p_text, uint8_t p_upperCase);
 
-	uint32_t m_key; // 0x00
+	uint32_t m_key;
 
 private:
-	int32_t m_length;      // 0x04
-	int32_t m_maxLength;   // 0x08
-	char m_text[0x100];    // 0x0c
-	uint32_t m_keyPressed; // 0x10c — whether PollKey read a key
+	int32_t m_length;
+	int32_t m_maxLength;
+	char m_text[0x100];
+	uint32_t m_keyPressed; // whether PollKey read a key
 };
 
 // The functions and globals of keyboardinput.cpp that other units use.

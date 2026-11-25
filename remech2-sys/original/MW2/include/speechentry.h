@@ -8,15 +8,15 @@
 // A queued voice message (QueueSpeech): a line and an optional suffix, played one after the
 // other, with their joined text.
 typedef struct SpeechEntry {
-	int32_t m_used;             // 0x00
-	int32_t m_id;               // 0x04
-	int32_t m_suffixId;         // 0x08
-	void* m_data;               // 0x0c
-	void* m_suffixData;         // 0x10
-	int32_t m_deadline;         // 0x14 — the clock tick a text-only message ends
-	int32_t m_priority;         // 0x18
-	char m_text[0x33];          // 0x1c
-	struct SpeechEntry* m_next; // 0x4f
+	int32_t m_used;
+	int32_t m_id;
+	int32_t m_suffixId;
+	void* m_data;
+	void* m_suffixData;
+	int32_t m_deadline; // the clock tick a text-only message ends
+	int32_t m_priority;
+	char m_text[0x33];
+	struct SpeechEntry* m_next;
 } SpeechEntry;
 
 #pragma pack(pop)

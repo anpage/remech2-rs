@@ -377,8 +377,8 @@ PANE* FitRectToText(char* p_text, void* p_font, PANE* p_rect)
 
 // A pane and the colour PlotCenteredPixel draws into it.
 typedef struct CenteredDraw {
-	PANE* m_target;  // 0x00
-	uint8_t m_color; // 0x04
+	PANE* m_target;
+	uint8_t m_color;
 } CenteredDraw;
 
 // Plots a pixel of p_draw's colour at (p_width / 2, -p_height / 2) from the centre of its target

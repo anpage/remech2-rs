@@ -29,58 +29,58 @@ enum BwdTag {
 
 // The simulator's BwdHeader.
 struct BwdRootNode {
-	int32_t m_type;        // 0x00
-	int32_t m_size;        // 0x04
-	int32_t m_maxNodeSize; // 0x08 — BwdAddRegistryTemplate keeps it at the largest node's size
+	int32_t m_type;
+	int32_t m_size;
+	int32_t m_maxNodeSize; // BwdAddRegistryTemplate keeps it at the largest node's size
 };
 
 struct BwdRevisionNode {
-	int32_t m_type;     // 0x00
-	int32_t m_size;     // 0x04
-	char m_revision[4]; // 0x08
+	int32_t m_type;
+	int32_t m_size;
+	char m_revision[4];
 };
 
 // The simulator's DtblRecord.
 struct BwdTableNode {
-	int32_t m_type;           // 0x00
-	int32_t m_size;           // 0x04
-	uint32_t m_poolCounts[5]; // 0x08 — the counts the static pools are sized for, all 0
+	int32_t m_type;
+	int32_t m_size;
+	uint32_t m_poolCounts[5]; // the counts the static pools are sized for, all 0
 };
 
 // A bmid record: the simulator reads it as a ResourceRef.
 struct BwdLinkNode {
-	int32_t m_type;         // 0x00
-	int32_t m_size;         // 0x04
-	int16_t m_animation;    // 0x08 — the animation StartAnimation plays the bitmap before it in
-	int16_t m_reserved0x0a; // 0x0a — the start of the unused ResourceRef::m_name
+	int32_t m_type;
+	int32_t m_size;
+	int16_t m_animation;    // the animation StartAnimation plays the bitmap before it in
+	int16_t m_reserved0x0a; // the start of the unused ResourceRef::m_name
 };
 
 // One mech of a star, the simulator's IncludeRecord2 (gpspec); the registry takes its first 0x5a
 // bytes.
 struct BwdGpsNode {
-	int32_t m_type;                      // 0x00
-	int32_t m_size;                      // 0x04
-	int16_t m_mekId;                     // 0x08 — the variant's MEK resource, -2 for a user variant
-	int16_t m_id;                        // 0x0a — the chassis' gamepiece stream
-	uint8_t m_team;                      // 0x0c — the star's level: 0 the player's, 1 to 5 the enemy's
-	uint8_t m_leader;                    // 0x0d — 1: the first mech of the star
-	uint8_t m_ai;                        // 0x0e — Player::m_aiMode: 0 for the player's own mech, else 2
-	uint8_t m_reserved0x0f;              // 0x0f
-	int16_t m_aiParams[8];               // 0x10 — Player::m_aiParams: g_bwdDifficultySettings' row, then 0
-	int16_t m_events;                    // 0x20 — event types (WidenEventFlags)
-	int16_t m_flags;                     // 0x22 — Player::m_flags
-	char m_chassis[9];                   // 0x24
-	char m_config[9];                    // 0x2d — the variant's file name
-	char m_playerName[16];               // 0x36 — the pilot
-	uint8_t m_reserved0x46[0x5c - 0x46]; // 0x46 — the rest of the player's name, and the short name
+	int32_t m_type;
+	int32_t m_size;
+	int16_t m_mekId;  // the variant's MEK resource, -2 for a user variant
+	int16_t m_id;     // the chassis' gamepiece stream
+	uint8_t m_team;   // the star's level: 0 the player's, 1 to 5 the enemy's
+	uint8_t m_leader; // 1: the first mech of the star
+	uint8_t m_ai;     // Player::m_aiMode: 0 for the player's own mech, else 2
+	uint8_t m_reserved0x0f;
+	int16_t m_aiParams[8]; // Player::m_aiParams: g_bwdDifficultySettings' row, then 0
+	int16_t m_events;      // event types (WidenEventFlags)
+	int16_t m_flags;       // Player::m_flags
+	char m_chassis[9];
+	char m_config[9];                    // the variant's file name
+	char m_playerName[16];               // the pilot
+	uint8_t m_reserved0x46[0x5c - 0x46]; // the rest of the player's name, and the short name
 };
 
 // A node whose size depends on the name it carries.
 struct BwdNameNode {
-	int32_t m_type;       // 0x00
-	int32_t m_size;       // 0x04
-	int16_t m_resourceId; // 0x08
-	char m_name[1];       // 0x0a
+	int32_t m_type;
+	int32_t m_size;
+	int16_t m_resourceId;
+	char m_name[1];
 };
 
 // Heap callbacks registered with the archive unit (prjfile.c); the file unit's

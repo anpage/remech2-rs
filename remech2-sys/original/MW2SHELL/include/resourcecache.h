@@ -6,12 +6,12 @@
 // A cached resource, followed by its data. DumpResourceCache prints the fields as "ID", "Type"
 // and "Lock". Unlocked entries sit on the purge list, oldest first.
 typedef struct ResourceCacheEntry {
-	int16_t m_id;                           // 0x00
-	int16_t m_lock;                         // 0x02
-	uint32_t m_type;                        // 0x04 — the four-character type tag
-	struct ResourceCacheEntry* m_next;      // 0x08 — in the g_cacheTable bucket
-	struct ResourceCacheEntry* m_purgeNext; // 0x0c — toward g_purgeListTail
-	struct ResourceCacheEntry* m_purgePrev; // 0x10
+	int16_t m_id;
+	int16_t m_lock;
+	uint32_t m_type;                        // the four-character type tag
+	struct ResourceCacheEntry* m_next;      // in the g_cacheTable bucket
+	struct ResourceCacheEntry* m_purgeNext; // toward g_purgeListTail
+	struct ResourceCacheEntry* m_purgePrev;
 } ResourceCacheEntry;
 
 // The functions and globals of resourcecache.c that other units use.

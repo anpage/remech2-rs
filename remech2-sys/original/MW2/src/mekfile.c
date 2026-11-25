@@ -27,24 +27,24 @@
 // A .MEK file's header. The file goes on with the eight sections (MechSection), the weapons
 // (MekWeapon) and the ammunition bins (MekAmmo).
 typedef struct MekHeader {
-	int32_t m_tons;        // 0x00
-	int32_t m_speed;       // 0x04
-	int32_t m_jump;        // 0x08 — 0: no jump jets, negative: none either
-	int32_t m_heatSinks;   // 0x0c
-	int32_t m_weaponCount; // 0x10
-	int32_t m_ammoCount;   // 0x14
+	int32_t m_tons;
+	int32_t m_speed;
+	int32_t m_jump; // 0: no jump jets, negative: none either
+	int32_t m_heatSinks;
+	int32_t m_weaponCount;
+	int32_t m_ammoCount;
 } MekHeader;
 
 // A .MEK file's weapon: its type and the part it fires from.
 typedef struct MekWeapon {
-	int32_t m_type;      // 0x00 — a weapon type, times 100, and its id in MechSection::m_slots
-	int32_t m_hardpoint; // 0x04 — an index into Mech::m_objects; negative: the section holding it
+	int32_t m_type;      // a weapon type, times 100, and its id in MechSection::m_slots
+	int32_t m_hardpoint; // an index into Mech::m_objects; negative: the section holding it
 } MekWeapon;
 
 // A .MEK file's ammunition bin.
 typedef struct MekAmmo {
-	int32_t m_id;   // 0x00 — its id in MechSection::m_slots
-	int32_t m_type; // 0x04 — the MekWeapon::m_type it feeds
+	int32_t m_id;   // its id in MechSection::m_slots
+	int32_t m_type; // the MekWeapon::m_type it feeds
 } MekAmmo;
 
 // The value each weapon type adds to a mech's (GetMechValue).

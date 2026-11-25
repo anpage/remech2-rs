@@ -21,16 +21,16 @@ enum WindowMode {
 #pragma pack(1)
 // Function table of the active display back end (DirectDraw, DisplayDib or GDI).
 struct DisplayBackend {
-	int32_t m_id;                                                            // 0x00 — DisplayBackendId
-	int32_t m_windowMode;                                                    // 0x04 — WindowMode
-	uint32_t m_style;                                                        // 0x08 — the shell window's style
-	int32_t (*m_begin)(WINDOW* p_buffer, int32_t p_width, int32_t p_height); // 0x0c
-	int32_t (*m_end)(void);                                                  // 0x10
-	int32_t (*m_setPalette)(int32_t p_first, int32_t p_count, PaletteColor* p_palette, int32_t p_allColors); // 0x14
-	int32_t (*m_setPaletteWithBrightness)(PaletteColor* p_palette);                                          // 0x18
-	int32_t (*m_blendPalettes)(PaletteColor* p_palette, int32_t p_steps);                                    // 0x1c
+	int32_t m_id;         // DisplayBackendId
+	int32_t m_windowMode; // WindowMode
+	uint32_t m_style;     // the shell window's style
+	int32_t (*m_begin)(WINDOW* p_buffer, int32_t p_width, int32_t p_height);
+	int32_t (*m_end)(void);
+	int32_t (*m_setPalette)(int32_t p_first, int32_t p_count, PaletteColor* p_palette, int32_t p_allColors);
+	int32_t (*m_setPaletteWithBrightness)(PaletteColor* p_palette);
+	int32_t (*m_blendPalettes)(PaletteColor* p_palette, int32_t p_steps);
 	// Returns 0 once the framebuffer can be drawn to (GDI: points the output buffer at the DIB bits).
-	int32_t (*m_acquireFramebuffer)(void); // 0x20
+	int32_t (*m_acquireFramebuffer)(void);
 };
 typedef struct DisplayBackend DisplayBackend;
 #pragma pack()

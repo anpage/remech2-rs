@@ -15,14 +15,14 @@ extern "C"
 #pragma pack(1)
 	// A growable array of item pointers, optionally kept sorted by m_compare.
 	typedef struct Collection {
-		int32_t m_capacity;                         // 0x00
-		int32_t m_count;                            // 0x04
-		int32_t m_growBy;                           // 0x08
-		uint8_t m_flags;                            // 0x0c
-		int32_t m_unsorted;                         // 0x0d
-		void** m_items;                             // 0x11
-		void (*m_destroyItem)(void*);               // 0x15
-		int (*m_compare)(const void*, const void*); // 0x19
+		int32_t m_capacity;
+		int32_t m_count;
+		int32_t m_growBy;
+		uint8_t m_flags;
+		int32_t m_unsorted;
+		void** m_items;
+		void (*m_destroyItem)(void*);
+		int (*m_compare)(const void*, const void*);
 	} Collection;
 #pragma pack()
 

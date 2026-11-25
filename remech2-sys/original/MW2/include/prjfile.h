@@ -7,43 +7,43 @@
 
 // A resource type in a PROJ file's header: its tag and its index of resources.
 typedef struct PrjType {
-	char m_tag[4];                       // 0x00
-	int32_t m_indexOffset;               // 0x04 — in the file, 0: no index
-	uint32_t m_indexSize;                // 0x08
-	uint8_t m_reserved0x0c[0x14 - 0x0c]; // 0x0c
-	uint16_t m_indexBase;                // 0x14 — a base the index's entries are relative to
-	uint16_t m_reserved0x16;             // 0x16
+	char m_tag[4];
+	int32_t m_indexOffset; // in the file, 0: no index
+	uint32_t m_indexSize;
+	uint8_t m_reserved0x0c[0x14 - 0x0c];
+	uint16_t m_indexBase; // a base the index's entries are relative to
+	uint16_t m_reserved0x16;
 } PrjType;
 
 // The header of a PROJ file, from file offset 0x0c.
 typedef struct PrjHeader {
-	uint8_t m_reserved0x00[0x0c]; // 0x00
-	uint16_t m_typeCount;         // 0x0c
-	PrjType m_types[1];           // 0x0e
+	uint8_t m_reserved0x00[0x0c];
+	uint16_t m_typeCount;
+	PrjType m_types[1];
 } PrjHeader;
 
 typedef struct PrjIndexEntry {
-	int32_t m_offset; // 0x00 — from the type's base
-	int32_t m_end;    // 0x04 — from the type's base
+	int32_t m_offset; // from the type's base
+	int32_t m_end;    // from the type's base
 } PrjIndexEntry;
 
 // A type's index of resources, by resource ID.
 typedef struct PrjIndex {
-	uint8_t m_reserved0x00[0x16]; // 0x00
-	PrjIndexEntry m_entries[1];   // 0x16
+	uint8_t m_reserved0x00[0x16];
+	PrjIndexEntry m_entries[1];
 } PrjIndex;
 
 typedef struct PrjTypeSlot {
-	PrjIndex* m_index; // 0x00 — loaded on first use
+	PrjIndex* m_index; // loaded on first use
 } PrjTypeSlot;
 
 // An open PROJ file.
 typedef struct PrjFile {
-	int32_t m_fd;            // 0x00
-	uint16_t m_open;         // 0x04
-	PrjHeader* m_header;     // 0x06
-	PrjTypeSlot m_types[32]; // 0x2a
-	char m_name[0x20];       // 0x12a
+	int32_t m_fd;
+	uint16_t m_open;
+	PrjHeader* m_header;
+	PrjTypeSlot m_types[32];
+	char m_name[0x20];
 } PrjFile;
 
 #pragma pack(pop)

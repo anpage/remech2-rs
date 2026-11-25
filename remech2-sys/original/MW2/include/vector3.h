@@ -5,9 +5,9 @@
 
 // A point in the world.
 typedef struct Vector3 {
-	int32_t m_x; // 0x00
-	int32_t m_y; // 0x04
-	int32_t m_z; // 0x08
+	int32_t m_x;
+	int32_t m_y;
+	int32_t m_z;
 } Vector3;
 
 #endif // VECTOR3_H

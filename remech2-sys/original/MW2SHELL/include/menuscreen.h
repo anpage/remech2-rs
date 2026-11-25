@@ -9,10 +9,10 @@
 // message (0x24 to 0x29 for the clan halls, ready rooms and cadet training), but PlayMidiSong
 // goes by the message and nothing reads m_song.
 struct MenuScreen {
-	MainMenuButton* m_buttons; // 0x00
-	int32_t m_count;           // 0x04
-	int32_t m_picture;         // 0x08 — for VideoDriver::LoadBackground
-	int32_t m_song;            // 0x0c
+	MainMenuButton* m_buttons;
+	int32_t m_count;
+	int32_t m_picture; // for VideoDriver::LoadBackground
+	int32_t m_song;
 };
 
 #endif // MENUSCREEN_H

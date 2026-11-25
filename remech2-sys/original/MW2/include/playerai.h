@@ -6,12 +6,12 @@
 
 // A player's AI state (Player::m_ai): the posted message, its state and its target and goal.
 typedef struct PlayerAi {
-	AiMessage m_posted; // 0x00
-	int16_t m_state;    // 0x06
-	uint16_t m_target;  // 0x08
-	uint16_t m_goal;    // 0x0a
-	uint16_t m_value;   // 0x0c — the mech's (GetMechValue): AssignStarTarget matches it
-	int16_t m_flags;    // 0x0e
+	AiMessage m_posted;
+	int16_t m_state;
+	uint16_t m_target;
+	uint16_t m_goal;
+	uint16_t m_value; // the mech's (GetMechValue): AssignStarTarget matches it
+	int16_t m_flags;
 } PlayerAi;
 
 #endif // PLAYERAI_H

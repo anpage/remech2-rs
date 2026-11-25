@@ -14,20 +14,19 @@ struct ResourceRef;
 #pragma pack(1)
 // The difficulty settings, read from a .cfg file as one block.
 typedef struct DifficultyCfg {
-	uint8_t m_unlimitedAmmo;   // 0x00 — the "cia" cheat; cleared in network games with more than one player
-	uint8_t m_invulnerable;    // 0x01 — the "blorb" cheat; cleared in network games
-	uint8_t m_splashDamage;    // 0x02 — splash damage hurts mechs; set in network games with more than one player
-	uint8_t m_collisionDamage; // 0x03 — collisions hurt mechs; set in network games with more than one player
-	uint8_t m_heatTracking;    // 0x04 — fires heat mechs nearby; set in network games with more than one player
-	uint8_t m_enemySkill;      // 0x05 — 0 easy, 1 medium, 2 hard (MW2SHELL); 2 in network games
-	uint8_t m_reserved0x06[2]; // 0x06
-	uint8_t m_regenerate;      // 0x08 — after the mission ends, the local player can regenerate
-	uint8_t
-		m_radar; // 0x09 — the radar and auto targeting (NETMECHW's "Radar + Auto Targeting"); set outside network games
-	uint8_t m_teamGame;     // 0x0a
-	uint32_t m_timeOfDay;   // 0x0b — the time of day phase a network game starts at; cleared outside network games
-	uint32_t m_gravity;     // 0x0f — overrides the planet's gravity when set; cleared outside network games
-	uint32_t m_temperature; // 0x13 — overrides the planet's temperature when set; cleared outside network games
+	uint8_t m_unlimitedAmmo;   // the "cia" cheat; cleared in network games with more than one player
+	uint8_t m_invulnerable;    // the "blorb" cheat; cleared in network games
+	uint8_t m_splashDamage;    // splash damage hurts mechs; set in network games with more than one player
+	uint8_t m_collisionDamage; // collisions hurt mechs; set in network games with more than one player
+	uint8_t m_heatTracking;    // fires heat mechs nearby; set in network games with more than one player
+	uint8_t m_enemySkill;      // 0 easy, 1 medium, 2 hard (MW2SHELL); 2 in network games
+	uint8_t m_reserved0x06[2];
+	uint8_t m_regenerate; // after the mission ends, the local player can regenerate
+	uint8_t m_radar; // the radar and auto targeting (NETMECHW's "Radar + Auto Targeting"); set outside network games
+	uint8_t m_teamGame;
+	uint32_t m_timeOfDay;   // the time of day phase a network game starts at; cleared outside network games
+	uint32_t m_gravity;     // overrides the planet's gravity when set; cleared outside network games
+	uint32_t m_temperature; // overrides the planet's temperature when set; cleared outside network games
 } DifficultyCfg;
 #pragma pack()
 

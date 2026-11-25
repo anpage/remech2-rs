@@ -5,8 +5,8 @@
 
 // A BWD record's header. The size counts the whole record, header included.
 typedef struct BwdRecord {
-	uint32_t m_tag;  // 0x00
-	uint32_t m_size; // 0x04
+	uint32_t m_tag;
+	uint32_t m_size;
 } BwdRecord;
 
 #endif // BWDRECORD_H

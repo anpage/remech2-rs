@@ -11,36 +11,36 @@ typedef struct CockpitPanel CockpitPanel;
    of a pane with a table of methods. InitCockpitPanel sets the defaults, and InitCockpitPanels
    installs the drawing handlers, which UpdateCockpit calls by the local mech's power state. */
 struct CockpitPanel {
-	CockpitPanel* m_self;  // 0x00
-	int16_t m_enabled;     // 0x04
-	int16_t m_damage;      // 0x06 — hits step it (DamageCockpitPanels); the panel flickers or shows static as it rises
-	int32_t m_lightUpTime; // 0x08 — the clock time the panel lights up at on startup
-	int32_t m_weapon;      // 0x0c — the weapon a weapon panel shows, -1: none
-	char m_name[0x20];     // 0x10
-	PANE* m_target;        // 0x30
-	struct Point* m_textOrigin;                        // 0x34 — where its text goes
-	struct RectTransition* m_transition;               // 0x38
-	int32_t m_lastPowerState;                          // 0x3c — the power state it last drew in (g_cockpitPowerState)
-	int16_t m_x;                                       // 0x40
-	int16_t m_y;                                       // 0x42
-	int16_t m_width;                                   // 0x44
-	int16_t m_height;                                  // 0x46
-	void (*m_init)(CockpitPanel*);                     // 0x48
-	void (*m_shutdown)(CockpitPanel*);                 // 0x4c — ShutdownCockpitPanels calls it
-	void (*m_setLightUpTime)(CockpitPanel*, uint32_t); // 0x50
-	void (*m_setWeapon)(CockpitPanel*, int32_t);       // 0x54
-	void (*m_setName)(CockpitPanel*, const char*);     // 0x58
-	void (*m_setTarget)(CockpitPanel*, PANE*);         // 0x5c
-	void (*m_setTextOrigin)(CockpitPanel*, struct Point*);                // 0x60
-	void (*m_setTransition)(CockpitPanel*, struct RectTransition*);       // 0x64
-	void (*m_setRect)(CockpitPanel*, int32_t, int32_t, int32_t, int32_t); // 0x68
-	void (*m_setDamage)(CockpitPanel*, int32_t);                          // 0x6c
-	void (*m_enable)(CockpitPanel*);                                      // 0x70
-	void (*m_disable)(CockpitPanel*);                                     // 0x74
-	void (*m_drawStartup)(CockpitPanel*);  // 0x78 — while the mech starts up (power state 1)
-	void (*m_draw)(CockpitPanel*);         // 0x7c — while it runs (2)
-	void (*m_drawShutdown)(CockpitPanel*); // 0x80 — in the other states
-	void (*m_drawStatic)(CockpitPanel*);   // 0x84 — the panel as static; nothing calls it through here
+	CockpitPanel* m_self;
+	int16_t m_enabled;
+	int16_t m_damage;      // hits step it (DamageCockpitPanels); the panel flickers or shows static as it rises
+	int32_t m_lightUpTime; // the clock time the panel lights up at on startup
+	int32_t m_weapon;      // the weapon a weapon panel shows, -1: none
+	char m_name[0x20];
+	PANE* m_target;
+	struct Point* m_textOrigin; // where its text goes
+	struct RectTransition* m_transition;
+	int32_t m_lastPowerState; // the power state it last drew in (g_cockpitPowerState)
+	int16_t m_x;
+	int16_t m_y;
+	int16_t m_width;
+	int16_t m_height;
+	void (*m_init)(CockpitPanel*);
+	void (*m_shutdown)(CockpitPanel*); // ShutdownCockpitPanels calls it
+	void (*m_setLightUpTime)(CockpitPanel*, uint32_t);
+	void (*m_setWeapon)(CockpitPanel*, int32_t);
+	void (*m_setName)(CockpitPanel*, const char*);
+	void (*m_setTarget)(CockpitPanel*, PANE*);
+	void (*m_setTextOrigin)(CockpitPanel*, struct Point*);
+	void (*m_setTransition)(CockpitPanel*, struct RectTransition*);
+	void (*m_setRect)(CockpitPanel*, int32_t, int32_t, int32_t, int32_t);
+	void (*m_setDamage)(CockpitPanel*, int32_t);
+	void (*m_enable)(CockpitPanel*);
+	void (*m_disable)(CockpitPanel*);
+	void (*m_drawStartup)(CockpitPanel*);  // while the mech starts up (power state 1)
+	void (*m_draw)(CockpitPanel*);         // while it runs (2)
+	void (*m_drawShutdown)(CockpitPanel*); // in the other states
+	void (*m_drawStatic)(CockpitPanel*);   // the panel as static; nothing calls it through here
 };
 
 // The cockpit panels, by index in g_cockpitPanels.

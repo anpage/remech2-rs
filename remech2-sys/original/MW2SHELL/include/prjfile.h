@@ -5,30 +5,30 @@
 
 #pragma pack(1)
 typedef struct ArchiveEntry {
-	char m_name[4];                      // 0x00
-	uint32_t m_offset;                   // 0x04
-	uint32_t m_size;                     // 0x08
-	uint8_t m_reserved0x0c[0x14 - 0x0c]; // 0x0c
-	uint16_t m_baseOffset;               // 0x14
-	uint8_t m_reserved0x16[0x18 - 0x16]; // 0x16
+	char m_name[4];
+	uint32_t m_offset;
+	uint32_t m_size;
+	uint8_t m_reserved0x0c[0x14 - 0x0c];
+	uint16_t m_baseOffset;
+	uint8_t m_reserved0x16[0x18 - 0x16];
 } ArchiveEntry;
 
 typedef struct ArchiveHeader {
-	uint8_t m_reserved0x00[0x0c]; // 0x00
-	uint16_t m_entryCount;        // 0x0c
-	ArchiveEntry m_entries[1];    // 0x0e
+	uint8_t m_reserved0x00[0x0c];
+	uint16_t m_entryCount;
+	ArchiveEntry m_entries[1];
 } ArchiveHeader;
 
 typedef struct ArchiveSlotEntry {
-	void* m_data; // 0x00
+	void* m_data;
 } ArchiveSlotEntry;
 
 typedef struct ArchiveSlot {
-	int32_t m_fd;                     // 0x00
-	uint16_t m_open;                  // 0x04
-	ArchiveHeader* m_header;          // 0x06
-	ArchiveSlotEntry m_entries[0x20]; // 0x2a
-	char m_name[0x20];                // 0x12a
+	int32_t m_fd;
+	uint16_t m_open;
+	ArchiveHeader* m_header;
+	ArchiveSlotEntry m_entries[0x20];
+	char m_name[0x20];
 } ArchiveSlot;
 #pragma pack()
 

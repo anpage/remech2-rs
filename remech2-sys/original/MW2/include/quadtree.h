@@ -12,14 +12,14 @@ struct Shape;
 // after the header (uint32_t each). AllocQuadtreeNode allocates it; Shape::m_collisionData holds the root
 // when the shape's m_collisionType is 5.
 typedef struct QuadtreeNode {
-	int32_t m_minX;                     // 0x00
-	int32_t m_maxX;                     // 0x04
-	int32_t m_minY;                     // 0x08
-	int32_t m_maxY;                     // 0x0c
-	int32_t m_minZ;                     // 0x10
-	int32_t m_maxZ;                     // 0x14
-	int32_t m_faceCount;                // 0x18
-	struct QuadtreeNode* m_children[4]; // 0x1c
+	int32_t m_minX;
+	int32_t m_maxX;
+	int32_t m_minY;
+	int32_t m_maxY;
+	int32_t m_minZ;
+	int32_t m_maxZ;
+	int32_t m_faceCount;
+	struct QuadtreeNode* m_children[4];
 } QuadtreeNode;
 
 // The functions and globals of quadtree.c that other units use.

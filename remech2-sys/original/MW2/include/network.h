@@ -10,52 +10,52 @@ struct NetLaunchInfo;
 
 // DA: a player's state, filled from the local player every g_stateInterval ticks.
 typedef struct NetStateMsg {
-	char m_tag[2];           // 0x00
-	uint8_t m_player;        // 0x02
-	int16_t m_target;        // 0x03 — the player's target (PlayerTargetInfo::m_target)
-	int16_t m_killer;        // 0x05
-	uint16_t m_flags;        // 0x07 — the power state in the low nibble
-	int32_t m_rearArmor3;    // 0x09 — m_sections[3].m_armor[1]
-	int32_t m_rearArmor2;    // 0x0d — m_sections[2]'s
-	int32_t m_rearArmor1;    // 0x11 — m_sections[1]'s
-	int32_t m_frontArmor[8]; // 0x15 — each section's m_armor[0]
-	int32_t m_internal[8];   // 0x35 — each section's m_internal
-	int32_t m_clock;         // 0x55
-	int32_t m_x;             // 0x59
-	int32_t m_y;             // 0x5d
-	int32_t m_z;             // 0x61
-	int32_t m_pitch;         // 0x65
-	int32_t m_heading;       // 0x69
-	int32_t m_roll;          // 0x6d
-	int32_t m_speed;         // 0x71
-	int32_t m_throttle;      // 0x75
-	int32_t m_turnRate;      // 0x79
-	int32_t m_torsoTwist;    // 0x7d
-	int32_t m_torsoPitch;    // 0x81
+	char m_tag[2];
+	uint8_t m_player;
+	int16_t m_target; // the player's target (PlayerTargetInfo::m_target)
+	int16_t m_killer;
+	uint16_t m_flags;        // the power state in the low nibble
+	int32_t m_rearArmor3;    // m_sections[3].m_armor[1]
+	int32_t m_rearArmor2;    // m_sections[2]'s
+	int32_t m_rearArmor1;    // m_sections[1]'s
+	int32_t m_frontArmor[8]; // each section's m_armor[0]
+	int32_t m_internal[8];   // each section's m_internal
+	int32_t m_clock;
+	int32_t m_x;
+	int32_t m_y;
+	int32_t m_z;
+	int32_t m_pitch;
+	int32_t m_heading;
+	int32_t m_roll;
+	int32_t m_speed;
+	int32_t m_throttle;
+	int32_t m_turnRate;
+	int32_t m_torsoTwist;
+	int32_t m_torsoPitch;
 } NetStateMsg;
 
 // WE: the weapons a player fired since the last one, a bit each.
 typedef struct NetWeaponsMsg {
-	char m_tag[2];      // 0x00
-	uint8_t m_player;   // 0x02
-	uint16_t m_weapons; // 0x03
+	char m_tag[2];
+	uint8_t m_player;
+	uint16_t m_weapons;
 } NetWeaponsMsg;
 
 // CO: a collision push, sent to the player pushed.
 typedef struct NetCollisionMsg {
-	char m_tag[2];       // 0x00
-	int32_t m_normalX;   // 0x02
-	int32_t m_normalY;   // 0x06
-	int32_t m_normalZ;   // 0x0a
-	int32_t m_velocityX; // 0x0e — the pusher's Mech::m_newVelocityX
-	int32_t m_velocityY; // 0x12
-	int32_t m_velocityZ; // 0x16
+	char m_tag[2];
+	int32_t m_normalX;
+	int32_t m_normalY;
+	int32_t m_normalZ;
+	int32_t m_velocityX; // the pusher's Mech::m_newVelocityX
+	int32_t m_velocityY;
+	int32_t m_velocityZ;
 } NetCollisionMsg;
 
 // CH: a chat line.
 typedef struct NetChatMsg {
-	char m_tag[2];     // 0x00
-	char m_text[0x50]; // 0x02
+	char m_tag[2];
+	char m_text[0x50];
 } NetChatMsg;
 
 #pragma pack(pop)

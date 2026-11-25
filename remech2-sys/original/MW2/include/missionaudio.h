@@ -5,8 +5,8 @@
 
 // A project file entry: a sound file name, chained in its hash bucket.
 typedef struct ProjectFileEntry {
-	char m_name[0x10];               // 0x00
-	struct ProjectFileEntry* m_next; // 0x10
+	char m_name[0x10];
+	struct ProjectFileEntry* m_next;
 } ProjectFileEntry;
 
 // The functions of missionaudio.c that other units use.

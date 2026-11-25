@@ -21,9 +21,9 @@
 
 // A player's model level as ChoosePlayerDetailLevels chooses it.
 typedef struct PlayerDetail {
-	int32_t m_distance; // 0x00 — from the eyepoint
-	int32_t m_level;    // 0x04 — -2 until chosen by distance
-	int32_t m_player;   // 0x08
+	int32_t m_distance; // from the eyepoint
+	int32_t m_level;    // -2 until chosen by distance
+	int32_t m_player;
 } PlayerDetail;
 
 int32_t g_classEntryCount = 0;

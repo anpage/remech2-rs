@@ -9,18 +9,18 @@
 // opens, its center, the transform it was opened with, the matrix that places its objects
 // and the enclosing block.
 typedef struct StaticBlock {
-	int32_t m_minX;    // 0x00
-	int32_t m_minY;    // 0x04
-	int32_t m_minZ;    // 0x08
-	int32_t m_maxX;    // 0x0c
-	int32_t m_maxY;    // 0x10
-	int32_t m_maxZ;    // 0x14
-	int32_t m_centerX; // 0x18
-	int32_t m_centerY; // 0x1c
-	int32_t m_centerZ; // 0x20
-	Xform m_xform;     // 0x24
-	Matrix m_matrix;   // 0x48
-	int32_t m_parent;  // 0x78 — the enclosing block, -1: none
+	int32_t m_minX;
+	int32_t m_minY;
+	int32_t m_minZ;
+	int32_t m_maxX;
+	int32_t m_maxY;
+	int32_t m_maxZ;
+	int32_t m_centerX;
+	int32_t m_centerY;
+	int32_t m_centerZ;
+	Xform m_xform;
+	Matrix m_matrix;
+	int32_t m_parent; // the enclosing block, -1: none
 } StaticBlock;
 
 #endif // STATICBLOCK_H

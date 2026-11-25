@@ -33,8 +33,8 @@ public:
 
 	// A link to another entry.
 	struct Topic {
-		int32_t m_id;    // 0x00
-		int16_t m_entry; // 0x04
+		int32_t m_id;
+		int16_t m_entry;
 	};
 
 	ArchiveReader(
@@ -59,20 +59,20 @@ public:
 	void Load(int32_t p_entry);
 
 private:
-	ButtonMenu* m_menu;         // 0x00
-	TMPackDataBase* m_database; // 0x04
-	Font* m_font;               // 0x0c
-	ArchiveReader* m_child;     // 0x10
-	TextGlyph* m_titleGlyph;    // 0x1c
-	Collection* m_topics;       // 0x20
-	uint8_t m_colors[0x100];    // 0x24
-	uint8_t m_ownsDatabase;     // 0x124
-	MainMenuButton* m_buttons;  // 0x125
-	int32_t m_count;            // 0x129
-	Collection* m_pages;        // 0x12d
-	int32_t m_page;             // 0x131
-	Page* m_currentPage;        // 0x135
-	char m_title[0x80];         // 0x139
+	ButtonMenu* m_menu;
+	TMPackDataBase* m_database;
+	Font* m_font;
+	ArchiveReader* m_child;
+	TextGlyph* m_titleGlyph;
+	Collection* m_topics;
+	uint8_t m_colors[0x100];
+	uint8_t m_ownsDatabase;
+	MainMenuButton* m_buttons;
+	int32_t m_count;
+	Collection* m_pages;
+	int32_t m_page;
+	Page* m_currentPage;
+	char m_title[0x80];
 };
 
 #pragma pack()

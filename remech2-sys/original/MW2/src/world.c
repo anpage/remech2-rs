@@ -65,185 +65,185 @@
 
 // planet: the gravity, the time of day and climate, and render switches.
 typedef struct BwdPlanetRecord {
-	BwdRecord m_header;         // 0x00
-	int32_t m_gravity;          // 0x08 — in g
-	uint32_t m_reserved0x0c;    // 0x0c
-	int32_t m_daysPerYear;      // 0x10
-	int32_t m_secondsPerDay;    // 0x14
-	uint32_t m_reserved0x18[3]; // 0x18
-	int32_t m_temperature;      // 0x24
-	int32_t m_jumpJetDrag;      // 0x28
-	int32_t m_mapShadeTop;      // 0x2c
-	int32_t m_mapShadeBase;     // 0x30
-	int32_t m_slideSlope;       // 0x34
-	int32_t m_breathable;       // 0x38
-	int32_t m_brightenDamage;   // 0x3c
-	int32_t m_noEffectCamera;   // 0x40
-	int32_t m_noSky;            // 0x44
-	int32_t m_noGround;         // 0x48
-	int32_t m_noHorizonBand;    // 0x4c
+	BwdRecord m_header;
+	int32_t m_gravity; // in g
+	uint32_t m_reserved0x0c;
+	int32_t m_daysPerYear;
+	int32_t m_secondsPerDay;
+	uint32_t m_reserved0x18[3];
+	int32_t m_temperature;
+	int32_t m_jumpJetDrag;
+	int32_t m_mapShadeTop;
+	int32_t m_mapShadeBase;
+	int32_t m_slideSlope;
+	int32_t m_breathable;
+	int32_t m_brightenDamage;
+	int32_t m_noEffectCamera;
+	int32_t m_noSky;
+	int32_t m_noGround;
+	int32_t m_noHorizonBand;
 } BwdPlanetRecord;
 
 // hiddentext.
 typedef struct BwdTextRecord {
-	BwdRecord m_header; // 0x00
-	char m_text[1];     // 0x08
+	BwdRecord m_header;
+	char m_text[1];
 } BwdTextRecord;
 
 // A record of two values.
 typedef struct BwdPairRecord {
-	BwdRecord m_header; // 0x00
-	int32_t m_a;        // 0x08
-	int32_t m_b;        // 0x0c
+	BwdRecord m_header;
+	int32_t m_a;
+	int32_t m_b;
 } BwdPairRecord;
 
 // A record of a resource: luma, music, animsound, bitmap prj and id list, the cockpit files.
 typedef struct BwdResourceRecord {
-	BwdRecord m_header; // 0x00
-	ResourceRef m_ref;  // 0x08
+	BwdRecord m_header;
+	ResourceRef m_ref;
 } BwdResourceRecord;
 
 // now: the time of day.
 typedef struct BwdNowRecord {
-	BwdRecord m_header;         // 0x00
-	uint32_t m_reserved0x08[2]; // 0x08
-	int32_t m_timeOfDay;        // 0x10
-	int16_t m_dayOfYear;        // 0x14
+	BwdRecord m_header;
+	uint32_t m_reserved0x08[2];
+	int32_t m_timeOfDay;
+	int16_t m_dayOfYear;
 } BwdNowRecord;
 
 // palettegroup: the palettes of the 20 slots.
 typedef struct BwdPaletteGroupRecord {
-	BwdRecord m_header; // 0x00
-	int16_t m_ids[20];  // 0x08
+	BwdRecord m_header;
+	int16_t m_ids[20];
 } BwdPaletteGroupRecord;
 
 // light: the eyepoint's light.
 typedef struct BwdLightRecord {
-	BwdRecord m_header;         // 0x00
-	uint32_t m_reserved0x08[2]; // 0x08
-	int32_t m_x;                // 0x10
-	int32_t m_y;                // 0x14
-	int32_t m_z;                // 0x18
-	int16_t m_ambient;          // 0x1c
-	int16_t m_directional;      // 0x1e
-	int32_t m_fadeDistance;     // 0x20
+	BwdRecord m_header;
+	uint32_t m_reserved0x08[2];
+	int32_t m_x;
+	int32_t m_y;
+	int32_t m_z;
+	int16_t m_ambient;
+	int16_t m_directional;
+	int32_t m_fadeDistance;
 } BwdLightRecord;
 
 // A window record's rectangle for one of g_panes.
 typedef struct BwdWindowEntry {
-	int32_t m_index;            // 0x00
-	int32_t m_x;                // 0x04
-	int32_t m_y;                // 0x08
-	int32_t m_width;            // 0x0c
-	int32_t m_height;           // 0x10
-	uint32_t m_reserved0x14[3]; // 0x14
+	int32_t m_index;
+	int32_t m_x;
+	int32_t m_y;
+	int32_t m_width;
+	int32_t m_height;
+	uint32_t m_reserved0x14[3];
 } BwdWindowEntry;
 
 // window: rectangles for the panes, as many as fit the record.
 typedef struct BwdWindowRecord {
-	BwdRecord m_header;          // 0x00
-	BwdWindowEntry m_entries[1]; // 0x08
+	BwdRecord m_header;
+	BwdWindowEntry m_entries[1];
 } BwdWindowRecord;
 
 // start: the eyepoint's view.
 typedef struct BwdStartRecord {
-	BwdRecord m_header;  // 0x00
-	int32_t m_values[7]; // 0x08 — Eyepoint 0x00-0x18
+	BwdRecord m_header;
+	int32_t m_values[7]; // Eyepoint 0x00-0x18
 } BwdStartRecord;
 
 // A record of two resource numbers: bitmapsection, bitmapenable.
 typedef struct BwdIdPairRecord {
-	BwdRecord m_header; // 0x00
-	int16_t m_a;        // 0x08
-	int16_t m_b;        // 0x0a
+	BwdRecord m_header;
+	int16_t m_a;
+	int16_t m_b;
 } BwdIdPairRecord;
 
 // polyoffset: the shape offset.
 typedef struct BwdOffsetRecord {
-	BwdRecord m_header; // 0x00
-	int32_t m_x;        // 0x08
-	int32_t m_y;        // 0x0c
-	int32_t m_z;        // 0x10
+	BwdRecord m_header;
+	int32_t m_x;
+	int32_t m_y;
+	int32_t m_z;
 } BwdOffsetRecord;
 
 // blockxform.
 typedef struct BwdXformRecord {
-	BwdRecord m_header; // 0x00
-	Xform m_xform;      // 0x08
+	BwdRecord m_header;
+	Xform m_xform;
 } BwdXformRecord;
 
 // A record of an object class or thing, and a value: scrounge, thing, gamepiece, eyeobj, pof,
 // objloc, booyowthing, xplode, lightobj. Only xplode records carry m_effectType.
 typedef struct BwdIdRecord {
-	BwdRecord m_header;   // 0x00
-	int16_t m_id;         // 0x08
-	int16_t m_value;      // 0x0a
-	int16_t m_effectType; // 0x0c
+	BwdRecord m_header;
+	int16_t m_id;
+	int16_t m_value;
+	int16_t m_effectType;
 } BwdIdRecord;
 
 // gamething: an object (and its replacement) that counts for the mission.
 typedef struct BwdGameThingRecord {
-	BwdRecord m_header;      // 0x00
-	int16_t m_objects[4][2]; // 0x08 — the object and its replacement
-	int16_t m_hitPoints;     // 0x18
-	uint16_t m_events;       // 0x1a
-	int32_t m_flags;         // 0x1c
-	char m_name[0x16];       // 0x20
-	char m_shortName[0x16];  // 0x36
+	BwdRecord m_header;
+	int16_t m_objects[4][2]; // the object and its replacement
+	int16_t m_hitPoints;
+	uint16_t m_events;
+	int32_t m_flags;
+	char m_name[0x16];
+	char m_shortName[0x16];
 } BwdGameThingRecord;
 
 // navpoint.
 typedef struct BwdNavPointRecord {
-	BwdRecord m_header; // 0x00
-	Vector3 m_position; // 0x08
-	int32_t m_heading;  // 0x14
-	int16_t m_used;     // 0x18
-	int16_t m_flags;    // 0x1a
-	int16_t m_owner;    // 0x1c
-	int16_t m_team;     // 0x1e
-	uint16_t m_radius;  // 0x20 — in hundreds
-	uint16_t m_events;  // 0x22
-	char m_name[0x16];  // 0x24
+	BwdRecord m_header;
+	Vector3 m_position;
+	int32_t m_heading;
+	int16_t m_used;
+	int16_t m_flags;
+	int16_t m_owner;
+	int16_t m_team;
+	uint16_t m_radius; // in hundreds
+	uint16_t m_events;
+	char m_name[0x16];
 } BwdNavPointRecord;
 
 // navobject: a nav point on an object.
 typedef struct BwdNavObjectRecord {
-	BwdRecord m_header;     // 0x00
-	int16_t m_reserved0x08; // 0x08
-	int16_t m_id;           // 0x0a
-	int16_t m_radius;       // 0x0c
-	uint16_t m_events;      // 0x0e
+	BwdRecord m_header;
+	int16_t m_reserved0x08;
+	int16_t m_id;
+	int16_t m_radius;
+	uint16_t m_events;
 } BwdNavObjectRecord;
 
 // task: a timed callback, on an object or detached.
 typedef struct BwdTaskRecord {
-	BwdRecord m_header; // 0x00
-	int16_t m_kind;     // 0x08 — an index into g_taskFns
-	int32_t m_period;   // 0x0a
-	char m_data[1];     // 0x0e — "object;..."
+	BwdRecord m_header;
+	int16_t m_kind; // an index into g_taskFns
+	int32_t m_period;
+	char m_data[1]; // "object;..."
 } BwdTaskRecord;
 
 // position and rotate: an object class's instance, placed.
 typedef struct BwdPlaceRecord {
-	BwdRecord m_header; // 0x00
-	int16_t m_id;       // 0x08
-	int32_t m_x;        // 0x0a
-	int32_t m_y;        // 0x0e
-	int32_t m_z;        // 0x12
+	BwdRecord m_header;
+	int16_t m_id;
+	int32_t m_x;
+	int32_t m_y;
+	int32_t m_z;
 } BwdPlaceRecord;
 
 // anim2d's parameters (LoadAnim2d).
 typedef struct BwdAnim2dSpec {
-	int16_t m_flags;      // 0x00
-	int16_t m_frameTime;  // 0x02
-	int16_t m_type;       // 0x04
-	int16_t m_resourceId; // 0x06
+	int16_t m_flags;
+	int16_t m_frameTime;
+	int16_t m_type;
+	int16_t m_resourceId;
 } BwdAnim2dSpec;
 
 // anim2d.
 typedef struct BwdAnim2dRecord {
-	BwdRecord m_header;   // 0x00
-	BwdAnim2dSpec m_spec; // 0x08
+	BwdRecord m_header;
+	BwdAnim2dSpec m_spec;
 } BwdAnim2dRecord;
 
 #pragma pack(pop)

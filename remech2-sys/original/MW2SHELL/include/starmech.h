@@ -5,9 +5,9 @@
 
 // One mech of a star: a negative m_chassis leaves the slot empty.
 struct StarMech {
-	int32_t m_chassis;    // 0x00 — an index into g_mechChassis (mechbay.cpp)
-	char m_variant[0x10]; // 0x04 — variant file name
-	char m_pilot[0x10];   // 0x14 — pilot name
+	int32_t m_chassis;    // an index into g_mechChassis (mechbay.cpp)
+	char m_variant[0x10]; // variant file name
+	char m_pilot[0x10];   // pilot name
 };
 
 #endif // STARMECH_H

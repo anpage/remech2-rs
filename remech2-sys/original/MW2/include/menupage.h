@@ -14,14 +14,14 @@ typedef int32_t (*MenuPageInitFn)(struct MenuDefinition* p_menu, struct MenuPage
 // A page of a menu: its items, some of which the page's callbacks copy from templates at the
 // end of the table.
 typedef struct MenuPage {
-	int32_t m_state;       // 0x00 — 0: new, 1: opening, 2: open, 3: opening a subpage, 4: accepted,
-						   // 5: cancelled (RunMenuItems)
-	char* m_title;         // 0x04
-	uint32_t m_aiSlot;     // 0x08 — an AI slot (FindStarSlotPlayer)
-	int32_t m_itemCount;   // 0x0c
-	int32_t m_selected;    // 0x10 — the highlighted item
-	MenuPageInitFn m_init; // 0x14
-	MenuItem m_items[16];  // 0x18
+	int32_t m_state; // 0: new, 1: opening, 2: open, 3: opening a subpage, 4: accepted,
+					 // 5: cancelled (RunMenuItems)
+	char* m_title;
+	uint32_t m_aiSlot; // an AI slot (FindStarSlotPlayer)
+	int32_t m_itemCount;
+	int32_t m_selected; // the highlighted item
+	MenuPageInitFn m_init;
+	MenuItem m_items[16];
 } MenuPage;
 
 #endif // MENUPAGE_H

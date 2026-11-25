@@ -5,18 +5,18 @@
 
 // A static pool: the room reserved for the blocks of one tag, inside one of the groups.
 typedef struct StaticPool {
-	uint32_t m_tag;   // 0x00 — a keyword code
-	int32_t m_size;   // 0x04
-	int32_t m_used;   // 0x08
-	int32_t m_group;  // 0x0c — the index in g_staticPoolGroups
-	int32_t m_offset; // 0x10 — in the group's block
+	uint32_t m_tag; // a keyword code
+	int32_t m_size;
+	int32_t m_used;
+	int32_t m_group;  // the index in g_staticPoolGroups
+	int32_t m_offset; // in the group's block
 } StaticPool;
 
 // One allocation that static pools share.
 typedef struct StaticPoolGroup {
-	uint8_t* m_block; // 0x00
-	int32_t m_size;   // 0x04
-	int32_t m_free;   // 0x08
+	uint8_t* m_block;
+	int32_t m_size;
+	int32_t m_free;
 } StaticPoolGroup;
 
 // The functions and globals of staticmem.c that other units use.

@@ -19,9 +19,9 @@ typedef char* (*MenuChoicesSuffixFn)(
 
 // The data of a list control (MenuControl::m_data): the texts of its choices.
 typedef struct MenuChoices {
-	MenuChoicesSuffixFn m_suffix; // 0x00
-	int32_t m_count;              // 0x04
-	char* m_texts[16];            // 0x08 — m_count of them
+	MenuChoicesSuffixFn m_suffix;
+	int32_t m_count;
+	char* m_texts[16]; // m_count of them
 } MenuChoices;
 
 #endif // MENUCHOICES_H

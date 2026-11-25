@@ -13,64 +13,64 @@
 // An engine: its rating, its weight (in 1/100 t) and its maker. Ids from 10000 up are XL
 // engines at half the weight.
 struct EngineType {
-	int32_t m_rating; // 0x00
-	int32_t m_weight; // 0x04
-	char* m_name;     // 0x08
+	int32_t m_rating;
+	int32_t m_weight;
+	char* m_name;
 };
 
 // A weapon: the stats the weapon info fields show. Masses are in 1/100 t. The table holds
 // negative values in the fields up to 0x14, so those are signed.
 struct Weapon {
-	int32_t m_heat;         // 0x00
-	int32_t m_damage;       // 0x04 — negative: per missile
-	int32_t m_minimumRange; // 0x08 — -1 for none
-	int32_t m_shortRange;   // 0x0c — -1 for none
-	int32_t m_mediumRange;  // 0x10 — -1 for none
-	int32_t m_range;        // 0x14 — -1 for none
-	int32_t m_mass;         // 0x18
-	uint32_t m_criticals;   // 0x1c — critical slots it takes
-	int32_t m_ammoPerTon;   // 0x20 — rounds per ton of ammo, 0 for weapons without ammo
-	char* m_name;           // 0x24
+	int32_t m_heat;
+	int32_t m_damage;       // negative: per missile
+	int32_t m_minimumRange; // -1 for none
+	int32_t m_shortRange;   // -1 for none
+	int32_t m_mediumRange;  // -1 for none
+	int32_t m_range;        // -1 for none
+	int32_t m_mass;
+	uint32_t m_criticals; // critical slots it takes
+	int32_t m_ammoPerTon; // rounds per ton of ammo, 0 for weapons without ammo
+	char* m_name;
 };
 
 // The internal structure of a weight class (20 to 110 tons in steps of 5) per location.
 struct InternalStructure {
-	int32_t m_centerTorso; // 0x00
-	int32_t m_sideTorso;   // 0x04
-	int32_t m_arm;         // 0x08
-	int32_t m_leg;         // 0x0c
+	int32_t m_centerTorso;
+	int32_t m_sideTorso;
+	int32_t m_arm;
+	int32_t m_leg;
 };
 
 // A piece of equipment other than a weapon: ids come in steps of 50 from 5000.
 struct Equipment {
-	int32_t m_id; // 0x00
-	char* m_name; // 0x04
+	int32_t m_id;
+	char* m_name;
 };
 
 // One location in the image of a .mek file: its armor and its critical slots.
 struct MekLocation {
-	int32_t m_front;      // 0x00
-	int32_t m_rear;       // 0x04
-	int32_t m_internal;   // 0x08
-	uint16_t m_items[12]; // 0x0c — item ids, ammunition as g_mekAmmo ids
-	int16_t m_slotCount;  // 0x24 — 12, or 6 for the head and legs
-	uint16_t m_flags;     // 0x26 — the simulator's MechSection::m_flags; the mech bay saves 1
+	int32_t m_front;
+	int32_t m_rear;
+	int32_t m_internal;
+	uint16_t m_items[12]; // item ids, ammunition as g_mekAmmo ids
+	int16_t m_slotCount;  // 12, or 6 for the head and legs
+	uint16_t m_flags;     // the simulator's MechSection::m_flags; the mech bay saves 1
 };
 
 // The header of a .mek file.
 struct MekHeader {
-	int32_t m_tonnage;      // 0x00
-	int32_t m_walkingSpeed; // 0x04
-	int32_t m_jumpJets;     // 0x08
-	int32_t m_heatSinks;    // 0x0c — the count, doubled for double heat sinks
-	int32_t m_weaponCount;  // 0x10
-	int32_t m_ammoCount;    // 0x14
+	int32_t m_tonnage;
+	int32_t m_walkingSpeed;
+	int32_t m_jumpJets;
+	int32_t m_heatSinks; // the count, doubled for double heat sinks
+	int32_t m_weaponCount;
+	int32_t m_ammoCount;
 };
 
 // A weapon or an ammunition entry of a .mek file.
 struct MekItem {
-	int32_t m_id;     // 0x00 — the weapon id; for ammunition, 10000 + weapon type * 100 + n
-	int32_t m_weapon; // 0x04 — the weapon id the ammunition feeds, -1 for a weapon
+	int32_t m_id;     // the weapon id; for ammunition, 10000 + weapon type * 100 + n
+	int32_t m_weapon; // the weapon id the ammunition feeds, -1 for a weapon
 };
 
 // The variant being edited.
@@ -81,59 +81,59 @@ struct MekItem {
 struct MekVariant {
 	// An item waiting for critical slots.
 	struct Item {
-		int32_t m_id;        // 0x00 — -1 when free
-		int32_t m_criticals; // 0x04 — slots it takes
+		int32_t m_id;        // -1 when free
+		int32_t m_criticals; // slots it takes
 	};
 
-	// One location's armor. The tab callbacks index the array through its base at 0x710.
+	// One location's armor (m_armor), which the tab callbacks index directly.
 	struct Armor {
-		int32_t m_internal; // 0x00 — internal structure
-		int32_t m_maxArmor; // 0x04 — twice the internal structure, 9 for the head
-		int32_t m_front;    // 0x08
-		int32_t m_rear;     // 0x0c — negative when the location has none
+		int32_t m_internal; // internal structure
+		int32_t m_maxArmor; // twice the internal structure, 9 for the head
+		int32_t m_front;
+		int32_t m_rear; // negative when the location has none
 	};
 
-	char m_title[0x100];         // 0x00 — '~' and the mech's name
-	char m_variantName[0x40];    // 0x100
-	int32_t m_maxMass;           // 0x200
-	int32_t m_usedMass;          // 0x204
-	int32_t m_freeMass;          // 0x208
-	int32_t m_engine;            // 0x20c — index into g_engines, + 10000 for an XL engine
-	int32_t m_engineRating;      // 0x210
-	int32_t m_engineMass;        // 0x214
-	int32_t m_gyroMass;          // 0x220
-	int32_t m_cockpitMass;       // 0x224
-	int32_t m_heatSinkType;      // 0x228 — 1 single, 2 double
-	int32_t m_heatSinkMass;      // 0x22c — ten heat sinks come free
-	int32_t m_externalHeatSinks; // 0x230 — heat sinks the engine can't hold, which take slots
-	int32_t m_jumpJetUnitMass;   // 0x234 — mass of one jump jet
-	int32_t m_jumpJetMass;       // 0x238
-	int32_t m_endoSteel;         // 0x240
-	int32_t m_internalMass;      // 0x244
-	int32_t m_ferroFibrous;      // 0x24c
-	int32_t m_armorMass;         // 0x250
-	int32_t m_armorFactor;       // 0x258 — armor points m_armorMass buys
-	int32_t m_armorAllocated;    // 0x25c
-	int32_t m_weaponMass;        // 0x260
-	int32_t m_ammoMass;          // 0x268
-	int32_t m_equipmentMass;     // 0x270
-	int32_t m_walkingSpeed;      // 0x278 — shown as 10.8 kph per point
-	int32_t m_runningSpeed;      // 0x27c
-	int32_t m_jumpJets;          // 0x280
-	int32_t m_ammo[25];          // 0x284 — ammunition ids, -1 past the last
-	int32_t m_weapons[10];       // 0x2e8 — weapon ids, -1 past the last
-	int32_t m_selectedWeapon;    // 0x310 — a weapon id, or a weapon type * 100; -1 for none
-	int32_t m_selectedLocation;  // 0x314 — index into g_locationNames
-	int32_t m_criticals[8][12];  // 0x318 — item ids per location and slot, 0 when free
-	int32_t m_unassignedCount;   // 0x49c
-	Item m_unassigned[78];       // 0x4a0
-	Armor m_armor[8];            // 0x710
-	int32_t m_masc;              // 0x790
-	int32_t m_rightLowerArm;     // 0x794 — the actuator is fitted
-	int32_t m_rightHand;         // 0x798
-	int32_t m_leftLowerArm;      // 0x79c
-	int32_t m_leftHand;          // 0x7a0
-	int32_t m_mascCriticals;     // 0x7a4 — MASC's slots (items 5001 and up) and tons
+	char m_title[0x100]; // '~' and the mech's name
+	char m_variantName[0x40];
+	int32_t m_maxMass;
+	int32_t m_usedMass;
+	int32_t m_freeMass;
+	int32_t m_engine; // index into g_engines, + 10000 for an XL engine
+	int32_t m_engineRating;
+	int32_t m_engineMass;
+	int32_t m_gyroMass;
+	int32_t m_cockpitMass;
+	int32_t m_heatSinkType;      // 1 single, 2 double
+	int32_t m_heatSinkMass;      // ten heat sinks come free
+	int32_t m_externalHeatSinks; // heat sinks the engine can't hold, which take slots
+	int32_t m_jumpJetUnitMass;   // mass of one jump jet
+	int32_t m_jumpJetMass;
+	int32_t m_endoSteel;
+	int32_t m_internalMass;
+	int32_t m_ferroFibrous;
+	int32_t m_armorMass;
+	int32_t m_armorFactor; // armor points m_armorMass buys
+	int32_t m_armorAllocated;
+	int32_t m_weaponMass;
+	int32_t m_ammoMass;
+	int32_t m_equipmentMass;
+	int32_t m_walkingSpeed; // shown as 10.8 kph per point
+	int32_t m_runningSpeed;
+	int32_t m_jumpJets;
+	int32_t m_ammo[25];         // ammunition ids, -1 past the last
+	int32_t m_weapons[10];      // weapon ids, -1 past the last
+	int32_t m_selectedWeapon;   // a weapon id, or a weapon type * 100; -1 for none
+	int32_t m_selectedLocation; // index into g_locationNames
+	int32_t m_criticals[8][12]; // item ids per location and slot, 0 when free
+	int32_t m_unassignedCount;
+	Item m_unassigned[78];
+	Armor m_armor[8];
+	int32_t m_masc;
+	int32_t m_rightLowerArm; // the actuator is fitted
+	int32_t m_rightHand;
+	int32_t m_leftLowerArm;
+	int32_t m_leftHand;
+	int32_t m_mascCriticals; // MASC's slots (items 5001 and up) and tons
 };
 
 // The functions and globals of mechbay.cpp that other units use.

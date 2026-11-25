@@ -12,43 +12,43 @@
 // The rotation is in 16.16 degrees: m_pitch about x, m_heading about y, m_roll about z, as
 // BuildMatrix takes them (the overlay's eye position readout prints them in that order).
 typedef struct Eyepoint {
-	int32_t m_x;                // 0x00
-	int32_t m_y;                // 0x04
-	int32_t m_z;                // 0x08
-	int32_t m_heading;          // 0x0c
-	int32_t m_pitch;            // 0x10 — clamped to +-90 degrees by the free camera
-	int32_t m_roll;             // 0x14
-	int32_t m_fovX;             // 0x18 — 16.16
-	int32_t m_lightX;           // 0x1c — the light's position (an effect's flash moves it)
-	int32_t m_lightY;           // 0x20
-	int32_t m_lightZ;           // 0x24
-	int16_t m_directionalLight; // 0x28 — nonzero: light from the origin's direction
-	int16_t m_ambientLight;     // 0x2a — out of 0x80 (ComputeShade)
-	int32_t m_viewLeft;         // 0x2c — the view rectangle, in pixels of the pane
-	int32_t m_viewRight;        // 0x30
-	int32_t m_viewTop;          // 0x34
-	int32_t m_viewBottom;       // 0x38
-	int32_t m_nearPlane;        // 0x3c
-	int32_t m_farPlane;         // 0x40
-	int32_t m_pixelAspect;      // 0x44 — pixel width / height, 16.16
-	int32_t m_offsetX;          // 0x4c — moves the projection centre off the view's
-	int32_t m_offsetY;          // 0x50
-	Matrix m_viewMatrix;        // 0x54 — rows 0-2 the view rotation, row 3 the eye position
-	int32_t m_halfWidth;        // 0x84
-	int32_t m_halfHeight;       // 0x88
-	int32_t m_centerX;          // 0x8c
-	int32_t m_centerY;          // 0x90
-	int32_t m_projectScaleX;    // 0x94 — half width times the horizontal field of view
-	int32_t m_projectScaleY;    // 0x98
-	int32_t m_projectScaleX16;  // 0x9c — m_projectScaleX in 16 bits, shifted by m_projectShiftX
-	int32_t m_projectScaleY16;  // 0xa0
-	int16_t m_projectShiftX;    // 0xa4
-	int16_t m_projectShiftY;    // 0xa6
-	int32_t m_frustumScaleX;    // 0xa8 — the side planes' scale for the visibility tests
-	int32_t m_frustumScaleY;    // 0xac — the top and bottom planes'
-	int32_t m_fovY;             // 0xb0
-	int32_t m_cullDistance;     // 0xb4 — the far plane, or 0x7fffffff for an unlimited one
-	int32_t m_detailScale;      // 0xb8 — scales distances for the level of detail
+	int32_t m_x;
+	int32_t m_y;
+	int32_t m_z;
+	int32_t m_heading;
+	int32_t m_pitch; // clamped to +-90 degrees by the free camera
+	int32_t m_roll;
+	int32_t m_fovX;   // 16.16
+	int32_t m_lightX; // the light's position (an effect's flash moves it)
+	int32_t m_lightY;
+	int32_t m_lightZ;
+	int16_t m_directionalLight; // nonzero: light from the origin's direction
+	int16_t m_ambientLight;     // out of 0x80 (ComputeShade)
+	int32_t m_viewLeft;         // the view rectangle, in pixels of the pane
+	int32_t m_viewRight;
+	int32_t m_viewTop;
+	int32_t m_viewBottom;
+	int32_t m_nearPlane;
+	int32_t m_farPlane;
+	int32_t m_pixelAspect; // pixel width / height, 16.16
+	int32_t m_offsetX;     // moves the projection centre off the view's
+	int32_t m_offsetY;
+	Matrix m_viewMatrix; // rows 0-2 the view rotation, row 3 the eye position
+	int32_t m_halfWidth;
+	int32_t m_halfHeight;
+	int32_t m_centerX;
+	int32_t m_centerY;
+	int32_t m_projectScaleX; // half width times the horizontal field of view
+	int32_t m_projectScaleY;
+	int32_t m_projectScaleX16; // m_projectScaleX in 16 bits, shifted by m_projectShiftX
+	int32_t m_projectScaleY16;
+	int16_t m_projectShiftX;
+	int16_t m_projectShiftY;
+	int32_t m_frustumScaleX; // the side planes' scale for the visibility tests
+	int32_t m_frustumScaleY; // the top and bottom planes'
+	int32_t m_fovY;
+	int32_t m_cullDistance; // the far plane, or 0x7fffffff for an unlimited one
+	int32_t m_detailScale;  // scales distances for the level of detail
 } Eyepoint;
 
 // The camera's view modes (SetViewMode), after the game keys that pick them.

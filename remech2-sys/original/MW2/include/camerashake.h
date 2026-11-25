@@ -6,13 +6,13 @@
 
 // An offset of the eyepoint's first six fields (its position and orientation).
 typedef struct CameraShakeKey {
-	int32_t m_x;        // 0x00
-	int32_t m_y;        // 0x04
-	int32_t m_z;        // 0x08
-	int32_t m_heading;  // 0x0c
-	int32_t m_pitch;    // 0x10
-	int32_t m_roll;     // 0x14
-	int32_t m_duration; // 0x18 — in clock ticks
+	int32_t m_x;
+	int32_t m_y;
+	int32_t m_z;
+	int32_t m_heading;
+	int32_t m_pitch;
+	int32_t m_roll;
+	int32_t m_duration; // in clock ticks
 } CameraShakeKey;
 
 // The functions and globals of camerashake.c that other units use.

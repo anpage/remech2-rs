@@ -23,27 +23,27 @@ public:
 	void ReadMouseState();
 
 private:
-	void* m_cursorShape;         // 0x00 — g_cursorShape, never read
-	VideoDriver* m_videoDriver;  // 0x04
-	Font* m_font;                // 0x08
-	int32_t m_positionTextWidth; // 0x0c — DrawCursorPosition's, restored before the next
-	uint32_t m_leftPressed;      // 0x10
-	uint32_t m_rightPressed;     // 0x14
-	uint32_t m_middlePressed;    // 0x18
-	uint8_t m_doubleClicked;     // 0x1c
-	uint32_t m_lastClickTime;    // 0x1f
+	void* m_cursorShape; // g_cursorShape, never read
+	VideoDriver* m_videoDriver;
+	Font* m_font;
+	int32_t m_positionTextWidth; // DrawCursorPosition's, restored before the next
+	uint32_t m_leftPressed;
+	uint32_t m_rightPressed;
+	uint32_t m_middlePressed;
+	uint8_t m_doubleClicked;
+	uint32_t m_lastClickTime;
 
 public:
 	// The screens read the cursor position, and the cockpit controls screen's scroll arrows
 	// repeat while a button is held.
-	int32_t m_x;          // 0x2b
-	int32_t m_y;          // 0x2f
-	uint32_t m_leftDown;  // 0x33
-	uint32_t m_rightDown; // 0x37
+	int32_t m_x;
+	int32_t m_y;
+	uint32_t m_leftDown;
+	uint32_t m_rightDown;
 
 private:
-	uint32_t m_middleDown; // 0x3b
-	uint32_t m_enabled;    // 0x3f
+	uint32_t m_middleDown;
+	uint32_t m_enabled;
 };
 
 #pragma pack()

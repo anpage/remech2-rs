@@ -12,10 +12,10 @@ public:
 	uint8_t Contains(int32_t p_x, int32_t p_y);
 
 private:
-	int32_t m_left;   // 0x00
-	int32_t m_top;    // 0x04
-	int32_t m_right;  // 0x08
-	int32_t m_bottom; // 0x0c
+	int32_t m_left;
+	int32_t m_top;
+	int32_t m_right;
+	int32_t m_bottom;
 };
 
 #endif // HITRECT_H

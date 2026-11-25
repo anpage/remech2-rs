@@ -30,14 +30,14 @@ public:
 	void DisableButton(int32_t p_id);
 
 private:
-	Collection* m_items;        // 0x00
-	VideoDriver* m_videoDriver; // 0x04
-	Font* m_font;               // 0x08
-	uint8_t m_colors[0x100];    // 0x0c
+	Collection* m_items;
+	VideoDriver* m_videoDriver;
+	Font* m_font;
+	uint8_t m_colors[0x100];
 
 public:
 	// The archive reader passes it on to the buttons it adds.
-	uint8_t m_drawRect; // 0x10c
+	uint8_t m_drawRect;
 };
 
 #pragma pack()

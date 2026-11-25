@@ -20,13 +20,13 @@ enum {
 };
 
 typedef struct Anim2d {
-	int32_t m_state;      // 0x00
-	int32_t m_frameCount; // 0x04
-	int32_t m_frameTime;  // 0x08 — clock ticks per frame
-	int32_t m_startTime;  // 0x0c — 0: not started
-	uint32_t m_flags;     // 0x10
-	int32_t m_resourceId; // 0x14 — a SHP resource, relative to g_artResolution
-	void* m_shape;        // 0x18 — loaded on first draw
+	int32_t m_state;
+	int32_t m_frameCount;
+	int32_t m_frameTime; // clock ticks per frame
+	int32_t m_startTime; // 0: not started
+	uint32_t m_flags;
+	int32_t m_resourceId; // a SHP resource, relative to g_artResolution
+	void* m_shape;        // loaded on first draw
 } Anim2d;
 
 // The functions and globals of anim2d.c that other units use.

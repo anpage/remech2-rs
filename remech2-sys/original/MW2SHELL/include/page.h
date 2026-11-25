@@ -30,11 +30,11 @@ public:
 
 	// The area of a link word and its id.
 	struct Link {
-		int32_t m_left;   // 0x00
-		int32_t m_top;    // 0x04
-		int32_t m_right;  // 0x08
-		int32_t m_bottom; // 0x0c
-		int32_t m_id;     // 0x10
+		int32_t m_left;
+		int32_t m_top;
+		int32_t m_right;
+		int32_t m_bottom;
+		int32_t m_id;
 	};
 
 	Page(
@@ -61,21 +61,21 @@ public:
 	void SetBanner(void* p_data, int32_t p_size);
 
 private:
-	Collection* m_glyphs;       // 0x00
-	uint8_t* m_colors;          // 0x04
-	Font* m_font;               // 0x08
-	int32_t m_left;             // 0x0c
-	int32_t m_top;              // 0x10
-	int32_t m_width;            // 0x14
-	int32_t m_bottom;           // 0x18
-	int32_t m_lineHeight;       // 0x1c
-	PopupPicture* m_banner;     // 0x20
-	VideoDriver* m_videoDriver; // 0x24
-	AudioSample* m_sample;      // 0x28
+	Collection* m_glyphs;
+	uint8_t* m_colors;
+	Font* m_font;
+	int32_t m_left;
+	int32_t m_top;
+	int32_t m_width;
+	int32_t m_bottom;
+	int32_t m_lineHeight;
+	PopupPicture* m_banner;
+	VideoDriver* m_videoDriver;
+	AudioSample* m_sample;
 
 public:
 	// The archive reader turns the links into buttons.
-	Collection* m_links; // 0x30
+	Collection* m_links;
 };
 
 // The globals of page.cpp that other units use.
