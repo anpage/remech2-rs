@@ -2047,7 +2047,7 @@ int32_t SaveMekFile(char* p_name)
 	g_mekHeader.m_ammoCount = i;
 
 	for (i = 0; i < 8; i++) {
-		g_mekLocations[i].m_unk0x26 = 1;
+		g_mekLocations[i].m_flags = 1;
 		g_mekLocations[i].m_slotCount = 12;
 		for (j = 0; j < 12; j++) {
 			if (g_variant.m_criticals[i][j] == -1) {

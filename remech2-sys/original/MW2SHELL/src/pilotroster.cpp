@@ -38,7 +38,7 @@ void LoadPilotRoster()
 			pilot->m_kills = 0;
 			pilot->m_hits = 0;
 			pilot->m_shotsFired = 0;
-			pilot->m_unk0x24 = 0;
+			pilot->m_reserved0x24 = 0;
 			strcpy(pilot->m_callsign, "");
 		}
 	}

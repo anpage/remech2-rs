@@ -5,18 +5,18 @@
 
 #pragma pack(1)
 typedef struct ArchiveEntry {
-	char m_name[4];                 // 0x00
-	uint32_t m_offset;              // 0x04
-	uint32_t m_size;                // 0x08
-	uint8_t m_unk0x0c[0x14 - 0x0c]; // 0x0c — never accessed
-	uint16_t m_baseOffset;          // 0x14
-	uint8_t m_unk0x16[0x18 - 0x16]; // 0x16 — never accessed
+	char m_name[4];                      // 0x00
+	uint32_t m_offset;                   // 0x04
+	uint32_t m_size;                     // 0x08
+	uint8_t m_reserved0x0c[0x14 - 0x0c]; // 0x0c
+	uint16_t m_baseOffset;               // 0x14
+	uint8_t m_reserved0x16[0x18 - 0x16]; // 0x16
 } ArchiveEntry;
 
 typedef struct ArchiveHeader {
-	uint8_t m_unk0x00[0x0c];   // 0x00 — never accessed
-	uint16_t m_entryCount;     // 0x0c
-	ArchiveEntry m_entries[1]; // 0x0e
+	uint8_t m_reserved0x00[0x0c]; // 0x00
+	uint16_t m_entryCount;        // 0x0c
+	ArchiveEntry m_entries[1];    // 0x0e
 } ArchiveHeader;
 
 typedef struct ArchiveSlotEntry {

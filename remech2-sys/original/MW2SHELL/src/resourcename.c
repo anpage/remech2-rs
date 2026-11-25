@@ -16,10 +16,10 @@ typedef struct ResourceEntry {
 } ResourceEntry;
 
 typedef struct ResourceTable {
-	uint8_t m_unk0x00[0x08];    // 0x00 — never accessed
-	int16_t m_count;            // 0x08
-	uint16_t m_unk0x0a;         // 0x0a — never accessed
-	ResourceEntry m_entries[1]; // 0x0c
+	uint8_t m_reserved0x00[0x08]; // 0x00
+	int16_t m_count;              // 0x08
+	uint16_t m_reserved0x0a;      // 0x0a
+	ResourceEntry m_entries[1];   // 0x0c
 } ResourceTable;
 
 int32_t FindResourceIdByName(int32_t p_type, char* p_name)

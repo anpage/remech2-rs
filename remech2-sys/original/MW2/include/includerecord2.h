@@ -13,7 +13,7 @@ typedef struct IncludeRecord2 {
 	uint8_t m_team;               // 0x0c
 	uint8_t m_leader;             // 0x0d — 1: the team's leader
 	uint8_t m_ai;                 // 0x0e — Player::m_aiMode; 0: the local player
-	uint8_t m_unk0x0f;            // 0x0f
+	uint8_t m_reserved0x0f;       // 0x0f
 	uint16_t m_aiParams[8];       // 0x10 — Player::m_aiParams
 	uint16_t m_events;            // 0x20 — event types (WidenEventFlags)
 	int16_t m_flags;              // 0x22 — Player::m_flags

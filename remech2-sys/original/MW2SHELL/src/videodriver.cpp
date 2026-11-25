@@ -15,8 +15,8 @@
 
 // Only the height field of the font data header is used by the text drawing wrappers.
 struct VideoFontHeader {
-	uint8_t m_unk0x00[8]; // 0x00
-	int32_t m_height;     // 0x08
+	uint8_t m_reserved0x00[8]; // 0x00
+	int32_t m_height;          // 0x08
 };
 
 // Set while RedrawGlyphs runs: text outside the dirty rectangle is skipped.

@@ -65,23 +65,23 @@
 
 // planet: the gravity, the time of day and climate, and render switches.
 typedef struct BwdPlanetRecord {
-	BwdRecord m_header;       // 0x00
-	int32_t m_gravity;        // 0x08 — in g
-	uint32_t m_unk0x0c;       // 0x0c
-	int32_t m_daysPerYear;    // 0x10
-	int32_t m_secondsPerDay;  // 0x14
-	uint32_t m_unk0x18[3];    // 0x18
-	int32_t m_temperature;    // 0x24
-	int32_t m_jumpJetDrag;    // 0x28
-	int32_t m_mapShadeTop;    // 0x2c
-	int32_t m_mapShadeBase;   // 0x30
-	int32_t m_slideSlope;     // 0x34
-	int32_t m_breathable;     // 0x38
-	int32_t m_brightenDamage; // 0x3c
-	int32_t m_noEffectCamera; // 0x40
-	int32_t m_noSky;          // 0x44
-	int32_t m_noGround;       // 0x48
-	int32_t m_noHorizonBand;  // 0x4c
+	BwdRecord m_header;         // 0x00
+	int32_t m_gravity;          // 0x08 — in g
+	uint32_t m_reserved0x0c;    // 0x0c
+	int32_t m_daysPerYear;      // 0x10
+	int32_t m_secondsPerDay;    // 0x14
+	uint32_t m_reserved0x18[3]; // 0x18
+	int32_t m_temperature;      // 0x24
+	int32_t m_jumpJetDrag;      // 0x28
+	int32_t m_mapShadeTop;      // 0x2c
+	int32_t m_mapShadeBase;     // 0x30
+	int32_t m_slideSlope;       // 0x34
+	int32_t m_breathable;       // 0x38
+	int32_t m_brightenDamage;   // 0x3c
+	int32_t m_noEffectCamera;   // 0x40
+	int32_t m_noSky;            // 0x44
+	int32_t m_noGround;         // 0x48
+	int32_t m_noHorizonBand;    // 0x4c
 } BwdPlanetRecord;
 
 // hiddentext.
@@ -105,10 +105,10 @@ typedef struct BwdResourceRecord {
 
 // now: the time of day.
 typedef struct BwdNowRecord {
-	BwdRecord m_header;    // 0x00
-	uint32_t m_unk0x08[2]; // 0x08
-	int32_t m_timeOfDay;   // 0x10
-	int16_t m_dayOfYear;   // 0x14
+	BwdRecord m_header;         // 0x00
+	uint32_t m_reserved0x08[2]; // 0x08
+	int32_t m_timeOfDay;        // 0x10
+	int16_t m_dayOfYear;        // 0x14
 } BwdNowRecord;
 
 // palettegroup: the palettes of the 20 slots.
@@ -119,24 +119,24 @@ typedef struct BwdPaletteGroupRecord {
 
 // light: the eyepoint's light.
 typedef struct BwdLightRecord {
-	BwdRecord m_header;     // 0x00
-	uint32_t m_unk0x08[2];  // 0x08
-	int32_t m_x;            // 0x10
-	int32_t m_y;            // 0x14
-	int32_t m_z;            // 0x18
-	int16_t m_ambient;      // 0x1c
-	int16_t m_directional;  // 0x1e
-	int32_t m_fadeDistance; // 0x20
+	BwdRecord m_header;         // 0x00
+	uint32_t m_reserved0x08[2]; // 0x08
+	int32_t m_x;                // 0x10
+	int32_t m_y;                // 0x14
+	int32_t m_z;                // 0x18
+	int16_t m_ambient;          // 0x1c
+	int16_t m_directional;      // 0x1e
+	int32_t m_fadeDistance;     // 0x20
 } BwdLightRecord;
 
 // A window record's rectangle for one of g_panes.
 typedef struct BwdWindowEntry {
-	int32_t m_index;       // 0x00
-	int32_t m_x;           // 0x04
-	int32_t m_y;           // 0x08
-	int32_t m_width;       // 0x0c
-	int32_t m_height;      // 0x10
-	uint32_t m_unk0x14[3]; // 0x14
+	int32_t m_index;            // 0x00
+	int32_t m_x;                // 0x04
+	int32_t m_y;                // 0x08
+	int32_t m_width;            // 0x0c
+	int32_t m_height;           // 0x10
+	uint32_t m_reserved0x14[3]; // 0x14
 } BwdWindowEntry;
 
 // window: rectangles for the panes, as many as fit the record.
@@ -208,11 +208,11 @@ typedef struct BwdNavPointRecord {
 
 // navobject: a nav point on an object.
 typedef struct BwdNavObjectRecord {
-	BwdRecord m_header; // 0x00
-	int16_t m_unk0x08;  // 0x08
-	int16_t m_id;       // 0x0a
-	int16_t m_radius;   // 0x0c
-	uint16_t m_events;  // 0x0e
+	BwdRecord m_header;     // 0x00
+	int16_t m_reserved0x08; // 0x08
+	int16_t m_id;           // 0x0a
+	int16_t m_radius;       // 0x0c
+	uint16_t m_events;      // 0x0e
 } BwdNavObjectRecord;
 
 // task: a timed callback, on an object or detached.

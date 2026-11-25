@@ -20,7 +20,7 @@ typedef struct DifficultyCfg {
 	uint8_t m_collisionDamage; // 0x03 — collisions hurt mechs; set in network games with more than one player
 	uint8_t m_heatTracking;    // 0x04 — fires heat mechs nearby; set in network games with more than one player
 	uint8_t m_enemySkill;      // 0x05 — 0 easy, 1 medium, 2 hard (MW2SHELL); 2 in network games
-	uint8_t m_unk0x06[2];      // 0x06
+	uint8_t m_reserved0x06[2]; // 0x06
 	uint8_t m_regenerate;      // 0x08 — after the mission ends, the local player can regenerate
 	uint8_t
 		m_radar; // 0x09 — the radar and auto targeting (NETMECHW's "Radar + Auto Targeting"); set outside network games

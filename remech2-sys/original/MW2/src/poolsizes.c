@@ -34,11 +34,11 @@ typedef struct RevRecord {
 typedef struct DtblRecord {
 	BwdRecord m_header;       // 0x00
 	int16_t m_players;        // 0x08
-	int16_t m_unk0x0a;        // 0x0a
+	int16_t m_reserved0x0a;   // 0x0a
 	int16_t m_objects;        // 0x0c
 	int16_t m_classEntries;   // 0x0e
-	int16_t m_unk0x10;        // 0x10
-	int16_t m_unk0x12;        // 0x12
+	int16_t m_reserved0x10;   // 0x10
+	int16_t m_reserved0x12;   // 0x12
 	int16_t m_anims;          // 0x14
 	int16_t m_animTracks;     // 0x16
 	int32_t m_animFrameBytes; // 0x18

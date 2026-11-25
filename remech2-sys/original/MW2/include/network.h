@@ -19,7 +19,7 @@ typedef struct NetStateMsg {
 	int32_t m_rearArmor2;    // 0x0d — m_sections[2]'s
 	int32_t m_rearArmor1;    // 0x11 — m_sections[1]'s
 	int32_t m_frontArmor[8]; // 0x15 — each section's m_armor[0]
-	int32_t m_internal[8];   // 0x35 — each section's m_unk0x08
+	int32_t m_internal[8];   // 0x35 — each section's m_internal
 	int32_t m_clock;         // 0x55
 	int32_t m_x;             // 0x59
 	int32_t m_y;             // 0x5d

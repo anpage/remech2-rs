@@ -34,7 +34,7 @@ void DrawBandPolygon(uint32_t p_flags, int32_t p_count, uint32_t* p_points, int3
 }
 
 // Draws a band as a textured quad (DrawAnimatedPolygon) from the first three points of a polygon: the
-// two whose m_unk0x0c/m_unk0x10 mark its ends (mode 0), or a square about the second one (mode
+// two whose (u, v: p_points[3], [4]) mark its ends (mode 0), or a square about the second one (mode
 // 1). A negative mark flips the texture. Returns half the band's width, or 0 without both ends.
 int32_t DrawBand(uint32_t p_color, int32_t p_count, int32_t* p_points, int32_t p_luma, int32_t p_mode)
 {

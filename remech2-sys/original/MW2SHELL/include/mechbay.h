@@ -54,7 +54,7 @@ struct MekLocation {
 	int32_t m_internal;   // 0x08
 	uint16_t m_items[12]; // 0x0c — item ids, ammunition as g_mekAmmo ids
 	int16_t m_slotCount;  // 0x24 — 12, or 6 for the head and legs
-	uint16_t m_unk0x26;   // 0x26 — always 1 in a saved .mek file, never read
+	uint16_t m_flags;     // 0x26 — the simulator's MechSection::m_flags; the mech bay saves 1
 };
 
 // The header of a .mek file.
