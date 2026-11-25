@@ -1,9 +1,9 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <stdbool.h> // IWYU pragma: export
+#include <stddef.h>  // IWYU pragma: export
+#include <stdint.h>  // IWYU pragma: export
 
 #define MECH_PTR_TO_S32(p_pointer) ((int32_t) (intptr_t) (p_pointer))
 #define MECH_S32_TO_PTR(p_value) ((void*) (intptr_t) (p_value))
