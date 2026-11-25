@@ -10,7 +10,7 @@ extern "C"
 {
 #endif
 
-	MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, undefined4* p_flags, MechChar* p_mission);
+	MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, MechChar* p_mission);
 
 #ifdef __cplusplus
 }

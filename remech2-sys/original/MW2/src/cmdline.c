@@ -24,9 +24,9 @@
 #include <string.h>
 
 // Parses the command line MECH2.EXE passes: switches start with / or -, anything else names the
-// mission (p_mission, "s.$" by default), which is shown with MonoPrintLine. /C sets p_flags[0];
-// /S and /X clear p_flags[1]. Returns FALSE without a command line (not launched by MECH2.EXE).
-MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, undefined4* p_flags, MechChar* p_mission)
+// mission (p_mission, "s.$" by default), which is shown with MonoPrintLine.
+// Returns FALSE without a command line (not launched by MECH2.EXE).
+MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, MechChar* p_mission)
 {
 	MechS32 result;
 	MechChar* arg;
@@ -50,9 +50,6 @@ MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, undefined4* p_flags, MechChar* p
 					value++;
 					g_supAnimBackdropName = value;
 				}
-				break;
-			case 'C':
-				p_flags[0] = 1;
 				break;
 			case 'D':
 				g_missionTimerStopped = 1;
@@ -108,9 +105,6 @@ MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, undefined4* p_flags, MechChar* p
 				break;
 			case 'R':
 				g_startOnAutopilot = 1;
-				break;
-			case 'S':
-				p_flags[1] = 0;
 				break;
 			case 'V':
 				if (arg[2] == '=' && isdigit(arg[3])) {

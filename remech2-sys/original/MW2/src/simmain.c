@@ -116,7 +116,6 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 	int result;
 	MechS32 i;
 	char missionName[64];
-	undefined4 unk0x28;
 	MechS32 seed;
 	MechS32 quitLatched;
 
@@ -132,7 +131,6 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 		Error(9, "Insufficient memory available.");
 	}
 
-	unk0x28 = 0;
 	// The original strcpy'd, with no limit
 	if (getenv("MECHWARRIOR")) {
 		snprintf(g_gameDir, sizeof(g_gameDir), "%s", getenv("MECHWARRIOR"));
@@ -147,7 +145,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 
 	g_displayBrightness = g_brightnessSetting = g_mw2SndCfgData->m_displayBrightness;
 
-	if (!ProcessCmdLineArgs(p_cmdLine, &unk0x28, missionName)) {
+	if (!ProcessCmdLineArgs(p_cmdLine, missionName)) {
 		return 0;
 	}
 
