@@ -27,7 +27,7 @@ int32_t PrepareCommandComputerPage(MenuDefinition* p_menu, MenuPage* p_page)
 
 	marked = 0;
 	if (!p_page) {
-		return FALSE;
+		return false;
 	}
 
 	count = GetLocalStarSize() - 1;
@@ -54,7 +54,7 @@ int32_t PrepareCommandComputerPage(MenuDefinition* p_menu, MenuPage* p_page)
 		p_page->m_itemCount = 2;
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Unless the page's AI slot holds a player outside AI state 12, keeps only the page's last two
@@ -69,7 +69,7 @@ int32_t PrepareCommandPointPage(MenuDefinition* p_menu, MenuPage* p_page)
 	int32_t valid;
 
 	if (!p_page) {
-		return FALSE;
+		return false;
 	}
 
 	unk0x08 = p_page->m_aiSlot;
@@ -90,7 +90,7 @@ int32_t PrepareCommandPointPage(MenuDefinition* p_menu, MenuPage* p_page)
 		p_page->m_itemCount = slot + 1;
 	}
 
-	return TRUE;
+	return true;
 }
 
 int32_t GetLanceOrder(int32_t p_index)

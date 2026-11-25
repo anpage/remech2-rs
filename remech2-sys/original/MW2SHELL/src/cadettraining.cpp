@@ -86,7 +86,7 @@ void CadetTrainingCallback(TMPackDataBase* p_database, int32_t* p_campaign, uint
 	if (!g_trainingButtonsShown && !IsVideoPlaying(0)) {
 		g_trainingButtonsShown = 1;
 		for (i = 1; i < g_cadetTrainingScreens[*p_campaign].m_count; i++) {
-			g_cadetTrainingMenu->AddButton(g_cadetTrainingScreens[*p_campaign].m_buttons[i], i, FALSE);
+			g_cadetTrainingMenu->AddButton(g_cadetTrainingScreens[*p_campaign].m_buttons[i], i, false);
 		}
 
 		p_database->GetDBItem(0x4c, &data, &size);

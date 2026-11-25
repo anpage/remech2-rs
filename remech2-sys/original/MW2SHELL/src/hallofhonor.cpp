@@ -129,8 +129,8 @@ void HallOfHonorCallback(int32_t p_active)
 	if (!p_active || g_mouseState->GetRightPressed() == 1 || g_mouseState->GetLeftPressed() == 1 ||
 		g_keyboardInput->PollKey() != 0) {
 		UnregisterMenuFunction(HallOfHonorCallback);
-		EnableShellMenuCommand(c_menuHallOfHonor, TRUE);
-		g_menuDialogOpen = FALSE;
+		EnableShellMenuCommand(c_menuHallOfHonor, true);
+		g_menuDialogOpen = false;
 		if (g_hallOfHonorMovie != NULL) {
 			delete g_hallOfHonorMovie;
 		}
@@ -138,7 +138,7 @@ void HallOfHonorCallback(int32_t p_active)
 		g_videoDriver->m_restoreColor = -1;
 		g_videoDriver->RestoreBackground(0, 0, 0x280, 0x1e0);
 		UpdateVideos();
-		g_videoDriver->SetPalette(g_savedScreenPalette, TRUE);
+		g_videoDriver->SetPalette(g_savedScreenPalette, true);
 		if (p_active) {
 			g_videoDriver->DrawShell();
 			g_videoDriver->RestoreBackground(0, 0, 0x280, 0x1e0);

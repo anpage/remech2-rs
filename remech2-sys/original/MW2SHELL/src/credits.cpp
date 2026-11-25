@@ -662,8 +662,8 @@ void CreditsCallback(int32_t p_active)
 	if (!p_active || g_mouseState->GetRightPressed() == 1 || g_mouseState->GetLeftPressed() == 1 ||
 		g_keyboardInput->PollKey() != 0) {
 		UnregisterMenuFunction(CreditsCallback);
-		EnableShellMenuCommand(c_menuKeshik, TRUE);
-		g_menuDialogOpen = FALSE;
+		EnableShellMenuCommand(c_menuKeshik, true);
+		g_menuDialogOpen = false;
 		if (g_creditsMovie != NULL) {
 			delete g_creditsMovie;
 		}
@@ -671,7 +671,7 @@ void CreditsCallback(int32_t p_active)
 		g_videoDriver->m_restoreColor = -1;
 		g_videoDriver->RestoreBackground(0, 0, 0x280, 0x1e0);
 		UpdateVideos();
-		g_videoDriver->SetPalette(g_savedScreenPalette, TRUE);
+		g_videoDriver->SetPalette(g_savedScreenPalette, true);
 		if (p_active) {
 			g_videoDriver->DrawShell();
 			g_videoDriver->RestoreBackground(0, 0, 0x280, 0x1e0);

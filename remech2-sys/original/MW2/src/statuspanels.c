@@ -106,20 +106,20 @@ void DrawObjectiveList(CockpitPanel* p_panel, Point* p_pos, void* p_font, uint8_
 	target = p_panel->m_target;
 	mission = &g_objectiveTable[g_localStar];
 	height = VFX_font_height(p_font);
-	primary = FALSE;
+	primary = false;
 	if (g_isNetworkGame && !g_difficulty->m_teamGame) {
 		count = 0;
-		secondary = FALSE;
+		secondary = false;
 		for (i = 0; i < mission->m_objectiveCount; i++) {
 			objective = &g_objectiveTable[g_localStar].m_objectives[i];
 			count += objective->m_listed;
 			if (objective->m_listed && objective->m_priority == 2) {
-				secondary = TRUE;
+				secondary = true;
 			}
 		}
 
 		if (secondary && count == 1) {
-			primary = TRUE;
+			primary = true;
 		}
 	}
 
@@ -131,7 +131,7 @@ void DrawObjectiveList(CockpitPanel* p_panel, Point* p_pos, void* p_font, uint8_
 
 		{
 			p_pos->m_x = p_panel->m_textOrigin->m_x;
-			twoLines = FALSE;
+			twoLines = false;
 			switch (p_priority) {
 			case 1:
 				label = "Primary: ";
@@ -180,7 +180,7 @@ void DrawObjectiveList(CockpitPanel* p_panel, Point* p_pos, void* p_font, uint8_
 				g_textColors[0xe] = 0xe;
 				p_pos->m_x = x;
 				p_pos->m_y = y;
-				twoLines = TRUE;
+				twoLines = true;
 			}
 
 			switch (objective->m_state) {

@@ -9,14 +9,14 @@
 
 int32_t StartRamp(Ramp* p_ramp, int32_t p_target, int32_t p_value, double p_seconds)
 {
-	int32_t result = FALSE;
+	int32_t result = false;
 
 	p_ramp->m_target = p_target;
 	p_ramp->m_value = p_value;
 	p_ramp->m_duration = p_seconds * 181.0;
 	p_ramp->m_time = g_currentClock;
 	if (p_ramp->m_duration > 0) {
-		result = TRUE;
+		result = true;
 	}
 
 	return result;
@@ -44,7 +44,7 @@ int32_t UpdateRamp(Ramp* p_ramp)
 
 int32_t StartWrappedRamp(WrappedRamp* p_ramp, int32_t p_target, int32_t p_value, double p_seconds, int32_t p_period)
 {
-	int32_t result = FALSE;
+	int32_t result = false;
 
 	p_ramp->m_target = p_target;
 	p_ramp->m_value = p_value;
@@ -52,7 +52,7 @@ int32_t StartWrappedRamp(WrappedRamp* p_ramp, int32_t p_target, int32_t p_value,
 	p_ramp->m_time = g_currentClock;
 	p_ramp->m_period = p_period;
 	if (p_ramp->m_duration > 0) {
-		result = TRUE;
+		result = true;
 	}
 
 	return result;

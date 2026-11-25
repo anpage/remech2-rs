@@ -146,7 +146,7 @@ int32_t OpenPrjFile(const char* p_name, char p_mode)
 
 	g_prjFiles[slot].m_fd = fd;
 	g_prjFiles[slot].m_header = header;
-	g_prjFiles[slot].m_open = TRUE;
+	g_prjFiles[slot].m_open = true;
 	memset(g_prjFiles[slot].m_name, 0, 0x20);
 	strncpy(g_prjFiles[slot].m_name, p_name, 0x20);
 	return slot;
@@ -165,7 +165,7 @@ int32_t ClosePrjFile(int32_t p_file)
 		}
 	}
 
-	g_prjFiles[p_file].m_open = FALSE;
+	g_prjFiles[p_file].m_open = false;
 	memset(g_prjFiles[p_file].m_name, 0, 0x20);
 	return MechClose(g_prjFiles[p_file].m_fd);
 }
@@ -178,13 +178,13 @@ uint16_t FindPrjType(int32_t p_file, const char* p_type)
 	PrjType* types;
 	uint16_t i;
 
-	found = FALSE;
+	found = false;
 	count = g_prjFiles[p_file].m_header->m_typeCount;
 	types = g_prjFiles[p_file].m_header->m_types;
 	i = 0;
 	while ((count > i) & !found) {
 		if (strncmp(types[i].m_tag, p_type, 4) == 0) {
-			found = TRUE;
+			found = true;
 		}
 		else {
 			i++;

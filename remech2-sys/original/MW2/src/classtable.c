@@ -243,12 +243,12 @@ int32_t LoadClassEntryShape(int32_t p_index, int32_t p_level, void* p_buffer)
 	flags = 0;
 	entry = &g_classTable[p_index];
 	if (entry->m_released) {
-		return TRUE;
+		return true;
 	}
 
 	if (entry->m_shape) {
 		if ((entry->m_shape->m_kind & 0xf0) == 0x50) {
-			return TRUE;
+			return true;
 		}
 
 		flags = GetShapeState(entry->m_shape);
@@ -261,7 +261,7 @@ int32_t LoadClassEntryShape(int32_t p_index, int32_t p_level, void* p_buffer)
 		size = GetPrjResourceSize(g_mw2PrjHandle, g_resourceTypeTags[c_resTagPoly], entry->m_resourceIds[p_level]);
 	}
 	else {
-		return FALSE;
+		return false;
 	}
 
 	entry->m_loadedLevel = -1;
@@ -277,7 +277,7 @@ int32_t LoadClassEntryShape(int32_t p_index, int32_t p_level, void* p_buffer)
 	UnlockCachedResource(entry->m_resourceIds[p_level], g_resourceTypeTags[c_resTagPoly]);
 	if (entry->m_shape) {
 		parent = NULL;
-		placed = FALSE;
+		placed = false;
 		SetShapeState(entry->m_shape, flags);
 		entry->m_loadedLevel = p_level;
 		if (!entry->m_obj) {
@@ -305,7 +305,7 @@ int32_t LoadClassEntryShape(int32_t p_index, int32_t p_level, void* p_buffer)
 
 				if (obj) {
 					entry->m_obj = obj;
-					placed = TRUE;
+					placed = true;
 				}
 			}
 		}
@@ -341,10 +341,10 @@ int32_t LoadClassEntryShape(int32_t p_index, int32_t p_level, void* p_buffer)
 		}
 
 		UpdateObj(entry->m_obj);
-		return TRUE;
+		return true;
 	}
 	else {
-		return FALSE;
+		return false;
 	}
 }
 
@@ -354,10 +354,10 @@ void ReleasePendingDetailLevel(void)
 	int32_t i;
 	int32_t done;
 
-	done = FALSE;
+	done = false;
 	for (i = 0; i < g_playerCount && !done; i++) {
 		if (g_players[i]->m_detailLevel != -1) {
-			done = TRUE;
+			done = true;
 			ReleaseClassLevel(i, g_players[i]->m_detailLevel);
 			g_players[i]->m_detailLevel = -1;
 		}

@@ -96,7 +96,7 @@ int32_t ShowInGameMessage(char* p_text, int32_t p_font, int32_t p_duration, int3
 	int32_t lowestPriority;
 	TimedOverlay* overlay;
 
-	done = FALSE;
+	done = false;
 	result = 0;
 	slot = -1;
 	lowestPriority = 0x29a;
@@ -104,7 +104,7 @@ int32_t ShowInGameMessage(char* p_text, int32_t p_font, int32_t p_duration, int3
 	while (!done) {
 		if (!g_timedOverlays[i].m_active) {
 			slot = i;
-			done = TRUE;
+			done = true;
 		}
 		else {
 			if (g_timedOverlays[i].m_priority <= p_priority) {
@@ -121,7 +121,7 @@ int32_t ShowInGameMessage(char* p_text, int32_t p_font, int32_t p_duration, int3
 
 			i++;
 			if (i == 2) {
-				done = TRUE;
+				done = true;
 			}
 		}
 	}

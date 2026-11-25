@@ -345,7 +345,7 @@ int32_t ProjectWorldPoint(int32_t* p_x, int32_t* p_y, int32_t* p_z)
 	z = FixedDot27(dx, g_viewProjZ0, dy, g_viewProjZ1, dz, g_viewProjZ2);
 	*p_z = z;
 	if (z <= g_viewNear) {
-		behind = TRUE;
+		behind = true;
 		if (z < 0) {
 			z = -z;
 		}
@@ -354,7 +354,7 @@ int32_t ProjectWorldPoint(int32_t* p_x, int32_t* p_y, int32_t* p_z)
 		}
 	}
 	else {
-		behind = FALSE;
+		behind = false;
 	}
 
 	*p_x = ProjectCoordinate(x, z, g_viewShiftX, g_viewCenterX);
@@ -502,10 +502,10 @@ int32_t CullShapeToFrustum(Shape* p_shape)
 int32_t CullHiddenShape(Shape* p_shape)
 {
 	if (p_shape->m_flags & 0x1000) {
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 int32_t IsLodQualityHigh(uint32_t p_unk0x00)

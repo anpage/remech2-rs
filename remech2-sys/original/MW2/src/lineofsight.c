@@ -23,7 +23,7 @@ int32_t CanSeeTarget(Player* p_player, int32_t p_ahead)
 
 	bearing = (p_player->m_heading + p_player->m_torsoTwist - p_player->m_targetInfo.m_heading + 0x1680000) % 0x1680000;
 	if (p_ahead && bearing < 0x10e0000 && bearing > 0x5a0000) {
-		return FALSE;
+		return false;
 	}
 
 	BuildRayFromSegment(
@@ -47,11 +47,11 @@ int32_t CanSeeTarget(Player* p_player, int32_t p_ahead)
 			return hit->m_owner == (target & 0xff);
 		}
 		else {
-			return FALSE;
+			return false;
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Walks the ground from (p_x, p_y, p_z) toward the player in steps of 1000 units, and tests

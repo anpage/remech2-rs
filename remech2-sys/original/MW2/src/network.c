@@ -912,21 +912,21 @@ BOOL PASCAL CountPlayersCallback(DPID p_id, LPSTR p_friendlyName, LPSTR p_formal
 	}
 
 	g_playersFound++;
-	return TRUE;
+	return true;
 }
 
 // Copies the session named g_sessionName into p_context.
 BOOL PASCAL FindSessionCallback(LPDPSESSIONDESC p_desc, LPVOID p_context, LPDWORD p_timeout, DWORD p_flags)
 {
 	if (p_flags & DPESC_TIMEDOUT) {
-		return FALSE;
+		return false;
 	}
 
 	if (strcmp(p_desc->szSessionName, g_sessionName) == 0) {
 		*(DPSESSIONDESC*) p_context = *p_desc;
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Picks the IPX service provider.
@@ -936,7 +936,7 @@ BOOL PASCAL FindIpxProviderCallback(LPGUID p_guid, LPSTR p_name, DWORD p_major, 
 		g_serviceProvider = p_guid;
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Looks for the session named g_sessionName, into p_desc.

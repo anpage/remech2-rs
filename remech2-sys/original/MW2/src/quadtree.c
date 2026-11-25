@@ -310,10 +310,10 @@ int32_t FaceOverlapsBox(
 	if (minX <= p_maxX && maxX >= p_minX && minZ <= p_maxZ && maxZ >= p_minZ) {
 		*p_minY = minY;
 		*p_maxY = maxY;
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Classifies the point (p_x, p_y, p_z) against the quadtree's faces: 0 outside the tree's
@@ -397,15 +397,15 @@ int32_t TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 	Face* face;
 
 	if (!p_node) {
-		return FALSE;
+		return false;
 	}
 
 	if (ClipRaySlab(p_ray->m_x0, p_ray->m_dirX, p_node->m_minX, p_node->m_maxX, &tMin, &tMax)) {
-		return FALSE;
+		return false;
 	}
 
 	if (ClipRaySlab(p_ray->m_y0, p_ray->m_dirY, p_node->m_minY, p_node->m_maxY, &t0, &t1)) {
-		return FALSE;
+		return false;
 	}
 
 	if (t0 > tMin) {
@@ -417,7 +417,7 @@ int32_t TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 	}
 
 	if (ClipRaySlab(p_ray->m_z0, p_ray->m_dirZ, p_node->m_minZ, p_node->m_maxZ, &t0, &t1)) {
-		return FALSE;
+		return false;
 	}
 
 	if (t0 > tMin) {
@@ -429,7 +429,7 @@ int32_t TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 	}
 
 	if (tMax < tMin) {
-		return FALSE;
+		return false;
 	}
 
 	if (tMin < 0) {
@@ -442,15 +442,15 @@ int32_t TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 	}
 
 	if (tMax < tMin) {
-		return FALSE;
+		return false;
 	}
 
 	if (p_node->m_faceCount == 0) {
 		if (TestQuadtreeChildrenRay(p_node, p_model, p_ray)) {
-			return TRUE;
+			return true;
 		}
 
-		return FALSE;
+		return false;
 	}
 
 	vertices = (Vertex*) (p_model + 1);
@@ -458,11 +458,11 @@ int32_t TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 	for (i = 0; i < p_node->m_faceCount; i++) {
 		face = *faces++;
 		if (IntersectRayFace(face, vertices, p_ray)) {
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Finds the nearest hit of p_ray among p_node's children and shortens p_ray to it. Whether any
@@ -491,14 +491,14 @@ int32_t TestQuadtreeChildrenRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray
 
 	if (nearest < 0x7fffffff) {
 		CopyRay(p_ray, &best);
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Finds the upward face of the quadtree under (p_x, p_z) and stores its height at the point in
-// p_top, or 0 if there is none. Returns FALSE outside the tree's ground area.
+// p_top, or 0 if there is none. Returns false outside the tree's ground area.
 int32_t GetQuadtreeTop(QuadtreeNode* p_node, Model* p_model, int32_t p_x, int32_t p_y, int32_t p_z, int32_t* p_top)
 {
 	Vertex* vertices;
@@ -507,32 +507,32 @@ int32_t GetQuadtreeTop(QuadtreeNode* p_node, Model* p_model, int32_t p_x, int32_
 	Face* face;
 
 	if (!p_node) {
-		return FALSE;
+		return false;
 	}
 
 	if (p_node->m_minX > p_x || p_node->m_maxX < p_x || p_node->m_minZ > p_z || p_node->m_maxZ < p_z) {
-		return FALSE;
+		return false;
 	}
 
 	if (p_node->m_faceCount == 0) {
 		if (GetQuadtreeTop(p_node->m_children[0], p_model, p_x, p_y, p_z, p_top)) {
-			return TRUE;
+			return true;
 		}
 
 		if (GetQuadtreeTop(p_node->m_children[1], p_model, p_x, p_y, p_z, p_top)) {
-			return TRUE;
+			return true;
 		}
 
 		if (GetQuadtreeTop(p_node->m_children[2], p_model, p_x, p_y, p_z, p_top)) {
-			return TRUE;
+			return true;
 		}
 
 		if (GetQuadtreeTop(p_node->m_children[3], p_model, p_x, p_y, p_z, p_top)) {
-			return TRUE;
+			return true;
 		}
 
 		*p_top = 0;
-		return TRUE;
+		return true;
 	}
 
 	vertices = (Vertex*) (p_model + 1);
@@ -541,12 +541,12 @@ int32_t GetQuadtreeTop(QuadtreeNode* p_node, Model* p_model, int32_t p_x, int32_
 		face = *faces++;
 		if (face->m_normal[1] > 0 && IsPointInFaceXZ(face, vertices, p_x, p_z)) {
 			IsBelowFacePlane(face, vertices, p_x, p_y, p_z, p_top);
-			return TRUE;
+			return true;
 		}
 	}
 
 	*p_top = 0;
-	return TRUE;
+	return true;
 }
 
 void DisableQuadtrees(void)

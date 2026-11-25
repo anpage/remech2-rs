@@ -491,14 +491,14 @@ void UpdateMenus(void)
 	}
 }
 
-// Draws the open in-mission menu and acts on g_menuKey. Returns FALSE when the menu should close.
+// Draws the open in-mission menu and acts on g_menuKey. Returns false when the menu should close.
 int32_t DrawAndRunMenu(MenuDefinition* p_menu)
 {
 	int32_t result;
 	PANE* target;
 	PANE* backgroundTarget;
 
-	result = FALSE;
+	result = false;
 	target = p_menu->m_target;
 	if (target == NULL) {
 		return result;
@@ -524,10 +524,10 @@ int32_t DrawAndRunMenu(MenuDefinition* p_menu)
 
 	RunMenuItems(p_menu);
 	if (!IsMenuPageStackEmpty(p_menu)) {
-		result = TRUE;
+		result = true;
 	}
 	else {
-		result = FALSE;
+		result = false;
 	}
 
 	return result;

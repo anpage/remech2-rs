@@ -24,7 +24,7 @@
 
 // Parses the command line MECH2.EXE passes: switches start with / or -, anything else names the
 // mission (p_mission, "s.$" by default), which is shown with MonoPrintLine.
-// Returns FALSE without a command line (not launched by MECH2.EXE).
+// Returns false without a command line (not launched by MECH2.EXE).
 int32_t ProcessCmdLineArgs(char* p_cmdLine, char* p_mission)
 {
 	int32_t result;
@@ -32,10 +32,10 @@ int32_t ProcessCmdLineArgs(char* p_cmdLine, char* p_mission)
 	char* value;
 	int32_t rate;
 
-	result = TRUE;
+	result = true;
 	if (!p_cmdLine) {
 		printf("This program must be launched from MECH2.EXE\n");
-		result = FALSE;
+		result = false;
 	}
 
 	strcpy(p_mission, "s.$");

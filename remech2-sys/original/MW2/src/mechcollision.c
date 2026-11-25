@@ -69,7 +69,7 @@ int32_t MoveMechWithCollisions(
 	*p_y = y1;
 	*p_z = z1;
 	shape = NULL;
-	hit = FALSE;
+	hit = false;
 	if (p_mech->m_powerState != 2 && p_mech->m_powerState != 4) {
 		p_mech->m_collisionTicks = 0;
 		return 0;
@@ -77,12 +77,12 @@ int32_t MoveMechWithCollisions(
 	else {
 		if (CollideWithMechs(p_mech, p_x, p_y, p_z, p_player)) {
 			p_mech->m_player->m_collidedWith = (*p_player)->m_index;
-			hit = TRUE;
+			hit = true;
 			p_mech->m_collisionTicks++;
 			*p_hit = NULL;
 		}
 		else if (CollideWithBuildings(p_mech, p_x, p_y, p_z, &shape)) {
-			hit = TRUE;
+			hit = true;
 			p_mech->m_collisionTicks++;
 			*p_hit = shape;
 		}
@@ -107,7 +107,7 @@ int32_t MoveMechWithCollisions(
 			lift = FixedMul16(p_mech->m_radius, 0x10000 - lift) + FixedMul16(p_mech->m_height, lift);
 			SetRayLength(&ray, length + lift);
 			if (TestSceneryCollision(&ray, &shape)) {
-				hit = TRUE;
+				hit = true;
 				p_mech->m_collisionTicks++;
 				*p_hit = shape;
 				if (!g_segmentNormalX && !g_segmentNormalY && !g_segmentNormalZ && shape) {

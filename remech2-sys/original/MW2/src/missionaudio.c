@@ -91,7 +91,7 @@ void* ReadSoundFile(char* p_name)
 
 	strcpy(name, p_name);
 	strcat(name, ".sfl");
-	if (!FindSoundFile(name, FALSE)) {
+	if (!FindSoundFile(name, false)) {
 		return NULL;
 	}
 

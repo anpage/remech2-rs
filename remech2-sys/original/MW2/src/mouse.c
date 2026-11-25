@@ -6,7 +6,7 @@
 
 // The sim's mouse: it keeps the pointer grabbed during a mission.
 
-int32_t g_cursorClipped = FALSE;
+int32_t g_cursorClipped = false;
 
 uint32_t g_reclipCursor = 0;
 
@@ -14,20 +14,20 @@ uint32_t g_reclipCursor = 0;
 static int32_t IsInsideWindow(int32_t p_x, int32_t p_y)
 {
 	if (p_x < 0 || p_x >= g_gameWindowWidth) {
-		return FALSE;
+		return false;
 	}
 	if (p_y < 0 || p_y >= g_gameWindowHeight) {
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Lets go of the pointer at the end of a mission. The original's MouseCloseDevice.
 void MouseRelease(void)
 {
-	MechMouseGrab(FALSE);
-	g_cursorClipped = FALSE;
+	MechMouseGrab(false);
+	g_cursorClipped = false;
 }
 
 int32_t CenterCursor(void* p_data, int32_t p_axis)
@@ -57,10 +57,10 @@ int32_t MousePoll(void* p_data, int32_t* p_position, uint32_t* p_buttons)
 
 	if (!g_cursorClipped || g_reclipCursor) {
 		// The original clipped the cursor to the window's client area.
-		MechMouseGrab(TRUE);
+		MechMouseGrab(true);
 		CenterCursor(p_data, 0);
 		CenterCursor(p_data, 1);
-		g_cursorClipped = TRUE;
+		g_cursorClipped = true;
 		g_reclipCursor = 0;
 	}
 

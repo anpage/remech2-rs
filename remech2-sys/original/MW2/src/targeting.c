@@ -367,7 +367,7 @@ void CycleTarget(Player* p_player, int32_t p_step, uint32_t p_flags)
 	int32_t tries;
 	int32_t kind;
 
-	found = FALSE;
+	found = false;
 	if (p_player->m_index == g_localPlayerId) {
 		g_reticleTargeting = 0;
 	}
@@ -400,7 +400,7 @@ void CycleTarget(Player* p_player, int32_t p_step, uint32_t p_flags)
 				kind = 0x200;
 				break;
 			case 1:
-				found = TRUE;
+				found = true;
 				break;
 			default:
 				index += p_step;
@@ -419,7 +419,7 @@ void CycleTarget(Player* p_player, int32_t p_step, uint32_t p_flags)
 				kind = 0x400;
 				break;
 			case 1:
-				found = TRUE;
+				found = true;
 				break;
 			default:
 				index += p_step;
@@ -438,7 +438,7 @@ void CycleTarget(Player* p_player, int32_t p_step, uint32_t p_flags)
 				kind = 0x100;
 				break;
 			case 1:
-				found = TRUE;
+				found = true;
 				break;
 			default:
 				index += p_step;
@@ -738,11 +738,11 @@ int32_t UpdateTarget(Player* p_player)
 	int32_t kind;
 	int32_t index;
 
-	lost = TRUE;
+	lost = true;
 	claim = 0;
-	isLocal = FALSE;
+	isLocal = false;
 	if (p_player->m_index == g_localPlayerId) {
-		isLocal = TRUE;
+		isLocal = true;
 	}
 
 	index = p_player->m_targetInfo.m_target & 0xff;
@@ -750,17 +750,17 @@ int32_t UpdateTarget(Player* p_player)
 	switch (kind) {
 	case 0x200:
 		if (TargetGamePiece(p_player->m_index, index, 0) >= 0) {
-			lost = FALSE;
+			lost = false;
 		}
 		break;
 	case 0x400:
 		if (TargetGameThing(p_player->m_index, index, 0) >= 0) {
-			lost = FALSE;
+			lost = false;
 		}
 		break;
 	case 0x100:
 		if (TargetNavPoint(p_player->m_index, index, 0) >= 0) {
-			lost = FALSE;
+			lost = false;
 			if (g_navTable[index].m_radius > p_player->m_targetInfo.m_distance && p_player->m_mech->m_autopilot != 1 &&
 				p_player->m_index == g_localPlayerId) {
 				if (!(g_navTable[index].m_flags & 0x20)) {
@@ -922,11 +922,11 @@ void TargetAtReticle(void)
 	Shape* shape;
 
 	target = -1;
-	autopilot = FALSE;
+	autopilot = false;
 	player = g_players[g_localPlayerId];
 	previous = player->m_targetInfo.m_target;
 	if (player->m_mech->m_autopilot == 1) {
-		autopilot = TRUE;
+		autopilot = true;
 	}
 
 	shape = g_aimedShape;
@@ -1077,11 +1077,11 @@ void TargetNearestEnemy(void)
 	target = 0;
 	best = -1;
 	bestDistance = 0x7fffffff;
-	autopilot = FALSE;
+	autopilot = false;
 	player = g_players[g_localPlayerId];
 	saved = player->m_targetInfo.m_target;
 	if (player->m_mech->m_autopilot == 1) {
-		autopilot = TRUE;
+		autopilot = true;
 	}
 
 	CycleEnemyTarget(0);

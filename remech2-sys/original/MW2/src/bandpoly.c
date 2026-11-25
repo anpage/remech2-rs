@@ -51,9 +51,9 @@ int32_t DrawBand(uint32_t p_color, int32_t p_count, int32_t* p_points, int32_t p
 	int32_t haveEnd;
 	uint32_t quad[4][6];
 
-	haveStart = FALSE;
-	haveEnd = FALSE;
-	flip = FALSE;
+	haveStart = false;
+	haveEnd = false;
+	flip = false;
 	if (p_count < 2) {
 		return 0;
 	}
@@ -63,26 +63,26 @@ int32_t DrawBand(uint32_t p_color, int32_t p_count, int32_t* p_points, int32_t p
 			if (p_points[4]) {
 				x1 = p_points[0];
 				y1 = p_points[1];
-				haveEnd = TRUE;
+				haveEnd = true;
 				if (p_points[4] < 0) {
-					flip = TRUE;
+					flip = true;
 				}
 			}
 			else if (p_mode == 0) {
 				x0 = p_points[0];
 				y0 = p_points[1];
-				haveStart = TRUE;
+				haveStart = true;
 			}
 		}
 		else {
 			if (p_mode == 1) {
 				x0 = p_points[0];
 				y0 = p_points[1];
-				haveStart = TRUE;
+				haveStart = true;
 			}
 
 			if (p_points[3] < 0) {
-				flip = TRUE;
+				flip = true;
 			}
 		}
 

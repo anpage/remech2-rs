@@ -65,7 +65,7 @@ int32_t g_extendedScanCodeMap[0x59] = {
 // clang-format on
 
 int32_t KeyboardReadKeyCode(int16_t* p_keyCode);
-void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam);
+void KeyboardQueueKeyCode(size_t p_virtualKey, intptr_t p_lParam);
 void KeyboardRecordKeyState(size_t p_virtualKey, uint32_t p_lParam, int32_t p_pressed);
 
 int32_t KeyboardReadKeyCode(int16_t* p_keyCode)
@@ -88,7 +88,7 @@ int32_t KeyboardFlushKeyCodes(void)
 {
 	MechMessage msg;
 
-	if (MechPeekMessage(&msg, c_mechMsgKeyFirst, c_mechMsgKeyLast, TRUE)) {
+	if (MechPeekMessage(&msg, c_mechMsgKeyFirst, c_mechMsgKeyLast, true)) {
 		HandleKeyboardMessages(msg.m_message, msg.m_wParam, msg.m_lParam);
 	}
 
@@ -96,39 +96,39 @@ int32_t KeyboardFlushKeyCodes(void)
 	return 0;
 }
 
-void HandleKeyboardMessages(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
+void HandleKeyboardMessages(uint32_t p_msg, size_t p_wParam, intptr_t p_lParam)
 {
 	MechMessage msg;
 	int32_t done;
 
-	done = FALSE;
+	done = false;
 	do {
 		switch (p_msg) {
 		case c_mechMsgKeyDown:
 		case c_mechMsgSysKeyDown:
-			KeyboardRecordKeyState(p_wParam, p_lParam, TRUE);
+			KeyboardRecordKeyState(p_wParam, p_lParam, true);
 			KeyboardQueueKeyCode(p_wParam, p_lParam);
 			break;
 		case c_mechMsgKeyUp:
 		case c_mechMsgSysKeyUp:
-			KeyboardRecordKeyState(p_wParam, p_lParam, FALSE);
+			KeyboardRecordKeyState(p_wParam, p_lParam, false);
 			break;
 		}
 
 		// The original passed system key messages on to DefWindowProc, and the next message through
 		// TranslateMessage.
-		if (MechPeekMessage(&msg, c_mechMsgKeyFirst, c_mechMsgKeyLast, TRUE)) {
+		if (MechPeekMessage(&msg, c_mechMsgKeyFirst, c_mechMsgKeyLast, true)) {
 			p_msg = msg.m_message;
 			p_wParam = msg.m_wParam;
 			p_lParam = msg.m_lParam;
 		}
 		else {
-			done = TRUE;
+			done = true;
 		}
 	} while (!done);
 }
 
-void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam)
+void KeyboardQueueKeyCode(size_t p_virtualKey, intptr_t p_lParam)
 {
 	int16_t keyCode;
 
@@ -221,7 +221,7 @@ int16_t KeyboardPollKeyCode(void)
 	int16_t keyCode;
 
 	KeyboardReadKeyCode(&keyCode);
-	if (keyCode == 0 && MechPeekMessage(&msg, c_mechMsgKeyFirst, c_mechMsgKeyLast, TRUE)) {
+	if (keyCode == 0 && MechPeekMessage(&msg, c_mechMsgKeyFirst, c_mechMsgKeyLast, true)) {
 		HandleKeyboardMessages(msg.m_message, msg.m_wParam, msg.m_lParam);
 		KeyboardReadKeyCode(&keyCode);
 	}

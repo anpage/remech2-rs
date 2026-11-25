@@ -28,7 +28,7 @@ int32_t InitializeMw2Prj(void)
 {
 	int32_t result;
 
-	result = TRUE;
+	result = true;
 	SetArchiveAllocator(Mw2PrjAlloc, Mw2PrjFree);
 	InitializeResourceCache();
 
@@ -41,7 +41,7 @@ int32_t InitializeMw2Prj(void)
 		LoadArchiveEntries(g_mw2PrjHandle);
 	}
 	else {
-		result = FALSE;
+		result = false;
 	}
 
 	return result;

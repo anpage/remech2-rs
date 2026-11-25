@@ -121,7 +121,7 @@ StaticPoolSize* ReadStaticMemoryTable(char* p_mission)
 
 // Reads a mission stream: checks its version, adds its data table's counts (a stream read for the
 // first time adds all of them), and runs its scenario table and the streams it includes. Returns
-// FALSE on an error.
+// false on an error.
 int32_t CountMissionStream(BwdStream* p_stream)
 {
 	int32_t result;
@@ -131,28 +131,28 @@ int32_t CountMissionStream(BwdStream* p_stream)
 	int32_t known;
 	uint32_t type;
 
-	result = TRUE;
+	result = true;
 	rev = (RevRecord*) (node = GetNextNode(p_stream));
 	if (!rev || g_bwdTypeCodes[1] != rev->m_header.m_tag) {
-		result = FALSE;
+		result = false;
 		Error(0x48, NULL);
 	}
 	else if (SWAP_TAG(rev->m_version) < SWAP_TAG(*(uint32_t*) g_bwdVersion)) {
-		result = FALSE;
+		result = false;
 		Error(0x49, NULL);
 	}
 	else {
 		node = GetNextNode(p_stream);
 		if (!node || node->m_type != g_bwdTypeCodes[2]) {
-			result = FALSE;
+			result = false;
 			Error(0x3e, NULL);
 		}
 		else {
 			if (FindBwdName((BwdName*) &p_stream->m_id)) {
-				known = TRUE;
+				known = true;
 			}
 			else {
-				known = FALSE;
+				known = false;
 				AddBwdName((BwdName*) &p_stream->m_id);
 			}
 

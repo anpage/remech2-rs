@@ -69,20 +69,20 @@ char g_honorLine[0x200];
 
 char g_objectiveTime[0x80];
 
-// Returns TRUE when one of the options that makes a trial easier is set.
+// Returns true when one of the options that makes a trial easier is set.
 uint8_t HasEasyOptions()
 {
 	if (g_difficultyConfig.m_unlimitedAmmo == 1) {
-		return TRUE;
+		return true;
 	}
 	if (g_difficultyConfig.m_invulnerability == 1) {
-		return TRUE;
+		return true;
 	}
 	if (!g_difficultyConfig.m_collisionDamage) {
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 // The qsort order of the debriefing's objectives: by the time they were reached, the ones never
@@ -374,17 +374,17 @@ int32_t AppendHonorBreakdown(
 // Copies p_src to p_dst with every run of spaces and control characters turned into one space.
 void CollapseWhitespace(char* p_dst, char* p_src)
 {
-	int32_t space = FALSE;
+	int32_t space = false;
 
 	while (*p_src) {
 		if (*p_src <= ' ') {
 			if (!space) {
 				*p_dst++ = ' ';
-				space = TRUE;
+				space = true;
 			}
 		}
 		else {
-			space = FALSE;
+			space = false;
 			*p_dst++ = *p_src;
 		}
 		p_src++;
@@ -605,7 +605,7 @@ void DrawMissionDebrief(TMPackDataBase* p_database, int32_t p_campaign, char** p
 	g_debriefMenu = new ButtonMenu(
 		g_videoDriver,
 		g_defaultFont,
-		FALSE,
+		false,
 		g_debriefScreens[p_campaign].m_buttons,
 		g_debriefScreens[p_campaign].m_count
 	);
@@ -644,7 +644,7 @@ void DrawMissionDebrief(TMPackDataBase* p_database, int32_t p_campaign, char** p
 		g_debriefPage = new Page(g_bodyFont, g_videoDriver, NULL, 0, 0, 100, 100);
 	}
 	else {
-		CollectionRemove(g_debriefPages, g_debriefPage, FALSE);
+		CollectionRemove(g_debriefPages, g_debriefPage, false);
 	}
 
 	if (!g_debriefPages->m_count || g_missionResults.m_outcome != 2) {

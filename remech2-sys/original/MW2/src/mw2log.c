@@ -16,7 +16,7 @@ int32_t OpenMw2Log(void)
 	sprintf(line, "MW2.EXE %s  %s \n", "$Date: 1995/06/25 15:47:38 $", ctime(&now));
 	WriteToMw2Log(line);
 
-	return TRUE;
+	return true;
 }
 
 int32_t CloseMw2Log(void)
@@ -28,11 +28,11 @@ int32_t CloseMw2Log(void)
 	sprintf(line, "\nend of MW2  %s\n", ctime(&now));
 	WriteToMw2Log(line);
 
-	return TRUE;
+	return true;
 }
 
 int32_t WriteToMw2Log(char* p_text)
 {
 	MechLogTracef("mw2.log: %s", p_text);
-	return TRUE;
+	return true;
 }

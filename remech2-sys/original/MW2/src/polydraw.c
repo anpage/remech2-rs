@@ -122,7 +122,7 @@ void DrawScenePolygon(int32_t p_count, uint32_t* p_points, uint32_t p_flags)
 		luma = (p_flags & 0xf00) >> 8;
 		index = p_flags & 0xff;
 		saved = g_renderSettings.m_affineTextures;
-		g_renderSettings.m_affineTextures = TRUE;
+		g_renderSettings.m_affineTextures = true;
 		DrawAnimatedPolygon(index, p_count, p_points, luma, 0, 1);
 		g_renderSettings.m_affineTextures = saved;
 		break;
@@ -168,7 +168,7 @@ void DrawSkyAndGround(Eyepoint* p_eyepoint)
 	x1 = p_eyepoint->m_viewRight;
 	y0 = p_eyepoint->m_viewTop;
 	y1 = p_eyepoint->m_viewBottom;
-	gradient = FALSE;
+	gradient = false;
 	rect = g_currentPane;
 	dx = dz = 0;
 	dy = g_horizonBandHeight;
@@ -204,7 +204,7 @@ void DrawSkyAndGround(Eyepoint* p_eyepoint)
 					band[7] = yLeft - dy;
 					band[13] = yLeft;
 					band[19] = yRight;
-					gradient = TRUE;
+					gradient = true;
 				}
 			}
 
@@ -225,7 +225,7 @@ void DrawSkyAndGround(Eyepoint* p_eyepoint)
 			band[7] = yLeft - dy;
 			band[13] = yLeft;
 			band[19] = yRight;
-			gradient = TRUE;
+			gradient = true;
 		}
 
 		if (yRight == yLeft) {
@@ -266,7 +266,7 @@ void DrawSkyAndGround(Eyepoint* p_eyepoint)
 			band[19] = yLeft;
 			band[1] = yLeft - dy;
 			band[7] = yRight - dy;
-			gradient = TRUE;
+			gradient = true;
 		}
 
 		if (yRight == yLeft) {
@@ -337,7 +337,7 @@ void DrawSkyAndGround(Eyepoint* p_eyepoint)
 			band[19] = y0;
 			band[7] = y1;
 			band[13] = y1;
-			gradient = TRUE;
+			gradient = true;
 		}
 		break;
 	case 10:
@@ -380,7 +380,7 @@ void DrawSkyAndGround(Eyepoint* p_eyepoint)
 			band[19] = y0;
 			band[7] = y1;
 			band[13] = y1;
-			gradient = TRUE;
+			gradient = true;
 		}
 		break;
 	case 1:
@@ -455,7 +455,7 @@ void DrawSkyAndGround(Eyepoint* p_eyepoint)
 				band[7] = yLeft - dy;
 				band[13] = yLeft;
 				band[19] = yRight;
-				gradient = TRUE;
+				gradient = true;
 			}
 		}
 		break;
@@ -487,7 +487,7 @@ void DrawSkyAndGround(Eyepoint* p_eyepoint)
 				band[7] = yLeft - dy;
 				band[13] = yLeft;
 				band[19] = yRight;
-				gradient = TRUE;
+				gradient = true;
 			}
 		}
 		break;

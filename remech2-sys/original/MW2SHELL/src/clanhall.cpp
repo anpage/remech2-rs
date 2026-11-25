@@ -63,7 +63,7 @@ void DrawClanHall(TMPackDataBase* p_database, int32_t p_campaign, uint8_t, size_
 		}
 	}
 
-	g_clanHallMenu = new ButtonMenu(g_videoDriver, g_defaultFont, FALSE, g_clanHallScreens[p_campaign].m_buttons, 4);
+	g_clanHallMenu = new ButtonMenu(g_videoDriver, g_defaultFont, false, g_clanHallScreens[p_campaign].m_buttons, 4);
 
 	switch (p_campaign) {
 	case 0:

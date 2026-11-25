@@ -291,7 +291,7 @@ int32_t BwdExecuteStream(BwdStream* p_stream)
 	uint32_t unk0x18;
 	int32_t affiliation;
 
-	result = TRUE;
+	result = true;
 	eventList = 0;
 	unk0x18 = 0;
 	affiliation = -1;
@@ -1023,7 +1023,7 @@ int32_t BwdExecuteStream(BwdStream* p_stream)
 			int32_t id;
 			uint16_t target;
 
-			found = FALSE;
+			found = false;
 			if (g_navCount < 0x80 && g_navCount != -1) {
 				id = navObject->m_id;
 				id = MapResourceId(id);
@@ -1033,7 +1033,7 @@ int32_t BwdExecuteStream(BwdStream* p_stream)
 					g_navTable[g_navCount].m_position[0] = x;
 					g_navTable[g_navCount].m_position[1] = y;
 					g_navTable[g_navCount].m_position[2] = z;
-					found = TRUE;
+					found = true;
 				}
 				else {
 					shape = FindClassById(id);
@@ -1043,7 +1043,7 @@ int32_t BwdExecuteStream(BwdStream* p_stream)
 							GetObjWorldAngles(obj, &x, &y, &z);
 							g_navTable[g_navCount].m_obj = obj;
 							g_navTable[g_navCount].m_heading = y;
-							found = TRUE;
+							found = true;
 						}
 					}
 				}
@@ -1233,7 +1233,7 @@ int32_t BwdExecuteStream(BwdStream* p_stream)
 
 					if (mech && !LoadMechConfig(mech, name, mekId, config)) {
 						Error(0x43, NULL);
-						result = FALSE;
+						result = false;
 					}
 				}
 				else {
@@ -1241,7 +1241,7 @@ int32_t BwdExecuteStream(BwdStream* p_stream)
 				}
 			}
 			else {
-				result = FALSE;
+				result = false;
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdMangleOff]) {
@@ -1281,7 +1281,7 @@ int32_t LoadWorld(char* p_name)
 	BwdStreamKey keyData;
 	BwdStream streamData;
 
-	result = FALSE;
+	result = false;
 	ResetTeams();
 	for (i = 0; i < 0x96; i++) {
 		g_thingRecordIndices[i] = -1;
@@ -1314,10 +1314,10 @@ int32_t LoadWorld(char* p_name)
 
 	if (!result) {
 		Error(0xb, "%s", key->m_name);
-		return FALSE;
+		return false;
 	}
 	else {
-		return TRUE;
+		return true;
 	}
 }
 

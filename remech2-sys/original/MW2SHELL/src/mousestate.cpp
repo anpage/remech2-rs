@@ -15,13 +15,13 @@ char g_cursorPositionText[0x20];
 inline int32_t IsInsideWindow(MechPoint& p_point)
 {
 	if (p_point.x < 0 || p_point.x >= g_windowWidth) {
-		return FALSE;
+		return false;
 	}
 	if (p_point.y < 0 || p_point.y >= g_windowHeight) {
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 MouseState::MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_cursorShape)

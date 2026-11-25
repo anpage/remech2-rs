@@ -635,7 +635,7 @@ void LateUpdateMechC(Mech* p_mech)
 	turn = 0;
 	cosine = 0;
 	throttle = 0;
-	active = TRUE;
+	active = true;
 	mech = p_mech;
 
 	if (mech->m_flags & 0x200) {
@@ -644,7 +644,7 @@ void LateUpdateMechC(Mech* p_mech)
 
 	isLocal = mech->m_player->m_index == g_localPlayerId;
 	if (mech->m_player->m_flags & 1) {
-		active = FALSE;
+		active = false;
 	}
 
 	if (mech->m_powerState == 2) {
@@ -1224,7 +1224,7 @@ int32_t CreateMech(int32_t p_index, Player* p_player)
 	size = GetMechAllocSize();
 	buffer = StaticPoolAlloc(size, g_staticPoolTags[1]);
 	if (!buffer) {
-		return FALSE;
+		return false;
 	}
 
 	mech = buffer;
@@ -1236,7 +1236,7 @@ int32_t CreateMech(int32_t p_index, Player* p_player)
 	p_player->m_mech = mech;
 	p_player->m_mechSize = 0x10e;
 	InitMechArrays(mech);
-	return TRUE;
+	return true;
 }
 
 // Lays out p_mech's allocation (its ten weapons, eight sections and 25 ammunition bins after it)

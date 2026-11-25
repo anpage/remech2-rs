@@ -30,16 +30,16 @@ uint8_t AddUniqueString(Collection* p_collection, char* p_string)
 	char* copy;
 
 	if (p_string == NULL) {
-		return TRUE;
+		return true;
 	}
 
-	if (FindString(p_collection, p_string, NULL) == TRUE) {
-		return FALSE;
+	if (FindString(p_collection, p_string, NULL) == true) {
+		return false;
 	}
 
 	copy = AllocateString(p_string);
 	ExpandCollection(p_collection, copy);
-	return TRUE;
+	return true;
 }
 
 uint8_t FindString(Collection* p_collection, char* p_string, char** p_found)
@@ -53,7 +53,7 @@ uint8_t FindString(Collection* p_collection, char* p_string, char** p_found)
 		entry =
 			bsearch(&p_string, p_collection->m_items, p_collection->m_count, sizeof(void*), p_collection->m_compare);
 		if (entry == NULL) {
-			return FALSE;
+			return false;
 		}
 
 		item = *entry;
@@ -62,7 +62,7 @@ uint8_t FindString(Collection* p_collection, char* p_string, char** p_found)
 				*p_found = item;
 			}
 
-			return TRUE;
+			return true;
 		}
 	}
 	else {
@@ -73,12 +73,12 @@ uint8_t FindString(Collection* p_collection, char* p_string, char** p_found)
 					*p_found = item;
 				}
 
-				return TRUE;
+				return true;
 			}
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Moves every string of p_source into p_collection, freeing the ones it already holds.
@@ -101,7 +101,7 @@ void MoveStrings(Collection* p_collection, Collection* p_source)
 
 void RemoveString(Collection* p_collection, char* p_string)
 {
-	CollectionRemove(p_collection, p_string, TRUE);
+	CollectionRemove(p_collection, p_string, true);
 }
 
 void AddString(Collection* p_collection, char* p_string)
@@ -120,10 +120,10 @@ uint8_t StringsEqualAt(Collection* p_a, int32_t p_indexA, Collection* p_b, int32
 	a = CollectionGet(p_a, p_indexA);
 	b = CollectionGet(p_b, p_indexB);
 	if (!strcmp(a, b)) {
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 void DumpStrings(char* p_title, Collection* p_collection)

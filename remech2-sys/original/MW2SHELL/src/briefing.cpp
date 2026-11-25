@@ -104,7 +104,7 @@ void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, int32_t p_campai
 	}
 
 	g_videoDriver->LoadBackground(p_database, g_briefingScreens[p_campaign].m_picture);
-	CollectionRemove(g_briefingPages, g_briefingPage, FALSE);
+	CollectionRemove(g_briefingPages, g_briefingPage, false);
 	g_keyboardInput->FlushKeys();
 
 	if (strcmp(g_currentPilot->m_callsign, "FERRARI")) {
@@ -113,7 +113,7 @@ void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, int32_t p_campai
 	g_briefingMenu = new ButtonMenu(
 		g_videoDriver,
 		g_bodyFont,
-		FALSE,
+		false,
 		g_briefingScreens[p_campaign].m_buttons,
 		g_briefingScreens[p_campaign].m_count
 	);
@@ -168,7 +168,7 @@ void BriefingCallback(TMPackDataBase*, int32_t* p_campaign, uint8_t*, char**, in
 				"",
 				g_archiveFont,
 				-1,
-				FALSE,
+				false,
 				NULL,
 				g_briefingPages,
 				g_situationScreens[*p_campaign].m_buttons,
@@ -193,7 +193,7 @@ void BriefingCallback(TMPackDataBase*, int32_t* p_campaign, uint8_t*, char**, in
 			g_briefingMenu = new ButtonMenu(
 				g_videoDriver,
 				g_defaultFont,
-				FALSE,
+				false,
 				g_briefingScreens[*p_campaign].m_buttons,
 				g_briefingScreens[*p_campaign].m_count
 			);

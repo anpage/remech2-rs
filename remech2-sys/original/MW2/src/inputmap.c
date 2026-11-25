@@ -182,10 +182,10 @@ InputSink g_inputSinks[] = {
 
 void DisableGameplayInput(void)
 {
-	g_gameplayInputEnabled = FALSE;
+	g_gameplayInputEnabled = false;
 }
 
 void EnableGameplayInput(void)
 {
-	g_gameplayInputEnabled = TRUE;
+	g_gameplayInputEnabled = true;
 }

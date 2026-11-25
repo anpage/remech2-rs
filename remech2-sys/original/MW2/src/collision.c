@@ -452,24 +452,24 @@ int32_t IntersectRayFace(Face* p_face, Vertex* p_vertices, Ray* p_ray)
 	nz = p_face->m_normal[2];
 	denom = FixedMul29(nx, p_ray->m_dirX) + FixedMul29(ny, p_ray->m_dirY) + FixedMul29(nz, p_ray->m_dirZ);
 	if (denom >= 0) {
-		return FALSE;
+		return false;
 	}
 
 	vertex = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset]];
 	d = -(FixedMul29(nx, vertex->m_worldX) + FixedMul29(ny, vertex->m_worldY) + FixedMul29(nz, vertex->m_worldZ));
 	num = FixedMul29(nx, p_ray->m_x0) + FixedMul29(ny, p_ray->m_y0) + FixedMul29(nz, p_ray->m_z0) + d;
 	if (num <= 0) {
-		return FALSE;
+		return false;
 	}
 
 	t = -(num / denom);
 	if (t > 0x7fff) {
-		return FALSE;
+		return false;
 	}
 
 	t = FixedDiv16(-num, denom);
 	if (t <= 0 || p_ray->m_length < t) {
-		return FALSE;
+		return false;
 	}
 
 	x = p_ray->m_x0 + FixedMul16(p_ray->m_dirX, t);
@@ -480,10 +480,10 @@ int32_t IntersectRayFace(Face* p_face, Vertex* p_vertices, Ray* p_ray)
 		g_hitNormalX = nx >> 13;
 		g_hitNormalY = ny >> 13;
 		g_hitNormalZ = nz >> 13;
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Tests whether the point (p_x, p_y, p_z) lies within the face, projected on the plane its normal
@@ -495,7 +495,7 @@ int32_t IsPointInFace(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p_y
 	int32_t nz;
 
 	if (p_face->m_indexCount < 3) {
-		return FALSE;
+		return false;
 	}
 
 	nx = abs(p_face->m_normal[0]);
@@ -526,11 +526,11 @@ int32_t IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p
 	Vertex* vertex;
 	int32_t left;
 
-	left = FALSE;
-	right = FALSE;
+	left = false;
+	right = false;
 	count = p_face->m_indexCount;
 	if (count < 3) {
-		return FALSE;
+		return false;
 	}
 
 	indices = (uint8_t*) p_face + p_face->m_indexOffset;
@@ -558,7 +558,7 @@ int32_t IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p
 	}
 
 	if (sides != 15) {
-		return FALSE;
+		return false;
 	}
 
 	prev = &p_vertices[indices[0]];
@@ -574,14 +574,14 @@ int32_t IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p
 
 		if (vertex->m_worldZ == p_z && prev->m_worldZ == p_z) {
 			if (vertex->m_worldX < p_x && prev->m_worldX < p_x) {
-				return FALSE;
+				return false;
 			}
 
 			if (vertex->m_worldX > p_x && prev->m_worldX > p_x) {
-				return FALSE;
+				return false;
 			}
 
-			return TRUE;
+			return true;
 		}
 
 		if (vertex->m_worldZ == p_z) {
@@ -590,27 +590,27 @@ int32_t IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p
 
 		if (vertex->m_worldX < p_x && prev->m_worldX < p_x) {
 			if (left) {
-				return FALSE;
+				return false;
 			}
 
 			if (right) {
-				return TRUE;
+				return true;
 			}
 
-			left = TRUE;
+			left = true;
 			continue;
 		}
 
 		if (vertex->m_worldX > p_x && prev->m_worldX > p_x) {
 			if (right) {
-				return FALSE;
+				return false;
 			}
 
 			if (left) {
-				return TRUE;
+				return true;
 			}
 
-			right = TRUE;
+			right = true;
 			continue;
 		}
 
@@ -620,32 +620,32 @@ int32_t IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p
 			p_x;
 		if (offset < 0) {
 			if (left) {
-				return FALSE;
+				return false;
 			}
 
 			if (right) {
-				return TRUE;
+				return true;
 			}
 
-			left = TRUE;
+			left = true;
 		}
 		else if (offset > 0) {
 			if (right) {
-				return FALSE;
+				return false;
 			}
 
 			if (left) {
-				return TRUE;
+				return true;
 			}
 
-			right = TRUE;
+			right = true;
 		}
 		else {
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Tests whether (p_x, p_y) lies within the face, seen along z.
@@ -661,11 +661,11 @@ int32_t IsPointInFaceXY(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p
 	Vertex* vertex;
 	int32_t left;
 
-	left = FALSE;
-	right = FALSE;
+	left = false;
+	right = false;
 	count = p_face->m_indexCount;
 	if (count < 3) {
-		return FALSE;
+		return false;
 	}
 
 	indices = (uint8_t*) p_face + p_face->m_indexOffset;
@@ -693,7 +693,7 @@ int32_t IsPointInFaceXY(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p
 	}
 
 	if (sides != 15) {
-		return FALSE;
+		return false;
 	}
 
 	prev = &p_vertices[indices[0]];
@@ -709,14 +709,14 @@ int32_t IsPointInFaceXY(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p
 
 		if (vertex->m_worldY == p_y && prev->m_worldY == p_y) {
 			if (vertex->m_worldX < p_x && prev->m_worldX < p_x) {
-				return FALSE;
+				return false;
 			}
 
 			if (vertex->m_worldX > p_x && prev->m_worldX > p_x) {
-				return FALSE;
+				return false;
 			}
 
-			return TRUE;
+			return true;
 		}
 
 		if (vertex->m_worldY == p_y) {
@@ -725,27 +725,27 @@ int32_t IsPointInFaceXY(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p
 
 		if (vertex->m_worldX < p_x && prev->m_worldX < p_x) {
 			if (left) {
-				return FALSE;
+				return false;
 			}
 
 			if (right) {
-				return TRUE;
+				return true;
 			}
 
-			left = TRUE;
+			left = true;
 			continue;
 		}
 
 		if (vertex->m_worldX > p_x && prev->m_worldX > p_x) {
 			if (right) {
-				return FALSE;
+				return false;
 			}
 
 			if (left) {
-				return TRUE;
+				return true;
 			}
 
-			right = TRUE;
+			right = true;
 			continue;
 		}
 
@@ -755,32 +755,32 @@ int32_t IsPointInFaceXY(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p
 			p_x;
 		if (offset < 0) {
 			if (left) {
-				return FALSE;
+				return false;
 			}
 
 			if (right) {
-				return TRUE;
+				return true;
 			}
 
-			left = TRUE;
+			left = true;
 		}
 		else if (offset > 0) {
 			if (right) {
-				return FALSE;
+				return false;
 			}
 
 			if (left) {
-				return TRUE;
+				return true;
 			}
 
-			right = TRUE;
+			right = true;
 		}
 		else {
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Tests whether (p_y, p_z) lies within the face, seen along x.
@@ -796,11 +796,11 @@ int32_t IsPointInFaceYZ(Face* p_face, Vertex* p_vertices, int32_t p_y, int32_t p
 	Vertex* vertex;
 	int32_t left;
 
-	left = FALSE;
-	right = FALSE;
+	left = false;
+	right = false;
 	count = p_face->m_indexCount;
 	if (count < 3) {
-		return FALSE;
+		return false;
 	}
 
 	indices = (uint8_t*) p_face + p_face->m_indexOffset;
@@ -828,7 +828,7 @@ int32_t IsPointInFaceYZ(Face* p_face, Vertex* p_vertices, int32_t p_y, int32_t p
 	}
 
 	if (sides != 15) {
-		return FALSE;
+		return false;
 	}
 
 	prev = &p_vertices[indices[0]];
@@ -844,14 +844,14 @@ int32_t IsPointInFaceYZ(Face* p_face, Vertex* p_vertices, int32_t p_y, int32_t p
 
 		if (vertex->m_worldZ == p_z && prev->m_worldZ == p_z) {
 			if (vertex->m_worldY < p_y && prev->m_worldY < p_y) {
-				return FALSE;
+				return false;
 			}
 
 			if (vertex->m_worldY > p_y && prev->m_worldY > p_y) {
-				return FALSE;
+				return false;
 			}
 
-			return TRUE;
+			return true;
 		}
 
 		if (vertex->m_worldZ == p_z) {
@@ -860,27 +860,27 @@ int32_t IsPointInFaceYZ(Face* p_face, Vertex* p_vertices, int32_t p_y, int32_t p
 
 		if (vertex->m_worldY < p_y && prev->m_worldY < p_y) {
 			if (left) {
-				return FALSE;
+				return false;
 			}
 
 			if (right) {
-				return TRUE;
+				return true;
 			}
 
-			left = TRUE;
+			left = true;
 			continue;
 		}
 
 		if (vertex->m_worldY > p_y && prev->m_worldY > p_y) {
 			if (right) {
-				return FALSE;
+				return false;
 			}
 
 			if (left) {
-				return TRUE;
+				return true;
 			}
 
-			right = TRUE;
+			right = true;
 			continue;
 		}
 
@@ -890,30 +890,30 @@ int32_t IsPointInFaceYZ(Face* p_face, Vertex* p_vertices, int32_t p_y, int32_t p
 			p_y;
 		if (offset < 0) {
 			if (left) {
-				return FALSE;
+				return false;
 			}
 
 			if (right) {
-				return TRUE;
+				return true;
 			}
 
-			left = TRUE;
+			left = true;
 		}
 		else if (offset > 0) {
 			if (right) {
-				return FALSE;
+				return false;
 			}
 
 			if (left) {
-				return TRUE;
+				return true;
 			}
 
-			right = TRUE;
+			right = true;
 		}
 		else {
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }

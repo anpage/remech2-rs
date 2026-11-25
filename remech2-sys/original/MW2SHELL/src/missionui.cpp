@@ -604,7 +604,7 @@ done:
 			delete g_trialSound;
 			g_trialSound = NULL;
 		}
-		g_videoDriver->ClearGlyphs(TRUE);
+		g_videoDriver->ClearGlyphs(true);
 		g_simHandoff.m_briefingMission = g_briefingMission;
 		MechPostMessage(p_msg, c_msgTrials, 0);
 		UnregisterScreenFunction(MissionBriefingCallback);

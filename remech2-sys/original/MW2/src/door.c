@@ -221,7 +221,7 @@ int32_t CreateDoor(int32_t p_index, Player* p_player)
 	size = GetMechAllocSize();
 	buffer = StaticPoolAlloc(size, g_staticPoolTags[1]);
 	if (!buffer) {
-		return FALSE;
+		return false;
 	}
 
 	mech = buffer;
@@ -248,5 +248,5 @@ int32_t CreateDoor(int32_t p_index, Player* p_player)
 		slot++;
 	}
 
-	return TRUE;
+	return true;
 }

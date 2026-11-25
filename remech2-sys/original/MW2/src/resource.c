@@ -153,7 +153,7 @@ int32_t LoadScenarioTable(ScenarioTable* p_table)
 {
 	int32_t result;
 
-	result = FALSE;
+	result = false;
 	if (g_scenarios) {
 		MechHeapFree(g_primaryHeap, g_scenarios);
 	}
@@ -165,7 +165,7 @@ int32_t LoadScenarioTable(ScenarioTable* p_table)
 	if (g_scenarios) {
 		memcpy(g_scenarios, p_table, p_table->m_header.m_size);
 		g_scenarioCount = (g_scenarios->m_header.m_size - 8) / 0xc;
-		result = TRUE;
+		result = true;
 	}
 	else {
 		Error(0x3f, NULL);
@@ -180,7 +180,7 @@ int32_t LoadMissionTable(MissionTable* p_table)
 	int32_t result;
 	int32_t slot;
 
-	result = FALSE;
+	result = false;
 	slot = p_table->m_star;
 	if (g_missionTables[slot]) {
 		MechHeapFree(g_primaryHeap, g_missionTables[slot]);
@@ -193,7 +193,7 @@ int32_t LoadMissionTable(MissionTable* p_table)
 		Error(0x40, NULL);
 	}
 	else {
-		result = TRUE;
+		result = true;
 		memcpy(g_missionTables[slot], p_table, p_table->m_header.m_size);
 		g_missionTableCounts[slot] =
 			(g_missionTables[slot]->m_header.m_size - sizeof(BwdRecord)) / sizeof(MissionEntry);
@@ -203,7 +203,7 @@ int32_t LoadMissionTable(MissionTable* p_table)
 	return result;
 }
 
-// Adds a path to g_paths, or returns FALSE if the table or the path is full.
+// Adds a path to g_paths, or returns false if the table or the path is full.
 int32_t LoadPathTable(PathRecord* p_record)
 {
 	int32_t count;
@@ -212,7 +212,7 @@ int32_t LoadPathTable(PathRecord* p_record)
 	int32_t i;
 	PathRecord* record;
 
-	result = FALSE;
+	result = false;
 	record = p_record;
 	count = (record->m_header.m_size - 0x48) / 0x1c;
 	if (g_pathCount >= 0x40 || count > 0x40) {
@@ -232,10 +232,10 @@ int32_t LoadPathTable(PathRecord* p_record)
 		g_paths[index].m_points[i].m_duration = record->m_points[i].m_duration;
 	}
 
-	return TRUE;
+	return true;
 }
 
-// Adds a formation to g_formationTemplates, or returns FALSE if the table or the formation is
+// Adds a formation to g_formationTemplates, or returns false if the table or the formation is
 // full.
 int32_t LoadFormationTable(FormationRecord* p_record)
 {
@@ -245,7 +245,7 @@ int32_t LoadFormationTable(FormationRecord* p_record)
 	int32_t i;
 	FormationRecord* record;
 
-	result = FALSE;
+	result = false;
 	record = p_record;
 	count = (record->m_header.m_size - 0x18) / 0xc;
 	if (g_formationTemplateCount >= 0x20 || count > 8) {
@@ -260,7 +260,7 @@ int32_t LoadFormationTable(FormationRecord* p_record)
 		g_formationTemplates[index].m_heading[i] = record->m_slots[i].m_heading;
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Runs p_fn on the stream an include record names. A name of "^" with id -1 or -2 takes the
@@ -277,15 +277,15 @@ int32_t ExecuteInclude(IncludeRecord* p_record, BwdStreamFn p_fn)
 
 	record = p_record;
 	key = &keyData;
-	ok = TRUE;
-	result = FALSE;
+	ok = true;
+	result = false;
 	key->m_id = record->m_id;
 	strncpy(key->m_name, record->m_name, 0xc);
 	key->m_name[0xc] = '\0';
 	if ((key->m_id == -2 || key->m_id == -1) && key->m_name[0] == '^') {
 		if (!g_scenarios) {
 			Error(0x39, NULL);
-			ok = FALSE;
+			ok = false;
 		}
 		else if (g_nextScenario < g_scenarioCount) {
 			strncpy(key->m_name, g_scenarios->m_names[g_nextScenario], 0xc);
@@ -294,14 +294,14 @@ int32_t ExecuteInclude(IncludeRecord* p_record, BwdStreamFn p_fn)
 		}
 		else {
 			Error(0x3b, NULL);
-			ok = FALSE;
+			ok = false;
 		}
 	}
 
 	if (ok) {
 		stream = OpenBwdStream(key, &streamData);
 		if (stream) {
-			result = TRUE;
+			result = true;
 			result &= p_fn(stream);
 			UnloadResource(stream);
 		}
@@ -363,14 +363,14 @@ int32_t RunIncludedStream(IncludeRecord2* p_record, BwdStreamFn p_fn)
 
 	record = p_record;
 	key = &keyData;
-	result = FALSE;
+	result = false;
 	id = record->m_id;
 	strncpy(key->m_name, record->m_name, 0xc);
 	key->m_name[0xc] = '\0';
 	key->m_id = id;
 	stream = OpenBwdStream(key, &streamData);
 	if (stream) {
-		result = TRUE;
+		result = true;
 		result = p_fn(stream);
 		UnloadResource(stream);
 	}
@@ -588,8 +588,8 @@ void CreateObjectNode(
 	data = NULL;
 	size = 0;
 	offset = 0;
-	first = TRUE;
-	fromResource = FALSE;
+	first = true;
+	fromResource = false;
 	resource = record->m_resource;
 	id = record->m_id;
 	parent = record->m_parent;
@@ -605,7 +605,7 @@ void CreateObjectNode(
 		data = LoadCachedResource(g_mw2PrjHandle, resource, g_resourceTypeTags[c_resTagPoly], 0);
 		if (data) {
 			size = GetPrjResourceSize(g_mw2PrjHandle, g_resourceTypeTags[c_resTagPoly], resource);
-			fromResource = TRUE;
+			fromResource = true;
 		}
 		else {
 			Error(0x38, NULL);
@@ -681,7 +681,7 @@ void CreateObjectNode(
 			AddClass(mapped, shape);
 		}
 
-		first = FALSE;
+		first = false;
 		if (parent == -2) {
 			BuildMatrix(&matrix, xform.m_angleX, xform.m_angleY, xform.m_angleZ, xform.m_x, xform.m_y, xform.m_z);
 			TransformShape(shape, &matrix);

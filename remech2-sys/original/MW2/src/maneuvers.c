@@ -117,7 +117,7 @@ void RunManeuver(Player* p_player, uint16_t p_target)
 	Mech* mech;
 	Player* leader;
 
-	done = FALSE;
+	done = false;
 	mech = p_player->m_mech;
 	if (p_player->m_maneuver != -1) {
 		switch (p_player->m_maneuver) {
@@ -149,13 +149,13 @@ void RunManeuver(Player* p_player, uint16_t p_target)
 		case c_maneuverAchick:
 			BrakeFall(p_player);
 			if (ManeuverAchick(p_player, p_target)) {
-				done = TRUE;
+				done = true;
 			}
 			break;
 		case c_maneuverAsrp:
 			BrakeFall(p_player);
 			if (ManeuverAchick(p_player, p_target)) {
-				done = TRUE;
+				done = true;
 			}
 
 			if (!AvoidObstacles(p_player)) {
@@ -169,39 +169,39 @@ void RunManeuver(Player* p_player, uint16_t p_target)
 			break;
 		case c_maneuverAjmpin:
 			if (ManeuverAjmpin(p_player, p_target)) {
-				done = TRUE;
+				done = true;
 			}
 			break;
 		case c_maneuverSprint:
 			if (ManeuverSprint(p_player, p_target)) {
-				done = TRUE;
+				done = true;
 			}
 			break;
 		case c_maneuverAdfa:
 			if (ManeuverAdfa(p_player, p_target) || p_player->m_mech->m_jumpFuel <= 0) {
-				done = TRUE;
+				done = true;
 			}
 			break;
 		case c_maneuverKama:
 			if (ManeuverKama(p_player, p_target)) {
-				done = TRUE;
+				done = true;
 			}
 			break;
 		case c_maneuverWchick:
 			BrakeFall(p_player);
 			if (ManeuverWchick(p_player, p_target)) {
-				done = TRUE;
+				done = true;
 			}
 			break;
 		case c_maneuverWbackp:
 			BrakeFall(p_player);
 			if (ManeuverWbackp(p_player, p_target)) {
-				done = TRUE;
+				done = true;
 			}
 			break;
 		case c_maneuverWpeek:
 			if (ManeuverWpeek(p_player, p_target)) {
-				done = TRUE;
+				done = true;
 			}
 			break;
 		case c_maneuverAvoid:
@@ -210,7 +210,7 @@ void RunManeuver(Player* p_player, uint16_t p_target)
 		case c_maneuverCircle:
 			BrakeFall(p_player);
 			if (ManeuverCircle(p_player, p_target)) {
-				done = TRUE;
+				done = true;
 			}
 			break;
 		}
@@ -236,15 +236,15 @@ void RunManeuver(Player* p_player, uint16_t p_target)
 		}
 
 		if (p_player->m_type == c_playerTypeMech && IsStuck(mech)) {
-			done = TRUE;
+			done = true;
 		}
 
 		if (p_player->m_maneuverEnd && p_player->m_maneuverEnd <= g_currentClock) {
-			done = TRUE;
+			done = true;
 		}
 
 		if (p_player->m_nextManeuver) {
-			done = TRUE;
+			done = true;
 		}
 
 		if (done) {
@@ -784,7 +784,7 @@ int32_t ManeuverAchick(Player* p_player, int16_t p_target)
 	int32_t heading;
 	int32_t result;
 
-	result = FALSE;
+	result = false;
 	SetTarget(p_player, p_target);
 	if (!AvoidObstacles(p_player)) {
 		heading = SteerToTarget(p_player);
@@ -801,7 +801,7 @@ int32_t ManeuverAchick(Player* p_player, int16_t p_target)
 	}
 
 	if (p_player->m_targetInfo.m_distance <= scale * 8000.0) {
-		result = TRUE;
+		result = true;
 	}
 
 	JumpToTurn(p_player);
@@ -814,7 +814,7 @@ int32_t ManeuverKama(Player* p_player, int16_t p_target)
 {
 	int32_t result;
 
-	result = FALSE;
+	result = false;
 	SetTarget(p_player, p_target);
 	if (!AvoidObstacles(p_player) || GetTargetShape(p_target) == p_player->m_avoidShape) {
 		SteerToTarget(p_player);
@@ -823,7 +823,7 @@ int32_t ManeuverKama(Player* p_player, int16_t p_target)
 
 	if (p_player->m_targetInfo.m_range <= 2000) {
 		p_player->m_steering->m_selfDestruct = 1;
-		result = TRUE;
+		result = true;
 	}
 
 	return result;
@@ -869,7 +869,7 @@ int32_t ManeuverWpeek(Player* p_player, int16_t p_target)
 	int32_t heading;
 	int32_t result;
 
-	result = FALSE;
+	result = false;
 	SetTarget(p_player, p_target);
 	heading = GetTargetBearing(p_player);
 	RunAIWeapons(p_player, heading);
@@ -901,7 +901,7 @@ int32_t ManeuverWpeek(Player* p_player, int16_t p_target)
 		break;
 	case 2:
 		if (BrakeFall(p_player)) {
-			result = TRUE;
+			result = true;
 		}
 		break;
 	}
@@ -952,10 +952,10 @@ int32_t ManeuverAdfa(Player* p_player, int16_t p_target)
 	turn = GetTargetBearing(p_player);
 	RunAIWeapons(p_player, turn);
 	if (p_player->m_onGround || p_player->m_mech->m_collisionTicks) {
-		result = TRUE;
+		result = true;
 	}
 	else {
-		result = FALSE;
+		result = false;
 	}
 
 	if (p_player->m_maneuverParam == 2) {
@@ -982,7 +982,7 @@ int32_t ManeuverAdfa(Player* p_player, int16_t p_target)
 
 		SetJumpJets(p_player, 1);
 		if (!CanJump(p_player, 40)) {
-			result = TRUE;
+			result = true;
 		}
 	}
 	else {
@@ -1146,11 +1146,11 @@ int32_t AvoidObstacles(Player* p_player)
 	mech = p_player->m_mech;
 	if (!mech->m_topSpeed || (!p_player->m_avoidSide && !p_player->m_steering->m_throttle) ||
 		p_player->m_steering->m_reverse) {
-		return FALSE;
+		return false;
 	}
 
 	if (p_player->m_nextAvoidCheck > g_currentClock) {
-		return p_player->m_avoidShape ? TRUE : FALSE;
+		return p_player->m_avoidShape ? true : false;
 	}
 
 	if (!p_player->m_avoidSide) {
@@ -1250,7 +1250,7 @@ int32_t AvoidObstacles(Player* p_player)
 		p_player->m_nextAvoidCheck = g_currentClock + (p_player->m_avoidShape ? 90 : 181);
 	}
 
-	return turn ? TRUE : FALSE;
+	return turn ? true : false;
 }
 
 // Whether p_shape is solid ground to stand on: a flat enough face or a shape of type 0x50.
@@ -1406,11 +1406,11 @@ int32_t IsOutOfAmmo(Mech* p_mech)
 	WeaponSlot* slot;
 	int32_t found;
 
-	found = FALSE;
+	found = false;
 	for (i = 0; i < p_mech->m_weaponCount && !found; i++) {
 		slot = &p_mech->m_weapons[i];
 		if (slot->m_state != c_weaponEmpty && slot->m_ammo) {
-			found = TRUE;
+			found = true;
 			break;
 		}
 	}
@@ -1648,11 +1648,11 @@ int16_t ChooseFlankPlace(Player* p_player)
 		}
 	}
 	else {
-		found = FALSE;
+		found = false;
 		if (place > 4) {
 			for (i = 6; i > 3 && !found; i--) {
 				if (!leader->m_placesTaken[i]) {
-					found = TRUE;
+					found = true;
 				}
 			}
 
@@ -1661,7 +1661,7 @@ int16_t ChooseFlankPlace(Player* p_player)
 		else {
 			for (i = 2; i < 5 && !found; i++) {
 				if (!leader->m_placesTaken[i]) {
-					found = TRUE;
+					found = true;
 				}
 			}
 

@@ -95,7 +95,7 @@ ButtonMenu::ButtonMenu(
 			text,
 			p_buttons[i].m_textPos,
 			NULL,
-			TRUE
+			true
 		);
 		item->m_label = label;
 		ExpandCollection(m_items, item);
@@ -148,7 +148,7 @@ int32_t ButtonMenu::HitTest(int32_t p_x, int32_t p_y)
 	id = -1;
 	for (i = 0; i < m_items->m_count; i++) {
 		item = (MenuEntry*) CollectionGet(m_items, i);
-		if (item->HitTest(p_x, p_y) == TRUE && item->m_enabled == TRUE) {
+		if (item->HitTest(p_x, p_y) == true && item->m_enabled == true) {
 			id = item->m_id;
 		}
 	}
@@ -163,7 +163,7 @@ void ButtonMenu::DrawRects()
 
 	for (i = 0; i < m_items->m_count; i++) {
 		item = (MenuEntry*) CollectionGet(m_items, i);
-		if (item->m_drawRect == TRUE) {
+		if (item->m_drawRect == true) {
 			item->DrawRect(m_videoDriver);
 		}
 	}
@@ -177,7 +177,7 @@ void ButtonMenu::RemoveButton(int32_t p_id)
 	for (i = 0; i < m_items->m_count; i++) {
 		item = (MenuEntry*) CollectionGet(m_items, i);
 		if (item->m_id == p_id) {
-			CollectionRemove(m_items, item, FALSE);
+			CollectionRemove(m_items, item, false);
 			delete item;
 		}
 	}
@@ -207,7 +207,7 @@ void ButtonMenu::AddButton(MainMenuButton p_button, int32_t p_id, uint8_t p_draw
 		text,
 		p_button.m_textPos,
 		NULL,
-		TRUE
+		true
 	);
 	item->m_label = label;
 	ExpandCollection(m_items, item);
@@ -221,7 +221,7 @@ void ButtonMenu::EnableButton(int32_t p_id)
 	for (i = 0; i < m_items->m_count; i++) {
 		item = (MenuEntry*) CollectionGet(m_items, i);
 		if (item->m_id == p_id && !item->m_enabled) {
-			item->m_enabled = TRUE;
+			item->m_enabled = true;
 			if (item->m_label != NULL) {
 				m_videoDriver->AddGlyph(item->m_label, 1);
 				item->m_label->Draw();
@@ -238,7 +238,7 @@ void ButtonMenu::DisableButton(int32_t p_id)
 	for (i = 0; i < m_items->m_count; i++) {
 		item = (MenuEntry*) CollectionGet(m_items, i);
 		if (item->m_id == p_id && item->m_enabled) {
-			item->m_enabled = FALSE;
+			item->m_enabled = false;
 			if (item->m_hover != NULL) {
 				delete item->m_hover;
 				item->m_hover = NULL;
@@ -275,7 +275,7 @@ MenuEntry::MenuEntry(
 	m_colors = p_colors;
 	m_enabled = p_enabled;
 	m_rect = new HitRect(p_left, p_top, p_right, p_bottom);
-	if (m_drawRect == TRUE) {
+	if (m_drawRect == true) {
 		DrawRect(p_videoDriver);
 	}
 }
@@ -301,7 +301,7 @@ uint8_t MenuEntry::HitTest(int32_t p_x, int32_t p_y)
 		if (m_hover == NULL && m_text != NULL && strlen(m_text) != 0) {
 			m_hover = m_font->AddOverlayText(m_textPos.x, m_textPos.y, m_text, m_colors);
 		}
-		return TRUE;
+		return true;
 	}
 	else {
 		if (m_hover != NULL) {
@@ -312,7 +312,7 @@ uint8_t MenuEntry::HitTest(int32_t p_x, int32_t p_y)
 			}
 		}
 
-		return FALSE;
+		return false;
 	}
 }
 
@@ -335,8 +335,8 @@ void HitRect::Draw(VideoDriver* p_videoDriver)
 uint8_t HitRect::Contains(int32_t p_x, int32_t p_y)
 {
 	if (m_bottom >= p_y && m_top <= p_y && m_right >= p_x && m_left <= p_x) {
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }

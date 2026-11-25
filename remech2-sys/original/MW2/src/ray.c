@@ -191,21 +191,21 @@ int32_t ClipRaySlab(int32_t p_origin, int32_t p_delta, int32_t p_min, int32_t p_
 	int32_t overflow;
 	int32_t quotient;
 
-	overflow = FALSE;
+	overflow = false;
 	if (p_delta == 0) {
-		overflow = TRUE;
+		overflow = true;
 	}
 	else {
 		toMin = p_min - p_origin;
 		toMax = p_max - p_origin;
 		quotient = toMin / p_delta;
 		if (quotient > 0x7fff || quotient < -0x8000) {
-			overflow = TRUE;
+			overflow = true;
 		}
 		else {
 			quotient = toMax / p_delta;
 			if (quotient > 0x7fff || quotient < -0x8000) {
-				overflow = TRUE;
+				overflow = true;
 			}
 		}
 	}

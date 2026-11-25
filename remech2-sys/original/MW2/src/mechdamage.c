@@ -898,7 +898,7 @@ void ApplyDamageToMech(int32_t p_attacker, Mech* p_mech, int32_t p_damage, int32
 	MechSection* section;
 
 	side = 0;
-	rear = FALSE;
+	rear = false;
 	level = 0;
 	roll = 0;
 	if (p_mech->m_player->m_index == g_localPlayerId && g_difficulty->m_invulnerable) {
@@ -918,7 +918,7 @@ void ApplyDamageToMech(int32_t p_attacker, Mech* p_mech, int32_t p_damage, int32
 	}
 
 	if (p_section & 0x8000) {
-		rear = TRUE;
+		rear = true;
 		p_section &= ~0x8000;
 	}
 

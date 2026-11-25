@@ -186,11 +186,11 @@ int32_t AllocPlayer(int32_t p_player)
 
 	player = StaticPoolAlloc(size, g_staticPoolTags[0]);
 	if (!player) {
-		return FALSE;
+		return false;
 	}
 
 	g_players[p_player] = player;
-	return TRUE;
+	return true;
 }
 
 // Sets up a newly allocated player.

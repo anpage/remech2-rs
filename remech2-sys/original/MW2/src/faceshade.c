@@ -252,9 +252,9 @@ int32_t ArePerspectiveTexturesOn(uint32_t p_unk0x00)
 void EnablePerspectiveTextures(uint32_t p_unk0x00, int32_t p_enable)
 {
 	if (!p_enable) {
-		g_renderSettings.m_affineTextures = TRUE;
+		g_renderSettings.m_affineTextures = true;
 	}
 	else {
-		g_renderSettings.m_affineTextures = FALSE;
+		g_renderSettings.m_affineTextures = false;
 	}
 }

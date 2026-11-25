@@ -388,7 +388,7 @@ int32_t PlaceCriticals(int32_t p_location, int32_t p_id, int32_t p_count)
 	int32_t i;
 
 	if (p_id <= 0) {
-		return FALSE;
+		return false;
 	}
 
 	for (i = 0; p_count && i < 12; i++) {
@@ -405,10 +405,10 @@ int32_t PlaceCriticals(int32_t p_location, int32_t p_id, int32_t p_count)
 			}
 		}
 
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 void RemoveUnassigned(int32_t p_id)
@@ -467,15 +467,15 @@ void UnassignItem(int32_t p_id)
 int32_t AssignItem(int32_t p_location, int32_t p_id, int32_t p_count)
 {
 	if (p_id <= 0) {
-		return FALSE;
+		return false;
 	}
 
 	if (PlaceCriticals(p_location, p_id, p_count)) {
 		RemoveUnassigned(p_id);
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 void DeleteItem(int32_t p_id)
@@ -1976,11 +1976,11 @@ int32_t FindMekItemInLocation(int32_t p_id, int32_t p_location, int32_t* p_slot)
 			if (p_slot != NULL) {
 				*p_slot = i;
 			}
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 int32_t FindMekItem(int32_t p_id, int32_t* p_location, int32_t* p_slot)
@@ -1996,11 +1996,11 @@ int32_t FindMekItem(int32_t p_id, int32_t* p_location, int32_t* p_slot)
 			if (p_slot != NULL) {
 				*p_slot = slot;
 			}
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Saves the variant being edited to the .mek file p_name in the mek directory, creating the
@@ -2526,19 +2526,19 @@ void PreviousVariant()
 	RedrawFields(g_screenFields);
 }
 
-// Saves the variant under the first free user slot. Returns FALSE when the variant is invalid.
+// Saves the variant under the first free user slot. Returns false when the variant is invalid.
 int32_t SaveUserVariant()
 {
 	int32_t i;
 
 	if (g_variant.m_unassigned[0].m_id != -1) {
 		ShowDialog("Invalid 'Mech specification:|Unassigned criticals detected.#Ok", 0);
-		return FALSE;
+		return false;
 	}
 
 	if (g_variant.m_usedMass > g_variant.m_maxMass) {
 		ShowDialog("Invalid 'Mech specification:|Chassis can not support|current mass.#Ok", 0);
-		return FALSE;
+		return false;
 	}
 
 	for (i = 100; i < 200; i++) {
@@ -2549,7 +2549,7 @@ int32_t SaveUserVariant()
 
 	if (i >= 200) {
 		ShowDialog("Error: Too many mechs|of this variant to save.#Ok", 0);
-		return TRUE;
+		return true;
 	}
 
 	sprintf(g_userMekName, "%s%02dusr.mek", g_mechChassis[g_selectedChassis].m_prefix, i - 100);
@@ -2558,11 +2558,11 @@ int32_t SaveUserVariant()
 	g_variantFiles[i][8] = '\0';
 	if (!SaveMekFile(g_userMekName)) {
 		ShowDialog("Error saving 'Mech.#Ok", 0);
-		return TRUE;
+		return true;
 	}
 
 	g_selectedVariant = i;
-	return TRUE;
+	return true;
 }
 
 // The mech bay's field tables: the bay's own (g_mechBayFields), the customize screen's
@@ -3058,7 +3058,7 @@ void DrawMechBay(TMPackDataBase* p_database, int32_t p_campaign, size_t p_wParam
 	g_mechBayMenu = new ButtonMenu(
 		g_videoDriver,
 		g_defaultFont,
-		FALSE,
+		false,
 		g_mechBayScreens[p_campaign].m_buttons,
 		g_mechBayScreens[p_campaign].m_count
 	);

@@ -15,12 +15,12 @@
 #include <string.h>
 
 // Set by a \A escape and never read.
-uint8_t g_pageLinkRead = FALSE;
+uint8_t g_pageLinkRead = false;
 
 // A \B or \G escape was read: the next ReadToken passes it on to the glyph as a word.
-uint8_t g_pageBackUpPending = FALSE;
+uint8_t g_pageBackUpPending = false;
 
-uint8_t g_pageGoToPending = FALSE;
+uint8_t g_pageGoToPending = false;
 
 // Layout's word, line and scratch buffers.
 char g_pageWord[0x400];
@@ -38,7 +38,7 @@ uint32_t g_typeOwed;
 #define PAGE_ADD_LINK(WORD_WIDTH)                                                                                      \
 	if (link != -1) {                                                                                                  \
 		rect = (Link*) MechHeapAlloc(g_primaryHeap, sizeof(Link));                                                     \
-		if (wrapped == TRUE) {                                                                                         \
+		if (wrapped == true) {                                                                                         \
 			rect->m_left = m_left;                                                                                     \
 			rect->m_top = m_top;                                                                                       \
 			rect->m_right = rect->m_left + (WORD_WIDTH);                                                               \
@@ -130,14 +130,14 @@ int32_t Page::ReadToken(char* p_text, char* p_word, int32_t* p_pos, int32_t p_en
 		return c_tokenEnd;
 	}
 
-	if (g_pageBackUpPending == TRUE) {
-		g_pageBackUpPending = FALSE;
+	if (g_pageBackUpPending == true) {
+		g_pageBackUpPending = false;
 		sprintf(p_word, "\\b%03d", *p_offset);
 		return c_tokenWord;
 	}
 
-	if (g_pageGoToPending == TRUE) {
-		g_pageGoToPending = FALSE;
+	if (g_pageGoToPending == true) {
+		g_pageGoToPending = false;
 		sprintf(p_word, "\\g%03d", *p_offset);
 		return c_tokenWord;
 	}
@@ -199,7 +199,7 @@ nextChar:
 			number[1] = p_text[++i];
 			i++;
 			number[2] = '\0';
-			g_pageLinkRead = TRUE;
+			g_pageLinkRead = true;
 			*p_link = atoi(number);
 			*p_pos = i;
 			SkipSpaces(p_text, p_pos, p_end);
@@ -211,7 +211,7 @@ nextChar:
 			number[2] = p_text[++i];
 			i++;
 			number[3] = '\0';
-			g_pageBackUpPending = TRUE;
+			g_pageBackUpPending = true;
 			*p_offset = atoi(number);
 			*p_pos = i;
 			SkipSpaces(p_text, p_pos, p_end);
@@ -223,7 +223,7 @@ nextChar:
 			number[2] = p_text[++i];
 			i++;
 			number[3] = '\0';
-			g_pageGoToPending = TRUE;
+			g_pageGoToPending = true;
 			*p_offset = atoi(number);
 			*p_pos = i;
 			SkipSpaces(p_text, p_pos, p_end);
@@ -296,7 +296,7 @@ char* Page::Layout(char* p_text)
 	pos = 0;
 	lineWidth = 0;
 	strcpy(g_pageLine, "");
-	center = FALSE;
+	center = false;
 	tabs = 0;
 	link = -1;
 	offset = -1;
@@ -305,7 +305,7 @@ char* Page::Layout(char* p_text)
 	while (token != c_tokenEnd) {
 		wordStart = p_text + pos;
 		token = ReadToken(p_text, g_pageWord, &pos, length, &link, &offset);
-		wrapped = FALSE;
+		wrapped = false;
 
 		switch (token) {
 		case c_tokenWord:
@@ -329,11 +329,11 @@ char* Page::Layout(char* p_text)
 
 			if (lineWidth + m_font->GetTextWidth(g_pageWord) <= m_width) {
 				lineWidth += AppendWord(g_pageLine, g_pageWord, width);
-				wrapped = FALSE;
+				wrapped = false;
 			}
 			else {
 				lineWidth = FlushLine(g_pageLine, g_pageWord);
-				wrapped = TRUE;
+				wrapped = true;
 			}
 
 			PAGE_ADD_LINK(m_font->GetTextWidth(g_pageWord));
@@ -343,12 +343,12 @@ char* Page::Layout(char* p_text)
 			}
 			break;
 		case c_tokenCenter:
-			center = TRUE;
+			center = true;
 			break;
 		case c_tokenNewLine:
 			width = m_font->GetTextWidth(g_pageWord);
-			if (center == TRUE) {
-				center = FALSE;
+			if (center == true) {
+				center = false;
 				gap = m_width - lineWidth;
 				half = gap / 2;
 				count = half / m_font->GetTextWidth(" ");
@@ -446,7 +446,7 @@ void Page::Restart()
 
 	for (i = 0; i < m_glyphs->m_count; i++) {
 		glyph = (TextGlyph*) CollectionGet(m_glyphs, i);
-		glyph->m_done = FALSE;
+		glyph->m_done = false;
 		glyph->m_cursorX = -1;
 		glyph->m_textIndex = -1;
 		glyph->SetTyped(1);

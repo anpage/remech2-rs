@@ -212,11 +212,11 @@ int32_t TestPointUnderFloor(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_
 	Face* face;
 
 	i = 0;
-	done = FALSE;
+	done = false;
 	while (!done) {
 		face = (Face*) ((uint8_t*) p_shape->m_model + p_shape->m_model->m_faceOffset) + i;
 		if (face->m_normal[1] > 0 && IsPointInFaceXZ(face, (Vertex*) (p_shape->m_model + 1), p_x, p_z)) {
-			done = TRUE;
+			done = true;
 			if (IsBelowFacePlane(face, (Vertex*) (p_shape->m_model + 1), p_x, p_y, p_z, &height)) {
 				return 1;
 			}
@@ -227,7 +227,7 @@ int32_t TestPointUnderFloor(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_
 		else {
 			i++;
 			if (i == p_shape->m_model->m_faceCount) {
-				done = TRUE;
+				done = true;
 			}
 		}
 	}
@@ -269,12 +269,12 @@ int32_t TestPointAboveFaces(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_
 	Vertex* vertex;
 
 	i = 0;
-	done = FALSE;
+	done = false;
 	vertices = (Vertex*) (p_shape->m_model + 1);
 	while (!done) {
 		face = (Face*) ((uint8_t*) p_shape->m_model + p_shape->m_model->m_faceOffset) + i;
 		if (face->m_normal[1] < 0 && IsPointInFaceXZ(face, vertices, p_x, p_z)) {
-			done = TRUE;
+			done = true;
 			vertex = &vertices[*((uint8_t*) face + face->m_indexOffset)];
 			height = vertex->m_worldY - SolvePlaneY(
 											face->m_normal[0],
@@ -297,7 +297,7 @@ int32_t TestPointAboveFaces(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_
 		else {
 			i++;
 			if (i == p_shape->m_model->m_faceCount) {
-				done = TRUE;
+				done = true;
 			}
 		}
 	}

@@ -8,7 +8,7 @@ struct MenuDefinition;
 struct MenuPage;
 
 // Prepares a page when its menu is first laid out (FirstMenu); a menu whose pages don't all
-// return TRUE is dropped.
+// return true is dropped.
 typedef int32_t (*MenuPageInitFn)(struct MenuDefinition* p_menu, struct MenuPage* p_page);
 
 // A page of a menu: its items, some of which the page's callbacks copy from templates at the

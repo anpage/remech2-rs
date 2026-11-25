@@ -196,9 +196,9 @@ void InitializeMono(void)
 {
 	int32_t i;
 
-	if (FALSE) {
-		g_monoEnabled = TRUE;
-		g_missionTimerStopped = TRUE;
+	if (false) {
+		g_monoEnabled = true;
+		g_missionTimerStopped = true;
 	}
 
 	for (i = 0; i < 0x50; i++) {
@@ -482,12 +482,12 @@ void MonoPrint(char* p_text)
 	int32_t i;
 	int32_t length;
 
-	newline = FALSE;
+	newline = false;
 	length = strlen(p_text);
 	ch[1] = '\0';
 	for (i = 0; i < length; i++) {
 		if (p_text[i] == '\n') {
-			newline = TRUE;
+			newline = true;
 		}
 		else {
 			ch[0] = p_text[i];
@@ -503,7 +503,7 @@ void MonoPrint(char* p_text)
 				g_monoRow = 3;
 			}
 
-			newline = FALSE;
+			newline = false;
 		}
 	}
 

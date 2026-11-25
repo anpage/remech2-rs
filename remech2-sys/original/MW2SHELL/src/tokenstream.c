@@ -112,13 +112,13 @@ int32_t ReadFileToken(FILE* p_file, char* p_token)
 	}
 
 	last = strlen(buffer) - 1;
-	trimmed = FALSE;
+	trimmed = false;
 	while (buffer[last] == ',') {
 		last--;
-		trimmed = TRUE;
+		trimmed = true;
 	}
 
-	if (trimmed == TRUE) {
+	if (trimmed == true) {
 		last++;
 		buffer[last] = '\0';
 	}

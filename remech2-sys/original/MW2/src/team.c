@@ -41,18 +41,18 @@ void ResetTeams(void)
 
 int32_t SetTeamFormationByName(int32_t p_team, const char* p_name)
 {
-	int32_t result = FALSE;
+	int32_t result = false;
 	int32_t i;
 
 	if (p_team >= 16) {
-		return FALSE;
+		return false;
 	}
 
 	for (i = 0; i < g_formationTemplateCount; i++) {
 		if (strcasecmp(g_formationTemplates[i].m_name, p_name) == 0) {
 			g_teams[p_team].m_formation = i;
 			g_teamFormations[p_team] = g_formationTemplates[i];
-			result = TRUE;
+			result = true;
 			break;
 		}
 	}
@@ -85,11 +85,11 @@ void SetTeamFormation(int32_t p_team, int32_t p_formation)
 
 int32_t SetPlayerSlot(uint32_t p_player, uint32_t p_slot)
 {
-	int32_t result = FALSE;
+	int32_t result = false;
 
 	if (p_player < g_playerCount && p_slot < 8) {
 		g_players[p_player]->m_slot = p_slot;
-		result = TRUE;
+		result = true;
 	}
 
 	return result;
@@ -104,7 +104,7 @@ int32_t SetTeamLeader(int32_t p_team, int32_t p_player)
 	Player* player;
 	int32_t dx;
 
-	result = FALSE;
+	result = false;
 	if (p_player == -1) {
 		g_teams[p_team].m_leader = p_player;
 	}
@@ -119,7 +119,7 @@ int32_t SetTeamLeader(int32_t p_team, int32_t p_player)
 			g_teamFormations[p_team].m_z[i] -= dz;
 		}
 
-		result = TRUE;
+		result = true;
 	}
 
 	return result;
@@ -136,7 +136,7 @@ int32_t PlaceTeam(int32_t p_team, int32_t p_x, int32_t p_y, int32_t p_z, int32_t
 	int32_t x;
 	uint32_t i;
 
-	result = FALSE;
+	result = false;
 	if (p_team < 16 && (leader = g_teams[p_team].m_leader) < g_playerCount) {
 		player = g_players[leader];
 		player->m_position.m_x = p_x;
@@ -158,7 +158,7 @@ int32_t PlaceTeam(int32_t p_team, int32_t p_x, int32_t p_y, int32_t p_z, int32_t
 			}
 		}
 
-		result = TRUE;
+		result = true;
 	}
 
 	return result;
@@ -177,7 +177,7 @@ int32_t GetTeamSlotPosition(uint32_t p_player, int32_t* p_x, int32_t* p_z, int32
 
 	y = 0;
 	if (p_player >= g_playerCount) {
-		return FALSE;
+		return false;
 	}
 
 	team = g_players[p_player]->m_team;
@@ -197,7 +197,7 @@ int32_t GetTeamSlotPosition(uint32_t p_player, int32_t* p_x, int32_t* p_z, int32
 		*p_heading = g_players[leader]->m_heading;
 	}
 
-	return TRUE;
+	return true;
 }
 
 int32_t GetTeamLeader(int32_t p_team)
@@ -225,7 +225,7 @@ int32_t AssignTeamSlots(int32_t p_team, int32_t p_unk0x04)
 	if (leader == -1) {
 		leader = ChooseTeamLeader(p_team);
 		if (leader == -1) {
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -242,7 +242,7 @@ int32_t AssignTeamSlots(int32_t p_team, int32_t p_unk0x04)
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 int32_t GetPlayerSide(int32_t p_player)

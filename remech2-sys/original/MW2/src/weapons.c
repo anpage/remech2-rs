@@ -85,7 +85,7 @@ void UpdateWeaponFireState(Mech* p_mech)
 	int32_t pan;
 	int32_t fired;
 
-	first = FALSE;
+	first = false;
 	if (p_mech->m_powerState != 2) {
 		return;
 	}
@@ -203,7 +203,7 @@ void UpdateWeaponFireState(Mech* p_mech)
 		case c_weaponFiring:
 			if (slot->m_volley > 0) {
 				if (slot->m_volley == def->m_volley) {
-					first = TRUE;
+					first = true;
 				}
 
 				time = slot->m_time + g_deltaTime;
@@ -219,7 +219,7 @@ void UpdateWeaponFireState(Mech* p_mech)
 						p_mech->m_deltaHeat += def->m_heat;
 
 						if (first) {
-							first = FALSE;
+							first = false;
 							if (p_mech->m_player->m_index == g_localPlayerId) {
 								g_localWeaponsFired[slot->m_index] = 1;
 							}
@@ -302,7 +302,7 @@ int32_t SpawnShot(Player* p_player, WeaponSlot* p_slot)
 		return 0;
 	}
 
-	found = FALSE;
+	found = false;
 	if (!p_slot->m_ammo) {
 		return 0;
 	}
@@ -341,7 +341,7 @@ int32_t SpawnShot(Player* p_player, WeaponSlot* p_slot)
 		for (i = 0; !found && i < 0xaf; i++) {
 			shot = &g_shots[i];
 			if (def->m_shotType == shot->m_type && !shot->m_flags && shot->m_object) {
-				found = TRUE;
+				found = true;
 			}
 		}
 
@@ -397,7 +397,7 @@ void SelectNextWeaponInGroup(Mech* p_mech, int32_t p_wrap)
 	int32_t i;
 	int32_t selected;
 
-	found = FALSE;
+	found = false;
 	if (p_mech->m_weaponCount <= 0) {
 		return;
 	}
@@ -414,7 +414,7 @@ void SelectNextWeaponInGroup(Mech* p_mech, int32_t p_wrap)
 		}
 
 		if (slot->m_status != -1 && slot->m_group == group && slot->m_state != c_weaponEmpty && index != selected) {
-			found = TRUE;
+			found = true;
 			p_mech->m_selectedWeapon = index;
 			break;
 		}
@@ -431,7 +431,7 @@ void SelectNextWeapon(Mech* p_mech)
 	int32_t done;
 	int32_t tries;
 
-	done = FALSE;
+	done = false;
 	tries = 0;
 	if (p_mech->m_weaponCount <= 0) {
 		return;
@@ -453,7 +453,7 @@ void SelectNextWeapon(Mech* p_mech)
 		}
 
 		if (p_mech->m_weapons[p_mech->m_selectedWeapon].m_state != c_weaponEmpty || ++tries == 10) {
-			done = TRUE;
+			done = true;
 		}
 	}
 }
@@ -468,7 +468,7 @@ void SelectNextWeaponGroup(Mech* p_mech)
 	int32_t current;
 
 	i = 0;
-	found = FALSE;
+	found = false;
 	selected = p_mech->m_selectedWeapon;
 	if (p_mech->m_weaponCount <= 0) {
 		return;
@@ -485,7 +485,7 @@ void SelectNextWeaponGroup(Mech* p_mech)
 
 			if (p_mech->m_weapons[i].m_status != -1 && p_mech->m_weapons[i].m_group == group &&
 				p_mech->m_weapons[i].m_state != c_weaponEmpty) {
-				found = TRUE;
+				found = true;
 				p_mech->m_selectedWeapon = selected = i;
 				break;
 			}
@@ -505,7 +505,7 @@ int32_t SelectWeaponGroup(Mech* p_mech, int32_t p_group)
 	int32_t current;
 
 	i = 0;
-	found = FALSE;
+	found = false;
 	if (p_group < 0 || p_group >= 3) {
 		return 0;
 	}
@@ -526,7 +526,7 @@ int32_t SelectWeaponGroup(Mech* p_mech, int32_t p_group)
 
 		if (p_mech->m_weapons[i].m_status != -1 && p_mech->m_weapons[i].m_group == p_group &&
 			p_mech->m_weapons[i].m_state != c_weaponEmpty) {
-			found = TRUE;
+			found = true;
 			p_mech->m_selectedWeapon = selected = i;
 			break;
 		}
@@ -735,13 +735,13 @@ void UpdateWeaponLock(Mech* p_mech)
 		dy = p_mech->m_player->m_position.m_y - p_mech->m_player->m_targetInfo.m_position.m_y;
 		dz = p_mech->m_player->m_position.m_z - p_mech->m_player->m_targetInfo.m_position.m_z;
 		if (IsWithinRadius(dx, dy, dz, def->m_shortRange) || !IsWithinRadius(dx, dy, dz, def->m_longRange)) {
-			inRange = FALSE;
+			inRange = false;
 			yaw = 0x100001;
 			pitch = 0x100001;
 			p_mech->m_flags &= 0x7fff;
 		}
 		else {
-			inRange = TRUE;
+			inRange = true;
 			heading = (p_mech->m_player->m_heading % 0x1680000 + 0x1680000) % 0x1680000;
 			twist = p_mech->m_player->m_torsoTwist % 0x1680000;
 			bearing = p_mech->m_player->m_targetInfo.m_heading - heading;

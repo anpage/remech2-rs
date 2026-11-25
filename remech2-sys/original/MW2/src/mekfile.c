@@ -55,7 +55,7 @@ uint16_t g_weaponValues[30] = {183, 137, 91,  46,  51,  34, 17,  74,  49, 25, 2,
 // missing) for chassis p_name, logging it to mw2.log: the sections, whose armor the difficulty
 // scales (the local player's by g_localArmorPerLevel, its side's by armorScale, the others' by
 // g_otherArmorPerLevel), the weapons and their ammunition bins, the heat sinks (scaled by the difficulty
-// and the temperature, g_temperature) and the jump jets. Returns TRUE.
+// and the temperature, g_temperature) and the jump jets. Returns true.
 int32_t LoadMechConfig(Mech* p_mech, char* p_name, int32_t p_id, char* p_config)
 {
 	int32_t armorScale;
@@ -360,7 +360,7 @@ int32_t LoadMechConfig(Mech* p_mech, char* p_name, int32_t p_id, char* p_config)
 		MechHeapFree(g_primaryHeap, header);
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Returns a mech's value: its tonnage, scaled by the critical slots it fills (by kind), plus its

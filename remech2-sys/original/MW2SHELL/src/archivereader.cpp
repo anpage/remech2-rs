@@ -67,7 +67,7 @@ void DrawArchive(TMPackDataBase* p_database, int32_t p_campaign, size_t p_wParam
 		g_archiveNames[p_campaign],
 		g_archiveFont,
 		1,
-		TRUE,
+		true,
 		NULL,
 		NULL,
 		g_archiveScreens[p_campaign].m_buttons,
@@ -115,7 +115,7 @@ void ArchiveReader::AddTopic(int16_t p_entry, int32_t p_index)
 // Clears the screen's glyphs, without deleting them.
 void ArchiveReader::ClearGlyphs()
 {
-	g_videoDriver->ClearGlyphs(FALSE);
+	g_videoDriver->ClearGlyphs(false);
 }
 
 void ArchiveReader::FirstPage()
@@ -257,7 +257,7 @@ void ArchiveReader::OpenTopic(int32_t p_id)
 			}
 
 			m_child =
-				new ArchiveReader(m_title, g_archiveFont, topic->m_entry, FALSE, m_database, NULL, m_buttons, m_count);
+				new ArchiveReader(m_title, g_archiveFont, topic->m_entry, false, m_database, NULL, m_buttons, m_count);
 			break;
 		}
 	}
@@ -379,7 +379,7 @@ void ArchiveReader::Load(int32_t p_entry)
 	page = NULL;
 	data = NULL;
 	topics = 0;
-	soundStarted = FALSE;
+	soundStarted = false;
 	topics = 0;
 	length = 0;
 	offset = 0;
@@ -427,7 +427,7 @@ void ArchiveReader::Load(int32_t p_entry)
 					g_archiveLine[wordLength + 1] = '\0';
 					if (!soundStarted && length >= 0x800) {
 						g_archiveSound->Start();
-						soundStarted = TRUE;
+						soundStarted = true;
 					}
 					strcpy(text, g_archiveLine);
 					text += wordLength;
@@ -520,7 +520,7 @@ ArchiveReader::ArchiveReader(
 	m_menu = new ButtonMenu(g_videoDriver, m_font, 0, m_buttons, p_count);
 	m_menu->AddButton(p_buttons[c_buttonBack], c_buttonBack, m_menu->m_drawRect);
 
-	if (m_ownsDatabase == TRUE) {
+	if (m_ownsDatabase == true) {
 		m_database = new TMPackDataBase(m_title);
 		if (m_database == NULL) {
 			delete g_videoDriver;
@@ -564,7 +564,7 @@ ArchiveReader::~ArchiveReader()
 	}
 
 	delete m_menu;
-	if (m_ownsDatabase == TRUE && m_database) {
+	if (m_ownsDatabase == true && m_database) {
 		delete m_database;
 	}
 

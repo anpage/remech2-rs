@@ -25,7 +25,7 @@ void DrawTexturedPolygon(
 	uint32_t unk0x08;
 
 	mode = 0x11;
-	p_useLuma = TRUE;
+	p_useLuma = true;
 	if (p_useLuma) {
 		mode |= 0x80;
 	}

@@ -148,10 +148,10 @@ int32_t VideoDriver::IntersectsRect(int32_t p_left, int32_t p_top, int32_t p_rig
 {
 	if (p_left > m_dirtyView.m_x1 || p_right < m_dirtyView.m_x0 || p_top > m_dirtyView.m_y1 ||
 		p_bottom < m_dirtyView.m_y0) {
-		return FALSE;
+		return false;
 	}
 	else {
-		return TRUE;
+		return true;
 	}
 }
 
@@ -162,10 +162,10 @@ int32_t VideoDriver::IntersectsRectBySize(int32_t p_left, int32_t p_top, int32_t
 
 	if (p_left > m_dirtyView.m_x1 || right < m_dirtyView.m_x0 || p_top > m_dirtyView.m_y1 ||
 		bottom < m_dirtyView.m_y0) {
-		return FALSE;
+		return false;
 	}
 	else {
-		return TRUE;
+		return true;
 	}
 }
 

@@ -220,7 +220,7 @@ int32_t ProjectMapPoint(MapPoint* p_point)
 	int32_t dy;
 	int32_t dz;
 
-	visible = FALSE;
+	visible = false;
 	x = p_point->m_xy.m_x;
 	y = p_point->m_xy.m_y;
 	z = p_point->m_z;
@@ -236,10 +236,10 @@ int32_t ProjectMapPoint(MapPoint* p_point)
 	if (z > 0) {
 		if (p_point->m_xy.m_x >= g_viewLeft && p_point->m_xy.m_x <= g_viewRight && p_point->m_xy.m_y >= g_viewTop &&
 			p_point->m_xy.m_y <= g_viewBottom) {
-			visible = TRUE;
+			visible = true;
 		}
 		else {
-			visible = FALSE;
+			visible = false;
 		}
 	}
 

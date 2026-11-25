@@ -42,7 +42,7 @@ void RunMenuSlider(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 	void* left;
 
 	step = 0;
-	apply = TRUE;
+	apply = true;
 	if (!p_menu) {
 		return;
 	}
@@ -72,10 +72,10 @@ void RunMenuSlider(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 	}
 
 	if (g_menuKey - '1' == p_index) {
-		pressed = TRUE;
+		pressed = true;
 	}
 	else {
-		pressed = FALSE;
+		pressed = false;
 	}
 
 	if ((p_control->m_flags & 1) && p_control->m_get) {
@@ -86,10 +86,10 @@ void RunMenuSlider(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 	}
 
 	if (p_page->m_selected == p_index) {
-		selected = TRUE;
+		selected = true;
 	}
 	else {
-		selected = FALSE;
+		selected = false;
 	}
 
 	switch (state) {
@@ -130,14 +130,14 @@ void RunMenuSlider(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 			p_control->m_set(p_control->m_arg, value);
 		}
 
-		apply = FALSE;
+		apply = false;
 		break;
 	case 5:
 		if (p_control->m_cancel) {
 			p_control->m_cancel(p_control->m_arg);
 		}
 
-		apply = FALSE;
+		apply = false;
 		break;
 	}
 
@@ -208,7 +208,7 @@ void RunMenuStatus(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 	char text[128];
 
 	step = 0;
-	apply = TRUE;
+	apply = true;
 	if (!p_menu) {
 		return;
 	}
@@ -236,10 +236,10 @@ void RunMenuStatus(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 	}
 
 	if (g_menuKey - '1' == p_index) {
-		pressed = TRUE;
+		pressed = true;
 	}
 	else {
-		pressed = FALSE;
+		pressed = false;
 	}
 
 	if ((p_control->m_flags & 1) && p_control->m_get) {
@@ -250,10 +250,10 @@ void RunMenuStatus(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 	}
 
 	if (p_page->m_selected == p_index) {
-		selected = TRUE;
+		selected = true;
 	}
 	else {
-		selected = FALSE;
+		selected = false;
 	}
 
 	switch (state) {
@@ -278,14 +278,14 @@ void RunMenuStatus(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 			p_control->m_set(p_control->m_arg, value);
 		}
 
-		apply = FALSE;
+		apply = false;
 		break;
 	case 5:
 		if (p_control->m_cancel) {
 			p_control->m_cancel(p_control->m_arg);
 		}
 
-		apply = FALSE;
+		apply = false;
 		break;
 	case 3:
 		break;
@@ -334,7 +334,7 @@ void RunMenuChoice(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 	int32_t apply;
 
 	step = 0;
-	apply = TRUE;
+	apply = true;
 	if (!p_menu) {
 		return;
 	}
@@ -362,10 +362,10 @@ void RunMenuChoice(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 	}
 
 	if (g_menuKey - '1' == p_index) {
-		pressed = TRUE;
+		pressed = true;
 	}
 	else {
-		pressed = FALSE;
+		pressed = false;
 	}
 
 	if ((p_control->m_flags & 1) && p_control->m_get) {
@@ -376,10 +376,10 @@ void RunMenuChoice(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 	}
 
 	if (p_page->m_selected == p_index) {
-		selected = TRUE;
+		selected = true;
 	}
 	else {
-		selected = FALSE;
+		selected = false;
 	}
 
 	switch (state) {
@@ -420,14 +420,14 @@ void RunMenuChoice(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 			p_control->m_set(p_control->m_arg, value);
 		}
 
-		apply = FALSE;
+		apply = false;
 		break;
 	case 5:
 		if (p_control->m_cancel) {
 			p_control->m_cancel(p_control->m_arg);
 		}
 
-		apply = FALSE;
+		apply = false;
 		break;
 	}
 

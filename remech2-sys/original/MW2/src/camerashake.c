@@ -39,7 +39,7 @@ void ResetCameraShake(void)
 	ClearCameraShakeKeys();
 }
 
-// Moves the eyepoint by the shake's current offset. Returns FALSE when no shake is playing.
+// Moves the eyepoint by the shake's current offset. Returns false when no shake is playing.
 int32_t UpdateCameraShake(void)
 {
 	int32_t base10;
@@ -50,11 +50,11 @@ int32_t UpdateCameraShake(void)
 	int32_t z;
 
 	if (g_cameraShakeKey < 0 || g_cameraShakeKey >= g_cameraShakeKeyCount) {
-		g_cameraShakeActive = FALSE;
+		g_cameraShakeActive = false;
 	}
 
 	if (!g_cameraShakeActive) {
-		return FALSE;
+		return false;
 	}
 
 	g_cameraShakeKeyTime += g_deltaTime;
@@ -73,7 +73,7 @@ int32_t UpdateCameraShake(void)
 	g_eyepoint->m_pitch = base10 + UpdateRamp(&g_cameraShakePitch);
 	g_eyepoint->m_heading = base0c + UpdateRamp(&g_cameraShakeHeading);
 	g_eyepoint->m_roll = base14 + UpdateRamp(&g_cameraShakeRoll);
-	return TRUE;
+	return true;
 }
 
 void StartCameraShake(void)
@@ -81,7 +81,7 @@ void StartCameraShake(void)
 	g_cameraShakeKey = 0;
 	g_cameraShakeKeyTime = 0;
 	if (g_cameraShakeKeyCount > 0) {
-		g_cameraShakeActive = TRUE;
+		g_cameraShakeActive = true;
 		StartCameraShakeKey(0);
 	}
 }
@@ -137,7 +137,7 @@ void ClearCameraShakeKeys(void)
 	g_cameraShakeKeyCount = 0;
 	g_cameraShakeKey = 0;
 	g_cameraShakeKeyTime = 0;
-	g_cameraShakeActive = FALSE;
+	g_cameraShakeActive = false;
 }
 
 void AddCameraShakeKey(

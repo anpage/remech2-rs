@@ -322,7 +322,7 @@ Point* GetHudGaugePositions(void)
 
 // Draws the crosshair at the end of the aim ray: for a selected weapon that follows its locked
 // target, the locked shape when the target is in range and within 3 units and 3 degrees of the
-// aim (returns TRUE then); otherwise the lock or guided-state shapes, or 0x67 without a ready
+// aim (returns true then); otherwise the lock or guided-state shapes, or 0x67 without a ready
 // weapon.
 int32_t DrawCrosshair(Mech* p_mech, int32_t p_bearing, int32_t p_pitch, int32_t p_distance)
 {
@@ -337,7 +337,7 @@ int32_t DrawCrosshair(Mech* p_mech, int32_t p_bearing, int32_t p_pitch, int32_t 
 	int32_t result;
 	int32_t y;
 
-	result = FALSE;
+	result = false;
 	shape = 0x76;
 	slot = &p_mech->m_weapons[p_mech->m_selectedWeapon];
 	def = &g_weaponDefs[slot->m_type];
@@ -357,7 +357,7 @@ int32_t DrawCrosshair(Mech* p_mech, int32_t p_bearing, int32_t p_pitch, int32_t 
 			if (p_mech->m_player->m_targetInfo.m_target && !(p_mech->m_player->m_targetInfo.m_target & 0x1100) &&
 				def->m_shortRange < p_distance && def->m_longRange > p_distance && range > p_pitch &&
 				-range < p_pitch && pitch > p_bearing && -pitch < p_bearing) {
-				result = TRUE;
+				result = true;
 				shape = shapeIn;
 			}
 			else {

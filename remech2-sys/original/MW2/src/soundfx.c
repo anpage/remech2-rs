@@ -376,13 +376,13 @@ int32_t StartSample(int32_t p_id, void* p_data, uint16_t p_flags, int16_t p_slot
 	}
 
 	if (p_userData) {
-		AIL_set_sample_user_data(sample, 0, (MECH_INTPTR) p_userData);
+		AIL_set_sample_user_data(sample, 0, (intptr_t) p_userData);
 	}
 
 	AIL_set_sample_user_data(sample, 1, p_id);
 	AIL_set_sample_user_data(sample, 2, slot);
 	AIL_set_sample_user_data(sample, 3, 0);
-	AIL_set_sample_user_data(sample, 4, (MECH_INTPTR) p_data);
+	AIL_set_sample_user_data(sample, 4, (intptr_t) p_data);
 	AIL_register_EOS_callback(sample, SampleEosCallback);
 
 	if (p_id > 0 && g_soundInfo[p_id].m_count != -1) {

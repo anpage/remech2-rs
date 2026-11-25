@@ -59,8 +59,8 @@ extern uint8_t g_menuCommandEnabled[5];
 
 extern "C" int ShellMain(char* p_cmdLine);
 // Implemented on the Rust side (src/shell/screens/debug.rs), around ShellHandleMessageC
-extern "C" MECH_INTPTR ShellHandleMessage(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
-MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+extern "C" intptr_t ShellHandleMessage(uint32_t p_msg, size_t p_wParam, intptr_t p_lParam);
+intptr_t ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, intptr_t p_lParam);
 void CloseMenuFunction();
 int32_t PumpMessage();
 extern "C" int32_t IsShellMenuCommandEnabled(int32_t p_command);

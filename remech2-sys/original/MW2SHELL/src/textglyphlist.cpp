@@ -25,7 +25,7 @@ void TextGlyphList::Remove(TextGlyph* p_item)
 
 	index = CollectionFind(m_items, p_item);
 	if (index >= 0) {
-		CollectionRemove(m_items, p_item, FALSE);
+		CollectionRemove(m_items, p_item, false);
 	}
 }
 
@@ -36,7 +36,7 @@ void TextGlyphList::Clear(uint8_t p_delete)
 	while (m_items->m_count != 0) {
 		item = (TextGlyph*) CollectionGet(m_items, m_items->m_count - 1);
 		if (item != NULL) {
-			if (p_delete == TRUE) {
+			if (p_delete == true) {
 				delete item;
 			}
 			else {

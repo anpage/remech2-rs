@@ -25,7 +25,7 @@ int32_t RunAIWeapons(Player* p_player, int32_t p_heading)
 	int32_t roll;
 	int32_t delta;
 
-	fired = FALSE;
+	fired = false;
 	if (p_player->m_nextFireTime <= g_currentClock) {
 		roll = RandomIntBelow(p_player->m_gunnery);
 		p_player->m_nextFireTime = roll * 22 + g_currentClock;
@@ -37,7 +37,7 @@ int32_t RunAIWeapons(Player* p_player, int32_t p_heading)
 					if (DecideAIFire(p_player)) {
 						if (!(p_player->m_skillFlag4) || CanSeeTarget(p_player, 1)) {
 							p_player->m_steering->m_weaponFire = 1;
-							fired = TRUE;
+							fired = true;
 						}
 					}
 				}
@@ -67,8 +67,8 @@ int32_t DecideAIFire(Player* p_player)
 	WeaponDef* def;
 
 	mech = p_player->m_mech;
-	for (i = 0, fire = FALSE; i < mech->m_weaponCount && !fire; i++) {
-		fire = TRUE;
+	for (i = 0, fire = false; i < mech->m_weaponCount && !fire; i++) {
+		fire = true;
 		slot = &mech->m_weapons[mech->m_selectedWeapon];
 		type = slot->m_type;
 		def = &g_weaponDefs[type];
@@ -77,15 +77,15 @@ int32_t DecideAIFire(Player* p_player)
 		case 2:
 			break;
 		default:
-			fire = FALSE;
+			fire = false;
 			break;
 		}
 
 		if (fire) {
-			fire = FALSE;
+			fire = false;
 			if ((def->m_heat + mech->m_heat) >> 16 < 65.0 && IsSelectedWeaponReady(mech) == 1 && slot->m_ammo &&
 				!RandomIntBelow(def->m_recycle / 90 + 1)) {
-				fire = TRUE;
+				fire = true;
 			}
 		}
 

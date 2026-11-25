@@ -231,7 +231,7 @@ int32_t SwitchCockpitView(void)
 	CockpitLayout* layout;
 	int32_t sound;
 
-	changed = FALSE;
+	changed = false;
 	if (g_cockpitLayoutIndex <= 2 && g_previousCockpitView == 4 && g_hudSettingsSaved) {
 		g_showCrosshair = g_savedShowCrosshair;
 		g_showTargetMarker = g_savedShowTargetMarker;
@@ -243,7 +243,7 @@ int32_t SwitchCockpitView(void)
 	}
 
 	if (g_cockpitLayoutIndex != g_requestedCockpitView) {
-		changed = TRUE;
+		changed = true;
 		switch (g_requestedCockpitView) {
 		case 0:
 			g_previousCockpitView = g_cockpitLayoutIndex;
@@ -828,15 +828,15 @@ int32_t MapShapeFilter(Shape* p_shape)
 	int32_t skip;
 	int32_t kind;
 
-	skip = FALSE;
+	skip = false;
 	kind = p_shape->m_kind & 0xf00;
 	if (kind == 0x100) {
 		flags = g_players[p_shape->m_owner]->m_flags;
 		if (flags & 0x16) {
-			skip = TRUE;
+			skip = true;
 		}
 		else {
-			skip = FALSE;
+			skip = false;
 		}
 	}
 	else {
@@ -844,7 +844,7 @@ int32_t MapShapeFilter(Shape* p_shape)
 		switch (type) {
 		case 0x30:
 		case 0x70:
-			skip = TRUE;
+			skip = true;
 			break;
 		default:
 			break;
@@ -1012,7 +1012,7 @@ int32_t GetMapHeightShade(CockpitLayout* p_layout, int32_t p_height)
 }
 
 // Draws the layout's view into the rectangle p_transition has reached, restoring the viewport
-// afterwards. Returns FALSE once the transition is over; then, with p_final, it draws into the
+// afterwards. Returns false once the transition is over; then, with p_final, it draws into the
 // transition's final rectangle and has it stretched to the screen.
 int32_t DrawMapViewTransition(int32_t p_reverse, CockpitLayout* p_layout, RectTransition* p_transition, int32_t p_final)
 {
@@ -1021,10 +1021,10 @@ int32_t DrawMapViewTransition(int32_t p_reverse, CockpitLayout* p_layout, RectTr
 	PANE* viewport;
 
 	viewport = p_layout->m_viewport;
-	result = TRUE;
+	result = true;
 	rect = UpdateRectTransition(p_reverse, p_transition);
 	if (!rect) {
-		result = FALSE;
+		result = false;
 		if (p_final) {
 			if (!p_reverse) {
 				rect = p_transition->m_def->m_second;

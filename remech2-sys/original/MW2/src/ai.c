@@ -404,7 +404,7 @@ int32_t RunAIRules(Player* p_player)
 	int32_t valid;
 
 	i = 0;
-	posted = FALSE;
+	posted = false;
 	TargetAttacker(p_player);
 
 	while (p_player->m_rules[i]) {
@@ -413,7 +413,7 @@ int32_t RunAIRules(Player* p_player)
 		arg = ResolveRuleTarget(rule->m_arg, p_player->m_ai.m_goal, 0, p_player->m_ai.m_target);
 
 		if (rule->m_message == p_player->m_ai.m_posted.m_message && p_player->m_ai.m_posted.m_target == target) {
-			posted = TRUE;
+			posted = true;
 			p_player->m_ai.m_posted.m_message = 0;
 		}
 
@@ -426,12 +426,12 @@ int32_t RunAIRules(Player* p_player)
 					ResolveRuleTarget(rule->m_newTarget, p_player->m_ai.m_goal, target, p_player->m_ai.m_target),
 					0
 				);
-				return TRUE;
+				return true;
 			}
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Collects the rules of p_player's state from its scripts into m_rules, the higher-priority
@@ -486,11 +486,11 @@ void CollectAIRules(Player* p_player)
 			}
 
 			j = 0;
-			found = FALSE;
+			found = false;
 			while (!found && p_player->m_rules[j]) {
 				if (p_player->m_rules[j]->m_target == rule->m_target &&
 					p_player->m_rules[j]->m_message == rule->m_message) {
-					found = TRUE;
+					found = true;
 				}
 
 				j++;
@@ -786,7 +786,7 @@ int32_t ChooseTeamLeader(int32_t p_team)
 
 	leader = GetTeamLeader(p_team);
 	newLeader = -1;
-	count = GetTeamMembers(p_team, members, TRUE);
+	count = GetTeamMembers(p_team, members, true);
 
 	if (count) {
 		for (i = 0; i < count; i++) {
@@ -1146,7 +1146,7 @@ int32_t IsTargetDetectable(Player* p_player, int16_t p_target, int16_t p_distanc
 	int32_t result;
 
 	dead = g_players[p_target & 0xff]->m_flags & 0x10;
-	result = TRUE;
+	result = true;
 
 	if (!p_check || g_currentClock <= p_player->m_nextDetectCheck) {
 		return dead == 0;
@@ -1154,7 +1154,7 @@ int32_t IsTargetDetectable(Player* p_player, int16_t p_target, int16_t p_distanc
 
 	if (p_player->m_targetInfo.m_distance < p_distance && (p_target & c_aiTargetPlayer) && dead &&
 		!CanSeeTarget(p_player, 1)) {
-		result = FALSE;
+		result = false;
 		g_hiddenTargetCount++;
 	}
 
@@ -1184,7 +1184,7 @@ Player* FindNearestTarget(Player* p_player, int16_t p_target, int16_t p_arg, int
 	target = -1;
 	*p_nearest = *p_best = 0;
 
-	count = GetTeamMembers(p_player->m_team, members, TRUE);
+	count = GetTeamMembers(p_player->m_team, members, true);
 	if (!count) {
 		return NULL;
 	}
@@ -1197,7 +1197,7 @@ Player* FindNearestTarget(Player* p_player, int16_t p_target, int16_t p_arg, int
 
 	type = mission->m_objectives[objective].m_type;
 	while ((target = NextTarget(p_player, p_target, target)) != -1) {
-		closer = FALSE;
+		closer = false;
 		if (!SetTarget(p_player, target)) {
 			continue;
 		}
@@ -1205,7 +1205,7 @@ Player* FindNearestTarget(Player* p_player, int16_t p_target, int16_t p_arg, int
 		if (p_player->m_targetInfo.m_distance < nearest) {
 			nearest = p_player->m_targetInfo.m_distance;
 			*p_best = target;
-			closer = TRUE;
+			closer = true;
 			if (!(target & c_aiTargetPlayer)) {
 				*p_nearest = target;
 			}
@@ -1230,7 +1230,7 @@ Player* FindNearestTarget(Player* p_player, int16_t p_target, int16_t p_arg, int
 					(member->m_ai.m_state == c_aiStateAttack || member->m_ai.m_state == c_aiStateTarget) && closer &&
 					type != 4) {
 					blocker = member;
-					closer = FALSE;
+					closer = false;
 					break;
 				}
 			}
@@ -1395,13 +1395,13 @@ void AiStateAttack(Player* p_player, uint16_t p_target)
 // The rule transitions (g_aiTransitionFns): whether the rule's new state is to be entered.
 int32_t AiTransitionNull(Player* p_player, AiRule* p_rule)
 {
-	return TRUE;
+	return true;
 }
 
 int32_t AiTransitionClearStack(Player* p_player, AiRule* p_rule)
 {
 	p_player->m_stackCount = 0;
-	return TRUE;
+	return true;
 }
 
 int32_t AiTransitionPush(Player* p_player, AiRule* p_rule)
@@ -1418,7 +1418,7 @@ int32_t AiTransitionPush(Player* p_player, AiRule* p_rule)
 		p_player->m_stack[0] = entry;
 	}
 
-	return TRUE;
+	return true;
 }
 
 int32_t AiTransitionPop(Player* p_player, AiRule* p_rule)
@@ -1426,13 +1426,13 @@ int32_t AiTransitionPop(Player* p_player, AiRule* p_rule)
 	AiStackEntry entry;
 
 	if (p_player->m_stackCount == 0) {
-		return TRUE;
+		return true;
 	}
 
 	p_player->m_stackCount--;
 	entry = p_player->m_stack[p_player->m_stackCount];
 	SetAIState(p_player, entry.m_state, entry.m_target, 0);
-	return FALSE;
+	return false;
 }
 
 uint16_t FindAttacker(Player* p_player)
@@ -1546,7 +1546,7 @@ int32_t AimTorsoPan(Player* p_player, int32_t p_angle, int32_t p_delta)
 	int32_t value;
 
 	value = p_angle / 0x2d00;
-	return AddClamped(value, p_delta * 2, TRUE);
+	return AddClamped(value, p_delta * 2, true);
 }
 
 // The torso tilt towards the target, off by p_delta (AddClamped).
@@ -1555,7 +1555,7 @@ int32_t AimTorsoTilt(Player* p_player, int32_t p_delta)
 	int32_t value;
 
 	value = p_player->m_targetInfo.m_pitch / 0xf00;
-	return AddClamped(value, p_delta * 2, TRUE);
+	return AddClamped(value, p_delta * 2, true);
 }
 
 // Turns p_player towards its target. Returns the bearing to it.
@@ -1866,12 +1866,12 @@ int32_t IsTargetDone(uint16_t p_target, int32_t p_check)
 	int16_t* flags;
 
 	flags = NULL;
-	result = TRUE;
+	result = true;
 	type = p_target & 0xff00;
 	index = p_target & 0xff;
 
 	if (type & 0xf000) {
-		return TRUE;
+		return true;
 	}
 
 	switch (type) {
@@ -1902,7 +1902,7 @@ int32_t IsTargetDone(uint16_t p_target, int32_t p_check)
 			}
 			else if (type == c_aiTargetNav) {
 				flags = NULL;
-				result = FALSE;
+				result = false;
 			}
 			break;
 		case 8:
@@ -1922,7 +1922,7 @@ int32_t IsTargetDone(uint16_t p_target, int32_t p_check)
 		}
 
 		if (flags && !(mask & *flags)) {
-			result = FALSE;
+			result = false;
 		}
 	}
 
@@ -1959,12 +1959,12 @@ int32_t HasAIState(Player* p_player, int16_t p_state)
 
 		for (j = 0; j < *script; j++) {
 			if (script[j * 2 + 1] == p_state) {
-				return TRUE;
+				return true;
 			}
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Makes p_player enter p_state with p_target, pushing the current state with p_push, if its
@@ -2028,7 +2028,7 @@ void PlacePatrolNavs(Player* p_player)
 	Player* player;
 	NavPoint* nav;
 
-	found = TRUE;
+	found = true;
 	range = GetTargetRange(p_player->m_ai.m_target);
 	owner = p_player->m_index;
 	index = p_player->m_ai.m_target & 0xff;
@@ -2051,7 +2051,7 @@ void PlacePatrolNavs(Player* p_player)
 		z = nav->m_position[2];
 		break;
 	default:
-		found = FALSE;
+		found = false;
 		break;
 	}
 
@@ -2135,7 +2135,7 @@ int32_t LoadAIScripts(void)
 		g_aiScripts[i + 1] = LoadCachedResource(g_mw2PrjHandle, i + 1, g_resourceTypeTags[c_resTagAit], 0);
 	}
 
-	return TRUE;
+	return true;
 }
 
 int32_t AiTransitionNotify(Player* p_player, AiRule* p_rule)
@@ -2147,7 +2147,7 @@ int32_t AiTransitionNotify(Player* p_player, AiRule* p_rule)
 		PostAIMessage(g_players[leader], p_rule->m_message, p_player->m_targetInfo.m_target, p_rule->m_arg);
 	}
 
-	return FALSE;
+	return false;
 }
 
 // The local player's teammate in formation slot p_slot, or -1.
@@ -2256,7 +2256,7 @@ int32_t OrderStarSlot(int32_t p_slot, int16_t p_command)
 	index = FindStarSlotPlayer(p_slot);
 
 	if (index == -1) {
-		return FALSE;
+		return false;
 	}
 
 	target = 0x1000;
@@ -2303,7 +2303,7 @@ int32_t OrderStarSlot(int32_t p_slot, int16_t p_command)
 	}
 
 	if (target & 0x1000) {
-		return FALSE;
+		return false;
 	}
 
 	if (index == g_localPlayerId) {
@@ -2317,7 +2317,7 @@ int32_t OrderStarSlot(int32_t p_slot, int16_t p_command)
 		SayLancemateReport(speech, p_slot);
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Adds p_delta to p_value (with p_value's sign with p_sameSign), clamped to +/-0x400.
@@ -2368,7 +2368,7 @@ void AssignStarObjective(int32_t p_team)
 		}
 	}
 
-	count = GetTeamMembers(p_team, members, TRUE);
+	count = GetTeamMembers(p_team, members, true);
 	if (!count) {
 		return;
 	}
@@ -2559,17 +2559,17 @@ int32_t AssignStarTarget(int32_t p_team, uint16_t p_target)
 
 	slot = 0;
 	if (p_target & 0xf000) {
-		return FALSE;
+		return false;
 	}
 
 	leader = GetTeamLeader(p_team);
 	if (leader == -1) {
-		return FALSE;
+		return false;
 	}
 
-	count = GetTeamMembers(p_team, members, TRUE);
+	count = GetTeamMembers(p_team, members, true);
 	if (!count) {
-		return FALSE;
+		return false;
 	}
 
 	switch (p_target & 0xf00) {
@@ -2581,7 +2581,7 @@ int32_t AssignStarTarget(int32_t p_team, uint16_t p_target)
 	}
 
 	if (g_currentObjective[p_team] == 4) {
-		result = FALSE;
+		result = false;
 		mission = &g_objectiveTable[p_team];
 		objective = &mission->m_objectives[g_currentObjective[p_team]];
 		required = objective->m_requiredCount;
@@ -2594,7 +2594,7 @@ int32_t AssignStarTarget(int32_t p_team, uint16_t p_target)
 			if (member->m_ai.m_state != c_aiStateTarget && member->m_ai.m_state != c_aiStateAttack &&
 				!IsOutOfAmmo(member->m_mech) && member->m_engageAtWill) {
 				SetAIState(member, c_aiStateTarget, p_target, 1);
-				result = TRUE;
+				result = true;
 			}
 		}
 
@@ -2628,10 +2628,10 @@ int32_t AssignStarTarget(int32_t p_team, uint16_t p_target)
 			SetAIState(member, c_aiStateTarget, p_target, 1);
 			member->m_ai.m_flags |= 0x20;
 			member->m_ai.m_flags &= ~0x40;
-			return TRUE;
+			return true;
 		}
 
-		return FALSE;
+		return false;
 	}
 }
 
@@ -2682,7 +2682,7 @@ void LeadStar(int32_t p_team)
 		return;
 	}
 
-	count = GetTeamMembers(p_team, members, FALSE);
+	count = GetTeamMembers(p_team, members, false);
 	if (!count) {
 		return;
 	}

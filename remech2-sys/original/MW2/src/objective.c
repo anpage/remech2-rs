@@ -87,7 +87,7 @@ int32_t DoFirstObjtv(StarMission* p_mission, int32_t p_team)
 	y = 0;
 	z = 0;
 	heading = 0;
-	found = FALSE;
+	found = false;
 	g_missionTime = g_currentClock / 181;
 	if (p_mission->m_objectives[0].m_targetCount > 0 && (p_mission->m_objectives[0].m_targets[0] & 0xff00) == 0x100) {
 		nav = (uint8_t) p_mission->m_objectives[0].m_targets[0];
@@ -96,7 +96,7 @@ int32_t DoFirstObjtv(StarMission* p_mission, int32_t p_team)
 			y = g_navTable[nav].m_position[1];
 			z = g_navTable[nav].m_position[2];
 			heading = g_navTable[nav].m_heading;
-			found = TRUE;
+			found = true;
 		}
 	}
 
@@ -143,24 +143,24 @@ int32_t HasTeamReachedTarget(uint8_t* p_target, int32_t p_team)
 
 	index = p_target[0];
 	kind = p_target[1] << 8;
-	reached = FALSE;
+	reached = false;
 	switch (kind) {
 	case 0x200:
 		player = g_players[index];
 		if ((player->m_flags & 0x20) && ((1 << p_team) & player->m_inspectedBy)) {
-			reached = TRUE;
+			reached = true;
 		}
 		break;
 	case 0x400:
 		thing = &g_gameThings[index];
 		if ((thing->m_flags & 0x20) && ((1 << p_team) & thing->m_teamsReached)) {
-			reached = TRUE;
+			reached = true;
 		}
 		break;
 	case 0x100:
 		nav = &g_navTable[index];
 		if ((nav->m_flags & 0x20) && ((1 << p_team) & nav->m_teamsReached)) {
-			reached = TRUE;
+			reached = true;
 		}
 		break;
 	}
@@ -186,7 +186,7 @@ int32_t IsTeamNearTarget(uint8_t* p_target, int32_t p_team)
 	index = p_target[0];
 	kind = p_target[1] << 8;
 	if (g_teams[p_team].m_leader < 0 && !g_isNetworkGame) {
-		return FALSE;
+		return false;
 	}
 
 	switch (kind) {
@@ -200,10 +200,10 @@ int32_t IsTeamNearTarget(uint8_t* p_target, int32_t p_team)
 					g_players[i]->m_position.m_z - target->m_position.m_z,
 					20000
 				)) {
-				return TRUE;
+				return true;
 			}
 		}
-		return FALSE;
+		return false;
 	case 0x400:
 		thing = &g_gameThings[index];
 		GetStaticObjectPosition(thing->m_staticObject, &x, &y, &z);
@@ -214,10 +214,10 @@ int32_t IsTeamNearTarget(uint8_t* p_target, int32_t p_team)
 													  g_players[i]->m_position.m_z - z,
 													  20000
 												  )) {
-				return TRUE;
+				return true;
 			}
 		}
-		return FALSE;
+		return false;
 	case 0x100:
 		nav = &g_navTable[index];
 		radius = nav->m_radius;
@@ -238,13 +238,13 @@ int32_t IsTeamNearTarget(uint8_t* p_target, int32_t p_team)
 					PlaySoundEffect(0xe7, 100, 0x40, 5, 0x50);
 				}
 
-				return TRUE;
+				return true;
 			}
 		}
-		return FALSE;
+		return false;
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Announces the local team's objective p_objective as successful (p_state 5) or failed (6), once.
@@ -256,7 +256,7 @@ int32_t AnnounceObjective(int32_t p_star, int32_t p_objective, int32_t p_state)
 
 	objective = &g_objectiveTable[p_star].m_objectives[p_objective];
 	if (p_star != g_localStar || g_objectiveAnnounced[p_objective]) {
-		return TRUE;
+		return true;
 	}
 
 	if (p_state == 5) {
@@ -280,8 +280,8 @@ int32_t AnnounceObjective(int32_t p_star, int32_t p_objective, int32_t p_state)
 	}
 
 	QueueSpeechLine(&line);
-	g_objectiveAnnounced[p_objective] = TRUE;
-	return TRUE;
+	g_objectiveAnnounced[p_objective] = true;
+	return true;
 }
 
 // In a network game with a single listed objective, a secondary one, picks the player with the
@@ -301,21 +301,21 @@ void ChooseNetworkWinner(void)
 	int32_t listed;
 
 	best = -0x7fff;
-	deathmatch = FALSE;
+	deathmatch = false;
 	mission = &g_objectiveTable[g_localStar];
 	if (g_isNetworkGame && !g_difficulty->m_teamGame) {
 		listed = 0;
-		secondary = FALSE;
+		secondary = false;
 		for (i = 0; i < mission->m_objectiveCount; i++) {
 			objective = &g_objectiveTable[g_localStar].m_objectives[i];
 			listed += objective->m_listed;
 			if (objective->m_listed && objective->m_priority == 2) {
-				secondary = TRUE;
+				secondary = true;
 			}
 		}
 
 		if (secondary && listed == 1) {
-			deathmatch = TRUE;
+			deathmatch = true;
 		}
 
 		if (deathmatch) {
@@ -353,11 +353,11 @@ int32_t AnnounceMissionResult(int32_t p_star, int32_t p_status)
 	SpeechLine line;
 
 	if (p_star != g_localStar) {
-		return TRUE;
+		return true;
 	}
 
 	if (g_missionResultAnnounced && g_isNetworkGame) {
-		return TRUE;
+		return true;
 	}
 	else {
 		g_missionResultAnnounced = 1;
@@ -385,7 +385,7 @@ int32_t AnnounceMissionResult(int32_t p_star, int32_t p_status)
 
 	line.m_text = text;
 	QueueSpeechLine(&line);
-	return TRUE;
+	return true;
 }
 
 // Returns whether condition p_condition of star p_star's objective p_objective holds.
@@ -402,8 +402,8 @@ int32_t TestObjectiveCondition(int32_t p_star, int32_t p_objective, int32_t p_co
 	other = objective->m_conditions[p_condition].m_objective;
 	star = objective->m_conditions[p_condition].m_star;
 	state = g_objectiveTable[star].m_objectives[other].m_state;
-	return (kind == 1 && (state == 5 || state == 6)) || (kind == 2 && state == 5) || (kind == 3 && state == 6) ? TRUE
-																											   : FALSE;
+	return (kind == 1 && (state == 5 || state == 6)) || (kind == 2 && state == 5) || (kind == 3 && state == 6) ? true
+																											   : false;
 }
 
 // Returns whether the conditions of star p_star's objective p_objective hold: one of them, or
@@ -418,13 +418,13 @@ int32_t ObjectiveConditionsHold(int32_t p_star, int32_t p_objective)
 
 	objective = &g_objectiveTable[p_star].m_objectives[p_objective];
 	all = objective->m_allConditions;
-	result = TRUE;
+	result = true;
 	if (objective->m_state == 5 || objective->m_state == 6) {
-		return FALSE;
+		return false;
 	}
 
 	if (objective->m_type == 0x10) {
-		return TRUE;
+		return true;
 	}
 
 	for (i = 0; i < 8; i++) {
@@ -435,22 +435,22 @@ int32_t ObjectiveConditionsHold(int32_t p_star, int32_t p_objective)
 		holds = TestObjectiveCondition(p_star, p_objective, i);
 		if (!all) {
 			if (holds) {
-				return TRUE;
+				return true;
 			}
 		}
 		else {
 			result &= holds;
 			if (!result) {
-				return FALSE;
+				return false;
 			}
 		}
 	}
 
 	if (!all) {
-		return FALSE;
+		return false;
 	}
 	else {
-		return TRUE;
+		return true;
 	}
 }
 
@@ -476,17 +476,17 @@ void UpdateObjective(int32_t p_star, int32_t p_objective)
 	MissionObjective* restartTarget;
 	MissionObjective* succeedTarget;
 
-	done = TRUE;
-	untouched = TRUE;
+	done = true;
+	untouched = true;
 	state = 3;
 	objective = &g_objectiveTable[p_star].m_objectives[p_objective];
 	if (g_isNetworkGame && objective->m_state == 5 && objective->m_type == 2) {
 		for (i = 0; i < objective->m_targetCount; i++) {
 			if (done && GetObjectiveTargetState((uint8_t*) &objective->m_targets[i])) {
-				done = TRUE;
+				done = true;
 			}
 			else {
-				done = FALSE;
+				done = false;
 			}
 		}
 
@@ -512,10 +512,10 @@ void UpdateObjective(int32_t p_star, int32_t p_objective)
 	case 2:
 		for (i = 0; i < objective->m_targetCount; i++) {
 			if (done && GetObjectiveTargetState((uint8_t*) &objective->m_targets[i])) {
-				done = TRUE;
+				done = true;
 			}
 			else {
-				done = FALSE;
+				done = false;
 			}
 		}
 		break;
@@ -523,47 +523,47 @@ void UpdateObjective(int32_t p_star, int32_t p_objective)
 		for (i = 0; i < objective->m_targetCount; i++) {
 			alive = GetObjectiveTargetState((uint8_t*) &objective->m_targets[i]);
 			if (done && !alive) {
-				done = TRUE;
+				done = true;
 			}
 			else {
-				done = FALSE;
+				done = false;
 			}
 
 			if (untouched && alive) {
-				untouched = TRUE;
+				untouched = true;
 			}
 			else {
-				untouched = FALSE;
+				untouched = false;
 			}
 		}
 		break;
 	case 8:
 		for (i = 0; i < objective->m_targetCount; i++) {
 			if (done && HasTeamReachedTarget((uint8_t*) &objective->m_targets[i], p_star)) {
-				done = TRUE;
+				done = true;
 			}
 			else {
-				done = FALSE;
+				done = false;
 			}
 		}
 		break;
 	case 0x20:
 		for (i = 0; i < objective->m_targetCount; i++) {
 			if (done && HasTeamReachedTarget((uint8_t*) &objective->m_targets[i], p_star)) {
-				done = TRUE;
+				done = true;
 			}
 			else {
-				done = FALSE;
+				done = false;
 			}
 		}
 
 		for (i = 0; i < g_objectiveTable[p_star].m_objectiveCount; i++) {
 			if (g_objectiveTable[p_star].m_objectives[i].m_mandatory && i != p_objective) {
 				if (done && g_objectiveTable[p_star].m_objectives[i].m_state == 5) {
-					done = TRUE;
+					done = true;
 				}
 				else {
-					done = FALSE;
+					done = false;
 				}
 			}
 		}
@@ -571,29 +571,29 @@ void UpdateObjective(int32_t p_star, int32_t p_objective)
 	case 0x100:
 		if (g_localStar != p_star && !g_isNetworkGame) {
 			if (done && g_currentObjective[p_star] == p_objective) {
-				done = TRUE;
+				done = true;
 			}
 			else {
-				done = FALSE;
+				done = false;
 			}
 		}
 
 		for (i = 0; i < objective->m_targetCount; i++) {
 			if (done && IsTeamNearTarget((uint8_t*) &objective->m_targets[i], p_star)) {
-				done = TRUE;
+				done = true;
 			}
 			else {
-				done = FALSE;
+				done = false;
 			}
 		}
 		break;
 	case 0x2000:
 		for (i = 0; i < objective->m_targetCount; i++) {
 			if (done && !IsTeamNearTarget((uint8_t*) &objective->m_targets[i], p_star)) {
-				done = TRUE;
+				done = true;
 			}
 			else {
-				done = FALSE;
+				done = false;
 			}
 		}
 		break;
@@ -621,14 +621,14 @@ void UpdateObjective(int32_t p_star, int32_t p_objective)
 
 	if (objective->m_timeLimit >= 0 && objective->m_startTime >= 0) {
 		if (g_missionTime - objective->m_startTime > objective->m_timeLimit) {
-			expired = TRUE;
+			expired = true;
 		}
 		else {
-			expired = FALSE;
+			expired = false;
 		}
 	}
 	else {
-		expired = FALSE;
+		expired = false;
 	}
 
 	switch (objective->m_type) {
@@ -824,26 +824,26 @@ void UpdateObjectives(void)
 		}
 
 		if (mission->m_status == 0) {
-			success = TRUE;
-			failed = FALSE;
+			success = true;
+			failed = false;
 			for (i = 0; i < mission->m_objectiveCount; i++) {
 				if (mission->m_objectives[i].m_mandatory) {
 					switch (mission->m_objectives[i].m_state) {
 					case 5:
 						if (success) {
-							success = TRUE;
+							success = true;
 						}
 						else {
-							success = FALSE;
+							success = false;
 						}
 						break;
 					case 6:
 					case 8:
-						success = FALSE;
-						failed = TRUE;
+						success = false;
+						failed = true;
 						break;
 					default:
-						success = FALSE;
+						success = false;
 						break;
 					}
 				}
@@ -935,11 +935,11 @@ int32_t EndTheMission2(void)
 	result.m_objectiveCount = count;
 
 	if (g_missionReport == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	g_missionReport->m_result = result;
-	return TRUE;
+	return true;
 }
 
 // Restarts star p_star's mission (a player's own, in a network game): every objective goes back

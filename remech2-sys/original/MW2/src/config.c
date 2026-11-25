@@ -223,7 +223,7 @@ void LayoutWeaponPanels(Mech* p_mech)
 	AmmoBin* bin;
 	int32_t right;
 
-	alternate = TRUE;
+	alternate = true;
 	for (i = 0; i < 10; i++) {
 		p_mech->m_weapons[i].m_index = i;
 	}
@@ -294,7 +294,7 @@ void LayoutWeaponPanels(Mech* p_mech)
 					right++;
 				}
 
-				alternate = FALSE;
+				alternate = false;
 			}
 			else {
 				panel = left;
@@ -306,7 +306,7 @@ void LayoutWeaponPanels(Mech* p_mech)
 					left++;
 				}
 
-				alternate = TRUE;
+				alternate = true;
 			}
 
 			g_cockpitPanels[panel]->m_setName(g_cockpitPanels[panel], g_weaponDefs[slot->m_type].m_name);
@@ -418,12 +418,12 @@ void InitCockpitPanels(void)
 	int32_t i;
 
 	for (i = 0; i < c_panelCount; i++) {
-		g_cockpitPanelEnabled[i] = TRUE;
+		g_cockpitPanelEnabled[i] = true;
 	}
 
-	g_cockpitPanelEnabled[1] = FALSE;
+	g_cockpitPanelEnabled[1] = false;
 	if (!g_difficulty->m_radar) {
-		g_cockpitPanelEnabled[c_panelTarget] = FALSE;
+		g_cockpitPanelEnabled[c_panelTarget] = false;
 	}
 
 	mech = g_players[g_localPlayerId]->m_mech;
@@ -730,7 +730,7 @@ int32_t LoadMgdFile(
 	);
 	if (!data) {
 		MechLogErrorf("symlog.txt: Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagMgeo]);
-		return FALSE;
+		return false;
 	}
 
 	cursor = data;
@@ -748,7 +748,7 @@ int32_t LoadMgdFile(
 		UnlockCachedResource(p_ref->m_id, g_resourceTypeTags[c_resTagMgeo]);
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Loads the animation file p_ref: up to 32 animations, numbered from the current base
@@ -781,7 +781,7 @@ int32_t LoadReels(ResourceRef* p_ref)
 	);
 	if (!data) {
 		MechLogErrorf("symlog.txt: Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagAnim]);
-		return FALSE;
+		return false;
 	}
 
 	count = *(int32_t*) data;
@@ -794,19 +794,19 @@ int32_t LoadReels(ResourceRef* p_ref)
 		unk0x08 = *(int32_t*) (data + offset);
 		offset += stride;
 		if (index >= 0x20) {
-			return FALSE;
+			return false;
 		}
 
 		index += base;
 		if (index >= 0x780) {
-			return FALSE;
+			return false;
 		}
 
 		frames = data + offset;
 		offset += frameCount * sizeof(int32_t);
 		g_reels[index] = StaticPoolAlloc(sizeof(Reel), g_staticPoolTags[5]);
 		if (!g_reels[index]) {
-			return FALSE;
+			return false;
 		}
 
 		g_reels[index]->m_amounts = (int32_t*) frames;
@@ -827,7 +827,7 @@ int32_t LoadReels(ResourceRef* p_ref)
 		g_reels[ids[i]]->m_events = (ReelEvent*) end;
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Loads the cockpit layout resource p_ref: the gauge positions (g_hudGaugePositions), three values
@@ -855,7 +855,7 @@ int32_t LoadHudFile(ResourceRef* p_ref)
 	);
 	if (!data) {
 		MechLogErrorf("symlog.txt: Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagHud]);
-		return FALSE;
+		return false;
 	}
 
 	cursor = data;
@@ -898,7 +898,7 @@ int32_t LoadHudFile(ResourceRef* p_ref)
 		UnlockCachedResource(p_ref->m_id, g_resourceTypeTags[c_resTagHud]);
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Loads the cockpit layout resource p_ref: five rectangles into p_gauges and fifteen into p_panels
@@ -911,7 +911,7 @@ int32_t LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels)
 	void* data;
 
 	if (!p_gauges || !p_panels) {
-		return FALSE;
+		return false;
 	}
 
 	data = LoadResourceByRef(
@@ -924,7 +924,7 @@ int32_t LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels)
 	);
 	if (!data) {
 		MechLogErrorf("symlog.txt: Couldn't load ID=%s Type=%s\n", p_ref->m_name, g_resourceTypeTags[c_resTagCpit]);
-		return FALSE;
+		return false;
 	}
 
 	target = p_gauges;
@@ -955,7 +955,7 @@ int32_t LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels)
 		UnlockCachedResource(p_ref->m_id, g_resourceTypeTags[c_resTagCpit]);
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Writes the screen as a picture: a 0x20-byte header from TABL resource 15, the palette, then
@@ -969,13 +969,13 @@ int32_t WriteScreenPicture(char* p_path, void* p_palette)
 	header = NULL;
 	file = MechOpen(p_path, c_mechOpenCreate);
 	if (file == -1) {
-		return FALSE;
+		return false;
 	}
 
 	header = LoadCachedResource(g_mw2PrjHandle, 15, g_resourceTypeTags[c_resTagTable], 1);
 	if (header == NULL) {
 		MechClose(file);
-		return FALSE;
+		return false;
 	}
 
 	MechWrite(file, header, 0x20);
@@ -984,7 +984,7 @@ int32_t WriteScreenPicture(char* p_path, void* p_palette)
 	MechWrite(file, pixels, g_screenPixelCount);
 	MechClose(file);
 	UnlockCachedResource(15, g_resourceTypeTags[c_resTagTable]);
-	return TRUE;
+	return true;
 }
 
 // Reads a whole file into memory from the heap, or from a static pool when p_poolTag is given.

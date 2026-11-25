@@ -101,10 +101,10 @@ int32_t DrawAnimatedPolygon(
 	}
 
 	if (!(anim->m_flags & 4) && p_luma > -1 && p_luma < 15) {
-		useLuma = TRUE;
+		useLuma = true;
 	}
 	else {
-		useLuma = FALSE;
+		useLuma = false;
 	}
 
 	if (!g_lumaTables) {
@@ -181,7 +181,7 @@ int32_t AddAnimFrame(int32_t p_resourceId, int32_t p_set)
 	int32_t slot;
 
 	slot = 0;
-	found = FALSE;
+	found = false;
 	if (g_animInitialized == -2) {
 		InitAnimations();
 	}
@@ -208,7 +208,7 @@ int32_t AddAnimFrame(int32_t p_resourceId, int32_t p_set)
 			}
 
 			if (g_animFrames[p_set][slot].m_resourceId == -1) {
-				found = TRUE;
+				found = true;
 			}
 		}
 	}

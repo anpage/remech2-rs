@@ -155,12 +155,12 @@ int32_t QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, int32_t p_priority
 
 	entry = NULL;
 	if (g_speechLocked) {
-		return FALSE;
+		return false;
 	}
 
 	if (!p_line) {
 		if (!p_suffix) {
-			return FALSE;
+			return false;
 		}
 		else {
 			p_line = p_suffix;
@@ -181,7 +181,7 @@ int32_t QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, int32_t p_priority
 	}
 
 	if (!p_line) {
-		return FALSE;
+		return false;
 	}
 
 	if (p_suffix) {
@@ -247,14 +247,14 @@ int32_t QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, int32_t p_priority
 			while (cur) {
 				if (cur->m_data) {
 					if (cur->m_data == entry->m_data) {
-						return FALSE;
+						return false;
 					}
 				}
 				else {
 					if (cur->m_id && cur->m_id == entry->m_id &&
 						(!cur->m_suffixId || entry->m_suffixId == cur->m_suffixId) &&
 						(g_soundInfo[entry->m_id].m_maxCount == -1 || ++i >= g_soundInfo[entry->m_id].m_maxCount)) {
-						return FALSE;
+						return false;
 					}
 
 					if (cur->m_priority < entry->m_priority) {
@@ -326,10 +326,10 @@ int32_t StartSpeech(SpeechEntry* p_entry)
 		if (p_entry->m_text[0]) {
 			ShowInGameMessage(p_entry->m_text, 0, 0x712, 0x32);
 			p_entry->m_deadline = g_currentClock + 0x712;
-			return TRUE;
+			return true;
 		}
 
-		return FALSE;
+		return false;
 	}
 
 	id = p_entry->m_id;
@@ -345,7 +345,7 @@ int32_t StartSpeech(SpeechEntry* p_entry)
 			id = -1;
 		}
 		else {
-			return FALSE;
+			return false;
 		}
 	}
 

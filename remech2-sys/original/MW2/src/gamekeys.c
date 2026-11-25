@@ -77,12 +77,12 @@ int32_t g_frontViewForRear;
 int32_t AppendTypedKey(int16_t p_key)
 {
 	if ((p_key & 0xff00) != 0x700) {
-		return FALSE;
+		return false;
 	}
 
 	memmove(g_typedKeys, &g_typedKeys[1], 0xe);
 	g_typedKeys[0xe] = (char) p_key;
-	return TRUE;
+	return true;
 }
 
 // Returns whether the typed keys end with the code p_code, whose characters are stored XORed
@@ -97,11 +97,11 @@ int32_t TypedCodeMatches(char* p_code)
 	typed = &g_typedKeys[0xe];
 	for (c = &p_code[n - 1]; n; n--, c--, typed--) {
 		if ((*c ^ 0x1a) != *typed) {
-			return FALSE;
+			return false;
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Takes a typed key for the cheat codes: when the last keys typed spell one (TypedCodeMatches; the codes
@@ -322,7 +322,7 @@ int32_t HandleChatKey(uint32_t p_keyCode)
 	}
 
 	if (p_keyCode & 0x400) {
-		return FALSE;
+		return false;
 	}
 
 	c = (char) p_keyCode;
@@ -332,7 +332,7 @@ int32_t HandleChatKey(uint32_t p_keyCode)
 		}
 
 		g_chatMessage[g_chatLength] = '\0';
-		return TRUE;
+		return true;
 	}
 
 	switch (c) {
@@ -340,7 +340,7 @@ int32_t HandleChatKey(uint32_t p_keyCode)
 		g_chatRecipient = 0;
 		memset(g_chatMessage, 0, 40);
 		g_chatLength = 0;
-		return TRUE;
+		return true;
 	case '\r':
 		if (g_chatRecipient > 0) {
 			g_chatRecipient = 0;
@@ -352,7 +352,7 @@ int32_t HandleChatKey(uint32_t p_keyCode)
 	}
 
 	if (g_chatLength > 39) {
-		return TRUE;
+		return true;
 	}
 
 	if (p_keyCode & 0x100) {
@@ -367,11 +367,11 @@ int32_t HandleChatKey(uint32_t p_keyCode)
 				g_chatRecipient = 0;
 				break;
 			default:
-				return FALSE;
+				return false;
 			}
 		}
 		else {
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -386,16 +386,16 @@ int32_t HandleChatKey(uint32_t p_keyCode)
 		ShowInGameMessage(text, 1, 0x2d4, 0x32);
 		memset(g_chatMessage, 0, 40);
 		g_chatLength = 0;
-		return TRUE;
+		return true;
 	}
 
 	if (c < ' ' || c > '~') {
-		return FALSE;
+		return false;
 	}
 
 	g_chatMessage[g_chatLength] = c;
 	g_chatLength++;
-	return TRUE;
+	return true;
 }
 
 // Runs the frame's game keys: after the mission ends, waits a while before offering to quit (or,

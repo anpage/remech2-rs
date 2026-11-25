@@ -30,7 +30,7 @@ int32_t FirstResource(void)
 {
 	int32_t result;
 
-	result = TRUE;
+	result = true;
 	SetPrjAllocator(Mw2PrjAlloc, Mw2PrjFree);
 	InitializeResourceCache();
 	if (!g_mw2PrjPath) {
@@ -43,7 +43,7 @@ int32_t FirstResource(void)
 	}
 	else {
 		Error(3, "\nCan't find file \"%s\"", g_mw2PrjPath, 0);
-		result = FALSE;
+		result = false;
 	}
 
 	return result;
@@ -68,11 +68,11 @@ int32_t PreloadResource(int32_t p_id, const char* p_type)
 
 	data = LoadCachedResource(g_mw2PrjHandle, p_id, p_type, 0);
 	if (data) {
-		result = TRUE;
+		result = true;
 		UnlockCachedResource(p_id, p_type);
 	}
 	else {
-		result = FALSE;
+		result = false;
 	}
 
 	return result;

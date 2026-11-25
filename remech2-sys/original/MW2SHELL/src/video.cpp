@@ -74,7 +74,7 @@ void FullscreenVideoCallback(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_
 
 		MechPostMessage(msg, g_fullscreenVideoWParam, 0);
 		g_fullscreenVideoMsg = g_fullscreenVideoWParam = c_msgScreenFrame;
-		g_drawFmv = FALSE;
+		g_drawFmv = false;
 	}
 }
 
@@ -102,7 +102,7 @@ int32_t PlayFullscreenVideo(const char* p_name, int32_t p_msg, int32_t p_wParam)
 	}
 
 	DisableShellMenu();
-	g_drawFmv = TRUE;
+	g_drawFmv = true;
 	return 1;
 }
 
@@ -515,14 +515,14 @@ int32_t LoadVideoFile(FmvSlot* p_slot, const char* p_name)
 
 	p_slot->m_smack = SmackOpen(GetPathToVideo(p_name), ((p_slot->m_flags & 0x40) >> 1) | 0xfe00, 0);
 	if (!p_slot->m_smack) {
-		return FALSE;
+		return false;
 	}
 
 	if (g_audioSubsystem && SmackSoundInTrack(p_slot->m_smack, 0x200)) {
 		SmackClose(p_slot->m_smack);
 		p_slot->m_smack = SmackOpen(GetPathToVideo(p_name), ((p_slot->m_flags & 0x40) >> 1) | 0xfe00, 0);
 		if (!p_slot->m_smack) {
-			return FALSE;
+			return false;
 		}
 
 		p_slot->m_flags |= 0x2000;
@@ -531,7 +531,7 @@ int32_t LoadVideoFile(FmvSlot* p_slot, const char* p_name)
 		SmackClose(p_slot->m_smack);
 		p_slot->m_smack = SmackOpen(GetPathToVideo(p_name), (p_slot->m_flags & 0x40) >> 1, 0);
 		if (!p_slot->m_smack) {
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -564,7 +564,7 @@ int32_t LoadVideoFile(FmvSlot* p_slot, const char* p_name)
 		}
 		else {
 			SmackClose(p_slot->m_smack);
-			return FALSE;
+			return false;
 		}
 	}
 	else if (p_slot->m_flags & 2) {
@@ -583,7 +583,7 @@ int32_t LoadVideoFile(FmvSlot* p_slot, const char* p_name)
 		SmackToBuffer(p_slot->m_smack, 0, 0, p_slot->m_width, p_slot->m_height, p_slot->m_frameBuffer, 0);
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Loads the SHP animation p_name into the slot.
@@ -593,7 +593,7 @@ int32_t LoadShpFile(FmvSlot* p_slot, const char* p_name)
 
 	p_slot->m_shp = MechReadFile(g_primaryHeap, GetPathToShp(p_name));
 	if (!p_slot->m_shp) {
-		return FALSE;
+		return false;
 	}
 
 	size = VFX_shape_bounds(p_slot->m_shp, 0);
@@ -610,7 +610,7 @@ int32_t LoadShpFile(FmvSlot* p_slot, const char* p_name)
 	p_slot->m_frameBuffer = NULL;
 	p_slot->m_nextFrameTime = 0;
 
-	return TRUE;
+	return true;
 }
 
 // Plays the video or SHP animation p_name in slot p_index at (p_left, p_top), p_fps frames a

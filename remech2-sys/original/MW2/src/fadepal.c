@@ -178,11 +178,11 @@ void FireJumpJetEffects(Mech* p_mech)
 	int32_t jet;
 	int32_t fired;
 
-	fired = FALSE;
+	fired = false;
 	player = p_mech->m_player;
 	jet = 6;
 	if (p_mech->m_objects[jet]) {
-		fired = TRUE;
+		fired = true;
 		player->m_firingObj = p_mech->m_objects[jet];
 		SpawnLaunchEffect(0x19, p_mech->m_player);
 		GetObjPosition(player->m_firingObj, &x, &y, &z);
@@ -190,7 +190,7 @@ void FireJumpJetEffects(Mech* p_mech)
 
 	jet = 7;
 	if (p_mech->m_objects[jet]) {
-		fired = TRUE;
+		fired = true;
 		player->m_firingObj = p_mech->m_objects[jet];
 		SpawnLaunchEffect(0x19, p_mech->m_player);
 		GetObjPosition(player->m_firingObj, &x, &y, &z);

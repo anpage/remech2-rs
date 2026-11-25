@@ -12,14 +12,14 @@
 // Arms the transition: the next update starts it from its first rectangle.
 void StartRectTransition(RectTransition* p_transition)
 {
-	p_transition->m_state->m_active = TRUE;
-	p_transition->m_state->m_wasActive = FALSE;
+	p_transition->m_state->m_active = true;
+	p_transition->m_state->m_wasActive = false;
 }
 
 void StopRectTransition(RectTransition* p_transition)
 {
-	p_transition->m_state->m_active = FALSE;
-	p_transition->m_state->m_wasActive = FALSE;
+	p_transition->m_state->m_active = false;
+	p_transition->m_state->m_wasActive = false;
 }
 
 // Moves p_out's edges to the fraction p_t (16.16) of the way from p_from to p_to: the horizontal
@@ -61,7 +61,7 @@ PANE* UpdateRectTransition(int32_t p_reverse, RectTransition* p_transition)
 	def = p_transition->m_def;
 	out = NULL;
 	active = state->m_active;
-	if (active == TRUE) {
+	if (active == true) {
 		out = def->m_out;
 		if (!p_reverse) {
 			from = def->m_first;
@@ -82,7 +82,7 @@ PANE* UpdateRectTransition(int32_t p_reverse, RectTransition* p_transition)
 			if (t >= 0x10000) {
 				*out = *to;
 				state->m_elapsed = 0;
-				active = FALSE;
+				active = false;
 			}
 			else {
 				LerpPaneRect(from, to, out, t, c_rectAxisBoth);
@@ -113,7 +113,7 @@ PANE* UpdateRectTransitionByAxis(int32_t p_reverse, RectTransition* p_transition
 	def = p_transition->m_def;
 	out = NULL;
 	active = state->m_active;
-	if (active == TRUE) {
+	if (active == true) {
 		out = def->m_out;
 		if (!p_reverse) {
 			from = def->m_first;
@@ -138,7 +138,7 @@ PANE* UpdateRectTransitionByAxis(int32_t p_reverse, RectTransition* p_transition
 			if (t >= 0x10000) {
 				*out = *to;
 				state->m_elapsed = 0;
-				active = FALSE;
+				active = false;
 			}
 			else if (t <= 0x8000) {
 				*out = *from;

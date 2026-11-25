@@ -382,14 +382,14 @@ typedef struct CenteredDraw {
 } CenteredDraw;
 
 // Plots a pixel of p_draw's colour at (p_width / 2, -p_height / 2) from the centre of its target
-// (16.16 fractions of the target), shows the frame, and returns FALSE if Esc was pressed.
+// (16.16 fractions of the target), shows the frame, and returns false if Esc was pressed.
 int32_t PlotCenteredPixel(CenteredDraw* p_draw, int32_t p_width, int32_t p_height)
 {
 	int32_t result;
 	PANE* target;
 	Point pos;
 
-	result = TRUE;
+	result = true;
 	if (!p_draw) {
 		return result;
 	}
@@ -408,7 +408,7 @@ int32_t PlotCenteredPixel(CenteredDraw* p_draw, int32_t p_width, int32_t p_heigh
 	g_currentRefreshMode->m_flip();
 
 	if (KeyboardPollKeyCode() == 0x1b) {
-		result = FALSE;
+		result = false;
 	}
 
 	return result;

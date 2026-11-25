@@ -135,10 +135,10 @@ char* g_starVideoFormat;
 void SaveStars()
 {
 	if (g_selectedStar == &g_playerStar) {
-		g_simHandoff.m_playerStarSelected = TRUE;
+		g_simHandoff.m_playerStarSelected = true;
 	}
 	else {
-		g_simHandoff.m_playerStarSelected = FALSE;
+		g_simHandoff.m_playerStarSelected = false;
 	}
 
 	g_simHandoff.m_playerStar = g_playerStar;
@@ -729,7 +729,7 @@ done:
 		delete g_mechLabSound;
 		delete g_starSound;
 		CloseAllVideos();
-		g_videoDriver->ClearGlyphs(TRUE);
+		g_videoDriver->ClearGlyphs(true);
 		MechPostMessage(p_msg, c_msgStarConfig, 0);
 		UnregisterScreenFunction(StarConfigCallback);
 	}

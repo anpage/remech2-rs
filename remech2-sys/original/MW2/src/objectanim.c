@@ -191,8 +191,8 @@ int32_t ReelMotionTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p
 	rate = 0;
 	enabled = 0;
 	number = 0;
-	jump = FALSE;
-	found = FALSE;
+	jump = false;
+	found = false;
 	thing = -1;
 	switch (p_event) {
 	case 0:
@@ -379,10 +379,10 @@ int32_t ReelMotionTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p
 				if (motion->m_reel->m_events[frame].m_flags & 0x40) {
 					target = motion->m_reel->m_events[frame].m_values[1];
 					if (motion->m_player->m_nextMotionState == target) {
-						jump = TRUE;
+						jump = true;
 					}
 					else {
-						jump = FALSE;
+						jump = false;
 					}
 				}
 
@@ -390,19 +390,19 @@ int32_t ReelMotionTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p
 					target = motion->m_reel->m_events[frame].m_values[1];
 					if (motion->m_player->m_nextMotionState != -1 &&
 						motion->m_player->m_motionState != motion->m_player->m_nextMotionState) {
-						jump |= TRUE;
+						jump |= true;
 					}
 				}
 
 				if (motion->m_reel->m_events[frame].m_flags & 0x100) {
 					target = motion->m_reel->m_events[frame].m_values[2];
 					if (motion->m_player->m_nextMotionState == -1) {
-						jump |= TRUE;
+						jump |= true;
 					}
 				}
 
 				if (jump) {
-					jump = FALSE;
+					jump = false;
 					if (motion->m_player->m_motionState < target) {
 						step = 1;
 					}
@@ -410,7 +410,7 @@ int32_t ReelMotionTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p
 						step = -1;
 					}
 
-					found = FALSE;
+					found = false;
 					next = frame;
 					while (!found) {
 						next += step;
@@ -419,28 +419,28 @@ int32_t ReelMotionTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p
 						}
 
 						if (next == -1) {
-							found = TRUE;
+							found = true;
 						}
 						else if (motion->m_reel->m_events[next].m_flags & 1) {
 							value = motion->m_reel->m_events[next].m_values[0];
 							if (value == target) {
-								found = TRUE;
+								found = true;
 							}
 						}
 					}
 
 					if (next != -1) {
-						found = FALSE;
+						found = false;
 						while (!found) {
 							if (next >= motion->m_reel->m_frameCount) {
 								next = -1;
-								found = TRUE;
+								found = true;
 							}
 							else {
 								if (motion->m_reel->m_events[next].m_flags & 0x200) {
 									value = motion->m_reel->m_events[next].m_values[3];
 									if (motion->m_player->m_motionState == value) {
-										found = TRUE;
+										found = true;
 									}
 								}
 
@@ -451,14 +451,14 @@ int32_t ReelMotionTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p
 
 					if (next != -1) {
 						motion->m_frame = next;
-						jump = TRUE;
+						jump = true;
 					}
 				}
 
 				if (!jump && (motion->m_reel->m_events[frame].m_flags & 0xc)) {
-					match = TRUE;
+					match = true;
 					if (motion->m_reel->m_events[frame].m_flags & 4) {
-						match = FALSE;
+						match = false;
 						for (i = 0; i < 4; i++) {
 							if (motion->m_reel->m_events[frame].m_values[i] == -1) {
 								break;
@@ -466,10 +466,10 @@ int32_t ReelMotionTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p
 
 							if (motion->m_reel->m_events[frame].m_values[i] ==
 								(int8_t) motion->m_player->m_nextMotionState) {
-								match = TRUE;
+								match = true;
 							}
 							else {
-								match = FALSE;
+								match = false;
 							}
 
 							if (match) {

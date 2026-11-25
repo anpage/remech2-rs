@@ -22,7 +22,7 @@ extern "C"
 	extern int16_t g_keyCodeMap[256];
 	extern int32_t g_extendedScanCodeMap[0x59];
 
-	void HandleKeyboardMessages(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+	void HandleKeyboardMessages(uint32_t p_msg, size_t p_wParam, intptr_t p_lParam);
 	int32_t KeyboardFlushKeyCodes(void);
 	int16_t KeyboardPollKeyCode(void);
 

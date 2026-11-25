@@ -66,7 +66,7 @@ void MidiSequence::SetVolume(int32_t p_volume)
 // A sequence always loops, so it plays for as long as it exists.
 uint8_t MidiSequence::IsAnySequencePlaying()
 {
-	return m_impl ? TRUE : FALSE;
+	return m_impl ? true : false;
 }
 
 AudioSample::AudioSample(AudioSubsystem* p_subsystem, void* p_data, uint32_t p_size)
@@ -123,7 +123,7 @@ void AudioSample::PlayAndWait()
 {
 	if (m_impl) {
 		Start();
-		while (IsPlaying() == TRUE) {
+		while (IsPlaying() == true) {
 		}
 	}
 }
@@ -138,10 +138,10 @@ void AudioSample::Stop()
 uint8_t AudioSample::IsPlaying()
 {
 	if (m_impl && ShellAudioSample_IsPlaying(m_impl)) {
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 void AudioSample::SetVolume(int32_t p_volume)

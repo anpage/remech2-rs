@@ -52,7 +52,7 @@ void (*g_screenFunction)(
 ) = NULL;
 
 // The screen a menu command opened over the current one (RegisterMenuFunction), called instead of
-// g_screenFunction while set: every frame with p_active TRUE, and with FALSE to close it
+// g_screenFunction while set: every frame with p_active true, and with false to close it
 // (CloseMenuFunction).
 void (*g_menuFunction)(int32_t p_active) = NULL;
 
@@ -80,7 +80,7 @@ void CloseMenuFunction();
 // The shell's message handler, originally its window procedure (ShellWindowProc).
 // ShellHandleMessage on the Rust side (src/shell/screens/debug.rs) wraps it, for the debug menu's
 // jumps between screens and to hold back the landing and ending videos while a prompt is up.
-MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
+intptr_t ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, intptr_t p_lParam)
 {
 	uint32_t msg;
 
@@ -108,8 +108,8 @@ MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_l
 	// On WM_NCMOUSEMOVE the original showed the cursor again if a movie had hidden it.
 	case c_mechMsgMouseMove:
 		if (IsFullscreenVideoPlaying() && !g_cursorHidden) {
-			MechMouseShowCursor(FALSE);
-			g_cursorHidden = TRUE;
+			MechMouseShowCursor(false);
+			g_cursorHidden = true;
 		}
 
 		// Full screen, the original showed the window's menu bar while the cursor was at the top of
@@ -135,9 +135,9 @@ MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_l
 			break;
 		case c_menuHallOfHonor:
 			CloseMenuFunction();
-			EnableShellMenuCommand(c_menuHallOfHonor, FALSE);
+			EnableShellMenuCommand(c_menuHallOfHonor, false);
 			DrawHallOfHonor();
-			g_menuDialogOpen = TRUE;
+			g_menuDialogOpen = true;
 			break;
 		case c_menuFleeToWindows:
 			if (ShowDialog("Embrace cowardice?#Yes|No", 1) == 0) {
@@ -150,20 +150,20 @@ MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_l
 				else {
 					MechPostMessage(c_msgQuit, 0, 0);
 				}
-				g_menuDialogOpen = TRUE;
+				g_menuDialogOpen = true;
 			}
 			break;
 		case c_menuCombatVariables:
 			CloseMenuFunction();
-			EnableShellMenuCommand(c_menuCombatVariables, FALSE);
+			EnableShellMenuCommand(c_menuCombatVariables, false);
 			DrawOptions();
-			g_menuDialogOpen = TRUE;
+			g_menuDialogOpen = true;
 			break;
 		case c_menuKeshik:
 			CloseMenuFunction();
-			EnableShellMenuCommand(c_menuKeshik, FALSE);
+			EnableShellMenuCommand(c_menuKeshik, false);
 			DrawCredits();
-			g_menuDialogOpen = TRUE;
+			g_menuDialogOpen = true;
 			break;
 		case c_menuHelpContents:
 		case c_menuTechnicalHelp:
@@ -172,11 +172,11 @@ MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_l
 		}
 		return 0;
 	case c_msgMainMenu:
-		g_pilotChosen = FALSE;
+		g_pilotChosen = false;
 		DrawMainMenu(g_mw2Database, &g_selectedCampaign);
 		if (g_cursorHidden) {
-			MechMouseShowCursor(TRUE);
-			g_cursorHidden = FALSE;
+			MechMouseShowCursor(true);
+			g_cursorHidden = false;
 		}
 		break;
 	case c_msgTrials:
@@ -197,8 +197,8 @@ MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_l
 		}
 		else {
 			if (g_cursorHidden) {
-				MechMouseShowCursor(TRUE);
-				g_cursorHidden = FALSE;
+				MechMouseShowCursor(true);
+				g_cursorHidden = false;
 			}
 
 			DrawClanHall(g_mw2Database, g_selectedCampaign, g_pilotChosen, p_wParam);
@@ -206,8 +206,8 @@ MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_l
 		break;
 	case c_msgPilotRoster:
 		if (g_cursorHidden) {
-			MechMouseShowCursor(TRUE);
-			g_cursorHidden = FALSE;
+			MechMouseShowCursor(true);
+			g_cursorHidden = false;
 		}
 
 		DrawPilotRoster(g_mw2Database, g_selectedCampaign, &g_pilotChosen, &g_scenario);
@@ -256,8 +256,8 @@ MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_l
 		DrawMissionDebrief(g_mw2Database, g_selectedCampaign, &g_scenario);
 		break;
 	case c_msgLandingVideo:
-		MechMouseShowCursor(FALSE);
-		g_cursorHidden = TRUE;
+		MechMouseShowCursor(false);
+		g_cursorHidden = true;
 
 		switch (g_selectedCampaign) {
 		case 0:
@@ -273,8 +273,8 @@ MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_l
 		}
 		break;
 	case c_msgEndingVideo:
-		MechMouseShowCursor(FALSE);
-		g_cursorHidden = TRUE;
+		MechMouseShowCursor(false);
+		g_cursorHidden = true;
 
 		switch (g_selectedCampaign) {
 		case 0:
@@ -310,7 +310,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 	void* itemData = NULL;
 	int32_t itemSize;
 	MechMessage msg;
-	int32_t fromSim = FALSE;
+	int32_t fromSim = false;
 
 	// The original was loaded fresh each time.
 	ResetShellGlobals();
@@ -323,7 +323,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 
 	// Drop what the sim or an earlier shell run left queued. What the start-up below posts, like
 	// ReadSimHandoff's message, is kept.
-	while (MechPeekMessage(&msg, 0, 0, TRUE)) {
+	while (MechPeekMessage(&msg, 0, 0, true)) {
 	}
 
 	if (*p_cmdLine == '\0') {
@@ -332,7 +332,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 		g_runSim = 0;
 	}
 	else if (strstr(p_cmdLine, "sim") != NULL) {
-		fromSim = TRUE;
+		fromSim = true;
 	}
 
 	InitTextColorMaps();
@@ -373,16 +373,16 @@ extern "C" int ShellMain(char* p_cmdLine)
 	LoadPilotRoster();
 	LoadDifficultyConfig();
 	ReadSimHandoff(fromSim, &g_selectedCampaign, &g_pilotChosen, &g_scenario);
-	MechMouseGrab(FALSE);
+	MechMouseGrab(false);
 
 	if (fromSim) {
 		EnableShellMenu();
-		MechMouseShowCursor(TRUE);
-		g_cursorHidden = FALSE;
+		MechMouseShowCursor(true);
+		g_cursorHidden = false;
 	}
 	else {
-		MechMouseShowCursor(FALSE);
-		g_cursorHidden = TRUE;
+		MechMouseShowCursor(false);
+		g_cursorHidden = true;
 	}
 
 	// The original sent the launcher's window c_msgActivateShell, to have it pass its messages to ShellWindowProc.
@@ -390,7 +390,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 
 	for (;;) {
 		MechAppPump();
-		if (MechPeekMessage(&msg, 0, 0, TRUE)) {
+		if (MechPeekMessage(&msg, 0, 0, true)) {
 			if (msg.m_message == c_mechMsgQuit) {
 				break;
 			}
@@ -414,7 +414,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 	g_videoDriver->ActivateFramebuffer();
 
 	if (g_menuFunction) {
-		g_menuFunction(FALSE);
+		g_menuFunction(false);
 	}
 
 	if (g_screenFunction) {
@@ -455,7 +455,7 @@ int32_t PumpMessage()
 
 	MechAppPump();
 
-	if (MechPeekMessage(&msg, 0, 0, TRUE)) {
+	if (MechPeekMessage(&msg, 0, 0, true)) {
 		if (msg.m_message == c_mechMsgQuit) {
 			MechPostMessage(c_mechMsgQuit, msg.m_wParam, 0);
 			return 0;
@@ -555,7 +555,7 @@ extern "C" int32_t IsShellMenuCommandEnabled(int32_t p_command)
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Originally EnableMenuItem on the window's menu.
@@ -600,7 +600,7 @@ void UnregisterScreenFunction(void (*p_callback)(TMPackDataBase*, int32_t*, uint
 void RunScreenFrame()
 {
 	if (g_menuFunction != NULL) {
-		g_menuFunction(TRUE);
+		g_menuFunction(true);
 	}
 	else {
 		if (g_screenFunction != NULL) {
@@ -629,6 +629,6 @@ void UnregisterMenuFunction(void (*p_callback)(int32_t p_active))
 void CloseMenuFunction()
 {
 	if (g_menuFunction != NULL) {
-		g_menuFunction(FALSE);
+		g_menuFunction(false);
 	}
 }

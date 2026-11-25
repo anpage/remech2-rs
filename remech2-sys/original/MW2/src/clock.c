@@ -41,7 +41,7 @@ int32_t g_previousClock = 0;
 
 int32_t g_clockModeBeforePause = 0;
 
-int32_t g_ticksTimerInitialized = FALSE;
+int32_t g_ticksTimerInitialized = false;
 
 int16_t* g_sqrtTable;
 
@@ -68,7 +68,7 @@ int32_t InitSinAtanTables(void)
 
 	g_sinTable[0x100] = g_sinTable[0x101] = 0x20000000;
 	g_atanTable[0x100] = g_atanTable[0x101] = 0x2d0000;
-	return TRUE;
+	return true;
 }
 
 // The cosines and sines of the angles whose tangents are 0 to 50 in steps of 1/16 (2.29).
@@ -82,7 +82,7 @@ int32_t InitSlopeTables(void)
 		g_slopeSines[i] = (int32_t) (i / 16.0 * cosine * 536870912.0);
 	}
 
-	return TRUE;
+	return true;
 }
 
 // The square roots of 0 to 1023 (6.10 fixed point).
@@ -95,7 +95,7 @@ int32_t InitSqrtTable(void)
 		g_sqrtTable[i] = (int16_t) (sqrt(i) * 1024.0);
 	}
 
-	return TRUE;
+	return true;
 }
 
 int32_t Hypot2D(int32_t p_x, int32_t p_y)
@@ -159,7 +159,7 @@ void FirstClock(void)
 		ResetTicks(g_realClockHandle);
 		ResetTicks(g_syncTicksHandle);
 		ResetTicks(g_clockHandle);
-		g_ticksTimerInitialized = TRUE;
+		g_ticksTimerInitialized = true;
 	}
 
 	g_currentClock = g_previousClock = 0;
@@ -185,7 +185,7 @@ void NextClockC(void)
 			g_clockModeBeforePause = g_clockMode;
 			g_clockMode = 3;
 			DebugPrint("NextClock(1): pause_timer(TRUE)");
-			PauseTimer(0x80, TRUE);
+			PauseTimer(0x80, true);
 		}
 	}
 	else if (g_clockMode == 3) {
@@ -193,7 +193,7 @@ void NextClockC(void)
 		if (!g_clockPaused) {
 			g_clockMode = g_clockModeBeforePause;
 			DebugPrint("NextClock(2): pause_timer(FALSE)");
-			PauseTimer(0x80, FALSE);
+			PauseTimer(0x80, false);
 			SetTicks(g_clockHandle, g_currentClock);
 		}
 	}
@@ -228,7 +228,7 @@ void StopTimers(void)
 		FreeTicks(g_realClockHandle);
 		StopTicks();
 		AIL_shutdown();
-		g_ticksTimerInitialized = FALSE;
+		g_ticksTimerInitialized = false;
 	}
 }
 

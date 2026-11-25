@@ -227,24 +227,24 @@ uint8_t ProjectArchive::LoadBwd(char* p_name)
 
 	m_bwdSize = 0;
 	if (m_handle < 0) {
-		return FALSE;
+		return false;
 	}
 
 	id = FindResourceIdByName(m_bwdTable, p_name);
 	switch (id) {
 	case -1:
-		return FALSE;
+		return false;
 	case -2:
-		return FALSE;
+		return false;
 	default:
 		m_bwd = (int32_t*) LoadCachedResource(m_handle, id, "BWD", 0);
 		m_bwdSize = m_bwd[1];
 		if (m_bwd == NULL) {
-			return FALSE;
+			return false;
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 int32_t* ProjectArchive::FindBwdNode(int32_t p_type)

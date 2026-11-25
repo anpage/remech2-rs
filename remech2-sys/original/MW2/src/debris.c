@@ -99,10 +99,10 @@ void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0
 		return;
 	}
 
-	destroy = FALSE;
+	destroy = false;
 	if ((p_obj->m_shape->m_kind & 0xf0) == 0x70 || (p_unk0x16 && p_obj->m_shape->m_partId == 0)) {
 		SetShapeKind(p_obj->m_shape, 0x50);
-		destroy = TRUE;
+		destroy = true;
 	}
 
 	for (i = 0; i < 0x80 && g_debrisChunks[i].m_active; i++) {
@@ -119,7 +119,7 @@ void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0
 
 	piece = AddDebrisPiece(p_obj);
 	if (piece >= 0) {
-		chunk->m_active = TRUE;
+		chunk->m_active = true;
 		chunk->m_obj = p_obj;
 		chunk->m_callback = p_callback;
 		chunk->m_startTime = g_currentClock;
@@ -182,7 +182,7 @@ void UpdateDebris(void)
 	}
 
 	for (i = 0; i < 0x80; i++) {
-		if (g_debrisChunks[i].m_active == TRUE && g_currentClock - g_debrisChunks[i].m_startTime > 0xe24 &&
+		if (g_debrisChunks[i].m_active == true && g_currentClock - g_debrisChunks[i].m_startTime > 0xe24 &&
 			!g_localMechLost) {
 			DisposeDebris(g_debrisChunks[i].m_obj, g_debrisChunks[i].m_callback);
 			g_debrisChunks[i] = g_emptyDebrisChunk;
@@ -246,7 +246,7 @@ void UpdateDebrisPiece(int32_t p_index)
 	int32_t dx;
 	int32_t dy;
 
-	landed = FALSE;
+	landed = false;
 	piece = &g_debrisPieces[p_index];
 	if (!piece->m_obj) {
 		return;
@@ -262,11 +262,11 @@ void UpdateDebrisPiece(int32_t p_index)
 	if (velocityY <= 0 && newY <= (ground = GetTerrainHeight(x, y, z))) {
 		if (rising) {
 			HideDebrisObj(piece->m_obj);
-			landed = TRUE;
+			landed = true;
 		}
 
 		if (velocityY > -0x8d6f) {
-			landed = TRUE;
+			landed = true;
 		}
 
 		newY = ground;

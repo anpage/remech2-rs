@@ -153,7 +153,7 @@ void ShowFatalError(const char* p_format, va_list p_args)
 	ShutdownRender();
 	StopTimers();
 	CloseInputDevices();
-	MechMouseShowCursor(TRUE);
+	MechMouseShowCursor(true);
 
 	// The original minimised the window and showed it in a message box
 	va_copy(args, p_args);

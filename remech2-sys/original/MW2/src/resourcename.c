@@ -81,7 +81,7 @@ void* LoadResourceByRef(
 
 	data = NULL;
 	loaded = NULL;
-	fromResource = FALSE;
+	fromResource = false;
 	id = p_ref->m_id;
 	if (id == -1) {
 		strncpy(name, p_ref->m_name, 12);
@@ -93,7 +93,7 @@ void* LoadResourceByRef(
 		data = LoadCachedResource(g_mw2PrjHandle, id, p_type, 0);
 		*p_size = GetPrjResourceSize(g_mw2PrjHandle, p_type, id);
 		if (data) {
-			fromResource = TRUE;
+			fromResource = true;
 		}
 	}
 
@@ -107,7 +107,7 @@ void* LoadResourceByRef(
 		}
 		else {
 			MechClose(handle);
-			fromResource = FALSE;
+			fromResource = false;
 		}
 	}
 

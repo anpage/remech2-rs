@@ -107,7 +107,7 @@ int32_t g_goLaunch = 0;
 const MissionLaunch* g_missionLaunch = NULL;
 MissionReport* g_missionReport = NULL;
 
-static MECH_INTPTR SimHandleMessage(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+static intptr_t SimHandleMessage(uint32_t p_msg, size_t p_wParam, intptr_t p_lParam);
 
 int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_netLaunch, MissionReport* p_report)
 {
@@ -157,7 +157,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 
 	InitRefreshMode(5, 0, &g_mainPixelBuffer, 640, 480, 0);
 	// The original sent the launcher's window 0x41f, to have it pass its messages to SimWindowProc
-	while (MechPeekMessage(&msg, 0, 0, TRUE)) {
+	while (MechPeekMessage(&msg, 0, 0, true)) {
 	}
 	MechSetMessageHandler(SimHandleMessage);
 	if (!InitDisplayGeometry()) {
@@ -190,7 +190,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 		DebugPrint("StartSupAnim()\n");
 		// The original passed whether the desktop had more than 256 colors or the game was full
 		// screen.
-		StartSupAnim(TRUE);
+		StartSupAnim(true);
 		DebugPrint("FirstResource()\n");
 		FirstResource();
 		DebugPrint("InitStaticMem()\n");
@@ -208,7 +208,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 		DebugPrint("ResetClocks()\n");
 		ResetClocks();
 		DebugPrint("WinMain(1): pause_timer(TRUE)");
-		PauseTimer(0x80, TRUE);
+		PauseTimer(0x80, true);
 		DebugPrint("FirstShots()\n");
 		FirstShots();
 		DebugPrint("ZeroGamethings()\n");
@@ -289,7 +289,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 			Error(0x50, "Error profiling video modes.");
 		}
 
-		MechMouseShowCursor(FALSE);
+		MechMouseShowCursor(false);
 
 		g_mouseOutsideClientWindow = 0;
 		// The original waited here for the refresh modes to be profiled.
@@ -302,7 +302,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 				DebugPrint("GoLaunch == GO_READY\n");
 				g_goLaunch |= 0x80000000;
 				DebugPrint("WinMain(2): pause_timer(false)");
-				PauseTimer(0x80, FALSE);
+				PauseTimer(0x80, false);
 				StartMissionMusic();
 				g_statusMessage = 0;
 			}
@@ -378,7 +378,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 
 		DebugPrint("Calling Blit()\n");
 		Blit();
-		while (MechPeekMessage(&msg, 0, 0, TRUE)) {
+		while (MechPeekMessage(&msg, 0, 0, true)) {
 		}
 
 		// The original sent the launcher's window 0x41e, to have it handle its own messages again.
@@ -408,7 +408,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 
 	MechHeapDestroy(g_primaryHeap);
 	g_primaryHeap = NULL;
-	MechMouseShowCursor(TRUE);
+	MechMouseShowCursor(true);
 
 	g_missionLaunch = NULL;
 	g_missionReport = NULL;
@@ -418,7 +418,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 }
 
 // The simulator's message handler, originally its window procedure (SimWindowProc).
-static MECH_INTPTR SimHandleMessage(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
+static intptr_t SimHandleMessage(uint32_t p_msg, size_t p_wParam, intptr_t p_lParam)
 {
 	if (p_msg >= c_mechMsgKeyFirst && p_msg <= c_mechMsgKeyLast) {
 		HandleKeyboardMessages(p_msg, p_wParam, p_lParam);
@@ -439,8 +439,8 @@ static MECH_INTPTR SimHandleMessage(uint32_t p_msg, size_t p_wParam, MECH_INTPTR
 	case c_mechMsgMouseMove:
 		if (g_mouseOutsideClientWindow) {
 			if (!g_simPaused || GetMenuSlotState(4) == 1) {
-				MechMouseShowCursor(FALSE);
-				g_mouseOutsideClientWindow = FALSE;
+				MechMouseShowCursor(false);
+				g_mouseOutsideClientWindow = false;
 			}
 		}
 		return 0;
@@ -448,7 +448,7 @@ static MECH_INTPTR SimHandleMessage(uint32_t p_msg, size_t p_wParam, MECH_INTPTR
 	// held the window at its windowed position and size.
 	// On WM_QUERYNEWPALETTE the original reloaded the palette.
 	case c_mechMsgClose:
-		g_shouldQuit = TRUE;
+		g_shouldQuit = true;
 		g_quitStage += 2;
 		return 0;
 	case c_mechMsgDestroy:
@@ -466,17 +466,17 @@ void HandleMessages(void)
 
 	MechAppPump();
 
-	if (!g_shouldQuit && MechPeekMessage(&msg, 0, 0, TRUE)) {
+	if (!g_shouldQuit && MechPeekMessage(&msg, 0, 0, true)) {
 		// The original skipped every mouse message here, and without looking at whether there was
 		// another message to take.
 		while (!g_mouseOutsideClientWindow && msg.m_message == c_mechMsgMouseMove) {
-			if (!MechPeekMessage(&msg, 0, 0, TRUE)) {
+			if (!MechPeekMessage(&msg, 0, 0, true)) {
 				return;
 			}
 		}
 
 		if (msg.m_message == c_mechMsgQuit) {
-			g_shouldQuit = TRUE;
+			g_shouldQuit = true;
 		}
 		else {
 			MechSendMessage(msg.m_message, msg.m_wParam, msg.m_lParam);
@@ -490,23 +490,23 @@ void UpdatePauseState(void)
 		if (g_simPaused && g_localSteering.m_keyCode) {
 			PlayResumeSound();
 			g_localSteering.m_keyCode = 0;
-			g_pauseRequested = FALSE;
+			g_pauseRequested = false;
 		}
 		else if (g_netRole || GetMenuSlotState(4)) {
-			g_pauseRequested = FALSE;
+			g_pauseRequested = false;
 		}
 	}
 
 	if (!GetMenuSlotState(4) && MechAppActive() && !g_pauseRequested) {
 		if (g_simPaused) {
-			MechMouseShowCursor(FALSE);
+			MechMouseShowCursor(false);
 
-			g_mouseOutsideClientWindow = FALSE;
+			g_mouseOutsideClientWindow = false;
 			DebugPrint("WinMain(3): pause_timer(false)");
-			PauseTimer(0x80, FALSE);
+			PauseTimer(0x80, false);
 			ResumeAudio();
 			EnableGameplayInput();
-			g_simPaused = FALSE;
+			g_simPaused = false;
 		}
 	}
 	else if (!g_simPaused && !g_netRole) {
@@ -518,10 +518,10 @@ void UpdatePauseState(void)
 		// In a window, the original showed the cursor here. We keep it hidden.
 
 		DebugPrint("WinMain(4): pause_timer(TRUE)");
-		PauseTimer(0x80, TRUE);
+		PauseTimer(0x80, true);
 		PauseAudio();
 		DisableGameplayInput();
-		g_simPaused = TRUE;
+		g_simPaused = true;
 	}
 }
 

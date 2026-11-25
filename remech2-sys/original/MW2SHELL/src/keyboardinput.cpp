@@ -134,7 +134,7 @@ int32_t KeyboardInput::EditText(char* p_text, uint8_t p_upperCase)
 			m_text[m_length] = m_key;
 			m_length++;
 			m_text[m_length] = '\0';
-			if (p_upperCase == TRUE) {
+			if (p_upperCase == true) {
 				UppercaseString(m_text);
 			}
 

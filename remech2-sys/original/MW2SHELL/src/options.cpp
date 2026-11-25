@@ -276,7 +276,7 @@ void DrawOptions()
 }
 
 // The options screen's per-frame callback: handles clicks on the options, and closes the
-// screen on a right click, a key, or when called with p_active FALSE, saving the settings.
+// screen on a right click, a key, or when called with p_active false, saving the settings.
 void OptionsCallback(int32_t p_active)
 {
 	ScreenField* option;
@@ -297,7 +297,7 @@ void OptionsCallback(int32_t p_active)
 
 	if (!p_active || g_mouseState->GetRightPressed() == 1 || g_keyboardInput->PollKey()) {
 		UnregisterMenuFunction(OptionsCallback);
-		EnableShellMenuCommand(c_menuCombatVariables, TRUE);
+		EnableShellMenuCommand(c_menuCombatVariables, true);
 		g_menuDialogOpen = 0;
 		HideFields(g_optionFields);
 		SaveSoundConfig();

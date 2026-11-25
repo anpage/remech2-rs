@@ -245,7 +245,7 @@ void DrawPilotRoster(TMPackDataBase* p_database, int32_t p_campaign, uint8_t* p_
 		}
 	}
 
-	g_rosterMenu = new ButtonMenu(g_videoDriver, g_defaultFont, FALSE, g_rosterScreens[p_campaign].m_buttons, 15);
+	g_rosterMenu = new ButtonMenu(g_videoDriver, g_defaultFont, false, g_rosterScreens[p_campaign].m_buttons, 15);
 	ShowPilotCallsigns();
 	if (!g_currentPilot) {
 		g_rosterMenu->DisableButton(11);

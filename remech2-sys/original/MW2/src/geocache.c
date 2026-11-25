@@ -719,23 +719,23 @@ int32_t AreStaticObjectsComplete(void)
 	int32_t i;
 	int32_t found;
 
-	found = FALSE;
+	found = false;
 	for (i = 0; i < g_staticObjectCount && !found; i++) {
 		if (g_staticObjects[i].m_resource == -1) {
-			found = TRUE;
+			found = true;
 		}
 	}
 
 	if (found) {
-		return FALSE;
+		return false;
 	}
 	else {
-		return TRUE;
+		return true;
 	}
 }
 
 // Loads cache entry p_index's shape and places it: a shape-only entry (-2) in block p_block's
-// frame, otherwise on its object. Returns TRUE while the shape is loaded, FALSE if it can't be or
+// frame, otherwise on its object. Returns true while the shape is loaded, false if it can't be or
 // shouldn't be: a hidden entry (0x800), or a destroyed game thing's (without explosion chunks).
 int32_t LoadStaticObject(int32_t p_index, int32_t p_block)
 {
@@ -752,20 +752,20 @@ int32_t LoadStaticObject(int32_t p_index, int32_t p_block)
 	offset = 0;
 	entry = &g_staticObjects[p_index];
 	if (entry->m_flags & 0x800) {
-		return FALSE;
+		return false;
 	}
 
 	if (entry->m_resource == -1) {
-		return FALSE;
+		return false;
 	}
 
 	thing = entry->m_thing;
 	if (thing != -1 && (g_gameThings[thing].m_flags & 0x8000) && (!g_explosionChunks || IsDebrisFull())) {
-		return FALSE;
+		return false;
 	}
 
 	if (entry->m_shape && !(GetShapeState(entry->m_shape) & 0x400)) {
-		return TRUE;
+		return true;
 	}
 
 	data = LoadCachedResource(g_mw2PrjHandle, entry->m_resource, g_resourceTypeTags[c_resTagPoly], 0);
@@ -773,7 +773,7 @@ int32_t LoadStaticObject(int32_t p_index, int32_t p_block)
 		size = GetPrjResourceSize(g_mw2PrjHandle, g_resourceTypeTags[c_resTagPoly], entry->m_resource);
 	}
 	else {
-		return FALSE;
+		return false;
 	}
 
 	SetShapeScale(entry->m_xform.m_scaleX, entry->m_xform.m_scaleY, entry->m_xform.m_scaleZ);
@@ -793,7 +793,7 @@ int32_t LoadStaticObject(int32_t p_index, int32_t p_block)
 	g_shapeOwnerSet = 0;
 	UnlockCachedResource(entry->m_resource, g_resourceTypeTags[c_resTagPoly]);
 	if (!entry->m_shape) {
-		return FALSE;
+		return false;
 	}
 
 	kind = (entry->m_flags & 0xf000) >> 12;
@@ -846,14 +846,14 @@ int32_t LoadStaticObject(int32_t p_index, int32_t p_block)
 		SetObjTreeCollisionType(entry->m_object, kind);
 	}
 	else {
-		return FALSE;
+		return false;
 	}
 
 	if (kind == 5) {
 		BuildShapeQuadtree(entry->m_shape);
 	}
 
-	return TRUE;
+	return true;
 }
 
 // Frees a cache entry's shape.
@@ -944,9 +944,9 @@ int32_t ToggleBlockBoxes(void)
 	Matrix matrix;
 	uint8_t* data;
 
-	result = FALSE;
+	result = false;
 	if (!g_blockBoxesShown) {
-		g_blockBoxesShown = TRUE;
+		g_blockBoxesShown = true;
 		ref = &local;
 		ref->m_id = -1;
 		strncpy(ref->m_name, "unitbox", 12);
@@ -981,7 +981,7 @@ int32_t ToggleBlockBoxes(void)
 				g_blockBoxes[i] = LoadShapes(data, &offset, size, NULL);
 				shape = g_blockBoxes[i];
 				if (shape) {
-					result = TRUE;
+					result = true;
 					SetShapeCollisionType(shape, 4);
 					BuildMatrix(&matrix, 0, 0, 0, block->m_centerX, block->m_centerY, block->m_centerZ);
 					MultiplyMatrix(&block->m_matrix, &matrix, &matrix);
@@ -1002,8 +1002,8 @@ int32_t ToggleBlockBoxes(void)
 		}
 	}
 	else {
-		g_blockBoxesShown = FALSE;
-		result = TRUE;
+		g_blockBoxesShown = false;
+		result = true;
 		for (i = 0; i < g_nextBlock; i++) {
 			if (g_blockBoxes[i]) {
 				DestroyObjShape(g_blockBoxes[i]);
@@ -1101,7 +1101,7 @@ int32_t FreeStaticObjectTree(uint32_t p_index)
 	int32_t i;
 	StaticObject* entry;
 
-	result = FALSE;
+	result = false;
 	for (i = 0; i < g_staticObjectCount; i++) {
 		if (g_staticObjects[i].m_parent == p_index) {
 			FreeStaticObjectTree(i);
@@ -1116,7 +1116,7 @@ int32_t FreeStaticObjectTree(uint32_t p_index)
 		}
 
 		ResetStaticObject(p_index);
-		result = TRUE;
+		result = true;
 	}
 
 	return result;

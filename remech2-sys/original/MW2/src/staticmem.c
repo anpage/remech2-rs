@@ -211,8 +211,8 @@ int32_t AddStaticPoolType(int32_t p_size, uint32_t p_tag)
 
 	pool->m_size += p_size;
 	if (pool->m_size > 0xffdc) {
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }

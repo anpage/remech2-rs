@@ -82,14 +82,14 @@ void DrawReadyRoom(TMPackDataBase* p_database, int32_t p_campaign, char** p_scen
 		g_readyRoomMenu = new ButtonMenu(
 			g_videoDriver,
 			g_defaultFont,
-			FALSE,
+			false,
 			g_readyRoomScreens[p_campaign].m_buttons,
 			g_readyRoomScreens[p_campaign].m_count
 		);
 	}
 	else {
 		g_readyRoomMenu =
-			new ButtonMenu(g_videoDriver, g_defaultFont, FALSE, g_readyRoomScreens[p_campaign].m_buttons, 4);
+			new ButtonMenu(g_videoDriver, g_defaultFont, false, g_readyRoomScreens[p_campaign].m_buttons, 4);
 	}
 
 	switch (p_campaign) {

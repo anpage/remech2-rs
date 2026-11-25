@@ -76,7 +76,7 @@ uint8_t TextGlyph::DrawNextChar()
 	if (strlen(m_text) <= m_textIndex) {
 		m_currentColors = m_colors;
 		m_done = 1;
-		return TRUE;
+		return true;
 	}
 
 	if (m_text[m_textIndex] == '\\') {
@@ -142,17 +142,17 @@ uint8_t TextGlyph::DrawNextChar()
 		m_width = m_cursorX - m_left + 1;
 	}
 
-	return FALSE;
+	return false;
 }
 
 uint8_t TextGlyph::TypeStep()
 {
 	if (m_done == 1) {
-		return TRUE;
+		return true;
 	}
 
 	if (strlen(m_text) == 0) {
-		return TRUE;
+		return true;
 	}
 
 	return DrawNextChar();
