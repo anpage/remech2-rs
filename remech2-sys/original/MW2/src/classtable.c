@@ -256,7 +256,7 @@ int32_t LoadClassEntryShape(int32_t p_index, int32_t p_level, void* p_buffer)
 		entry->m_shape = NULL;
 	}
 
-	data = LoadCachedResource(g_mw2PrjHandle, entry->m_resourceIds[p_level], g_resourceTypeTags[c_resTagPoly], 0);
+	data = LoadCachedResource(g_mw2PrjHandle, entry->m_resourceIds[p_level], g_resourceTypeTags[c_resTagPoly]);
 	if (data) {
 		size = GetPrjResourceSize(g_mw2PrjHandle, g_resourceTypeTags[c_resTagPoly], entry->m_resourceIds[p_level]);
 	}
@@ -420,7 +420,7 @@ void ChoosePlayerDetailLevels(void)
 	int32_t range1;
 	int32_t dz;
 	int32_t best;
-	int32_t unk0x18;
+	int32_t pitch;
 	int32_t level;
 	int32_t range2;
 	PlayerDetail* entry;
@@ -472,7 +472,7 @@ void ChoosePlayerDetailLevels(void)
 			dx = player->m_position.m_x - ex;
 			dy = player->m_position.m_y - ey;
 			dz = player->m_position.m_z - ez;
-			GetBearingAndRange(dx, dy, dz, &heading, &length, (uint32_t*) &ground, &unk0x18);
+			GetBearingAndRange(dx, dy, dz, &heading, &length, (uint32_t*) &ground, &pitch);
 			entry->m_distance = length;
 			if (ground < best) {
 				best = ground;

@@ -212,7 +212,7 @@ int32_t GetTeamLeader(int32_t p_team)
 }
 
 // Numbers the team's active members' formation slots from 1, the leader taking slot 0.
-int32_t AssignTeamSlots(int32_t p_team, int32_t p_unk0x04)
+int32_t AssignTeamSlots(int32_t p_team)
 {
 	Team* team;
 	Player* player;

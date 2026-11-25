@@ -34,7 +34,7 @@ int32_t FindResourceIdByName(int32_t p_type, char* p_name)
 	char name[12];
 
 	id = -1;
-	data = LoadCachedResource(g_mw2PrjHandle, p_type, g_resourceTypeTags[c_resTagTable], 1);
+	data = LoadCachedResource(g_mw2PrjHandle, p_type, g_resourceTypeTags[c_resTagTable]);
 	if (data != NULL) {
 		table = data;
 		entry = data->m_entries;
@@ -77,7 +77,7 @@ char* FindResourceNameById(int32_t p_type, int32_t p_id, char* p_buffer)
 
 	result = NULL;
 	if (p_buffer != NULL) {
-		data = LoadCachedResource(g_mw2PrjHandle, p_type, g_resourceTypeTags[c_resTagTable], 1);
+		data = LoadCachedResource(g_mw2PrjHandle, p_type, g_resourceTypeTags[c_resTagTable]);
 		if (data != NULL) {
 			table = data;
 			entry = data->m_entries;

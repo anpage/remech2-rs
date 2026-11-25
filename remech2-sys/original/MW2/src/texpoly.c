@@ -22,7 +22,7 @@ void DrawTexturedPolygon(
 	uint8_t* rows[128];
 	int32_t i;
 	uint32_t* points;
-	uint32_t unk0x08;
+	uint32_t color;
 
 	mode = 0x11;
 	p_useLuma = true;
@@ -53,6 +53,6 @@ void DrawTexturedPolygon(
 	texture.m_width = texture.m_height = p_height;
 	texture.m_vAddrs = rows;
 	points = p_points;
-	unk0x08 = points[2];
-	VFX_polygon_clip_XY_and_render(p_target, p_points, p_count, mode, unk0x08, &texture, p_luma, 0);
+	color = points[2];
+	VFX_polygon_clip_XY_and_render(p_target, p_points, p_count, mode, color, &texture, p_luma, 0);
 }

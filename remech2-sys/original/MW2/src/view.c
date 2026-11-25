@@ -508,12 +508,12 @@ int32_t CullHiddenShape(Shape* p_shape)
 	return false;
 }
 
-int32_t IsLodQualityHigh(uint32_t p_unk0x00)
+int32_t IsLodQualityHigh(void)
 {
 	return g_lodQuality == 1;
 }
 
-void SetLodQualityHigh(uint32_t p_unk0x00, int32_t p_enable)
+void SetLodQualityHigh(int32_t p_enable)
 {
 	if (p_enable) {
 		g_lodQuality = 1;

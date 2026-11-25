@@ -28,7 +28,7 @@ extern "C"
 
 	void InitializeResourceCache(void);
 	void UnlockCachedResource(int32_t p_id, char* p_type);
-	void* LoadCachedResource(int32_t p_handle, int32_t p_id, char* p_type, int32_t p_unk0x0c);
+	void* LoadCachedResource(int32_t p_handle, int32_t p_id, char* p_type);
 	void* AllocateMemory(uint32_t p_size);
 	void ShutdownResourceCache(void);
 	void FreeCachedResource(int32_t p_id, char* p_type);

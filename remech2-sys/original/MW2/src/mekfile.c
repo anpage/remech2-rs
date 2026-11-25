@@ -113,7 +113,7 @@ int32_t LoadMechConfig(Mech* p_mech, char* p_name, int32_t p_id, char* p_config)
 	file = LoadFile(BuildGamePath(name), &size, (void**) &header, NULL);
 	if (file == -1) {
 		if (p_id > 0) {
-			header = LoadCachedResource(g_mw2PrjHandle, p_id, g_resourceTypeTags[c_resTagMek], 0);
+			header = LoadCachedResource(g_mw2PrjHandle, p_id, g_resourceTypeTags[c_resTagMek]);
 			if (header == NULL) {
 				Error(0x21, "%s ID %d", name, p_id, 0);
 			}

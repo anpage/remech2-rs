@@ -65,18 +65,18 @@ int32_t PrepareCommandPointPage(MenuDefinition* p_menu, MenuPage* p_page)
 	int32_t slot;
 	int32_t index;
 	int32_t src;
-	uint32_t unk0x08;
+	uint32_t aiSlot;
 	int32_t valid;
 
 	if (!p_page) {
 		return false;
 	}
 
-	unk0x08 = p_page->m_aiSlot;
+	aiSlot = p_page->m_aiSlot;
 	count = GetLocalStarSize() - 1;
-	valid = unk0x08 <= count;
+	valid = aiSlot <= count;
 	if (valid) {
-		index = FindStarSlotPlayer(unk0x08);
+		index = FindStarSlotPlayer(aiSlot);
 		valid = index < g_playerCount && g_players[index]->m_ai.m_state != 12;
 	}
 

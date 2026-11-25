@@ -509,7 +509,7 @@ void FirstAI(void)
 	int32_t i;
 
 	for (i = 0; i < g_objectiveCount; i++) {
-		AssignTeamSlots(i, 0);
+		AssignTeamSlots(i);
 		ResetStarOrders(i);
 	}
 }
@@ -2132,7 +2132,7 @@ int32_t LoadAIScripts(void)
 
 	g_aiScripts[0] = NULL;
 	for (i = 0; i < 9; i++) {
-		g_aiScripts[i + 1] = LoadCachedResource(g_mw2PrjHandle, i + 1, g_resourceTypeTags[c_resTagAit], 0);
+		g_aiScripts[i + 1] = LoadCachedResource(g_mw2PrjHandle, i + 1, g_resourceTypeTags[c_resTagAit]);
 	}
 
 	return true;

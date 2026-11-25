@@ -28,7 +28,7 @@ extern "C"
 	void HandleCheatInput(int16_t p_key);
 	void ShiftCharacter(char* p_char);
 	int32_t HandleChatKey(uint32_t p_keyCode);
-	void HandleGameKeys(int32_t p_unk0x00, int32_t p_unk0x04, uint16_t p_key);
+	void HandleGameKeys(uint16_t p_key);
 	void RunGameKey(int32_t p_key);
 
 #ifdef __cplusplus

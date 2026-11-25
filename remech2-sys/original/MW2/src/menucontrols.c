@@ -141,10 +141,10 @@ void RunMenuSlider(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_ind
 		break;
 	}
 
-	left = LoadCachedResource(g_mw2PrjHandle, shapes[0] + g_artResolution, g_resourceTypeTags[c_resTagShp], 0);
-	bar = LoadCachedResource(g_mw2PrjHandle, shapes[2] + g_artResolution, g_resourceTypeTags[c_resTagShp], 0);
-	knob = LoadCachedResource(g_mw2PrjHandle, shapes[6] + g_artResolution, g_resourceTypeTags[c_resTagShp], 0);
-	right = LoadCachedResource(g_mw2PrjHandle, shapes[4] + g_artResolution, g_resourceTypeTags[c_resTagShp], 0);
+	left = LoadCachedResource(g_mw2PrjHandle, shapes[0] + g_artResolution, g_resourceTypeTags[c_resTagShp]);
+	bar = LoadCachedResource(g_mw2PrjHandle, shapes[2] + g_artResolution, g_resourceTypeTags[c_resTagShp]);
+	knob = LoadCachedResource(g_mw2PrjHandle, shapes[6] + g_artResolution, g_resourceTypeTags[c_resTagShp]);
+	right = LoadCachedResource(g_mw2PrjHandle, shapes[4] + g_artResolution, g_resourceTypeTags[c_resTagShp]);
 	if (bar && knob) {
 		size = VFX_shape_bounds(bar, 0);
 		width = size >> 16;

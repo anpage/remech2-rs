@@ -100,18 +100,14 @@ void InitDamagePanel(void)
 		g_outlineRemap[i] = i;
 	}
 
-	shape = LoadCachedResource(g_mw2PrjHandle, g_hudLayoutValues[0], g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, g_hudLayoutValues[0], g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		height1 = VFX_shape_resolution(shape, 0);
 		UnlockCachedResource(g_hudLayoutValues[0], g_resourceTypeTags[c_resTagShp]);
 		width1 = height1 >> 16;
 		height1 &= 0xffff;
-		shape = LoadCachedResource(
-			g_mw2PrjHandle,
-			g_hudLayoutValues[0] + g_artResolution,
-			g_resourceTypeTags[c_resTagShp],
-			0
-		);
+		shape =
+			LoadCachedResource(g_mw2PrjHandle, g_hudLayoutValues[0] + g_artResolution, g_resourceTypeTags[c_resTagShp]);
 	}
 
 	if (shape) {
@@ -198,8 +194,7 @@ void DrawDamageOutline(Mech* p_mech, PANE* p_target)
 
 	rear = 0;
 	front = 0;
-	shape =
-		LoadCachedResource(g_mw2PrjHandle, g_hudLayoutValues[0] + g_artResolution, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, g_hudLayoutValues[0] + g_artResolution, g_resourceTypeTags[c_resTagShp]);
 	if (!shape) {
 		return;
 	}
@@ -283,7 +278,7 @@ void DrawArmorBars(Mech* p_mech, PANE* p_target)
 	MechSection* section;
 
 	g_textColors[0xe] = 6;
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (font) {
 		VFX_string_draw(p_target, g_htalLabelHPosition.m_x, g_htalLabelHPosition.m_y, font, g_htalLabelH, g_textColors);
 		VFX_string_draw(p_target, g_htalLabelTPosition.m_x, g_htalLabelTPosition.m_y, font, g_htalLabelT, g_textColors);

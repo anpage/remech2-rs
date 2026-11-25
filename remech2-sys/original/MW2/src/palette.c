@@ -89,7 +89,7 @@ void ApplyPaletteResource(int32_t p_slot)
 
 	id = &g_paletteResourceIds[p_slot];
 	if (*id > 0) {
-		palette = LoadCachedResource(g_mw2PrjHandle, *id, g_resourceTypeTags[c_resTagPal], 0);
+		palette = LoadCachedResource(g_mw2PrjHandle, *id, g_resourceTypeTags[c_resTagPal]);
 		if (palette) {
 			g_currentDisplayBackend->m_setPaletteWithBrightness((PaletteColor*) palette);
 			UnlockCachedResource(*id, g_resourceTypeTags[c_resTagPal]);
@@ -133,11 +133,11 @@ int32_t StartPaletteFade(int32_t p_palette, int32_t p_duration, int32_t p_mode)
 	}
 	else if (g_paletteFadeSteps <= 0) {
 		fromSlot = g_currentPalette;
-		from = LoadCachedResource(g_mw2PrjHandle, g_paletteResourceIds[fromSlot], g_resourceTypeTags[c_resTagPal], 0);
+		from = LoadCachedResource(g_mw2PrjHandle, g_paletteResourceIds[fromSlot], g_resourceTypeTags[c_resTagPal]);
 	}
 
 	if (from) {
-		to = LoadCachedResource(g_mw2PrjHandle, g_paletteResourceIds[p_palette], g_resourceTypeTags[c_resTagPal], 0);
+		to = LoadCachedResource(g_mw2PrjHandle, g_paletteResourceIds[p_palette], g_resourceTypeTags[c_resTagPal]);
 		if (to) {
 			g_paletteFadeTarget = p_palette;
 			g_paletteFadeBack = fromSlot;
@@ -192,7 +192,7 @@ void StartPaletteCycle(uint8_t p_first, int32_t p_count)
 
 	g_paletteCycling = 1;
 	g_paletteCycleResource = g_paletteResourceIds[g_currentPalette];
-	palette = LoadCachedResource(g_mw2PrjHandle, g_paletteCycleResource, g_resourceTypeTags[c_resTagPal], 0);
+	palette = LoadCachedResource(g_mw2PrjHandle, g_paletteCycleResource, g_resourceTypeTags[c_resTagPal]);
 	if (palette == NULL) {
 		return;
 	}
@@ -223,7 +223,7 @@ int32_t SetPaletteResourceId(int32_t p_id, int32_t p_slot)
 
 	old = g_paletteResourceIds[p_slot];
 	g_paletteResourceIds[p_slot] = p_id;
-	LoadCachedResource(g_mw2PrjHandle, p_id, g_resourceTypeTags[c_resTagPal], 0);
+	LoadCachedResource(g_mw2PrjHandle, p_id, g_resourceTypeTags[c_resTagPal]);
 	UnlockCachedResource(p_id, g_resourceTypeTags[c_resTagPal]);
 	return old;
 }
@@ -266,7 +266,7 @@ void StartPalettes(int32_t p_dissolve)
 	ticks = 0;
 	hasPalette = g_paletteResourceIds[0x10] != -1;
 	if (hasPalette) {
-		palette = LoadCachedResource(g_mw2PrjHandle, hasPalette, g_resourceTypeTags[c_resTagPal], 0);
+		palette = LoadCachedResource(g_mw2PrjHandle, hasPalette, g_resourceTypeTags[c_resTagPal]);
 		if (palette) {
 			if (p_dissolve == 0) {
 				g_currentDisplayBackend->m_blendPalettes((PaletteColor*) palette, 30);

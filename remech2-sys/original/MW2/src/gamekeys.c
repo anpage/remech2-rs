@@ -401,7 +401,7 @@ int32_t HandleChatKey(uint32_t p_keyCode)
 // Runs the frame's game keys: after the mission ends, waits a while before offering to quit (or,
 // with DifficultyCfg::m_regenerate, to regenerate); otherwise passes the key code (from the local
 // steering, through the cheat codes, the chat message and LookupGameKey) to RunGameKey.
-void HandleGameKeys(int32_t p_unk0x00, int32_t p_unk0x04, uint16_t p_key)
+void HandleGameKeys(uint16_t p_key)
 {
 	if (g_simPaused) {
 		return;
@@ -424,7 +424,7 @@ void HandleGameKeys(int32_t p_unk0x00, int32_t p_unk0x04, uint16_t p_key)
 			g_chatRecipient = 0;
 			CycleTrackedPlayer(0, 1);
 			g_renderSettings.m_wireframe = 0;
-			SetInfrared(0, 0);
+			SetInfrared(0);
 			g_speechFlushTime = g_currentClock + 0x108;
 			if (!g_netRole) {
 				g_missionEnded = 1;
@@ -487,7 +487,7 @@ void HandleGameKeys(int32_t p_unk0x00, int32_t p_unk0x04, uint16_t p_key)
 				break;
 			case 0x4f:
 				g_renderSettings.m_wireframe = 0;
-				SetInfrared(0, 0);
+				SetInfrared(0);
 				ReloadPlayerMech(g_localPlayerId, 0);
 				SetViewMode(c_viewCockpit);
 				g_sinkPilotTiltReset = 1;
@@ -841,7 +841,7 @@ void RunGameKey(int32_t p_key)
 		}
 		break;
 	case 0xa6:
-		SetInfrared(0, !g_infraredOn);
+		SetInfrared(!g_infraredOn);
 		break;
 	case 0x41:
 		g_chatRecipient = 0;

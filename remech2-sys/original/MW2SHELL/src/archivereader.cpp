@@ -368,7 +368,7 @@ void ArchiveReader::Load(int32_t p_entry)
 	int16_t command;
 	int32_t result;
 	uint8_t picture;
-	uint8_t unk0x2c;
+	uint8_t pad;
 	int16_t topicEntry;
 	int32_t size;
 	char* text;
@@ -468,7 +468,7 @@ void ArchiveReader::Load(int32_t p_entry)
 		case 0x300:
 			result = m_database->ReadDBItemData(p_entry, offset, &picture, 1);
 			offset++;
-			result = m_database->ReadDBItemData(p_entry, offset, &unk0x2c, 1);
+			result = m_database->ReadDBItemData(p_entry, offset, &pad, 1);
 			offset++;
 			result = m_database->GetDBItem(picture, &data, &size);
 			if (page == NULL) {

@@ -757,7 +757,7 @@ int32_t LoadReels(ResourceRef* p_ref)
 {
 	int32_t ids[32];
 	int32_t size;
-	int32_t unk0x08;
+	int32_t kind;
 	uint8_t* frames;
 	int32_t base;
 	int32_t offset;
@@ -791,7 +791,7 @@ int32_t LoadReels(ResourceRef* p_ref)
 	for (i = 0; i < count; i++) {
 		index = *(int32_t*) (data + offset);
 		offset += stride;
-		unk0x08 = *(int32_t*) (data + offset);
+		kind = *(int32_t*) (data + offset);
 		offset += stride;
 		if (index >= 0x20) {
 			return false;
@@ -810,7 +810,7 @@ int32_t LoadReels(ResourceRef* p_ref)
 		}
 
 		g_reels[index]->m_amounts = (int32_t*) frames;
-		g_reels[index]->m_kind = unk0x08;
+		g_reels[index]->m_kind = kind;
 		g_reels[index]->m_frameCount = frameCount;
 		if (p_ref->m_id == -1) {
 			g_reels[index]->m_byName = 1;
@@ -972,7 +972,7 @@ int32_t WriteScreenPicture(char* p_path, void* p_palette)
 		return false;
 	}
 
-	header = LoadCachedResource(g_mw2PrjHandle, 15, g_resourceTypeTags[c_resTagTable], 1);
+	header = LoadCachedResource(g_mw2PrjHandle, 15, g_resourceTypeTags[c_resTagTable]);
 	if (header == NULL) {
 		MechClose(file);
 		return false;

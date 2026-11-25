@@ -66,7 +66,7 @@ int32_t PreloadResource(int32_t p_id, const char* p_type)
 	int32_t result;
 	void* data;
 
-	data = LoadCachedResource(g_mw2PrjHandle, p_id, p_type, 0);
+	data = LoadCachedResource(g_mw2PrjHandle, p_id, p_type);
 	if (data) {
 		result = true;
 		UnlockCachedResource(p_id, p_type);

@@ -212,7 +212,7 @@ void UpdateMech(Mech* p_mech)
 	int32_t posY2;
 	int32_t posZ2;
 	struct Shape* hitShape2;
-	int32_t savedUnk0xa4;
+	int32_t savedCollisionTicks;
 	int32_t sound;
 	int32_t volume;
 	int32_t sound2;
@@ -393,7 +393,7 @@ void UpdateMech(Mech* p_mech)
 			velX = mech->m_velocityX;
 			velY = mech->m_velocityY;
 			velZ = mech->m_velocityZ;
-			savedUnk0xa4 = mech->m_collisionTicks;
+			savedCollisionTicks = mech->m_collisionTicks;
 
 			if (MoveMechWithCollisions(mech, &hitShape2, &hitPlayer, dx, dy, dz, &posX2, &posY2, &posZ2)) {
 				if (hitShape2 != hitShape) {
@@ -407,7 +407,7 @@ void UpdateMech(Mech* p_mech)
 				velZ = mech->m_velocityZ = velZ * 2;
 			}
 
-			mech->m_collisionTicks = savedUnk0xa4;
+			mech->m_collisionTicks = savedCollisionTicks;
 			if (mech->m_powerState == 4) {
 				KnockMechOver(mech);
 				mech->m_player->m_onGround = 1;

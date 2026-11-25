@@ -95,12 +95,8 @@ void DrawAnim2d(PANE* p_target, int32_t p_index, int32_t p_x, int32_t p_y)
 	}
 
 	if (!anim->m_shape) {
-		anim->m_shape = LoadCachedResource(
-			g_mw2PrjHandle,
-			anim->m_resourceId + g_artResolution,
-			g_resourceTypeTags[c_resTagShp],
-			0
-		);
+		anim->m_shape =
+			LoadCachedResource(g_mw2PrjHandle, anim->m_resourceId + g_artResolution, g_resourceTypeTags[c_resTagShp]);
 		if (!anim->m_shape) {
 			FreeAnim2ds(p_index);
 			return;

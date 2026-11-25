@@ -208,9 +208,8 @@ void UnlockCachedResource(int32_t p_id, char* p_type)
 }
 
 // Returns the data of p_type item p_id of p_handle, loading it into the cache when needed and
-// purging the least recently used entries to make room. p_unk0x0c is ignored (the name tables
-// pass 1), so nothing gives it a name.
-void* LoadCachedResource(int32_t p_handle, int32_t p_id, char* p_type, int32_t p_unk0x0c)
+// purging the least recently used entries to make room.
+void* LoadCachedResource(int32_t p_handle, int32_t p_id, char* p_type)
 {
 	ResourceCacheEntry* entry;
 	ResourceCacheEntry* block;

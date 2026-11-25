@@ -439,7 +439,7 @@ void DrawMapContents(CockpitLayout* p_layout)
 		x = (viewport->m_x1 - viewport->m_x0 + 1) >> 1;
 		y = (viewport->m_y1 - viewport->m_y0 + 1) >> 1;
 		id = p_layout->m_icons[0][0] + g_artResolution;
-		shape = LoadCachedResource(g_mw2PrjHandle, id, g_resourceTypeTags[c_resTagShp], 0);
+		shape = LoadCachedResource(g_mw2PrjHandle, id, g_resourceTypeTags[c_resTagShp]);
 		if (shape) {
 			VFX_shape_draw(viewport, shape, 0, x, y);
 			UnlockCachedResource(id, g_resourceTypeTags[c_resTagShp]);
@@ -464,7 +464,7 @@ void DrawMapIcon(CockpitLayout* p_layout, MapPoint p_pos, int32_t p_icon)
 	}
 
 	if (visible) {
-		shape = LoadCachedResource(g_mw2PrjHandle, p_icon + g_artResolution, g_resourceTypeTags[c_resTagShp], 0);
+		shape = LoadCachedResource(g_mw2PrjHandle, p_icon + g_artResolution, g_resourceTypeTags[c_resTagShp]);
 		if (shape) {
 			VFX_shape_draw(viewport, shape, 0, p_pos.m_xy.m_x, p_pos.m_xy.m_y);
 			UnlockCachedResource(p_icon + g_artResolution, g_resourceTypeTags[c_resTagShp]);
@@ -593,7 +593,7 @@ void DrawMapTarget(CockpitLayout* p_layout)
 		return;
 	}
 
-	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + icon, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + icon, g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		if (visible) {
 			VFX_shape_draw(viewport, shape, 0, pos.m_xy.m_x, pos.m_xy.m_y);
@@ -645,8 +645,7 @@ void DrawMapNavPoints(CockpitLayout* p_layout)
 				}
 
 				if (icon != -1) {
-					shape =
-						LoadCachedResource(g_mw2PrjHandle, g_artResolution + icon, g_resourceTypeTags[c_resTagShp], 0);
+					shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + icon, g_resourceTypeTags[c_resTagShp]);
 					if (shape) {
 						VFX_shape_draw(viewport, shape, 0, pos.m_xy.m_x, pos.m_xy.m_y);
 						UnlockCachedResource(g_artResolution + icon, g_resourceTypeTags[c_resTagShp]);
@@ -704,7 +703,7 @@ void DrawMapViewText(CockpitLayout* p_layout)
 	}
 
 	player = g_players[g_localPlayerId];
-	font = LoadCachedResource(g_mw2PrjHandle, p_layout->m_font + g_artResolution, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, p_layout->m_font + g_artResolution, g_resourceTypeTags[c_resTagFont]);
 	if (font) {
 		if (p_layout->m_range != p_layout->m_formattedRange) {
 			range = p_layout->m_range / 2;

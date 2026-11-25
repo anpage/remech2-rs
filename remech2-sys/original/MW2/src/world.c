@@ -288,12 +288,10 @@ int32_t BwdExecuteStream(BwdStream* p_stream)
 	uint32_t eventList;
 	uint32_t type;
 	char* eventName;
-	uint32_t unk0x18;
 	int32_t affiliation;
 
 	result = true;
 	eventList = 0;
-	unk0x18 = 0;
 	affiliation = -1;
 	eventList = FindEventList(p_stream->m_name);
 	eventName = p_stream->m_name;
@@ -594,7 +592,7 @@ int32_t BwdExecuteStream(BwdStream* p_stream)
 			EndBlock(p_stream);
 		}
 		else if (type == g_bwdTypeCodes[c_bwdObject]) {
-			CreateObjectNode((BwdObjectRecord*) node, unk0x18, 0, g_blockDepth, g_inRepeat, g_repeatPass);
+			CreateObjectNode((BwdObjectRecord*) node, g_blockDepth, g_inRepeat, g_repeatPass);
 		}
 		else if (type == g_bwdTypeCodes[c_bwdAnimFile]) {
 			ResourceRef* ref;

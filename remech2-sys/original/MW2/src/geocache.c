@@ -293,7 +293,6 @@ int32_t PlaceStaticObject(
 	Xform p_xform,
 	int32_t p_block,
 	int32_t p_parent,
-	int32_t p_unk0x3c,
 	uint32_t p_flags,
 	uint32_t p_kind,
 	uint32_t p_shapeKind
@@ -768,7 +767,7 @@ int32_t LoadStaticObject(int32_t p_index, int32_t p_block)
 		return true;
 	}
 
-	data = LoadCachedResource(g_mw2PrjHandle, entry->m_resource, g_resourceTypeTags[c_resTagPoly], 0);
+	data = LoadCachedResource(g_mw2PrjHandle, entry->m_resource, g_resourceTypeTags[c_resTagPoly]);
 	if (data) {
 		size = GetPrjResourceSize(g_mw2PrjHandle, g_resourceTypeTags[c_resTagPoly], entry->m_resource);
 	}

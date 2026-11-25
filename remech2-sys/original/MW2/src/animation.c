@@ -82,7 +82,7 @@ int32_t DrawAnimatedPolygon(
 	frame->m_useCount++;
 	data = frame->m_data;
 	if (!data) {
-		data = LoadCachedResource(g_mw2PrjHandle, frame->m_resourceId, g_resourceTypeTags[c_resTagCel], 0);
+		data = LoadCachedResource(g_mw2PrjHandle, frame->m_resourceId, g_resourceTypeTags[c_resTagCel]);
 		if (!data) {
 			return 0;
 		}
@@ -108,7 +108,7 @@ int32_t DrawAnimatedPolygon(
 	}
 
 	if (!g_lumaTables) {
-		g_lumaTables = LoadCachedResource(g_mw2PrjHandle, g_lumaResourceId, g_resourceTypeTags[c_resTagLuma], 0);
+		g_lumaTables = LoadCachedResource(g_mw2PrjHandle, g_lumaResourceId, g_resourceTypeTags[c_resTagLuma]);
 	}
 
 	if (p_direct) {

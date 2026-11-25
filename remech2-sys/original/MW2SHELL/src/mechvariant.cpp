@@ -31,17 +31,6 @@
 #include <string.h>
 #include <strings.h>
 
-// The two stars of a custom battle: the player's and the enemy's.
-
-int32_t PlayVideo(
-	int32_t p_index,
-	const char* p_name,
-	uint32_t p_unk0x08,
-	uint32_t p_unk0x0c,
-	uint32_t p_unk0x10,
-	uint32_t p_unk0x14
-);
-
 // The formations of the Wolf and Inner Sphere stars (Jade Falcon's differ): six formations of
 // three mechs.
 FormationPositions g_formationLayouts[6] = {
@@ -68,6 +57,7 @@ char g_jadeFalconStarVideo[] = "ajfsc%s";
 
 char g_trialStarVideo[] = "aiasc%s";
 
+// The two stars of a custom battle: the player's and the enemy's.
 CustomStar g_playerStar =
 	{0, 0, 3, 3, 100, {{12, "tbr00std", "MechWarrior"}, {0, "drw00std", "Friend 1"}, {1, "frm00std", "Friend 2"}}};
 

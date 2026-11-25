@@ -233,7 +233,7 @@ void DrawObjectivesPanel(CockpitPanel* p_panel)
 	}
 
 	mission = &g_objectiveTable[g_localStar];
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}
@@ -309,7 +309,7 @@ void DrawNetworkPanel(CockpitPanel* p_panel)
 		return;
 	}
 
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}
@@ -481,7 +481,7 @@ void DrawKillsPanel(CockpitPanel* p_panel)
 		return;
 	}
 
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}
@@ -525,7 +525,7 @@ void DrawAutopilotPanel(CockpitPanel* p_panel)
 		return;
 	}
 
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}
@@ -566,7 +566,7 @@ void DrawSpeedPanel(CockpitPanel* p_panel)
 		g_textColors[0xe] = 0xe;
 	}
 
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}
@@ -595,7 +595,7 @@ void DrawMascPanel(CockpitPanel* p_panel)
 	}
 
 	p_panel->m_setName(p_panel, "MASC");
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}
@@ -622,7 +622,7 @@ void DrawHeatPanel(CockpitPanel* p_panel)
 		return;
 	}
 
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}
@@ -665,7 +665,7 @@ void DrawHeatRatePanel(CockpitPanel* p_panel)
 	}
 
 	p_panel->m_setName(p_panel, "dH/dT");
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}
@@ -696,7 +696,7 @@ void DrawJetsPanel(CockpitPanel* p_panel)
 	}
 
 	p_panel->m_setName(p_panel, "Jets");
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}

@@ -43,7 +43,7 @@ void DrawPausedBanner(void)
 {
 	void* shape;
 
-	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x5e, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x5e, g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		if (g_pausedBannerUnscaled) {
 			g_pausedBannerRect.m_window = &g_mainPixelBuffer;

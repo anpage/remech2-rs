@@ -51,8 +51,7 @@ void LayoutMessageBoxes(void)
 		shape = LoadCachedResource(
 			g_mw2PrjHandle,
 			overlay->m_background + g_artResolution,
-			g_resourceTypeTags[c_resTagShp],
-			0
+			g_resourceTypeTags[c_resTagShp]
 		);
 		if (shape != NULL) {
 			FitRectToShape(target, target, shape, 0);
@@ -74,8 +73,7 @@ void LayoutMessageBoxes(void)
 		MechCenterMessagePane(target);
 		ScalePointToFrame(target, &overlay->m_textPos, &overlay->m_textPos);
 
-		font =
-			LoadCachedResource(g_mw2PrjHandle, overlay->m_font + g_artResolution, g_resourceTypeTags[c_resTagFont], 0);
+		font = LoadCachedResource(g_mw2PrjHandle, overlay->m_font + g_artResolution, g_resourceTypeTags[c_resTagFont]);
 		if (font != NULL) {
 			height = target->m_y1 - target->m_y0 + 1;
 			fontHeight = VFX_font_height(font);
@@ -159,15 +157,13 @@ void DrawTimedOverlays(void)
 				font = LoadCachedResource(
 					g_mw2PrjHandle,
 					overlay->m_font + g_artResolution,
-					g_resourceTypeTags[c_resTagFont],
-					0
+					g_resourceTypeTags[c_resTagFont]
 				);
 				if (font != NULL) {
 					background = LoadCachedResource(
 						g_mw2PrjHandle,
 						overlay->m_background + g_artResolution,
-						g_resourceTypeTags[c_resTagShp],
-						0
+						g_resourceTypeTags[c_resTagShp]
 					);
 					if (background != NULL) {
 						VFX_shape_draw(overlay->m_target, background, 0, 0, 0);
@@ -205,10 +201,10 @@ void DrawTextBox(int32_t p_background, int32_t p_font, char* p_text, int32_t p_x
 
 	if (p_background != -1) {
 		background =
-			LoadCachedResource(g_mw2PrjHandle, p_background + g_artResolution, g_resourceTypeTags[c_resTagShp], 0);
+			LoadCachedResource(g_mw2PrjHandle, p_background + g_artResolution, g_resourceTypeTags[c_resTagShp]);
 	}
 
-	font = LoadCachedResource(g_mw2PrjHandle, p_font + g_artResolution, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, p_font + g_artResolution, g_resourceTypeTags[c_resTagFont]);
 	if (font != NULL) {
 		rect.m_window = &g_mainPixelBuffer;
 		FitRectToText(p_text, font, &rect);
@@ -249,7 +245,7 @@ void DrawTextResourceBox(int32_t p_background, int32_t p_font, int32_t p_id, int
 	char* c;
 	int32_t ch;
 
-	text = LoadCachedResource(g_mw2PrjHandle, p_id, g_resourceTypeTags[c_resTagText], 0);
+	text = LoadCachedResource(g_mw2PrjHandle, p_id, g_resourceTypeTags[c_resTagText]);
 	if (text != NULL) {
 		c = text;
 		while (*c != '\0') {

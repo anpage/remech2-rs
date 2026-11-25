@@ -114,7 +114,7 @@ BwdStream* OpenBwdStream(BwdStreamKey* p_key, BwdStream* p_stream)
 	if (!data && id != -1) {
 		p_stream->m_fromResource = 1;
 		p_stream->m_id = id;
-		data = LoadCachedResource(g_mw2PrjHandle, id, g_resourceTypeTags[c_resTagBwd], 1);
+		data = LoadCachedResource(g_mw2PrjHandle, id, g_resourceTypeTags[c_resTagBwd]);
 		if (!data) {
 			Error(0x2a, "%s ID %d", p_key->m_name, p_key->m_id, 0);
 		}

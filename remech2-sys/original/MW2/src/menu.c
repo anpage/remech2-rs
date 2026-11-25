@@ -184,8 +184,7 @@ void LayoutMenu(MenuDefinition* p_menu)
 		shape = LoadCachedResource(
 			g_mw2PrjHandle,
 			p_menu->m_backgroundId + g_artResolution,
-			g_resourceTypeTags[c_resTagShp],
-			0
+			g_resourceTypeTags[c_resTagShp]
 		);
 		if (shape) {
 			size = VFX_shape_bounds(shape, 0);
@@ -227,8 +226,7 @@ void LoadMenuResources(MenuDefinition* p_menu)
 		p_menu->m_background = LoadCachedResource(
 			g_mw2PrjHandle,
 			p_menu->m_backgroundId + g_artResolution,
-			g_resourceTypeTags[c_resTagShp],
-			0
+			g_resourceTypeTags[c_resTagShp]
 		);
 	}
 	else {
@@ -239,8 +237,7 @@ void LoadMenuResources(MenuDefinition* p_menu)
 		p_menu->m_cursorShape = LoadCachedResource(
 			g_mw2PrjHandle,
 			p_menu->m_cursorShapeId + g_artResolution,
-			g_resourceTypeTags[c_resTagShp],
-			0
+			g_resourceTypeTags[c_resTagShp]
 		);
 	}
 	else {
@@ -248,7 +245,7 @@ void LoadMenuResources(MenuDefinition* p_menu)
 	}
 
 	p_menu->m_font =
-		LoadCachedResource(g_mw2PrjHandle, p_menu->m_fontId + g_artResolution, g_resourceTypeTags[c_resTagFont], 0);
+		LoadCachedResource(g_mw2PrjHandle, p_menu->m_fontId + g_artResolution, g_resourceTypeTags[c_resTagFont]);
 }
 
 // Opens a menu on its root page. Menus with flag 1 take the controls, so this calls

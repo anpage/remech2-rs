@@ -1,7 +1,6 @@
 #include "bandpoly.h"
 
 #include "animation.h"
-#include "palette.h"
 #include "polydraw.h"
 #include "types.h"
 
@@ -136,16 +135,4 @@ int32_t DrawBand(uint32_t p_color, int32_t p_count, int32_t* p_points, int32_t p
 
 	DrawAnimatedPolygon(p_color, 4, quad[0], p_luma, 1, 0);
 	return dx;
-}
-
-int32_t DrawBandWithFlash(uint32_t p_unk0x00, int32_t p_unk0x04, uint32_t* p_unk0x08)
-{
-	int32_t result;
-
-	result = DrawBand(p_unk0x00, p_unk0x04, (int32_t*) p_unk0x08, 15, 0);
-	if (result > 60) {
-		StartPaletteFade(17, 181, 1);
-	}
-
-	return result;
 }

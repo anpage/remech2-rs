@@ -350,8 +350,8 @@ int32_t StartSpeech(SpeechEntry* p_entry)
 	}
 
 	if (suffix) {
-		if (LoadCachedResource(0, suffix, g_resourceTypeTags[c_resTagSnds], 0)) {
-			if (!LoadCachedResource(0, id, g_resourceTypeTags[c_resTagSnds], 0)) {
+		if (LoadCachedResource(0, suffix, g_resourceTypeTags[c_resTagSnds])) {
+			if (!LoadCachedResource(0, id, g_resourceTypeTags[c_resTagSnds])) {
 				UnlockCachedResource(suffix, g_resourceTypeTags[c_resTagSnds]);
 			}
 			else {

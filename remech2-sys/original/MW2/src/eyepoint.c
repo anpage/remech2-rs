@@ -610,14 +610,14 @@ void GetCockpitEyeView(int32_t* p_pitch, int32_t* p_heading, int32_t* p_roll, in
 // Switches to the drop view (mode 4): the camera starts level at the mech and falls, turning.
 void UpdateDropView(void)
 {
-	int32_t unk0x10;
-	int32_t unk0x0c;
-	int32_t unk0x14;
+	int32_t pitch;
+	int32_t heading;
+	int32_t roll;
 	int32_t x;
 	int32_t y;
 	int32_t z;
 
-	GetPlayerEyeView(&unk0x10, &unk0x0c, &unk0x14, &x, &y, &z);
+	GetPlayerEyeView(&pitch, &heading, &roll, &x, &y, &z);
 	if (g_viewMode != c_viewDrop) {
 		g_dropSpeed = 0;
 		g_eyepoint->m_pitch = 0x5a0000;

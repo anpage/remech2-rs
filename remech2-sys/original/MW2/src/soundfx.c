@@ -333,7 +333,7 @@ int32_t StartSample(int32_t p_id, void* p_data, uint16_t p_flags, int16_t p_slot
 		g_audioEngine->m_data[slot] = p_data;
 	}
 	else {
-		g_audioEngine->m_data[slot] = LoadCachedResource(0, p_id, g_resourceTypeTags[c_resTagSnds], 0);
+		g_audioEngine->m_data[slot] = LoadCachedResource(0, p_id, g_resourceTypeTags[c_resTagSnds]);
 		if (!g_audioEngine->m_data[slot]) {
 			return -6;
 		}
@@ -639,7 +639,7 @@ void UpdateAmbientSound(AmbientSound* p_sound)
 		}
 
 		if (!p_sound->m_data) {
-			p_sound->m_data = LoadCachedResource(0, p_sound->m_id, g_resourceTypeTags[c_resTagSnds], 0);
+			p_sound->m_data = LoadCachedResource(0, p_sound->m_id, g_resourceTypeTags[c_resTagSnds]);
 		}
 
 		if (!p_sound->m_data ||

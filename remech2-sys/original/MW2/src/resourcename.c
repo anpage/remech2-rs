@@ -29,7 +29,7 @@ int32_t FindResourceIdByName(int32_t p_table, char* p_name)
 	char name[12];
 
 	result = -1;
-	table = LoadCachedResource(g_mw2PrjHandle, p_table, g_resourceTypeTags[c_resTagTable], 1);
+	table = LoadCachedResource(g_mw2PrjHandle, p_table, g_resourceTypeTags[c_resTagTable]);
 	if (table) {
 		header = table;
 		entry = table + 0xc;
@@ -90,7 +90,7 @@ void* LoadResourceByRef(
 	}
 
 	if (id != -1) {
-		data = LoadCachedResource(g_mw2PrjHandle, id, p_type, 0);
+		data = LoadCachedResource(g_mw2PrjHandle, id, p_type);
 		*p_size = GetPrjResourceSize(g_mw2PrjHandle, p_type, id);
 		if (data) {
 			fromResource = true;

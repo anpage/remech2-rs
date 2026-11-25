@@ -244,12 +244,12 @@ void EnableTextureMaps(uint32_t p_flags, int32_t p_enable)
 }
 
 // The display detail setting: textures with perspective correction.
-int32_t ArePerspectiveTexturesOn(uint32_t p_unk0x00)
+int32_t ArePerspectiveTexturesOn(void)
 {
 	return !g_renderSettings.m_affineTextures;
 }
 
-void EnablePerspectiveTextures(uint32_t p_unk0x00, int32_t p_enable)
+void EnablePerspectiveTextures(int32_t p_enable)
 {
 	if (!p_enable) {
 		g_renderSettings.m_affineTextures = true;

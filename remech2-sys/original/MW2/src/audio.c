@@ -230,7 +230,7 @@ void StartMissionMusic(void)
 	if (!g_musicStarted) {
 		g_musicStarted = 1;
 		if (g_musicResource <= 0 ||
-			(music = LoadCachedResource(0, g_musicResource, g_resourceTypeTags[c_resTagMus], 0)) == NULL) {
+			(music = LoadCachedResource(0, g_musicResource, g_resourceTypeTags[c_resTagMus])) == NULL) {
 			return;
 		}
 

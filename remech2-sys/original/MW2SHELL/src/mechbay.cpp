@@ -31,15 +31,6 @@
 // The mech bay: the variant being edited, its engine, weapons and armor, and the fields that
 // show them.
 
-int32_t PlayVideo(
-	int32_t p_index,
-	const char* p_name,
-	uint32_t p_unk0x08,
-	uint32_t p_unk0x0c,
-	uint32_t p_unk0x10,
-	uint32_t p_unk0x14
-);
-
 Equipment g_equipment[23] = {
 	{5000, "MASC"},
 	{5050, "Targeting Computer"},

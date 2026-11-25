@@ -65,7 +65,7 @@ void DrawWeaponPanel(CockpitPanel* p_panel)
 		break;
 	}
 
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (font) {
 		g_textColors[0xe] = color;
 		if (weapon->m_ammo < 0) {
@@ -120,7 +120,7 @@ void DrawWeaponPanelStartup(CockpitPanel* p_panel)
 	}
 
 	clock = g_currentClock;
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}

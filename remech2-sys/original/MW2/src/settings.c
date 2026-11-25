@@ -97,7 +97,7 @@ int32_t GetSystemSetting(int32_t p_id)
 
 	switch (p_id) {
 	case 0xa6:
-		value = IsInfraredOn(0);
+		value = IsInfraredOn();
 		break;
 	case 0xa7:
 		if (g_renderSettings.m_wireframe == 1) {
@@ -129,7 +129,7 @@ void SetSystemSetting(int32_t p_id, int32_t p_value)
 {
 	switch (p_id) {
 	case 0xa6:
-		SetInfrared(0, p_value);
+		SetInfrared(p_value);
 		break;
 	case 0xa7:
 		if (p_value) {

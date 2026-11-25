@@ -71,7 +71,7 @@ void UpdateTimeOfDay(void)
 
 	phase = 3;
 	if (g_cockpitPanels[c_panelRadar]->m_damage >= 1 && g_infraredOn == 1) {
-		SetInfrared(0, 0);
+		SetInfrared(0);
 		g_infraredOn = 0;
 	}
 
@@ -126,12 +126,12 @@ void FadeToTimeOfDayPhase(int32_t p_phase)
 	}
 }
 
-int32_t IsInfraredOn(uint32_t p_unk0x00)
+int32_t IsInfraredOn(void)
 {
 	return g_infraredOn;
 }
 
-void SetInfrared(uint32_t p_unk0x00, int32_t p_state)
+void SetInfrared(int32_t p_state)
 {
 	if (g_infraredOn != p_state) {
 		if (p_state == 1) {

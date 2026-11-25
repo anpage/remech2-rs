@@ -50,14 +50,7 @@ extern "C"
 	void FreeMissionTables(void);
 	int32_t MapResourceId(int32_t p_id);
 	void SetMangleBase(int32_t p_base);
-	void CreateObjectNode(
-		struct BwdObjectRecord* p_record,
-		uint32_t p_unk0x04,
-		int32_t p_unk0x08,
-		int32_t p_static,
-		int32_t p_class,
-		int32_t p_level
-	);
+	void CreateObjectNode(struct BwdObjectRecord* p_record, int32_t p_static, int32_t p_class, int32_t p_level);
 	struct SceneObject* NextThingRecordObject(void);
 	int32_t FindFreeGameThing(void);
 

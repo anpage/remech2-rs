@@ -550,17 +550,10 @@ void SetMangleBase(int32_t p_base)
 // Creates the shape of a world stream's object record: a static object of the current block
 // (p_static), an entry of the class table (p_class, for level p_level), or else a shape of its own,
 // in the world or under its parent's object.
-void CreateObjectNode(
-	BwdObjectRecord* p_record,
-	uint32_t p_unk0x04,
-	int32_t p_unk0x08,
-	int32_t p_static,
-	int32_t p_class,
-	int32_t p_level
-)
+void CreateObjectNode(BwdObjectRecord* p_record, int32_t p_static, int32_t p_class, int32_t p_level)
 {
 	int32_t offset;
-	int32_t unk0x34;
+	int32_t shapeKind;
 	Xform xform;
 	int32_t parent;
 	int32_t fromResource;
@@ -594,7 +587,7 @@ void CreateObjectNode(
 	id = record->m_id;
 	parent = record->m_parent;
 	kind = record->m_kind;
-	unk0x34 = record->m_shapeKind;
+	shapeKind = record->m_shapeKind;
 	if (kind < 0 || kind >= 8) {
 		kind = 4;
 	}
@@ -602,7 +595,7 @@ void CreateObjectNode(
 	xform = record->m_xform;
 	flags = record->m_flags;
 	if (resource != -1) {
-		data = LoadCachedResource(g_mw2PrjHandle, resource, g_resourceTypeTags[c_resTagPoly], 0);
+		data = LoadCachedResource(g_mw2PrjHandle, resource, g_resourceTypeTags[c_resTagPoly]);
 		if (data) {
 			size = GetPrjResourceSize(g_mw2PrjHandle, g_resourceTypeTags[c_resTagPoly], resource);
 			fromResource = true;
@@ -628,7 +621,7 @@ void CreateObjectNode(
 			}
 
 			id = MapResourceId(id);
-			PlaceStaticObject(id, resource, xform, g_currentBlock, parentIndex, p_unk0x08, flags, kind, unk0x34);
+			PlaceStaticObject(id, resource, xform, g_currentBlock, parentIndex, flags, kind, shapeKind);
 			UnlockCachedResource(resource, g_resourceTypeTags[c_resTagPoly]);
 			return;
 		}
@@ -639,7 +632,7 @@ void CreateObjectNode(
 			parent = MapResourceId(parent);
 			parentIndex = FindThingIdxById(parent);
 			g_thingIndices[g_thingCount] =
-				AddClassEntryLevel(resource, xform.m_x, xform.m_y, xform.m_z, parentIndex, p_level, thing, unk0x34);
+				AddClassEntryLevel(resource, xform.m_x, xform.m_y, xform.m_z, parentIndex, p_level, thing, shapeKind);
 			g_thingCount++;
 			UnlockCachedResource(resource, g_resourceTypeTags[c_resTagPoly]);
 			return;
@@ -667,7 +660,7 @@ void CreateObjectNode(
 	SetShapeFlags(flags);
 	shape = LoadShapes(data, &offset, size, NULL);
 	if (shape) {
-		shape->m_kind = unk0x34;
+		shape->m_kind = shapeKind;
 		if (kind >= 0 && kind < 8) {
 			SetShapeCollisionType(shape, kind);
 		}

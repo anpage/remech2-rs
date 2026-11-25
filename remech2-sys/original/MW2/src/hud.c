@@ -241,7 +241,7 @@ void InitHudGauges(void)
 
 	target = g_cockpitPanels[c_panelAltimeter]->m_target;
 	ScalePointToFrame(target, &g_altimeterOrigin, &g_altimeterOrigin);
-	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		int32_t extent;
 
@@ -254,7 +254,7 @@ void InitHudGauges(void)
 	g_altimeterLevelX = g_altimeterOrigin.m_x;
 	g_altimeterGroundX = g_altimeterMarkWidth + g_altimeterLevelX;
 	g_altimeterTargetX = g_altimeterMarkWidth + g_altimeterGroundX;
-	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 7, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 7, g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		int32_t extent;
 
@@ -268,7 +268,7 @@ void InitHudGauges(void)
 
 	target = g_cockpitPanels[c_panelCompass]->m_target;
 	ScalePointToFrame(target, &g_compassOrigin, &g_compassOrigin);
-	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x19, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x19, g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		int32_t extent;
 
@@ -279,7 +279,7 @@ void InitHudGauges(void)
 		g_compassScale = (width << 16) / 0x168;
 	}
 
-	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x13, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x13, g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		int32_t extent;
 		int32_t origin;
@@ -293,7 +293,7 @@ void InitHudGauges(void)
 		UnlockCachedResource(extent + 0x13, g_resourceTypeTags[c_resTagShp]);
 	}
 
-	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x25, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x25, g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		int32_t extent;
 
@@ -303,7 +303,7 @@ void InitHudGauges(void)
 		UnlockCachedResource(extent + 0x25, g_resourceTypeTags[c_resTagShp]);
 	}
 
-	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x1f, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x1f, g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		int32_t extent;
 
@@ -753,7 +753,7 @@ void DrawHudShape(int32_t p_x, int32_t p_y, int32_t p_id)
 {
 	void* shape;
 
-	shape = LoadCachedResource(g_mw2PrjHandle, p_id + g_artResolution, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, p_id + g_artResolution, g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		VFX_shape_draw(&g_currentPane, shape, 0, p_x, p_y);
 		UnlockCachedResource(p_id + g_artResolution, g_resourceTypeTags[c_resTagShp]);
@@ -765,7 +765,7 @@ void DrawPaneShape(int32_t p_x, int32_t p_y, int32_t p_id, PANE* p_target)
 {
 	void* shape;
 
-	shape = LoadCachedResource(g_mw2PrjHandle, p_id + g_artResolution, g_resourceTypeTags[c_resTagShp], 0);
+	shape = LoadCachedResource(g_mw2PrjHandle, p_id + g_artResolution, g_resourceTypeTags[c_resTagShp]);
 	if (shape) {
 		VFX_shape_draw(p_target, shape, 0, p_x, p_y);
 		UnlockCachedResource(p_id + g_artResolution, g_resourceTypeTags[c_resTagShp]);

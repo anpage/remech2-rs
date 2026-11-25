@@ -62,7 +62,7 @@ int32_t IsGroundLevelToward(Player* p_player, int32_t p_x, int32_t p_y, int32_t 
 	int32_t level;
 	int32_t pitch;
 	uint32_t distance;
-	int32_t unk0x10;
+	int32_t length;
 	int32_t height;
 	int32_t i;
 	int32_t yaw;
@@ -76,7 +76,7 @@ int32_t IsGroundLevelToward(Player* p_player, int32_t p_x, int32_t p_y, int32_t 
 		p_player->m_position.m_y - p_y,
 		p_player->m_position.m_z - p_z,
 		&yaw,
-		&unk0x10,
+		&length,
 		&distance,
 		&pitch
 	);

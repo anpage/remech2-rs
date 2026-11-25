@@ -252,8 +252,8 @@ void UnlockCachedResource(int32_t p_id, const char* p_type)
 
 // Returns resource p_id of type p_type from project file p_file, locked in the cache: the cached
 // copy, or one read in, purging unlocked items while the cache is full or memory runs out. A
-// missing resource is logged to symlog.txt and reported. p_unk0x0c goes unused.
-void* LoadCachedResource(int32_t p_file, int32_t p_id, const char* p_type, uint32_t p_unk0x0c)
+// missing resource is logged and reported.
+void* LoadCachedResource(int32_t p_file, int32_t p_id, const char* p_type)
 {
 	ResourceCacheEntry* entry;
 	ResourceCacheEntry* item;

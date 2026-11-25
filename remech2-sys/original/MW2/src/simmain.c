@@ -320,7 +320,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 			NextClock();
 			UpdateInputs();
 			UpdateMenuKey();
-			HandleGameKeys(0, 0, 0);
+			HandleGameKeys(0);
 			RunTimedCallbacks(&g_detachedTasks);
 			if (!g_isNetworkGame || (g_goLaunch & 0x80000000)) {
 				UpdateAllPlayers();

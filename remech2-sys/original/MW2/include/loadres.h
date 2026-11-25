@@ -37,7 +37,7 @@ extern "C"
 	void FreeCacheEntry(ResourceCacheEntry* p_item);
 	void DumpResourceCache(void);
 	void UnlockCachedResource(int32_t p_id, const char* p_type);
-	void* LoadCachedResource(int32_t p_file, int32_t p_id, const char* p_type, uint32_t p_unk0x0c);
+	void* LoadCachedResource(int32_t p_file, int32_t p_id, const char* p_type);
 	void FreeCachedResource(int32_t p_id, const char* p_type);
 	int32_t PurgeOldestCacheEntry(void);
 	void* MemAlloc(uint32_t p_size);

@@ -19,8 +19,8 @@ extern "C"
 	void ToggleTextureMaps(uint32_t p_flags);
 	int32_t AreTextureMapsOn(uint32_t p_flags);
 	void EnableTextureMaps(uint32_t p_flags, int32_t p_enable);
-	int32_t ArePerspectiveTexturesOn(uint32_t p_unk0x00);
-	void EnablePerspectiveTextures(uint32_t p_unk0x00, int32_t p_enable);
+	int32_t ArePerspectiveTexturesOn(void);
+	void EnablePerspectiveTextures(int32_t p_enable);
 
 #ifdef __cplusplus
 }

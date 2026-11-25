@@ -72,8 +72,8 @@ extern "C"
 	int32_t CullSceneShape(struct Shape* p_shape);
 	int32_t CullShapeToFrustum(struct Shape* p_shape);
 	int32_t CullHiddenShape(struct Shape* p_shape);
-	int32_t IsLodQualityHigh(uint32_t p_unk0x00);
-	void SetLodQualityHigh(uint32_t p_unk0x00, int32_t p_enable);
+	int32_t IsLodQualityHigh(void);
+	void SetLodQualityHigh(int32_t p_enable);
 
 #ifdef __cplusplus
 }

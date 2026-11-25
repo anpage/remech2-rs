@@ -66,7 +66,6 @@ extern "C"
 		Xform p_xform,
 		int32_t p_block,
 		int32_t p_parent,
-		int32_t p_unk0x3c,
 		uint32_t p_flags,
 		uint32_t p_kind,
 		uint32_t p_shapeKind

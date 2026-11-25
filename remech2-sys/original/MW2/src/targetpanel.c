@@ -228,7 +228,7 @@ void DrawTargetPanelText(CockpitPanel* p_panel)
 		}
 	}
 
-	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont], 0);
+	font = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 	if (!font) {
 		return;
 	}
@@ -344,7 +344,7 @@ void DrawTargetPanel(CockpitPanel* p_panel)
 	heading = player->m_targetInfo.m_heading;
 	object = GetLocalTargetObject();
 	if (!object) {
-		noTarget = LoadCachedResource(g_mw2PrjHandle, 0x5b, g_resourceTypeTags[c_resTagShp], 0);
+		noTarget = LoadCachedResource(g_mw2PrjHandle, 0x5b, g_resourceTypeTags[c_resTagShp]);
 		if (noTarget) {
 			VFX_pane_wipe(p_panel->m_target, 0);
 			VFX_shape_draw(p_panel->m_target, noTarget, 0, 1, 1);
@@ -355,7 +355,7 @@ void DrawTargetPanel(CockpitPanel* p_panel)
 		return;
 	}
 	else if (!object->m_shape) {
-		noObject = LoadCachedResource(g_mw2PrjHandle, 0x58, g_resourceTypeTags[c_resTagShp], 0);
+		noObject = LoadCachedResource(g_mw2PrjHandle, 0x58, g_resourceTypeTags[c_resTagShp]);
 		if (noObject) {
 			VFX_pane_wipe(p_panel->m_target, 0);
 			VFX_shape_draw(p_panel->m_target, noObject, 0, 1, 1);

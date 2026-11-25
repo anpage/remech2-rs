@@ -121,13 +121,13 @@ void SetTerrainTextmaps(int32_t p_arg, int32_t p_terrainTextmaps)
 
 int32_t GetDisplayDetail(int32_t p_arg)
 {
-	return IsLodQualityHigh(p_arg) || ArePerspectiveTexturesOn(p_arg);
+	return IsLodQualityHigh() || ArePerspectiveTexturesOn();
 }
 
 void SetDisplayDetail(int32_t p_arg, int32_t p_displayDetail)
 {
-	SetLodQualityHigh(p_arg, p_displayDetail);
-	EnablePerspectiveTextures(p_arg, p_displayDetail);
+	SetLodQualityHigh(p_displayDetail);
+	EnablePerspectiveTextures(p_displayDetail);
 	g_mw2SndCfgData->m_displayDetail = p_displayDetail;
 }
 

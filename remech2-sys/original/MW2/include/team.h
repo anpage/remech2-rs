@@ -35,7 +35,7 @@ extern "C"
 	int32_t PlaceTeam(int32_t p_team, int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_heading);
 	int32_t GetTeamSlotPosition(uint32_t p_player, int32_t* p_x, int32_t* p_z, int32_t* p_heading);
 	int32_t GetTeamLeader(int32_t p_team);
-	int32_t AssignTeamSlots(int32_t p_team, int32_t p_unk0x04);
+	int32_t AssignTeamSlots(int32_t p_team);
 	int32_t GetPlayerSide(int32_t p_player);
 	int32_t GetThingSide(int32_t p_thing);
 	int32_t GetNavSide(uint32_t p_nav);

@@ -182,7 +182,7 @@ void* ProjectArchive::GetResource(int32_t p_id, char* p_tag)
 		return NULL;
 	}
 
-	return LoadCachedResource(m_handle, p_id, p_tag, 0);
+	return LoadCachedResource(m_handle, p_id, p_tag);
 }
 
 void* ProjectArchive::GetResourceByName(char* p_name, int32_t p_type, char* p_tag)
@@ -244,7 +244,7 @@ uint8_t ProjectArchive::LoadBwd(char* p_name)
 	case -2:
 		return false;
 	default:
-		m_bwd = (int32_t*) LoadCachedResource(m_handle, id, "BWD", 0);
+		m_bwd = (int32_t*) LoadCachedResource(m_handle, id, "BWD");
 		m_bwdSize = m_bwd[1];
 		if (m_bwd == NULL) {
 			return false;
