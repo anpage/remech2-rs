@@ -35,7 +35,6 @@
 
 // Sixteen directions around a mech, as (x, z) divisors of a length: BuildProbeRay's probe rays
 // and GetOffsetPoint's offsets.
-// GLOBAL: MW2 0x100a2900
 Point g_probeDirections[16] = {
 	{0, 1},
 	{2, 1},
@@ -57,7 +56,6 @@ Point g_probeDirections[16] = {
 
 // The maneuver tables: the maneuvers a mech chooses among and those that may follow each.
 
-// GLOBAL: MW2 0x100a2980
 ManeuverEntry g_mechManeuvers[13] = {
 	{{0, 6, 0, 1, 2, 3, 4, 4, 0}},
 	{{1, 5, 0, 1, 2, 3, 4, 0, 0}},
@@ -74,17 +72,13 @@ ManeuverEntry g_mechManeuvers[13] = {
 	{{0, 0, 0, 0, 0, 0, 0, 0, 0}},
 };
 
-// GLOBAL: MW2 0x100a2a70
 ManeuverEntry g_stupidManeuvers = {{0, 1, 0, 0, 0, 0, 0, 0, 0}};
 
-// GLOBAL: MW2 0x100a2a88
 ManeuverEntry g_circleManeuvers = {{12, 1, 12, 0, 0, 0, 0, 0, 0}};
 
-// GLOBAL: MW2 0x100a2aa0
 ManeuverEntry g_behindManeuvers = {{1, 1, 1, 0, 0, 0, 0, 0, 0}};
 
 // The table of a mech whose m_tons is 1 (ChooseManeuver).
-// GLOBAL: MW2 0x100a2ab8
 ManeuverEntry g_altMechManeuvers[13] = {
 	{{0, 7, 0, 1, 2, 3, 4, 4, 4}},
 	{{1, 6, 0, 1, 2, 3, 4, 4, 0}},
@@ -102,28 +96,22 @@ ManeuverEntry g_altMechManeuvers[13] = {
 };
 
 // Set once InitializeManeuvers has filled g_maneuverTables.
-// GLOBAL: MW2 0x100a2ba4
 MechS32 g_maneuverTablesReady = 0;
 
 // Set from the world stream's planet record when positive: the jump jets' drag divisor, and the
 // ground slope (16.16) past which a mech on it slides.
 
-// GLOBAL: MW2 0x100a2bdc
 MechS32 g_jumpJetDrag = 100000;
 
-// GLOBAL: MW2 0x100a2be0
 MechS32 g_slideSlope = 0x2000;
 
 // The maneuver table of each player type (m_type, 1 to 8), and in entry 8 the alternative to the
 // first.
-// GLOBAL: MW2 0x101748e0
 ManeuverTable g_maneuverTables[9];
 
 // Runs p_player's current maneuver (m_maneuver) against p_target for a tick, and ends it when it
 // is done, when another is asked for (m_nextManeuver: out of ammunition, the mech jumps in or
 // runs at the target, or flees) or when its time is up; with no maneuver, chooses and starts one.
-// Stack-slot permutation: done, mech and leader.
-// FUNCTION: MW2 0x10013430
 void RunManeuver(Player* p_player, MechU16 p_target)
 {
 	MechS32 done;
@@ -274,7 +262,6 @@ void RunManeuver(Player* p_player, MechU16 p_target)
 
 // Resets p_player's maneuver state and sets the maneuvers its piloting (1 to 4) allows, and fills
 // the maneuver tables the first time.
-// FUNCTION: MW2 0x100139e9
 void InitializeManeuvers(Player* p_player)
 {
 	MechS16 i;
@@ -375,8 +362,6 @@ void InitializeManeuvers(Player* p_player)
 // Picks p_player's next maneuver: one an order asked for, an AI player's escape, attack or chase
 // when it applies, or else one its maneuver table lets follow the previous one (any one at
 // first), redrawn until its conditions hold.
-// Stack-slot permutation: mech, table, choice and index.
-// FUNCTION: MW2 0x10013d81
 MechS32 ChooseManeuver(Player* p_player)
 {
 	Mech* mech;
@@ -472,8 +457,6 @@ MechS32 ChooseManeuver(Player* p_player)
 }
 
 // Returns the index of maneuver p_id in p_table, or -1.
-// The original loads the index before m_entries (index order).
-// FUNCTION: MW2 0x100140e4
 MechS16 FindManeuver(ManeuverTable* p_table, MechS16 p_id)
 {
 	MechS16 i;
@@ -489,7 +472,6 @@ MechS16 FindManeuver(ManeuverTable* p_table, MechS16 p_id)
 
 // Starts p_player's maneuver (m_maneuver): resets its state and sets it up, with the time it
 // ends (m_maneuverEnd).
-// FUNCTION: MW2 0x10014149
 void StartManeuver(Player* p_player)
 {
 	p_player->m_ai.m_goal = p_player->m_ai.m_target;
@@ -575,7 +557,6 @@ void StartManeuver(Player* p_player)
 
 // Ends p_player's maneuver (m_maneuver): undoes what it set up, records it as the previous one
 // and makes the goal the target again.
-// FUNCTION: MW2 0x1001450e
 void EndManeuver(Player* p_player)
 {
 	switch (p_player->m_maneuver) {
@@ -629,8 +610,6 @@ void EndManeuver(Player* p_player)
 }
 
 // Places a nav point for p_player where GetOffsetPoint puts it, and makes it the player's target.
-// The only diff is a stack-slot permutation of x, y, z and nav.
-// FUNCTION: MW2 0x10014723
 void PlaceOffsetNav(Player* p_player, MechU32 p_target, MechS16 p_direction, MechS16 p_distance)
 {
 	MechS32 z;
@@ -650,9 +629,7 @@ void PlaceOffsetNav(Player* p_player, MechU32 p_target, MechS16 p_direction, Mec
 // Finds the point p_distance units out in direction p_direction (of g_probeDirections's 16) from
 // target p_target, a player (0x200) or a game thing (0x400), in world coordinates; for a player
 // *p_y takes its heading. A game thing without an object is offset from its position.
-// The empty else arms give the original's jmp to the next statement after each offset. The only
-// other diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100147d0
+// The empty else arms give the original's jmp to the next statement after each offset.
 void GetOffsetPoint(MechU32 p_target, MechS16 p_direction, MechS32* p_x, MechS32* p_z, MechS32* p_y, MechS16 p_distance)
 {
 	MechU32 index;
@@ -713,7 +690,6 @@ void GetOffsetPoint(MechU32 p_target, MechS16 p_direction, MechS32* p_x, MechS32
 
 // Whether p_turn (16.16 degrees) is a sharp turn, past 5 degrees either way; a stopped player
 // then creeps forward.
-// FUNCTION: MW2 0x1001498c
 MechS32 IsSharpTurn(Player* p_player, MechS32 p_turn)
 {
 	MechS32 sharp;
@@ -730,7 +706,6 @@ MechS32 IsSharpTurn(Player* p_player, MechS32 p_turn)
 }
 
 // Steers p_player at p_target and closes to 15000, asking for c_maneuverAvoid within 4500.
-// FUNCTION: MW2 0x100149e7
 void ManeuverStupid(Player* p_player, MechS16 p_target)
 {
 	MechS32 range;
@@ -757,7 +732,6 @@ void ManeuverStupid(Player* p_player, MechS16 p_target)
 
 // Turns p_player toward its goal and closes on its target; once stopped and turned more than 5
 // degrees away, turns in place (IsSharpTurn) until the target is more than 4500 away.
-// FUNCTION: MW2 0x10014aa8
 void ManeuverBehind(Player* p_player, MechS16 p_target)
 {
 	MechS32 heading;
@@ -803,8 +777,6 @@ void ManeuverBehind(Player* p_player, MechS16 p_target)
 
 // Closes on p_target. Whether it is within 8000, or more when closing fast (GetClosingRate, per
 // 500000).
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10014c3d
 MechS32 ManeuverAchick(Player* p_player, MechS16 p_target)
 {
 	MechDouble scale;
@@ -837,7 +809,6 @@ MechS32 ManeuverAchick(Player* p_player, MechS16 p_target)
 
 // Runs at p_target, even when the shape AvoidObstacles steers around is the target's own, and
 // self-destructs within 2000 of it. Whether it did.
-// FUNCTION: MW2 0x10014d4e
 MechS32 ManeuverKama(Player* p_player, MechS16 p_target)
 {
 	MechS32 result;
@@ -858,8 +829,6 @@ MechS32 ManeuverKama(Player* p_player, MechS16 p_target)
 }
 
 // Backs p_player away from p_target at full throttle, facing it. Whether its mech collides.
-// The only diff is a stack-slot permutation of heading and result.
-// FUNCTION: MW2 0x10014df1
 MechS32 ManeuverWbackp(Player* p_player, MechS16 p_target)
 {
 	MechS32 heading;
@@ -875,7 +844,6 @@ MechS32 ManeuverWbackp(Player* p_player, MechS16 p_target)
 }
 
 // Turns p_player toward its goal and closes on its target. Whether it is within 3000.
-// FUNCTION: MW2 0x10014e5e
 MechS32 ManeuverWchick(Player* p_player, MechS16 p_target)
 {
 	MechS32 heading;
@@ -895,8 +863,6 @@ MechS32 ManeuverWchick(Player* p_player, MechS16 p_target)
 
 // Turns p_player toward p_target and runs an attack in three steps (m_maneuverParam): steer at it
 // while it can fire and has a line to it, then for a second, then BrakeFall. Whether that ended.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10014f23
 MechS32 ManeuverWpeek(Player* p_player, MechS16 p_target)
 {
 	MechS32 heading;
@@ -943,7 +909,6 @@ MechS32 ManeuverWpeek(Player* p_player, MechS16 p_target)
 }
 
 // Turns p_player toward p_target. Whether the player is at least 2000 above it.
-// FUNCTION: MW2 0x100150c1
 MechS32 ManeuverAjmpin(Player* p_player, MechS16 p_target)
 {
 	MechS32 heading;
@@ -960,7 +925,6 @@ MechS32 ManeuverAjmpin(Player* p_player, MechS16 p_target)
 }
 
 // Turns p_player toward p_target.
-// FUNCTION: MW2 0x1001512e
 MechS32 ManeuverSprint(Player* p_player, MechS16 p_target)
 {
 	MechS32 heading;
@@ -975,8 +939,6 @@ MechS32 ManeuverSprint(Player* p_player, MechS16 p_target)
 // forward or backward by how fast it closes; closer in, it cuts them, counting the ticks it was
 // still jumping (m_maneuverParam; it stops at 2). Whether it is done: on the ground, colliding, or unable to
 // jump on.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10015172
 MechS32 ManeuverAdfa(Player* p_player, MechS16 p_target)
 {
 	MechS32 rate;
@@ -1039,7 +1001,6 @@ MechS32 ManeuverAdfa(Player* p_player, MechS16 p_target)
 
 // Drives p_player at full throttle (backwards while StartManeuver set m_reverse), steering
 // towards p_target.
-// FUNCTION: MW2 0x10015342
 void ManeuverAvoid(Player* p_player, MechS16 p_target)
 {
 	MechS32 heading;
@@ -1065,8 +1026,6 @@ void ManeuverAvoid(Player* p_player, MechS16 p_target)
 // Turns p_player toward its goal and closes on its target, giving up the goal (ReleaseNavPoints,
 // PlacePatrolNavs) now and then while far from the target, and handing the target to AdvanceNavTarget
 // within 3000.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100153e6
 MechS32 ManeuverCircle(Player* p_player, MechS16 p_target)
 {
 	MechS32 heading;
@@ -1101,8 +1060,6 @@ MechS32 ManeuverCircle(Player* p_player, MechS16 p_target)
 
 // Whether p_player, targeting a player it has no clear line to, is more than 800 below it, with
 // jump jets (its jump fuel not negative).
-// The only diff is a stack-slot permutation of index and below.
-// FUNCTION: MW2 0x10015520
 MechS32 IsBelowHiddenTarget(Player* p_player)
 {
 	MechS16 index;
@@ -1132,8 +1089,6 @@ MechS32 IsBelowHiddenTarget(Player* p_player)
 // Near the ground, fires the player's jump jets while its mech falls faster than 85% of the fall
 // damage speed and clears it once it is slower than 75%, and logs a fall faster than that speed.
 // Returns whether the player is on the ground.
-// Stack-slot permutation: line, value and mech.
-// FUNCTION: MW2 0x100155e1
 MechS32 BrakeFall(Player* p_player)
 {
 	MechChar line[80];
@@ -1171,7 +1126,6 @@ MechS32 BrakeFall(Player* p_player)
 }
 
 // Fires (p_value set) or cuts p_player's jump jets.
-// FUNCTION: MW2 0x100156f2
 void SetJumpJets(Player* p_player, MechS8 p_value)
 {
 	p_player->m_steering->m_jumpJetEnabled = p_value;
@@ -1181,8 +1135,6 @@ void SetJumpJets(Player* p_player, MechS8 p_value)
 // the avoiding side m_avoidSide, as long as the mech's speed (m_probeScale), and turns away from what
 // they hit, slowing down if the first one hits. Returns whether it steered. Between checks (every
 // 10 ticks for the local player, 90 or 181 for others) it returns whether it is avoiding a shape.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10015709
 MechS32 AvoidObstacles(Player* p_player)
 {
 	MechS32 length;
@@ -1305,7 +1257,6 @@ MechS32 AvoidObstacles(Player* p_player)
 }
 
 // Whether p_shape is solid ground to stand on: a flat enough face or a shape of type 0x50.
-// FUNCTION: MW2 0x10015b40
 MechS32 IsStandableShape(Shape* p_shape)
 {
 	if (HasHeightTest(p_shape) && g_segmentNormalY >= 0xc41b) {
@@ -1317,8 +1268,6 @@ MechS32 IsStandableShape(Shape* p_shape)
 
 // Builds a probe ray for p_player in p_ray: p_length along direction p_step (mirrored for a
 // negative p_side) in the mech's frame, from its position or, with p_fromEdge, from its side.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10015b9f
 void BuildProbeRay(Player* p_player, Ray* p_ray, MechS32 p_side, MechS16 p_step, MechS32 p_length, MechS32 p_fromEdge)
 {
 	Matrix* matrix;
@@ -1366,8 +1315,6 @@ void BuildProbeRay(Player* p_player, Ray* p_ray, MechS32 p_side, MechS16 p_step,
 }
 
 // Which side of p_player the point (p_x, p_y, p_z) is, seen from p_shape: 1 or -1.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10015d2a
 MechS16 GetAvoidSide(Player* p_player, Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 dz;
@@ -1394,7 +1341,6 @@ MechS16 GetAvoidSide(Player* p_player, Shape* p_shape, MechS32 p_x, MechS32 p_y,
 }
 
 // The heading from p_player to p_target (16.16 degrees, 0 to 360), keeping its target.
-// FUNCTION: MW2 0x10015dd6
 MechS32 GetHeadingTo(Player* p_player, MechS16 p_target)
 {
 	MechS32 target;
@@ -1408,7 +1354,6 @@ MechS32 GetHeadingTo(Player* p_player, MechS16 p_target)
 }
 
 // Clamps p_value to +/- p_limit.
-// FUNCTION: MW2 0x10015e34
 MechS32 ClampMagnitude(MechS32 p_value, MechS32 p_limit)
 {
 	if (p_value > p_limit) {
@@ -1422,8 +1367,6 @@ MechS32 ClampMagnitude(MechS32 p_value, MechS32 p_limit)
 }
 
 // Whether the segment from p_player at height p_y to its target is clear, or hits the target.
-// The only diff is a stack-slot permutation of ray, hit, target and flags.
-// FUNCTION: MW2 0x10015e74
 MechS32 HasLineToTarget(Player* p_player, MechS32 p_y)
 {
 	Ray ray;
@@ -1460,8 +1403,6 @@ MechS32 HasLineToTarget(Player* p_player, MechS32 p_y)
 }
 
 // Whether p_mech has weapons but none left that can fire: every one is out of ammunition.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10015fa8
 MechS32 IsOutOfAmmo(Mech* p_mech)
 {
 	MechS16 i;
@@ -1481,7 +1422,6 @@ MechS32 IsOutOfAmmo(Mech* p_mech)
 }
 
 // Fires p_player's jump jets forward (p_value set) or backward.
-// FUNCTION: MW2 0x10016057
 void SetJumpDirection(Player* p_player, MechS16 p_value)
 {
 	p_player->m_steering->m_jumpJetFireForward = p_value;
@@ -1494,7 +1434,6 @@ void SetJumpDirection(Player* p_player, MechS16 p_value)
 }
 
 // How fast p_player closes on its target since the last call, per tick.
-// FUNCTION: MW2 0x10016093
 MechS32 GetClosingRate(Player* p_player)
 {
 	MechS32 rate;
@@ -1511,7 +1450,6 @@ MechS32 GetClosingRate(Player* p_player)
 // Fires p_player's jump jets to turn faster in the air while its target is outside the torso's
 // twist, and stops them once it is inside, unless the maneuver works them itself. Only with the
 // piloting skill for it, and not while avoiding.
-// FUNCTION: MW2 0x100160eb
 void JumpToTurn(Player* p_player)
 {
 	MechS32 turn;
@@ -1536,7 +1474,6 @@ void JumpToTurn(Player* p_player)
 
 // Whether p_player's mech can jump: jump fuel left (at least 6), jump jets that lift it and its
 // heat (16.16) under p_limit.
-// FUNCTION: MW2 0x10016222
 MechS32 CanJump(Player* p_player, MechS32 p_limit)
 {
 	Mech* mech;
@@ -1546,8 +1483,6 @@ MechS32 CanJump(Player* p_player, MechS32 p_limit)
 }
 
 // The shape of the player or game thing an AI target id names, or NULL.
-// The only diff is a stack-slot permutation of index, id and obj.
-// FUNCTION: MW2 0x1001627f
 Shape* GetTargetShape(MechS16 p_target)
 {
 	MechS16 index;
@@ -1573,8 +1508,6 @@ Shape* GetTargetShape(MechS16 p_target)
 // AI player that sees the shot coming (a guided weapon or type 21, and the target inside its
 // sights within 3 units and 15 degrees) sidesteps along a clear path (state 11), or else braces
 // (state 4).
-// Stack-slot permutation; pitch < range and bearing < maxAngle compare in the other operand order.
-// FUNCTION: MW2 0x1001632c
 void DodgeShot(WeaponSlot* p_slot, Mech* p_mech)
 {
 	MechS32 maxAngle;
@@ -1675,8 +1608,6 @@ void DodgeShot(WeaponSlot* p_slot, Mech* p_mech)
 // Picks p_player's place around its goal player (eight places, 45 degrees apart): the one it is
 // nearest, moved off the front and back, or else the first free one on its side. Returns twice
 // the place.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100166b1
 MechS16 ChooseFlankPlace(Player* p_player)
 {
 	MechS32 angle;
@@ -1747,7 +1678,6 @@ MechS16 ChooseFlankPlace(Player* p_player)
 }
 
 // Whether p_mech is stuck: colliding, not reversing, and not in a maneuver that jumps or avoids.
-// FUNCTION: MW2 0x10016880
 MechS32 IsStuck(Mech* p_mech)
 {
 	return p_mech->m_collisionTicks && p_mech->m_player->m_steering->m_reverse != 1 &&

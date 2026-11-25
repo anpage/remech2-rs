@@ -29,80 +29,58 @@
 #include "weapons.h"
 
 // The size of the altimeter's mark shape (InitHudGauges), which spaces its columns.
-// GLOBAL: MW2 0x100a5ed0
 MechS32 g_altimeterMarkWidth = 0xf0f;
 
-// GLOBAL: MW2 0x100a5ed4
 MechS32 g_altimeterMarkHeight = 0xd79;
 
 // The altimeter's place, in 16.16 fractions of its gauge until InitHudGauges scales it.
-// GLOBAL: MW2 0x100a5ed8
 Point g_altimeterOrigin = {0xb333, 0x8000};
 
 // The compass's place, likewise.
-// GLOBAL: MW2 0x100a5ee0
 Point g_compassOrigin = {0x8000, 0x6666};
 
-// GLOBAL: MW2 0x100a5ee8
 Point g_hudGaugePositions[6] = {{0x73, 0x10}, {8, 0x4a}, {4, 0x28}, {4, 0x4a}, {0, 0}, {0, 0}};
 
 // The HUD's display options: the HUD itself, the crosshair, the target marker, the compass and
 // the altimeter.
-// GLOBAL: MW2 0x100a5f18
 undefined4 g_showHud = 1;
 
-// GLOBAL: MW2 0x100a5f1c
 MechS32 g_showCrosshair = 1;
 
-// GLOBAL: MW2 0x100a5f20
 MechS32 g_showTargetMarker = 1;
 
-// GLOBAL: MW2 0x100a5f24
 MechS32 g_showCompass = 1;
 
-// GLOBAL: MW2 0x100a5f2c
 MechS32 g_showAltimeter = 1;
 
 // The layout of the altimeter and the compass, from their shapes' extents (InitHudGauges).
 
-// GLOBAL: MW2 0x100be5a0
 MechS32 g_compassArrowWidth;
 
-// GLOBAL: MW2 0x100be5a4
 MechS32 g_compassArrowHeight;
 
-// GLOBAL: MW2 0x100be5a8
 MechS32 g_compassSideArrowWidth;
 
-// GLOBAL: MW2 0x100be5ac
 MechS32 g_compassSideArrowHeight;
 
-// GLOBAL: MW2 0x100be5b0
 MechS32 g_altimeterGroundX;
 
-// GLOBAL: MW2 0x100be5b4
 MechS32 g_altimeterTargetX;
 
 // The altimeter's scale: pixels per 16.16 unit of height.
-// GLOBAL: MW2 0x100be5b8
 MechS32 g_altimeterScale;
 
 // The compass's scale: pixels per degree, 16.16.
-// GLOBAL: MW2 0x100be5bc
 MechS32 g_compassScale;
 
-// GLOBAL: MW2 0x100be5c0
 MechS32 g_compassTapeAbove;
 
-// GLOBAL: MW2 0x100be5c4
 MechS32 g_altimeterLevelX;
 
-// GLOBAL: MW2 0x100be5c8
 MechS32 g_compassTapeBelow;
 
 // Draws the HUD's overlays the display options enable: the compass and its target markers, the
 // crosshair, the target marker and the altimeter, at the gauge positions.
-// FUNCTION: MW2 0x10040b30
 void DrawHudAt(
 	Mech* p_mech,
 	MechS32 p_heading,
@@ -144,7 +122,6 @@ void DrawHudAt(
 
 // DrawHudAt with the overlays at their default places, and the crosshair only with
 // p_drawCrosshair (the view is the cockpit's).
-// FUNCTION: MW2 0x10040bfd
 void DrawHud(
 	Mech* p_mech,
 	MechS32 p_heading,
@@ -180,8 +157,6 @@ void DrawHud(
 
 // Draws the altimeter: the mech's height, the height of m_player's mark (Player::m_unk0x74) and
 // the height of the target, clamped to the gauge. p_x and p_y go unused.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10040cbc
 void DrawAltimeter(Mech* p_mech, MechS32 p_x, MechS32 p_y)
 {
 	CockpitPanel* gauge;
@@ -258,8 +233,6 @@ void DrawAltimeter(Mech* p_mech, MechS32 p_x, MechS32 p_y)
 
 // Lays out the altimeter and the compass from their shapes' extents. Each shape is released by
 // its extent plus its id, not by the id it was loaded with.
-// Stack-slot permutation; the second g_altimeterMarkWidth sum loads its operands in the other order.
-// FUNCTION: MW2 0x10040f91
 void InitHudGauges(void)
 {
 	void* shape;
@@ -343,7 +316,6 @@ void InitHudGauges(void)
 }
 
 // Returns the HUD gauges' positions (the compass's, then the altimeter's).
-// FUNCTION: MW2 0x100412c8
 Point* GetHudGaugePositions(void)
 {
 	return g_hudGaugePositions;
@@ -353,8 +325,6 @@ Point* GetHudGaugePositions(void)
 // target, the locked shape when the target is in range and within 3 units and 3 degrees of the
 // aim (returns TRUE then); otherwise the lock or guided-state shapes, or 0x67 without a ready
 // weapon.
-// Stack-slot permutation; range > p_pitch compares in the other operand order.
-// FUNCTION: MW2 0x100412dd
 MechS32 DrawCrosshair(Mech* p_mech, MechS32 p_bearing, MechS32 p_pitch, MechS32 p_distance)
 {
 	MechS32 x;
@@ -420,8 +390,6 @@ MechS32 DrawCrosshair(Mech* p_mech, MechS32 p_bearing, MechS32 p_pitch, MechS32 
 // Marks the player's target on the screen: a player's or a game thing's mech with its side's
 // markers (DrawPlayerBrackets, DrawObjectBrackets), a nav with shape 0xe5, or 0xeb at the edge when it is
 // off the screen.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100414ab
 void DrawTargetMarker(Mech* p_mech)
 {
 	MechS32 index;
@@ -474,8 +442,6 @@ void DrawTargetMarker(Mech* p_mech)
 // Draws the compass's target markers: the target's bearing p_bearing from the heading (from the
 // torso, p_twistBearing, unless the target is a nav point), and the arrows above and below while
 // its pitch p_pitch is beyond 3 degrees. p_x and p_y go unused.
-// Stack-slot permutation; the two y sums load g_compassOrigin.m_y first (commutative operands).
-// FUNCTION: MW2 0x1004161f
 void DrawCompassMarkers(
 	Mech* p_mech,
 	MechS32 p_x,
@@ -554,8 +520,6 @@ void DrawCompassMarkers(
 
 // Draws the compass tape at heading p_heading (degrees), twice to wrap around, and the torso twist
 // p_twist as a bar from the center. p_x and p_y go unused.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1004183a
 void DrawCompass(MechS32 p_x, MechS32 p_y, MechS32 p_heading, MechS32 p_twist)
 {
 	CockpitPanel* gauge;
@@ -607,8 +571,6 @@ void DrawCompass(MechS32 p_x, MechS32 p_y, MechS32 p_heading, MechS32 p_twist)
 
 // Projects the end of the mech's player's aim ray to the screen: returns ProjectWorldPoint's result,
 // and the point in p_x and p_y.
-// Stack-slot permutation: result, ray, x, y and z.
-// FUNCTION: MW2 0x10041998
 MechS32 ProjectAimPoint(Mech* p_mech, MechS32* p_x, MechS32* p_y)
 {
 	MechS32 result;
@@ -630,8 +592,6 @@ MechS32 ProjectAimPoint(Mech* p_mech, MechS32* p_x, MechS32* p_y)
 
 // Marks player p_player on the screen: brackets at the corners of its mech, sized by its radius
 // and depth, in its side's shapes; off the screen, an arrow at the edge.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10041a14
 void DrawPlayerBrackets(Player* p_player, MechS32 p_side)
 {
 	MechS32 topLeft;
@@ -708,8 +668,6 @@ void DrawPlayerBrackets(Player* p_player, MechS32 p_side)
 
 // Marks the object p_object on the screen like DrawPlayerBrackets a player: brackets around its shape,
 // at most half the screen apart, or an arrow at the edge.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10041c3c
 void DrawObjectBrackets(struct SceneObject* p_object, MechS32 p_side)
 {
 	MechS32 maxSize;
@@ -792,7 +750,6 @@ void DrawObjectBrackets(struct SceneObject* p_object, MechS32 p_side)
 
 // Draws frame 0 of the "SHP" resource p_id (relative to g_artResolution) at p_x, p_y of the
 // current pane.
-// FUNCTION: MW2 0x10041e98
 void DrawHudShape(MechS32 p_x, MechS32 p_y, MechS32 p_id)
 {
 	void* shape;
@@ -805,8 +762,6 @@ void DrawHudShape(MechS32 p_x, MechS32 p_y, MechS32 p_id)
 }
 
 // Draws frame 0 of the "SHP" resource p_id (relative to g_artResolution) at p_x, p_y.
-// Operand order: p_id + g_artResolution loads p_id first in the original.
-// FUNCTION: MW2 0x10041f06
 void DrawPaneShape(MechS32 p_x, MechS32 p_y, MechS32 p_id, PANE* p_target)
 {
 	void* shape;
@@ -819,7 +774,6 @@ void DrawPaneShape(MechS32 p_x, MechS32 p_y, MechS32 p_id, PANE* p_target)
 }
 
 // Draws DrawHudShape's shape at p_x, p_y of pane p_target.
-// FUNCTION: MW2 0x10041f73
 void DrawShapeOverPane(MechS32 p_x, MechS32 p_y, MechS32 p_id, PANE* p_target)
 {
 	DrawHudShape(p_target->m_x0 + p_x, p_target->m_y0 + p_y, p_id);

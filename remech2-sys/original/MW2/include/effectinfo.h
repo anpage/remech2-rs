@@ -5,7 +5,6 @@
 #include "types.h"
 
 // The properties of an effect type (g_effectInfo).
-// SIZE 0x1c
 typedef struct EffectInfo {
 	MechS32 m_duration;    // 0x00 — ticks
 	MechS32 m_flash;       // 0x04 — a palette flash (StartPaletteFlash) when the camera follows, or -1

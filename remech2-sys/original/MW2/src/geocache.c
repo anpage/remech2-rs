@@ -36,107 +36,74 @@
 #include <stdlib.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(GeoClass, 0x08)
-DECOMP_SIZE_ASSERT(StaticObject, 0x7c)
-DECOMP_SIZE_ASSERT(StaticBlock, 0x7c)
-DECOMP_SIZE_ASSERT(Xform, 0x24)
-
 // Two maps from world stream IDs to indices: the game things' (FindThingIdxById, filled by
 // CreateObjectNode), and the stars', the static objects' (FindStarIdxById, AllocStaticObject).
 // Their sizes come from the static memory table (AllocGeoTables).
-// GLOBAL: MW2 0x100a3850
 MechS32* g_thingIndices = NULL;
 
-// GLOBAL: MW2 0x100a3854
 MechS32* g_thingIds = NULL;
 
 // Set inside a world stream's repeated section (REPR to ENDR); g_repeatPass counts its passes.
-// GLOBAL: MW2 0x100a3858
 MechS32 g_inRepeat = 0;
 
-// GLOBAL: MW2 0x100a385c
 MechS32 g_repeatPass = 0;
 
-// GLOBAL: MW2 0x100a3860
 MechS32* g_starIndices = NULL;
 
-// GLOBAL: MW2 0x100a3864
 MechS32* g_starIds = NULL;
 
-// GLOBAL: MW2 0x100a3868
 MechS32 g_classCount = 0;
 
-// GLOBAL: MW2 0x100a386c
 MechS32 g_classCapacity = 0;
 
-// GLOBAL: MW2 0x100a3870
 GeoClass* g_classes = NULL;
 
-// GLOBAL: MW2 0x100a3874
 MechS32 g_staticObjectCount = 0;
 
-// GLOBAL: MW2 0x100a3878
 undefined4 g_staticCacheReady = 0;
 
 // The block BeginBlock opens next.
-// GLOBAL: MW2 0x100a387c
 MechS32 g_nextBlock = 0;
 
 // The block BeginBlock opened last, -1: none.
-// GLOBAL: MW2 0x100a3880
 MechS32 g_currentBlock = -1;
 
-// GLOBAL: MW2 0x100a3884
 MechS32 g_blockDepth = 0;
 
 // The transform the next block opens with (ApplyBlockXform).
-// GLOBAL: MW2 0x100a3888
 Xform g_pendingXform = {1, 1, 1, 0, 0, 0, 0, 0, 0};
 
 // The transform BeginBlock resets g_pendingXform to.
-// GLOBAL: MW2 0x100a38b0
 Xform g_defaultXform = {1, 1, 1, 0, 0, 0, 0, 0, 0};
 
-// GLOBAL: MW2 0x100a38d4
 MechS32 g_explosionChunks = 1;
 
-// GLOBAL: MW2 0x1010b6b0
 StaticBlock g_staticBlocks[32];
 
-// GLOBAL: MW2 0x1010c630
 StaticObject g_staticObjects[0x402];
 
-// GLOBAL: MW2 0x1012b7b4
 MechS32 g_starCapacity;
 
-// GLOBAL: MW2 0x1012b7b0
 MechS32 g_thingCount;
 
 // The blocks BeginBlock opened.
-// GLOBAL: MW2 0x1012b730
 MechS32 g_blockStack[32];
 
 // Set when PropagateStaticObjectStates changed an entry; UpdateGeoCache propagates again.
-// GLOBAL: MW2 0x1010b610
 MechS32 g_staticObjectsChanged;
 
 // The shapes ToggleBlockBoxes shows for the blocks' boxes.
-// GLOBAL: MW2 0x1010b620
 Shape* g_blockBoxes[32];
 
-// GLOBAL: MW2 0x1010b6a0
 MechS32 g_thingCapacity;
 
 // Whether ToggleBlockBoxes shows the blocks' boxes.
-// GLOBAL: MW2 0x1010b6a4
 MechS32 g_blockBoxesShown;
 
-// GLOBAL: MW2 0x1010b6a8
 MechS32 g_starCount;
 
 // Allocates the class, thing and star tables to the sizes in the mission's static memory table.
 // Returns whether it could.
-// FUNCTION: MW2 0x1001f3e0
 MechS32 AllocGeoTables(void)
 {
 	MechU32 size;
@@ -177,7 +144,6 @@ MechS32 AllocGeoTables(void)
 }
 
 // Adds a class to the class table. Returns whether there was room.
-// FUNCTION: MW2 0x1001f504
 MechS32 AddClass(MechS32 p_id, Shape* p_class)
 {
 	MechS32 result;
@@ -194,7 +160,6 @@ MechS32 AddClass(MechS32 p_id, Shape* p_class)
 }
 
 // Returns the class of an ID (the last one added), or NULL.
-// FUNCTION: MW2 0x1001f564
 Shape* FindClassById(MechS32 p_id)
 {
 	Shape* result;
@@ -212,7 +177,6 @@ Shape* FindClassById(MechS32 p_id)
 }
 
 // Frees the class, thing and star tables.
-// FUNCTION: MW2 0x1001f5cb
 void FreeGeoTables(void)
 {
 	if (g_classes) {
@@ -247,8 +211,6 @@ void FreeGeoTables(void)
 }
 
 // Returns the thing index of an ID (the last one listed), or -1.
-// The loop test compares in the other operand order (the unit's symbol table).
-// FUNCTION: MW2 0x1001f6e9
 MechS32 FindThingIdxById(MechS32 p_id)
 {
 	MechS32 i;
@@ -264,7 +226,6 @@ MechS32 FindThingIdxById(MechS32 p_id)
 	return result;
 }
 
-// FUNCTION: MW2 0x1001f74c
 void UpdateGeoCache(void)
 {
 	if (g_staticObjectsChanged) {
@@ -277,8 +238,6 @@ void UpdateGeoCache(void)
 }
 
 // Returns the star index of an ID (the last one listed), or -1.
-// The loop test compares in the other operand order (the unit's symbol table).
-// FUNCTION: MW2 0x1001f77d
 MechS32 FindStarIdxById(MechS32 p_id)
 {
 	MechS32 i;
@@ -298,7 +257,6 @@ MechS32 FindStarIdxById(MechS32 p_id)
 
 // Takes the next free static object for ID p_id, mapping the ID to it. Returns its index, or -1
 // when the cache or the map is full.
-// FUNCTION: MW2 0x1001f7eb
 MechS32 AllocStaticObject(undefined4 p_id)
 {
 	MechS32 result = -1;
@@ -318,13 +276,11 @@ MechS32 AllocStaticObject(undefined4 p_id)
 	return result;
 }
 
-// FUNCTION: MW2 0x1001f873
 Shape** GetStaticShapeSlot(MechS32 p_index)
 {
 	return &g_staticObjects[p_index].m_shape;
 }
 
-// FUNCTION: MW2 0x1001f894
 Shape* GetStaticShape(MechS32 p_index)
 {
 	return g_staticObjects[p_index].m_shape;
@@ -332,8 +288,6 @@ Shape* GetStaticShape(MechS32 p_index)
 
 // Places static object p_id: its resource, transform, block and parent, and the object it hangs
 // from (none for a shape-only entry, -2). Returns its index, or -1 if p_id isn't cached.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1001f8b5
 MechS32 PlaceStaticObject(
 	MechS32 p_id,
 	MechS32 p_resource,
@@ -395,9 +349,6 @@ MechS32 PlaceStaticObject(
 // size, its center, and the matrix that places its objects, from the pending transform
 // (g_pendingXform, reset afterwards) and every enclosing block's matrix. The outermost block
 // also clears the placed-object list.
-// Stack-slot permutation; i < g_starCapacity compares in the other operand order, and the second
-// center sum adds its operands in the other order.
-// FUNCTION: MW2 0x1001fa05
 void BeginBlock(BwdBlockRecord* p_record)
 {
 	StaticBlock* block;
@@ -474,13 +425,11 @@ void BeginBlock(BwdBlockRecord* p_record)
 	}
 }
 
-// FUNCTION: MW2 0x1001fe41
 void HandleElseBlock(void)
 {
 }
 
 // Closes the block BeginBlock opened last.
-// FUNCTION: MW2 0x1001fe4c
 void EndBlock(struct BwdStream* p_stream)
 {
 	g_blockDepth--;
@@ -493,14 +442,12 @@ void EndBlock(struct BwdStream* p_stream)
 }
 
 // Sets the transform the next block opens with.
-// FUNCTION: MW2 0x1001fe8c
 void ApplyBlockXform(Xform p_xform)
 {
 	g_pendingXform = p_xform;
 }
 
 // Transforms a point by the current block's matrix.
-// FUNCTION: MW2 0x1001fea6
 void TransformBlockPoint(MechS32* p_point)
 {
 	if (g_currentBlock != -1) {
@@ -509,7 +456,6 @@ void TransformBlockPoint(MechS32* p_point)
 }
 
 // Resets a static object cache entry.
-// FUNCTION: MW2 0x1001feef
 void ResetStaticObject(MechS32 p_index)
 {
 	StaticObject* entry;
@@ -530,7 +476,6 @@ void ResetStaticObject(MechS32 p_index)
 	entry->m_callback = NULL;
 }
 
-// FUNCTION: MW2 0x1001ffda
 void ResetStaticCache(void)
 {
 	MechS32 i;
@@ -543,9 +488,6 @@ void ResetStaticCache(void)
 	g_staticCacheReady = 1;
 }
 
-// The loop test compares in the other operand order (the unit's symbol table), and i and entry
-// sit in permuted stack slots.
-// FUNCTION: MW2 0x10020029
 void FirstStaticCache(void)
 {
 	MechS32 i;
@@ -557,7 +499,6 @@ void FirstStaticCache(void)
 	}
 }
 
-// FUNCTION: MW2 0x10020080
 void AttachTaskToObj(MechS32 p_index, TimedCallbackFn p_fn, MechS32 p_period, MechChar* p_data)
 {
 	StaticObject* entry;
@@ -567,8 +508,6 @@ void AttachTaskToObj(MechS32 p_index, TimedCallbackFn p_fn, MechS32 p_period, Me
 }
 
 // Runs the timed callbacks of the cache entries.
-// The only diff is a stack-slot permutation of i and entry.
-// FUNCTION: MW2 0x100200bd
 void RunStaticObjectTasks(void)
 {
 	MechS32 i;
@@ -584,7 +523,6 @@ void RunStaticObjectTasks(void)
 
 // The static object's timed callbacks: removes one, removes them all, or signals them all (-1)
 // when the object is loaded again.
-// FUNCTION: MW2 0x1002012a
 void RemoveStaticObjectTask(MechS32 p_index, TimedCallback* p_callback)
 {
 	StaticObject* entry;
@@ -593,7 +531,6 @@ void RemoveStaticObjectTask(MechS32 p_index, TimedCallback* p_callback)
 	RemoveTask(&entry->m_callback, p_callback);
 }
 
-// FUNCTION: MW2 0x1002015f
 void RemoveStaticObjectTasks(MechS32 p_index)
 {
 	StaticObject* entry;
@@ -602,7 +539,6 @@ void RemoveStaticObjectTasks(MechS32 p_index)
 	RemoveAllTasks(&entry->m_callback);
 }
 
-// FUNCTION: MW2 0x10020190
 void SignalStaticObjectTasks(MechS32 p_index)
 {
 	StaticObject* entry;
@@ -611,7 +547,6 @@ void SignalStaticObjectTasks(MechS32 p_index)
 	SignalAllTasks(&entry->m_callback);
 }
 
-// FUNCTION: MW2 0x100201c1
 void SetStaticObjectKind(MechS32 p_index, MechU32 p_kind)
 {
 	StaticObject* entry;
@@ -623,8 +558,6 @@ void SetStaticObjectKind(MechS32 p_index, MechU32 p_kind)
 
 // Links cache entry p_index to its game thing and to the entry that replaces it when the thing is
 // destroyed (DestroyStaticObject), which stays unloaded (0x800) until then.
-// Stack-slot permutation; p_index >= g_staticObjectCount compares in the other operand order.
-// FUNCTION: MW2 0x100201fe
 void LinkStaticObjectThing(MechS32 p_index, MechS32 p_replacement, MechS32 p_thing)
 {
 	StaticObject* replacement;
@@ -649,8 +582,6 @@ void LinkStaticObjectThing(MechS32 p_index, MechS32 p_replacement, MechS32 p_thi
 // Destroys the game thing of cache entry p_index: marks both (0x200 and 0x800, 4), frees its shape
 // and loads the entry that replaces it (m_replacement) where the old object was. Returns the
 // replacement's index, or -1.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10020292
 MechS32 DestroyStaticObject(MechS32 p_index)
 {
 	Matrix matrix;
@@ -710,8 +641,6 @@ MechS32 DestroyStaticObject(MechS32 p_index)
 
 // Marks p_thing's cache entry (flag 0x200) and has DestroyStaticObject replace it. When the replacement's
 // game thing has flag 0x8000, its object tree is handed to BlowOffObjTree and FreeStaticObjectTree.
-// Stack-slot permutation: index, current and entry.
-// FUNCTION: MW2 0x10020429
 void DestroyThingObject(GameThing* p_thing)
 {
 	MechS32 index;
@@ -742,9 +671,6 @@ void DestroyThingObject(GameThing* p_thing)
 // hides the entry (DestroyStaticObject); a parent flagged 0x800 flags the entry and unloads it
 // (UnloadStaticObject), and an entry whose parent no longer is is loaded again (LoadStaticObject), its game
 // thing's object marked when the thing has bit 0x8000.
-// Stack-slot permutation of the locals. Operand order: the loop test (i < g_staticObjectCount)
-// loads g_staticObjectCount first in the original.
-// FUNCTION: MW2 0x100204e8
 void PropagateStaticObjectStates(void)
 {
 	GameThing* thing;
@@ -789,7 +715,6 @@ void PropagateStaticObjectStates(void)
 }
 
 // Returns whether every static object in use has a resource (the world loader's check).
-// FUNCTION: MW2 0x10020684
 MechS32 AreStaticObjectsComplete(void)
 {
 	MechS32 i;
@@ -813,8 +738,6 @@ MechS32 AreStaticObjectsComplete(void)
 // Loads cache entry p_index's shape and places it: a shape-only entry (-2) in block p_block's
 // frame, otherwise on its object. Returns TRUE while the shape is loaded, FALSE if it can't be or
 // shouldn't be: a hidden entry (0x800), or a destroyed game thing's (without explosion chunks).
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10020704
 MechS32 LoadStaticObject(MechS32 p_index, MechS32 p_block)
 {
 	MechS32 size;
@@ -935,7 +858,6 @@ MechS32 LoadStaticObject(MechS32 p_index, MechS32 p_block)
 }
 
 // Frees a cache entry's shape.
-// FUNCTION: MW2 0x10020b95
 void UnloadStaticObject(MechS32 p_index)
 {
 	StaticObject* entry;
@@ -947,7 +869,6 @@ void UnloadStaticObject(MechS32 p_index)
 	}
 }
 
-// FUNCTION: MW2 0x10020bdd
 struct SceneObject* GetStaticSceneObject(MechS32 p_index)
 {
 	struct SceneObject* result;
@@ -960,7 +881,6 @@ struct SceneObject* GetStaticSceneObject(MechS32 p_index)
 	return result;
 }
 
-// FUNCTION: MW2 0x10020c26
 Shape* GetStaticObjectShape(MechS32 p_index)
 {
 	Shape* result;
@@ -975,9 +895,6 @@ Shape* GetStaticObjectShape(MechS32 p_index)
 
 // Returns a cache entry's position: its shape's, or its object's. A bad index (the test lets
 // g_staticObjectCount itself through) or an empty entry gives 0, 0, 0.
-// Stack-slot permutation: obj and entry. Operand order: p_index > g_staticObjectCount loads
-// g_staticObjectCount first in the original.
-// FUNCTION: MW2 0x10020c6f
 void GetStaticObjectPosition(MechS32 p_index, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	struct SceneObject* obj;
@@ -1009,8 +926,6 @@ void GetStaticObjectPosition(MechS32 p_index, MechS32* p_x, MechS32* p_y, MechS3
 
 // Shows the static blocks' boxes (the "unitbox" model scaled to each), or frees them when they are
 // shown. Returns whether any is shown.
-// Stack-slot permutation; the loop tests compare in the other operand order.
-// FUNCTION: MW2 0x10020d51
 MechS32 ToggleBlockBoxes(void)
 {
 	MechS32 result;
@@ -1102,8 +1017,6 @@ MechS32 ToggleBlockBoxes(void)
 }
 
 // Loads the "unitbox" model into every box of the tree p_root.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10021067
 void ShowQuadtreeBoxes(QuadtreeNode* p_root)
 {
 	MechS32 size;
@@ -1132,8 +1045,6 @@ void ShowQuadtreeBoxes(QuadtreeNode* p_root)
 }
 
 // Loads model p_data scaled to the box of p_node at its center, then to its children's.
-// Stack-slot permutation; the original loads m_unk0x14 first in z's sum (commutative operand order).
-// FUNCTION: MW2 0x1002116a
 void LoadQuadtreeBoxes(QuadtreeNode* p_node, MechU8* p_data, MechS32 p_size)
 {
 	MechS32 result;
@@ -1187,8 +1098,6 @@ void LoadQuadtreeBoxes(QuadtreeNode* p_node, MechU8* p_data, MechS32 p_size)
 
 // Frees cache entry p_index and, first, every entry hanging from it, zeroing its game thing.
 // Returns whether p_index is an entry.
-// Stack-slot permutation; the loop test compares in the other operand order.
-// FUNCTION: MW2 0x10021314
 MechS32 FreeStaticObjectTree(MechU32 p_index)
 {
 	MechS32 result;
@@ -1218,7 +1127,6 @@ MechS32 FreeStaticObjectTree(MechU32 p_index)
 }
 
 // Frees a scene object tree, and the shapes on it when the object has one.
-// FUNCTION: MW2 0x100213cf
 void DestroyObjTreeAndShapes(struct SceneObject* p_obj)
 {
 	ShapeCallback callback;
@@ -1237,13 +1145,11 @@ void DestroyObjTreeAndShapes(struct SceneObject* p_obj)
 	DestroyObjTree(p_obj, callback);
 }
 
-// FUNCTION: MW2 0x10021423
 MechS32 GetExplosionChunks(MechS32 p_arg)
 {
 	return g_explosionChunks;
 }
 
-// FUNCTION: MW2 0x10021438
 void SetExplosionChunks(MechS32 p_arg, MechS32 p_explosionChunks)
 {
 	g_explosionChunks = p_explosionChunks;

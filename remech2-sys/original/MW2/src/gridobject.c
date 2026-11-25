@@ -15,42 +15,31 @@
 // The grid SetGridObject sets up: its cell size, whether the object is on, has been shown and
 // snaps to the nearest cell.
 
-// GLOBAL: MW2 0x100a7114
 MechS32 g_gridCellSize = 0;
 
-// GLOBAL: MW2 0x100a7118
 MechS32 g_gridObjectSet = 0;
 
-// GLOBAL: MW2 0x100a711c
 MechS32 g_gridObjectPlaced = 0;
 
-// GLOBAL: MW2 0x100a7120
 MechS32 g_gridObjectShown = 0;
 
-// GLOBAL: MW2 0x100a7124
 MechS32 g_gridObjectSnaps = 0;
 
-// GLOBAL: MW2 0x100a7128
 SceneObject* g_gridObject = NULL;
 
 // The eyepoint's cell and the object's position.
 
-// GLOBAL: MW2 0x100be9e0
 Vector3 g_gridCell;
 
-// GLOBAL: MW2 0x100be9f0
 Vector3 g_gridAnchor;
 
 // How far the eyepoint may stray from the object before it snaps to another cell.
-// GLOBAL: MW2 0x100be9fc
 MechS32 g_gridSnapDistance;
 
 // Makes p_obj the object that follows the eyepoint on a grid, a cell at a time: the cells are its
 // model's span (with children) or a third of it, in steps of 0x4000, and it is snapped to the
 // nearest cell once the eyepoint strays past 9/16 of a cell (with children) or kept on the cell
 // under the eyepoint.
-// Stack-slot permutation; depth > span compares in the other operand order.
-// FUNCTION: MW2 0x1004b130
 void SetGridObject(SceneObject* p_obj)
 {
 	MechS32 depth;
@@ -128,8 +117,6 @@ void SetGridObject(SceneObject* p_obj)
 }
 
 // Moves the grid object (SetGridObject) to the eyepoint's cell when that changes.
-// Stack-slot permutation; dz > g_gridSnapDistance compares in the other operand order.
-// FUNCTION: MW2 0x1004b344
 void UpdateGridObject(void)
 {
 	MechS32 dx;
@@ -197,7 +184,6 @@ void UpdateGridObject(void)
 	}
 }
 
-// FUNCTION: MW2 0x1004b539
 void ShowGridObject(MechS32 p_enable)
 {
 	if (g_gridObject) {

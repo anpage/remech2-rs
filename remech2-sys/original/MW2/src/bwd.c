@@ -17,21 +17,14 @@
 #include <stdio.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(BwdNode, 0x08)
-DECOMP_SIZE_ASSERT(BwdHeader, 0x0c)
-DECOMP_SIZE_ASSERT(BwdStream, 0x1f)
-
 // Set by a command-line switch: OpenBwdStream reads every stream from a file, even one with a
 // resource id.
-// GLOBAL: MW2 0x100a5bec
 MechS32 g_streamsFromFiles = 0;
 
 // Set by a command-line switch: OpenBwdStream logs each stream it opens
-// GLOBAL: MW2 0x100a5bf0
 MechS32 g_logStreams = 0;
 
 // Only LogKeywordName's dead first store takes its address.
-// GLOBAL: MW2 0x10109c40
 MechChar g_unk0x10109c40[1];
 
 // Copies a BWD file from the buffer passed in from the shell
@@ -63,8 +56,6 @@ static void* CopyLaunchBwd(const MechChar* p_name, MechS32* p_size)
 // Opens the BWD stream p_key names into p_stream: from a file when the key has no resource id
 // (a name without an extension gets ".BWD"), or always with g_streamsFromFiles, and otherwise, or
 // when there is no such file, from the resource file. Returns p_stream, or NULL.
-// Stack-slot permutation: line, result, id, dot, file, size and data.
-// FUNCTION: MW2 0x1003fb00
 BwdStream* OpenBwdStream(BwdStreamKey* p_key, BwdStream* p_stream)
 {
 	MechChar line[256];
@@ -152,8 +143,6 @@ BwdStream* OpenBwdStream(BwdStreamKey* p_key, BwdStream* p_stream)
 
 // Steps p_stream to its next node and returns it, or NULL at the end of the stream or on a node
 // of a bad size.
-// Stack-slot permutation: next and result.
-// FUNCTION: MW2 0x1003fdfb
 BwdNode* GetNextNode(BwdStream* p_stream)
 {
 	BwdNode* next;
@@ -183,7 +172,6 @@ BwdNode* GetNextNode(BwdStream* p_stream)
 }
 
 // Frees a stream's data, or releases its resource.
-// FUNCTION: MW2 0x1003feb8
 void UnloadResource(BwdStream* p_stream)
 {
 	if (p_stream) {
@@ -197,7 +185,6 @@ void UnloadResource(BwdStream* p_stream)
 }
 
 // Returns the name of the keyword with tag p_code, or "unknown".
-// FUNCTION: MW2 0x1003ff09
 MechChar* GetKeywordName(MechU32 p_code)
 {
 	MechS32 i;
@@ -217,7 +204,6 @@ MechChar* GetKeywordName(MechU32 p_code)
 }
 
 // Appends a line to mw2debug.txt and shows it on screen.
-// FUNCTION: MW2 0x1003ff75
 void LogDebugLine(MechChar* p_text)
 {
 	// We send it to the Rust side to log with tracing instead
@@ -227,8 +213,6 @@ void LogDebugLine(MechChar* p_text)
 }
 
 // Logs a keyword's name with LogDebugLine.
-// Stack-slot permutation: line and name.
-// FUNCTION: MW2 0x1003ffcf
 void LogKeywordName(MechU32 p_code)
 {
 	MechChar line[256];

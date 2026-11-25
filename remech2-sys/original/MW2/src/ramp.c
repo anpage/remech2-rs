@@ -7,11 +7,6 @@
 // the target after a duration given in seconds, optionally wrapping around a period (angles),
 // and eased values, which close a fixed fraction of the distance at each step.
 
-DECOMP_SIZE_ASSERT(Ramp, 0x10)
-DECOMP_SIZE_ASSERT(WrappedRamp, 0x14)
-DECOMP_SIZE_ASSERT(EasedValue, 0x0c)
-
-// FUNCTION: MW2 0x100495b0
 MechS32 StartRamp(Ramp* p_ramp, MechS32 p_target, MechS32 p_value, MechDouble p_seconds)
 {
 	MechS32 result = FALSE;
@@ -27,7 +22,6 @@ MechS32 StartRamp(Ramp* p_ramp, MechS32 p_target, MechS32 p_value, MechDouble p_
 	return result;
 }
 
-// FUNCTION: MW2 0x10049611
 MechS32 UpdateRamp(Ramp* p_ramp)
 {
 	MechS32 delta;
@@ -48,7 +42,6 @@ MechS32 UpdateRamp(Ramp* p_ramp)
 	return p_ramp->m_value;
 }
 
-// FUNCTION: MW2 0x100496ab
 MechS32 StartWrappedRamp(WrappedRamp* p_ramp, MechS32 p_target, MechS32 p_value, MechDouble p_seconds, MechS32 p_period)
 {
 	MechS32 result = FALSE;
@@ -66,7 +59,6 @@ MechS32 StartWrappedRamp(WrappedRamp* p_ramp, MechS32 p_target, MechS32 p_value,
 }
 
 // Moves the value the short way around the period.
-// FUNCTION: MW2 0x10049715
 MechS32 UpdateWrappedRamp(WrappedRamp* p_ramp)
 {
 	MechS32 half;
@@ -97,7 +89,6 @@ MechS32 UpdateWrappedRamp(WrappedRamp* p_ramp)
 }
 
 // Sets the target, brought within half a period of zero.
-// FUNCTION: MW2 0x10049805
 MechS32 SetWrappedRampTarget(WrappedRamp* p_ramp, MechS32 p_target)
 {
 	MechS32 half;

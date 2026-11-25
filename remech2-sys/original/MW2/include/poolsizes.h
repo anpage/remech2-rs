@@ -6,7 +6,6 @@
 struct BwdStream;
 
 // One entry of a mission's static memory table: a pool tag and its size.
-// SIZE 0x08
 typedef struct StaticPoolSize {
 	MechU32 m_tag;  // 0x00
 	MechU32 m_size; // 0x04

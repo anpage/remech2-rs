@@ -4,7 +4,6 @@
 #include "types.h"
 
 // A path's waypoint: a position and three 16.16 values the path record gives as integers.
-// SIZE 0x1c
 typedef struct PathPoint {
 	MechS32 m_x;        // 0x00
 	MechS32 m_y;        // 0x04
@@ -16,7 +15,6 @@ typedef struct PathPoint {
 } PathPoint;
 
 // A named path of up to 64 waypoints, loaded from a mission's path records.
-// SIZE 0x744
 typedef struct Path {
 	MechChar m_name[0x40];    // 0x00
 	MechS32 m_count;          // 0x40

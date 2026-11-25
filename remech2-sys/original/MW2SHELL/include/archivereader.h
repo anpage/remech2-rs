@@ -19,7 +19,6 @@ struct MainMenuButton;
 
 #pragma pack(1)
 
-// SIZE 0x1b9
 // A clan hall archive (ARCHWO.MW2, ARCHJF.MW2): an entry of the archive database laid out as
 // pages of text and pictures, with links to further entries. A followed link opens a child
 // reader on top of this one.
@@ -33,7 +32,6 @@ public:
 		c_buttonTopic = 4 // topic links take ids from here up
 	};
 
-	// SIZE 0x06
 	// A link to another entry.
 	struct Topic {
 		MechS32 m_id;    // 0x00

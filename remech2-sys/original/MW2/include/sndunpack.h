@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// The sound-block decoder of sndunpack.asm, in portable C (sndunpack.c).
+// The sound-block decoder (sndunpack.c).
 #ifdef __cplusplus
 extern "C"
 {
@@ -18,26 +18,5 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-
-// sndunpack.asm's routines and data. reccmp reads annotations from C sources only, so they're
-// here, by name.
-
-// FUNCTION: MW2 0x1001a63c
-// DecodeSoundFrames
-
-// FUNCTION: MW2 0x1001a87b
-// UpsampleSoundFrame4
-
-// FUNCTION: MW2 0x1001a8d3
-// UpsampleSoundFrame2
-
-// GLOBAL: MW2 0x100a2f04
-// g_soundUpsampleBuffer
-
-// GLOBAL: MW2 0x100a3304
-// g_soundFrame
-
-// GLOBAL: MW2 0x100a3705
-// g_soundDeltas
 
 #endif // SNDUNPACK_H

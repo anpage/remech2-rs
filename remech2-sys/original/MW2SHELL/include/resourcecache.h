@@ -6,7 +6,6 @@
 
 // A cached resource, followed by its data. DumpResourceCache prints the fields as "ID", "Type"
 // and "Lock". Unlocked entries sit on the purge list, oldest first.
-// SIZE 0x14
 typedef struct ResourceCacheEntry {
 	MechS16 m_id;                           // 0x00
 	MechS16 m_lock;                         // 0x02

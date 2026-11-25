@@ -13,15 +13,9 @@
 
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(QuadtreeNode, 0x2c)
-
-// GLOBAL: MW2 0x100a37dc
 MechS32 g_quadtreesDisabled = 0;
 
 // Builds p_shape's quadtree (m_collisionData) over its model's bounds, unless g_quadtreesDisabled is set.
-// Stack-slot permutation of the locals. Operand order: root->m_unk0x14 < vertex->m_worldZ loads
-// the vertex's first in the original.
-// FUNCTION: MW2 0x1001df00
 void BuildShapeQuadtree(Shape* p_shape)
 {
 	Model* model;
@@ -88,9 +82,6 @@ void BuildShapeQuadtree(Shape* p_shape)
 
 // Builds the quadtree child p_quadrant of p_node from p_model's faces. A leaf takes at most 25
 // faces; with more, the child is split again.
-// Stack-slot permutation; minX >= maxX, minZ >= maxZ and faceHigh > highY compare in the other
-// operand order.
-// FUNCTION: MW2 0x1001e0a7
 QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, MechS32 p_quadrant, Model* p_model)
 {
 	MechS32 j;
@@ -200,8 +191,6 @@ QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, MechS32 p_quadrant, Model
 }
 
 // Allocates a quadtree node with room for p_faceCount entries, cleared.
-// The only diff is a stack-slot permutation of entries and node.
-// FUNCTION: MW2 0x1001e429
 QuadtreeNode* AllocQuadtreeNode(
 	undefined4 p_minX,
 	undefined4 p_maxX,
@@ -243,7 +232,6 @@ QuadtreeNode* AllocQuadtreeNode(
 }
 
 // Frees a quadtree.
-// FUNCTION: MW2 0x1001e50d
 void FreeQuadtree(QuadtreeNode* p_node)
 {
 	MechS32 i;
@@ -263,9 +251,6 @@ void FreeQuadtree(QuadtreeNode* p_node)
 
 // Returns whether face p_face of p_model overlaps the box from (p_minX, p_minZ) to
 // (p_maxX, p_maxZ), seen from above; if it does, stores the face's height range.
-// Stack-slot permutation; the min/max tests and the final bounds tests compare in the other operand
-// order.
-// FUNCTION: MW2 0x1001e57a
 MechS32 FaceOverlapsBox(
 	Face* p_face,
 	Model* p_model,
@@ -336,8 +321,6 @@ MechS32 FaceOverlapsBox(
 
 // Classifies the point (p_x, p_y, p_z) against the quadtree's faces: 0 outside the tree's
 // ground area, 2 above the faces under it, 3 below one of them.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1001e6dc
 MechS32 ClassifyQuadtreePoint(QuadtreeNode* p_node, Model* p_model, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 result;
@@ -405,8 +388,6 @@ MechS32 ClassifyQuadtreePoint(QuadtreeNode* p_node, Model* p_model, MechS32 p_x,
 }
 
 // Returns whether p_ray hits one of the quadtree's faces, shortening it to the hit.
-// Stack-slot permutation; the t1 < tMax and t0 < tMax tests compare in the other operand order.
-// FUNCTION: MW2 0x1001e90f
 MechS32 TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 {
 	MechS32 tMin;
@@ -489,8 +470,6 @@ MechS32 TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 
 // Finds the nearest hit of p_ray among p_node's children and shortens p_ray to it. Whether any
 // child was hit.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1001eb25
 MechS32 TestQuadtreeChildrenRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 {
 	MechS32 length;
@@ -523,8 +502,6 @@ MechS32 TestQuadtreeChildrenRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray
 
 // Finds the upward face of the quadtree under (p_x, p_z) and stores its height at the point in
 // p_top, or 0 if there is none. Returns FALSE outside the tree's ground area.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1001ebfa
 MechS32 GetQuadtreeTop(QuadtreeNode* p_node, Model* p_model, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32* p_top)
 {
 	Vertex* vertices;
@@ -575,14 +552,12 @@ MechS32 GetQuadtreeTop(QuadtreeNode* p_node, Model* p_model, MechS32 p_x, MechS3
 	return TRUE;
 }
 
-// FUNCTION: MW2 0x1001edfa
 void DisableQuadtrees(void)
 {
 	g_quadtreesDisabled = 1;
 }
 
 // Returns the bytes a quadtree takes.
-// FUNCTION: MW2 0x1001ee0f
 MechS32 GetQuadtreeSize(QuadtreeNode* p_node)
 {
 	MechS32 i;

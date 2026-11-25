@@ -9,12 +9,10 @@
 #include <stdlib.h>
 
 // The texture coordinates of a band's corners (DrawBand).
-// GLOBAL: MW2 0x100a2330
 Point g_bandTexCoords[4] = {{0, 0}, {0x10000, 0}, {0x10000, 0x10000}, {0, 0x10000}};
 
 // Draws a polygon of p_count points in the mode in p_flags' low four bits, in the color in bits
 // 4-11: modes 0 and 3 draw it filled (DrawBand) when the render settings allow.
-// FUNCTION: MW2 0x10010750
 void DrawBandPolygon(MechU32 p_flags, MechS32 p_count, MechU32* p_points, MechS32 p_unk0x0c)
 {
 	MechU32 color;
@@ -39,8 +37,6 @@ void DrawBandPolygon(MechU32 p_flags, MechS32 p_count, MechU32* p_points, MechS3
 // Draws a band as a textured quad (DrawAnimatedPolygon) from the first three points of a polygon: the
 // two whose m_unk0x0c/m_unk0x10 mark its ends (mode 0), or a square about the second one (mode
 // 1). A negative mark flips the texture. Returns half the band's width, or 0 without both ends.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100107de
 MechS32 DrawBand(MechU32 p_color, MechS32 p_count, MechS32* p_points, MechS32 p_luma, MechS32 p_mode)
 {
 	MechS32 x0;
@@ -143,7 +139,6 @@ MechS32 DrawBand(MechU32 p_color, MechS32 p_count, MechS32* p_points, MechS32 p_
 	return dx;
 }
 
-// FUNCTION: MW2 0x10010a7f
 MechS32 DrawBandWithFlash(undefined4 p_unk0x00, MechS32 p_unk0x04, undefined4* p_unk0x08)
 {
 	MechS32 result;

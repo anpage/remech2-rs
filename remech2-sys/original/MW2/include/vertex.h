@@ -8,7 +8,6 @@ struct ProjectedVertex;
 
 // A vertex of a model (Model): its position in the model, the position
 // TransformModel transforms it to, and two more values AddShapeVertex sets.
-// SIZE 0x2c
 typedef struct Vertex {
 	MechS32 m_modelX;                     // 0x00 — the position in the model
 	MechS32 m_modelY;                     // 0x04

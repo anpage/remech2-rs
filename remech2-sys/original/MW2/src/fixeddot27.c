@@ -6,7 +6,6 @@
 #include "types.h"
 
 // Returns p_a * p_b + p_c * p_d + p_e * p_f, shifted right by 27 and rounded.
-// FUNCTION: MW2 0x100426c0
 MechS32 FixedDot27(MechS32 p_a, MechS32 p_b, MechS32 p_c, MechS32 p_d, MechS32 p_e, MechS32 p_f)
 {
 	/* The sum wraps at 64 bits, like the add/adc chain. */

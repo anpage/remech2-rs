@@ -13,10 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(VideoDriver, 0x3ae)
-DECOMP_SIZE_ASSERT(WINDOW, 0x14)
-DECOMP_SIZE_ASSERT(PANE, 0x14)
-
 // Only the height field of the font data header is used by the text drawing wrappers.
 struct VideoFontHeader {
 	undefined m_unk0x00[8]; // 0x00
@@ -24,25 +20,20 @@ struct VideoFontHeader {
 };
 
 // Set while RedrawGlyphs runs: text outside the dirty rectangle is skipped.
-// GLOBAL: MW2SHELL 0x1005c2a0
 MechS32 g_redrawingGlyphs = 0;
 
 // Set by LoadPalette: DrawShell loads the new palette between two flips of a black one.
-// GLOBAL: MW2SHELL 0x1005c2a4
 MechS32 g_clearPaletteOnDraw = 0;
 
 // The black palette of ClearPalette, and LoadBackground's picture palette.
-// GLOBAL: MW2SHELL 0x10079698
 PaletteColor g_tempPalette[0x100];
 
 // The text colors when a glyph has none: each color maps to itself, but 0 is transparent.
-// GLOBAL: MW2SHELL 0x10079998
 MechU8 g_defaultColorMap[0x100];
 
 // 0 once the framebuffer can be drawn to.
 #define ACQUIRE_FRAMEBUFFER() (g_currentDisplayBackend->m_acquireFramebuffer())
 
-// FUNCTION: MW2SHELL 0x10005e70
 void QuitWithVDriverError(MechS32 p_code)
 {
 	ShutdownRefreshMode();
@@ -56,18 +47,12 @@ void QuitWithVDriverError(MechS32 p_code)
 	exit(p_code + 1);
 }
 
-// FUNCTION: MW2SHELL 0x10005eea
 void ClearPalette()
 {
 	memset(g_tempPalette, 0, sizeof(g_tempPalette));
 	g_currentDisplayBackend->m_setPalette(0, 0x100, g_tempPalette, 1);
 }
 
-// Matches except for the operand order of m_width * m_height in the back buffer allocation
-// (the original loads m_height first). It tracks the number of symbols declared ahead of this
-// unit: declaring AudioSubsystem's seventh new method flipped it (while fixing RestoreBackground's
-// additions); neither the declaration order nor the source operand order flips it back.
-// FUNCTION: MW2SHELL 0x10005f21
 VideoDriver::VideoDriver()
 {
 	MechS32 i;
@@ -119,7 +104,6 @@ VideoDriver::VideoDriver()
 	m_fmvFirstFrame = 0;
 }
 
-// FUNCTION: MW2SHELL 0x10006202
 VideoDriver::~VideoDriver()
 {
 	delete m_overlayGlyphs;
@@ -128,7 +112,6 @@ VideoDriver::~VideoDriver()
 	ShutdownRefreshMode();
 }
 
-// FUNCTION: MW2SHELL 0x100062a0
 void VideoDriver::ExpandRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom)
 {
 	if (p_left < m_dirtyView.m_x0) {
@@ -145,7 +128,6 @@ void VideoDriver::ExpandRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, Mec
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10006330
 void VideoDriver::ExpandRectBySize(MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
 {
 	MechS32 right = p_left + p_width - 1;
@@ -165,7 +147,6 @@ void VideoDriver::ExpandRectBySize(MechS32 p_left, MechS32 p_top, MechS32 p_widt
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100063d4
 MechS32 VideoDriver::IntersectsRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom)
 {
 	if (p_left > m_dirtyView.m_x1 || p_right < m_dirtyView.m_x0 || p_top > m_dirtyView.m_y1 ||
@@ -177,7 +158,6 @@ MechS32 VideoDriver::IntersectsRect(MechS32 p_left, MechS32 p_top, MechS32 p_rig
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10006445
 MechS32 VideoDriver::IntersectsRectBySize(MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
 {
 	MechS32 right = p_left + p_width - 1;
@@ -192,7 +172,6 @@ MechS32 VideoDriver::IntersectsRectBySize(MechS32 p_left, MechS32 p_top, MechS32
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100064ca
 void VideoDriver::UpdatePalette()
 {
 	g_currentDisplayBackend->m_setPalette(0, 0x100, m_palette, m_allColors);
@@ -200,7 +179,6 @@ void VideoDriver::UpdatePalette()
 
 // Presents the frame, reloading the palette first if it changed, then empties the dirty
 // rectangle.
-// FUNCTION: MW2SHELL 0x10006502
 void VideoDriver::DrawShell()
 {
 	if (m_screenView.m_x0 > m_dirtyView.m_x0) {
@@ -263,9 +241,6 @@ void VideoDriver::DrawShell()
 }
 
 // DrawShell for movie frames: the dirty rectangle is stretched to the screen.
-// Operand order: the original loads m_height first in both m_width * m_height (as in
-// FUN_10005f21; the source operand order doesn't flip it).
-// FUNCTION: MW2SHELL 0x10006842
 void VideoDriver::DrawFmv()
 {
 	if (m_paletteChanged) {
@@ -295,13 +270,11 @@ void VideoDriver::DrawFmv()
 	m_dirtyView.m_y1 = m_screenView.m_y0;
 }
 
-// FUNCTION: MW2SHELL 0x10006a04
 void VideoDriver::GetPalette(PaletteColor* p_palette)
 {
 	memcpy(p_palette, m_palette, sizeof(m_palette));
 }
 
-// FUNCTION: MW2SHELL 0x10006a2f
 void VideoDriver::SetPalette(PaletteColor* p_palette, undefined4 p_allColors)
 {
 	memcpy(m_palette, p_palette, sizeof(m_palette));
@@ -309,13 +282,11 @@ void VideoDriver::SetPalette(PaletteColor* p_palette, undefined4 p_allColors)
 	m_allColors = p_allColors;
 }
 
-// FUNCTION: MW2SHELL 0x10006a6d
 void VideoDriver::LoadPicturePalette(undefined* p_data, MechS32 p_size, PaletteColor* p_palette)
 {
 	VFX_PCX_palette(p_data, p_size, p_palette);
 }
 
-// FUNCTION: MW2SHELL 0x10006a99
 void VideoDriver::ReadPictureSize(MechS32* p_maxX, MechS32* p_maxY, undefined* p_data, MechS32 p_size, MechS32 p_type)
 {
 	if (p_size) {
@@ -335,7 +306,6 @@ void VideoDriver::ReadPictureSize(MechS32* p_maxX, MechS32* p_maxY, undefined* p
 }
 
 // Loads a picture, with its palette, and draws it to the screen and the background.
-// FUNCTION: MW2SHELL 0x10006b21
 void VideoDriver::ShowPicture(
 	undefined* p_picture,
 	MechS32 p_pictureLength,
@@ -363,7 +333,6 @@ void VideoDriver::ShowPicture(
 	ExpandRect(m_screenView.m_x0, m_screenView.m_y0, m_screenView.m_x1, m_screenView.m_y1);
 }
 
-// FUNCTION: MW2SHELL 0x10006c50
 void VideoDriver::LoadBackground(TMPackDataBase* p_database, MechS32 p_id)
 {
 	MechS32 size;
@@ -394,7 +363,6 @@ void VideoDriver::LoadBackground(TMPackDataBase* p_database, MechS32 p_id)
 	MechHeapFree(g_primaryHeap, data);
 }
 
-// FUNCTION: MW2SHELL 0x10006da9
 void VideoDriver::DrawPicture(undefined* p_data, MechS32 p_type, PANE* p_view)
 {
 	switch (p_type) {
@@ -410,7 +378,6 @@ void VideoDriver::DrawPicture(undefined* p_data, MechS32 p_type, PANE* p_view)
 	ExpandRect(m_screenView.m_x0, m_screenView.m_y0, m_screenView.m_x1, m_screenView.m_y1);
 }
 
-// FUNCTION: MW2SHELL 0x10006e51
 void VideoDriver::DrawLine(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom, MechS32 p_color)
 {
 	if (ACQUIRE_FRAMEBUFFER() == 0) {
@@ -421,7 +388,6 @@ void VideoDriver::DrawLine(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS
 }
 
 // Draws a block of pixels (a video's frame) to the screen.
-// FUNCTION: MW2SHELL 0x10006ed4
 void VideoDriver::DrawPixels(undefined* p_pixels, MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
 {
 	PANE view;
@@ -442,7 +408,6 @@ void VideoDriver::DrawPixels(undefined* p_pixels, MechS32 p_left, MechS32 p_top,
 }
 
 // DrawPixels, skipped unless the block meets the dirty rectangle.
-// FUNCTION: MW2SHELL 0x10006f87
 void VideoDriver::DrawPixelsClipped(
 	undefined* p_pixels,
 	MechS32 p_left,
@@ -473,7 +438,6 @@ void VideoDriver::DrawPixelsClipped(
 }
 
 // The same as DrawPixels. Unused: a duplicate keeps its placeholder rather than a second name.
-// FUNCTION: MW2SHELL 0x1000705f
 void VideoDriver::FUN_1000705f(undefined* p_pixels, MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
 {
 	PANE view;
@@ -493,7 +457,6 @@ void VideoDriver::FUN_1000705f(undefined* p_pixels, MechS32 p_left, MechS32 p_to
 	ExpandRectBySize(p_left, p_top, p_width, p_height);
 }
 
-// FUNCTION: MW2SHELL 0x10007112
 void VideoDriver::ReadPixels(undefined* p_pixels, MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
 {
 	PANE view;
@@ -511,7 +474,6 @@ void VideoDriver::ReadPixels(undefined* p_pixels, MechS32 p_left, MechS32 p_top,
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100071ad
 void VideoDriver::RestoreBackground(MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
 {
 	PANE view;
@@ -529,19 +491,16 @@ void VideoDriver::RestoreBackground(MechS32 p_left, MechS32 p_top, MechS32 p_wid
 	ExpandRectBySize(p_left, p_top, p_width, p_height);
 }
 
-// FUNCTION: MW2SHELL 0x1000725d
 void VideoDriver::CopyScreenToBackground()
 {
 	VFX_pane_copy(&m_screenView, 0, 0, &m_backView, 0, 0, -1);
 }
 
-// FUNCTION: MW2SHELL 0x10007293
 void VideoDriver::CopyBackgroundToScreen()
 {
 	VFX_pane_copy(&m_backView, 0, 0, &m_screenView, 0, 0, -1);
 }
 
-// FUNCTION: MW2SHELL 0x100072c9
 void VideoDriver::LoadPalette(MechS32 p_id)
 {
 	MechS32 size;
@@ -565,7 +524,6 @@ void VideoDriver::LoadPalette(MechS32 p_id)
 }
 
 // Draws frame p_frame of an SHP animation to the screen.
-// FUNCTION: MW2SHELL 0x100073b3
 void VideoDriver::DrawShpFrame(
 	void* p_shp,
 	undefined4 p_frame,
@@ -583,7 +541,6 @@ void VideoDriver::DrawShpFrame(
 }
 
 // DrawShpFrame, skipped unless the frame meets the dirty rectangle.
-// FUNCTION: MW2SHELL 0x10007430
 void VideoDriver::DrawShpFrameClipped(
 	void* p_shp,
 	undefined4 p_frame,
@@ -604,9 +561,6 @@ void VideoDriver::DrawShpFrameClipped(
 	ExpandRectBySize(p_left, p_top, p_width, p_height);
 }
 
-// Only the stack slots differ: the original puts cursor at [ebp-4] and acquired at [ebp-0xc];
-// VC++ 4.1 assigns them [ebp-0xc] and [ebp-4] here. width stays at [ebp-8].
-// FUNCTION: MW2SHELL 0x100074d2
 MechS32 VideoDriver::DrawString(MechS32 p_left, MechS32 p_top, void* p_font, MechChar* p_text, undefined* p_colorMap)
 {
 	MechChar* cursor;
@@ -643,9 +597,6 @@ MechS32 VideoDriver::DrawString(MechS32 p_left, MechS32 p_top, void* p_font, Mec
 	return width;
 }
 
-// Only the stack slots differ: the original puts width at [ebp-4] and acquired at [ebp-8];
-// VC++ 4.1 assigns them [ebp-8] and [ebp-4] here.
-// FUNCTION: MW2SHELL 0x10007603
 MechS32 VideoDriver::DrawChar(MechS32 p_left, MechS32 p_top, void* p_font, MechChar p_char, undefined* p_colorMap)
 {
 	MechS32 width;
@@ -669,7 +620,6 @@ MechS32 VideoDriver::DrawChar(MechS32 p_left, MechS32 p_top, void* p_font, MechC
 	return width;
 }
 
-// FUNCTION: MW2SHELL 0x100076e8
 void VideoDriver::AddGlyph(TextGlyph* p_item, MechS32 p_overlay)
 {
 	if (p_overlay) {
@@ -680,14 +630,12 @@ void VideoDriver::AddGlyph(TextGlyph* p_item, MechS32 p_overlay)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000772d
 void VideoDriver::RemoveGlyph(TextGlyph* p_item)
 {
 	m_overlayGlyphs->Remove(p_item);
 	m_glyphs->Remove(p_item);
 }
 
-// FUNCTION: MW2SHELL 0x10007763
 void VideoDriver::RedrawGlyphs(MechS32 p_overlay)
 {
 	g_redrawingGlyphs = 1;
@@ -702,14 +650,12 @@ void VideoDriver::RedrawGlyphs(MechS32 p_overlay)
 	g_redrawingGlyphs = 0;
 }
 
-// FUNCTION: MW2SHELL 0x100077b4
 void VideoDriver::ClearGlyphs(MechU8 p_delete)
 {
 	m_overlayGlyphs->Clear(p_delete);
 	m_glyphs->Clear(p_delete);
 }
 
-// FUNCTION: MW2SHELL 0x100077ea
 void VideoDriver::ActivateFramebuffer()
 {
 	if (ACQUIRE_FRAMEBUFFER() == 0) {

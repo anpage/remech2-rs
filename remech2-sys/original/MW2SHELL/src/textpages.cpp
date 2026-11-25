@@ -21,16 +21,13 @@ enum {
 };
 
 // The colors of the pages LoadTextPages lays out.
-// GLOBAL: MW2SHELL 0x1008f658
 MechU8 g_textPageColors[0x100];
 
 // The text with its escapes expanded: \\Q the quote, \\R0 to \\R2 the pilot's rank and the next
 // two, \\H the pilot's honor.
-// GLOBAL: MW2SHELL 0x1008d658
 MechChar g_expandedText[0x2000];
 
 // Expands the escapes of p_text into g_expandedText and returns a copy of the result.
-// FUNCTION: MW2SHELL 0x1002dc60
 MechChar* ExpandTextEscapes(MechChar* p_text, MechChar* p_quote)
 {
 	MechS32 i;
@@ -116,8 +113,6 @@ MechChar* ExpandTextEscapes(MechChar* p_text, MechChar* p_quote)
 
 // Lays out p_text (p_size bytes, the last of which becomes its terminator) on as many pages as
 // it takes, adding them to p_pages. With p_quote, the text's escapes are expanded first.
-// Not 100%: the stack slots of page, text and the new temporaries are permuted.
-// FUNCTION: MW2SHELL 0x1002e09b
 void LayoutTextPages(
 	MechChar* p_text,
 	MechS32 p_size,
@@ -153,8 +148,6 @@ void LayoutTextPages(
 
 // Lays out the text (HTXT node) of the project file p_name on pages, in colors that draw 0
 // transparent and everything else in color 1.
-// Not 100%: the stack slots of node and i are permuted.
-// FUNCTION: MW2SHELL 0x1002e1b1
 void LoadTextPages(
 	Collection* p_pages,
 	MechS32 p_left,

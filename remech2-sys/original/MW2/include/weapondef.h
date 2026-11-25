@@ -5,7 +5,6 @@
 #include "types.h"
 
 // A weapon type, from the table of weapon definitions (g_weaponDefs: LLASER, MLASER, ...).
-// SIZE 0x58
 typedef struct WeaponDef {
 	MechS32 m_shotType;      // 0x00 — the Shot::m_type a launch takes from the free shots
 	MechS32 m_impact;        // 0x04 — the effect the shot sets off (Shot::m_impact)

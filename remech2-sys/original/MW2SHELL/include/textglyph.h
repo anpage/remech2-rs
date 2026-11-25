@@ -8,7 +8,6 @@ class Font;
 class VideoDriver;
 
 // A line of text drawn with a Font, either at once or one character per step.
-// SIZE 0x3e
 #pragma pack(1)
 class TextGlyph {
 public:
@@ -33,7 +32,6 @@ private:
 	MechChar* m_text;           // 0x19
 
 public:
-	// The shell's field tables read the size directly: an inline accessor would leave a jmp at /Ob1.
 	MechS32 m_height; // 0x1d
 	MechS32 m_width;  // 0x21
 

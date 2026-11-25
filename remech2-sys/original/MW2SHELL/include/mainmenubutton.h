@@ -4,7 +4,6 @@
 #include "decomp.h"
 #include "types.h"
 
-// SIZE 0x1c
 // A button of a menu screen: its hit rectangle and a label. A label starting with '<' is drawn
 // all the time, the others only while the mouse is over the button.
 struct MainMenuButton {

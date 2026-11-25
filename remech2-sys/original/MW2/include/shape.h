@@ -13,7 +13,6 @@ struct Vertex;
    detail and the one in use. CreateShape allocates it. */
 typedef struct Shape Shape;
 
-// SIZE 0x4c
 struct Shape {
 	MechU16 m_flags; // 0x00 — 0x10f: the load flags (SetShapeLoadFlags), 0xf0: the damage level (RaisePartDamageLevel),
 					 // 0x200: transformed bounds current, 0x800: not in the collision list, 0x1000: hidden

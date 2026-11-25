@@ -31,7 +31,6 @@
 // The mission briefing screen: the mission's stars and their mechs, read from the mission's
 // BWD file, and its briefing text and videos.
 
-// SIZE 0x20
 // A star in a mission's BWD file (node type 0x46). Its mechs' variant names follow, one per
 // mech of the star's size.
 struct BwdStar {
@@ -42,13 +41,9 @@ struct BwdStar {
 	MechChar m_variants[1][0x10]; // 0x10
 };
 
-DECOMP_SIZE_ASSERT(MechNameTag, 0x08)
-DECOMP_SIZE_ASSERT(Formation, 0x08)
-
 void MissionBriefingCallback(TMPackDataBase*, MechS32*, MechU8*, MechChar**, MechS32);
 
 // The briefing videos of the missions, each with its looping continuation.
-// GLOBAL: MW2SHELL 0x1006a1c0
 MechChar* g_briefingVideos[12][2] = {
 	{"aplan01", "aplan01c"},
 	{"aplan02", "aplan02c"},
@@ -65,7 +60,6 @@ MechChar* g_briefingVideos[12][2] = {
 };
 
 // The missions of the Trials of Grievance, in order; the list ends at the first NULL.
-// GLOBAL: MW2SHELL 0x1006a220
 MechChar* g_briefingScenarios[12] = {
 	"jackscn1",
 	"chedscn1",
@@ -80,80 +74,60 @@ MechChar* g_briefingScenarios[12] = {
 };
 
 // The clans' videos, by the index into g_clanNames.
-// GLOBAL: MW2SHELL 0x1006a250
 MechChar* g_clanVideos[6] = {"wiawolf", "wiajf", "wiaghost", "wiasmoke", "wianova", "wiasteel"};
 
 // The names of the mechs of the player's star...
-// GLOBAL: MW2SHELL 0x1006a268
 MechNameTag g_playerMechTags[3] = {0};
 
 // ...and of the enemy's.
-// GLOBAL: MW2SHELL 0x1006a280
 MechNameTag g_enemyMechTags[3] = {0};
 
-// GLOBAL: MW2SHELL 0x1006a298
 MechS32 g_briefingChassisCount = 0xf;
 
 // The briefing video, an index into g_briefingVideos.
-// GLOBAL: MW2SHELL 0x1006a29c
 MechS32 g_briefingVideo = 0;
 
 // The formation names of the enemy's star...
-// GLOBAL: MW2SHELL 0x1006a2a0
 TextGlyph* g_enemyFormationName = NULL;
 
 // ...and of the player's.
-// GLOBAL: MW2SHELL 0x1006a2a4
 TextGlyph* g_playerFormationName = NULL;
 
-// GLOBAL: MW2SHELL 0x1006a2a8
 ButtonMenu* g_missionBriefingMenu = NULL;
 
 // Played on LAUNCH.
-// GLOBAL: MW2SHELL 0x1006a2b0
 AudioSample* g_launchSound = NULL;
 
 // Only for a trial (WM_USER + 0xe).
-// GLOBAL: MW2SHELL 0x1006a2b4
 AudioSample* g_trialSound = NULL;
 
 // The text colors: each color maps to itself, but 0 is transparent and 1 is drawn in 0x22.
-// GLOBAL: MW2SHELL 0x10090058
 MechU8 g_briefingTextColors[0x100];
 
 // The player's clan and the rival clan, indices into g_clanNames and g_clanVideos. They are
 // never the same.
-// GLOBAL: MW2SHELL 0x10090170
 MechS32 g_briefingClan;
 
 // The three lines of briefing text.
-// GLOBAL: MW2SHELL 0x10090160
 TextGlyph* g_briefingLines[3];
 
 // The formations of the player's star and the enemy's, indices into g_formations.
-// GLOBAL: MW2SHELL 0x1009016c
 MechS32 g_playerFormation;
 
-// GLOBAL: MW2SHELL 0x10090158
 MechS32 g_briefingRival;
 
 // DrawMissionBriefing's p_wParam: WM_USER + 0xe for a trial.
-// GLOBAL: MW2SHELL 0x10090174
 size_t g_briefingMessage;
 
-// GLOBAL: MW2SHELL 0x10090178
 MechS32 g_enemyFormation;
 
 // The briefing text line being built.
-// GLOBAL: MW2SHELL 0x10090180
 MechChar g_briefingLine[0x100];
 
 // The mission, an index into g_briefingScenarios.
-// GLOBAL: MW2SHELL 0x10090280
 MechS32 g_briefingMission;
 
 // Sets up a star from a BWD star node, and registers its mechs' variants.
-// FUNCTION: MW2SHELL 0x10037c60
 void LoadStar(MechS32 p_star, BwdStar* p_data)
 {
 	MechS32 i;
@@ -167,8 +141,6 @@ void LoadStar(MechS32 p_star, BwdStar* p_data)
 
 // Reads the mission's BWD file (the scenario's first four letters + "brf2"): its briefing
 // name, optionally its two stars (p_stars) and its briefing video and text (p_video).
-// Not 100%: the stack slots of name, file, title, star and the loop locals are permuted.
-// FUNCTION: MW2SHELL 0x10037cf7
 void ShellApplyMissionUiInfo(MechChar* p_scenario, MechS32 p_stars, MechS32 p_video)
 {
 	MechS32* briefing;
@@ -239,8 +211,6 @@ void ShellApplyMissionUiInfo(MechChar* p_scenario, MechS32 p_stars, MechS32 p_vi
 }
 
 // Shows the name of mech type p_type at (p_left, p_top), replacing the tag's previous glyph.
-// Not 100%: the stack slot of text is permuted with the delete temporaries.
-// FUNCTION: MW2SHELL 0x10037feb
 void ShowMechName(MechNameTag* p_tag, MechS32 p_type, MechS32 p_left, MechS32 p_top)
 {
 	MechChar* text;
@@ -261,7 +231,6 @@ void ShowMechName(MechNameTag* p_tag, MechS32 p_type, MechS32 p_left, MechS32 p_
 }
 
 // Shows the formation names of both stars.
-// FUNCTION: MW2SHELL 0x10038093
 void ShowFormationNames()
 {
 	MechPoint* pos;
@@ -285,7 +254,6 @@ void ShowFormationNames()
 
 // Picks a value by the pilot of the player's first mech: 0x12 for Enzo, 0x11 for Hobbes, 0x10
 // for Calvin and 0xf for anyone else.
-// FUNCTION: MW2SHELL 0x100381c2
 MechS32 GetChassisCount()
 {
 	CustomStar* star;
@@ -305,8 +273,6 @@ MechS32 GetChassisCount()
 }
 
 // Sets up the mission briefing screen. p_wParam is WM_USER + 0xe for a trial.
-// Not 100%: the stack slots of pos, audioData, i and audioSize are permuted.
-// FUNCTION: MW2SHELL 0x100382e6
 void DrawMissionBriefing(TMPackDataBase* p_database, MechChar** p_scenario, size_t p_wParam)
 {
 	MechPoint* pos;
@@ -380,8 +346,6 @@ void DrawMissionBriefing(TMPackDataBase* p_database, MechChar** p_scenario, size
 
 // The mission briefing's frame: LAUNCH, EXIT, the next mission, both clans' videos, the mechs
 // and formations of both stars (next and previous), and the two stars' accept and config.
-// Not 100%: the stack slots of pos, variant, i and button are permuted.
-// FUNCTION: MW2SHELL 0x10038744
 void MissionBriefingCallback(TMPackDataBase*, MechS32*, MechU8*, MechChar** p_scenario, MechS32 p_msg)
 {
 	MechPoint* pos;

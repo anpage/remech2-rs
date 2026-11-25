@@ -6,7 +6,6 @@
 #include "types.h"
 
 // Returns (p_value << p_shift) / p_depth, divided by 4 and rounded, plus p_center.
-// FUNCTION: MW2 0x10042740
 MechS32 ProjectCoordinate(MechS32 p_value, MechS32 p_depth, MechS32 p_shift, MechS32 p_center)
 {
 	/* shld/shl take the count modulo 32; the rounding and the sum wrap. */

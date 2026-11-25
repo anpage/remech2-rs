@@ -6,7 +6,6 @@
 
 class VideoDriver;
 
-// SIZE 0x10
 class HitRect {
 public:
 	HitRect(undefined4 p_left, undefined4 p_top, undefined4 p_right, undefined4 p_bottom);

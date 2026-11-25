@@ -20,7 +20,6 @@ void CreditsCallback(MechS32 p_active);
 
 // The lines of the credits: '<' marks a title, '>' a heading, '~' a title in
 // g_creditsTitleColors, and NULL a blank line.
-// GLOBAL: MW2SHELL 0x10071db0
 MechChar* g_creditLines[0x21f] = {
 	"<ACTIVISION presents",
 	NULL,
@@ -568,21 +567,16 @@ MechChar* g_creditLines[0x21f] = {
 	NULL,
 };
 
-// GLOBAL: MW2SHELL 0x1007262c
 LoopingMovie* g_creditsMovie = NULL;
 
-// GLOBAL: MW2SHELL 0x10074648
 MechChar g_creditsMovieName[0x10] = "amwlogo1";
 
 // The first line still on screen.
-// GLOBAL: MW2SHELL 0x10094b80
 MechS32 g_creditsFirstLine;
 
-// GLOBAL: MW2SHELL 0x10094b88
 undefined g_creditsTitleColors[0x100];
 
 // The screen position of line 0.
-// GLOBAL: MW2SHELL 0x10094c88
 MechS32 g_creditsScrollTop;
 
 #define c_creditsPixelsPerSecond 60
@@ -590,7 +584,6 @@ MechS32 g_creditsScrollTop;
 MechU32 g_creditsLastTime;
 MechU32 g_creditsOwed;
 
-// FUNCTION: MW2SHELL 0x10046e80
 void DrawCredits()
 {
 	MechS32 i;
@@ -614,7 +607,6 @@ void DrawCredits()
 }
 
 // Scroll the credits, and restore the shell once dismissed by a key or mouse click.
-// FUNCTION: MW2SHELL 0x10046fa8
 void CreditsCallback(MechS32 p_active)
 {
 	MechU32 index;

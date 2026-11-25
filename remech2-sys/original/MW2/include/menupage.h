@@ -14,7 +14,6 @@ typedef MechS32 (*MenuPageInitFn)(struct MenuDefinition* p_menu, struct MenuPage
 
 // A page of a menu: its items, some of which the page's callbacks copy from templates at the
 // end of the table.
-// SIZE 0x158
 typedef struct MenuPage {
 	MechS32 m_state;       // 0x00 — 0: new, 1: opening, 2: open, 3: opening a subpage, 4: accepted,
 						   // 5: cancelled (RunMenuItems)

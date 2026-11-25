@@ -9,7 +9,6 @@
 struct MenuPage;
 
 // An in-mission menu's definition, one of the eleven in g_menuDefinitions.
-// SIZE 0x6c
 typedef struct MenuDefinition {
 	PANE* m_target;                // 0x00 — where the menu draws
 	MechU32 m_flags;               // 0x04 — 1: takes navigation keys, 0x20: clears its target
@@ -36,7 +35,6 @@ typedef struct MenuDefinition {
 } MenuDefinition;
 
 // A registered menu: RegisterMenu adds one per menu ID to g_menuSlots.
-// SIZE 0x18
 typedef struct MenuSlot {
 	MechS32 m_id;                 // 0x00 — the index in g_menuDefinitions
 	MechS32 m_state;              // 0x04 — 1: open

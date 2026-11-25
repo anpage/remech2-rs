@@ -10,7 +10,6 @@
 
 // An entry of a mission table, one per objective of the star's mission (StarMission), which
 // SetUpStarMission copies into the objective.
-// SIZE 0x97
 typedef struct MissionEntry {
 	MechS32 m_type;                        // 0x00 — the first entry's must be 0x10
 	MechU8 m_listed;                       // 0x04 — 'V': on the objectives panel

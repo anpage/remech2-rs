@@ -33,36 +33,27 @@
 #include <stdio.h>
 
 // A game-key toggle (GetSystemSetting's setting 0x3c).
-// GLOBAL: MW2 0x100a1590
 MechS32 g_autoEject = 0;
 
 // The armor per damage level of other players' sections (the local player's: g_localArmorPerLevel).
-// GLOBAL: MW2 0x100a1594
 MechS32 g_otherArmorPerLevel = 4;
 
-// GLOBAL: MW2 0x100a1598
 MechS32 g_localArmorPerLevel = 4;
 
-// GLOBAL: MW2 0x100a159c
 MechS32 g_localMechHidden = 0;
 
 // The kill count the cockpit shows in a network game.
-// GLOBAL: MW2 0x100a15a0
 MechS32 g_killCount = 0;
 
 // Set while the local player has been warned of critical heat (CalculateHeat).
-// GLOBAL: MW2 0x100a15a4
 MechS32 g_criticalHeatWarned = 0;
 
 // When the warning was given.
-// GLOBAL: MW2 0x100bdff0
 MechS32 g_criticalHeatWarningTime;
 
 // Runs the autopilot (m_autopilot): mode 1 follows the nav points in order, skipping the ones
 // already reached and marking each one it reaches (turning off after the last); then the AI
 // steers, the throttle saved while AvoidObstacles has it.
-// Stack-slot permutation: index and first.
-// FUNCTION: MW2 0x100079d0
 void RunAutopilot(Mech* p_mech)
 {
 	MechS32 index;
@@ -130,7 +121,6 @@ void RunAutopilot(Mech* p_mech)
 
 // The PUNCH_IN_AUTO_HDG game key: sets the player's target heading (the HUD's bearing marker,
 // which the autopilot steers by) to where the torso faces, unless the autopilot is on.
-// FUNCTION: MW2 0x10007cb5
 void PunchInAutoHeading(Mech* p_mech)
 {
 	MechS32 heading;
@@ -145,8 +135,6 @@ void PunchInAutoHeading(Mech* p_mech)
 
 // Destroys p_mech on behalf of player p_killer, unless g_mechPoweredUp is clear: an intact
 // section holding an ammunition bin with ammunition left blows up first (DestroyCriticalSlot) instead.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10007d06
 void DestroyMech(MechS32 p_killer, Mech* p_mech)
 {
 	WeaponSlot* weapon;
@@ -197,8 +185,6 @@ void DestroyMech(MechS32 p_killer, Mech* p_mech)
 // in m_heat, 16.16 percent: overheating (bit 4, above 80) shuts the mech down after 6 seconds
 // (state 3), and above 100 the ammunition may explode (with bit 8) or the mech is destroyed after
 // 25 seconds; the local player hears the warnings. Cooling below 65 ends the shutdown.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10007e86
 void CalculateHeat(Mech* p_mech)
 {
 	MechS32 delta;
@@ -296,9 +282,6 @@ void CalculateHeat(Mech* p_mech)
 }
 
 // Destroys p_mech, on behalf of player p_killer (-2: its player left the game).
-// Stack-slot permutation: next and text. The original compares p_killer with g_localPlayerId and
-// indexes m_unk0x52 in the other operand order.
-// FUNCTION: MW2 0x1000832b
 void KillMech(MechS32 p_killer, Mech* p_mech)
 {
 	MechS32 leader;
@@ -469,9 +452,6 @@ void KillMech(MechS32 p_killer, Mech* p_mech)
 }
 
 // Calls DestroyCriticalSlot once for each of section p_section's m_slotCount.
-// Stack-slot permutation of i, section and count; the loop test compares with i in eax in the
-// original (operand order).
-// FUNCTION: MW2 0x10008938
 void DestroySectionSlots(MechS32 p_attacker, Mech* p_mech, MechU32 p_section)
 {
 	MechS32 i;
@@ -488,7 +468,6 @@ void DestroySectionSlots(MechS32 p_attacker, Mech* p_mech, MechU32 p_section)
 // Destroys section p_section of p_mech, on behalf of player p_attacker.
 // Destroying section 3 takes sections 1, 2 and 4 to 6 with it; section 2 takes 5, and 4 takes 6.
 // Of sections 7 and 8, the first to go only marks the mech (0x20); the second destroys 1 and 3.
-// FUNCTION: MW2 0x1000899d
 void DestroySection(MechS32 p_attacker, Mech* p_mech, MechU32 p_section)
 {
 	MechSection* section;
@@ -552,8 +531,6 @@ void DestroySection(MechS32 p_attacker, Mech* p_mech, MechU32 p_section)
 // 10000) explodes with its shots, damaging the section, and the equipment loses its function (the
 // jump jets, the heat sinks, the engine, the gyro...). The local player hears which, unless
 // p_recursing; 8000 and 9000 hit another, random slot instead.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10008c0f
 void DestroyCriticalSlot(MechS32 p_attacker, Mech* p_mech, MechU32 p_section, MechS32 p_slot, MechS32 p_recursing)
 {
 	MechS32 id;
@@ -919,9 +896,6 @@ void DestroyCriticalSlot(MechS32 p_attacker, Mech* p_mech, MechU32 p_section, Me
 // which may destroy the section or hit its critical slots. Section 3 stands for a random one of
 // 2 to 4. The local player takes none while invulnerable, and in a network game each machine
 // only damages its own mech.
-// The original ends in an explicit return (the jmp to the epilogue). The only diff is a stack-slot
-// permutation of the locals.
-// FUNCTION: MW2 0x1000991b
 void ApplyDamageToMech(MechS32 p_attacker, Mech* p_mech, MechS32 p_damage, MechS32 p_section)
 {
 	MechS32 side;
@@ -1040,7 +1014,6 @@ void ApplyDamageToMech(MechS32 p_attacker, Mech* p_mech, MechS32 p_damage, MechS
 
 // Ejects from p_mech, unless it is already shutting down or ejecting: the local player (p_eject)
 // ejects with a sound, or hears that the ejection system is disabled, and the mech is destroyed.
-// FUNCTION: MW2 0x10009d2a
 void EjectPlayer(Mech* p_mech, MechS32 p_eject)
 {
 	if (p_mech->m_powerState == 4 || p_mech->m_powerState == 5) {
@@ -1062,7 +1035,6 @@ void EjectPlayer(Mech* p_mech, MechS32 p_eject)
 }
 
 // Toggles the local player's object between HideObjTree and ShowObjTree.
-// FUNCTION: MW2 0x10009dd2
 void ToggleLocalMechVisible(void)
 {
 	if (!g_localMechHidden) {

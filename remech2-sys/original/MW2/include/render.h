@@ -6,7 +6,6 @@
 #include "types.h"
 #include "window.h"
 
-// SIZE 0x18
 typedef struct GameWindowGeometry {
 	MechS32 m_width;      // 0x00
 	MechS32 m_height;     // 0x04

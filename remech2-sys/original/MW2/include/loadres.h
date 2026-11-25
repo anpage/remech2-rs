@@ -7,7 +7,6 @@
 // The header of a cached resource: its ID, type and lock count (the cache log prints
 // "ID %5d Type %4s Lock %d Size %7d"), its hash chain in g_cacheTable and its place in the
 // purge list of unlocked items. The resource data follows.
-// SIZE 0x14
 typedef struct ResourceCacheEntry {
 	MechS16 m_id;                           // 0x00
 	MechS16 m_lock;                         // 0x02

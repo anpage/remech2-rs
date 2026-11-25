@@ -14,7 +14,6 @@ struct Player;
 
 #pragma pack(push, 1)
 
-// SIZE 0x10e
 typedef struct Mech {
 	struct Player* m_player;          // 0x00
 	Ramp m_torsoTwist;                // 0x04 — 16.16 degrees, towards the steering's torso pan

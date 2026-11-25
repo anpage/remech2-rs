@@ -12,7 +12,6 @@
 // by m_offsetX/m_offsetY), the clip planes and the projection UpdateProjection derives from them.
 // The rotation is in 16.16 degrees: m_pitch about x, m_heading about y, m_roll about z, as
 // BuildMatrix takes them (the overlay's eye position readout prints them in that order).
-// SIZE 0xe0
 typedef struct Eyepoint {
 	MechS32 m_x;                             // 0x00
 	MechS32 m_y;                             // 0x04

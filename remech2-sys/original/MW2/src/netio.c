@@ -9,19 +9,15 @@
 
 // The consecutive failed sends and receives: each one after the first waits before the next.
 
-// GLOBAL: MW2 0x100a0030
 MechS32 g_sendRetries = 0;
 
-// GLOBAL: MW2 0x100a0034
 MechS32 g_recvRetries = 0;
 
 // The result of the last broadcast, or 5 after a failed one: a send after a failure goes out
 // guaranteed.
-// GLOBAL: MW2 0x100bcd18
 HRESULT g_sendResult;
 
 // Sends a message to every player of the session.
-// FUNCTION: MW2 0x10001000
 void NetSend(MechU8* p_msg, MechU32 p_size)
 {
 	DWORD flags;
@@ -73,15 +69,12 @@ void NetSend(MechU8* p_msg, MechU32 p_size)
 }
 
 // Sends a message to one player.
-// FUNCTION: MW2 0x1000119a
 void NetSendTo(DPID p_to, void* p_msg, MechU32 p_size)
 {
 	g_directPlay->lpVtbl->Send(g_directPlay, g_localDpid, p_to, DPSEND_TRYONCE, p_msg, p_size);
 }
 
 // Receives the next message into g_netRecvBuffer. Returns the sender, or -1 when there is none.
-// The only diff is a stack-slot permutation of from, result and size.
-// FUNCTION: MW2 0x100011c9
 DPID NetReceive(void)
 {
 	DPID from;

@@ -30,7 +30,6 @@
 #include "view.h"
 
 // The launch sound of the local player's weapon, in the cockpit (p_shotType is unused).
-// FUNCTION: MW2 0x1004c890
 void PlayWeaponLaunchSound(undefined4 p_shotType, MechS32 p_sound, undefined4 p_pan)
 {
 	if (p_sound > 0) {
@@ -41,8 +40,6 @@ void PlayWeaponLaunchSound(undefined4 p_shotType, MechS32 p_sound, undefined4 p_
 // Renders the scene into pane p_target from the camera p_view with a field of view of
 // p_fovX (only the objects under p_object, if set), then restores the eyepoint, its field of view
 // and the pending palette.
-// Stack-slot permutation: palette and view.
-// FUNCTION: MW2 0x1004c8bd
 void RenderViewToPane(MechU32 p_target, MechS32 p_fovX, MechS32* p_view, struct SceneObject* p_object)
 {
 	MechS32 fovX;
@@ -83,14 +80,12 @@ void RenderViewToPane(MechU32 p_target, MechS32 p_fovX, MechS32* p_view, struct 
 }
 
 // Flashes palette slot 0x11 (the ZAPPED palette, solid red) over two seconds (0x16a clock ticks).
-// FUNCTION: MW2 0x1004ca0d
 void FlashZappedPalette(void)
 {
 	StartPaletteFade(0x11, 0x16a, 1);
 }
 
 // Flashes palette slot 0x11 (ZAPPED) over p_level (0-15) fifteenths of two seconds.
-// FUNCTION: MW2 0x1004ca29
 void FlashZappedPaletteLevel(MechU32 p_level)
 {
 	MechS32 duration;
@@ -108,8 +103,6 @@ void FlashZappedPaletteLevel(MechU32 p_level)
 
 // Fades (blocking, over 60 steps) to palette slot 0x10, or 0x11 if p_alternate is set, then applies
 // that slot.
-// Stack-slot permutation: slot and palette.
-// FUNCTION: MW2 0x1004ca82
 void FadeToEndPalette(MechS32 p_alternate)
 {
 	MechS32 slot;
@@ -131,7 +124,6 @@ void FadeToEndPalette(MechS32 p_alternate)
 }
 
 // Sets off the smoke of a wrecked mech, or now and then a spark while m_stateTime is set.
-// FUNCTION: MW2 0x1004cb11
 void EmitWreckSmoke(Mech* p_mech)
 {
 	MechS32 x;
@@ -157,8 +149,6 @@ void EmitWreckSmoke(Mech* p_mech)
 }
 
 // Breaks a destroyed mech's model into debris.
-// Stack-slot permutation: obj, upper, lower and the three indices.
-// FUNCTION: MW2 0x1004cc27
 void BreakUpMech(Mech* p_mech)
 {
 	SceneObject* obj;
@@ -181,7 +171,6 @@ void BreakUpMech(Mech* p_mech)
 }
 
 // Sets off the flames of the jump jets and plays their sound.
-// FUNCTION: MW2 0x1004ccba
 void FireJumpJetEffects(Mech* p_mech)
 {
 	MechS32 z;
@@ -228,7 +217,6 @@ void FireJumpJetEffects(Mech* p_mech)
 }
 
 // Plays a mech's landing: the thud, and the camera shake for the local player.
-// FUNCTION: MW2 0x1004ce3e
 void PlayMechLanding(Mech* p_mech, MechS32 p_speed)
 {
 	MechS32 sound;
@@ -254,8 +242,6 @@ void PlayMechLanding(Mech* p_mech, MechS32 p_speed)
 }
 
 // Shakes the camera away from a hit's direction, unless a shake is already playing.
-// Stack-slot permutation: off10 and off0c.
-// FUNCTION: MW2 0x1004cee2
 void PlayPlayerHitFeedback(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 off10;

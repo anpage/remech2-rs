@@ -21,8 +21,6 @@
 // A slider from 0 to 0x10000 (MenuControl::m_data holds its shapes: the left cap, the bar, the
 // right cap and the knob): while selected, Space or Right (0xc8) raises it by a tenth and Left
 // (0xc9) lowers it, and its number key raises it too.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10072840
 void RunMenuSlider(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_index, Point p_pos, MenuPage* p_page)
 {
 	MechS32 pressed;
@@ -197,8 +195,6 @@ void RunMenuSlider(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_ind
 
 // A list of choices shown with a suffix from MenuChoices::m_suffix; it changes only through its
 // callbacks.
-// Stack-slot permutation; m_texts[value] loads the array before the index (index order).
-// FUNCTION: MW2 0x10072dab
 void RunMenuStatus(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_index, Point p_pos, MenuPage* p_page)
 {
 	MechS32 pressed;
@@ -328,8 +324,6 @@ void RunMenuStatus(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_ind
 
 // A list of choices (MenuChoices): while selected, Space or Right (0xc8) picks the next and Left
 // (0xc9) the previous, wrapping, and its number key the next.
-// Stack-slot permutation; m_texts[value] loads the array before the index (index order).
-// FUNCTION: MW2 0x10073136
 void RunMenuChoice(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_index, Point p_pos, MenuPage* p_page)
 {
 	MechS32 pressed;
@@ -468,8 +462,6 @@ void RunMenuChoice(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_ind
 
 // A text box (MenuTextBox) in the menu's font; its rectangle is placed in the menu's target the
 // first time. Reports 0 through m_preview unless the menu is being accepted or cancelled.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100734ad
 void RunMenuTextBox(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_index, Point p_pos, MenuPage* p_page)
 {
 	MenuTextBox* box;

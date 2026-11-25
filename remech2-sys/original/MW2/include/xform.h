@@ -7,7 +7,6 @@
 // The transform the next block opens with (ApplyBlockXform) and a static object's placement:
 // a scale (BeginBlock puts it on the diagonal as 2.29 fixed point), the rotation angles about x,
 // y and z (16.16 degrees, BuildMatrix) and a translation.
-// SIZE 0x24
 typedef struct Xform {
 	MechS32 m_scaleX; // 0x00
 	MechS32 m_scaleY; // 0x04

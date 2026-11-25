@@ -15,12 +15,8 @@
 
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(GameThing, 0x40)
-DECOMP_SIZE_ASSERT(PlayerSteering, 0x48)
-
 // The kinds of player a gamepiece record can create, by Player::m_type: 3 has its own
 // callbacks (artillery.c), 7 another (door.c); the others are mechs.
-// GLOBAL: MW2 0x100ad4a0
 PlayerType g_playerTypes[9] = {
 	{0, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
 	{1, CreateMech, FirstMech, UpdateMech, LateUpdateMech, UpdateLocalMech, DrawMechCockpit, ShutdownMech},
@@ -33,22 +29,16 @@ PlayerType g_playerTypes[9] = {
 	{8, CreateMech, FirstMech, UpdateMech, LateUpdateMech, UpdateLocalMech, DrawMechCockpit, ShutdownMech},
 };
 
-// GLOBAL: MW2 0x100ad5e0
 MechS32 g_playerCount = 0;
 
-// GLOBAL: MW2 0x100ad5e4
 MechS32 g_gameThingCount = 0;
 
 // The world loader stops at 0x3c players (BwdExecuteStream), which fill the original's room
 // before g_gameThings.
-// GLOBAL: MW2 0x100c3570
 Player* g_players[0x3c];
 
-// GLOBAL: MW2 0x100c3660
 GameThing g_gameThings[254];
 
-// Operand order: the loop test (i < g_playerCount) compares with i in eax in the original.
-// FUNCTION: MW2 0x1006cf80
 void FirstClassFunctions(void)
 {
 	MechS32 i;
@@ -62,7 +52,6 @@ void FirstClassFunctions(void)
 	}
 }
 
-// FUNCTION: MW2 0x1006cffa
 void UpdateAllPlayers(void)
 {
 	PlayerMechFn update;
@@ -78,8 +67,6 @@ void UpdateAllPlayers(void)
 	}
 }
 
-// Operand order: the loop test (i < g_playerCount) compares with i in eax in the original.
-// FUNCTION: MW2 0x1006d068
 void LateUpdateAllPlayers(void)
 {
 	MechS32 i;
@@ -93,7 +80,6 @@ void LateUpdateAllPlayers(void)
 	}
 }
 
-// FUNCTION: MW2 0x1006d0e5
 void UpdateLocalPlayer(void)
 {
 	Player* player;
@@ -108,7 +94,6 @@ void UpdateLocalPlayer(void)
 	}
 }
 
-// FUNCTION: MW2 0x1006d139
 void DrawLocalPlayer(void)
 {
 	Player* player;
@@ -123,8 +108,6 @@ void DrawLocalPlayer(void)
 	}
 }
 
-// Stack slots: shutdown and i are swapped.
-// FUNCTION: MW2 0x1006d18d
 void ShutdownAllPlayers(void)
 {
 	PlayerMechFn shutdown;
@@ -138,7 +121,6 @@ void ShutdownAllPlayers(void)
 	}
 }
 
-// FUNCTION: MW2 0x1006d1f5
 void ZeroGameThing(MechS32 p_index)
 {
 	GameThing* thing;
@@ -152,7 +134,6 @@ void ZeroGameThing(MechS32 p_index)
 	thing->m_name[0] = '\0';
 }
 
-// FUNCTION: MW2 0x1006d247
 void ZeroGamethings(void)
 {
 	MechS32 i;
@@ -164,8 +145,6 @@ void ZeroGamethings(void)
 
 // Creates player p_player: allocates it, sets it up, gives it its steering (the input sinks for
 // the local player, the room after it otherwise), and passes it to p_fn if given.
-// The original loads g_localPlayerId into eax for the comparison with p_player (operand order).
-// FUNCTION: MW2 0x1006d282
 void CreateSimPlayer(MechS32 p_player, PlayerCreatedFn p_fn)
 {
 	PlayerCreatedFn fn;
@@ -196,9 +175,6 @@ void CreateSimPlayer(MechS32 p_player, PlayerCreatedFn p_fn)
 }
 
 // Allocates player p_player: a remote player gets room for its steering after it.
-// Stack-slot permutation of player and size; the original compares p_player with
-// g_localPlayerId in eax (operand order).
-// FUNCTION: MW2 0x1006d340
 MechS32 AllocPlayer(MechS32 p_player)
 {
 	Player* player;
@@ -219,7 +195,6 @@ MechS32 AllocPlayer(MechS32 p_player)
 }
 
 // Sets up a newly allocated player.
-// FUNCTION: MW2 0x1006d3a4
 void InitPlayer(Player* p_player)
 {
 	p_player->m_type = 0;

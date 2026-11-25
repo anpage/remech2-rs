@@ -52,68 +52,49 @@
 
 #include <stdio.h>
 
-DECOMP_SIZE_ASSERT(Mech, 0x10e)
-
 // The "mightymouse" cheat: infinite jump jet fuel.
-// GLOBAL: MW2 0x100a2be4
 MechS32 g_infiniteJumpFuel = 0;
 
 // Set by a game key: run JettisonAmmo on the local mech next tick.
-// GLOBAL: MW2 0x100a2be8
 MechS32 g_jettisonAmmoRequested = 0;
 
 // Set by the MASC game key: toggle the local mech's MASC next tick.
-// GLOBAL: MW2 0x100a2bec
 MechS32 g_toggleMascRequested = 0;
 
-// GLOBAL: MW2 0x100a2bf0
 MechS32 g_mascEngaged = 0;
 
-// GLOBAL: MW2 0x100a2bf4
 MechS32 g_unk0x100a2bf4 = 0;
 
-// GLOBAL: MW2 0x100a2bf8
 MechS32 g_manualWeaponCycle = 0;
 
 // Set when the local mech lands while g_unk0x100a2c00 is on (UpdateMech).
-// GLOBAL: MW2 0x100a2bfc
 MechS32 g_unk0x100a2bfc = 0;
 
-// GLOBAL: MW2 0x100a2c00
 MechS32 g_unk0x100a2c00 = 1;
 
-// GLOBAL: MW2 0x100a2c04
 MechS32 g_localMechLost = 0;
 
 // A power request for the local mech: 1 powers it up, -1 shuts it down.
-// GLOBAL: MW2 0x100a2c08
 MechS32 g_powerRequest = 0;
 
 // The local player's heading at the last tick, while the torso recenters (LateUpdateMech).
-// GLOBAL: MW2 0x100a2c0c
 MechS32 g_recenterLastHeading = 0;
 
-// GLOBAL: MW2 0x100a2c10
 MechS32 g_mechPoweredUp = 0;
 
 // The clock at the last MASC malfunction roll (LateUpdateMech).
-// GLOBAL: MW2 0x100a2c14
 MechS32 g_lastMascRoll = 0;
 
-// GLOBAL: MW2 0x100a2c18
 MechS32 g_localMechDestroyed = 0;
 
-// GLOBAL: MW2 0x100a2c1c
 MechS32 g_ejectStarted = 0;
 
 // Set once the local mech's collision sound played; cleared when it moves freely (UpdateMech).
-// GLOBAL: MW2 0x100be00c
 MechS32 g_collisionSoundPlayed;
 
 // Puts p_player's mech back in its starting state: fresh parts for a new mech (and, for the local
 // player, its cockpit), the ramps, weapon and motion state, its object back on the ground and the
 // player's pose from it. With g_startOnAutopilot the local player starts on the autopilot.
-// FUNCTION: MW2 0x10016ad0
 void FirstMech(struct Player* p_player)
 {
 	Mech* mech;
@@ -204,8 +185,6 @@ void FirstMech(struct Player* p_player)
 // driven at on the ground, or under gravity, drag and jump jet thrust in the air), resolves
 // collisions with shapes and other mechs, lands it on the terrain (with falling damage), slides
 // it down slopes, then poses its objects. Every player type's update (PlayerType::m_updateFn).
-// Stack-slot permutation of the locals (its wider [ebp-N] encodings also shift the jumps).
-// FUNCTION: MW2 0x10016edf
 void UpdateMech(Mech* p_mech)
 {
 	MechS32 height;
@@ -639,10 +618,8 @@ void UpdateMech(Mech* p_mech)
 // recentering, the MASC (which can fail), the heat, and the power state machine: starting up,
 // running, shut down, destroyed (exploding until the timer runs out) and ejecting.
 // Every player type's late update (PlayerType::m_lateUpdateFn).
-// Stack-slot permutation of the locals.
 // LateUpdateMech on the Rust side (src/sim/jumpjets.rs) wraps it, keeping the jump fuel's
 // recharge at the same rate whatever the framerate.
-// FUNCTION: MW2 0x100180cd
 void LateUpdateMechC(Mech* p_mech)
 {
 	MechS32 throttle;
@@ -1114,8 +1091,6 @@ void LateUpdateMechC(Mech* p_mech)
 // other system keys; a destroyed one (4) ends the mission once; an ejecting one (5) runs the
 // ejection camera and then ends it. Except while destroyed or ejecting, a power request shuts the
 // mech down, or powers up a shut-down mech that isn't overheating.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10019368
 void UpdateLocalMech(Mech* p_mech)
 {
 	MechS32 dx;
@@ -1226,7 +1201,6 @@ void UpdateLocalMech(Mech* p_mech)
 	}
 }
 
-// FUNCTION: MW2 0x1001975a
 void DrawMechCockpit(Mech* p_mech)
 {
 	Mech* mech;
@@ -1242,7 +1216,6 @@ void DrawMechCockpit(Mech* p_mech)
 }
 
 // Runs ShutdownCockpitPanels for the local player's mech.
-// FUNCTION: MW2 0x1001978e
 void ShutdownMech(Mech* p_mech)
 {
 	Mech* mech;
@@ -1258,8 +1231,6 @@ void ShutdownMech(Mech* p_mech)
 }
 
 // Allocates p_player's mech and sets it up.
-// Stack-slot permutation of buffer, i, size and mech.
-// FUNCTION: MW2 0x100197ca
 MechS32 CreateMech(MechS32 p_index, Player* p_player)
 {
 	void* buffer = NULL;
@@ -1288,8 +1259,6 @@ MechS32 CreateMech(MechS32 p_index, Player* p_player)
 
 // Lays out p_mech's allocation (its ten weapons, eight sections and 25 ammunition bins after it)
 // and empties the weapons and the bins.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10019881
 void InitMechArrays(struct Mech* p_mech)
 {
 	AmmoBin* bin;
@@ -1340,7 +1309,6 @@ void InitMechArrays(struct Mech* p_mech)
 
 // Returns the size of a mech's allocation: the mech, its ten weapons and eight sections, and 500
 // bytes more.
-// FUNCTION: MW2 0x10019a0a
 MechS32 GetMechAllocSize(void)
 {
 	MechS32 size;
@@ -1353,7 +1321,6 @@ MechS32 GetMechAllocSize(void)
 }
 
 // Nothing calls it.
-// FUNCTION: MW2 0x10019a3c
 MechS32 GetLastSelectedWeapon(Player* p_player)
 {
 	Mech* mech;
@@ -1363,7 +1330,6 @@ MechS32 GetLastSelectedWeapon(Player* p_player)
 }
 
 // Selects weapon p_weapon of p_player's mech.
-// FUNCTION: MW2 0x10019a61
 void SetSelectedWeapon(Player* p_player, MechS32 p_weapon)
 {
 	Mech* mech;
@@ -1373,7 +1339,6 @@ void SetSelectedWeapon(Player* p_player, MechS32 p_weapon)
 }
 
 // Nothing calls it.
-// FUNCTION: MW2 0x10019a84
 MechS32 GetMechHeight(Player* p_player)
 {
 	Mech* mech;

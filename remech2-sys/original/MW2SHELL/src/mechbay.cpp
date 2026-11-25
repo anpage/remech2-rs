@@ -32,19 +32,6 @@
 // The mech bay: the variant being edited, its engine, weapons and armor, and the fields that
 // show them.
 
-DECOMP_SIZE_ASSERT(ScreenField, 0x2c)
-DECOMP_SIZE_ASSERT(EngineType, 0x0c)
-DECOMP_SIZE_ASSERT(Weapon, 0x28)
-DECOMP_SIZE_ASSERT(MekVariant::Item, 0x08)
-DECOMP_SIZE_ASSERT(MekVariant::Armor, 0x10)
-DECOMP_SIZE_ASSERT(MekVariant, 0x7a8)
-DECOMP_SIZE_ASSERT(MechChassis, 0x18)
-DECOMP_SIZE_ASSERT(MekLocation, 0x28)
-DECOMP_SIZE_ASSERT(Equipment, 0x08)
-DECOMP_SIZE_ASSERT(InternalStructure, 0x10)
-DECOMP_SIZE_ASSERT(MekHeader, 0x18)
-DECOMP_SIZE_ASSERT(MekItem, 0x08)
-
 MechS32 PlayVideo(
 	MechS32 p_index,
 	const char* p_name,
@@ -54,7 +41,6 @@ MechS32 PlayVideo(
 	MechU32 p_unk0x14
 );
 
-// GLOBAL: MW2SHELL 0x1005c438
 Equipment g_equipment[23] = {
 	{5000, "MASC"},
 	{5050, "Targeting Computer"},
@@ -81,11 +67,9 @@ Equipment g_equipment[23] = {
 	{9000, "Ferro-Fibrous"},
 };
 
-// GLOBAL: MW2SHELL 0x1005c4f0
 MechChar* g_locationNames[8] =
 	{"Head", "Right Torso", "Center Torso", "Left Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg"};
 
-// GLOBAL: MW2SHELL 0x1005c510
 InternalStructure g_internalStructure[19] = {
 	{4, 3, 1, 2},     {5, 4, 2, 3},     {6, 5, 3, 4},     {8, 6, 4, 6},     {10, 7, 5, 7},
 	{11, 8, 6, 8},    {12, 10, 6, 10},  {14, 11, 7, 11},  {16, 12, 8, 12},  {18, 13, 9, 13},
@@ -93,14 +77,11 @@ InternalStructure g_internalStructure[19] = {
 	{27, 18, 14, 18}, {29, 19, 15, 19}, {30, 20, 16, 20}, {31, 21, 17, 21},
 };
 
-// GLOBAL: MW2SHELL 0x1005c640
 MekVariant g_variant = {0};
 
 // The variant LoadMekFile replaced.
-// GLOBAL: MW2SHELL 0x1005cde8
 MekVariant g_previousVariant = {0};
 
-// GLOBAL: MW2SHELL 0x1005d590
 EngineType g_engines[] = {
 	{10, 50, "Omni"},      {15, 50, "GM"},          {20, 50, "Pitban"},    {25, 50, "Omni"},
 	{30, 100, "Nissan"},   {35, 100, "VOX"},        {40, 100, "GM"},       {45, 100, "GM"},
@@ -124,7 +105,6 @@ EngineType g_engines[] = {
 	{390, 4600, "Magna"},  {395, 4900, "Hermes"},   {400, 5250, "LTV"},    {-1, 0, NULL},
 };
 
-// GLOBAL: MW2SHELL 0x1005d950
 Weapon g_weapons[] = {
 	{6, -1, -1, 7, 14, 1000, 500, 4, 6, "LRM 20"},
 	{5, -1, -1, 7, 14, 1000, 350, 2, 8, "LRM 15"},
@@ -160,28 +140,21 @@ Weapon g_weapons[] = {
 };
 
 // The field table of the component shown on the right, NULL for none.
-// GLOBAL: MW2SHELL 0x1005de28
 ScreenField* g_componentFields = NULL;
 
 // The screen's own fields: the bay's or the customize screen's.
-// GLOBAL: MW2SHELL 0x1005de2c
 ScreenField* g_screenFields = NULL;
 
 // The location UpdateArmor takes the next point of armor from.
-// GLOBAL: MW2SHELL 0x1005de30
 MechS32 g_armorTrimLocation = 0;
 
 // Where the location map's frame of each location goes.
-// GLOBAL: MW2SHELL 0x1005de38
 MechS32 g_locationMapLefts[8] = {75, 46, 86, 126, 10, 162, 39, 109};
 
-// GLOBAL: MW2SHELL 0x1005de58
 MechS32 g_locationMapTops[8] = {171, 206, 206, 206, 204, 204, 310, 310};
 
-// GLOBAL: MW2SHELL 0x1005de78
 AudioSample* g_locationSound = NULL;
 
-// GLOBAL: MW2SHELL 0x10061560
 MechChassis g_mechChassis[] = {
 	{"ds", "frm", "firemoth", "Firemoth", 20, 85},
 	{"kf", "ktf", "kitfox", "Kit Fox", 30, 89},
@@ -205,127 +178,91 @@ MechChassis g_mechChassis[] = {
 };
 
 // The chassis on offer: 15, and up to 18 in a trial (GetChassisCount).
-// GLOBAL: MW2SHELL 0x10061728
 MechS32 g_chassisCount = 15;
 
 // The chassis video of each campaign's bay, with the chassis code.
-// GLOBAL: MW2SHELL 0x10061730
 MechChar g_wolfChassisVideo[] = "awomp%s";
 
-// GLOBAL: MW2SHELL 0x10061738
 MechChar g_jadeFalconChassisVideo[] = "ajfmp%s";
 
-// GLOBAL: MW2SHELL 0x10061740
 MechChar g_trialChassisVideo[] = "aiamp%s";
 
-// GLOBAL: MW2SHELL 0x10061748
 MechChar* g_chassisVideoFormat = g_wolfChassisVideo;
 
-// GLOBAL: MW2SHELL 0x1006176c
 MechS32 g_selectedChassis = 7;
 
-// GLOBAL: MW2SHELL 0x10061770
 AudioSample* g_chassisNameSound = NULL;
 
 // Set by the star screen when it opens the bay to change one of the star's mechs.
-// GLOBAL: MW2SHELL 0x10061774
 MechS32 g_pickStarMech = 0;
 
-// GLOBAL: MW2SHELL 0x10061778
 ButtonMenu* g_mechBayMenu = NULL;
 
-// GLOBAL: MW2SHELL 0x1006177c
 AudioSample* g_mechBayAmbience = NULL;
 
 // The wParam the screen was opened with.
-// GLOBAL: MW2SHELL 0x10061780
 MechS32 g_mechBayWParam = c_msgScreenFrame;
 
 // Set to 1 when the mech bay closes; nothing reads it.
-// GLOBAL: MW2SHELL 0x1006178c
 MechS32 g_unk0x1006178c = 1;
 
-// GLOBAL: MW2SHELL 0x10079a98
 undefined4 g_chassisVideoLeft;
 
-// GLOBAL: MW2SHELL 0x10079a9c
 undefined4 g_chassisVideoTop;
 
 // g_pickStarMech as the bay was opened: ACCEPT MECH checks the star's tonnage, and the other
 // screens are out of reach.
-// GLOBAL: MW2SHELL 0x10079aa0
 MechS32 g_pickingStarMech;
 
-// GLOBAL: MW2SHELL 0x10079aa8
 MechChar g_userMekName[0x20];
 
-// GLOBAL: MW2SHELL 0x10079ac8
 AudioSample* g_acceptSound;
 
 // The pilot's callsign and the star's maximum weight.
-// GLOBAL: MW2SHELL 0x10079ad0
 MechChar g_callsignLine[0x80];
 
-// GLOBAL: MW2SHELL 0x10079b50
 MechChar g_tempBuffer[0x100];
 
 // The image of a .mek file, besides g_mekLocations: its header, the ammunition and weapons
 // and the variant name.
-// GLOBAL: MW2SHELL 0x10079c50
 MekItem g_mekAmmo[25];
 
-// GLOBAL: MW2SHELL 0x10079d18
 AudioSample* g_variantSound;
 
-// GLOBAL: MW2SHELL 0x10079d20
 MekHeader g_mekHeader;
 
-// GLOBAL: MW2SHELL 0x10079d38
 MechChar g_chassisVideoName[0x10];
 
-// GLOBAL: MW2SHELL 0x10079d48
 MechChar g_mekVariantName[0x32];
 
 // The chassis' variant files: its standard ones in 0-99, the user's in 100-199.
-// GLOBAL: MW2SHELL 0x10079d80
 MechChar g_variantFiles[200][13];
 
-// GLOBAL: MW2SHELL 0x1007a7a8
 MekItem g_mekWeapons[10];
 
 // DrawMechBay's p_wParam. Never read.
-// GLOBAL: MW2SHELL 0x1007a7f8
 MechS32 g_mechBayMessage;
 
-// GLOBAL: MW2SHELL 0x1007a800
 MechChar g_variantFileName[0x20];
 
-// GLOBAL: MW2SHELL 0x1007a820
 undefined g_mekFileBuffer[0x800];
 
-// GLOBAL: MW2SHELL 0x1007c820
 MekLocation g_mekLocations[8];
 
 // The color maps of the fields: over the maximum mass, clickable or highlighted, and plain
 // text.
-// GLOBAL: MW2SHELL 0x1007c960
 undefined g_warningColors[0x100];
 
-// GLOBAL: MW2SHELL 0x1007ca60
 undefined g_activeColors[0x100];
 
-// GLOBAL: MW2SHELL 0x1007cb60
 undefined g_textColors[0x100];
 
 // The path of the .mek file being saved.
-// GLOBAL: MW2SHELL 0x1007cc60
 MechChar g_mekPath[0x20];
 
 // The variant shown, an index into g_variantFiles.
-// GLOBAL: MW2SHELL 0x1007cc80
 MechS32 g_selectedVariant;
 
-// FUNCTION: MW2SHELL 0x10007850
 MechS32 RoundUpTons(MechS32 p_value)
 {
 	MechS32 remainder;
@@ -334,20 +271,16 @@ MechS32 RoundUpTons(MechS32 p_value)
 	return remainder ? p_value + 100 - remainder : p_value;
 }
 
-// FUNCTION: MW2SHELL 0x1000788c
 MechS32 RoundDownTons(MechS32 p_value)
 {
 	return p_value - p_value % 100;
 }
 
-// FUNCTION: MW2SHELL 0x100078ae
 MechS32 RoundTons(MechS32 p_value)
 {
 	return RoundDownTons(p_value + 50);
 }
 
-// Stack-slot permutation: top and height.
-// FUNCTION: MW2SHELL 0x100078cd
 void ShowFields(ScreenField* p_tabs)
 {
 	MechS32 top;
@@ -393,7 +326,6 @@ void ShowFields(ScreenField* p_tabs)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100079f8
 void RedrawFields(ScreenField* p_tabs)
 {
 	ScreenField* tab;
@@ -416,7 +348,6 @@ void RedrawFields(ScreenField* p_tabs)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10007ac8
 void HideFields(ScreenField* p_tabs)
 {
 	if (p_tabs == NULL) {
@@ -433,7 +364,6 @@ void HideFields(ScreenField* p_tabs)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10007b4d
 MechS32 RemoveCriticals(MechS32 p_id)
 {
 	MechS32 count;
@@ -457,10 +387,6 @@ MechS32 RemoveCriticals(MechS32 p_id)
 	return count;
 }
 
-// Array index order: the original loads i before p_location in m_criticals[p_location][i]. The
-// order follows the unit's symbol table: renaming the unit's globals flipped it here and fixed it
-// in RemoveCriticals.
-// FUNCTION: MW2SHELL 0x10007bee
 MechS32 PlaceCriticals(MechS32 p_location, MechS32 p_id, MechS32 p_count)
 {
 	MechS32 i;
@@ -489,7 +415,6 @@ MechS32 PlaceCriticals(MechS32 p_location, MechS32 p_id, MechS32 p_count)
 	return TRUE;
 }
 
-// FUNCTION: MW2SHELL 0x10007cd4
 void RemoveUnassigned(MechS32 p_id)
 {
 	MechS32 j;
@@ -516,7 +441,6 @@ void RemoveUnassigned(MechS32 p_id)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10007d9e
 void AddUnassigned(MechS32 p_id, MechS32 p_unk0x04)
 {
 	if (p_id <= 0) {
@@ -530,7 +454,6 @@ void AddUnassigned(MechS32 p_id, MechS32 p_unk0x04)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10007df0
 void UnassignItem(MechS32 p_id)
 {
 	MechS32 count;
@@ -545,7 +468,6 @@ void UnassignItem(MechS32 p_id)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10007e3b
 MechS32 AssignItem(MechS32 p_location, MechS32 p_id, MechS32 p_count)
 {
 	if (p_id <= 0) {
@@ -560,9 +482,6 @@ MechS32 AssignItem(MechS32 p_location, MechS32 p_id, MechS32 p_count)
 	return FALSE;
 }
 
-// Stack-slot permutation: id, group, index, i and j. m_criticals[i][j] also loads the base before
-// the index, the reverse of the original.
-// FUNCTION: MW2SHELL 0x10007e90
 void DeleteItem(MechS32 p_id)
 {
 	MechS32 id;
@@ -635,7 +554,6 @@ void DeleteItem(MechS32 p_id)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000819f
 MechS32 AddAmmo(MechS32 p_id)
 {
 	MechS32 i;
@@ -660,8 +578,6 @@ MechS32 AddAmmo(MechS32 p_id)
 	return 0;
 }
 
-// Stack-slot permutation: count and i.
-// FUNCTION: MW2SHELL 0x10008254
 MechS32 CountAmmo(MechS32 p_id)
 {
 	MechS32 count;
@@ -682,7 +598,6 @@ MechS32 CountAmmo(MechS32 p_id)
 	return count;
 }
 
-// FUNCTION: MW2SHELL 0x100082de
 void RemoveAmmo(MechS32 p_id)
 {
 	MechS32 j;
@@ -709,7 +624,6 @@ void RemoveAmmo(MechS32 p_id)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100083d6
 MechS32 AddWeapon(MechS32 p_id)
 {
 	MechS32 i;
@@ -730,7 +644,6 @@ MechS32 AddWeapon(MechS32 p_id)
 	return 0;
 }
 
-// FUNCTION: MW2SHELL 0x10008470
 void RemoveWeapon(MechS32 p_id)
 {
 	MechS32 j;
@@ -778,9 +691,6 @@ void RemoveWeapon(MechS32 p_id)
 	}
 }
 
-// Operand order: the original adds m_engineMass last in the m_usedMass sum; it follows the unit's
-// symbol table.
-// FUNCTION: MW2SHELL 0x10008686
 void UpdateMass()
 {
 	g_variant.m_gyroMass = RoundUpTons((MechS32) (g_variant.m_engineRating / 100.0 * 100.0));
@@ -793,7 +703,6 @@ void UpdateMass()
 	g_variant.m_freeMass = g_variant.m_maxMass - g_variant.m_usedMass;
 }
 
-// FUNCTION: MW2SHELL 0x10008739
 void UpdateSpeed()
 {
 	g_variant.m_walkingSpeed = g_variant.m_engineRating * 100 / g_variant.m_maxMass;
@@ -802,12 +711,10 @@ void UpdateSpeed()
 
 // Empty. UpdateStats calls it after UpdateSpeed, so it is probably an update step whose body
 // was removed; nothing says which.
-// FUNCTION: MW2SHELL 0x10008776
 void FUN_10008776()
 {
 }
 
-// FUNCTION: MW2SHELL 0x10008786
 void UpdateHeatSinks()
 {
 	MechS32 count;
@@ -831,7 +738,6 @@ void UpdateHeatSinks()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000884c
 void UpdateEngine()
 {
 	g_variant.m_engineRating = g_engines[g_variant.m_engine % 10000].m_rating;
@@ -850,7 +756,6 @@ void UpdateEngine()
 	g_variant.m_unk0x21c = g_variant.m_maxMass - g_variant.m_engineMass;
 }
 
-// FUNCTION: MW2SHELL 0x100088ec
 void UpdateJumpJets()
 {
 	UpdateSpeed();
@@ -872,7 +777,6 @@ void UpdateJumpJets()
 	g_variant.m_jumpJetMass = g_variant.m_jumpJets * g_variant.m_jumpJetUnitMass;
 }
 
-// FUNCTION: MW2SHELL 0x10008989
 void UpdateStats()
 {
 	UpdateMass();
@@ -880,7 +784,6 @@ void UpdateStats()
 	FUN_10008776();
 }
 
-// FUNCTION: MW2SHELL 0x100089a8
 void UpdateWeaponMass()
 {
 	MechS32 i;
@@ -893,7 +796,6 @@ void UpdateWeaponMass()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10008a16
 void UpdateArmor()
 {
 	MechS32 i;
@@ -935,7 +837,6 @@ void UpdateArmor()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10008b76
 void UpdateAmmoMass()
 {
 	MechS32 i;
@@ -950,7 +851,6 @@ void UpdateAmmoMass()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10008bce
 TextGlyph* DrawLocationMap(ScreenField* p_tab)
 {
 	// An empty test of the unused parameter: the original compiles it to a cmp with a zero-length je.
@@ -967,7 +867,6 @@ TextGlyph* DrawLocationMap(ScreenField* p_tab)
 	return NULL;
 }
 
-// FUNCTION: MW2SHELL 0x10008c30
 TextGlyph* DrawMass(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -977,7 +876,6 @@ TextGlyph* DrawMass(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x10008cb0
 TextGlyph* DrawUsedMass(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -993,7 +891,6 @@ TextGlyph* DrawUsedMass(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, colors);
 }
 
-// FUNCTION: MW2SHELL 0x10008dcc
 TextGlyph* DrawEngineRating(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1003,7 +900,6 @@ TextGlyph* DrawEngineRating(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x10008e4f
 TextGlyph* DrawEngineType(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1013,7 +909,6 @@ TextGlyph* DrawEngineType(ScreenField* p_tab)
 		->AddOverlayText(p_tab->m_left, p_tab->m_top, (MechChar*) (value >= 10000 ? "XL" : "Std"), p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x10008eaa
 TextGlyph* DrawEngineMaker(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1023,7 +918,6 @@ TextGlyph* DrawEngineMaker(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x10008f14
 TextGlyph* DrawSpeed(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1033,7 +927,6 @@ TextGlyph* DrawSpeed(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x10008fdd
 TextGlyph* DrawHeatSinkCount(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1051,7 +944,6 @@ TextGlyph* DrawHeatSinkCount(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x10009076
 TextGlyph* DrawHeatSinkType(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1061,7 +953,6 @@ TextGlyph* DrawHeatSinkType(ScreenField* p_tab)
 		->AddOverlayText(p_tab->m_left, p_tab->m_top, (MechChar*) (value == 1 ? "Single" : "Double"), p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x100090ce
 TextGlyph* DrawNumber(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1071,7 +962,6 @@ TextGlyph* DrawNumber(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x1000918c
 TextGlyph* DrawLabel(ScreenField* p_tab)
 {
 	MechChar* text;
@@ -1084,7 +974,6 @@ TextGlyph* DrawLabel(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, text, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x100091dc
 TextGlyph* DrawTitle(ScreenField* p_tab)
 {
 	MechChar* text;
@@ -1097,7 +986,6 @@ TextGlyph* DrawTitle(ScreenField* p_tab)
 	return g_titleFont->AddOverlayText(p_tab->m_left, p_tab->m_top, text, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x1000922c
 TextGlyph* DrawInternalType(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1107,7 +995,6 @@ TextGlyph* DrawInternalType(ScreenField* p_tab)
 		->AddOverlayText(p_tab->m_left, p_tab->m_top, (MechChar*) (value ? "Endo-S" : "Std"), p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x10009284
 TextGlyph* DrawArmorType(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1117,7 +1004,6 @@ TextGlyph* DrawArmorType(ScreenField* p_tab)
 		->AddOverlayText(p_tab->m_left, p_tab->m_top, (MechChar*) (value ? "Ferro-F" : "Std"), p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x100092dc
 TextGlyph* DrawLocationArmor(ScreenField* p_tab)
 {
 	MekVariant::Armor* armor;
@@ -1138,7 +1024,6 @@ TextGlyph* DrawLocationArmor(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x100093a7
 TextGlyph* DrawArmorAllocation(ScreenField* p_tab)
 {
 	MekVariant::Armor* armor;
@@ -1154,7 +1039,6 @@ TextGlyph* DrawArmorAllocation(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x1000943f
 TextGlyph* DrawLocationMaxArmor(ScreenField* p_tab)
 {
 	MechS32 location;
@@ -1168,7 +1052,6 @@ TextGlyph* DrawLocationMaxArmor(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x100094ba
 TextGlyph* DrawSelectedLocation(ScreenField* p_tab)
 {
 	MechS32 location;
@@ -1182,7 +1065,6 @@ TextGlyph* DrawSelectedLocation(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x10009537
 TextGlyph* DrawWeaponEntry(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1223,7 +1105,6 @@ TextGlyph* DrawWeaponEntry(ScreenField* p_tab)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100096bd
 TextGlyph* DrawWeaponTableEntry(ScreenField* p_tab)
 {
 	MechS32 index;
@@ -1243,7 +1124,6 @@ TextGlyph* DrawWeaponTableEntry(ScreenField* p_tab)
 }
 
 // Draws one statistic (p_tab->m_data) of the highlighted weapon.
-// FUNCTION: MW2SHELL 0x100097a0
 TextGlyph* DrawWeaponInfo(ScreenField* p_tab)
 {
 	MechS32 weapon;
@@ -1347,7 +1227,6 @@ TextGlyph* DrawWeaponInfo(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x10009d50
 TextGlyph* DrawLocationName(ScreenField* p_tab)
 {
 	MechS32 location;
@@ -1362,8 +1241,6 @@ TextGlyph* DrawLocationName(ScreenField* p_tab)
 
 // Draws the item in one critical slot (p_tab->m_data) of the selected location: a weapon, a
 // piece of equipment or ammunition (ids from 10000 up).
-// Not 100%: the stack slots of id and i are permuted.
-// FUNCTION: MW2SHELL 0x10009da9
 TextGlyph* DrawCritical(ScreenField* p_tab)
 {
 	MechS32 id;
@@ -1405,8 +1282,6 @@ TextGlyph* DrawCritical(ScreenField* p_tab)
 }
 
 // Draws one entry (p_tab->m_data) of the items list with its count, like DrawCritical.
-// Not 100%: the stack slots of id, count and i are permuted.
-// FUNCTION: MW2SHELL 0x10009f92
 TextGlyph* DrawUnassigned(ScreenField* p_tab)
 {
 	MechS32 id;
@@ -1444,7 +1319,6 @@ TextGlyph* DrawUnassigned(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x1000a161
 TextGlyph* DrawMore(ScreenField* p_tab)
 {
 	if (g_variant.m_unassigned[MECH_PTR_TO_S32(p_tab->m_data)].m_id <= 0) {
@@ -1454,7 +1328,6 @@ TextGlyph* DrawMore(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, "More...", p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x1000a1b0
 TextGlyph* DrawYesNo(ScreenField* p_tab)
 {
 	MechS32 value;
@@ -1464,8 +1337,6 @@ TextGlyph* DrawYesNo(ScreenField* p_tab)
 		->AddOverlayText(p_tab->m_left, p_tab->m_top, (MechChar*) (value ? "Yes" : "No"), p_tab->m_colors);
 }
 
-// Stack-slot permutation: id and text.
-// FUNCTION: MW2SHELL 0x1000a208
 TextGlyph* DrawEquipmentName(ScreenField* p_tab)
 {
 	MechS32 id;
@@ -1495,7 +1366,6 @@ TextGlyph* DrawEquipmentName(ScreenField* p_tab)
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, text, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x1000a2eb
 void ShowComponent(ScreenField* p_tab)
 {
 	ScreenField* tabs;
@@ -1511,7 +1381,6 @@ void ShowComponent(ScreenField* p_tab)
 	ShowFields(g_componentFields);
 }
 
-// FUNCTION: MW2SHELL 0x1000a36d
 void ShowWeapons(ScreenField* p_tab)
 {
 	g_variant.m_selectedWeapon = -1;
@@ -1521,7 +1390,6 @@ void ShowWeapons(ScreenField* p_tab)
 	SetVideoFlags(14, 0x20, 0x20);
 }
 
-// FUNCTION: MW2SHELL 0x1000a3b5
 void ShowArmor(ScreenField* p_tab)
 {
 	ShowComponent(p_tab);
@@ -1530,7 +1398,6 @@ void ShowArmor(ScreenField* p_tab)
 	SetVideoFlags(14, 0x20, 0x20);
 }
 
-// FUNCTION: MW2SHELL 0x1000a3f3
 void ShowCriticals(ScreenField* p_tab)
 {
 	ShowComponent(p_tab);
@@ -1540,7 +1407,6 @@ void ShowCriticals(ScreenField* p_tab)
 	SetVideoFlags(14, 0x20, 0x20);
 }
 
-// FUNCTION: MW2SHELL 0x1000a43b
 void EditVariantName(ScreenField* p_tab)
 {
 	if (p_tab->m_glyph != NULL) {
@@ -1559,7 +1425,6 @@ void EditVariantName(ScreenField* p_tab)
 	p_tab->m_glyph = g_defaultFont->AddText(p_tab->m_left, p_tab->m_top, (MechChar*) p_tab->m_data, p_tab->m_colors);
 }
 
-// FUNCTION: MW2SHELL 0x1000a4f0
 void ClickFaster(ScreenField* p_tab)
 {
 	MechS32 rating;
@@ -1589,10 +1454,6 @@ void ClickFaster(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// The rating product differs only in evaluation order: the original divides m_maxMass before
-// loading m_walkingSpeed - 1, as ClickFaster does; the order follows the unit's symbol table (it has
-// flipped between the two functions as declarations moved).
-// FUNCTION: MW2SHELL 0x1000a5a3
 void ClickSlower(ScreenField* p_tab)
 {
 	MechS32 rating;
@@ -1626,7 +1487,6 @@ void ClickSlower(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000a668
 void ToggleEngineType(ScreenField* p_tab)
 {
 	MechS32 i;
@@ -1670,7 +1530,6 @@ void ToggleEngineType(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000a7ae
 void AddJumpJet(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1686,7 +1545,6 @@ void AddJumpJet(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000a803
 void RemoveJumpJet(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1701,7 +1559,6 @@ void RemoveJumpJet(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000a84d
 void AddHeatSink(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1712,7 +1569,6 @@ void AddHeatSink(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000a878
 void RemoveHeatSink(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1726,7 +1582,6 @@ void RemoveHeatSink(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000a8b0
 void ToggleHeatSinkType(ScreenField* p_tab)
 {
 	MechS32 i;
@@ -1746,7 +1601,6 @@ void ToggleHeatSinkType(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000a955
 void ClickAddArmor(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1757,7 +1611,6 @@ void ClickAddArmor(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000a980
 void ClickRemoveArmor(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1771,7 +1624,6 @@ void ClickRemoveArmor(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000a9b8
 void ToggleArmorType(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1801,7 +1653,6 @@ void ToggleArmorType(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000aac2
 void ToggleInternalType(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1833,7 +1684,6 @@ void ToggleInternalType(ScreenField* p_tab)
 	RedrawFields(g_screenFields);
 }
 
-// FUNCTION: MW2SHELL 0x1000abe8
 void ClickAddWeapon(ScreenField* p_tab)
 {
 	MechS32 id;
@@ -1863,7 +1713,6 @@ void ClickAddWeapon(ScreenField* p_tab)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000acc4
 void ClickDeleteWeapon(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1884,7 +1733,6 @@ void ClickDeleteWeapon(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000ad3f
 void ClickAddAmmo(ScreenField* p_tab)
 {
 	MechS32 id;
@@ -1910,7 +1758,6 @@ void ClickAddAmmo(ScreenField* p_tab)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000adf9
 void ClickDeleteAmmo(ScreenField* p_tab)
 {
 	MechS32 count;
@@ -1936,7 +1783,6 @@ void ClickDeleteAmmo(ScreenField* p_tab)
 	UpdateStats();
 }
 
-// FUNCTION: MW2SHELL 0x1000aeaa
 void SelectWeapon(ScreenField* p_tab)
 {
 	MechS32 id;
@@ -1953,7 +1799,6 @@ void SelectWeapon(ScreenField* p_tab)
 	g_variant.m_selectedWeapon = *(MechS32*) p_tab->m_data;
 }
 
-// FUNCTION: MW2SHELL 0x1000af16
 void SelectWeaponType(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1969,7 +1814,6 @@ void SelectWeaponType(ScreenField* p_tab)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000af87
 void NextLocation(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -1982,15 +1826,12 @@ void NextLocation(ScreenField* p_tab)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000afc9
 void SelectLocation(ScreenField* p_tab)
 {
 	g_locationSound->Start();
 	g_variant.m_selectedLocation = MECH_PTR_TO_S32(p_tab->m_data);
 }
 
-// Stack-slot permutation: id and count.
-// FUNCTION: MW2SHELL 0x1000afef
 void ClickUnassigned(ScreenField* p_tab)
 {
 	MechS32 id;
@@ -2015,14 +1856,12 @@ void ClickUnassigned(ScreenField* p_tab)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000b0c2
 void ClickMore(ScreenField* p_tab)
 {
 	if (p_tab) {
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000b0dc
 void ClickCritical(ScreenField* p_tab)
 {
 	MechS32 id;
@@ -2044,9 +1883,6 @@ void ClickCritical(ScreenField* p_tab)
 	UnassignItem(id);
 }
 
-// Comparison operand order: the original loads m_armorAllocated into eax and compares m_armorFactor with
-// it, the reverse of ours; flipping the source didn't change it.
-// FUNCTION: MW2SHELL 0x1000b166
 void AddFrontArmor(ScreenField* p_tab)
 {
 	MekVariant::Armor* armor;
@@ -2077,7 +1913,6 @@ void AddFrontArmor(ScreenField* p_tab)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000b239
 void RemoveFrontArmor(ScreenField* p_tab)
 {
 	MekVariant::Armor* armor;
@@ -2092,9 +1927,6 @@ void RemoveFrontArmor(ScreenField* p_tab)
 	}
 }
 
-// Comparison operand order: the original loads m_armorAllocated into eax and compares m_armorFactor with
-// it, the reverse of ours; flipping the source didn't change it.
-// FUNCTION: MW2SHELL 0x1000b284
 void AddRearArmor(ScreenField* p_tab)
 {
 	MekVariant::Armor* armor;
@@ -2123,7 +1955,6 @@ void AddRearArmor(ScreenField* p_tab)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000b339
 void RemoveRearArmor(ScreenField* p_tab)
 {
 	MekVariant::Armor* armor;
@@ -2140,7 +1971,6 @@ void RemoveRearArmor(ScreenField* p_tab)
 
 // Toggles the flag at m_data and adds or removes the item id held in m_arg. The arm
 // actuators (5401, 5402, 5451, 5452) take a fixed slot in the arms, replacing what is there.
-// FUNCTION: MW2SHELL 0x1000b384
 void ToggleEquipment(ScreenField* p_tab)
 {
 	MechS32* flag;
@@ -2209,9 +2039,6 @@ void ToggleEquipment(ScreenField* p_tab)
 }
 
 // Returns the first tab with a click callback that contains the point.
-// Operand order: the original loads m_width before m_left; swapping them in the source didn't
-// change it.
-// FUNCTION: MW2SHELL 0x1000b5ed
 ScreenField* FindFieldAt(ScreenField* p_tabs, MechS32 p_x, MechS32 p_y)
 {
 	if (p_tabs) {
@@ -2228,7 +2055,6 @@ ScreenField* FindFieldAt(ScreenField* p_tabs, MechS32 p_x, MechS32 p_y)
 	return NULL;
 }
 
-// FUNCTION: MW2SHELL 0x1000b679
 MechS32 FindMekItemInLocation(MechS32 p_id, MechS32 p_location, MechS32* p_slot)
 {
 	MechS32 i;
@@ -2245,8 +2071,6 @@ MechS32 FindMekItemInLocation(MechS32 p_id, MechS32 p_location, MechS32* p_slot)
 	return FALSE;
 }
 
-// Stack-slot permutation: location and slot.
-// FUNCTION: MW2SHELL 0x1000b6f4
 MechS32 FindMekItem(MechS32 p_id, MechS32* p_location, MechS32* p_slot)
 {
 	MechS32 location;
@@ -2269,8 +2093,6 @@ MechS32 FindMekItem(MechS32 p_id, MechS32* p_location, MechS32* p_slot)
 
 // Saves the variant being edited to the .mek file p_name in the mek directory, creating the
 // directory if needed. Returns 1, or 0 on failure.
-// Not 100%: the original loads the index before the base in m_criticals[i][j] in the slot loop.
-// FUNCTION: MW2SHELL 0x1000b771
 MechS32 SaveMekFile(MechChar* p_name)
 {
 	MechS32 ammo;
@@ -2387,7 +2209,6 @@ MechS32 SaveMekFile(MechChar* p_name)
 
 // Returns the image of a .mek file: a user variant from the mek directory, or a standard one
 // ("…std") from the project file.
-// FUNCTION: MW2SHELL 0x1000bce5
 void* LoadMekImage(MechChar* p_name)
 {
 	MechChar path[0x20];
@@ -2412,7 +2233,6 @@ void* LoadMekImage(MechChar* p_name)
 	return g_projectArchive->GetResourceByName(p_name, 6, "MEK");
 }
 
-// FUNCTION: MW2SHELL 0x1000be09
 void ReleaseMekImage(MechChar* p_name)
 {
 	if (!strncasecmp(p_name + 5, "std", 3)) {
@@ -2421,14 +2241,12 @@ void ReleaseMekImage(MechChar* p_name)
 }
 
 // Copies p_size bytes and returns the source position after them.
-// FUNCTION: MW2SHELL 0x1000be4d
 undefined* ReadBytes(undefined* p_dst, undefined* p_src, MechU32 p_size)
 {
 	memcpy(p_dst, p_src, p_size);
 	return p_src + p_size;
 }
 
-// FUNCTION: MW2SHELL 0x1000be7a
 void SetCritical(MechS32 p_location, MechS32 p_slot, MechS32 p_id)
 {
 	MechS32 count;
@@ -2447,9 +2265,6 @@ void SetCritical(MechS32 p_location, MechS32 p_slot, MechS32 p_id)
 
 // Loads the .mek file p_name into the variant being edited, keeping the previous variant in
 // g_previousVariant, and derives the engine, armor and internal structure from it.
-// Not 100%: the stack slots of the locals are permuted, and m_items[j] of g_mekLocations loads the
-// base before the index.
-// FUNCTION: MW2SHELL 0x1000befe
 void LoadMekFile(MechChar* p_name)
 {
 	MechS32 id;
@@ -2667,7 +2482,6 @@ void LoadMekFile(MechChar* p_name)
 
 // Lists the variants of a mech: the standard ones from the project file in 1-99 (and the name
 // of the first in 0), the user's from the mek directory in 100-199.
-// FUNCTION: MW2SHELL 0x1000c8b8
 void LoadMechBuildList(MechChar* p_prefix)
 {
 	MechS32 i;
@@ -2700,7 +2514,6 @@ void LoadMechBuildList(MechChar* p_prefix)
 	MechFileListFree(files);
 }
 
-// FUNCTION: MW2SHELL 0x1000ca74
 void LoadChassis()
 {
 	sprintf(g_chassisVideoName, g_chassisVideoFormat, g_mechChassis[g_selectedChassis].m_code);
@@ -2712,8 +2525,7 @@ void LoadChassis()
 	strcpy(&g_variant.m_title[1], g_mechChassis[g_selectedChassis].m_name);
 }
 
-// Plays the selected mech's name. Stack-slot permutation: audioData and audioSize.
-// FUNCTION: MW2SHELL 0x1000cba7
+// Plays the selected mech's name.
 void PlayChassisName()
 {
 	void* audioData;
@@ -2734,9 +2546,6 @@ void PlayChassisName()
 	g_chassisNameSound->Start();
 }
 
-// Comparison operand order: the original loads g_chassisCount into eax and compares
-// g_selectedChassis with it, the reverse of ours; flipping the source didn't change it.
-// FUNCTION: MW2SHELL 0x1000cce5
 void NextChassis()
 {
 	g_selectedChassis++;
@@ -2749,7 +2558,6 @@ void NextChassis()
 	LoadChassis();
 }
 
-// FUNCTION: MW2SHELL 0x1000cd2a
 void PreviousChassis()
 {
 	g_selectedChassis--;
@@ -2762,7 +2570,6 @@ void PreviousChassis()
 	LoadChassis();
 }
 
-// FUNCTION: MW2SHELL 0x1000cd65
 void NextVariant()
 {
 	for (g_selectedVariant++; g_selectedVariant < 200; g_selectedVariant++) {
@@ -2783,7 +2590,6 @@ void NextVariant()
 	RedrawFields(g_screenFields);
 }
 
-// FUNCTION: MW2SHELL 0x1000ce50
 void PreviousVariant()
 {
 	if (g_selectedVariant == 0) {
@@ -2809,7 +2615,6 @@ void PreviousVariant()
 }
 
 // Saves the variant under the first free user slot. Returns FALSE when the variant is invalid.
-// FUNCTION: MW2SHELL 0x1000cf4c
 MechS32 SaveUserVariant()
 {
 	MechS32 i;
@@ -2867,7 +2672,6 @@ extern ScreenField g_criticalFields[];
 extern ScreenField g_customizeFields[];
 extern ScreenField g_mechBayFields[];
 
-// GLOBAL: MW2SHELL 0x1005de80
 ScreenField g_engineFields[] = {
 	MB_TAB(444, 64, -1, -1, g_textColors, DrawLabel, NULL, "ENGINE", NULL),
 	MB_TAB(444, MB_ROW(2, 2), -1, -1, g_textColors, DrawLabel, NULL, "Rating", NULL),
@@ -2887,7 +2691,6 @@ ScreenField g_engineFields[] = {
 	MB_END,
 };
 
-// GLOBAL: MW2SHELL 0x1005e140
 ScreenField g_heatSinkFields[] = {
 	MB_TAB(444, 64, -1, -1, g_textColors, DrawLabel, NULL, "HEAT SINKS", NULL),
 	MB_TAB(444, MB_ROW(2, 2), -1, -1, g_textColors, DrawLabel, NULL, "Count", NULL),
@@ -2911,7 +2714,6 @@ ScreenField g_heatSinkFields[] = {
 	MB_END,
 };
 
-// GLOBAL: MW2SHELL 0x1005e2f8
 ScreenField g_jumpJetFields[] = {
 	MB_TAB(444, 64, -1, -1, g_textColors, DrawLabel, NULL, "JUMP JETS", NULL),
 	MB_TAB(444, MB_ROW(2, 2), -1, -1, g_textColors, DrawLabel, NULL, "Count", NULL),
@@ -2923,7 +2725,6 @@ ScreenField g_jumpJetFields[] = {
 	MB_END,
 };
 
-// GLOBAL: MW2SHELL 0x1005e458
 ScreenField g_internalFields[] = {
 	MB_TAB(444, 64, -1, -1, g_textColors, DrawLabel, NULL, "INTERNAL STRUCTURE", NULL),
 	MB_TAB(444, MB_ROW(2, 2), -1, -1, g_textColors, DrawLabel, NULL, "Type", NULL),
@@ -2959,7 +2760,6 @@ ScreenField g_internalFields[] = {
 	MB_END,
 };
 
-// GLOBAL: MW2SHELL 0x1005e820
 ScreenField g_armorFields[] = {
 	MB_TAB(0, 0, -1, -1, g_textColors, DrawLocationMap, NULL, 0, NULL),
 	MB_TAB(444, 64, -1, -1, g_textColors, DrawLabel, NULL, "ARMOR", NULL),
@@ -3018,7 +2818,6 @@ ScreenField g_armorFields[] = {
 	MB_END,
 };
 
-// GLOBAL: MW2SHELL 0x1005efe0
 ScreenField g_equipmentFields[] = {
 	MB_TAB(444, 64, -1, -1, g_textColors, DrawLabel, NULL, "EQUIPMENT", NULL),
 	MB_TAB(444, MB_ROW(2, 2), -1, -1, g_textColors, DrawLabel, NULL, "Yes", NULL),
@@ -3086,7 +2885,6 @@ ScreenField g_equipmentFields[] = {
 	MB_END,
 };
 
-// GLOBAL: MW2SHELL 0x1005f248
 ScreenField g_weaponFields[] = {
 	MB_TAB(224, 64, -1, -1, g_textColors, DrawLabel, NULL, "WEAPONS AND AMMO", NULL),
 	MB_TAB(224, MB_ROW(2, 2), 130, -1, g_textColors, DrawWeaponEntry, SelectWeapon, &g_variant.m_weapons[0], NULL),
@@ -3149,7 +2947,6 @@ ScreenField g_weaponFields[] = {
 	MB_END,
 };
 
-// GLOBAL: MW2SHELL 0x1005fc70
 ScreenField g_criticalFields[] = {
 	MB_TAB(0, 0, -1, -1, g_textColors, DrawLocationMap, NULL, 0, NULL),
 	MB_TAB(224, 64, 100, -1, g_activeColors, DrawLocationName, NextLocation, &g_variant.m_selectedLocation, NULL),
@@ -3212,7 +3009,6 @@ ScreenField g_criticalFields[] = {
 	MB_END,
 };
 
-// GLOBAL: MW2SHELL 0x10060698
 ScreenField g_customizeFields[] = {
 	MB_TAB(320, 4, -1, -1, g_textColors, DrawTitle, NULL, "~CUSTOMIZING", NULL),
 	MB_TAB(320, 28, -1, -1, g_textColors, DrawTitle, NULL, g_variant.m_title, NULL),
@@ -3254,7 +3050,6 @@ ScreenField g_customizeFields[] = {
 	MB_END,
 };
 
-// GLOBAL: MW2SHELL 0x10060d20
 ScreenField g_mechBayFields[] = {
 	MB_TAB(320, 4, -1, -1, g_textColors, DrawTitle, NULL, g_callsignLine, NULL),
 	MB_TAB(320, 28, -1, -1, g_textColors, DrawTitle, NULL, g_variant.m_title, NULL),
@@ -3312,8 +3107,6 @@ ScreenField g_mechBayFields[] = {
 
 // Opens the mech bay: its sounds, color maps, menu and videos, the chassis and variant of the
 // current star's selected mech, and its fields.
-// Not 100%: the stack slots of data, i and size are permuted.
-// FUNCTION: MW2SHELL 0x1000d0d4
 void DrawMechBay(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam)
 {
 	CustomStar* star;

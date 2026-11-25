@@ -27,7 +27,6 @@ enum {
 };
 
 // A projectile in flight.
-// SIZE 0x50
 typedef struct Shot {
 	MechS32 m_type;        // 0x00 — 7 for a shot that knocks mechs down
 	MechS32 m_impact;      // 0x04 — the effect it sets off, with c_impactMech etc.

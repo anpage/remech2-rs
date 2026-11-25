@@ -4,7 +4,6 @@
 #include "decomp.h"
 #include "types.h"
 
-// SIZE 0x40
 typedef struct GameThing {
 	MechS16 m_flags;                   // 0x00 — 4: destroyed
 	MechS16 m_teamsReached;            // 0x02 — a bit per team that reached it

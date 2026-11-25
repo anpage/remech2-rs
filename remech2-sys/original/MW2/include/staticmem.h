@@ -5,7 +5,6 @@
 #include "types.h"
 
 // A static pool: the room reserved for the blocks of one tag, inside one of the groups.
-// SIZE 0x14
 typedef struct StaticPool {
 	MechU32 m_tag;    // 0x00 — a keyword code
 	MechS32 m_size;   // 0x04
@@ -15,7 +14,6 @@ typedef struct StaticPool {
 } StaticPool;
 
 // One allocation that static pools share.
-// SIZE 0x0c
 typedef struct StaticPoolGroup {
 	undefined* m_block; // 0x00
 	MechS32 m_size;     // 0x04

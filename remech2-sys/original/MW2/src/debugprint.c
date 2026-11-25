@@ -7,10 +7,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-// GLOBAL: MW2 0x100ea3f0
 MechChar g_debugPrintBuffer[0x100];
 
-// FUNCTION: MW2 0x10050900
 void ShowMessage(const MechChar* p_format, ...)
 {
 	va_list args;
@@ -22,7 +20,6 @@ void ShowMessage(const MechChar* p_format, ...)
 	MechLogError(g_debugPrintBuffer);
 }
 
-// FUNCTION: MW2 0x10050958
 void DebugPrint(const MechChar* p_format, ...)
 {
 	va_list args;

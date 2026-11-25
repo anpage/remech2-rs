@@ -24,42 +24,28 @@
 
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(DepthEntry, 0x8)
-DECOMP_SIZE_ASSERT(ProjectedVertex, 0x20)
-DECOMP_SIZE_ASSERT(QueuedPolygon, 0xc)
-
 // The number of entries in the list being built.
-// GLOBAL: MW2 0x100a54b0
 MechS32 g_depthEntryCount = 0;
 
-// GLOBAL: MW2 0x100a54b4
 MechS32 g_polygonCount = 0;
 
-// GLOBAL: MW2 0x100a54b8
 MechS32 g_maxPolygons = 0;
 
-// GLOBAL: MW2 0x1010b5a0
 MechS32 g_shapesDrawn;
 
 // The depth the shapes are queued at.
-// GLOBAL: MW2 0x1010b5a4
 MechS32 g_queueDepth;
 
 // The list being built: g_depthQueue or g_drawList.
-// GLOBAL: MW2 0x1010b5c4
 DepthEntry* g_depthList;
 
 // The flags of the shape being queued.
-// GLOBAL: MW2 0x1010b5c8
 MechU32 g_queuedShapeFlags;
 
-// GLOBAL: MW2 0x1010b5cc
 MechS32 g_shapesConsidered;
 
 // Selects the shape's level of detail for p_depth (the first model whose distance, scaled by the
 // eyepoint, lies beyond it, or the last) and queues its faces. Returns 1 if it has no model.
-// Stack-slot permutation: every local.
-// FUNCTION: MW2 0x100335d0
 MechS32 QueueShapeLod(Shape* p_shape, MechS32 p_depth)
 {
 	Model* model;
@@ -136,9 +122,6 @@ MechS32 QueueShapeLod(Shape* p_shape, MechS32 p_depth)
 }
 
 // Sorts the entries from p_first to p_last, farthest first (a quicksort).
-// The p_last/p_first comparison loads its operands in the opposite order (one attempt at swapping
-// them didn't flip it), and stack-slot permutation: the swaps' temporaries.
-// FUNCTION: MW2 0x1003378e
 void SortDepthEntries(DepthEntry* p_first, DepthEntry* p_last)
 {
 	MechS32 pivot;
@@ -200,7 +183,6 @@ void SortDepthEntries(DepthEntry* p_first, DepthEntry* p_last)
 
 // Draws the shapes of the list p_root heads, farthest first. Shapes flagged 0x100 are queued
 // whole and expanded after the sort (DrawDepthQueue).
-// FUNCTION: MW2 0x100338bb
 void DrawShapeList(Shape* p_root)
 {
 	Shape* shape;
@@ -239,9 +221,6 @@ void DrawShapeList(Shape* p_root)
 
 // Sorts the queue DrawShapeList built, moves its polygons to g_drawList in order, expanding
 // each whole shape into its own sorted run of polygons, and draws them.
-// The i/count and g_polygonCount/g_maxPolygons comparisons load their operands in the opposite
-// order (reccmp scores it as an effective match).
-// FUNCTION: MW2 0x10033a06
 void DrawDepthQueue(void)
 {
 	MechS32 count;
@@ -284,7 +263,6 @@ void DrawDepthQueue(void)
 }
 
 // Draws the shapes of the scene tree p_root, farthest first.
-// FUNCTION: MW2 0x10033b9e
 void DrawObjTreeShapes(SceneObject* p_root)
 {
 	MechS32 i;
@@ -305,7 +283,6 @@ void DrawObjTreeShapes(SceneObject* p_root)
 }
 
 // Queues the polygons of p_object's shape and of its descendants' shapes.
-// FUNCTION: MW2 0x10033c4b
 void QueueObjTree(SceneObject* p_object)
 {
 	SceneObject* child;
@@ -329,7 +306,6 @@ void QueueObjTree(SceneObject* p_object)
 	}
 }
 
-// FUNCTION: MW2 0x10033d0f
 void DrawShapeListFrom(Shape* p_root, Eyepoint* p_eyepoint)
 {
 	SelectEyepoint(p_eyepoint);
@@ -337,8 +313,6 @@ void DrawShapeListFrom(Shape* p_root, Eyepoint* p_eyepoint)
 }
 
 // Draws a queued polygon, clipping it to the screen first if a vertex lies far outside it.
-// Stack-slot permutation: every local.
-// FUNCTION: MW2 0x10033d32
 void DrawQueuedPolygon(QueuedPolygon* p_poly)
 {
 	ProjectedVertex* vertex;
@@ -380,8 +354,6 @@ void DrawQueuedPolygon(QueuedPolygon* p_poly)
 
 // Clips a queued polygon to the screen (right, left, top and bottom in turn) and stores the
 // result in p_points, six dwords per vertex. Returns the number of vertices.
-// Stack-slot permutation: every local.
-// FUNCTION: MW2 0x10033e92
 MechS32 ClipPolygonToScreen(QueuedPolygon* p_poly, MechU32* p_points)
 {
 	ProjectedVertex* cur;
@@ -567,8 +539,6 @@ MechS32 ClipPolygonToScreen(QueuedPolygon* p_poly, MechU32* p_points)
 
 // Returns the depth where the edge from (p_a0, p_z0) to (p_a1, p_z1), in view space, crosses
 // the screen column (p_isX) or row p_edge.
-// Stack-slot permutation: da, dz, t and z.
-// FUNCTION: MW2 0x10034499
 MechS32 GetEdgeCrossingDepth(MechS32 p_a0, MechS32 p_a1, MechS32 p_edge, MechS32 p_isX, MechS32 p_z0, MechS32 p_z1)
 {
 	MechS32 dz;
@@ -604,7 +574,6 @@ MechS32 GetEdgeCrossingDepth(MechS32 p_a0, MechS32 p_a1, MechS32 p_edge, MechS32
 }
 
 // Stores in p_out the point where the edge from p_a to p_b crosses the screen column p_x.
-// FUNCTION: MW2 0x10034571
 void ClipEdgeToColumn(ProjectedVertex* p_a, ProjectedVertex* p_b, MechS32 p_x, ProjectedVertex* p_out)
 {
 	MechS32 z;
@@ -643,7 +612,6 @@ void ClipEdgeToColumn(ProjectedVertex* p_a, ProjectedVertex* p_b, MechS32 p_x, P
 }
 
 // Stores in p_out the point where the edge from p_a to p_b crosses the screen row p_y.
-// FUNCTION: MW2 0x10034779
 void ClipEdgeToRow(ProjectedVertex* p_a, ProjectedVertex* p_b, MechS32 p_y, ProjectedVertex* p_out)
 {
 	MechS32 z;

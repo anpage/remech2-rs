@@ -6,7 +6,6 @@
 // The direction of a gauge needle from the center of its rectangle, as GetRectEdgeAtSlope and
 // GetEllipseEdgeAtAngle switch on it: the needle points left (x at or left of the center), up, and
 // too steeply for a 16.16 slope.
-// SIZE 0x4
 typedef union GaugeQuadrant {
 	struct {
 		MechU32 m_left : 1;  // 0x00 — bit 0

@@ -4,7 +4,6 @@
 #include "types.h"
 
 // A rectangle of the cockpit layout resource (CPIT) (LoadCptFile): its corner and size.
-// SIZE 0x8
 typedef struct CockpitFrame {
 	MechS16 m_x;      // 0x00
 	MechS16 m_y;      // 0x02

@@ -10,7 +10,6 @@ struct Shape;
 // A sound that loops on an object while the eyepoint is in range (FUN_1007ed1e). AmbientSoundTask
 // allocates 0x1e bytes for it, so it is packed.
 #pragma pack(2)
-// SIZE 0x1e
 typedef struct AmbientSound {
 	MechS32 m_range;           // 0x00
 	MechS32 m_slot;            // 0x04 — the sample slot, 8-15, or -1

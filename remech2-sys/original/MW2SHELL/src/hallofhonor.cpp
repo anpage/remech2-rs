@@ -22,7 +22,6 @@ void operator delete(void*);
 #include <stdlib.h>
 #include <string.h>
 
-// FUNCTION: MW2SHELL 0x1003e2f0
 int ComparePilotRecords(const void* p_first, const void* p_second)
 {
 	const PilotRecord* const* firstParam = (const PilotRecord* const*) p_first;
@@ -54,14 +53,11 @@ int ComparePilotRecords(const void* p_first, const void* p_second)
 
 void HallOfHonorCallback(MechS32 p_active);
 
-// GLOBAL: MW2SHELL 0x1006aeac
 LoopingMovie* g_hallOfHonorMovie = NULL;
 
-// GLOBAL: MW2SHELL 0x10090670
 MechChar g_hallOfHonorText[0x20];
 
 // Draw the eight highest-ranking active pilots from both clan rosters.
-// FUNCTION: MW2SHELL 0x1003e3c9
 void DrawHallOfHonor()
 {
 	PilotRecord* pilots[20];
@@ -126,7 +122,6 @@ void DrawHallOfHonor()
 	RegisterMenuFunction(HallOfHonorCallback);
 }
 
-// FUNCTION: MW2SHELL 0x1003e86b
 void HallOfHonorCallback(MechS32 p_active)
 {
 	if (p_active && g_hallOfHonorMovie != NULL) {

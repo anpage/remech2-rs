@@ -11,8 +11,6 @@
 
 // Returns the square root of a 16.16 fixed-point value: a binary search between half and twice
 // FixedSqrtGuess's estimate, for at most 100 steps.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100168f0
 MechU32 FixedSqrt16(MechU32 p_value)
 {
 	MechU32 square;
@@ -51,7 +49,6 @@ MechU32 FixedSqrt16(MechU32 p_value)
 }
 
 // Scales the vector to length 1.0 (16.16); a zero vector stays as it is.
-// FUNCTION: MW2 0x100169b4
 void NormalizeVectorGuarded(MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	MechS32 length;
@@ -64,7 +61,6 @@ void NormalizeVectorGuarded(MechS32* p_x, MechS32* p_y, MechS32* p_z)
 	}
 }
 
-// FUNCTION: MW2 0x10016a2e
 MechS32 FloatVectorLength(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechDouble x = p_x;

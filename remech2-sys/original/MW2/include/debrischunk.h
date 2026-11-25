@@ -6,7 +6,6 @@
 
 // A scene object blown off a model (BlowOffChunk): it flies as a DebrisPiece until it is shot
 // to pieces (DamageChunk) or times out (UpdateDebris), then goes to its callback.
-// SIZE 0x14
 typedef struct DebrisChunk {
 	MechS32 m_active;          // 0x00
 	SceneObject* m_obj;        // 0x04

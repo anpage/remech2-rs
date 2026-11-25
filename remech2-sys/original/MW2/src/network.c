@@ -56,120 +56,85 @@ BOOL PASCAL FindSessionCallback(LPDPSESSIONDESC p_desc, LPVOID p_context, LPDWOR
 BOOL PASCAL FindIpxProviderCallback(LPGUID p_guid, LPSTR p_name, DWORD p_major, DWORD p_minor, LPVOID p_context);
 MechS32 FindSession(LPDPSESSIONDESC p_desc);
 
-// GLOBAL: MW2 0x100a1758
 MechS32 g_stateInterval = 36;
 
 // The number of players of a network game, or 0.
-// GLOBAL: MW2 0x100a175c
 MechS32 g_isNetworkGame = 0;
 
-// GLOBAL: MW2 0x100a1760
 MechChar* g_sessionName = NULL;
 
 // Set when this tick's messages brought the master's clock.
-// GLOBAL: MW2 0x100a1764
 MechS16 g_clockSynced = 0;
 
 // Set when the shell launched the game with its own DirectPlay session.
-// GLOBAL: MW2 0x100a1768
 MechS16 g_launchedByShell = 0;
 
-// GLOBAL: MW2 0x100a1770
 MechS32 g_stateCount = 0;
 
-// GLOBAL: MW2 0x100a1774
 MechS32 g_messagesReceived = 0;
 
-// GLOBAL: MW2 0x100a1778
 MechS32 g_unrecognizedMessages = 0;
 
-// GLOBAL: MW2 0x100a177c
 MechS32 g_successSent = 0;
 
-// GLOBAL: MW2 0x100a1780
 MechS16 g_gameStarted = 0;
 
-// GLOBAL: MW2 0x100a1788
 NetLaunchInfo* g_netLaunch = NULL;
 
 // The send buffers. The weapons message shares the state message's.
 
-// GLOBAL: MW2 0x100a178c
 NetStateMsg* g_stateMsg = NULL;
 
-// GLOBAL: MW2 0x100a1790
 NetWeaponsMsg* g_weaponsMsg = NULL;
 
 // SN: the game things destroyed so far. After the tag, the sender's g_stateCount (an older
 // message is ignored) and a bit for each thing, the first in the high bit of the first byte.
-// GLOBAL: MW2 0x100a1794
 MechU8* g_thingsMsg = NULL;
 
-// GLOBAL: MW2 0x100a1798
 NetChatMsg* g_chatMsg = NULL;
 
 // 1 while the network runs, 2 once it has stopped.
-// GLOBAL: MW2 0x100a179c
 MechS32 g_netState = 0;
 
 // 0 alone, 1 the master (it keeps the clock), 2 a slave.
-// GLOBAL: MW2 0x100a17a0
 MechS32 g_netRole = 0;
 
-// GLOBAL: MW2 0x100a17a8
 GUID g_sessionGuid = {0x5a237e00, 0xea03, 0x11ce, {0x97, 0xdc, 0x00, 0x20, 0xaf, 0x24, 0xc6, 0x4a}};
 
-// GLOBAL: MW2 0x100a17b8
 LPDIRECTPLAY g_directPlay = NULL;
 
-// GLOBAL: MW2 0x100a17bc
 DPID g_localDpid = 99;
 
 // The lowest id among the players: the master's.
-// GLOBAL: MW2 0x100a17c0
 DPID g_masterDpid = 0;
 
-// GLOBAL: MW2 0x100a17c4
 LPGUID g_serviceProvider = NULL;
 
-// GLOBAL: MW2 0x100a17c8
 MechS32 g_nextStateTime = 0;
 
-// GLOBAL: MW2 0x101770a0
 MechChar* g_netRecvBuffer;
 
-// GLOBAL: MW2 0x101770cc
 void* g_unk0x101770cc;
 
-// GLOBAL: MW2 0x101770d0
 MechU32 g_stateMsgSize;
 
 // When each player was last heard from.
-// GLOBAL: MW2 0x101770e0
 MechS32 g_lastHeard[8];
 
 // The clock of each player's last state message.
-// GLOBAL: MW2 0x10177100
 MechS32 g_lastStateClock[8];
 
-// GLOBAL: MW2 0x10177120
 MechS8 g_playerReady[8];
 
-// GLOBAL: MW2 0x10177128
 MechS32 g_playersFound;
 
-// GLOBAL: MW2 0x1017712c
 MechU32 g_thingsMsgSize;
 
-// GLOBAL: MW2 0x10177130
 MechS8 g_playerDestroyed[8];
 
 // The count of each player's last things message.
-// GLOBAL: MW2 0x10177140
 MechS32 g_lastThingsCount[8];
 
-// The only diff is the order the m_playerIds index loads its base and index in.
-// FUNCTION: MW2 0x1000e410
 MechS32 GetPlayerSlotFromNetId(DPID p_id)
 {
 	MechS32 i;
@@ -188,7 +153,6 @@ MechS32 GetPlayerSlotFromNetId(DPID p_id)
 	}
 }
 
-// FUNCTION: MW2 0x1000e493
 void FirstNetwork(NetLaunchInfo* p_netLaunch)
 {
 	MechS32 i;
@@ -235,15 +199,11 @@ void FirstNetwork(NetLaunchInfo* p_netLaunch)
 	}
 }
 
-// FUNCTION: MW2 0x1000e677
 MechS32 FirstExternalCtrl(void)
 {
 	return 1;
 }
 
-// Matches except for a stack-slot permutation of from, player, i, tag and text, and the
-// operand order of the comparisons of slot and i with g_localPlayerId and of the state timer.
-// FUNCTION: MW2 0x1000e68c
 MechS32 UpdateNetwork(void)
 {
 	MechChar text[80];
@@ -362,7 +322,6 @@ MechS32 UpdateNetwork(void)
 	return 1;
 }
 
-// FUNCTION: MW2 0x1000eb05
 void ShutdownNetwork(void)
 {
 	StopExternalIO();
@@ -385,8 +344,6 @@ void ShutdownNetwork(void)
 }
 
 // Sends the local player's state.
-// The only diff is a stack-slot permutation of player, thing, mech, i, section and steering.
-// FUNCTION: MW2 0x1000ebad
 void SendStateMsg(void)
 {
 	Player* player;
@@ -480,9 +437,6 @@ void SendStateMsg(void)
 
 // Sends a chat line to player p_to, or to the players of side 1 (-3), those of side 0 (-2) or
 // everybody (-1). Fails on a line of 80 characters or more.
-// Matches except for a stack-slot permutation of i and size, the operand order of the
-// comparison of i with g_localPlayerId and the order the m_playerIds[p_to] index loads in.
-// FUNCTION: MW2 0x1000efa4
 MechS32 SendChatMsg(MechS32 p_to, MechChar* p_text)
 {
 	MechS32 i;
@@ -522,7 +476,6 @@ MechS32 SendChatMsg(MechS32 p_to, MechChar* p_text)
 	return 1;
 }
 
-// FUNCTION: MW2 0x1000f171
 void ReceiveChatMsg(NetChatMsg* p_msg, MechS32 p_slot)
 {
 	MechChar text[100];
@@ -538,8 +491,6 @@ void ReceiveChatMsg(NetChatMsg* p_msg, MechS32 p_slot)
 }
 
 // Applies a player's state message.
-// The only diff is a stack-slot permutation of its locals.
-// FUNCTION: MW2 0x1000f1ee
 void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 {
 	MechChar text2[40];
@@ -731,7 +682,6 @@ void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 }
 
 // Sends the weapons the local player fired since the last time, if any.
-// FUNCTION: MW2 0x1000f989
 void SendWeaponsMsg(void)
 {
 	Player* player;
@@ -756,8 +706,6 @@ void SendWeaponsMsg(void)
 }
 
 // Fires the weapons of a player's weapons message.
-// The only diff is a stack-slot permutation of player, msg, bit, mech and i.
-// FUNCTION: MW2 0x1000fa58
 void ReceiveWeaponsMsg(NetWeaponsMsg* p_msg, MechS32 p_slot)
 {
 	Player* player;
@@ -786,7 +734,6 @@ void ReceiveWeaponsMsg(NetWeaponsMsg* p_msg, MechS32 p_slot)
 }
 
 // Sends player p_slot a collision push along the normal (p_x, p_y, p_z).
-// FUNCTION: MW2 0x1000faef
 void SendCollisionMsg(MechS32 p_slot, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	Mech* mech;
@@ -805,7 +752,6 @@ void SendCollisionMsg(MechS32 p_slot, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 }
 
 // Applies a collision push from player p_slot to the local mech.
-// FUNCTION: MW2 0x1000fb8f
 void ReceiveCollisionMsg(NetCollisionMsg* p_msg, MechS32 p_slot)
 {
 	MechS32 volume;
@@ -835,7 +781,6 @@ void ReceiveCollisionMsg(NetCollisionMsg* p_msg, MechS32 p_slot)
 }
 
 // Sends GO: a slave is ready, or the master starts the game.
-// FUNCTION: MW2 0x1000fca8
 void SendGoMsg(void)
 {
 	MechChar msg[] = "GO";
@@ -847,7 +792,6 @@ void SendGoMsg(void)
 	}
 }
 
-// FUNCTION: MW2 0x1000fcf5
 void ReceiveGoMsg(MechChar* p_msg, MechS32 p_slot)
 {
 	MechS32 i;
@@ -875,8 +819,6 @@ void ReceiveGoMsg(MechChar* p_msg, MechS32 p_slot)
 }
 
 // Sends the game things destroyed so far.
-// The only diff is a stack-slot permutation of out, i, count and bits.
-// FUNCTION: MW2 0x1000fda6
 void SendThingsMsg(void)
 {
 	MechU8* out;
@@ -909,8 +851,6 @@ void SendThingsMsg(void)
 }
 
 // Destroys the game things a player's things message has destroyed.
-// The only diff is a stack-slot permutation of in, msgCount, i, count and bits.
-// FUNCTION: MW2 0x1000fe61
 void ReceiveThingsMsg(MechU8* p_msg, MechS32 p_slot)
 {
 	MechU8* in;
@@ -945,7 +885,6 @@ void ReceiveThingsMsg(MechU8* p_msg, MechS32 p_slot)
 }
 
 // Sends SU once: the local player's objectives succeeded.
-// FUNCTION: MW2 0x1000ff29
 void SendSuccessMsg(void)
 {
 	MechChar msg[] = "SU";
@@ -956,7 +895,6 @@ void SendSuccessMsg(void)
 	}
 }
 
-// FUNCTION: MW2 0x1000ff70
 void ReceiveSuccessMsg(MechChar* p_msg, MechS32 p_slot)
 {
 	MechChar text[80];
@@ -974,8 +912,6 @@ void ReceiveSuccessMsg(MechChar* p_msg, MechS32 p_slot)
 }
 
 // Counts the players and keeps the lowest id as the master's.
-// The only diff is the operand order of the comparison of p_id with g_masterDpid.
-// FUNCTION: MW2 0x1000ffe6
 BOOL PASCAL CountPlayersCallback(DPID p_id, LPSTR p_friendlyName, LPSTR p_formalName, DWORD p_flags, LPVOID p_context)
 {
 	if (p_id < g_masterDpid) {
@@ -987,7 +923,6 @@ BOOL PASCAL CountPlayersCallback(DPID p_id, LPSTR p_friendlyName, LPSTR p_formal
 }
 
 // Copies the session named g_sessionName into p_context.
-// FUNCTION: MW2 0x1001001a
 BOOL PASCAL FindSessionCallback(LPDPSESSIONDESC p_desc, LPVOID p_context, LPDWORD p_timeout, DWORD p_flags)
 {
 	if (p_flags & DPESC_TIMEDOUT) {
@@ -1002,7 +937,6 @@ BOOL PASCAL FindSessionCallback(LPDPSESSIONDESC p_desc, LPVOID p_context, LPDWOR
 }
 
 // Picks the IPX service provider.
-// FUNCTION: MW2 0x10010098
 BOOL PASCAL FindIpxProviderCallback(LPGUID p_guid, LPSTR p_name, DWORD p_major, DWORD p_minor, LPVOID p_context)
 {
 	if (memcmp(p_name, "WinSock IPX Connection For DirectPlay", 38) == 0) {
@@ -1013,8 +947,6 @@ BOOL PASCAL FindIpxProviderCallback(LPGUID p_guid, LPSTR p_name, DWORD p_major, 
 }
 
 // Looks for the session named g_sessionName, into p_desc.
-// The only diff is a stack-slot permutation of result and desc.
-// FUNCTION: MW2 0x100100cc
 MechS32 FindSession(LPDPSESSIONDESC p_desc)
 {
 	HRESULT result;
@@ -1035,8 +967,6 @@ MechS32 FindSession(LPDPSESSIONDESC p_desc)
 	return 0;
 }
 
-// The only diff is a stack-slot permutation of result, desc, guid and unk0x04.
-// FUNCTION: MW2 0x10010178
 MechS32 StartExternalIO(NetLaunchInfo* p_netLaunch)
 {
 	HRESULT result;
@@ -1149,7 +1079,6 @@ MechS32 StartExternalIO(NetLaunchInfo* p_netLaunch)
 }
 
 // Sends SS and leaves the session, then stops the network.
-// FUNCTION: MW2 0x10010539
 MechS32 StopExternalIO(void)
 {
 	MechChar msg[] = "SS";
@@ -1187,7 +1116,6 @@ MechS32 StopExternalIO(void)
 }
 
 // Counts the players and elects the one with the lowest id master. Alone, the network stops.
-// FUNCTION: MW2 0x10010669
 void ElectMaster(void)
 {
 	HRESULT result;

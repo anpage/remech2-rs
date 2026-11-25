@@ -31,25 +31,19 @@
 
 // Who the chat message goes to: 0 nobody (no message is being typed), -1 everybody, or a
 // player.
-// GLOBAL: MW2 0x100a116c
 MechS32 g_chatRecipient = 0;
 
 // Whether the objectives panel shows.
-// GLOBAL: MW2 0x100a1170
 MechS32 g_showObjectives = 0;
 
-// GLOBAL: MW2 0x100bcd88
 MechChar g_ticksText[16];
 
-// GLOBAL: MW2 0x100bcd98
 MechChar g_secondsText[16];
 
 // The chat message being typed. HandleChatKey edits it.
-// GLOBAL: MW2 0x10179e90
 MechChar g_chatMessage[0x30];
 
 // Formats a tick count (181 per second) as hours:minutes:seconds.
-// FUNCTION: MW2 0x10004f40
 MechChar* FormatTicks(MechS32 p_ticks)
 {
 	MechDouble seconds;
@@ -64,7 +58,6 @@ MechChar* FormatTicks(MechS32 p_ticks)
 }
 
 // Formats a count of seconds as hours:minutes:seconds.
-// FUNCTION: MW2 0x10004ff5
 MechChar* FormatSeconds(MechS32 p_seconds)
 {
 	MechS32 seconds;
@@ -78,9 +71,7 @@ MechChar* FormatSeconds(MechS32 p_seconds)
 	return g_secondsText;
 }
 
-// Matches except for the stack slots of width and c (a consistent permutation).
 // Returns the width of p_text in p_font.
-// FUNCTION: MW2 0x1000507d
 MechS32 GetTextWidth(const MechChar* p_text, void* p_font)
 {
 	MechS32 width;
@@ -97,9 +88,6 @@ MechS32 GetTextWidth(const MechChar* p_text, void* p_font)
 // Lists the objectives of priority p_priority the local player's star can see, from p_pos, each
 // with its state at the right edge of the panel. A name longer than 31 characters takes two
 // lines. In a network game whose only listed objective is a secondary one, it counts as primary.
-// Stack-slot permutation of the locals (label, objective, twoLines, height, i, target, mission,
-// primary, secondary, count, x and y).
-// FUNCTION: MW2 0x100050d1
 void DrawObjectiveList(CockpitPanel* p_panel, Point* p_pos, void* p_font, MechU8 p_priority)
 {
 	PANE* target;
@@ -230,8 +218,6 @@ void DrawObjectiveList(CockpitPanel* p_panel, Point* p_pos, void* p_font, MechU8
 
 // Draws the objectives panel: the objectives by priority, then the mission clock or how the
 // mission ended.
-// Stack-slot permutation of the locals (cursor, mission, font, height, gap, ticks and text).
-// FUNCTION: MW2 0x100056f0
 void DrawObjectivesPanel(CockpitPanel* p_panel)
 {
 	StarMission* mission;
@@ -302,8 +288,6 @@ void DrawObjectivesPanel(CockpitPanel* p_panel)
 // Draws the network status panel: whom the camera tracks, or how to regenerate, or that the
 // game waits for the other players; then the chat message being typed, with its recipients and
 // a cursor.
-// Stack-slot permutation of the locals (state, cursor, pos, color, height, player, gap, text and font).
-// FUNCTION: MW2 0x10005add
 void DrawNetworkPanel(CockpitPanel* p_panel)
 {
 	MechChar* state;
@@ -489,7 +473,6 @@ void DrawNetworkPanel(CockpitPanel* p_panel)
 }
 
 // Shows the local player's kill count in a network game.
-// FUNCTION: MW2 0x100060b6
 void DrawKillsPanel(CockpitPanel* p_panel)
 {
 	void* font;
@@ -520,8 +503,6 @@ void DrawKillsPanel(CockpitPanel* p_panel)
 }
 
 // Shows the autopilot's state.
-// Stack-slot permutation of text and font.
-// FUNCTION: MW2 0x10006189
 void DrawAutopilotPanel(CockpitPanel* p_panel)
 {
 	MechChar* text;
@@ -564,9 +545,7 @@ void DrawAutopilotPanel(CockpitPanel* p_panel)
 	UnlockCachedResource(g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 }
 
-// Stack-slot permutation of mech and font.
 // Shows the local mech's speed in kph, in a different color while it backs up, and its throttle bar.
-// FUNCTION: MW2 0x10006291
 void DrawSpeedPanel(CockpitPanel* p_panel)
 {
 	MechS32 speed;
@@ -608,7 +587,6 @@ void DrawSpeedPanel(CockpitPanel* p_panel)
 }
 
 // Labels the MASC panel while MASC is available.
-// FUNCTION: MW2 0x100063cd
 void DrawMascPanel(CockpitPanel* p_panel)
 {
 	void* font;
@@ -634,9 +612,7 @@ void DrawMascPanel(CockpitPanel* p_panel)
 	UnlockCachedResource(g_artResolution + 1, g_resourceTypeTags[c_resTagFont]);
 }
 
-// Stack-slot permutation of mech and font.
 // Labels the heat panel with the shutdown state and draws the heat bar.
-// FUNCTION: MW2 0x10006484
 void DrawHeatPanel(CockpitPanel* p_panel)
 {
 	Mech* mech;
@@ -681,7 +657,6 @@ void DrawHeatPanel(CockpitPanel* p_panel)
 }
 
 // Labels the heat rate panel and draws its bar.
-// FUNCTION: MW2 0x100065c3
 void DrawHeatRatePanel(CockpitPanel* p_panel)
 {
 	void* font;
@@ -709,7 +684,6 @@ void DrawHeatRatePanel(CockpitPanel* p_panel)
 }
 
 // Labels the jump jet panel of a mech with jump jets and draws the fuel bar.
-// FUNCTION: MW2 0x1000667c
 void DrawJetsPanel(CockpitPanel* p_panel)
 {
 	void* font;

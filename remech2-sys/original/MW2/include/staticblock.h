@@ -9,7 +9,6 @@
 // A block of the static object cache (g_staticBlocks, 32 of them): the box BeginBlock
 // opens, its center, the transform it was opened with, the matrix that places its objects
 // and the enclosing block.
-// SIZE 0x7c
 typedef struct StaticBlock {
 	MechS32 m_minX;    // 0x00
 	MechS32 m_minY;    // 0x04

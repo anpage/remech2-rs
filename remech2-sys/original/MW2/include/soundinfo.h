@@ -5,7 +5,6 @@
 #include "types.h"
 
 // The playback limits of one sound resource, from the table InitSoundInfo unpacks; -1 is unset.
-// SIZE 0x08
 typedef struct SoundInfo {
 	MechS16 m_priority; // 0x00
 	MechS16 m_maxCount; // 0x02 — how many may play at once

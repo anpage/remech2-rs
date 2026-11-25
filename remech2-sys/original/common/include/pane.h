@@ -8,8 +8,7 @@ typedef struct WINDOW WINDOW;
 
 #pragma pack(1)
 // VFX.H's PANE: a rectangle of a WINDOW, inclusive, which Miles Design VFX's drawing routines
-// (3rdparty/vfx) take. Coordinates are relative to the WINDOW; VFX clips the pane to it.
-// SIZE 0x14
+// take. Coordinates are relative to the WINDOW; VFX clips the pane to it.
 struct PANE {
 	WINDOW* m_window; // 0x00
 	MechS32 m_x0;     // 0x04

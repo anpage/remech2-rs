@@ -46,8 +46,6 @@ static MechS32 TransformRow(Matrix* p_matrix, MechS32 p_row, MechS32 p_x, MechS3
 
 // Transforms p_model's vertices (their positions into m_worldX-m_worldZ) and face normals by
 // p_matrix. The products are an __asm block.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10039a30
 void TransformModel(Model* p_model, Matrix* p_matrix)
 {
 	Vertex* vertex = (Vertex*) (p_model + 1);
@@ -82,7 +80,6 @@ void TransformModel(Model* p_model, Matrix* p_matrix)
 
 // Transforms the shape's position (m_modelCenterX-Z) by p_matrix into m_centerX-Z, and bumps its
 // transform count (m_transformCount). The products are an __asm block.
-// FUNCTION: MW2 0x10039b94
 void TransformShapeCenter(struct Shape* p_shape, Matrix* p_matrix)
 {
 	p_shape->m_flags &= ~0x200;
@@ -115,7 +112,6 @@ void TransformShapeCenter(struct Shape* p_shape, Matrix* p_matrix)
 }
 
 // Transforms a shape and each of its models by p_matrix.
-// FUNCTION: MW2 0x10039c36
 void TransformShape(struct Shape* p_shape, Matrix* p_matrix)
 {
 	Model* model;
@@ -129,7 +125,6 @@ void TransformShape(struct Shape* p_shape, Matrix* p_matrix)
 
 // Solves the plane p_normalX * x + p_normalY * y + p_normalZ * z + p_distance = 0 for y at
 // (p_dx, p_dz): (p_normalX * p_dx + p_normalZ * p_dz + p_distance) / p_normalY, in 64 bits.
-// FUNCTION: MW2 0x10039c96
 MechS32 SolvePlaneY(
 	MechS32 p_normalX,
 	MechS32 p_normalY,
@@ -147,8 +142,6 @@ MechS32 SolvePlaneY(
 
 // Returns an approximate distance from (p_x, p_y, p_z) to the shape's center, (4 * the largest +
 // the others) / 4 of the offsets, or 0x7fffffff outside its bounding sphere.
-// Stack-slot permutation: radius, deltaY and deltaZ.
-// FUNCTION: MW2 0x10039ccc
 MechS32 ApproximateShapeDistance(struct Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 deltaX = Difference(p_shape->m_centerX, p_x);
@@ -192,8 +185,6 @@ MechS32 ApproximateShapeDistance(struct Shape* p_shape, MechS32 p_x, MechS32 p_y
 // The normal of the triangle (p_x0, p_y0, p_z0), (p_x1, p_y1, p_z1), (p_x2, p_y2, p_z2): the cross
 // product of its edges, scaled to 2.29 fixed point; returns the scale's exponent. A degenerate
 // triangle gets the normal (-1, -1, -1) and 0. The products and the scaling are __asm blocks.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10039dda
 MechS32 ComputeTriangleNormal(
 	MechS32 p_x0,
 	MechS32 p_y0,
@@ -281,7 +272,6 @@ MechS32 ComputeTriangleNormal(
 }
 
 // Returns p_value / (p_a - p_b) in 15.17 fixed point, or 0 if p_a and p_b are equal.
-// FUNCTION: MW2 0x1003a05d
 MechS32 DivDifference17(MechS32 p_a, MechS32 p_b, MechS32 p_value)
 {
 	MechS32 divisor = Difference(p_a, p_b);
@@ -295,8 +285,6 @@ MechS32 DivDifference17(MechS32 p_a, MechS32 p_b, MechS32 p_value)
 
 // Returns how far along p_ray it passes closest to the shape's center, less the radius, or
 // 0x7fffffff when it misses the bounding sphere or ends first; 10 when the ray starts inside it.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1003a096
 MechS32 RayShapeDistance(struct Shape* p_shape, Ray* p_ray)
 {
 	MechS32 radius = p_shape->m_radius;

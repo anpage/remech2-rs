@@ -6,7 +6,6 @@
 #include "types.h"
 
 // p_a * p_b / (p_b + p_c) >> 12.
-// FUNCTION: MW2 0x1004c800
 MechS32 MulRatio(MechS32 p_a, MechS32 p_b, MechS32 p_c)
 {
 	/* The divisor wraps at 32 bits, and the quotient is shifted unsigned. */

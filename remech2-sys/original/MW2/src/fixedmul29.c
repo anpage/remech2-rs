@@ -6,7 +6,6 @@
 #include "types.h"
 
 // p_a * p_b >> 29, rounded.
-// FUNCTION: MW2 0x10019ad0
 MechS32 FixedMul29(MechS32 p_a, MechS32 p_b)
 {
 	return PortableS32(PortableShrdRound((MechU64) ((MechS64) p_a * p_b), 29));

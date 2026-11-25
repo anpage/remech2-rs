@@ -11,7 +11,6 @@ struct Shape;
 
 // An entry of the depth-sorted draw lists (g_depthQueue, g_drawList): a polygon, or a
 // shape whose polygons are queued once the list is sorted (QueuedPolygon::m_count bit 15).
-// SIZE 0x8
 typedef struct DepthEntry {
 	struct QueuedPolygon* m_poly; // 0x00
 	MechS32 m_depth;              // 0x04

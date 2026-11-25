@@ -9,7 +9,6 @@
 
 // What a player is aiming at: the target and the distance, bearing and pitch to it
 // (GetBearingAndRange).
-// SIZE 0x28
 typedef struct PlayerTargetInfo {
 	MechS32 m_distance; // 0x00 — to the target along the ground
 	MechS32 m_range;    // 0x04 — to the target in a straight line (the target panel's)

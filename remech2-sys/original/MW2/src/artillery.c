@@ -25,7 +25,6 @@
 
 // Resets the player's mech of this class: its torso objects and ramps, state and weapons, stands
 // its object up where it is and clears the player's steering.
-// FUNCTION: MW2 0x10059fc0
 void FirstArtillery(Player* p_player)
 {
 	Mech* mech;
@@ -79,7 +78,6 @@ void FirstArtillery(Player* p_player)
 
 // Updates the mech's torso: clears the tick's heat, steps the twist and pitch ramps and turns the
 // torso objects (m_pitchObj by the pitch, m_torsoObj by the player's view angles with the twist).
-// FUNCTION: MW2 0x1005a203
 void UpdateArtillery(Mech* p_mech)
 {
 	Mech* mech;
@@ -117,8 +115,6 @@ void UpdateArtillery(Mech* p_mech)
 // full turn, otherwise within the limit) and stops on overheating; otherwise the steering is
 // cleared. Then the heat, and the power states: 0 starts powering up, 1 runs once the power-up
 // time has passed, 3 starts over and 4 is destroyed.
-// Stack-slot permutation: mech, twist and delta.
-// FUNCTION: MW2 0x1005a2ea
 void LateUpdateArtillery(Mech* p_mech)
 {
 	Mech* mech;
@@ -206,7 +202,6 @@ void LateUpdateArtillery(Mech* p_mech)
 	}
 }
 
-// FUNCTION: MW2 0x1005a61d
 void ShutdownArtillery(Mech* p_mech)
 {
 	if (!p_mech) {
@@ -215,8 +210,6 @@ void ShutdownArtillery(Mech* p_mech)
 }
 
 // Allocates p_player's mech, its weapons and sections, and sets them up.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1005a637
 MechS32 CreateArtillery(MechS32 p_index, Player* p_player)
 {
 	void* buffer = NULL;

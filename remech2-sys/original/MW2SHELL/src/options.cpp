@@ -29,7 +29,6 @@ void OptionsCallback(MechS32);
 extern ScreenField g_optionFields[18];
 
 // A button with a centered caption. Nothing calls its two functions.
-// SIZE 0x9c
 struct PewterPlaque0x9c {
 	MechS32 m_left;        // 0x00
 	MechS32 m_top;         // 0x04
@@ -41,24 +40,17 @@ struct PewterPlaque0x9c {
 	undefined4 m_unk0x98;  // 0x98 — only cleared, by LayoutButton
 };
 
-// GLOBAL: MW2SHELL 0x10070d90
 LoopingMovie* g_optionsMovie = NULL;
 
-// GLOBAL: MW2SHELL 0x1007116c
 MechChar g_optionsMovieName[0x10] = "amwlogo1";
 
-// GLOBAL: MW2SHELL 0x10092c18
 AudioSample* g_volumeTestSample;
-// GLOBAL: MW2SHELL 0x10092c30
 PaletteColor g_savedPalette[0x100];
-// GLOBAL: MW2SHELL 0x10092f30
 void* g_sliderImages;
 
-// GLOBAL: MW2SHELL 0x10070d98
 MechChar* g_skillNames[] = {"~EASY", "~MEDIUM", "~HARD"};
 
 // Lay out a button: its rectangle around a center, and its caption centered in it. Unused.
-// FUNCTION: MW2SHELL 0x10043280
 void LayoutButton(
 	PewterPlaque0x9c* p_plaque,
 	MechS32 p_centerX,
@@ -80,13 +72,11 @@ void LayoutButton(
 }
 
 // Whether a point lies in a button. Unused.
-// FUNCTION: MW2SHELL 0x10043333
 MechS32 IsPointInButton(PewterPlaque0x9c* p_plaque, MechS32 p_x, MechS32 p_y)
 {
 	return p_x >= p_plaque->m_left && p_x <= p_plaque->m_right && p_y >= p_plaque->m_top && p_y <= p_plaque->m_bottom;
 }
 
-// FUNCTION: MW2SHELL 0x1004338a
 TextGlyph* DrawSkillOption(ScreenField* p_option)
 {
 	MechU8 value = *(MechU8*) p_option->m_data;
@@ -94,7 +84,6 @@ TextGlyph* DrawSkillOption(ScreenField* p_option)
 	return g_titleFont->AddText(p_option->m_left + p_option->m_width / 2, p_option->m_top, g_skillNames[value], NULL);
 }
 
-// FUNCTION: MW2SHELL 0x100433dc
 TextGlyph* DrawIntToggle(ScreenField* p_option)
 {
 	MechS32 value = *(MechS32*) p_option->m_data;
@@ -107,7 +96,6 @@ TextGlyph* DrawIntToggle(ScreenField* p_option)
 	);
 }
 
-// FUNCTION: MW2SHELL 0x1004343c
 TextGlyph* DrawByteToggle(ScreenField* p_option)
 {
 	MechU8 value = *(MechU8*) p_option->m_data;
@@ -120,7 +108,6 @@ TextGlyph* DrawByteToggle(ScreenField* p_option)
 	);
 }
 
-// FUNCTION: MW2SHELL 0x1004349f
 TextGlyph* DrawDishonorableToggle(ScreenField* p_option)
 {
 	MechU8 value = *(MechU8*) p_option->m_data;
@@ -133,7 +120,6 @@ TextGlyph* DrawDishonorableToggle(ScreenField* p_option)
 	);
 }
 
-// FUNCTION: MW2SHELL 0x10043517
 TextGlyph* DrawInvertedDishonorableToggle(ScreenField* p_option)
 {
 	MechU8 value = *(MechU8*) p_option->m_data;
@@ -146,7 +132,6 @@ TextGlyph* DrawInvertedDishonorableToggle(ScreenField* p_option)
 	);
 }
 
-// FUNCTION: MW2SHELL 0x10043589
 TextGlyph* DrawHighLowToggle(ScreenField* p_option)
 {
 	MechS32 value = *(MechS32*) p_option->m_data;
@@ -162,7 +147,6 @@ TextGlyph* DrawHighLowToggle(ScreenField* p_option)
 // DrawResolutionOption and ToggleRenderResolution are implemented on the Rust side
 // (src/shell/screens/settings.rs)
 
-// FUNCTION: MW2SHELL 0x10043651
 void CycleByteOption(ScreenField* p_option)
 {
 	MechU8* value;
@@ -174,7 +158,6 @@ void CycleByteOption(ScreenField* p_option)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10043688
 void ToggleIntOption(ScreenField* p_toggle)
 {
 	MechS32* value;
@@ -188,7 +171,6 @@ void ToggleIntOption(ScreenField* p_toggle)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100436c7
 void ToggleByteOption(ScreenField* p_option)
 {
 	MechU8* value;
@@ -202,7 +184,6 @@ void ToggleByteOption(ScreenField* p_option)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10043758
 TextGlyph* RestoreFieldBackground(ScreenField* p_option)
 {
 	g_videoDriver->RestoreBackground(p_option->m_left, p_option->m_top, p_option->m_width, p_option->m_height);
@@ -210,7 +191,6 @@ TextGlyph* RestoreFieldBackground(ScreenField* p_option)
 	return NULL;
 }
 
-// FUNCTION: MW2SHELL 0x10043790
 TextGlyph* DrawVolumeSlider(ScreenField* p_option)
 {
 	MechS32 position;
@@ -226,8 +206,6 @@ TextGlyph* DrawVolumeSlider(ScreenField* p_option)
 
 // Drags a volume slider while the left button is held: the value follows the mouse, and a
 // change of 0xa00 or more plays the test sample at the new volume.
-// Not 100%: the stack slots of previous, value and volume are permuted.
-// FUNCTION: MW2SHELL 0x1004381b
 void DragVolumeSlider(ScreenField* p_option)
 {
 	MechS32 previous;
@@ -265,7 +243,6 @@ void DragVolumeSlider(ScreenField* p_option)
 	} while (g_mouseState->m_leftDown == 1);
 }
 
-// FUNCTION: MW2SHELL 0x10043926
 void LoadSoundConfig()
 {
 	SoundSettings sound;
@@ -284,7 +261,6 @@ void LoadSoundConfig()
 	g_soundConfig.m_displayBrightness = display.m_brightness;
 }
 
-// FUNCTION: MW2SHELL 0x10043979
 void LoadDifficultyConfig()
 {
 	DifficultySettings settings;
@@ -298,7 +274,6 @@ void LoadDifficultyConfig()
 	g_difficultyConfig.m_enemySkill = settings.m_enemySkill;
 }
 
-// FUNCTION: MW2SHELL 0x100439cc
 void SaveDifficultyConfig()
 {
 	DifficultySettings settings;
@@ -312,7 +287,6 @@ void SaveDifficultyConfig()
 	MechSetDifficultySettings(&settings);
 }
 
-// FUNCTION: MW2SHELL 0x10043a1f
 void SaveSoundConfig()
 {
 	SoundSettings sound;
@@ -331,9 +305,6 @@ void SaveSoundConfig()
 	MechSetDisplaySettings(&display);
 }
 
-// Stack-slot permutation: original paletteSize is at [ebp-0x10] and audioSize at
-// [ebp-0x14]; VC++ assigns them [ebp-0x14] and [ebp-0x10] here.
-// FUNCTION: MW2SHELL 0x10043a72
 void DrawOptions()
 {
 	MechS32 paletteSize;
@@ -358,7 +329,6 @@ void DrawOptions()
 
 // The options screen's per-frame callback: handles clicks on the options, and closes the
 // screen on a right click, a key, or when called with p_active FALSE, saving the settings.
-// FUNCTION: MW2SHELL 0x10043c1f
 void OptionsCallback(MechS32 p_active)
 {
 	ScreenField* option;
@@ -412,7 +382,6 @@ void OptionsCallback(MechS32 p_active)
 	{x, y, width, height, 0, NULL, NULL, draw, click, value, NULL}
 // A label right-aligned at x 0x16a, where the art's labels end
 #define OPTION_LABEL(y, text) {0xb4, y, 0xb6, 0x13, 0, NULL, NULL, DrawOptionLabel, NULL, (void*) text, NULL}
-// GLOBAL: MW2SHELL 0x10070da8
 ScreenField g_optionFields[18] = {
 	OPTION_ROW(0x189, 0xdb, 100, DrawSkillOption, CycleByteOption, &g_difficultyConfig.m_enemySkill),
 	OPTION_ROW(0x189, 0xef, 100, DrawByteToggle, ToggleByteOption, &g_difficultyConfig.m_heatTracking),

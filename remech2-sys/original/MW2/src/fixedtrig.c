@@ -10,7 +10,6 @@
 // Returns the sine of p_angle (16.16 degrees) from the table, as 16.16: the angle is scaled
 // to 1024 steps to the circle (0x5b05b05b is 2^37 / 360), and the table's quarter wave is
 // interpolated, mirrored and negated by quadrant.
-// FUNCTION: MW2 0x100696c0
 MechS32 FixedSin(MechS32 p_angle)
 {
 	MechS32 result;
@@ -40,7 +39,6 @@ MechS32 FixedSin(MechS32 p_angle)
 }
 
 // Returns the cosine of p_angle (16.16 degrees): the sine 90 degrees on.
-// FUNCTION: MW2 0x1006973a
 MechS32 FixedCos(MechS32 p_angle)
 {
 	/* The add wraps (BuildMatrixEx's portable C calls this with any angle). */
@@ -49,8 +47,6 @@ MechS32 FixedCos(MechS32 p_angle)
 
 // Returns the arcsine of p_sine (2.29 fixed point, as the table holds it) in 16.16 degrees: a
 // binary search of the table's quarter wave, interpolated between the two entries found.
-// Stack-slot permutation: result and table.
-// FUNCTION: MW2 0x1006975b
 MechS32 FixedAsin(MechS32 p_sine)
 {
 	/* The magnitude wraps like the C's negation (INT_MIN stays negative), and the search
@@ -106,7 +102,6 @@ MechS32 FixedAsin(MechS32 p_sine)
 	return negative ? -result : result;
 }
 
-// FUNCTION: MW2 0x100698b9
 MechS32 FixedAcos(MechS32 p_cosine)
 {
 	return 0x5a0000 - FixedAsin(p_cosine);
@@ -114,7 +109,6 @@ MechS32 FixedAcos(MechS32 p_cosine)
 
 // Returns the bearing of (p_x, p_z) in 16.16 degrees: the arctangent of the smaller over the
 // larger component from the table, folded into its octant. The result is also left in dx:ax.
-// FUNCTION: MW2 0x100698de
 MechS32 FixedAtan2(MechS32 p_x, MechS32 p_z)
 {
 	/* The magnitudes wrap like neg (INT_MIN stays negative) and compare signed; the quotient,

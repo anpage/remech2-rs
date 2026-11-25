@@ -9,7 +9,6 @@ class VideoDriver;
 
 #pragma pack(1)
 
-// SIZE 0x43
 class MouseState {
 public:
 	MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_cursorShape);
@@ -41,9 +40,8 @@ private:
 	undefined4 m_unk0x27;        // 0x27 — only cleared, by the constructor
 
 public:
-	// The screens read the cursor position and the cockpit controls screen's scroll arrows
-	// repeat while a button is held; they read these directly: an inline accessor would leave a
-	// jmp at /Ob1.
+	// The screens read the cursor position, and the cockpit controls screen's scroll arrows
+	// repeat while a button is held.
 	MechS32 m_x;            // 0x2b
 	MechS32 m_y;            // 0x2f
 	undefined4 m_leftDown;  // 0x33

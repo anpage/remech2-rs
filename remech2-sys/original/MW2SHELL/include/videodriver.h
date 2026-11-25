@@ -12,7 +12,6 @@ class TextGlyph;
 class TMPackDataBase;
 
 #pragma pack(1)
-// SIZE 0x3ae
 class VideoDriver {
 public:
 	VideoDriver();
@@ -89,7 +88,6 @@ public:
 	// LoopingMovie decodes into m_screenBuffer.m_pixels directly.
 	WINDOW m_screenBuffer; // 0x2e
 
-	// ShellWindowProc clears m_backBuffer.m_pixels directly: an inline accessor would leave a jmp at /Ob1.
 	WINDOW m_backBuffer; // 0x42
 
 	PANE m_screenView; // 0x56

@@ -12,14 +12,11 @@
 
 // The order each AI slot was given last, an index into g_orderChoices (7: none); slot 0 is the
 // whole star's.
-// GLOBAL: MW2 0x100acaf0
 MechS32 g_lanceOrders[8] = {7, 7, 7, 7, 7, 0, 0, 0};
 
 // Fills the page with an item per AI slot (from template 5) and a last one (template 6), marking
 // the slots whose player is in AI state 12. With no slot, or every slot marked, the page has only
 // templates 7 and 6.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10065f50
 MechS32 PrepareCommandComputerPage(MenuDefinition* p_menu, MenuPage* p_page)
 {
 	MechS32 marked;
@@ -63,8 +60,6 @@ MechS32 PrepareCommandComputerPage(MenuDefinition* p_menu, MenuPage* p_page)
 
 // Unless the page's AI slot holds a player outside AI state 12, keeps only the page's last two
 // items.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100660c2
 MechS32 PrepareCommandPointPage(MenuDefinition* p_menu, MenuPage* p_page)
 {
 	MechS32 count;
@@ -99,7 +94,6 @@ MechS32 PrepareCommandPointPage(MenuDefinition* p_menu, MenuPage* p_page)
 	return TRUE;
 }
 
-// FUNCTION: MW2 0x100661ef
 MechS32 GetLanceOrder(MechS32 p_index)
 {
 	MechS32 state;
@@ -112,13 +106,11 @@ MechS32 GetLanceOrder(MechS32 p_index)
 	return state;
 }
 
-// FUNCTION: MW2 0x10066223
 MechS32 GetFormation(MechS32 p_arg)
 {
 	return GetTeamFormation(g_localStar);
 }
 
-// FUNCTION: MW2 0x10066241
 void SelectFormation(MechS32 p_formation, MechS32 p_value)
 {
 	g_lanceOrders[0] = 0;
@@ -127,8 +119,6 @@ void SelectFormation(MechS32 p_formation, MechS32 p_value)
 }
 
 // Returns the AI state of the player in AI slot p_index, plus one (0: none).
-// Stack-slot permutation: player, ai, index and state.
-// FUNCTION: MW2 0x10066272
 MechS32 GetSlotAiState(MechS32 p_index)
 {
 	Player* player;
@@ -152,7 +142,6 @@ MechS32 GetSlotAiState(MechS32 p_index)
 }
 
 // Gives the control the page's AI slot.
-// FUNCTION: MW2 0x100662df
 void SetControlSlot(MenuPage* p_page, MenuControl* p_control)
 {
 	if (!p_page) {
@@ -167,8 +156,6 @@ void SetControlSlot(MenuPage* p_page, MenuControl* p_control)
 }
 
 // Installs GetSlotGoalName as the suffix of the control's choices.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10066314
 void InstallGoalSuffix(MenuPage* p_page, MenuControl* p_control)
 {
 	MenuChoicesSuffixFn old;
@@ -193,7 +180,6 @@ void InstallGoalSuffix(MenuPage* p_page, MenuControl* p_control)
 
 // The orders' actions: each records the order for the menu and gives it to the slot's player
 // (OrderStarSlot).
-// FUNCTION: MW2 0x10066369
 void OrderAttack(MechS32 p_index, MechS32 p_value)
 {
 	if (p_index < 8) {
@@ -204,7 +190,6 @@ void OrderAttack(MechS32 p_index, MechS32 p_value)
 	RequestMenuClose(1);
 }
 
-// FUNCTION: MW2 0x100663a4
 void OrderEngageAtWill(MechS32 p_index, MechS32 p_value)
 {
 	if (p_index < 8) {
@@ -215,7 +200,6 @@ void OrderEngageAtWill(MechS32 p_index, MechS32 p_value)
 	RequestMenuClose(1);
 }
 
-// FUNCTION: MW2 0x100663df
 void OrderJoinFormation(MechS32 p_index, MechS32 p_value)
 {
 	if (p_index < 8) {
@@ -226,7 +210,6 @@ void OrderJoinFormation(MechS32 p_index, MechS32 p_value)
 	RequestMenuClose(1);
 }
 
-// FUNCTION: MW2 0x1006641a
 void OrderDefend(MechS32 p_index, MechS32 p_value)
 {
 	if (p_index < 8) {
@@ -237,7 +220,6 @@ void OrderDefend(MechS32 p_index, MechS32 p_value)
 	RequestMenuClose(1);
 }
 
-// FUNCTION: MW2 0x10066455
 void OrderDisengage(MechS32 p_index, MechS32 p_value)
 {
 	if (p_index < 8) {
@@ -248,7 +230,6 @@ void OrderDisengage(MechS32 p_index, MechS32 p_value)
 	RequestMenuClose(1);
 }
 
-// FUNCTION: MW2 0x10066490
 void OrderShutdown(MechS32 p_index, MechS32 p_value)
 {
 	if (p_index < 8) {
@@ -260,8 +241,6 @@ void OrderShutdown(MechS32 p_index, MechS32 p_value)
 }
 
 // Returns the name of the goal of the control's AI player: a nav, a player or a game thing.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100664cb
 MechChar* GetSlotGoalName(
 	MenuDefinition* p_menu,
 	MenuControl* p_control,

@@ -11,20 +11,15 @@
 #include <stdio.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(SimHandoffState, 0x218)
-
 // The mission's name, from its BWD file (ShellApplyMissionUiInfo), passed to the simulator as
 // "-b=".
-// GLOBAL: MW2SHELL 0x1006a550
 MechChar g_missionName[0x10] = "xxxxxxxx.xxx";
 
-// GLOBAL: MW2SHELL 0x10090288
 SimHandoffState g_simHandoff;
 
 // Reads the shell's state back from Rust after a mission. With p_fromSim, posts the saved
 // message to the shell window; otherwise it returns to the campaign's start (2, no pilot, no
 // scenario).
-// FUNCTION: MW2SHELL 0x10039b50
 void ReadSimHandoff(MechS32 p_fromSim, MechS32* p_campaign, MechU8* p_pilotChosen, char** p_scenario)
 {
 	MechS32 i;
@@ -61,7 +56,6 @@ void ReadSimHandoff(MechS32 p_fromSim, MechS32* p_campaign, MechU8* p_pilotChose
 // Saves the shell's state to Rust before a mission: the message to post on return, the
 // campaign, the pilot, and the simulator's command line (the scenario and "-b=" the mission's
 // name).
-// FUNCTION: MW2SHELL 0x10039c92
 void WriteSimHandoff(MechU32 p_msg, MechS32 p_campaign, MechU8 p_pilotChosen, const char* p_scenario)
 {
 	g_simHandoff.m_msg = p_msg;

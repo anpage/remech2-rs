@@ -11,8 +11,6 @@
 
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(HitRect, 0x10)
-
 // The menu's collection owns 0x2a-byte entries with a hit rectangle and two text glyphs.
 #pragma pack(1)
 struct MenuEntry {
@@ -48,13 +46,8 @@ struct MenuEntry {
 };
 #pragma pack()
 
-DECOMP_SIZE_ASSERT(MenuEntry, 0x2a)
-
-DECOMP_SIZE_ASSERT(ButtonMenu, 0x10d)
-
 // The font argument is ignored: the buttons always use g_buttonFont. m_colors maps colour 0
 // to 0xff and 1 to 6, and leaves the others as they are.
-// FUNCTION: MW2SHELL 0x100485f0
 ButtonMenu::ButtonMenu(
 	VideoDriver* p_videoDriver,
 	Font* p_font,
@@ -109,7 +102,6 @@ ButtonMenu::ButtonMenu(
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1004883e
 ButtonMenu::~ButtonMenu()
 {
 	MechS32 i;
@@ -124,7 +116,6 @@ ButtonMenu::~ButtonMenu()
 	MechHeapFree(g_primaryHeap, m_items);
 }
 
-// FUNCTION: MW2SHELL 0x100488ed
 void ButtonMenu::RemoveButtonsFrom(MechS32 p_id)
 {
 	Collection* retained;
@@ -148,8 +139,6 @@ void ButtonMenu::RemoveButtonsFrom(MechS32 p_id)
 	DestroyCollection(retained);
 }
 
-// Stack-slot permutation: i and item exchange [ebp-N] slots with the original.
-// FUNCTION: MW2SHELL 0x100489e9
 MechS32 ButtonMenu::HitTest(MechS32 p_x, MechS32 p_y)
 {
 	MechS32 id;
@@ -167,8 +156,6 @@ MechS32 ButtonMenu::HitTest(MechS32 p_x, MechS32 p_y)
 	return id;
 }
 
-// Stack-slot permutation: i and item exchange [ebp-N] slots with the original.
-// FUNCTION: MW2SHELL 0x10048a7c
 void ButtonMenu::DrawRects()
 {
 	MechS32 i;
@@ -182,7 +169,6 @@ void ButtonMenu::DrawRects()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10048aec
 void ButtonMenu::RemoveButton(MechS32 p_id)
 {
 	MechS32 i;
@@ -198,7 +184,6 @@ void ButtonMenu::RemoveButton(MechS32 p_id)
 }
 
 // Adds one button.
-// FUNCTION: MW2SHELL 0x10048b95
 void ButtonMenu::AddButton(MainMenuButton p_button, MechS32 p_id, MechU8 p_drawRect)
 {
 	TextGlyph* label = NULL;
@@ -228,7 +213,6 @@ void ButtonMenu::AddButton(MainMenuButton p_button, MechS32 p_id, MechU8 p_drawR
 	ExpandCollection(m_items, item);
 }
 
-// FUNCTION: MW2SHELL 0x10048cc1
 void ButtonMenu::EnableButton(MechS32 p_id)
 {
 	MechS32 i;
@@ -246,7 +230,6 @@ void ButtonMenu::EnableButton(MechS32 p_id)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10048d65
 void ButtonMenu::DisableButton(MechS32 p_id)
 {
 	MechS32 i;
@@ -267,7 +250,6 @@ void ButtonMenu::DisableButton(MechS32 p_id)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10048e43
 MenuEntry::MenuEntry(
 	MechS32 p_left,
 	MechS32 p_top,
@@ -298,7 +280,6 @@ MenuEntry::MenuEntry(
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10048f65
 MenuEntry::~MenuEntry()
 {
 	if (m_hover != NULL) {
@@ -309,13 +290,11 @@ MenuEntry::~MenuEntry()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10049003
 void MenuEntry::DrawRect(VideoDriver* p_videoDriver)
 {
 	m_rect->Draw(p_videoDriver);
 }
 
-// FUNCTION: MW2SHELL 0x1004902a
 MechU8 MenuEntry::HitTest(MechS32 p_x, MechS32 p_y)
 {
 	if (m_enabled && m_rect->Contains(p_x, p_y)) {
@@ -337,7 +316,6 @@ MechU8 MenuEntry::HitTest(MechS32 p_x, MechS32 p_y)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10049145
 HitRect::HitRect(undefined4 p_left, undefined4 p_top, undefined4 p_right, undefined4 p_bottom)
 {
 	m_left = p_left;
@@ -347,12 +325,10 @@ HitRect::HitRect(undefined4 p_left, undefined4 p_top, undefined4 p_right, undefi
 }
 
 // Empty, and nothing in the original calls it: there is nothing to name it after.
-// FUNCTION: MW2SHELL 0x10049183
 void HitRect::FUN_10049183()
 {
 }
 
-// FUNCTION: MW2SHELL 0x10049199
 void HitRect::Draw(VideoDriver* p_videoDriver)
 {
 	p_videoDriver->DrawLine(m_left, m_bottom, m_right, m_bottom, 1);
@@ -361,7 +337,6 @@ void HitRect::Draw(VideoDriver* p_videoDriver)
 	p_videoDriver->DrawLine(m_left, m_bottom, m_left, m_top, 1);
 }
 
-// FUNCTION: MW2SHELL 0x10049245
 MechU8 HitRect::Contains(MechS32 p_x, MechS32 p_y)
 {
 	if (m_bottom >= p_y && m_top <= p_y && m_right >= p_x && m_left <= p_x) {

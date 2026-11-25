@@ -17,10 +17,7 @@
 
 #include <stdlib.h>
 
-DECOMP_SIZE_ASSERT(ShapeCollisionFns, 0xc)
-
 // The collision tests of each shape type (Shape::m_collisionType).
-// GLOBAL: MW2 0x100a54c0
 ShapeCollisionFns g_shapeCollisionFns[8] = {
 	{TestPointInBox, TestRayBox, GetBoxTop},
 	{TestPointInBoxColumn, TestRayBox, NULL},
@@ -33,55 +30,40 @@ ShapeCollisionFns g_shapeCollisionFns[8] = {
 };
 
 // The normal of the surface the last collision test hit, 16.16.
-// GLOBAL: MW2 0x100a5520
 MechS32 g_hitNormalX = 0;
 
-// GLOBAL: MW2 0x100a5524
 MechS32 g_hitNormalY = 0;
 
-// GLOBAL: MW2 0x100a5528
 MechS32 g_hitNormalZ = 0;
 
 // The normal of the ground GetTerrainHeight found.
-// GLOBAL: MW2 0x100a552c
 MechS32 g_groundNormalX = 0;
 
-// GLOBAL: MW2 0x100a5530
 MechS32 g_groundNormalY = 0;
 
-// GLOBAL: MW2 0x100a5534
 MechS32 g_groundNormalZ = 0;
 
 // The normal of the surface TestSegmentCollision hit.
-// GLOBAL: MW2 0x100a5538
 MechS32 g_segmentNormalX = 0;
 
-// GLOBAL: MW2 0x100a553c
 MechS32 g_segmentNormalY = 0;
 
-// GLOBAL: MW2 0x100a5540
 MechS32 g_segmentNormalZ = 0;
 
 // The background color the 3D view is cleared to.
-// GLOBAL: MW2 0x100a5544
 MechS32 g_backgroundColor = 0;
 
 // The sky's color (DrawSkyAndGround; the ground's is g_groundColor).
-// GLOBAL: MW2 0x100a5548
 MechS32 g_skyColor = 0xe0;
 
 // The ground's color (DrawSkyAndGround; the sky's is g_skyColor).
-// GLOBAL: MW2 0x100a554c
 MechS32 g_groundColor = 0xef;
 
 // The horizon map's (LoadMapBitmap, from the world stream's hrzm record).
-// GLOBAL: MW2 0x100a5550
 MechS32 g_horizonMapColor = 0xea;
 
-// GLOBAL: MW2 0x100a5558
 MechS32 g_unk0x100a5558 = -1;
 
-// FUNCTION: MW2 0x10034a40
 void SetShapeCollisionType(Shape* p_shape, MechS32 p_collisionType)
 {
 	p_shape->m_collisionType = p_collisionType;
@@ -96,7 +78,6 @@ void SetShapeCollisionType(Shape* p_shape, MechS32 p_collisionType)
 
 // Returns whether p_y lies below the plane of the face at (p_x, p_z), with the plane's height
 // there in p_height, and sets the hit normal to the face's.
-// FUNCTION: MW2 0x10034a7b
 MechS32 IsBelowFacePlane(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32* p_height)
 {
 	Vertex* vertex;
@@ -119,9 +100,6 @@ MechS32 IsBelowFacePlane(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 
 // Returns the height of the ground at (p_x, p_z): the highest surface of the world's shapes
 // within 1000 units of p_y, else the highest one below p_y, else 0. Its normal goes to
 // g_groundNormal.
-// Stack-slot permutation of the locals; two comparisons have their operands the other way
-// around.
-// FUNCTION: MW2 0x10034b30
 MechS32 GetTerrainHeight(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	Shape* root;
@@ -180,9 +158,6 @@ MechS32 GetTerrainHeight(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 
 // Returns the height of the highest surface of the world's shapes at (p_x, p_z), or 0. Its
 // normal goes to g_groundNormal.
-// Stack-slot permutation of the locals; the best < top comparison has its operands the
-// other way around.
-// FUNCTION: MW2 0x10034cbc
 MechS32 GetHighestSurface(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	Shape* root;
@@ -221,14 +196,12 @@ MechS32 GetHighestSurface(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 	return best > -0x7fffffff ? best : 0;
 }
 
-// FUNCTION: MW2 0x10034db8
 MechS32 HasHeightTest(Shape* p_shape)
 {
 	return g_shapeCollisionFns[p_shape->m_collisionType].m_getHeight != NULL;
 }
 
 // Tests the point against the world's shape nearest to it, returned in p_hit.
-// FUNCTION: MW2 0x10034deb
 MechS32 TestPointCollision(MechS32 p_x, MechS32 p_y, MechS32 p_z, Shape** p_hit)
 {
 	*p_hit = FindNearestShape(g_sceneShapes, p_x, p_y, p_z);
@@ -241,8 +214,6 @@ MechS32 TestPointCollision(MechS32 p_x, MechS32 p_y, MechS32 p_z, Shape** p_hit)
 }
 
 // Returns the shape under p_root nearest to (p_x, p_y, p_z).
-// Stack-slot permutation: best, distance, nearest and shape.
-// FUNCTION: MW2 0x10034e59
 Shape* FindNearestShape(Shape* p_root, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 best;
@@ -268,7 +239,6 @@ Shape* FindNearestShape(Shape* p_root, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 }
 
 // Tests the point against the shape; a shape type without a point test always hits.
-// FUNCTION: MW2 0x10034ee7
 MechS32 TestShapePoint(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 (*testPoint)(Shape*, MechS32, MechS32, MechS32);
@@ -284,9 +254,6 @@ MechS32 TestShapePoint(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 // Tests the segment against the world's shapes, other than those of player p_exclude (-1 for
 // none). On a hit, returns the shape in p_hit and moves the ray's end to the nearest point of
 // impact; its normal goes to g_segmentNormal.
-// Stack-slot permutation of the locals; the two comparisons with best have their operands
-// the other way around.
-// FUNCTION: MW2 0x10034f37
 MechS32 TestSegmentCollision(Ray* p_ray, Shape** p_hit, MechS32 p_exclude)
 {
 	MechU16 surface;
@@ -343,8 +310,6 @@ MechS32 TestSegmentCollision(Ray* p_ray, Shape** p_hit, MechS32 p_exclude)
 }
 
 // TestSegmentCollision against the world's scenery only: no mechs, nor shapes of type 6.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10035107
 MechS32 TestSceneryCollision(Ray* p_ray, Shape** p_hit)
 {
 	MechU16 surface;
@@ -398,8 +363,6 @@ MechS32 TestSceneryCollision(Ray* p_ray, Shape** p_hit)
 
 // Tests the ray against the shape: with the type's ray test, else by its point test at four
 // steps along the ray (cutting the ray at the first hit), else by the shape's bounding sphere.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100352ad
 MechS32 TestShapeRay(Shape* p_shape, Ray* p_ray, MechS32 p_distance)
 {
 	MechS32 (*testRay)(Shape*, Ray*);
@@ -451,7 +414,6 @@ MechS32 TestShapeRay(Shape* p_shape, Ray* p_ray, MechS32 p_distance)
 
 // Cuts the ray at p_distance along it and sets the hit normal to point from the shape's
 // centre to the ray's end (to its start when p_distance is 10).
-// FUNCTION: MW2 0x10035423
 void EndRayAtShape(Shape* p_shape, Ray* p_ray, MechS32 p_distance)
 {
 	if (p_distance > 0) {
@@ -474,9 +436,6 @@ void EndRayAtShape(Shape* p_shape, Ray* p_ray, MechS32 p_distance)
 
 // Intersects p_ray with the face's plane from its front side and, if the point lies within the
 // face, ends the ray there and keeps the face's normal as the hit normal.
-// The three sums of products (denom, d, num) call FixedMul29 in another order than the original
-// (commutative operands), and the locals are permuted.
-// FUNCTION: MW2 0x100354d3
 MechS32 IntersectRayFace(Face* p_face, Vertex* p_vertices, Ray* p_ray)
 {
 	MechS32 nx;
@@ -532,8 +491,6 @@ MechS32 IntersectRayFace(Face* p_face, Vertex* p_vertices, Ray* p_ray)
 
 // Tests whether the point (p_x, p_y, p_z) lies within the face, projected on the plane its normal
 // is closest to.
-// The comparisons with nz run in the other operand order (an effective match).
-// FUNCTION: MW2 0x10035722
 MechS32 IsPointInFace(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 nx;
@@ -560,8 +517,6 @@ MechS32 IsPointInFace(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p_y
 
 // Tests whether (p_x, p_z) lies within the face, seen from above: the point must have vertices on
 // each side, and the edges crossing its z must pass it on both sides.
-// The only diff is a stack-slot permutation of the locals (vertex and prev).
-// FUNCTION: MW2 0x100357f8
 MechS32 IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p_z)
 {
 	MechS32 count;
@@ -697,8 +652,6 @@ MechS32 IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p
 }
 
 // Tests whether (p_x, p_y) lies within the face, seen along z.
-// The only diff is a stack-slot permutation of the locals (vertex and prev).
-// FUNCTION: MW2 0x10035b5b
 MechS32 IsPointInFaceXY(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p_y)
 {
 	MechS32 count;
@@ -834,8 +787,6 @@ MechS32 IsPointInFaceXY(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p
 }
 
 // Tests whether (p_y, p_z) lies within the face, seen along x.
-// The only diff is a stack-slot permutation of the locals (vertex and prev).
-// FUNCTION: MW2 0x10035ebe
 MechS32 IsPointInFaceYZ(Face* p_face, Vertex* p_vertices, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 count;

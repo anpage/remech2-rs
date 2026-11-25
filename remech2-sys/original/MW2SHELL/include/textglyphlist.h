@@ -7,7 +7,6 @@
 
 class TextGlyph;
 
-// SIZE 0x04
 class TextGlyphList {
 public:
 	TextGlyphList();

@@ -10,13 +10,11 @@
 // The brightness setting (0-15) as a 16.16 fraction: read, previewed, set (and saved to
 // the player's settings), and the preview undone.
 
-// FUNCTION: MW2 0x100745e0
 MechS32 GetBrightnessFraction(MechS32 p_arg)
 {
 	return FixedMul16(g_displayBrightness << 16, FixedDiv16(1, 15));
 }
 
-// FUNCTION: MW2 0x1007460e
 void PreviewBrightnessFraction(MechS32 p_arg, MechS32 p_value)
 {
 	MechS32 brightness;
@@ -28,7 +26,6 @@ void PreviewBrightnessFraction(MechS32 p_arg, MechS32 p_value)
 	}
 }
 
-// FUNCTION: MW2 0x1007464f
 void SetBrightnessFraction(MechS32 p_arg, MechS32 p_value)
 {
 	g_displayBrightness = g_brightnessSetting = FixedMul16(p_value, 15);
@@ -36,7 +33,6 @@ void SetBrightnessFraction(MechS32 p_arg, MechS32 p_value)
 	PreviewBrightness(g_displayBrightness);
 }
 
-// FUNCTION: MW2 0x10074693
 void RestoreBrightness(MechS32 p_arg)
 {
 	g_brightnessSetting = g_displayBrightness;

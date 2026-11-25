@@ -6,7 +6,6 @@
 
 // A segment from (x0, y0, z0) to (x1, y1, z1) in 16.16 fixed point, with its delta and, once
 // BuildRayFixed or BuildRayFloat has run, its unit direction and length.
-// SIZE 0x38
 typedef struct Ray {
 	MechS32 m_x0;     // 0x00
 	MechS32 m_y0;     // 0x04

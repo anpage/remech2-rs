@@ -17,28 +17,18 @@
 // places each member (by its slot) relative to the leader. Formations are copied from a
 // table of named templates.
 
-DECOMP_SIZE_ASSERT(TeamFormation, 0x70)
-DECOMP_SIZE_ASSERT(Team, 0x38)
-
-// GLOBAL: MW2 0x100a5918
 MechS32 g_localStar = -1;
 
-// GLOBAL: MW2 0x100a591c
 MechS32 g_formationTemplateCount = 0;
 
-// GLOBAL: MW2 0x10109c90
 TeamFormation g_formationTemplates[32];
 
-// GLOBAL: MW2 0x1010aa90
 Team g_teams[16];
 
-// GLOBAL: MW2 0x1010ae10
 MechS32 g_starSides[8];
 
-// GLOBAL: MW2 0x1010ae30
 TeamFormation g_teamFormations[16];
 
-// FUNCTION: MW2 0x1003bbe0
 void ResetTeams(void)
 {
 	MechU32 i;
@@ -50,9 +40,6 @@ void ResetTeams(void)
 	}
 }
 
-// Operand order: the loop test (i < g_formationTemplateCount) compares with i in eax in the
-// original.
-// FUNCTION: MW2 0x1003bc55
 MechS32 SetTeamFormationByName(MechS32 p_team, const MechChar* p_name)
 {
 	MechS32 result = FALSE;
@@ -74,7 +61,6 @@ MechS32 SetTeamFormationByName(MechS32 p_team, const MechChar* p_name)
 	return result;
 }
 
-// FUNCTION: MW2 0x1003bd1a
 MechS32 GetTeamFormation(MechS32 p_team)
 {
 	if (p_team >= 16) {
@@ -84,7 +70,6 @@ MechS32 GetTeamFormation(MechS32 p_team)
 	return g_teams[p_team].m_formation;
 }
 
-// FUNCTION: MW2 0x1003bd4c
 void SetTeamFormation(MechS32 p_team, MechS32 p_formation)
 {
 	if (p_team >= 16 || p_formation >= 32) {
@@ -99,8 +84,6 @@ void SetTeamFormation(MechS32 p_team, MechS32 p_formation)
 	g_teamFormations[p_team] = g_formationTemplates[p_formation];
 }
 
-// Operand order: the original compares p_player < g_playerCount with p_player in eax.
-// FUNCTION: MW2 0x1003bdcb
 MechS32 SetPlayerSlot(MechU32 p_player, MechU32 p_slot)
 {
 	MechS32 result = FALSE;
@@ -114,9 +97,6 @@ MechS32 SetPlayerSlot(MechU32 p_player, MechU32 p_slot)
 }
 
 // Makes a player the team's leader and moves the formation's origin to the leader's slot.
-// Stack-slot permutation: result, i, dz and player. Operand order: the original compares
-// p_player < g_playerCount with p_player in eax.
-// FUNCTION: MW2 0x1003be18
 MechS32 SetTeamLeader(MechS32 p_team, MechS32 p_player)
 {
 	MechS32 result;
@@ -147,9 +127,6 @@ MechS32 SetTeamLeader(MechS32 p_team, MechS32 p_player)
 }
 
 // Places the team's leader, then every member at its formation slot around the leader.
-// Stack-slot permutation: result, z, heading, x and i. Operand order: the original compares
-// leader < g_playerCount with g_playerCount in eax.
-// FUNCTION: MW2 0x1003bf40
 MechS32 PlaceTeam(MechS32 p_team, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_heading)
 {
 	MechS32 result;
@@ -190,9 +167,6 @@ MechS32 PlaceTeam(MechS32 p_team, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32
 
 // Returns where a player's formation slot puts it: the leader's own position, or the slot's
 // offset transformed by the leader's orientation.
-// Stack-slot permutation: slot, leader, matrix, obj, y and team. Operand order: the original
-// compares p_player >= g_playerCount with p_player in eax.
-// FUNCTION: MW2 0x1003c07e
 MechS32 GetTeamSlotPosition(MechU32 p_player, MechS32* p_x, MechS32* p_z, MechS32* p_heading)
 {
 	MechS32 slot;
@@ -227,7 +201,6 @@ MechS32 GetTeamSlotPosition(MechU32 p_player, MechS32* p_x, MechS32* p_z, MechS3
 	return TRUE;
 }
 
-// FUNCTION: MW2 0x1003c1b4
 MechS32 GetTeamLeader(MechS32 p_team)
 {
 	MechS32 result = 0;
@@ -240,8 +213,6 @@ MechS32 GetTeamLeader(MechS32 p_team)
 }
 
 // Numbers the team's active members' formation slots from 1, the leader taking slot 0.
-// Stack-slot permutation: team, player, i, slot and leader.
-// FUNCTION: MW2 0x1003c1ef
 MechS32 AssignTeamSlots(MechS32 p_team, MechS32 p_unk0x04)
 {
 	Team* team;
@@ -275,13 +246,11 @@ MechS32 AssignTeamSlots(MechS32 p_team, MechS32 p_unk0x04)
 	return TRUE;
 }
 
-// FUNCTION: MW2 0x1003c2e3
 MechS32 GetPlayerSide(MechS32 p_player)
 {
 	return g_teams[g_players[p_player]->m_team].m_side;
 }
 
-// FUNCTION: MW2 0x1003c30e
 MechS32 GetThingSide(MechS32 p_thing)
 {
 	MechS32 index;
@@ -296,7 +265,6 @@ MechS32 GetThingSide(MechS32 p_thing)
 }
 
 // The side of the team that owns nav p_nav; 2 past the first 16 navs.
-// FUNCTION: MW2 0x1003c353
 MechS32 GetNavSide(MechU32 p_nav)
 {
 	MechS32 side;
@@ -309,7 +277,6 @@ MechS32 GetNavSide(MechU32 p_nav)
 	return side;
 }
 
-// FUNCTION: MW2 0x1003c39d
 MechS32 OnSameSide(MechS32 p_playerA, MechS32 p_playerB)
 {
 	return GetPlayerSide(p_playerB) == GetPlayerSide(p_playerA);

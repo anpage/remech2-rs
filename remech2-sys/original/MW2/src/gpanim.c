@@ -10,14 +10,11 @@
 #include "soundfx.h"
 #include "types.h"
 
-// GLOBAL: MW2 0x100a0110
 MechS32 g_motionSounds[4][4] =
 	{{-1, 0x12e, 0x12e, -1}, {0x14f, -1, -1, 0x14f}, {0x11a, 0x11a, 0x148, 0x11a}, {0x119, 0x119, 0x119, 0x12d}};
 
-// GLOBAL: MW2 0x10181970
 MechS32 g_lastMotionSound[60];
 
-// FUNCTION: MW2 0x10003620
 void FirstGPAnim(void)
 {
 	MechS32 i;
@@ -27,7 +24,6 @@ void FirstGPAnim(void)
 	}
 }
 
-// FUNCTION: MW2 0x1000365a
 void StartMotion(Player* p_player)
 {
 	if (p_player->m_index != g_localPlayerId) {
@@ -38,14 +34,12 @@ void StartMotion(Player* p_player)
 	p_player->m_nextMotionState = -1;
 }
 
-// FUNCTION: MW2 0x1000369e
 void StopMotion(Player* p_player)
 {
 	p_player->m_speedLevel = 0;
 	p_player->m_nextMotionState = -1;
 }
 
-// FUNCTION: MW2 0x100036c3
 MechS32* GetEyepointOffset(Player* p_player, MechS32* p_offset)
 {
 	p_offset[0] = g_eyepoint->m_x - p_player->m_position.m_x;
@@ -57,8 +51,6 @@ MechS32* GetEyepointOffset(Player* p_player, MechS32* p_offset)
 // Picks the player's motion state from its mech's throttle (m_speedLevel, m_nextMotionState; 2
 // while its steering's m_reverse is set), plays its pending sound m_pendingSound once (bit 8 of
 // m_animFlags), and for the local player updates the looping sounds (UpdateMotionSounds).
-// Stack-slot permutation: offset and position.
-// FUNCTION: MW2 0x10003710
 void UpdateMotion(Player* p_player)
 {
 	MechS32* offset;
@@ -111,9 +103,6 @@ void UpdateMotion(Player* p_player)
 	}
 }
 
-// Matches except for the stack slots of offset, sound and id (a consistent permutation) and
-// the order the p_sounds index loads its row and column in.
-// FUNCTION: MW2 0x100038c2
 void UpdateMotionSounds(Player* p_player, MechS32 (*p_sounds)[4], MechS32* p_offset)
 {
 	MechS32 offset[3];
@@ -147,7 +136,6 @@ void UpdateMotionSounds(Player* p_player, MechS32 (*p_sounds)[4], MechS32* p_off
 	}
 }
 
-// FUNCTION: MW2 0x10003a10
 void ResetMotion(Player* p_player)
 {
 	MechS32 id;

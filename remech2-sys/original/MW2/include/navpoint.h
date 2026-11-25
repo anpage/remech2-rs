@@ -8,7 +8,6 @@ struct SceneObject;
 
 // A nav point (AI target type 0x100): mission navs, and the ones AI players place for
 // themselves.
-// SIZE 0x54
 typedef struct NavPoint {
 	undefined4 m_used;                 // 0x00 — nonzero when in use
 	struct SceneObject* m_obj;         // 0x04 — the object it follows, or NULL

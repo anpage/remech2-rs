@@ -6,7 +6,6 @@
 
 // A vertex projected for drawing, one of AllocProjectedVertex's per-frame records: its view-space
 // position, screen position, texture coordinates and clip outcodes.
-// SIZE 0x20
 typedef struct ProjectedVertex {
 	MechS32 m_x;                      // 0x00
 	MechS32 m_y;                      // 0x04

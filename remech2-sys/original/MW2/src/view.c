@@ -22,150 +22,102 @@
 #include "types.h"
 
 // The level of detail: 1 high, 2 low (TOGGLE_LOD_QUALITY); it divides Eyepoint::m_detailScale.
-// GLOBAL: MW2 0x100a712c
 MechS32 g_lodQuality = 1;
 
-// GLOBAL: MW2 0x100ea820
 MechS32 g_viewNear;
 
-// GLOBAL: MW2 0x100ea824
 MechS32 g_viewShiftX;
 
-// GLOBAL: MW2 0x100ea828
 MechS32 g_viewShiftY;
 
-// GLOBAL: MW2 0x100ea82c
 MechS32 g_viewFar;
 
-// GLOBAL: MW2 0x100ea830
 MechS32 g_viewLeft;
 
-// GLOBAL: MW2 0x100ea834
 MechS32 g_viewCenterX;
 
-// GLOBAL: MW2 0x100ea838
 MechS32 g_viewHalfHeight;
 
-// GLOBAL: MW2 0x100ea83c
 MechS32 g_viewHalfWidth;
 
-// GLOBAL: MW2 0x100ea840
 MechS32 g_viewBottom;
 
-// GLOBAL: MW2 0x100ea844
 MechS32 g_viewProjectScaleX;
 
-// GLOBAL: MW2 0x100ea848
 MechS32 g_viewProjectScaleY;
 
-// GLOBAL: MW2 0x100ea84c
 MechS32 g_viewRight;
 
-// GLOBAL: MW2 0x100ea850
 MechS32 g_viewTop;
 
-// GLOBAL: MW2 0x100ea854
 MechS32 g_viewLeftScaled;
 
-// GLOBAL: MW2 0x100ea858
 MechS32 g_viewCenterY;
 
-// GLOBAL: MW2 0x100ea85c
 MechS32 g_viewBottomScaled;
 
-// GLOBAL: MW2 0x100ea860
 MechS32 g_viewFarPlane;
 
-// GLOBAL: MW2 0x100ea864
 MechS32 g_viewProjX0;
 
-// GLOBAL: MW2 0x100ea868
 MechS32 g_viewProjX1;
 
-// GLOBAL: MW2 0x100ea86c
 MechS32 g_viewProjX2;
 
-// GLOBAL: MW2 0x100ea870
 MechS32 g_viewProjY0;
 
-// GLOBAL: MW2 0x100ea874
 MechS32 g_viewProjY1;
 
-// GLOBAL: MW2 0x100ea878
 MechS32 g_viewProjY2;
 
-// GLOBAL: MW2 0x100ea87c
 MechS32 g_viewProjZ0;
 
-// GLOBAL: MW2 0x100ea880
 MechS32 g_viewProjZ1;
 
-// GLOBAL: MW2 0x100ea884
 MechS32 g_viewProjZ2;
 
-// GLOBAL: MW2 0x100ea888
 MechS32 g_viewProjectScaleX16;
 
-// GLOBAL: MW2 0x100ea88c
 MechS32 g_viewProjectScaleY16;
 
-// GLOBAL: MW2 0x100ea890
 MechS32 g_viewRotX0;
 
-// GLOBAL: MW2 0x100ea894
 MechS32 g_viewRotX1;
 
-// GLOBAL: MW2 0x100ea898
 MechS32 g_viewRotX2;
 
-// GLOBAL: MW2 0x100ea89c
 MechS32 g_viewRotY0;
 
-// GLOBAL: MW2 0x100ea8a0
 MechS32 g_viewRotY1;
 
-// GLOBAL: MW2 0x100ea8a4
 MechS32 g_viewRotY2;
 
-// GLOBAL: MW2 0x100ea8a8
 MechS32 g_viewRotZ0;
 
-// GLOBAL: MW2 0x100ea8ac
 MechS32 g_viewRotZ1;
 
-// GLOBAL: MW2 0x100ea8b0
 MechS32 g_viewRotZ2;
 
-// GLOBAL: MW2 0x100ea8b4
 MechS32 g_viewEyeY;
 
-// GLOBAL: MW2 0x100ea8b8
 MechS32 g_viewEyeX;
 
-// GLOBAL: MW2 0x100ea8bc
 MechS32 g_viewEyeZ;
 
-// GLOBAL: MW2 0x100ea8c0
 MechS32 g_viewLightZ;
 
-// GLOBAL: MW2 0x100ea8c4
 MechS32 g_viewLightX;
 
-// GLOBAL: MW2 0x100ea8c8
 MechS32 g_viewLightY;
 
-// GLOBAL: MW2 0x100ea8cc
 MechS32 g_viewTopScaled;
 
-// GLOBAL: MW2 0x100ea8d0
 MechS32 g_viewNearPlane;
 
-// GLOBAL: MW2 0x100ea8d4
 MechS32 g_viewRightScaled;
 
 // Makes p_eyepoint the current eyepoint and copies what the renderer uses each frame out of it:
 // its rotation (also scaled by the projection factors), position, view rectangle and shading.
-// FUNCTION: MW2 0x1004b980
 void SelectEyepoint(Eyepoint* p_eyepoint)
 {
 	Eyepoint* eyepoint;
@@ -219,8 +171,6 @@ void SelectEyepoint(Eyepoint* p_eyepoint)
 }
 
 // Sets up the eyepoint's projection from its view rectangle, field of view and pixel aspect.
-// Stack-slot permutation: every local.
-// FUNCTION: MW2 0x1004bc2e
 void UpdateProjection(Eyepoint* p_eyepoint)
 {
 	MechS32 centerX;
@@ -306,14 +256,12 @@ void UpdateProjection(Eyepoint* p_eyepoint)
 	eyepoint->m_detailScale = low2 / (g_lodQuality * 160);
 }
 
-// FUNCTION: MW2 0x1004bf61
 void SetNearPlane(Eyepoint* p_eyepoint, MechS32 p_value)
 {
 	p_eyepoint->m_nearPlane = g_viewNearPlane = p_value;
 	g_viewNear = p_value << 2;
 }
 
-// FUNCTION: MW2 0x1004bf8a
 void SetFarPlane(Eyepoint* p_eyepoint, MechS32 p_value)
 {
 	p_eyepoint->m_farPlane = g_viewFarPlane = p_value;
@@ -329,7 +277,6 @@ void SetFarPlane(Eyepoint* p_eyepoint, MechS32 p_value)
 
 // Builds the eyepoint's view matrix (its rotation transposed, and its position) from its
 // position and rotation.
-// FUNCTION: MW2 0x1004bfe8
 void UpdateViewMatrix(Eyepoint* p_eyepoint)
 {
 	Matrix matrix;
@@ -349,7 +296,6 @@ void UpdateViewMatrix(Eyepoint* p_eyepoint)
 	p_eyepoint->m_viewMatrix.m_rows[3][2] = matrix.m_rows[3][2];
 }
 
-// FUNCTION: MW2 0x1004c05c
 void ResetEyepointView(Eyepoint* p_eyepoint)
 {
 	p_eyepoint->m_offsetX = 0;
@@ -359,7 +305,6 @@ void ResetEyepointView(Eyepoint* p_eyepoint)
 }
 
 // Sets the eyepoint's view from a transform.
-// FUNCTION: MW2 0x1004c093
 void SetEyepointTransform(Eyepoint* p_eyepoint, Matrix* p_matrix)
 {
 	TransposeRotation(p_matrix, &p_eyepoint->m_viewMatrix);
@@ -369,7 +314,6 @@ void SetEyepointTransform(Eyepoint* p_eyepoint, Matrix* p_matrix)
 }
 
 // Gets the eyepoint's view as a transform.
-// FUNCTION: MW2 0x1004c0d8
 void GetEyepointTransform(Eyepoint* p_eyepoint, Matrix* p_matrix)
 {
 	TransposeRotation(&p_eyepoint->m_viewMatrix, p_matrix);
@@ -381,8 +325,6 @@ void GetEyepointTransform(Eyepoint* p_eyepoint, Matrix* p_matrix)
 // Projects the world point (*p_x, *p_y, *p_z) onto the screen in place (*p_z the depth). A point
 // at or behind the near plane is projected mirrored. Returns whether it is in front and on the
 // screen.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1004c11d
 MechS32 ProjectWorldPoint(MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	MechS32 x;
@@ -428,8 +370,6 @@ MechS32 ProjectWorldPoint(MechS32* p_x, MechS32* p_y, MechS32* p_z)
 // The scene's shape filter (RenderSettings::m_shapeFilter): culls a shape against the view frustum,
 // like CullMapViewShape the map view's. 1: a shape of kind 0xa0 with g_inCockpitView, 5: out of
 // range or past the far plane, 4: in front of the near plane, 6 and 7: outside the side planes.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1004c2ef
 MechS32 CullSceneShape(Shape* p_shape)
 {
 	MechS32 y;
@@ -500,8 +440,6 @@ MechS32 CullSceneShape(Shape* p_shape)
 
 // Culls a shape against the view frustum like CullSceneShape, without its range test. 1 for a
 // hidden shape (bit 0x1000).
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1004c565
 MechS32 CullShapeToFrustum(Shape* p_shape)
 {
 	MechS32 y;
@@ -562,7 +500,6 @@ MechS32 CullShapeToFrustum(Shape* p_shape)
 	return 0;
 }
 
-// FUNCTION: MW2 0x1004c779
 MechS32 CullHiddenShape(Shape* p_shape)
 {
 	if (p_shape->m_flags & 0x1000) {
@@ -572,13 +509,11 @@ MechS32 CullHiddenShape(Shape* p_shape)
 	return FALSE;
 }
 
-// FUNCTION: MW2 0x1004c7a6
 MechS32 IsLodQualityHigh(undefined4 p_unk0x00)
 {
 	return g_lodQuality == 1;
 }
 
-// FUNCTION: MW2 0x1004c7cf
 void SetLodQualityHigh(undefined4 p_unk0x00, MechS32 p_enable)
 {
 	if (p_enable) {

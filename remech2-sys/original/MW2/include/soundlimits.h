@@ -5,7 +5,6 @@
 #include "types.h"
 
 // An entry of the sound table InitSoundInfo unpacks into g_soundInfo.
-// SIZE 0x08
 typedef struct SoundTableEntry {
 	MechS16 m_id;       // 0x00 — the sound resource
 	MechS16 m_priority; // 0x02

@@ -16,8 +16,6 @@
 	}                                                                                                                  \
 	else
 
-// Stack-slot permutation: collection, items and i take different [ebp-N] slots than the original.
-// FUNCTION: MW2SHELL 0x1003c0a0
 MechS32 CreateCollection(
 	Collection** p_collection,
 	MechS32 p_growBy,
@@ -61,7 +59,6 @@ MechS32 CreateCollection(
 	return 0;
 }
 
-// FUNCTION: MW2SHELL 0x1003c1dc
 MechS32 DestroyCollection(Collection* p_collection)
 {
 	MechS32 i;
@@ -81,7 +78,6 @@ MechS32 DestroyCollection(Collection* p_collection)
 	return 0;
 }
 
-// FUNCTION: MW2SHELL 0x1003c296
 MechS32 ExpandCollection(Collection* p_collection, void* p_item)
 {
 	void** items;
@@ -119,8 +115,6 @@ MechS32 ExpandCollection(Collection* p_collection, void* p_item)
 	return 0;
 }
 
-// Stack-slot permutation: index and item swap [ebp-N] slots with the original.
-// FUNCTION: MW2SHELL 0x1003c3ba
 void CollectionRemove(Collection* p_collection, void* p_item, MechU8 p_destroy)
 {
 	MechS32 index;
@@ -144,8 +138,6 @@ void CollectionRemove(Collection* p_collection, void* p_item, MechU8 p_destroy)
 	}
 }
 
-// Stack-slot permutation: found, item, key and i take different [ebp-N] slots than the original.
-// FUNCTION: MW2SHELL 0x1003c45f
 MechS32 CollectionFind(Collection* p_collection, void* p_item)
 {
 	void** found;
@@ -180,7 +172,6 @@ MechS32 CollectionFind(Collection* p_collection, void* p_item)
 	return -1;
 }
 
-// FUNCTION: MW2SHELL 0x1003c55d
 void SortCollection(Collection* p_collection)
 {
 	if (p_collection->m_unsorted == 1) {
@@ -189,7 +180,6 @@ void SortCollection(Collection* p_collection)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003c59e
 void EnsureCollectionSorted(Collection* p_collection)
 {
 	if ((p_collection->m_flags & c_collectionSorted) && p_collection->m_unsorted == 1) {
@@ -198,7 +188,6 @@ void EnsureCollectionSorted(Collection* p_collection)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003c5f0
 void* CollectionGet(Collection* p_collection, MechS32 p_index)
 {
 	EnsureCollectionSorted(p_collection);
@@ -210,7 +199,6 @@ void* CollectionGet(Collection* p_collection, MechS32 p_index)
 	return p_collection->m_items[p_index];
 }
 
-// FUNCTION: MW2SHELL 0x1003c638
 void MoveCollectionItems(Collection* p_collection, Collection* p_source)
 {
 	MechS32 i;
@@ -223,9 +211,6 @@ void MoveCollectionItems(Collection* p_collection, Collection* p_source)
 	ClearCollection(p_source);
 }
 
-// Operand order: the original loads i before m_items for m_items[i]; i and item also take
-// different [ebp-N] slots than the original.
-// FUNCTION: MW2SHELL 0x1003c69e
 void ClearCollection(Collection* p_collection)
 {
 	MechS32 i;

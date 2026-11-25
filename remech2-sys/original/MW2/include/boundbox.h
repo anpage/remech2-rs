@@ -7,7 +7,6 @@
 
 // The bounding box of a shape's selected model (Shape::m_collisionData), from the
 // transformed vertices. CreateShapeBoundBox allocates it inside a larger 0x78-byte block.
-// SIZE 0x18
 typedef struct BoundBox {
 	MechS32 m_minX; // 0x00
 	MechS32 m_maxX; // 0x04

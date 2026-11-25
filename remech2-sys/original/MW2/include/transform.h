@@ -8,7 +8,6 @@
    (SetIdentityMatrix sets the identity, 0x20000000 on the diagonal). */
 typedef struct Matrix Matrix;
 
-// SIZE 0x30
 struct Matrix {
 	MechS32 m_rows[4][3]; // 0x00
 };

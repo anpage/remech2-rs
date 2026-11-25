@@ -15,17 +15,14 @@
 #include <string.h>
 
 // The flags a new shape starts with (CreateShape).
-// GLOBAL: MW2 0x100a5898
 MechU32 g_newShapeFlags = 0;
 
-// FUNCTION: MW2 0x1003a530
 MechU32 GetNewShapeFlags(void)
 {
 	return g_newShapeFlags;
 }
 
 // Sets the flags new shapes start with; returns the previous ones.
-// FUNCTION: MW2 0x1003a545
 MechU32 SetNewShapeFlags(MechU32 p_flags)
 {
 	MechU32 previous;
@@ -36,20 +33,17 @@ MechU32 SetNewShapeFlags(MechU32 p_flags)
 }
 
 // Selects the shape's first model.
-// FUNCTION: MW2 0x1003a56b
 void SelectFirstModel(Shape* p_shape)
 {
 	SelectModel(p_shape, p_shape->m_models);
 }
 
-// FUNCTION: MW2 0x1003a589
 void SelectModel(Shape* p_shape, Model* p_model)
 {
 	p_shape->m_model = p_model;
 }
 
 // Selects the next model, wrapping around to the first.
-// FUNCTION: MW2 0x1003a59d
 void SelectNextModel(Shape* p_shape)
 {
 	if (!p_shape->m_model || !p_shape->m_model->m_next) {
@@ -62,9 +56,6 @@ void SelectNextModel(Shape* p_shape)
 
 // Allocates a model with room for the vertices, the faces and p_extra more bytes (returned in
 // p_extraData), inserts it into the shape's list by p_key and selects it.
-// The size sum adds p_extra and vertexBytes in the other order, and the locals sit in
-// permuted stack slots.
-// FUNCTION: MW2 0x1003a5f3
 Model* AddModel(
 	Shape* p_shape,
 	MechS32 p_key,
@@ -134,7 +125,6 @@ Model* AddModel(
 }
 
 // Selects the first model whose key is at most p_key.
-// FUNCTION: MW2 0x1003a7a2
 void SelectModelByKey(Shape* p_shape, MechS32 p_key)
 {
 	Model* model;
@@ -147,7 +137,6 @@ void SelectModelByKey(Shape* p_shape, MechS32 p_key)
 	}
 }
 
-// FUNCTION: MW2 0x1003a7f9
 void SetModelKey(Shape* p_shape, MechS32 p_key)
 {
 	Model* model;
@@ -160,7 +149,6 @@ void SetModelKey(Shape* p_shape, MechS32 p_key)
 	model->m_key = p_key;
 }
 
-// FUNCTION: MW2 0x1003a827
 MechS32 GetModelKey(Shape* p_shape)
 {
 	Model* model;
@@ -173,7 +161,6 @@ MechS32 GetModelKey(Shape* p_shape)
 	return model->m_key;
 }
 
-// FUNCTION: MW2 0x1003a859
 void FUN_1003a859(Shape* p_shape, MechS32 p_unk0x14)
 {
 	Model* model;
@@ -186,7 +173,6 @@ void FUN_1003a859(Shape* p_shape, MechS32 p_unk0x14)
 	model->m_unk0x14 = p_unk0x14;
 }
 
-// FUNCTION: MW2 0x1003a889
 MechU32 FUN_1003a889(Shape* p_shape)
 {
 	Model* model;
@@ -200,7 +186,6 @@ MechU32 FUN_1003a889(Shape* p_shape)
 }
 
 // Allocates a shape with one model (AddModel).
-// FUNCTION: MW2 0x1003a8c1
 Shape* CreateShape(MechS32 p_vertexCount, MechS32 p_faceCount, MechS32 p_extra, void** p_extraData)
 {
 	Shape* shape;
@@ -233,7 +218,6 @@ Shape* CreateShape(MechS32 p_vertexCount, MechS32 p_faceCount, MechS32 p_extra, 
 }
 
 // Appends a vertex to the selected model.
-// FUNCTION: MW2 0x1003aa1d
 void AddShapeVertex(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z, undefined4 p_u, undefined4 p_v)
 {
 	Model* model;
@@ -254,8 +238,6 @@ void AddShapeVertex(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z, undef
 }
 
 // Appends a face to the selected model, its vertex indices at p_indices.
-// The only diff is a stack-slot permutation of model and face.
-// FUNCTION: MW2 0x1003aab5
 Face* AddShapeFace(Shape* p_shape, MechU16 p_color, MechU8* p_indices)
 {
 	Model* model;
@@ -276,7 +258,6 @@ Face* AddShapeFace(Shape* p_shape, MechU16 p_color, MechU8* p_indices)
 }
 
 // Appends a vertex index to a face of the selected model.
-// FUNCTION: MW2 0x1003ab34
 void AddShapeFaceIndex(Shape* p_shape, Face* p_face, MechU32 p_index)
 {
 	Model* model;
@@ -290,7 +271,6 @@ void AddShapeFaceIndex(Shape* p_shape, Face* p_face, MechU32 p_index)
 	p_face->m_indexCount++;
 }
 
-// FUNCTION: MW2 0x1003ab79
 void FreeModel(Model* p_model)
 {
 	if (!p_model) {
@@ -301,8 +281,6 @@ void FreeModel(Model* p_model)
 }
 
 // Removes the selected model from the shape's list and frees it.
-// The only diff is a stack-slot permutation of model and cursor.
-// FUNCTION: MW2 0x1003aba5
 void RemoveSelectedModel(Shape* p_shape)
 {
 	Model* model;
@@ -334,7 +312,6 @@ void RemoveSelectedModel(Shape* p_shape)
 }
 
 // Frees the shape and its models.
-// FUNCTION: MW2 0x1003ac5f
 void FreeShape(Shape* p_shape)
 {
 	Model* model;
@@ -351,7 +328,6 @@ void FreeShape(Shape* p_shape)
 	MechHeapFree(g_primaryHeap, p_shape);
 }
 
-// FUNCTION: MW2 0x1003acbe
 void SetShapeState(Shape* p_shape, MechS32 p_flags)
 {
 	if (p_shape) {
@@ -359,7 +335,6 @@ void SetShapeState(Shape* p_shape, MechS32 p_flags)
 	}
 }
 
-// FUNCTION: MW2 0x1003acf7
 MechU32 GetShapeState(Shape* p_shape)
 {
 	if (p_shape) {
@@ -370,7 +345,6 @@ MechU32 GetShapeState(Shape* p_shape)
 	}
 }
 
-// FUNCTION: MW2 0x1003ad2d
 void SetShapeKind(Shape* p_shape, MechS32 p_kind)
 {
 	if (p_shape) {
@@ -378,37 +352,31 @@ void SetShapeKind(Shape* p_shape, MechS32 p_kind)
 	}
 }
 
-// FUNCTION: MW2 0x1003ad4c
 void SetShapePartId(Shape* p_shape, MechU16 p_partId)
 {
 	p_shape->m_partId = p_partId;
 }
 
-// FUNCTION: MW2 0x1003ad62
 void SetShapeOwner(Shape* p_shape, MechU16 p_owner)
 {
 	p_shape->m_owner = p_owner;
 }
 
-// FUNCTION: MW2 0x1003ad78
 MechU32 GetShapeKind(Shape* p_shape)
 {
 	return p_shape->m_kind;
 }
 
-// FUNCTION: MW2 0x1003ad93
 MechU32 GetShapePartId(Shape* p_shape)
 {
 	return p_shape->m_partId;
 }
 
-// FUNCTION: MW2 0x1003adae
 MechU32 GetShapeOwner(Shape* p_shape)
 {
 	return p_shape->m_owner;
 }
 
-// FUNCTION: MW2 0x1003adc9
 MechS32 GetShapeBounds(Shape* p_shape, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	if (p_x) {
@@ -428,7 +396,6 @@ MechS32 GetShapeBounds(Shape* p_shape, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 
 // Computes the selected model's face normals, then the shape's center and radius (a shape
 // LoadShapeRecord has just built).
-// FUNCTION: MW2 0x1003ae1e
 void ComputeNormalsAndBounds(Shape* p_shape)
 {
 	Model* model;
@@ -449,10 +416,6 @@ void ComputeNormalsAndBounds(Shape* p_shape)
 
 // Sets p_shape's center to the middle of its first model's bounding box, and its radius to the
 // distance from there to the farthest vertex.
-// Stack-slot permutation of the locals. The vertex address loads the index first where the
-// original loads the model first (index order), and 4.1 sums the squares in another order, which
-// also compares d before storing it; a probe of the same source picks yet another order.
-// FUNCTION: MW2 0x1003ae96
 void ComputeShapeBounds(Shape* p_shape)
 {
 	MechDouble dz;
@@ -525,7 +488,6 @@ void ComputeShapeBounds(Shape* p_shape)
 // Sets the face's normal (both copies) from its vertices: a triangle's directly, otherwise from
 // its longest edge and the vertex that gives the largest area with it, stopping at the first
 // area over 16. A face of fewer than 3 vertices keeps the default (0x20000000, 0, 0).
-// FUNCTION: MW2 0x1003b0e4
 void ComputeFaceNormal(Face* p_face, Vertex* p_vertices)
 {
 	MechS32 length;
@@ -629,7 +591,6 @@ void ComputeFaceNormal(Face* p_face, Vertex* p_vertices)
 }
 
 // Returns the selected model's vertex and face counts.
-// FUNCTION: MW2 0x1003b43d
 void GetModelCounts(Shape* p_shape, MechS32* p_vertexCount, MechS32* p_faceCount)
 {
 	Model* model;
@@ -649,7 +610,6 @@ void GetModelCounts(Shape* p_shape, MechS32* p_vertexCount, MechS32* p_faceCount
 }
 
 // Calls p_fn for each shape of the list after p_shape.
-// FUNCTION: MW2 0x1003b48f
 void ForEachShape(Shape* p_shape, void (*p_fn)(Shape*))
 {
 	Shape* shape;
@@ -668,7 +628,6 @@ void ForEachShape(Shape* p_shape, void (*p_fn)(Shape*))
 }
 
 // Returns a vertex's transformed position.
-// FUNCTION: MW2 0x1003b4dd
 void GetTransformedVertex(Shape* p_shape, MechS32 p_index, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	Model* model;
@@ -694,9 +653,6 @@ void GetTransformedVertex(Shape* p_shape, MechS32 p_index, MechS32* p_x, MechS32
 }
 
 // Returns a vertex's position in the model.
-// The vertex address adds the model and the index in the other order (GetTransformedVertex's
-// identical expression doesn't).
-// FUNCTION: MW2 0x1003b55a
 void GetVertexPosition(Shape* p_shape, MechS32 p_index, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	Model* model;
@@ -722,7 +678,6 @@ void GetVertexPosition(Shape* p_shape, MechS32 p_index, MechS32* p_x, MechS32* p
 }
 
 // Returns a face of the selected model and up to p_max of its vertex indices.
-// FUNCTION: MW2 0x1003b5d6
 void GetShapeFace(
 	Shape* p_shape,
 	MechS32 p_index,
@@ -762,7 +717,6 @@ void GetShapeFace(
 	}
 }
 
-// FUNCTION: MW2 0x1003b696
 void SetFaceColor(Shape* p_shape, MechS32 p_index, MechS32 p_color)
 {
 	Model* model;
@@ -777,32 +731,27 @@ void SetFaceColor(Shape* p_shape, MechS32 p_index, MechS32 p_color)
 	}
 }
 
-// FUNCTION: MW2 0x1003b6e5
 struct SceneObject* GetShapeObject(Shape* p_shape)
 {
 	return p_shape->m_object;
 }
 
-// FUNCTION: MW2 0x1003b6fb
 void SetShapeObject(Shape* p_shape, struct SceneObject* p_object)
 {
 	p_shape->m_object = p_object;
 }
 
-// FUNCTION: MW2 0x1003b70f
 MechU32 GetShapeLoadFlags(Shape* p_shape)
 {
 	return p_shape->m_flags & 0x10f;
 }
 
-// FUNCTION: MW2 0x1003b72f
 void SetShapeLoadFlags(Shape* p_shape, MechU32 p_flags)
 {
 	p_shape->m_flags = (p_shape->m_flags & ~0x10f) | (p_flags & 0x10f) | 0x8000;
 }
 
 // Unlinks the shape and frees it.
-// FUNCTION: MW2 0x1003b75e
 void DestroyShape(Shape* p_shape)
 {
 	if (p_shape) {
@@ -812,7 +761,6 @@ void DestroyShape(Shape* p_shape)
 }
 
 // Detaches the shape from its scene object and frees it. A ShapeCallback (DestroyObjTree).
-// FUNCTION: MW2 0x1003b78b
 void DestroyObjShape(Shape* p_shape)
 {
 	struct SceneObject* obj;
@@ -826,8 +774,6 @@ void DestroyObjShape(Shape* p_shape)
 }
 
 // Returns the bytes the shape, its models and its bounding data take.
-// The only diff is a stack-slot permutation of model, vertex and size.
-// FUNCTION: MW2 0x1003b7cc
 MechS32 GetShapeMemorySize(Shape* p_shape)
 {
 	Model* model;

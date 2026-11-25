@@ -5,9 +5,6 @@
 #include "videodriver.h"
 #include "windowstate.h"
 
-DECOMP_SIZE_ASSERT(PopupPicture, 0x35c)
-
-// FUNCTION: MW2SHELL 0x10045d60
 PopupPicture::PopupPicture(
 	undefined* p_data,
 	MechS32 p_size,
@@ -52,7 +49,6 @@ PopupPicture::PopupPicture(
 	VFX_pane_copy(&m_screenView, 0, 0, &m_savedView, 0, 0, -1);
 }
 
-// FUNCTION: MW2SHELL 0x10045f19
 PopupPicture::~PopupPicture()
 {
 	Hide();
@@ -63,7 +59,6 @@ PopupPicture::~PopupPicture()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10045f69
 void PopupPicture::Show()
 {
 	if (m_sample && !m_sample->IsPlaying()) {
@@ -76,7 +71,6 @@ void PopupPicture::Show()
 	m_videoDriver->RedrawGlyphs(1);
 }
 
-// FUNCTION: MW2SHELL 0x1004601c
 void PopupPicture::Hide()
 {
 	VFX_pane_copy(&m_savedView, 0, 0, &m_screenView, 0, 0, -1);

@@ -14,34 +14,24 @@
 #include "queuedpolygon.h"
 #include "types.h"
 
-// GLOBAL: MW2 0x100ba5cc
 MechS32 g_drawBufferSize = 0x80;
 
-// GLOBAL: MW2 0x100ba5d0
 MechU8* g_drawBufferMemory = NULL;
 
-// GLOBAL: MW2 0x100c1a68
 MechS32 g_depthListCapacity;
 
-// GLOBAL: MW2 0x100c1a6c
 MechU8* g_drawBuffer;
 
-// GLOBAL: MW2 0x100c1a70
 MechU8* g_drawBufferTop;
 
-// GLOBAL: MW2 0x100c2280
 DepthEntry* g_drawList;
 
-// GLOBAL: MW2 0x100c2698
 MechU8* g_drawBufferBottom;
 
-// GLOBAL: MW2 0x100c269c
 DepthEntry* g_depthQueue;
 
-// GLOBAL: MW2 0x1010b5ac
 MechS32 g_queueHasRoom;
 
-// FUNCTION: MW2 0x1007d120
 void ShutdownDrawBuffer(void)
 {
 	if (g_drawBufferMemory != NULL) {
@@ -50,9 +40,7 @@ void ShutdownDrawBuffer(void)
 	}
 }
 
-// Operand order: the original computes g_depthListCapacity << 4 before p_kilobytes << 10 in size
-// (both front ends reorder commutative operands). The << 4 was two lists of 8-byte DepthEntry.
-// FUNCTION: MW2 0x1007d150
+// The << 4 was two lists of 8-byte DepthEntry.
 void InitializeDrawBuffer(MechS32 p_kilobytes, MechS32 p_entries)
 {
 	MechU32 size;
@@ -76,14 +64,12 @@ void InitializeDrawBuffer(MechS32 p_kilobytes, MechS32 p_entries)
 	InitSlopeTables();
 }
 
-// FUNCTION: MW2 0x1007d220
 void ResetDrawBuffer(void)
 {
 	g_drawBufferBottom = g_drawBuffer;
 	g_drawBufferTop = g_drawBuffer + g_drawBufferSize - 0x30;
 }
 
-// FUNCTION: MW2 0x1007d248
 ProjectedVertex* AllocProjectedVertex(void)
 {
 	MechS32 recordSize;
@@ -101,7 +87,6 @@ ProjectedVertex* AllocProjectedVertex(void)
 	return record;
 }
 
-// FUNCTION: MW2 0x1007d296
 MechU8* AllocQueuedPolygon(void)
 {
 	MechS32 recordSize;

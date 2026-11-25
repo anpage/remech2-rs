@@ -11,19 +11,12 @@
 
 #include <stdlib.h>
 
-DECOMP_SIZE_ASSERT(StaticPool, 0x14)
-DECOMP_SIZE_ASSERT(StaticPoolGroup, 0x0c)
-
-// GLOBAL: MW2 0x100a6ddc
 MechS32 g_staticPoolGroupCount = 0;
 
-// GLOBAL: MW2 0x100a6de0
 MechS32 g_staticPoolCount = 0;
 
-// GLOBAL: MW2 0x100be5e0
 StaticPoolGroup g_staticPoolGroups[5];
 
-// GLOBAL: MW2 0x100be620
 StaticPool g_staticPools[32];
 
 void ResetStaticPools(void);
@@ -33,9 +26,6 @@ MechS32 AddStaticPoolType(MechS32 p_size, MechU32 p_tag);
 
 // Reads the mission's pool sizes, places the pools in groups of up to 0xffdc bytes, largest
 // first, and allocates the groups. Returns whether it could read the sizes.
-// Stack-slot permutation: i, pool, j, group and best. The loop tests and the comparisons of the
-// groups' free room follow the unit's symbol table in the other operand order.
-// FUNCTION: MW2 0x100498b0
 MechS32 InitStaticMem(char* p_mission)
 {
 	MechS32 i;
@@ -102,8 +92,6 @@ MechS32 InitStaticMem(char* p_mission)
 }
 
 // Takes a block from the pool of a tag, logging the call to mw2.log.
-// Stack-slot permutation: i, pool, block and group.
-// FUNCTION: MW2 0x10049afb
 void* StaticPoolAlloc(MechU32 p_size, MechU32 p_tag)
 {
 	MechS32 i;
@@ -141,8 +129,6 @@ void* StaticPoolAlloc(MechU32 p_size, MechU32 p_tag)
 }
 
 // Frees the groups' blocks.
-// The loop test compares in the other operand order (the unit's symbol table).
-// FUNCTION: MW2 0x10049c55
 void FreeStaticMem(void)
 {
 	MechS32 i;
@@ -157,8 +143,6 @@ void FreeStaticMem(void)
 }
 
 // Orders pools by size, largest first (for qsort).
-// Stack-slot permutation: b and difference.
-// FUNCTION: MW2 0x10049cc7
 int CompareStaticPools(const void* p_a, const void* p_b)
 {
 	StaticPool* a;
@@ -179,14 +163,12 @@ int CompareStaticPools(const void* p_a, const void* p_b)
 	return 0;
 }
 
-// FUNCTION: MW2 0x10049d1f
 void ResetStaticPools(void)
 {
 }
 
 // Adds the pool sizes of the mission's static memory table (seven tag and size pairs).
 // Returns whether the mission has the table.
-// FUNCTION: MW2 0x10049d2a
 MechS32 ParseStaticPoolConfig(char* p_mission)
 {
 	StaticPoolSize* entry;
@@ -210,9 +192,6 @@ MechS32 ParseStaticPoolConfig(char* p_mission)
 
 // Adds room for a tag, making its pool on first use. Returns whether the pool still fits in a
 // group.
-// Stack-slot permutation: pool and i. Both tests against g_staticPoolCount compare in the other
-// operand order (the unit's symbol table).
-// FUNCTION: MW2 0x10049da3
 MechS32 AddStaticPoolType(MechS32 p_size, MechU32 p_tag)
 {
 	StaticPool* pool;

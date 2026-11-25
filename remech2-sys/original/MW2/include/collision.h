@@ -9,7 +9,6 @@ struct Face;
 struct Vertex;
 
 // A shape type's collision tests: a point, a ray, and the height of the surface under a point.
-// SIZE 0xc
 typedef struct ShapeCollisionFns {
 	MechS32 (*m_testPoint)(Shape*, MechS32, MechS32, MechS32);           // 0x00
 	MechS32 (*m_testRay)(Shape*, Ray*);                                  // 0x04

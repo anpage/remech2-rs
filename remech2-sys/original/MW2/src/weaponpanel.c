@@ -19,9 +19,6 @@
 // Draws a weapon panel: the name of the local mech's weapon p_panel->m_weapon with its ammo,
 // in the color of its state (and the weapon group's, while it is ready), and frames the panel
 // in that color if the weapon is selected.
-// The selected-weapon comparison loads its operands in the opposite order (one attempt at
-// swapping them didn't flip it), and stack-slot permutation: color, font, mech, text and weapon.
-// FUNCTION: MW2 0x10033280
 void DrawWeaponPanel(CockpitPanel* p_panel)
 {
 	Mech* mech;
@@ -105,8 +102,6 @@ void DrawWeaponPanel(CockpitPanel* p_panel)
 
 // Draws a panel's name once the clock passes p_panel->m_lightUpTime, if the local mech has the
 // weapon p_panel->m_weapon.
-// Stack-slot permutation: clock, font, mech and weapon.
-// FUNCTION: MW2 0x100334d3
 void DrawWeaponPanelStartup(CockpitPanel* p_panel)
 {
 	Mech* mech;

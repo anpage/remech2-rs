@@ -11,14 +11,12 @@ enum {
 	c_rectAxisVertical = 2
 };
 
-// SIZE 0x0c
 typedef struct RectTransitionState {
 	MechS32 m_active;    // 0x00
 	MechS32 m_wasActive; // 0x04 — m_active at the previous update
 	MechS32 m_elapsed;   // 0x08 — in clock ticks
 } RectTransitionState;
 
-// SIZE 0x10
 typedef struct RectTransitionDef {
 	MechS32 m_duration; // 0x00 — in clock ticks
 	PANE* m_first;      // 0x04

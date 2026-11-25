@@ -47,8 +47,6 @@ static MechS32 TransformRow(Matrix* p_matrix, MechS32 p_row, MechS32 p_x, MechS3
 
 // Transforms the point (*p_x, *p_y, *p_z) by p_matrix: its 2.29 rotation, then its translation.
 // The products are an __asm block.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1000d650
 void TransformPoint(Matrix* p_matrix, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	MechS32 x = *p_x;
@@ -62,8 +60,6 @@ void TransformPoint(Matrix* p_matrix, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 
 // Rotates the point (*p_x, *p_y, *p_z) by p_matrix's 2.29 rotation. The products are an __asm
 // block.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1000d708
 void RotatePoint(Matrix* p_matrix, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	MechS32 x = *p_x;
@@ -77,8 +73,6 @@ void RotatePoint(Matrix* p_matrix, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 
 // Recomputes column p_column of p_matrix's 2.29 rotation as the cross product of the other two,
 // which makes it orthogonal to them again. The products are an __asm block.
-// Stack-slot permutation: the column values and x, y and z.
-// FUNCTION: MW2 0x1000d7c0
 void OrthogonalizeMatrixColumn(Matrix* p_matrix, MechS32 p_column)
 {
 	MechS32 a;
@@ -107,7 +101,6 @@ void OrthogonalizeMatrixColumn(Matrix* p_matrix, MechS32 p_column)
 }
 
 // Multiplies two 2.29 fixed-point values. The body is an __asm block.
-// FUNCTION: MW2 0x1000d9a8
 MechS32 MatrixMul29(MechS32 p_a, MechS32 p_b)
 {
 	return Mul29(p_a, p_b);
@@ -115,7 +108,6 @@ MechS32 MatrixMul29(MechS32 p_a, MechS32 p_b)
 
 // The dot product of two vectors of 2.29 fixed-point values, with a 64-bit sum. The body is an
 // __asm block.
-// FUNCTION: MW2 0x1000d9ce
 MechS32 MatrixDot29(MechS32 p_ax, MechS32 p_ay, MechS32 p_az, MechS32 p_bx, MechS32 p_by, MechS32 p_bz)
 {
 	return Round29(Product(p_ax, p_bx) + Product(p_ay, p_by) + Product(p_az, p_bz), 0);
@@ -123,8 +115,6 @@ MechS32 MatrixDot29(MechS32 p_ax, MechS32 p_ay, MechS32 p_az, MechS32 p_bx, Mech
 
 // Multiplies the rotations of p_a and p_b (2.29 fixed point) into p_dst. The
 // products are an __asm block.
-// Stack-slot permutation of the locals the __asm block names.
-// FUNCTION: MW2 0x1000da0c
 void MultiplyRotations(Matrix* p_a, Matrix* p_b, Matrix* p_dst)
 {
 	/* Every product is read before the first store: p_dst may be either operand. */
@@ -151,7 +141,6 @@ void MultiplyRotations(Matrix* p_a, Matrix* p_b, Matrix* p_dst)
 
 // Composes p_b with p_a into p_dst: the rotations' product, and p_b's
 // translation transformed by p_a.
-// FUNCTION: MW2 0x1000dbba
 void MultiplyMatrix(Matrix* p_a, Matrix* p_b, Matrix* p_dst)
 {
 	MechS32 z;
@@ -171,7 +160,6 @@ void MultiplyMatrix(Matrix* p_a, Matrix* p_b, Matrix* p_dst)
 }
 
 // Transposes the rotation of p_src into p_dst.
-// FUNCTION: MW2 0x1000dc33
 void TransposeRotation(Matrix* p_src, Matrix* p_dst)
 {
 	MechS32 temp;
@@ -191,7 +179,6 @@ void TransposeRotation(Matrix* p_src, Matrix* p_dst)
 }
 
 // Inverts a rigid transform: the transposed rotation, and the negated translation rotated by it.
-// FUNCTION: MW2 0x1000dcbd
 void InvertMatrix(Matrix* p_src, Matrix* p_dst)
 {
 	MechS32 z;
@@ -211,7 +198,6 @@ void InvertMatrix(Matrix* p_src, Matrix* p_dst)
 	p_dst->m_rows[3][2] = z;
 }
 
-// FUNCTION: MW2 0x1000dd4d
 void SetIdentityMatrix(Matrix* p_matrix)
 {
 	p_matrix->m_rows[0][0] = p_matrix->m_rows[1][1] = p_matrix->m_rows[2][2] = 0x20000000;
@@ -220,13 +206,11 @@ void SetIdentityMatrix(Matrix* p_matrix)
 	p_matrix->m_rows[0][2] = p_matrix->m_rows[1][2] = p_matrix->m_rows[3][2] = 0;
 }
 
-// FUNCTION: MW2 0x1000dddf
 void CopyMatrix(Matrix* p_src, Matrix* p_dst)
 {
 	MemCopy(p_dst, p_src, sizeof(Matrix));
 }
 
-// FUNCTION: MW2 0x1000ddfc
 void CopyRotation(Matrix* p_src, Matrix* p_dst)
 {
 	MemCopy(p_dst, p_src, sizeof(Matrix));
@@ -236,8 +220,6 @@ void CopyRotation(Matrix* p_src, Matrix* p_dst)
 // Builds p_matrix from three rotation angles (16.16 degrees) and a translation. The bits 0-1 of
 // p_flags pick the rotation order, and bit 2 builds the inverse rotation. A rotation about one axis
 // only is built directly. The products are __asm blocks.
-// Stack-slot permutation: t, the sines and the cosines.
-// FUNCTION: MW2 0x1000de3b
 void BuildMatrixEx(
 	Matrix* p_matrix,
 	MechS32 p_angleX,
@@ -339,7 +321,6 @@ void BuildMatrixEx(
 	p_matrix->m_rows[3][2] = p_z;
 }
 
-// FUNCTION: MW2 0x1000e2b9
 void BuildMatrix(
 	Matrix* p_matrix,
 	MechS32 p_angleX,
@@ -356,8 +337,6 @@ void BuildMatrix(
 // Reads the three rotation angles (16.16 degrees) back out of p_matrix. Near straight up or down
 // (the pitch sine within 0.001 of 1), the angle comes from the other rows; with nothing to go on,
 // the yaw is taken as 90 degrees and the roll from the first row.
-// Stack-slot permutation: pitch, roll, length and yaw.
-// FUNCTION: MW2 0x1000e2ea
 void GetMatrixAngles(Matrix* p_matrix, undefined4* p_angleX, undefined4* p_angleY, undefined4* p_angleZ)
 {
 	MechS32 pitch;

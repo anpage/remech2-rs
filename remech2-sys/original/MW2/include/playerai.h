@@ -6,7 +6,6 @@
 #include "types.h"
 
 // A player's AI state (Player::m_ai): the posted message, its state and its target and goal.
-// SIZE 0x10
 typedef struct PlayerAi {
 	AiMessage m_posted;   // 0x00
 	undefined2 m_unk0x04; // 0x04 — nothing reads or writes it

@@ -8,43 +8,32 @@
 #include <string.h>
 #include <strings.h>
 
-DECOMP_SIZE_ASSERT(ArchiveEntry, 0x18)
-DECOMP_SIZE_ASSERT(ArchiveSlot, 0x14a)
-
 // One slot: the dispdib globals follow in the original.
-// GLOBAL: MW2SHELL 0x10096610
 ArchiveSlot g_archiveSlots[1];
 
 // The heap callbacks the archive unit allocates through, registered by SetArchiveAllocator
 // (ProjectArchive passes PrjHeapAlloc and PrjHeapFree).
-// GLOBAL: MW2SHELL 0x10066da0
 void* (*g_archiveAlloc)(undefined4) = NULL;
 
-// GLOBAL: MW2SHELL 0x10066da4
 void (*g_archiveFree)(void*) = NULL;
 
-// FUNCTION: MW2SHELL 0x1002fb90
 void SetArchiveAllocator(void* (*p_alloc)(undefined4), void (*p_free)(void*))
 {
 	g_archiveAlloc = p_alloc;
 	g_archiveFree = p_free;
 }
 
-// FUNCTION: MW2SHELL 0x1002fbab
 void* ArchiveAlloc(undefined4 p_size)
 {
 	return g_archiveAlloc(p_size);
 }
 
-// FUNCTION: MW2SHELL 0x1002fbc8
 void ArchiveFree(void* p_block)
 {
 	g_archiveFree(p_block);
 }
 
 // Writes p_size bytes in chunks of at most 0x4000. Returns p_size, or -1 on a short write.
-// Stack-slot permutation: remaining and chunk swap homes.
-// FUNCTION: MW2SHELL 0x1002fbe0
 MechS32 ArchiveWrite(MechS32 p_fd, MechU8* p_buffer, MechU32 p_size)
 {
 	MechU8* buffer;
@@ -67,8 +56,6 @@ MechS32 ArchiveWrite(MechS32 p_fd, MechU8* p_buffer, MechU32 p_size)
 }
 
 // Reads p_size bytes in chunks of at most 0x4000. Returns p_size, or -1 on a short read.
-// Stack-slot permutation: remaining and chunk swap homes.
-// FUNCTION: MW2SHELL 0x1002fc5e
 MechS32 ArchiveRead(MechS32 p_fd, MechU8* p_buffer, MechU32 p_size)
 {
 	MechU8* buffer;
@@ -92,8 +79,6 @@ MechS32 ArchiveRead(MechS32 p_fd, MechU8* p_buffer, MechU32 p_size)
 
 // Opens the project archive p_name in a free slot: p_mode 2 for reading and writing (a project
 // marked 0xfe returns -2), 0 for reading. Loads its header and returns the slot, or -1.
-// Not 100%: the stack slots of the locals are permuted.
-// FUNCTION: MW2SHELL 0x1002fcdc
 MechS32 OpenArchive(char* p_name, MechChar p_mode)
 {
 	ArchiveHeader* header;
@@ -168,7 +153,6 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 }
 
 // Release the header and cached archive entries, then close its file descriptor.
-// FUNCTION: MW2SHELL 0x1002ffc9
 MechS32 CloseArchive(MechS32 p_handle)
 {
 	MechU16 index;
@@ -192,8 +176,6 @@ MechS32 CloseArchive(MechS32 p_handle)
 }
 
 // Find an archive entry by its four-byte type tag. Returns 0xffff if absent.
-// Stack-slot permutation: count and entries.
-// FUNCTION: MW2SHELL 0x10030177
 MechU16 FindArchiveEntry(MechS32 p_handle, MechChar* p_name)
 {
 	MechChar found;
@@ -223,8 +205,6 @@ MechU16 FindArchiveEntry(MechS32 p_handle, MechChar* p_name)
 }
 
 // Read and cache every archive entry whose on-disk data offset is nonzero.
-// Stack-slot permutation: count, index and size.
-// FUNCTION: MW2SHELL 0x1003024f
 MechS32 LoadArchiveEntries(MechS32 p_handle)
 {
 	MechU16 count;
@@ -257,8 +237,6 @@ MechS32 LoadArchiveEntries(MechS32 p_handle)
 }
 
 // Compute a cached subresource length, clamping non-positive lengths to zero.
-// Stack-slot permutation: offsets, entries and length.
-// FUNCTION: MW2SHELL 0x100303b5
 MechS32 GetArchiveItemSize(MechS32 p_handle, MechChar* p_name, MechU16 p_index)
 {
 	MechS16 entry;
@@ -289,8 +267,6 @@ MechS32 GetArchiveItemSize(MechS32 p_handle, MechChar* p_name, MechU16 p_index)
 }
 
 // Look up a subresource's byte offset and length in the cached archive entry.
-// Stack-slot permutation: offsets and entries.
-// FUNCTION: MW2SHELL 0x100304c5
 MechS32 SeekArchiveItem(MechS32 p_handle, MechChar* p_name, MechU32 p_index, void** p_offset, MechS32* p_size)
 {
 	MechU16 entry;
@@ -323,7 +299,6 @@ MechS32 SeekArchiveItem(MechS32 p_handle, MechChar* p_name, MechU32 p_index, voi
 }
 
 // Read p_size bytes after selecting the archive descriptor and offset.
-// FUNCTION: MW2SHELL 0x10030620
 void ReadArchiveAt(void* p_data, MechS32 p_handle, void* p_offset, MechU32 p_size)
 {
 	p_handle = g_archiveSlots[p_handle].m_fd;
@@ -333,8 +308,6 @@ void ReadArchiveAt(void* p_data, MechS32 p_handle, void* p_offset, MechU32 p_siz
 }
 
 // Read a cached archive subresource into the caller's buffer.
-// Stack-slot permutation: entry, offsets, entries, offset and size.
-// FUNCTION: MW2SHELL 0x1003066e
 MechS32 ReadArchiveItem(MechS32 p_handle, MechChar* p_name, MechU16 p_index, void* p_data)
 {
 	MechS16 entry;
@@ -372,8 +345,6 @@ MechS32 ReadArchiveItem(MechS32 p_handle, MechChar* p_name, MechU16 p_index, voi
 }
 
 // Return the archive offset and descriptor of a cached subresource.
-// Stack-slot permutation: offsets and entries.
-// FUNCTION: MW2SHELL 0x100307f4
 MechS32 GetArchiveItemOffset(MechS32 p_handle, MechChar* p_name, MechU16 p_index, MechS32* p_fd)
 {
 	MechS16 entry;

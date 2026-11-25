@@ -8,7 +8,6 @@
 // Its data is the task text of the BWD stream's task record (BwdExecuteStream).
 typedef MechS32 (*TimedCallbackFn)(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period);
 
-// SIZE 0x18
 typedef struct TimedCallback {
 	TimedCallbackFn m_fn;         // 0x00
 	void* m_data;                 // 0x04

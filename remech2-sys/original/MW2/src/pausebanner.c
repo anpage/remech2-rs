@@ -31,20 +31,15 @@
 
 // The debug keys' selections (HandleDebugKey): a number, and a mech section.
 
-// GLOBAL: MW2 0x100a15d0
 MechS32 g_debugSlot = -1;
 
-// GLOBAL: MW2 0x100a15d4
 MechS32 g_debugSection = -1;
 
 // The banner's rectangle, in 16.16 fractions of the screen until the first draw scales it.
-// GLOBAL: MW2 0x100a15e0
 PANE g_pausedBannerRect = {NULL, 0, 0x3333, 0x10000, 0x6666};
 
-// GLOBAL: MW2 0x100a15f4
 MechS32 g_pausedBannerUnscaled = 1;
 
-// FUNCTION: MW2 0x10009e50
 void DrawPausedBanner(void)
 {
 	void* shape;
@@ -62,20 +57,17 @@ void DrawPausedBanner(void)
 	}
 }
 
-// FUNCTION: MW2 0x10009ef1
 void PlayPauseSound(void)
 {
 	PlaySoundOnce(0xc6, 100, 0x40, RandomSampleRate());
 }
 
-// FUNCTION: MW2 0x10009f13
 void PlayResumeSound(void)
 {
 	PlaySoundOnce(0xf1, 0x32, 0x40, RandomSampleRate());
 }
 
 // Pauses the clock and the audio, outside a network game.
-// FUNCTION: MW2 0x10009f35
 void PauseGame(void)
 {
 	if (!g_netRole) {
@@ -85,7 +77,6 @@ void PauseGame(void)
 }
 
 // Resumes the clock and the audio, outside a network game.
-// FUNCTION: MW2 0x10009f61
 void ResumeGame(void)
 {
 	if (!g_netRole) {
@@ -97,8 +88,6 @@ void ResumeGame(void)
 // The debug keys, which RunGameKey passes on while the mission timer is stopped: views, the
 // debug render flags and overlays, the difficulty switches, the objective state of the selected
 // star (g_debugStar) and objective (g_debugObjective), and a number and mech section selection.
-// The original compares g_debugStar with g_objectiveCount in the other operand order.
-// FUNCTION: MW2 0x10009f8d
 void HandleDebugKey(MechU16 p_key)
 {
 	MechChar text[40];

@@ -18,32 +18,24 @@
 #include "vfx3d.h"
 #include "vfxa.h"
 
-// GLOBAL: MW2 0x100a6be0
 Eyepoint g_mainEyepoint = {0, 0,   0, 0,   0,    0,       0x10000, 1000, 10000, -1000, 1,  0x48,
 						   0, 319, 0, 199, 0x40, 0x249f0, 0,       0,    0,     0,     {0}};
 
-// GLOBAL: MW2 0x100a6cc0
 Eyepoint* g_eyepoint = &g_mainEyepoint;
 
-// GLOBAL: MW2 0x100a6cc8
 RenderSettings g_renderSettings = {0, 1, 1,       1,       1, 1, 1,    1,    1,    1, {0xe0, 0xef}, 1, 0, 0,
 								   0, 0, 0x186a0, 0x10000, 0, 0, NULL, NULL, NULL, 0, NULL};
 
-// GLOBAL: MW2 0x100a6d30
 MechS32 g_horizonBandHeight = 0x24;
 
 // Polygon drawing: a polygon is p_count points of 6 dwords each (x, y, a shade, two texture
 // coordinates and a depth), and the mode in bits 12 to 14 of p_flags picks how it is drawn.
 
 // The end of the last line DrawLineTo drew.
-// GLOBAL: MW2 0x100be5d4
 MechS32 g_lineEndX;
 
-// GLOBAL: MW2 0x100be5d8
 MechS32 g_lineEndY;
 
-// Stack-slot permutation: luma, saved, mode, index, scale, shade and fraction.
-// FUNCTION: MW2 0x10042e00
 void DrawScenePolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
 {
 	MechS32 luma;
@@ -155,9 +147,6 @@ void DrawScenePolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
 // one bit of the case; the parts are filled in g_skyColor (the sky, with m_drawSky) and
 // g_groundColor (the ground, with m_drawGround), and with m_horizonBand a shaded band over the
 // horizon blends the sky into the ground.
-// Stack-slot permutation; the original calls IsAboveHorizon for the corners in the order of the
-// terms, (x0, y1) first (commutative operand order).
-// FUNCTION: MW2 0x1004320b
 void DrawSkyAndGround(Eyepoint* p_eyepoint)
 {
 	MechS32 y1;
@@ -512,7 +501,6 @@ void DrawSkyAndGround(Eyepoint* p_eyepoint)
 }
 
 // Draws a closed polygon of five points.
-// FUNCTION: MW2 0x1004440d
 void DrawPentagon(
 	MechS32 p_x0,
 	MechS32 p_y0,
@@ -542,7 +530,6 @@ void DrawPentagon(
 	g_renderSettings.m_drawPolygon(5, points, p_flags);
 }
 
-// FUNCTION: MW2 0x100444a6
 void DrawQuad(
 	MechS32 p_x0,
 	MechS32 p_y0,
@@ -568,7 +555,6 @@ void DrawQuad(
 	g_renderSettings.m_drawPolygon(4, points, p_flags);
 }
 
-// FUNCTION: MW2 0x10044527
 void DrawTriangle(MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, MechS32 p_y1, MechS32 p_x2, MechS32 p_y2, MechU32 p_flags)
 {
 	MechU32 points[3 * 6];
@@ -583,7 +569,6 @@ void DrawTriangle(MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, MechS32 p_y1, MechS3
 }
 
 // Draws a line from the end of the last one to (p_x, p_y).
-// FUNCTION: MW2 0x10044590
 void DrawLineTo(MechS32 p_x, MechS32 p_y, MechU32 p_color)
 {
 	VFX_line_draw(&g_currentPane, p_x, p_y, g_lineEndX, g_lineEndY, 0, p_color);
@@ -593,7 +578,6 @@ void DrawLineTo(MechS32 p_x, MechS32 p_y, MechU32 p_color)
 
 // Draws a polygon: a point or a line with the pane's own routines where the settings
 // allow, else through g_renderSettings's polygon callback, filled, outlined or both.
-// FUNCTION: MW2 0x100445d2
 void DrawPolygonOrLine(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
 {
 	if (p_count == 1 && g_renderSettings.m_drawPixels) {

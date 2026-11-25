@@ -33,25 +33,19 @@
 // The ready room screen.
 
 // The video playing before the screen moves on, -1 for none, and the message it moves on with.
-// GLOBAL: MW2SHELL 0x1006a588
 MechS32 g_readyRoomExitVideo = -1;
 
-// GLOBAL: MW2SHELL 0x1006a58c
 MechS32 g_readyRoomExitMessage = c_msgScreenFrame;
 
 // Database item 0x64, played with the mech bay's video.
-// GLOBAL: MW2SHELL 0x1006a590
 AudioSample* g_readyRoomSound = NULL;
 
-// GLOBAL: MW2SHELL 0x100904a0
 ButtonMenu* g_readyRoomMenu;
 
 // DrawReadyRoom's p_wParam: the quick tips show when it comes from the clan hall (c_msgClanHall).
-// GLOBAL: MW2SHELL 0x100904a4
 size_t g_readyRoomMessage;
 
 // Play the second faction grid animation only when video slot zero is idle.
-// FUNCTION: MW2SHELL 0x10039de0
 void PlayReadyRoomGrid(MechS32 p_campaign)
 {
 	if (!IsVideoPlaying(0)) {
@@ -71,7 +65,6 @@ void ReadyRoomCallback(TMPackDataBase* p_database, MechS32* p_campaign, MechU8*,
 
 // Opens the ready room. Coming from the clan hall (c_msgClanHall) or a mission (c_msgDebrief) sets
 // up the pilot's next mission first; only the pilot FREEBIRTHTOAD gets the mission buttons.
-// FUNCTION: MW2SHELL 0x10039e72
 void DrawReadyRoom(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scenario, size_t p_wParam)
 {
 	if (p_wParam == c_msgClanHall || p_wParam == c_msgDebrief) {
@@ -118,8 +111,6 @@ void DrawReadyRoom(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scen
 
 // The ready room's frame: CLAN HALL, MECH LAB, STAR CONFIG, MISSION BRIEFING, and for
 // FREEBIRTHTOAD the missions. The mech lab and briefing play a video before moving on.
-// Not 100%: the stack slots of the locals are permuted.
-// FUNCTION: MW2SHELL 0x1003a151
 void ReadyRoomCallback(TMPackDataBase* p_database, MechS32* p_campaign, MechU8*, MechChar** p_scenario, MechS32 p_msg)
 {
 	void* data = NULL;

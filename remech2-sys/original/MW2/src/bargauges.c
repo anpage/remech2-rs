@@ -18,77 +18,55 @@
 // jet fuel. Each eases towards its value, and the rectangles are fractions of their panels
 // until ScaleBarGauges scales them to pixels.
 
-// GLOBAL: MW2 0x100a82f0
 EasedValue g_heatBarLevel = {0, 0, 1};
 
-// GLOBAL: MW2 0x100a82fc
 undefined4 g_unk0x100a82fc = 0;
 
-// GLOBAL: MW2 0x100a8300
 EasedValue g_throttleBarLevel = {0, 0, 1};
 
-// GLOBAL: MW2 0x100a830c
 undefined4 g_unk0x100a830c = 0;
 
-// GLOBAL: MW2 0x100a8310
 EasedValue g_heatRateBarLevel = {0, 0, 4};
 
-// GLOBAL: MW2 0x100a831c
 undefined4 g_unk0x100a831c = 0;
 
-// GLOBAL: MW2 0x100a8320
 EasedValue g_jumpFuelBarLevel = {0, 0, 1};
 
-// GLOBAL: MW2 0x100a832c
 undefined4 g_unk0x100a832c = 0;
 
 // The size of the throttle gauge.
-// GLOBAL: MW2 0x100a8330
 Point g_throttleGaugeSize = {0x1e7a, 0x8dc9};
 
 // The throttle gauge's frame: left, top, right and bottom.
-// GLOBAL: MW2 0x100a8338
 MechS32 g_throttleFrameLeft = 0;
 
-// GLOBAL: MW2 0x100a833c
 MechS32 g_throttleFrameTop = 0;
 
-// GLOBAL: MW2 0x100a8340
 MechS32 g_throttleFrameRight = 0;
 
-// GLOBAL: MW2 0x100a8344
 MechS32 g_throttleFrameBottom = 0;
 
 // The left of the throttle bar and the level of zero throttle.
-// GLOBAL: MW2 0x100a8348
 MechS32 g_throttleBarLeft = 0;
 
-// GLOBAL: MW2 0x100a834c
 MechS32 g_throttleZeroY = 0;
 
 // The heat bar: its position and size.
-// GLOBAL: MW2 0x100a8350
 Point g_heatBarPosition = {0, 0x3333};
 
-// GLOBAL: MW2 0x100a8358
 Point g_heatBarSize = {0xea4e, 0x5555};
 
 // The heat rate bar.
-// GLOBAL: MW2 0x100a8360
 Point g_heatRateBarPosition = {0, 0x3333};
 
-// GLOBAL: MW2 0x100a8368
 Point g_heatRateBarSize = {0xdf2e, 0x5555};
 
 // The jump jet fuel bar.
-// GLOBAL: MW2 0x100a8370
 Point g_jumpFuelBarPosition = {0, 0x3333};
 
-// GLOBAL: MW2 0x100a8378
 Point g_jumpFuelBarSize = {0xdf2e, 0x5555};
 
 // Scales the gauges' rectangles to their panels.
-// FUNCTION: MW2 0x1004d020
 void ScaleBarGauges(void)
 {
 	CockpitPanel* panel;
@@ -116,9 +94,6 @@ void ScaleBarGauges(void)
 }
 
 // Draws the heat bar: a band from each end that meets in the middle as the heat rises.
-// Stack-slot permutation of the locals (heat, width, middle, level, middleX, mech, rightX, x, y, edge,
-// height, target and color).
-// FUNCTION: MW2 0x1004d175
 void DrawHeatBar(PANE* p_target)
 {
 	MechS32 heat;
@@ -170,8 +145,6 @@ void DrawHeatBar(PANE* p_target)
 }
 
 // Draws the heat rate bar.
-// Stack-slot permutation: level, backColor, fill, fillColor and mech.
-// FUNCTION: MW2 0x1004d310
 void DrawHeatRateBar(PANE* p_target)
 {
 	MechS32 level;
@@ -234,8 +207,6 @@ void DrawHeatRateBar(PANE* p_target)
 }
 
 // Draws the throttle gauge: its frame and a bar up from zero, or down in reverse.
-// Stack-slot permutation: color, mech, width, height, x, y and value.
-// FUNCTION: MW2 0x1004d48a
 void DrawThrottleGauge(PANE* p_target)
 {
 	MechS32 color;
@@ -298,7 +269,6 @@ void DrawThrottleGauge(PANE* p_target)
 }
 
 // Draws the jump jet fuel bar.
-// FUNCTION: MW2 0x1004d660
 void DrawJumpFuelBar(PANE* p_target)
 {
 	MechS32 fill;
@@ -333,8 +303,6 @@ void DrawJumpFuelBar(PANE* p_target)
 }
 
 // Draws a bar p_height up from (p_x, p_y), shaded darker towards its edges.
-// Stack-slot permutation: half, dark, end, darker, top and i.
-// FUNCTION: MW2 0x1004d732
 void DrawVerticalBar(PANE* p_target, MechS32 p_x, MechS32 p_y, MechS32 p_width, MechS32 p_height, MechS32 p_color)
 {
 	MechS32 half;
@@ -372,8 +340,6 @@ void DrawVerticalBar(PANE* p_target, MechS32 p_x, MechS32 p_y, MechS32 p_width, 
 }
 
 // Draws a bar p_width across from (p_x, p_y), shaded darker towards its edges.
-// Stack-slot permutation: half, dark, end, darker, right and i.
-// FUNCTION: MW2 0x1004d8ae
 void DrawHorizontalBar(PANE* p_target, MechS32 p_x, MechS32 p_y, MechS32 p_width, MechS32 p_height, MechS32 p_color)
 {
 	MechS32 half;

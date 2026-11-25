@@ -5,8 +5,8 @@
 #include "smackw32.h"
 #include "types.h"
 
-// SIZE 0x4c in the original, whose offsets the fields are marked with: it had four more fields
-// at 0x04-0x10 for a VideoSound stream that no slot ever used.
+// The fields are marked with the original's offsets: it had four more fields at 0x04-0x10 for a
+// VideoSound stream that no slot ever used.
 // One FMV playback slot; the shell keeps 32 of them in g_fmvSlots. Flags at 0x1c: 0x80 places the
 // video by its bottom center, 0x1000 disables the menu for this video, 0x80000000 marks the slot in use.
 struct FmvSlot {

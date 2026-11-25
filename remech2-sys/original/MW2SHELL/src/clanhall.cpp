@@ -23,34 +23,26 @@
 
 // The clan hall screen.
 
-// GLOBAL: MW2SHELL 0x10063b70
 ButtonMenu* g_clanHallMenu = NULL;
 
 // The Wolf hall's ambience.
-// GLOBAL: MW2SHELL 0x10063b74
 AudioSample* g_clanHallAmbience = NULL;
 
 // The welcome for a newly registered pilot (g_newPilotRegistered), database item 0x69.
-// GLOBAL: MW2SHELL 0x10063b78
 AudioSample* g_welcomeSound = NULL;
 
 // The Jade Falcon hall holds the welcome back until its door videos (2 and 3) are done.
-// GLOBAL: MW2SHELL 0x10063b7c
 MechS32 g_welcomePending = 0;
 
 // The video playing before the screen moves on, -1 for none, and the message it moves on with.
-// GLOBAL: MW2SHELL 0x10063b80
 MechS32 g_clanHallExitVideo = -1;
 
-// GLOBAL: MW2SHELL 0x10063b84
 MechS32 g_clanHallExitMessage = c_msgScreenFrame;
 
 void ClanHallCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, MechS32 p_msg);
 
 // Opens the clan hall. Coming back from registering a pilot (c_msgPilotRoster) sets up the new
 // pilot's star first.
-// Not 100%: the stack slots of unused, data and size are permuted.
-// FUNCTION: MW2SHELL 0x10014040
 void DrawClanHall(TMPackDataBase* p_database, MechS32 p_campaign, MechU8, size_t p_wParam)
 {
 	MechS32 unused = -1;
@@ -117,8 +109,6 @@ void DrawClanHall(TMPackDataBase* p_database, MechS32 p_campaign, MechU8, size_t
 
 // The clan hall's frame: CADET TRAINING, ARCHIVE HOLOPROJECTOR, READY ROOM, REGISTER and EXIT.
 // The Jade Falcon hall plays a door video before moving on.
-// Not 100%: the stack slots of data, button and size are permuted.
-// FUNCTION: MW2SHELL 0x1001445c
 void ClanHallCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, MechS32 p_msg)
 {
 	void* data = NULL;

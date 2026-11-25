@@ -16,45 +16,32 @@
 #include "targeting.h"
 #include "types.h"
 
-// GLOBAL: MW2 0x100aa870
 MechChar g_gameCtrlItem[] = "Game Ctrl";
 
-// GLOBAL: MW2 0x100aa880
 MechChar g_systemsStatusTitle[] = "SYSTEMS STATUS";
 
-// GLOBAL: MW2 0x100aa890
 MechChar g_lightAmplificationItem[] = "Light Amplification";
 
-// GLOBAL: MW2 0x100aa8a8
 MechChar g_imageEnhancementItem[] = "Image Emhancement";
 
-// GLOBAL: MW2 0x100aa8bc
 MechChar g_hudItem[] = "HUD";
 
-// GLOBAL: MW2 0x100aa8c0
 MechChar g_autoThermOverrideItem[] = "Auto Therm Override";
 
-// GLOBAL: MW2 0x100aa8d8
 MechChar g_autoEjectItem[] = "Auto Eject";
 
-// GLOBAL: MW2 0x100aa8e8
 MenuControl g_infraredControl = {3, 0, &g_offOnChoices, 166, NULL, GetSystemSetting, NULL, SetSystemSetting, NULL};
 
-// GLOBAL: MW2 0x100aa910
 MenuControl g_enhancedVisionControl =
 	{3, 0, &g_offOnChoices, 167, NULL, GetSystemSetting, NULL, SetSystemSetting, NULL};
 
-// GLOBAL: MW2 0x100aa938
 MenuControl g_hudControl = {3, 0, &g_offOnChoices, 19, NULL, GetSystemSetting, NULL, SetSystemSetting, NULL};
 
-// GLOBAL: MW2 0x100aa960
 MenuControl g_overrideShutdownControl =
 	{3, 0, &g_offOnChoices, 64, NULL, GetSystemSetting, NULL, SetSystemSetting, NULL};
 
-// GLOBAL: MW2 0x100aa988
 MenuControl g_autoEjectControl = {3, 0, &g_offOnChoices, 60, NULL, GetSystemSetting, NULL, SetSystemSetting, NULL};
 
-// GLOBAL: MW2 0x100aa9b0
 MenuPage g_systemsStatusPage = {
 	0,
 	g_systemsStatusTitle,
@@ -69,13 +56,10 @@ MenuPage g_systemsStatusPage = {
 	 {6, g_escToExitText, NULL, NULL, NULL}}
 };
 
-// GLOBAL: MW2 0x100aab08
 PANE g_systemsMenuTarget = {NULL, 0x8ccd, 0x547b, 0x10000, 0x9eb8};
 
-// GLOBAL: MW2 0x100aab20
 PANE g_systemsMenuBackgroundTarget = {NULL, 0x8ccd, 0x547b, 0x10000, 0x9eb8};
 
-// GLOBAL: MW2 0x100aab38
 MenuDefinition g_systemsMenu = {
 	&g_systemsMenuTarget,
 	2,
@@ -101,7 +85,6 @@ MenuDefinition g_systemsMenu = {
 	&g_systemsStatusPage
 };
 
-// GLOBAL: MW2 0x100e95f0
 MenuPage* g_systemsMenuPageStack[8];
 
 // The systems status menu's settings, by the game key that toggles each (GAMEKEY.MAP): 0x13
@@ -109,7 +92,6 @@ MenuPage* g_systemsMenuPageStack[8];
 // and 0xa7 ENHANCED_VISION (image enhancement: outlined polygons).
 
 // Returns the setting p_id, or 0.
-// FUNCTION: MW2 0x1005e9b0
 MechS32 GetSystemSetting(MechS32 p_id)
 {
 	MechS32 value;
@@ -144,7 +126,6 @@ MechS32 GetSystemSetting(MechS32 p_id)
 }
 
 // Changes the setting p_id (see GetSystemSetting) to p_value.
-// FUNCTION: MW2 0x1005eb10
 void SetSystemSetting(MechS32 p_id, MechS32 p_value)
 {
 	switch (p_id) {

@@ -26,8 +26,6 @@
 // Parses the command line MECH2.EXE passes: switches start with / or -, anything else names the
 // mission (p_mission, "s.$" by default), which is shown with MonoPrintLine. /C sets p_flags[0];
 // /S and /X clear p_flags[1]. Returns FALSE without a command line (not launched by MECH2.EXE).
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1001ee80
 MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, undefined4* p_flags, MechChar* p_mission)
 {
 	MechS32 result;

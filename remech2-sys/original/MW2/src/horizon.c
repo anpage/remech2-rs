@@ -9,8 +9,6 @@
 #include "types.h"
 
 // Returns whether the screen point (p_x, p_y) lies above the horizon of p_eyepoint's view.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10071930
 MechS32 IsAboveHorizon(MechS32 p_x, MechS32 p_y, Eyepoint* p_eyepoint)
 {
 	MechS32 offsetX = PortableS32((MechU32) p_x - (MechU32) p_eyepoint->m_centerX);
@@ -24,8 +22,6 @@ MechS32 IsAboveHorizon(MechS32 p_x, MechS32 p_y, Eyepoint* p_eyepoint)
 }
 
 // Returns the screen y of the horizon at screen x p_x in p_eyepoint's view.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100719ca
 MechS32 HorizonYAtX(MechS32 p_x, Eyepoint* p_eyepoint)
 {
 	MechS32 x = PortableS32((MechU32) p_x - (MechU32) p_eyepoint->m_centerX);
@@ -41,8 +37,6 @@ MechS32 HorizonYAtX(MechS32 p_x, Eyepoint* p_eyepoint)
 }
 
 // Returns the screen x of the horizon at screen y p_y in p_eyepoint's view.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10071a4c
 MechS32 HorizonXAtY(MechS32 p_y, Eyepoint* p_eyepoint)
 {
 	MechS32 y = PortableS32((MechU32) p_eyepoint->m_centerY - (MechU32) p_y);

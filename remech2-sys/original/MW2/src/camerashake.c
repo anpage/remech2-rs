@@ -13,50 +13,34 @@
 // orientation reached over a duration. The keys play in order, ramping from one offset to the
 // next, on top of the eyepoint's base values.
 
-DECOMP_SIZE_ASSERT(CameraShakeKey, 0x1c)
-
-// GLOBAL: MW2 0x100acb10
 MechS32 g_cameraShakeKeyCount = 10;
 
-// GLOBAL: MW2 0x100acb14
 MechS32 g_cameraShakeActive = 0;
 
-// GLOBAL: MW2 0x100becc8
 Ramp g_cameraShakeHeading;
 
-// GLOBAL: MW2 0x100becd8
 MechS32 g_cameraShakeKey;
 
-// GLOBAL: MW2 0x100bece0
 Ramp g_cameraShakeZ;
 
-// GLOBAL: MW2 0x100becf0
 MechS32 g_cameraShakeKeyTime;
 
-// GLOBAL: MW2 0x100becf8
 Ramp g_cameraShakeRoll;
 
-// GLOBAL: MW2 0x100bed08
 Ramp g_cameraShakeX;
 
-// GLOBAL: MW2 0x100bed18
 Ramp g_cameraShakePitch;
 
-// GLOBAL: MW2 0x100bed28
 CameraShakeKey g_cameraShakeKeys[10];
 
-// GLOBAL: MW2 0x100bee40
 Ramp g_cameraShakeY;
 
-// FUNCTION: MW2 0x100665e0
 void ResetCameraShake(void)
 {
 	ClearCameraShakeKeys();
 }
 
 // Moves the eyepoint by the shake's current offset. Returns FALSE when no shake is playing.
-// Stack-slot permutation: base10, base0c, base14, x, y and z.
-// FUNCTION: MW2 0x100665f0
 MechS32 UpdateCameraShake(void)
 {
 	MechS32 base10;
@@ -93,7 +77,6 @@ MechS32 UpdateCameraShake(void)
 	return TRUE;
 }
 
-// FUNCTION: MW2 0x10066758
 void StartCameraShake(void)
 {
 	g_cameraShakeKey = 0;
@@ -106,9 +89,6 @@ void StartCameraShake(void)
 
 // Starts the ramps toward a key, from the eyepoint's current offset (the first key) or from the
 // previous key.
-// Stack-slot permutation: x, seconds, off14, off0c, off10, z, key and y. Operand order: the
-// original compares p_key >= g_cameraShakeKeyCount with p_key in eax.
-// FUNCTION: MW2 0x10066798
 void StartCameraShakeKey(MechS32 p_key)
 {
 	MechS32 x;
@@ -152,7 +132,6 @@ void StartCameraShakeKey(MechS32 p_key)
 	StartRamp(&g_cameraShakeRoll, key->m_roll, off14, seconds);
 }
 
-// FUNCTION: MW2 0x10066968
 void ClearCameraShakeKeys(void)
 {
 	memset(g_cameraShakeKeys, 0, sizeof(g_cameraShakeKeys));
@@ -162,7 +141,6 @@ void ClearCameraShakeKeys(void)
 	g_cameraShakeActive = FALSE;
 }
 
-// FUNCTION: MW2 0x100669a9
 void AddCameraShakeKey(
 	MechS32 p_x,
 	MechS32 p_y,
@@ -190,7 +168,6 @@ void AddCameraShakeKey(
 	g_cameraShakeKeyCount++;
 }
 
-// FUNCTION: MW2 0x10066a2e
 MechS32 IsCameraShaking(void)
 {
 	return g_cameraShakeActive;

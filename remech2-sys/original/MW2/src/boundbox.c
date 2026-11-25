@@ -10,9 +10,6 @@
 
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(BoundBox, 0x18)
-
-// FUNCTION: MW2 0x1006e970
 BoundBox* CreateBoundBox(void)
 {
 	BoundBox* box;
@@ -27,7 +24,6 @@ BoundBox* CreateBoundBox(void)
 }
 
 // Gives the shape a bounding box, once.
-// FUNCTION: MW2 0x1006e9e6
 void EnsureBoundBox(Shape* p_shape)
 {
 	BoundBox* box;
@@ -53,7 +49,6 @@ void EnsureBoundBox(Shape* p_shape)
 	p_shape->m_flags |= 0x200;
 }
 
-// FUNCTION: MW2 0x1006ea90
 BoundBox* CreateShapeBoundBox(Shape* p_shape)
 {
 	BoundBox* box;
@@ -67,7 +62,6 @@ BoundBox* CreateShapeBoundBox(Shape* p_shape)
 	return box;
 }
 
-// FUNCTION: MW2 0x1006eb02
 void AttachShapeBoundBox(Shape* p_shape)
 {
 	BoundBox* box;
@@ -93,9 +87,6 @@ void AttachShapeBoundBox(Shape* p_shape)
 }
 
 // Computes the bounding box of the shape's first model, transforming it first if it is out of date.
-// The model/shape stamp comparison loads its operands in the other order (the unit's symbol
-// table), and model, vertex and selected sit in permuted stack slots.
-// FUNCTION: MW2 0x1006eb80
 void ComputeModelBounds(
 	Shape* p_shape,
 	MechS32* p_minX,
@@ -155,7 +146,6 @@ void ComputeModelBounds(
 }
 
 // Frees the shape's bounding data.
-// FUNCTION: MW2 0x1006ed30
 void FreeBoundBox(Shape* p_shape)
 {
 	void* data;
@@ -182,7 +172,6 @@ void FreeBoundBox(Shape* p_shape)
 }
 
 // Returns the bytes the shape's bounding data take.
-// FUNCTION: MW2 0x1006edc3
 MechS32 GetBoundBoxSize(Shape* p_shape)
 {
 	MechS32 size;

@@ -265,27 +265,21 @@ typedef struct BwdAnim2dRecord {
 #pragma pack(pop)
 
 // Set by the local player's gpspec record: its hudfile record loads the HUD once.
-// GLOBAL: MW2 0x100a173c
 MechS32 g_loadHudFile = 0;
 
 // The next g_shots slot a booyowthing record fills.
-// GLOBAL: MW2 0x100a1740
 MechS32 g_nextShotRecord = 0;
 
 // The next g_effects slot an xplode record fills.
-// GLOBAL: MW2 0x100a1744
 MechS32 g_nextEffectRecord = 0;
 
 // The name of the mission's music (the world stream's music record).
-// GLOBAL: MW2 0x100e9330
 MechChar g_musicName[12];
 
 // The mission's "MUS" resource.
-// GLOBAL: MW2 0x100e9340
 MechS32 g_musicResource;
 
 // Widens p_flags: any of the bits 0x730 sets them all, as does either of the bits 3.
-// FUNCTION: MW2 0x1000a9c0
 MechU32 WidenEventFlags(MechU32 p_flags)
 {
 	if (p_flags & 0x730) {
@@ -303,9 +297,6 @@ MechU32 WidenEventFlags(MechU32 p_flags)
 // gamepiece and cockpit file records execute their own streams. Events of the things and nav
 // points it creates are posted to the stream's event list (the mission table's, once one is
 // read). Returns whether every stream it executed loaded.
-// Stack-slot permutation of the locals (its wider [ebp-N] encodings also shift the jumps).
-// Operand order: the rep record's i < g_thingCapacity loads g_thingCapacity first in the original.
-// FUNCTION: MW2 0x1000a9f5
 MechS32 BwdExecuteStream(BwdStream* p_stream)
 {
 	MechS32 result;
@@ -1340,8 +1331,6 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 
 // Loads the mission world p_name (a resource number or a file name): resets the teams, the
 // thing table and the shape offset, then executes its BWD stream. Returns whether it loaded.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1000d30f
 MechS32 LoadWorld(MechChar* p_name)
 {
 	BwdStream* stream;
@@ -1393,9 +1382,6 @@ MechS32 LoadWorld(MechChar* p_name)
 
 // Counts the players and game things of each side and gives each game thing the radius of its
 // object's shape. In a network game, every player's team but the local one is on side 1.
-// Stack-slot permutation: obj and i. Operand order: i == g_localStar loads
-// g_localStar first in the original.
-// FUNCTION: MW2 0x1000d4a6
 void AfterWorldLoader(void)
 {
 	SceneObject* obj;

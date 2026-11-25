@@ -6,7 +6,6 @@
 
 // An ammunition bin of a mech (Mech::m_ammoBins, Mech::m_ammoBinCount of them): the weapon it feeds and
 // the critical-slot id it occupies (DestroyMech).
-// SIZE 0x14
 typedef struct AmmoBin {
 	MechS16 m_type;     // 0x00
 	MechS16 m_shots;    // 0x02

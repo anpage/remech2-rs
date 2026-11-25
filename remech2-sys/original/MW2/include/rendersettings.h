@@ -9,7 +9,6 @@ struct ProjectedVertex;
 struct Shape;
 struct Vertex;
 
-// SIZE 0x68
 // Rendering settings (g_renderSettings) the map view saves and replaces as one block.
 typedef struct RenderSettings {
 	MechS32 m_blankScene;  // 0x00 — the frame draw callback only clears the pane

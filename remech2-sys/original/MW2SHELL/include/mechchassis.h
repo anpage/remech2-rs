@@ -4,7 +4,6 @@
 #include "decomp.h"
 #include "types.h"
 
-// SIZE 0x18
 // A mech the bay can load. The table ends with a zeroed entry; only the first 15 are offered.
 struct MechChassis {
 	MechChar* m_code;     // 0x00 — code of the mech's videos, "awomp%s"

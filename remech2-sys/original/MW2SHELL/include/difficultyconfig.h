@@ -10,7 +10,6 @@ struct DifficultyConfig {
 	MechU8 m_unlimitedAmmo;
 	// dishonorable when set
 	MechU8 m_invulnerability;
-	// the simulator's TOGGLE_SPLASH_DAMAGE key flips it
 	MechU8 m_splashDamage;
 	// dishonorable when clear
 	MechU8 m_collisionDamage;

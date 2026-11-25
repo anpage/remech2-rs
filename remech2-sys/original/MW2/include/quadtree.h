@@ -12,7 +12,6 @@ struct Shape;
 // A quadtree node: its bounds, its four children (m_unk0x18 == 0) and m_unk0x18 entries
 // after the header (undefined4 each). AllocQuadtreeNode allocates it; Shape::m_collisionData holds the root
 // when the shape's m_collisionType is 5.
-// SIZE 0x2c
 typedef struct QuadtreeNode {
 	MechS32 m_minX;                     // 0x00
 	MechS32 m_maxX;                     // 0x04

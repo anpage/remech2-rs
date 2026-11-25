@@ -13,7 +13,6 @@
 
 // An engine: its rating, its weight (in 1/100 t) and its maker. Ids from 10000 up are XL
 // engines at half the weight.
-// SIZE 0x0c
 struct EngineType {
 	MechS32 m_rating; // 0x00
 	MechS32 m_weight; // 0x04
@@ -22,7 +21,6 @@ struct EngineType {
 
 // A weapon: the stats the weapon info fields show. Masses are in 1/100 t. The table holds
 // negative values in the fields up to 0x14, so those are signed.
-// SIZE 0x28
 struct Weapon {
 	MechS32 m_heat;         // 0x00
 	MechS32 m_damage;       // 0x04 — negative: per missile
@@ -36,7 +34,6 @@ struct Weapon {
 	MechChar* m_name;       // 0x24
 };
 
-// SIZE 0x10
 // The internal structure of a weight class (20 to 110 tons in steps of 5) per location.
 struct InternalStructure {
 	MechS32 m_centerTorso; // 0x00
@@ -45,14 +42,12 @@ struct InternalStructure {
 	MechS32 m_leg;         // 0x0c
 };
 
-// SIZE 0x08
 // A piece of equipment other than a weapon: ids come in steps of 50 from 5000.
 struct Equipment {
 	MechS32 m_id;     // 0x00
 	MechChar* m_name; // 0x04
 };
 
-// SIZE 0x28
 // One location in the image of a .mek file: its armor and its critical slots.
 struct MekLocation {
 	MechS32 m_front;      // 0x00
@@ -63,7 +58,6 @@ struct MekLocation {
 	undefined2 m_unk0x26; // 0x26 — always 1 in a saved .mek file, never read
 };
 
-// SIZE 0x18
 // The header of a .mek file.
 struct MekHeader {
 	MechS32 m_tonnage;      // 0x00
@@ -74,30 +68,24 @@ struct MekHeader {
 	MechS32 m_ammoCount;    // 0x14
 };
 
-// SIZE 0x08
 // A weapon or an ammunition entry of a .mek file.
 struct MekItem {
 	MechS32 m_id;     // 0x00 — the weapon id; for ammunition, 10000 + weapon type * 100 + n
 	MechS32 m_weapon; // 0x04 — the weapon id the ammunition feeds, -1 for a weapon
 };
 
-// SIZE 0x7a8
-// The variant being edited. DeleteItem copies an m_unassigned entry through the struct base
-// (0x1005c640 + 0x4a0), which places the start; LoadMekFile copies the whole struct to
-// g_previousVariant at 0x1005cde8 (0x7a8 bytes further), which bounds it.
+// The variant being edited.
 // Masses are in 1/100 t. Items are ids: weapon w's #n is w * 100 + n (n from 1), equipment
 // takes 5000-5999 in steps of 50 (5850 an XL engine's side torso slots), heat sink #n is
 // 6000 + n, jump jet #n 7000 + n, Endo Steel and Ferro-Fibrous slots 8001-8007 and 9001-9007,
 // and ammunition ton #n of weapon id w is 10000 + w * 100 + n.
 struct MekVariant {
-	// SIZE 0x08
 	// An item waiting for critical slots.
 	struct Item {
 		MechS32 m_id;        // 0x00 — -1 when free
 		MechS32 m_criticals; // 0x04 — slots it takes
 	};
 
-	// SIZE 0x10
 	// One location's armor. The tab callbacks index the array through its base at 0x710.
 	struct Armor {
 		MechS32 m_internal; // 0x00 — internal structure

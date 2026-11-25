@@ -5,13 +5,8 @@
 #include "types.h"
 #include "vfxrend.h"
 
-DECOMP_SIZE_ASSERT(VFX_TEXTURE, 0xc)
-
 // Draws a polygon of p_count points (six dwords each) textured with the p_width by p_height
 // bitmap p_pixels, through the code block's routines.
-// The p_width/p_height comparison loads its operands in the opposite order (one attempt at
-// swapping them didn't flip it), and stack-slot permutation: i, points, rows and unk0x08.
-// FUNCTION: MW2 0x1006dd50
 void DrawTexturedPolygon(
 	PANE* p_target,
 	MechU8* p_pixels,

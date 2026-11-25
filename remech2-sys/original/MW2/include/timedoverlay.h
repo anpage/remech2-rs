@@ -7,7 +7,6 @@
 
 // One of the two in-game message boxes: ShowInGameMessage fills the one it may replace,
 // DrawTimedOverlays shows it on its background shape until m_expireTime.
-// SIZE 0x24
 typedef struct TimedOverlay {
 	MechChar* m_text;     // 0x00 — a 0x100-byte buffer
 	Point m_textPos;      // 0x04

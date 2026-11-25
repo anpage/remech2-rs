@@ -5,9 +5,6 @@
 #include "videodriver.h"
 #include "windowstate.h"
 
-DECOMP_SIZE_ASSERT(Font, 0x414)
-
-// FUNCTION: MW2SHELL 0x10005340
 Font::Font(void* p_data, VideoDriver* p_videoDriver)
 {
 	m_videoDriver = p_videoDriver;
@@ -17,13 +14,11 @@ Font::Font(void* p_data, VideoDriver* p_videoDriver)
 }
 
 // Nothing in the shell deletes a Font, so the destructor has no callers.
-// FUNCTION: MW2SHELL 0x10005394
 Font::~Font()
 {
 	MechHeapFree(g_primaryHeap, m_data);
 }
 
-// FUNCTION: MW2SHELL 0x100053be
 MechS32 Font::GetTextWidth(MechChar* p_text)
 {
 	MechS32 width;
@@ -40,14 +35,12 @@ MechS32 Font::GetTextWidth(MechChar* p_text)
 	return width;
 }
 
-// FUNCTION: MW2SHELL 0x10005424
 MechS32 Font::GetCharacterWidth(MechS32 p_char)
 {
 	return VFX_character_width(m_data, p_char);
 }
 
 // Draws p_text and keeps its glyph among the glyphs drawn under the videos.
-// FUNCTION: MW2SHELL 0x1000544e
 TextGlyph* Font::AddText(MechS32 p_left, MechS32 p_top, MechChar* p_text, undefined* p_colors)
 {
 	TextGlyph* glyph;
@@ -63,7 +56,6 @@ TextGlyph* Font::AddText(MechS32 p_left, MechS32 p_top, MechChar* p_text, undefi
 }
 
 // Draws p_text and keeps its glyph among the glyphs drawn over the videos.
-// FUNCTION: MW2SHELL 0x10005522
 TextGlyph* Font::AddOverlayText(MechS32 p_left, MechS32 p_top, MechChar* p_text, undefined* p_colors)
 {
 	TextGlyph* glyph;
@@ -79,7 +71,6 @@ TextGlyph* Font::AddOverlayText(MechS32 p_left, MechS32 p_top, MechChar* p_text,
 }
 
 // Like AddText, but starts typing the text out (TextGlyph::TypeStep) instead of drawing it whole.
-// FUNCTION: MW2SHELL 0x100055f6
 TextGlyph* Font::AddTypedText(MechS32 p_left, MechS32 p_top, MechChar* p_text, undefined* p_colors)
 {
 	TextGlyph* glyph;
@@ -90,20 +81,17 @@ TextGlyph* Font::AddTypedText(MechS32 p_left, MechS32 p_top, MechChar* p_text, u
 	return glyph;
 }
 
-// FUNCTION: MW2SHELL 0x100056b9
 MechS32 Font::DrawString(MechS32 p_left, MechS32 p_top, MechChar* p_text, undefined* p_colors)
 {
 	return m_videoDriver->DrawString(p_left, p_top, m_data, p_text, p_colors);
 }
 
-// FUNCTION: MW2SHELL 0x100056f5
 MechS32 Font::DrawChar(MechS32 p_left, MechS32 p_top, MechS32 p_char, undefined* p_colors)
 {
 	return m_videoDriver->DrawChar(p_left, p_top, m_data, p_char, p_colors);
 }
 
 // Text entry: m_typedRight holds the right edge of each typed character, m_typedCount their count.
-// FUNCTION: MW2SHELL 0x10005731
 void Font::TypeKey(MechS32 p_left, MechS32 p_top, MechS32 p_key, undefined* p_colors)
 {
 	MechS32 width;
@@ -161,7 +149,6 @@ void Font::TypeKey(MechS32 p_left, MechS32 p_top, MechS32 p_key, undefined* p_co
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10005913
 void Font::ResetTyping()
 {
 	MechS32 i;

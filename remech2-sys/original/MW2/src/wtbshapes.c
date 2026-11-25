@@ -18,74 +18,52 @@
 #include <stdlib.h>
 #include <string.h>
 
-// GLOBAL: MW2 0x1009de38
 const MechS32 g_wtbTag = 0x4f425457;
 
-// GLOBAL: MW2 0x100ba65c
 MechS32 g_shapeLoadError = 0;
 
-// GLOBAL: MW2 0x100ba660
 MechS32 g_unk0x100ba660 = 0;
 
-// GLOBAL: MW2 0x100ba664
 MechS32 g_unk0x100ba664 = 0;
 
-// GLOBAL: MW2 0x100ba668
 MechS32 g_shapeOffsetX = 0;
 
-// GLOBAL: MW2 0x100ba66c
 MechS32 g_shapeOffsetY = 0;
 
-// GLOBAL: MW2 0x100ba670
 MechS32 g_shapeOffsetZ = 0;
 
-// GLOBAL: MW2 0x100ba674
 MechS32 g_shapeScaleX = 1;
 
-// GLOBAL: MW2 0x100ba678
 MechS32 g_shapeScaleY = 1;
 
-// GLOBAL: MW2 0x100ba67c
 MechS32 g_shapeScaleZ = 1;
 
-// GLOBAL: MW2 0x100ba680
 MechU32 g_shapeFlags = 0;
 
-// GLOBAL: MW2 0x100ba684
 MechU32 g_faceIdCount = 0;
 
-// GLOBAL: MW2 0x100ba688
 MechS32 g_subShapeCollisionType = 4;
 
-// GLOBAL: MW2 0x100ba68c
 MechS32 g_unk0x100ba68c = 0;
 
-// GLOBAL: MW2 0x100bfabc
 MechS32 g_shapeHasObject;
 
-// GLOBAL: MW2 0x100bfac0
 MechU32* g_faceIds;
 
-// GLOBAL: MW2 0x100bfac4
 MechS32 g_shapeHasKey;
 
-// GLOBAL: MW2 0x100bfd40
 MechS32 g_shapeOwnerSet;
 
-// GLOBAL: MW2 0x100bfd44
 MechS32 g_shapeOwnerKind;
 
-// GLOBAL: MW2 0x100bfd48
 MechS32 g_shapeOwner;
 
-// FUNCTION: MW2 0x1007f140
 void SetFaceIds(MechU32* p_ids, MechU32 p_count)
 {
 	g_faceIds = p_ids;
 	g_faceIdCount = p_count;
 }
 
-// FUNCTION: MW2 0x1007f15b
 void SetShapeOffset(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	g_shapeOffsetX = p_x;
@@ -93,7 +71,6 @@ void SetShapeOffset(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 	g_shapeOffsetZ = p_z;
 }
 
-// FUNCTION: MW2 0x1007f17e
 void SetShapeScale(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	g_shapeScaleX = p_x;
@@ -112,7 +89,6 @@ void SetShapeScale(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 	}
 }
 
-// FUNCTION: MW2 0x1007f1e6
 void SetShapeFlags(MechU32 p_flags)
 {
 	g_shapeFlags = p_flags;
@@ -120,8 +96,6 @@ void SetShapeFlags(MechU32 p_flags)
 
 // Reads the shape records from p_offset up to p_size; the first becomes the shape, the others
 // its levels of detail.
-// Stack slots: next and count are swapped.
-// FUNCTION: MW2 0x1007f1f9
 Shape* LoadShapes(MechU8* p_data, MechS32* p_offset, MechS32 p_size, SceneObject* p_parent)
 {
 	Shape* next;
@@ -149,10 +123,6 @@ Shape* LoadShapes(MechU8* p_data, MechS32* p_offset, MechS32 p_size, SceneObject
 	return shape;
 }
 
-// Stack slots: the locals are permuted. The recompiled slots take shorter encodings, so reccmp
-// compares only as many bytes of the original as the recompiled function has. Operand order:
-// j < count.
-// FUNCTION: MW2 0x1007f2d5
 MechS32 LoadShapeRecord(MechU8* p_data, MechS32* p_offset, Shape** p_shape, SceneObject* p_parent, MechS32* p_count)
 {
 	MechChar* suffix;
@@ -381,7 +351,6 @@ MechS32 LoadShapeRecord(MechU8* p_data, MechS32* p_offset, Shape** p_shape, Scen
 
 // Maps a face id: ids 0 and 0x14 take the team colour of player g_shapeOwner while
 // g_shapeOwnerSet is set; ids with bit 15 index g_faceIds.
-// FUNCTION: MW2 0x1007fae3
 MechU32 MapFaceId(MechU32 p_id)
 {
 	MechS32 team;

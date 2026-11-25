@@ -21,23 +21,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-// GLOBAL: MW2 0x100a589c
 MechChar* g_fatalErrorTitle = "\nMW2.EXE - fatal error";
 
-// GLOBAL: MW2 0x100a58a0
 MechChar* g_warningTitle = "\nMW2.EXE - warning";
 
 // The code of the last error.
-// GLOBAL: MW2 0x100a58a4
 MechS32 g_errorCode = 0;
 
 // The error message; the length is unknown.
-// GLOBAL: MW2 0x100be010
 MechChar g_errorMessage[0x400];
 
 // Reports error p_code, with a printf-style message: codes that are warnings are logged, the
 // others are fatal and end the game, most of them after shutting the subsystems down.
-// FUNCTION: MW2 0x1003b8c0
 void Error(MechS32 p_code, const char* p_format, ...)
 {
 	va_list args;
@@ -139,7 +134,6 @@ void Error(MechS32 p_code, const char* p_format, ...)
 }
 
 // Shuts the subsystems down before the game exits on an error.
-// FUNCTION: MW2 0x1003ba07
 void ShutdownOnError(void)
 {
 	FreeBwdNames();
@@ -153,7 +147,6 @@ void ShutdownOnError(void)
 }
 
 // Shows a fatal error's message, logs it, and exits.
-// FUNCTION: MW2 0x1003ba3a
 void ShowFatalError(const char* p_format, va_list p_args)
 {
 	va_list args;
@@ -174,8 +167,6 @@ void ShowFatalError(const char* p_format, va_list p_args)
 // Formats an error's message: p_title, the code, the code's text from the "SystemError" section,
 // and the printf-style message p_format, if any. The message is logged and shown. The original
 // took a pointer to p_format on Error's stack and read the arguments from the slots after it.
-// Stack-slot permutation of code and args.
-// FUNCTION: MW2 0x1003bad1
 MechChar* FormatErrorMessage(MechChar* p_title, MechS32 p_code, const char* p_format, va_list p_args)
 {
 	int written;
@@ -201,7 +192,6 @@ MechChar* FormatErrorMessage(MechChar* p_title, MechS32 p_code, const char* p_fo
 }
 
 // Logs a warning's message and clears the error code.
-// FUNCTION: MW2 0x1003bbb1
 void LogWarning(const char* p_format, va_list p_args)
 {
 	FormatErrorMessage(g_warningTitle, g_errorCode, p_format, p_args);

@@ -5,7 +5,6 @@
 #include "types.h"
 
 #pragma pack(1)
-// SIZE 0x09
 // One mission of a clan campaign. Each campaign's table holds its 16 missions in order, then a
 // NULL-scenario entry titled "Retired".
 struct CampaignMission {

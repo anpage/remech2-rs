@@ -5,7 +5,6 @@
 #include "starmech.h"
 #include "types.h"
 
-// SIZE 0x10
 class ProjectArchive {
 public:
 	ProjectArchive(const char* p_name);

@@ -11,24 +11,18 @@
 
 void FreeCacheEntry(ResourceCacheEntry* p_entry);
 
-// GLOBAL: MW2SHELL 0x10063a54
 ResourceCacheEntry** g_cacheTable = NULL;
 
 // The number of the next dump DumpResourceCache writes.
-// GLOBAL: MW2SHELL 0x10063a58
 MechS32 g_cacheDumpNumber = 0;
 
 // The number of entries.
-// GLOBAL: MW2SHELL 0x10096860
 MechS32 g_cacheEntryCount;
 
-// GLOBAL: MW2SHELL 0x10096864
 ResourceCacheEntry* g_purgeListHead;
 
-// GLOBAL: MW2SHELL 0x10096868
 ResourceCacheEntry* g_purgeListTail;
 
-// FUNCTION: MW2SHELL 0x10013690
 void UnlockCacheEntry(ResourceCacheEntry* p_entry)
 {
 	if (p_entry->m_lock == 0) {
@@ -47,9 +41,6 @@ void UnlockCacheEntry(ResourceCacheEntry* p_entry)
 	}
 }
 
-// Operand order: the original compares p_entry against g_purgeListHead and g_purgeListTail with
-// the globals loaded first; it follows the unit's symbol table.
-// FUNCTION: MW2SHELL 0x10013703
 void LockCacheEntry(ResourceCacheEntry* p_entry)
 {
 	if (p_entry->m_lock == 1) {
@@ -73,13 +64,11 @@ void LockCacheEntry(ResourceCacheEntry* p_entry)
 	p_entry->m_purgePrev = NULL;
 }
 
-// FUNCTION: MW2SHELL 0x100137aa
 void AllocateCacheTable(void)
 {
 	g_cacheTable = (ResourceCacheEntry**) calloc(0x3f1, sizeof(ResourceCacheEntry*));
 }
 
-// FUNCTION: MW2SHELL 0x100137c9
 void RebuildPurgeList(void)
 {
 	MechS32 i;
@@ -97,7 +86,6 @@ void RebuildPurgeList(void)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1001385c
 void ShutdownResourceCache(void)
 {
 	MechS32 i;
@@ -120,7 +108,6 @@ void ShutdownResourceCache(void)
 	free(g_cacheTable);
 }
 
-// FUNCTION: MW2SHELL 0x10013907
 void InitializeResourceCache(void)
 {
 	g_cacheEntryCount = 0;
@@ -130,15 +117,10 @@ void InitializeResourceCache(void)
 }
 
 // Empty and never called: there is nothing to name it after.
-// FUNCTION: MW2SHELL 0x10013935
 void FUN_10013935(void)
 {
 }
 
-// Stack-slot permutation: bucket and entry exchange [ebp-8] and [ebp-4]. The hash
-// loads type[3] before type[2] in the recompilation; reversing their source order
-// does not change VC++ 4.1's load order.
-// FUNCTION: MW2SHELL 0x10013940
 ResourceCacheEntry* FindCacheEntry(MechS32 p_id, char* p_type)
 {
 	MechS32 bucket;
@@ -158,10 +140,6 @@ ResourceCacheEntry* FindCacheEntry(MechS32 p_id, char* p_type)
 	return entry;
 }
 
-// Stack-slot permutation only: entry uses [ebp-10] instead of [ebp-4], the
-// four type bytes use [ebp-8..-5] instead of [ebp-c..-9], the terminator uses
-// [ebp-4] instead of [ebp-8], and bucket uses [ebp-c] instead of [ebp-10].
-// FUNCTION: MW2SHELL 0x100139e7
 void FreeCacheEntry(ResourceCacheEntry* p_entry)
 {
 	MechS32 bucket;
@@ -201,8 +179,6 @@ void FreeCacheEntry(ResourceCacheEntry* p_entry)
 
 // Writes the cache to dbugcch<n>.log: every entry by bucket, then the purge list. The original also
 // printed each entry's block size (_msize).
-// Not 100%: the stack slots of the locals are permuted.
-// FUNCTION: MW2SHELL 0x10013b11
 void DumpResourceCache(void)
 {
 	MechChar name[100];
@@ -229,12 +205,10 @@ void DumpResourceCache(void)
 }
 
 // Empty and never called: there is nothing to name it after.
-// FUNCTION: MW2SHELL 0x10013c6e
 void FUN_10013c6e(void)
 {
 }
 
-// FUNCTION: MW2SHELL 0x10013c79
 void UnlockCachedResource(MechS32 p_id, char* p_type)
 {
 	ResourceCacheEntry* entry = FindCacheEntry(p_id, p_type);
@@ -248,8 +222,6 @@ void UnlockCachedResource(MechS32 p_id, char* p_type)
 // Returns the data of p_type item p_id of p_handle, loading it into the cache when needed and
 // purging the least recently used entries to make room. p_unk0x0c is ignored (the name tables
 // pass 1), so nothing gives it a name.
-// Not 100%: the stack slots of the locals are permuted.
-// FUNCTION: MW2SHELL 0x10013cb5
 void* LoadCachedResource(MechS32 p_handle, MechS32 p_id, char* p_type, MechS32 p_unk0x0c)
 {
 	ResourceCacheEntry* entry;
@@ -308,7 +280,6 @@ void* LoadCachedResource(MechS32 p_handle, MechS32 p_id, char* p_type, MechS32 p
 	return block + 1;
 }
 
-// FUNCTION: MW2SHELL 0x10013ef4
 void FreeCachedResource(MechS32 p_id, char* p_type)
 {
 	ResourceCacheEntry* entry = FindCacheEntry(p_id, p_type);
@@ -320,13 +291,11 @@ void FreeCachedResource(MechS32 p_id, char* p_type)
 }
 
 // Empty and never called: there is nothing to name it after.
-// FUNCTION: MW2SHELL 0x10013f30
 void FUN_10013f30(void)
 {
 }
 
 // Returns its argument. Never called, and the body gives no name.
-// FUNCTION: MW2SHELL 0x10013f3b
 undefined4 FUN_10013f3b(undefined4 p_value)
 {
 	return p_value;
@@ -334,13 +303,11 @@ undefined4 FUN_10013f3b(undefined4 p_value)
 
 // LoadCachedResource from archive handle 0. Never called; it keeps its placeholder because what
 // handle 0 stands for here isn't known.
-// FUNCTION: MW2SHELL 0x10013f4e
 void* FUN_10013f4e(MechS32 p_id, char* p_type)
 {
 	return LoadCachedResource(0, p_id, p_type, 0);
 }
 
-// FUNCTION: MW2SHELL 0x10013f72
 MechS32 PurgeOldestCacheEntry(void)
 {
 	if (g_purgeListHead != NULL) {
@@ -352,14 +319,12 @@ MechS32 PurgeOldestCacheEntry(void)
 }
 
 // Zeroed, with calloc.
-// FUNCTION: MW2SHELL 0x10013fa9
 void* AllocateMemory(undefined4 p_size)
 {
 	return calloc(p_size, 1);
 }
 
 // Unused.
-// FUNCTION: MW2SHELL 0x10014029
 void FreeMemory(void* p_buffer)
 {
 	free(p_buffer);

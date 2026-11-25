@@ -14,28 +14,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(Page, 0x34)
-DECOMP_SIZE_ASSERT(Page::Link, 0x14)
-
 // Set by a \A escape and never read.
-// GLOBAL: MW2SHELL 0x10071180
 MechU8 g_pageLinkRead = FALSE;
 
 // A \B or \G escape was read: the next ReadToken passes it on to the glyph as a word.
-// GLOBAL: MW2SHELL 0x10071184
 MechU8 g_pageBackUpPending = FALSE;
 
-// GLOBAL: MW2SHELL 0x10071188
 MechU8 g_pageGoToPending = FALSE;
 
 // Layout's word, line and scratch buffers.
-// GLOBAL: MW2SHELL 0x10093a78
 MechChar g_pageWord[0x400];
 
-// GLOBAL: MW2SHELL 0x10093e78
 MechChar g_pageLine[0x400];
 
-// GLOBAL: MW2SHELL 0x10094278
 MechChar g_pageTemp[0x400];
 
 #define c_typeCharsPerSecond 1200
@@ -65,8 +56,6 @@ MechU32 g_typeOwed;
 		link = -1;                                                                                                     \
 	}
 
-// Stack-slot permutation: glyphs, result, data and size.
-// FUNCTION: MW2SHELL 0x10044880
 Page::Page(
 	Font* p_font,
 	VideoDriver* p_videoDriver,
@@ -116,7 +105,6 @@ Page::Page(
 }
 
 // Returns the number of spaces skipped.
-// FUNCTION: MW2SHELL 0x10044a44
 MechS32 Page::SkipSpaces(MechChar* p_text, MechS32* p_pos, MechS32 p_end)
 {
 	MechS32 count;
@@ -131,7 +119,6 @@ MechS32 Page::SkipSpaces(MechChar* p_text, MechS32* p_pos, MechS32 p_end)
 }
 
 // Reads the next word or escape code at *p_pos into p_word and returns its c_token kind.
-// FUNCTION: MW2SHELL 0x10044a96
 MechS32 Page::ReadToken(
 	MechChar* p_text,
 	MechChar* p_word,
@@ -261,7 +248,6 @@ nextChar:
 
 // Moves down a line and turns p_line into a glyph, then starts the next line with p_word.
 // Returns the width of the new line.
-// FUNCTION: MW2SHELL 0x10044f3b
 MechS32 Page::FlushLine(MechChar* p_line, MechChar* p_word)
 {
 	m_top += m_lineHeight;
@@ -280,7 +266,6 @@ MechS32 Page::FlushLine(MechChar* p_line, MechChar* p_word)
 }
 
 // Returns the width p_word adds, measuring it unless p_width gives it.
-// FUNCTION: MW2SHELL 0x10045005
 MechS32 Page::AppendWord(MechChar* p_line, MechChar* p_word, MechS32 p_width)
 {
 	strcat(p_line, p_word);
@@ -293,9 +278,6 @@ MechS32 Page::AppendWord(MechChar* p_line, MechChar* p_word, MechS32 p_width)
 
 // Lays out p_text until the page is full or a \S code. Returns where the next page starts, or
 // NULL at the end of the text.
-// Only a stack-slot permutation of the locals remains. Declaring count and i ahead of tabs
-// makes the two string loops compare their operands in the original order.
-// FUNCTION: MW2SHELL 0x1004506f
 MechChar* Page::Layout(MechChar* p_text)
 {
 	MechS32 offset;
@@ -432,7 +414,6 @@ MechChar* Page::Layout(MechChar* p_text)
 	return NULL;
 }
 
-// FUNCTION: MW2SHELL 0x10045844
 void Page::AddGlyph(MechChar* p_text, MechS32 p_left, MechS32 p_top)
 {
 	TextGlyph* glyph;
@@ -441,7 +422,6 @@ void Page::AddGlyph(MechChar* p_text, MechS32 p_left, MechS32 p_top)
 	ExpandCollection(m_glyphs, glyph);
 }
 
-// FUNCTION: MW2SHELL 0x100458ff
 void Page::Show()
 {
 	TextGlyph* glyph;
@@ -458,7 +438,6 @@ void Page::Show()
 }
 
 // Starts typing the page out again.
-// FUNCTION: MW2SHELL 0x1004596f
 void Page::Restart()
 {
 	TextGlyph* glyph;
@@ -486,7 +465,6 @@ void Page::Restart()
 
 // Advances the glyphs still typing and stops the sound when done.
 // The original advanced one character per call.
-// FUNCTION: MW2SHELL 0x10045a2b
 void Page::TypeStep()
 {
 	TextGlyph* glyph;
@@ -516,7 +494,6 @@ void Page::TypeStep()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10045ab0
 void Page::Hide()
 {
 	TextGlyph* glyph;
@@ -536,13 +513,11 @@ void Page::Hide()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10045b38
 void Page::SetBanner(undefined* p_data, MechS32 p_size)
 {
 	m_banner = new PopupPicture(p_data, p_size, m_videoDriver, 0, 0, m_sample);
 }
 
-// FUNCTION: MW2SHELL 0x10045be7
 Page::~Page()
 {
 	TextGlyph* glyph;

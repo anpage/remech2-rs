@@ -8,7 +8,6 @@
 #pragma pack(push, 1)
 
 // An animated texture: which frame set it plays, where it is, and how fast.
-// SIZE 0x0e
 typedef struct Animation {
 	MechS16 m_set;      // 0x00 — in g_animFrames
 	MechS16 m_frame;    // 0x02

@@ -14,57 +14,38 @@
 #include "speech.h"
 #include "types.h"
 
-DECOMP_SIZE_ASSERT(TimeOfDayPhase, 0x08)
-
-// GLOBAL: MW2 0x100ba5d8
 TimeOfDayPhase g_timeOfDayPhases[4] = {{4, 2715}, {0, 2715}, {4, 3620}, {8, 2715}};
 
-// GLOBAL: MW2 0x100ba5f8
 MechS32 g_timeOfDayPhase = -1;
 
-// GLOBAL: MW2 0x100ba5fc
 MechS32 g_soundDelayPerUnit = 0x168;
 
-// GLOBAL: MW2 0x100ba600
 MechS32 g_gravity = 0x794;
 
-// GLOBAL: MW2 0x100ba604
 MechS32 g_gravityScale = 0x10000;
 
-// GLOBAL: MW2 0x100ba608
 MechS32 g_unk0x100ba608 = 0;
 
-// GLOBAL: MW2 0x100ba60c
 MechS32 g_secondsPerDay = 86400;
 
-// GLOBAL: MW2 0x100ba610
 MechS32 g_daysPerYear = 365;
 
-// GLOBAL: MW2 0x100ba614
 MechS32 g_dayOfYear = 0;
 
-// GLOBAL: MW2 0x100ba618
 MechS32 g_timeOfDay = 43200;
 
-// GLOBAL: MW2 0x100ba61c
 MechS32 g_startTimeOfDay = 43200;
 
-// GLOBAL: MW2 0x100bfaa0
 MechS32 g_timeOfDayFrames;
 
-// GLOBAL: MW2 0x100bfaa8
 MechS32 g_timeOfDayStarts[4];
 
-// GLOBAL: MW2 0x100bfab8
 MechS32 g_timeOfDayEnabled;
 
-// GLOBAL: MW2 0x100bfd4c
 MechS32 g_nextTimeOfDayUpdate;
 
-// GLOBAL: MW2 0x100bfd50
 MechS32 g_infraredOn;
 
-// FUNCTION: MW2 0x1007d610
 void FirstEnvironment(void)
 {
 	MechS32 hour;
@@ -84,8 +65,6 @@ void FirstEnvironment(void)
 	g_gravityScale = FixedDiv16(g_gravity, 0x794);
 }
 
-// Stack slots: seconds, time and i are permuted.
-// FUNCTION: MW2 0x1007d6bb
 void UpdateTimeOfDay(void)
 {
 	MechS32 phase;
@@ -127,8 +106,6 @@ void UpdateTimeOfDay(void)
 	}
 }
 
-// Operand order: the original compares p_phase != g_timeOfDayPhase with g_timeOfDayPhase in eax.
-// FUNCTION: MW2 0x1007d7e3
 void FadeToTimeOfDayPhase(MechS32 p_phase)
 {
 	MechS32 duration;
@@ -152,14 +129,11 @@ void FadeToTimeOfDayPhase(MechS32 p_phase)
 	}
 }
 
-// FUNCTION: MW2 0x1007d875
 MechS32 IsInfraredOn(undefined4 p_unk0x00)
 {
 	return g_infraredOn;
 }
 
-// Operand order: the original compares g_infraredOn != p_state with p_state in eax.
-// FUNCTION: MW2 0x1007d88a
 void SetInfrared(undefined4 p_unk0x00, MechS32 p_state)
 {
 	if (g_infraredOn != p_state) {
@@ -180,8 +154,6 @@ void SetInfrared(undefined4 p_unk0x00, MechS32 p_state)
 	}
 }
 
-// Stack slots: i and mech are swapped.
-// FUNCTION: MW2 0x1007d931
 void QuadrupleMechCooling(void)
 {
 	MechS32 i;
@@ -193,8 +165,6 @@ void QuadrupleMechCooling(void)
 	}
 }
 
-// Stack slots: i and mech are swapped.
-// FUNCTION: MW2 0x1007d97c
 void QuarterMechCooling(void)
 {
 	MechS32 i;

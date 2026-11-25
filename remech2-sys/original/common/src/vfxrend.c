@@ -1,5 +1,4 @@
-/* VFXREND, Miles Design VFX's polygon renderer (3rdparty/vfx/VFXREND.ASM), in portable C, which
-   both DLLs compile in place of the assembly.
+/* VFXREND, Miles Design VFX's polygon renderer, reimplemented in C, which both DLLs compile.
 
    VFXREND builds its primitives from one macro, MAKE_POLY, for each set of operation flags
    RENDOPTS.INC lists (MW2's 25, g_primitives), and dispatches on the flags through a table. The C

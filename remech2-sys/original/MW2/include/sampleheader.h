@@ -8,7 +8,6 @@
 
 // The header of a sound resource ("SNDS"): the "SFLX" tag, the sample count and the bytes per
 // sample. The sample data follows.
-// SIZE 0x0e
 typedef struct SampleHeader {
 	MechChar m_tag[4];   // 0x00 — "SFLX"
 	undefined4 m_size;   // 0x04

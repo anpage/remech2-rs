@@ -4,7 +4,6 @@
 #include "types.h"
 
 // A named formation: each of the eight slots' offset from the leader and heading.
-// SIZE 0x70
 typedef struct TeamFormation {
 	MechChar m_name[0x10]; // 0x00
 	MechS32 m_x[8];        // 0x10

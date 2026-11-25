@@ -13,7 +13,6 @@ typedef void (*ObjectCallback)(SceneObject* p_obj);
 
 /* A node of the scene tree: its transform relative to the parent, the world transform
    UpdateObjWorld derives from it, and an optional shape. CreateObj allocates it. */
-// SIZE 0x7c
 struct SceneObject {
 	SceneObject* m_parent;          // 0x00
 	SceneObject* m_firstChild;      // 0x04

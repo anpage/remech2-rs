@@ -17,7 +17,6 @@ struct BwdBlockRecord;
 struct BwdStream;
 
 // An entry of the class table: an ID and its class.
-// SIZE 0x08
 typedef struct GeoClass {
 	MechS32 m_id;          // 0x00
 	struct Shape* m_class; // 0x04

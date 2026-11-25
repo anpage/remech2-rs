@@ -9,9 +9,6 @@
 
 #include <math.h>
 
-DECOMP_SIZE_ASSERT(Ray, 0x38)
-
-// FUNCTION: MW2 0x10002e20
 void BuildRayFromSegment(Ray* p_ray, MechS32 p_x0, MechS32 p_y0, MechS32 p_z0, MechS32 p_x1, MechS32 p_y1, MechS32 p_z1)
 {
 	p_ray->m_x0 = p_x0;
@@ -27,7 +24,6 @@ void BuildRayFromSegment(Ray* p_ray, MechS32 p_x0, MechS32 p_y0, MechS32 p_z0, M
 	p_ray->m_state = c_rayNone;
 }
 
-// FUNCTION: MW2 0x10002ebc
 void BuildRayFromDirection(
 	Ray* p_ray,
 	MechS32 p_x0,
@@ -55,7 +51,6 @@ void BuildRayFromDirection(
 	p_ray->m_state = c_rayFixed;
 }
 
-// FUNCTION: MW2 0x10002f7e
 MechS32 GetRayLength(Ray* p_ray)
 {
 	if (p_ray->m_state == c_rayNone) {
@@ -65,7 +60,6 @@ MechS32 GetRayLength(Ray* p_ray)
 	return p_ray->m_length;
 }
 
-// FUNCTION: MW2 0x10002fad
 void BuildRayFixed(Ray* p_ray)
 {
 	MechS32 length;
@@ -82,7 +76,6 @@ void BuildRayFixed(Ray* p_ray)
 	}
 }
 
-// FUNCTION: MW2 0x10003053
 void BuildRayFloat(Ray* p_ray)
 {
 	MechDouble dx;
@@ -107,7 +100,6 @@ void BuildRayFloat(Ray* p_ray)
 	p_ray->m_state = c_rayFloat;
 }
 
-// FUNCTION: MW2 0x1000313e
 void SetRayLength(Ray* p_ray, MechS32 p_length)
 {
 	if (p_ray->m_state == c_rayNone) {
@@ -125,7 +117,6 @@ void SetRayLength(Ray* p_ray, MechS32 p_length)
 	}
 }
 
-// FUNCTION: MW2 0x1000320f
 void AdvanceRayStart(Ray* p_ray, MechS32 p_distance)
 {
 	MechS32 state;
@@ -152,7 +143,6 @@ void AdvanceRayStart(Ray* p_ray, MechS32 p_distance)
 	}
 }
 
-// FUNCTION: MW2 0x100032f9
 void SetRayEnd(Ray* p_ray, MechS32 p_x1, MechS32 p_y1, MechS32 p_z1)
 {
 	MechS32 state;
@@ -178,7 +168,6 @@ void SetRayEnd(Ray* p_ray, MechS32 p_x1, MechS32 p_y1, MechS32 p_z1)
 	}
 }
 
-// FUNCTION: MW2 0x100033df
 void ClipRayToGround(Ray* p_ray, MechS32 p_y)
 {
 	MechS32 length;
@@ -189,14 +178,11 @@ void ClipRayToGround(Ray* p_ray, MechS32 p_y)
 	}
 }
 
-// FUNCTION: MW2 0x1000342d
 void CopyRay(Ray* p_dst, Ray* p_src)
 {
 	*p_dst = *p_src;
 }
 
-// Matches except for the stack slots of toMax and quotient (a consistent permutation).
-// FUNCTION: MW2 0x10003445
 MechS32 ClipRaySlab(MechS32 p_origin, MechS32 p_delta, MechS32 p_min, MechS32 p_max, MechS32* p_tMin, MechS32* p_tMax)
 {
 	MechS32 toMax;

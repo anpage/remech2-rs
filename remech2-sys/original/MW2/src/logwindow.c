@@ -6,7 +6,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-// FUNCTION: MW2 0x1003a432
 void DebugPrintInternal(const MechChar* p_format, ...)
 {
 	MechChar message[0x100];

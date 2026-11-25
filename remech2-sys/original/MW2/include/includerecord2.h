@@ -7,7 +7,6 @@
 
 // A world stream's gamepiece record (gpspec): the stream that creates the player (RunIncludedStream),
 // the player's team, AI parameters and names, and its mech's chassis and MEK configuration.
-// SIZE 0x62
 typedef struct IncludeRecord2 {
 	BwdRecord m_header;               // 0x00
 	MechS16 m_mekId;                  // 0x08 — a MEK resource (LoadMechConfig)

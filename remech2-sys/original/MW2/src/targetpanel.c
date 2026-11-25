@@ -36,34 +36,25 @@
 #include <stdio.h>
 #include <string.h>
 
-// GLOBAL: MW2 0x100ba4bc
 MechS32 g_targetPanelMode = 1;
 
 // Set to announce the target's side with the next name the target panel shows.
-// GLOBAL: MW2 0x100ba4c0
 MechS32 g_announceTargetSide = 0;
 
 // When the target panel goes from the target's short name to its name.
-// GLOBAL: MW2 0x100ba4c4
 MechS32 g_targetFullNameTime = 0;
 
 // The target the panel showed last.
-// GLOBAL: MW2 0x100ba4c8
 MechS32 g_lastPanelTarget = 0;
 
 // The target panel flickers to static while set.
-// GLOBAL: MW2 0x100ba4cc
 MechS32 g_targetPanelStatic = 0;
 
 // The name the target panel shows for an unknown installation.
-// GLOBAL: MW2 0x100c26a0
 MechChar g_anonymousInstallationName[8];
 
 // Writes the target panel's text: the locked target's name (its short name when it changes, its
 // name after a while), coloured by its side, and its distance.
-// Stack-slot permutation of the locals. g_currentClock > g_targetFullNameTime compares with its
-// operands reversed (it flipped when speech.h's declarations were added ahead of it).
-// FUNCTION: MW2 0x1007b930
 void DrawTargetPanelText(CockpitPanel* p_panel)
 {
 	MechS32 index;
@@ -263,8 +254,6 @@ void DrawTargetPanelText(CockpitPanel* p_panel)
 
 // Draws the target panel: the locked target through a camera behind it, a nav point's icon, or
 // static while the panel is damaged (m_damage).
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1007c126
 void DrawTargetPanel(CockpitPanel* p_panel)
 {
 	MechS32 index;
@@ -413,7 +402,6 @@ void DrawTargetPanel(CockpitPanel* p_panel)
 }
 
 // Draws a panel as static (animation 0).
-// FUNCTION: MW2 0x1007c6df
 void DrawTargetStatic(CockpitPanel* p_panel)
 {
 	if (!p_panel->m_enabled) {
@@ -426,8 +414,6 @@ void DrawTargetStatic(CockpitPanel* p_panel)
 
 // Draws the target panel while its transition opens it, the view resized to the transition's
 // rectangle (g_panes[7] and the panel's target) for the frame.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1007c71e
 void DrawTargetPanelStartup(CockpitPanel* p_panel)
 {
 	PANE* rect;
@@ -465,8 +451,6 @@ void DrawTargetPanelStartup(CockpitPanel* p_panel)
 
 // Draws the target panel while its transition closes it, unless the view it last drew (0, 3 or
 // 4) already had it closed.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1007c81c
 void DrawTargetPanelShutdown(CockpitPanel* p_panel)
 {
 	PANE* rect;

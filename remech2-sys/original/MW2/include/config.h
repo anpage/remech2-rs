@@ -14,7 +14,6 @@ struct ResourceRef;
 
 #pragma pack(1)
 // The difficulty settings, read from a .cfg file as one block.
-// SIZE 0x17
 typedef struct DifficultyCfg {
 	undefined m_unlimitedAmmo;   // 0x00 — the "cia" cheat; cleared in network games with more than one player
 	undefined m_invulnerable;    // 0x01 — the "blorb" cheat; cleared in network games

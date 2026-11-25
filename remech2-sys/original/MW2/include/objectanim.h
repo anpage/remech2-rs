@@ -10,7 +10,6 @@
 #include "vertex.h"
 
 // An animation file LoadAnimFile has loaded: its id and the base of its animation numbers.
-// SIZE 0x8
 typedef struct AnimFile {
 	MechS32 m_id;   // 0x00
 	MechS32 m_base; // 0x04

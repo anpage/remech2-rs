@@ -11,10 +11,8 @@ enum {
 	c_lzWindowSize = 0x1000
 };
 
-// SIZE 0x8c
 class TMPackDataBase {
 public:
-	// SIZE 0x08
 	class TMPackDBEntry {
 	public:
 		TMPackDBEntry(undefined4 p_offset, undefined4 p_size);

@@ -15,7 +15,6 @@
 static const size_t c_savedPilotSize = offsetof(PilotRecord, m_glyph);
 static const long c_savedGlyphSize = 4;
 
-// FUNCTION: MW2SHELL 0x1002da80
 void LoadPilotRoster()
 {
 	PilotRecord* pilot;
@@ -58,7 +57,6 @@ void LoadPilotRoster()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1002dbec
 void SavePilotRoster()
 {
 	static const MechU8 glyph[4] = {0};

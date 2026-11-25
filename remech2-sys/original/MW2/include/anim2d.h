@@ -5,7 +5,6 @@
 #include "targeting.h"
 #include "types.h"
 
-// SIZE 0x08
 typedef struct FramePrj {
 	MechS32 m_id;      // 0x00 — -1: free
 	MechS16 m_unk0x04; // 0x04
@@ -27,7 +26,6 @@ enum {
 	c_anim2dFreeWhenDone = 0x8
 };
 
-// SIZE 0x1c
 typedef struct Anim2d {
 	MechS32 m_state;      // 0x00
 	MechS32 m_frameCount; // 0x04

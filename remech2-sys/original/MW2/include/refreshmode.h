@@ -10,7 +10,6 @@
 #pragma pack(1)
 // A refresh mode (the original's debug strings name them): how the framebuffer reaches the
 // screen through a display back end. The original had six, several to a back end.
-// SIZE 0x24
 struct RefreshMode {
 	MechS32 m_index;                                                         // 0x00
 	MechS32 m_backend;                                                       // 0x04 — DisplayBackendId

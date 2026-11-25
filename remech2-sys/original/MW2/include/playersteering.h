@@ -7,7 +7,6 @@
 // A player's controls, set each frame by the input layer for the local player (g_localSteering) and
 // by the AI for the others. The members are the sinks of the same names (g_inputSinks); the bytes
 // are buttons, which the mech's update clears once it has acted on them.
-// SIZE 0x48
 typedef struct PlayerSteering {
 	MechS32 m_torsoTilt;              // 0x00
 	MechS32 m_torsoPan;               // 0x04 — swept between ±45 degrees by SweepTorso

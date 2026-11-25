@@ -25,10 +25,8 @@
 // cycles through five views of the local mech (CycleMechViewMode), drawn into the panel's render
 // target, optionally through the panel's rectangle transition.
 
-// GLOBAL: MW2 0x100a88e8
 MechS32 g_mechViewStatic = 0;
 
-// FUNCTION: MW2 0x100509a0
 void CycleMechViewMode(void)
 {
 	g_mechViewMode++;
@@ -37,9 +35,6 @@ void CycleMechViewMode(void)
 	}
 }
 
-// Stack-slot permutation: camera, mech and saved and view. The original's longer displacements
-// make its code longer, so reccmp compares only the recompiled length of it.
-// FUNCTION: MW2 0x100509c8
 void DrawMechViewPanel(CockpitPanel* p_panel)
 {
 	MechS32* camera;
@@ -141,7 +136,6 @@ void DrawMechViewPanel(CockpitPanel* p_panel)
 	}
 }
 
-// FUNCTION: MW2 0x10050dc3
 void SetMechViewRenderSettings(RenderSettings* p_saved)
 {
 	*p_saved = g_renderSettings;
@@ -154,7 +148,6 @@ void SetMechViewRenderSettings(RenderSettings* p_saved)
 	g_renderSettings.m_flags &= ~4;
 }
 
-// FUNCTION: MW2 0x10050e20
 void DrawMechViewStatic(CockpitPanel* p_panel)
 {
 	if (!p_panel->m_enabled || !g_mechViewMode) {
@@ -165,8 +158,6 @@ void DrawMechViewStatic(CockpitPanel* p_panel)
 	DrawPanelAnim(p_panel->m_target, 0, 0, 0);
 }
 
-// Stack-slot permutation: target and y.
-// FUNCTION: MW2 0x10050e6c
 void DrawMechViewFrame(CockpitPanel* p_panel, MechS32 p_color, MechS32 p_shapeId)
 {
 	PANE* target;
@@ -180,8 +171,6 @@ void DrawMechViewFrame(CockpitPanel* p_panel, MechS32 p_color, MechS32 p_shapeId
 	DrawPaneShape(x, y, p_shapeId, target);
 }
 
-// Stack-slot permutation: frame, savedSlot and savedTarget and transition.
-// FUNCTION: MW2 0x10050ebe
 void DrawMechViewStartup(CockpitPanel* p_panel)
 {
 	PANE savedTarget;
@@ -217,8 +206,6 @@ void DrawMechViewStartup(CockpitPanel* p_panel)
 	p_panel->m_lastPowerState = g_cockpitPowerState;
 }
 
-// Stack-slot permutation: frame, savedSlot and savedTarget and transition.
-// FUNCTION: MW2 0x10050fd6
 void DrawMechViewShutdown(CockpitPanel* p_panel)
 {
 	PANE savedTarget;

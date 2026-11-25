@@ -23,8 +23,6 @@ typedef struct ResourceTable {
 	ResourceEntry m_entries[1]; // 0x0c
 } ResourceTable;
 
-// Stack-slot permutation: every local, name included, takes a different [ebp-N] slot.
-// FUNCTION: MW2SHELL 0x100050f0
 MechS32 FindResourceIdByName(MechS32 p_type, char* p_name)
 {
 	MechS32 j;
@@ -68,8 +66,6 @@ MechS32 FindResourceIdByName(MechS32 p_type, char* p_name)
 	return id;
 }
 
-// Stack-slot permutation: j, table, data, entry, result, i and c.
-// FUNCTION: MW2SHELL 0x10005232
 char* FindResourceNameById(MechS32 p_type, MechS32 p_id, char* p_buffer)
 {
 	MechS32 j;

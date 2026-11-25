@@ -32,142 +32,105 @@
 
 // The track view's distance from the mech; UpdateFreeEyeView also starts the free camera that far
 // back from it.
-// GLOBAL: MW2 0x100a23ec
 MechS32 g_trackDistance = 0;
 
 // The track view's distance limits, height and turn around the mech (UpdateTrackView).
 
-// GLOBAL: MW2 0x100a23f0
 MechS32 g_trackMinDistance = 0;
 
-// GLOBAL: MW2 0x100a23f4
 MechS32 g_trackMaxDistance = 0;
 
-// GLOBAL: MW2 0x100a23f8
 MechS32 g_trackHeight = 0;
 
-// GLOBAL: MW2 0x100a23fc
 MechS32 g_trackTurn = 0xb40000;
 
-// GLOBAL: MW2 0x100a2400
 MechS32 g_normalFov = 0x10000;
 
-// GLOBAL: MW2 0x100a2404
 MechS32 g_zoomFov = 0x10000;
 
 // The view mode the camera was updated in last (c_view...), or -1.
-// GLOBAL: MW2 0x100a2408
 MechS32 g_viewMode = -1;
 
 // The view mode to return to from the ordinance view.
-// GLOBAL: MW2 0x100a240c
 MechS32 g_ordinanceReturnMode = -1;
 
 // The view mode FirstEyepoint starts the camera in.
-// GLOBAL: MW2 0x100a2410
 MechS32 g_initialViewMode = 0;
 
 // The view mode SetViewMode asked for; UpdateEyepoint switches to it.
-// GLOBAL: MW2 0x100a2414
 MechS32 g_requestedViewMode = 0;
 
 // Set when a mech starts under the autopilot (mechclass.c); nothing reads it.
-// GLOBAL: MW2 0x100a2418
 MechS32 g_autopilotStart = 1;
 
 // Set while the cockpit view is placed at the eye (GetCockpitEyeView), not shaking: the HUD
 // draws the crosshair only then.
-// GLOBAL: MW2 0x100a241c
 MechS32 g_cockpitEyeSteady = 0;
 
 // Set while the camera is in the cockpit view: the cockpit's own shape (g_cockpitObject) is drawn
 // separately, and the 3D sound calls get it.
-// GLOBAL: MW2 0x100a2420
 undefined4 g_inCockpitView = 0;
 
 // The view mode SetViewMode forces once the local mech is lost (g_localMechLost): the track view.
-// GLOBAL: MW2 0x100a2424
 MechS32 g_lostViewMode = -1;
 
 // Set while a network game's lost player advances the viewpoint between players; until then the
 // track view circles the mech.
-// GLOBAL: MW2 0x100a2428
 MechS32 g_spectating = 0;
 
-// GLOBAL: MW2 0x100a242c
 struct Player* g_localPlayer = NULL;
 
 // The player the camera tracks.
-// GLOBAL: MW2 0x100a2430
 MechS32 g_trackedPlayer = 0;
 
 // The local mech's cockpit height and torso twist (InitCockpitPanels): the first raises the eye
 // (GetPlayerEyeView, the aim ray); nothing reads the second.
-// GLOBAL: MW2 0x100a2434
 MechS32* g_eyeHeightOffset = NULL;
 
-// GLOBAL: MW2 0x100a2438
 MechS32* g_eyeTwist = NULL;
 
 // The drop camera (UpdateDropView): its vertical speed, acceleration and start clock.
-// GLOBAL: MW2 0x100a243c
 MechS32 g_dropSpeed = 0;
 
-// GLOBAL: MW2 0x100a2440
 MechS32 g_dropAcceleration = 0x3ca0;
 
-// GLOBAL: MW2 0x100a2444
 MechS32 g_dropStartClock = 0;
 
 // Set while no glance key is held (UpdateCockpitView).
-// GLOBAL: MW2 0x100a2448
 MechS8 g_glanceReleased = 0;
 
 // The view UpdateOrdinanceView saves when it enters the ordinance view.
-// GLOBAL: MW2 0x10176f10
 MechS32 g_ordinanceSavedView[7];
 
 // The track view's height limits (UpdateTrackView).
-// GLOBAL: MW2 0x10176f2c
 MechS32 g_trackMaxHeight;
 
 // The track view's eased offsets from the mech and its eased heading and pitch.
-// GLOBAL: MW2 0x10176f30
 Ramp g_trackOffsetZ;
 
-// GLOBAL: MW2 0x10176f40
 WrappedRamp g_trackPitch;
 
-// GLOBAL: MW2 0x10176f60
 WrappedRamp g_trackHeading;
 
-// GLOBAL: MW2 0x10176f74
 MechS32 g_trackMinHeight;
 
 // The cockpit view's tilt, eased toward g_sinkPilotTilt.
-// GLOBAL: MW2 0x10176f80
 Ramp g_pilotTilt;
 
-// GLOBAL: MW2 0x10176f90
 Ramp g_trackOffsetY;
 
-// GLOBAL: MW2 0x10176fa0
 SavedView g_savedViews[5];
 
 // The cockpit view's pan, eased toward g_sinkPilotPan.
-// GLOBAL: MW2 0x10177030
 Ramp g_pilotPan;
 
 // The free camera's forward speed.
-// GLOBAL: MW2 0x10177040
 Ramp g_freeEyeSpeed;
 
-// GLOBAL: MW2 0x10177050
 Ramp g_trackOffsetX;
 
 // Resets the camera: its ramps, the saved views and the view scale, follows the local player
 // and resets the camera shake and the zoom.
-// FUNCTION: MW2 0x10010ee0
 void FirstEyepoint(void)
 {
 	MechS32 i;
@@ -199,8 +162,6 @@ void FirstEyepoint(void)
 // Updates the camera for the frame in the view mode GetViewMode picks (the free camera without a
 // local player): the cockpit, tracking, external, drop or free camera, driven by the
 // eyepoint and track sinks.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100110f7
 void UpdateEyepoint(void)
 {
 	MechS32 mode;
@@ -278,7 +239,6 @@ void UpdateEyepoint(void)
 	TurnBillboards();
 }
 
-// FUNCTION: MW2 0x100113af
 MechS32 GetCameraFloor(Eyepoint* p_eyepoint)
 {
 	MechS32 height;
@@ -294,7 +254,6 @@ MechS32 GetCameraFloor(Eyepoint* p_eyepoint)
 	return height;
 }
 
-// FUNCTION: MW2 0x10011401
 void SetViewMode(MechS32 p_zoom)
 {
 	if (g_localMechLost) {
@@ -308,7 +267,6 @@ void SetViewMode(MechS32 p_zoom)
 	g_requestedViewMode = p_zoom;
 }
 
-// FUNCTION: MW2 0x10011440
 MechS32 GetViewMode(void)
 {
 	return g_requestedViewMode;
@@ -319,7 +277,6 @@ MechS32 GetViewMode(void)
 
 // Saves the eyepoint's position and orientation (0x00-0x14) to p_view, marking it (p_view[6])
 // as set. Returns 0 without both.
-// FUNCTION: MW2 0x100114ea
 MechS32 SaveView(Eyepoint* p_eyepoint, MechS32* p_view)
 {
 	if (p_view == NULL || p_eyepoint == NULL) {
@@ -338,7 +295,6 @@ MechS32 SaveView(Eyepoint* p_eyepoint, MechS32* p_view)
 
 // Restores the eyepoint's position and orientation from p_view, if SaveView set it. Returns
 // 0 without both, or when the view is not set.
-// FUNCTION: MW2 0x1001156a
 MechS32 RestoreView(Eyepoint* p_eyepoint, MechS32* p_view)
 {
 	if (p_view == NULL || p_eyepoint == NULL) {
@@ -360,7 +316,6 @@ MechS32 RestoreView(Eyepoint* p_eyepoint, MechS32* p_view)
 
 // Moves the camera to the next (p_next) or previous player, or back to the local player
 // (p_home), skipping players who left or whose mechs are gone.
-// FUNCTION: MW2 0x100115f4
 void CycleTrackedPlayer(MechS32 p_next, MechS32 p_home)
 {
 	MechS32 step;
@@ -396,8 +351,6 @@ void CycleTrackedPlayer(MechS32 p_next, MechS32 p_home)
 
 // Returns the camera player's view: its orientation and, from the cockpit, the position of its
 // eye object (at half the object's height outside the external views).
-// Stack-slot permutation of player, x, y and z.
-// FUNCTION: MW2 0x100116c3
 void GetPlayerEyeView(MechS32* p_pitch, MechS32* p_heading, MechS32* p_roll, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	Player* player;
@@ -442,7 +395,6 @@ void GetPlayerEyeView(MechS32* p_pitch, MechS32* p_heading, MechS32* p_roll, Mec
 // The ordinance view: saves the view and zooms out the first time, then follows the tracked
 // shot; once it is gone, returns to the previous view mode (restoring the saved view for the free
 // camera).
-// FUNCTION: MW2 0x10011819
 void UpdateOrdinanceView(void)
 {
 	MechS32* camera;
@@ -469,9 +421,6 @@ void UpdateOrdinanceView(void)
 // The track view: places the camera behind the tracked player's mech: p_distance and p_height move it out and up,
 // within limits taken from the mech's size the first time, p_turn turns it around the mech and
 // p_tilt tilts it. The first call after another view starts its ramps from the current eyepoint.
-// Stack-slot permutation of the locals. The original compares g_trackHeight with
-// g_trackMaxHeight in the other operand order.
-// FUNCTION: MW2 0x100118bc
 void UpdateTrackView(MechS32 p_distance, MechS32 p_height, MechS32 p_tilt, MechS32 p_turn)
 {
 	MechS32 y;
@@ -589,7 +538,6 @@ void UpdateTrackView(MechS32 p_distance, MechS32 p_height, MechS32 p_tilt, MechS
 // Updates the cockpit view each frame: resets the pilot's look ramps after an external view, turns
 // the view towards a held glance key (or back ahead once all are released), then places the
 // eyepoint unless the camera is shaking.
-// FUNCTION: MW2 0x10011cb0
 void UpdateCockpitView(void)
 {
 	if (g_viewMode) {
@@ -640,8 +588,6 @@ void UpdateCockpitView(void)
 }
 
 // GetPlayerEyeView's view, turned from the cockpit by the pilot's pan and tilt.
-// Stack-slot permutation: pan and tilt.
-// FUNCTION: MW2 0x10011e45
 void GetCockpitEyeView(MechS32* p_pitch, MechS32* p_heading, MechS32* p_roll, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	MechS32 pan;
@@ -663,8 +609,6 @@ void GetCockpitEyeView(MechS32* p_pitch, MechS32* p_heading, MechS32* p_roll, Me
 }
 
 // Switches to the drop view (mode 4): the camera starts level at the mech and falls, turning.
-// Stack-slot permutation: the six locals.
-// FUNCTION: MW2 0x10011edc
 void UpdateDropView(void)
 {
 	MechS32 unk0x10;
@@ -690,8 +634,6 @@ void UpdateDropView(void)
 
 // Moves the free camera (mode 2): p_climb raises it, p_speed drives it forward (eased),
 // p_strafe moves it sideways, and p_turn and p_pitch turn it. It stays above the ground.
-// Stack-slot permutation: sinHeading, cosHeading, cosPitch and speed.
-// FUNCTION: MW2 0x10011f9a
 void UpdateFreeEyeView(MechS32 p_climb, MechS32 p_speed, MechS32 p_strafe, MechS32 p_turn, MechS32 p_pitch)
 {
 	MechS32 sinHeading;
@@ -746,7 +688,6 @@ void UpdateFreeEyeView(MechS32 p_climb, MechS32 p_speed, MechS32 p_strafe, MechS
 
 // Turns the world's shapes of types 0x10 and 0x60 to face the eyepoint, or to a fixed angle when
 // IsSatelliteView is set.
-// FUNCTION: MW2 0x1001220a
 void TurnBillboards(void)
 {
 	MechS32 pitch;

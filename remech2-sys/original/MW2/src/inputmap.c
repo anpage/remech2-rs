@@ -1,140 +1,96 @@
-/* The local player's steering, and the sinks the input layer writes it through. The unit is not
-   named input.c: the CRT has an input.c (the scanf engine) whose line records reccmp confuses with
-   it. */
+/* The local player's steering, and the sinks the input layer writes it through. */
 #include "inputmap.h"
 
 #include "decomp.h"
 #include "types.h"
 
 // The local player's steering: the outputs of the sinks.
-// GLOBAL: MW2 0x100b2500
 PlayerSteering g_localSteering = {0};
 
 // The outputs of the sinks past the steering. pilot_tilt and pilot_pan are the cockpit
 // view's look offsets, zoom_factor the view scale (16.16, reset to 1 by FirstEyepoint), and the
 // glance sinks look aside while one is held.
-// GLOBAL: MW2 0x100b2548
 MechS32 g_sinkPilotTilt = 0;
 
-// GLOBAL: MW2 0x100b254c
 MechS32 g_sinkPilotPan = 0;
 
-// GLOBAL: MW2 0x100b2550
 MechS32 g_sinkEyepointTilt = 0;
 
-// GLOBAL: MW2 0x100b2554
 MechS32 g_sinkEyepointPanDelta = 0;
 
-// GLOBAL: MW2 0x100b2558
 MechS32 g_sinkEyepointSlideDelta = 0;
 
-// GLOBAL: MW2 0x100b255c
 MechS32 g_sinkTrackDistanceDelta = 0;
 
-// GLOBAL: MW2 0x100b2560
 MechS32 g_sinkTrackHeightDelta = 0;
 
-// GLOBAL: MW2 0x100b2564
 MechS32 g_sinkZoomFactor = 0;
 
-// GLOBAL: MW2 0x100b2568
 MechS8 g_sinkPilotTiltPlus = 0;
 
-// GLOBAL: MW2 0x100b2569
 MechS8 g_sinkPilotTiltMinus = 0;
 
-// GLOBAL: MW2 0x100b256a
 MechS8 g_sinkPilotTiltReset = 0;
 
-// GLOBAL: MW2 0x100b256b
 MechS8 g_sinkPilotPanPlus = 0;
 
-// GLOBAL: MW2 0x100b256c
 MechS8 g_sinkPilotPanMinus = 0;
 
-// GLOBAL: MW2 0x100b256d
 MechS8 g_sinkPilotPanReset = 0;
 
-// GLOBAL: MW2 0x100b256e
 MechS8 g_sinkGlanceLeft = 0;
 
-// GLOBAL: MW2 0x100b256f
 MechS8 g_sinkGlanceRight = 0;
 
-// GLOBAL: MW2 0x100b2570
 MechS8 g_sinkGlanceUp = 0;
 
-// GLOBAL: MW2 0x100b2571
 MechS8 g_sinkGlanceDown = 0;
 
-// GLOBAL: MW2 0x100b2572
 MechS8 g_sinkEyepointTiltPlus = 0;
 
-// GLOBAL: MW2 0x100b2573
 MechS8 g_sinkEyepointTiltMinus = 0;
 
-// GLOBAL: MW2 0x100b2574
 MechS8 g_sinkEyepointTiltReset = 0;
 
-// GLOBAL: MW2 0x100b2575
 MechS8 g_sinkEyepointPanPlus = 0;
 
-// GLOBAL: MW2 0x100b2576
 MechS8 g_sinkEyepointPanMinus = 0;
 
-// GLOBAL: MW2 0x100b2577
 MechS8 g_sinkEyepointPanReset = 0;
 
-// GLOBAL: MW2 0x100b2578
 MechS8 g_sinkEyepointSlidePlus = 0;
 
-// GLOBAL: MW2 0x100b2579
 MechS8 g_sinkEyepointSlideMinus = 0;
 
-// GLOBAL: MW2 0x100b257a
 MechS8 g_sinkTrackDistancePlus = 0;
 
-// GLOBAL: MW2 0x100b257b
 MechS8 g_sinkTrackDistanceMinus = 0;
 
-// GLOBAL: MW2 0x100b257c
 MechS8 g_sinkTrackHeightPlus = 0;
 
-// GLOBAL: MW2 0x100b257d
 MechS8 g_sinkTrackHeightMinus = 0;
 
-// GLOBAL: MW2 0x100b257e
 MechS8 g_sinkZoomFactorPlus = 0;
 
-// GLOBAL: MW2 0x100b257f
 MechS8 g_sinkZoomFactorMinus = 0;
 
-// GLOBAL: MW2 0x100b2580
 MechS8 g_sinkZoomFactorReset = 0;
 
-// GLOBAL: MW2 0x100b2588
 MechS32 g_sinkMenuItem = 0;
 
-// GLOBAL: MW2 0x100b258c
 MechS32 g_sinkMenuValue = 0;
 
-// GLOBAL: MW2 0x100b2592
 MechS8 g_sinkMenuItemReset = 0;
 
-// GLOBAL: MW2 0x100b2595
 MechS8 g_sinkMenuValueReset = 0;
 
-// GLOBAL: MW2 0x100b2596
 MechS8 g_sinkMenuEnter = 0;
 
-// GLOBAL: MW2 0x100b2597
 MechS8 g_sinkMenuAbort = 0;
 
-// GLOBAL: MW2 0x100b25a4
 MechS32 g_gameplayInputEnabled = 1;
 
 // The sinks the input layer writes.
-// GLOBAL: MW2 0x100b7388
 InputSink g_inputSinks[] = {
 	{"torso_tilt", &g_localSteering.m_torsoTilt, 0, 0, -60, 60, 4, 0},
 	{"torso_tilt_plus", &g_localSteering.m_torsoTiltPlus, 1, 0, 0, 0, 0, 0},
@@ -225,13 +181,11 @@ InputSink g_inputSinks[] = {
 	{"menu_abort", &g_sinkMenuAbort, 2, 0, 0, 0, 0, 0},
 };
 
-// FUNCTION: MW2 0x1007b768
 void DisableGameplayInput(void)
 {
 	g_gameplayInputEnabled = FALSE;
 }
 
-// FUNCTION: MW2 0x1007b77d
 void EnableGameplayInput(void)
 {
 	g_gameplayInputEnabled = TRUE;

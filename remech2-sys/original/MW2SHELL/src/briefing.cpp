@@ -28,20 +28,15 @@
 
 // The briefing's p_quote for LoadTextPages: empty, so the quote escapes in a briefing's text
 // expand to nothing. That is its only use, and it gives no name.
-// GLOBAL: MW2SHELL 0x10071cd8
 MechChar g_unk0x10071cd8[0x04] = "";
 
-// GLOBAL: MW2SHELL 0x10071cdc
 ButtonMenu* g_briefingMenu = NULL;
 
-// GLOBAL: MW2SHELL 0x10071ce0
 Page* g_briefingPage = NULL;
 
-// GLOBAL: MW2SHELL 0x10071ce4
 Collection* g_briefingPages = NULL;
 
 // The situation reader, while it is open.
-// GLOBAL: MW2SHELL 0x10071ce8
 ArchiveReader* g_situationReader = NULL;
 
 void BriefingCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, MechS32 p_msg);
@@ -49,8 +44,6 @@ void BriefingCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**,
 // Opens the briefing screen: lays the scenario's briefing text (its first four letters, padded
 // with '_', plus "BRF1") out on pages under the menu. A campaign's last mission briefs from
 // KTWOBRF1/KTJFBRF1 once the pilot's rank is high enough.
-// Not 100%: the stack slots of left, top, width, height and i are permuted.
-// FUNCTION: MW2SHELL 0x10046200
 void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, MechS32 p_campaign)
 {
 	MechS32 left;
@@ -138,7 +131,6 @@ void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, MechS32 p_campai
 }
 
 // The briefing screen's frame: ABORT, SITUATION (the text in a reader), LAUNCH and SKIP.
-// FUNCTION: MW2SHELL 0x10046653
 void BriefingCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, MechS32 p_msg)
 {
 	MechS32 result;

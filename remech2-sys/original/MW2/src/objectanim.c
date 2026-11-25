@@ -43,7 +43,6 @@
 #include <strings.h>
 
 // The state of ColorCycleTask's callback: the faces of a shape cycle through up to sixteen colors.
-// SIZE 0x50
 typedef struct ColorCycle {
 	Shape** m_shape;      // 0x00 — the star's shape (GetStaticShapeSlot)
 	Shape* m_model;       // 0x04
@@ -53,7 +52,6 @@ typedef struct ColorCycle {
 } ColorCycle;
 
 // The state of SpinTask's callback: an object turning at constant rates.
-// SIZE 0x1c
 typedef struct ObjectSpin {
 	Shape** m_shape;       // 0x00
 	SceneObject* m_object; // 0x04
@@ -65,7 +63,6 @@ typedef struct ObjectSpin {
 } ObjectSpin;
 
 // The state of OrbitTask's callback: an object circling while it turns.
-// SIZE 0x1c
 typedef struct ObjectOrbit {
 	Shape** m_shape;       // 0x00
 	SceneObject* m_object; // 0x04
@@ -78,7 +75,6 @@ typedef struct ObjectOrbit {
 
 // The state of ReelMotionTask's callback: an object moving through an animation (Reel)
 // in step with its player's animation state (m_animFlags to m_animRate).
-// SIZE 0x2c
 typedef struct ReelMotion {
 	Reel* m_reel;          // 0x00
 	Reel* m_initial;       // 0x04
@@ -94,7 +90,6 @@ typedef struct ReelMotion {
 } ReelMotion;
 
 // The state of PathTask's callback: a star's object following a path, eased by the ramps.
-// SIZE 0x88
 typedef struct PathFollower {
 	Shape** m_shape;       // 0x00 — the star's shape (GetStaticShapeSlot)
 	SceneObject* m_object; // 0x04
@@ -111,81 +106,52 @@ typedef struct PathFollower {
 	WrappedRamp m_roll;    // 0x74
 } PathFollower;
 
-DECOMP_SIZE_ASSERT(AmbientSound, 0x1e)
-DECOMP_SIZE_ASSERT(PathPoint, 0x1c)
-DECOMP_SIZE_ASSERT(Path, 0x744)
-DECOMP_SIZE_ASSERT(ColorCycle, 0x50)
-DECOMP_SIZE_ASSERT(ObjectSpin, 0x1c)
-DECOMP_SIZE_ASSERT(ObjectOrbit, 0x1c)
-DECOMP_SIZE_ASSERT(AnimFile, 0x8)
-DECOMP_SIZE_ASSERT(ReelMotion, 0x2c)
-DECOMP_SIZE_ASSERT(PathFollower, 0x88)
-DECOMP_SIZE_ASSERT(ReelEvent, 0x8)
-
 // Why ReelMotionTask last failed: 1 no player, 2 disabled, 3 no object, 4-7 missing state.
-// GLOBAL: MW2 0x100a6d64
 MechS32 g_reelMotionError = 0;
 
 // The number of entries in g_paths.
-// GLOBAL: MW2 0x100a6d68
 MechS32 g_pathCount = 0;
 
-// GLOBAL: MW2 0x100a6d6c
 MechS32 g_maxAnimNumber = 0;
 
 // The base of the animation numbers of the file being loaded.
-// GLOBAL: MW2 0x100a6d70
 MechS32 g_animBase = 0;
 
 // The number of entries in g_animFiles.
-// GLOBAL: MW2 0x100a6d74
 MechS32 g_animFileCount = 0;
 
 // Set to shade from the origin rather than the light (GetFaceShade).
-// GLOBAL: MW2 0x1010b530
 MechS32 g_directionalLight;
 
 // The outcodes of the polygon being built: any vertex's (or) and every vertex's (and).
-// GLOBAL: MW2 0x1010b53c
 MechU8 g_polygonOrCodes;
 
-// GLOBAL: MW2 0x1010b5b8
 MechU8 g_polygonAndCodes;
 
 // The projected vertices of the polygon being built, and their count.
-// GLOBAL: MW2 0x1010b550
 ProjectedVertex* g_polygonPoints[20];
 
-// GLOBAL: MW2 0x1010b5b0
 MechS32 g_polygonPointCount;
 
 // Where QueueFace copies the next polygon's vertex pointers in the draw buffer.
-// GLOBAL: MW2 0x1010b534
 MechU8* g_polygonPointCursor;
 
 // QueueFace's counts: faces it took (5bc), faces past the back-face test (538), vertices it
 // projected (5b4) and polygons it queued (5a8).
 
-// GLOBAL: MW2 0x1010b5bc
 MechS32 g_facesTried;
 
-// GLOBAL: MW2 0x1010b538
 MechS32 g_facesFrontFacing;
 
-// GLOBAL: MW2 0x1010b5b4
 MechS32 g_verticesTransformed;
 
-// GLOBAL: MW2 0x1010b5a8
 MechS32 g_polygonsQueued;
 
-// GLOBAL: MW2 0x100ea8e0
 Path g_paths[0x40];
 
 // The animations of the loaded animation files, by number.
-// GLOBAL: MW2 0x101079e0
 Reel* g_reels[0x780];
 
-// GLOBAL: MW2 0x101097e0
 AnimFile g_animFiles[60];
 
 // A timed callback (TimedCallbackFn) moving a thing's object through an animation. Its data is
@@ -193,9 +159,6 @@ AnimFile g_animFiles[60];
 // (g_lastPlayer). Each frame moves or turns the object by the frame's amount, spread over
 // the rate; the frame events jump to other frames by the player's animation state (m_motionState,
 // the frame it reached, and m_nextMotionState, the one it wants).
-// Stack-slot permutation of the locals. The original adds i before scaling frame in the
-// m_values[i] reads (index order).
-// FUNCTION: MW2 0x10046750
 MechS32 ReelMotionTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
 {
 	MechS32 next;
@@ -580,7 +543,6 @@ MechS32 ReelMotionTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS
 }
 
 // Scales p_value by mode p_mode: 1 by 1.5, 3 by 0.75, any other mode leaves it.
-// FUNCTION: MW2 0x100472fe
 MechS32 ScaleBySpeedLevel(MechS32 p_mode, MechS32 p_value)
 {
 	MechS32 result;
@@ -605,7 +567,6 @@ MechS32 ScaleBySpeedLevel(MechS32 p_mode, MechS32 p_value)
 
 // Loads the animation file p_ref unless it has been, and sets the base of its animation numbers
 // (g_animBase). Returns -1 if it was already loaded.
-// FUNCTION: MW2 0x10047380
 MechS32 LoadAnimFile(ResourceRef* p_ref)
 {
 	MechS32 result;
@@ -635,13 +596,11 @@ MechS32 LoadAnimFile(ResourceRef* p_ref)
 	return result;
 }
 
-// FUNCTION: MW2 0x10047462
 MechS32 GetAnimBase(void)
 {
 	return g_animBase;
 }
 
-// FUNCTION: MW2 0x10047477
 MechS32 GetReelMotionSize(void)
 {
 	return sizeof(ReelMotion);
@@ -649,8 +608,6 @@ MechS32 GetReelMotionSize(void)
 
 // A timed callback (TimedCallbackFn) cycling the face colors of a star's shape. Its data is
 // "<star id>;<color>,<color>,...": up to sixteen colors, each a palette row.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1004748c
 MechS32 ColorCycleTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
 {
 	MechChar* token;
@@ -736,8 +693,6 @@ MechS32 ColorCycleTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS
 
 // A timed callback (TimedCallbackFn) turning a star's object. Its data is
 // "<star id>;<x>,<y>,<z>,<period>": the turns in degrees per period of seconds.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1004771e
 MechS32 SpinTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
 {
 	MechS32 dz;
@@ -823,8 +778,6 @@ MechS32 SpinTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_p
 
 // A timed callback (TimedCallbackFn) moving a star's object around a circle. Its data is
 // "<star id>;<radius>,<period>,<enabled>,<unused>".
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x100479ec
 MechS32 OrbitTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
 {
 	MechChar* token;
@@ -915,8 +868,6 @@ MechS32 OrbitTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_
 
 // A timed callback (TimedCallbackFn) looping a sound on a star's object. Its data is
 // "<star id>;<range>,<sound name>,<enabled>".
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10047d10
 MechS32 AmbientSoundTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
 {
 	MechChar* token;
@@ -993,8 +944,6 @@ MechS32 AmbientSoundTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, Mec
 // A timed callback (TimedCallbackFn) moving a star's object along a path. Its data is
 // "<star id>;<mode>,<rotate>,<path name>": mode "loop", "repeat" or else stop at the end, and
 // "rotate" to turn the object along the path. Event -1 restarts it.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10047f60
 MechS32 PathTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
 {
 	MechChar rotate[64];
@@ -1311,8 +1260,6 @@ static MechS32 Interpolate(MechS32 p_from, MechS32 p_to, MechS32 p_toPlane, Mech
 // Returns the vertex's projected copy (m_projection), transforming it into view space
 // (g_viewProjX0's rows, from the eyepoint g_viewEyeY) the first time. The transform is an
 // __asm block.
-// Stack-slot permutation of the locals the __asm blocks name.
-// FUNCTION: MW2 0x10048c50
 ProjectedVertex* GetViewVertex(Vertex* p_vertex)
 {
 	ProjectedVertex* result = p_vertex->m_projection;
@@ -1338,8 +1285,6 @@ ProjectedVertex* GetViewVertex(Vertex* p_vertex)
 // Returns a new projected vertex where the edge from p_a to p_b crosses the near plane
 // (g_viewNear), its position and texture coordinates interpolated. The body is an __asm
 // block.
-// Stack-slot permutation of the locals the __asm block names.
-// FUNCTION: MW2 0x10048d46
 ProjectedVertex* ClipEdgeToNearPlane(Vertex* p_a, Vertex* p_b)
 {
 	ProjectedVertex* a;
@@ -1413,7 +1358,6 @@ ProjectedVertex* ClipEdgeToNearPlane(Vertex* p_a, Vertex* p_b)
 // Projects a view-space vertex onto the screen once per frame (m_projected), with its clip
 // outcodes (m_unk0x1c: 1 left, 2 right, 4 top, 8 bottom), accumulates the outcodes of the
 // polygon being built and adds the vertex to its list (up to 20). The body is an __asm block.
-// FUNCTION: MW2 0x10048ebe
 ProjectedVertex* ProjectVertex(ProjectedVertex* p_vertex)
 {
 	MechS32 screen;
@@ -1458,8 +1402,6 @@ ProjectedVertex* ProjectVertex(ProjectedVertex* p_vertex)
 // Returns the shade (0x7f: full) of p_face from the angle between its normal and the direction
 // from its first vertex to the light (g_viewLightZ, or the origin with g_directionalLight). The
 // shading is an __asm block.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10048faf
 MechS32 GetFaceShade(Face* p_face, Vertex* p_vertices)
 {
 	Vertex* vertex = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset]];
@@ -1532,8 +1474,6 @@ MechS32 GetFaceShade(Face* p_face, Vertex* p_vertices)
 // the average (2), nearest (4) or farthest of its vertices' depths. The back-face test, the
 // projection, the clipping walk and the depth rules are __asm blocks; the first keeps the normal's
 // z in depth.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10049155
 void QueueFace(Face* p_face, Vertex* p_vertices)
 {
 	Vertex* vertex;

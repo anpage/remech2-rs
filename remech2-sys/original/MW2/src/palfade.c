@@ -6,11 +6,6 @@
 #include "simmain.h"
 #include "types.h"
 
-DECOMP_SIZE_ASSERT(PaletteCycle, 0x0d)
-DECOMP_SIZE_ASSERT(PaletteFade, 0x19)
-
-// Matches except for the stack slots of i and dst (a consistent permutation).
-// FUNCTION: MW2 0x10010ad0
 MechS32 InitPaletteCycle(PaletteCycle* p_cycle, MechU8* p_palette, MechU8 p_first, MechS32 p_count)
 {
 	MechU8* working;
@@ -33,7 +28,6 @@ MechS32 InitPaletteCycle(PaletteCycle* p_cycle, MechU8* p_palette, MechU8 p_firs
 	return 1;
 }
 
-// FUNCTION: MW2 0x10010b6e
 void RotatePaletteCycle(PaletteCycle* p_cycle)
 {
 	MechU8* p;
@@ -60,7 +54,6 @@ void RotatePaletteCycle(PaletteCycle* p_cycle)
 	g_currentDisplayBackend->m_setPaletteWithBrightness((PaletteColor*) p_cycle->m_working);
 }
 
-// FUNCTION: MW2 0x10010c3d
 void FreePaletteCycle(PaletteCycle* p_cycle)
 {
 	if (p_cycle->m_working) {
@@ -71,8 +64,6 @@ void FreePaletteCycle(PaletteCycle* p_cycle)
 	g_currentDisplayBackend->m_setPaletteWithBrightness((PaletteColor*) p_cycle->m_original);
 }
 
-// Matches except for the stack slots of i and accum (a consistent permutation).
-// FUNCTION: MW2 0x10010c85
 MechS32 InitPaletteFade(
 	PaletteFade* p_fade,
 	MechU8* p_from,
@@ -112,8 +103,6 @@ MechS32 InitPaletteFade(
 	return 1;
 }
 
-// Matches except for the stack slots of i and accum (a consistent permutation).
-// FUNCTION: MW2 0x10010d99
 void StepPaletteFade(PaletteFade* p_fade, MechS32 p_count)
 {
 	MechU8* palette;

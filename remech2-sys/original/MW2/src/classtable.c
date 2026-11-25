@@ -20,29 +20,20 @@
 #include "types.h"
 #include "wtbshapes.h"
 
-DECOMP_SIZE_ASSERT(ClassEntry, 0x44)
-
 // A player's model level as ChoosePlayerDetailLevels chooses it.
-// SIZE 0x0c
 typedef struct PlayerDetail {
 	MechS32 m_distance; // 0x00 — from the eyepoint
 	MechS32 m_level;    // 0x04 — -2 until chosen by distance
 	MechS32 m_player;   // 0x08
 } PlayerDetail;
 
-// GLOBAL: MW2 0x100a37d4
 MechS32 g_classEntryCount = 0;
 
-// GLOBAL: MW2 0x100a37d8
 MechS32 g_classTableReady = 0;
 
-// GLOBAL: MW2 0x1012b7e0
 ClassEntry g_classTable[0x30c];
 
 // Loads the shapes of p_player's entries for its base level (m_baseLevel) into one pool block.
-// Stack-slot permutation: count, i and buffer.
-// Operand order: i < g_classEntryCount loads g_classEntryCount first in the original.
-// FUNCTION: MW2 0x1001ce90
 MechS32 LoadBaseLevelShapes(Player* p_player)
 {
 	MechS32 i;
@@ -75,8 +66,6 @@ MechS32 LoadBaseLevelShapes(Player* p_player)
 // Adds p_unk0x00 as level p_level of a class entry: level 0 starts a new entry, a later level
 // goes to entry p_index. The unset levels above it take the same value. Returns the entry's
 // index, or -1.
-// Stack-slot permutation: index and i.
-// FUNCTION: MW2 0x1001cf93
 MechS32 AddClassEntryLevel(
 	MechS32 p_unk0x00,
 	undefined4 p_unk0x04,
@@ -143,8 +132,6 @@ MechS32 AddClassEntryLevel(
 	return index;
 }
 
-// Stack-slot permutation: entry and level.
-// FUNCTION: MW2 0x1001d12a
 void ResetClassTable(void)
 {
 	ClassEntry* entry;
@@ -172,8 +159,6 @@ void ResetClassTable(void)
 }
 
 // Gives the entries added since the last call (owner -2) to p_player.
-// Operand order: i < g_classEntryCount loads g_classEntryCount first in the original.
-// FUNCTION: MW2 0x1001d220
 void ClaimNewClassEntries(Player* p_player)
 {
 	MechS32 i;
@@ -192,8 +177,6 @@ void ClaimNewClassEntries(Player* p_player)
 
 // Loads the level-p_level shapes of p_owner's entries, or, for a player with flag 2, keeps the
 // shape already loaded. Returns 0 when a shape doesn't load.
-// Stack-slot permutation: i and result.
-// FUNCTION: MW2 0x1001d292
 MechS32 LoadClassLevel(MechS32 p_owner, MechS32 p_level)
 {
 	MechS32 i;
@@ -229,7 +212,6 @@ MechS32 LoadClassLevel(MechS32 p_owner, MechS32 p_level)
 }
 
 // Releases the level-p_level shapes of p_owner's entries.
-// FUNCTION: MW2 0x1001d3a4
 void ReleaseClassLevel(MechS32 p_owner, MechS32 p_level)
 {
 	MechS32 i;
@@ -244,8 +226,6 @@ void ReleaseClassLevel(MechS32 p_owner, MechS32 p_level)
 // Loads the level-p_level shape of entry p_index in place of the one it has, and gives it an object:
 // under its player's object, or under the object (or shape object) of entry m_unk0x1c, made in
 // p_buffer if given. Returns whether the entry has its shape.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1001d3ff
 MechS32 LoadClassEntryShape(MechS32 p_index, MechS32 p_level, void* p_buffer)
 {
 	MechS32 kind;
@@ -370,8 +350,6 @@ MechS32 LoadClassEntryShape(MechS32 p_index, MechS32 p_level, void* p_buffer)
 }
 
 // Releases the shapes of the first player whose m_detailLevel names a level, and clears it.
-// Operand order: i < g_playerCount loads g_playerCount first in the original.
-// FUNCTION: MW2 0x1001d88b
 void ReleasePendingDetailLevel(void)
 {
 	MechS32 i;
@@ -388,7 +366,6 @@ void ReleasePendingDetailLevel(void)
 }
 
 // Releases entry p_index's shape if it is the one loaded for level p_level.
-// FUNCTION: MW2 0x1001d912
 void ReleaseClassEntryShape(MechS32 p_index, MechS32 p_level)
 {
 	ClassEntry* entry;
@@ -401,7 +378,6 @@ void ReleaseClassEntryShape(MechS32 p_index, MechS32 p_level)
 	}
 }
 
-// FUNCTION: MW2 0x1001d980
 struct SceneObject* GetClassObject(MechS32 p_index)
 {
 	struct SceneObject* obj;
@@ -414,8 +390,6 @@ struct SceneObject* GetClassObject(MechS32 p_index)
 	return obj;
 }
 
-// Operand order: p_index < g_classEntryCount loads p_index first in the original.
-// FUNCTION: MW2 0x1001d9ca
 Shape* GetClassShape(MechS32 p_index)
 {
 	Shape* shape;
@@ -428,7 +402,6 @@ Shape* GetClassShape(MechS32 p_index)
 	return shape;
 }
 
-// FUNCTION: MW2 0x1001da14
 void SetClassEntryPartId(MechS32 p_index, MechU16 p_value)
 {
 	ClassEntry* entry;
@@ -440,8 +413,6 @@ void SetClassEntryPartId(MechS32 p_index, MechU16 p_value)
 // Chooses each player's model level (Player::m_detailLevel) by its distance from the eyepoint: the
 // nearest player within range gets level 0, the next two level 1, the rest 2 or 3 by distance.
 // The local player's own view (GetViewMode == 0) takes level 4, and dead players 0 or 1.
-// Stack-slot permutation; i == g_localPlayerId compares in the other operand order.
-// FUNCTION: MW2 0x1001da44
 void ChoosePlayerDetailLevels(void)
 {
 	MechS32 scale;
@@ -546,8 +517,6 @@ void ChoosePlayerDetailLevels(void)
 }
 
 // Releases the shape of the entry whose object is p_obj.
-// Stack-slot permutation: i and entry.
-// FUNCTION: MW2 0x1001ddf2
 void ReleaseObjShape(struct SceneObject* p_obj)
 {
 	MechS32 i;
@@ -569,8 +538,6 @@ void ReleaseObjShape(struct SceneObject* p_obj)
 }
 
 // Forgets the shape of the entry whose object is p_obj without releasing it.
-// Operand order: i < g_classEntryCount loads g_classEntryCount first in the original.
-// FUNCTION: MW2 0x1001de84
 void ForgetObjShape(struct SceneObject* p_obj)
 {
 	ClassEntry* entry;

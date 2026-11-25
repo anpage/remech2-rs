@@ -5,7 +5,6 @@
 #include "types.h"
 
 // A voice message: the sound resource and the text shown without digital sound.
-// SIZE 0x0c
 typedef struct SpeechLine {
 	MechS32 m_id;     // 0x00 — a sound resource, or 0
 	MechChar* m_text; // 0x04

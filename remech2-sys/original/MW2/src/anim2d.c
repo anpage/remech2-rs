@@ -14,22 +14,14 @@
 // Frame projections (a table of 96) and 2D animations: up to seven SHP resources whose frames
 // play on the clock, once or looping, drawn into a pane.
 
-DECOMP_SIZE_ASSERT(FramePrj, 0x08)
-DECOMP_SIZE_ASSERT(Anim2d, 0x1c)
-
-// GLOBAL: MW2 0x100a156c
 MechS32 g_framePrjCount = -1;
 
-// GLOBAL: MW2 0x100a158c
 MechS32 g_anim2dCount = 0;
 
-// GLOBAL: MW2 0x10179b60
 Anim2d* g_anim2ds[7];
 
-// GLOBAL: MW2 0x10179b80
 FramePrj g_framePrjs[0x60];
 
-// FUNCTION: MW2 0x10007510
 MechS32 LoadFramePrj(MechU16 p_id, MechS16 p_unk0x04, MechS16 p_unk0x06)
 {
 	FramePrj* prj;
@@ -49,7 +41,6 @@ MechS32 LoadFramePrj(MechU16 p_id, MechS16 p_unk0x04, MechS16 p_unk0x06)
 	return g_framePrjCount++;
 }
 
-// FUNCTION: MW2 0x1000759c
 void ResetFramePrjs(void)
 {
 	MechS32 i;
@@ -63,7 +54,6 @@ void ResetFramePrjs(void)
 	g_framePrjCount = 0;
 }
 
-// FUNCTION: MW2 0x100075eb
 void ClearFramePrj(FramePrj* p_prj)
 {
 	p_prj->m_id = -1;
@@ -71,7 +61,6 @@ void ClearFramePrj(FramePrj* p_prj)
 	p_prj->m_unk0x06 = 0;
 }
 
-// FUNCTION: MW2 0x10007611
 MechS16 LoadAnim2d(MechU32 p_flags, MechS32 p_frameTime, MechS32 p_type, MechS16* p_resourceId)
 {
 	Anim2d* anim;
@@ -104,7 +93,6 @@ MechS16 LoadAnim2d(MechU32 p_flags, MechS32 p_frameTime, MechS32 p_type, MechS16
 }
 
 // Frees one animation, or all of them for a negative index.
-// FUNCTION: MW2 0x100076ea
 void FreeAnim2ds(MechS32 p_index)
 {
 	if (p_index >= 0) {
@@ -117,7 +105,6 @@ void FreeAnim2ds(MechS32 p_index)
 	}
 }
 
-// FUNCTION: MW2 0x1000773a
 void FreeAnim2d(MechS32 p_index)
 {
 	if (g_anim2ds[p_index]) {
@@ -132,8 +119,6 @@ void FreeAnim2d(MechS32 p_index)
 
 // Draws the animation's current frame, loading its shape on first use. The index test never
 // rejects anything (the original tests p_index < 0 && p_index >= 7).
-// Stack-slot permutation: frame and anim.
-// FUNCTION: MW2 0x100077b3
 void DrawAnim2d(PANE* p_target, MechS32 p_index, MechS32 p_x, MechS32 p_y)
 {
 	MechS32 frame;
@@ -210,7 +195,6 @@ void DrawAnim2d(PANE* p_target, MechS32 p_index, MechS32 p_x, MechS32 p_y)
 }
 
 // Restarts the animation. As in DrawAnim2d, the index test never rejects anything.
-// FUNCTION: MW2 0x10007987
 void RestartAnim2d(MechS32 p_index)
 {
 	if (p_index < 0 && p_index >= 7) {

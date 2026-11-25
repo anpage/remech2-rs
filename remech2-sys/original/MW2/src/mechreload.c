@@ -22,21 +22,16 @@
 #include <string.h>
 
 // The player whose mech ReloadPlayerMech is reloading, or -1.
-// GLOBAL: MW2 0x100ba690
 MechS32 g_reloadingPlayer = -1;
 
-// GLOBAL: MW2 0x100ba694
 MechS32 g_unk0x100ba694 = 0;
 
-// GLOBAL: MW2 0x100ba698
 RememberedMech g_rememberedMechs[60] = {0};
 
-// GLOBAL: MW2 0x100babc0
 MechSegment* g_mechSegments[60] = {NULL};
 
 // Reloads player p_player's mech as it was remembered. Without p_force, only a player with
 // flag 2 set. The original was declared without a prototype, and two callers passed two more zeros.
-// FUNCTION: MW2 0x1007fbe0
 MechS32 ReloadPlayerMech(MechS32 p_player, MechS32 p_force)
 {
 	Mech* mech;
@@ -113,7 +108,6 @@ MechS32 ReloadPlayerMech(MechS32 p_player, MechS32 p_force)
 	return 1;
 }
 
-// FUNCTION: MW2 0x1007fecf
 void RememberLoadMech(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p_config)
 {
 	MechS32 id;
@@ -133,7 +127,6 @@ void RememberLoadMech(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p_
 	strcpy(g_rememberedMechs[id].m_config, p_config);
 }
 
-// FUNCTION: MW2 0x1007ff9c
 void RememberMechSegments(Mech* p_mech)
 {
 	SceneObject* obj;
@@ -154,7 +147,6 @@ void RememberMechSegments(Mech* p_mech)
 	g_mechSegments[id] = SaveMechSegments(obj);
 }
 
-// FUNCTION: MW2 0x10080014
 SceneObject* RestoreMechSegments(MechSegment* p_segment)
 {
 	SceneObject* obj;
@@ -177,7 +169,6 @@ SceneObject* RestoreMechSegments(MechSegment* p_segment)
 	return obj;
 }
 
-// FUNCTION: MW2 0x100800e3
 MechSegment* SaveMechSegments(SceneObject* p_obj)
 {
 	MechSegment* segment;

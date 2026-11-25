@@ -35,7 +35,6 @@ typedef MechS32 (*PlayerCreatedFn)(MechS32 p_index, Player* p_player);
 
 #pragma pack(push, 1)
 
-// SIZE 0x1aa
 struct Player {
 	MechS32 m_type;        // 0x00 — c_playerType…
 	MechS32 m_index;       // 0x04

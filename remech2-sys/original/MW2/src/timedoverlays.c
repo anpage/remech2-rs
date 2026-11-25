@@ -16,27 +16,18 @@
 
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(TimedOverlay, 0x24)
-
-// GLOBAL: MW2 0x100adee0
 PANE g_topMessagePane = {&g_mainPixelBuffer, 0, 0, 0x10000, 0x10000};
 
-// GLOBAL: MW2 0x100adef4
 undefined4 g_unk0x100adef4 = 0;
 
-// GLOBAL: MW2 0x100adef8
 PANE g_bottomMessagePane = {&g_mainPixelBuffer, 0, 0, 0x10000, 0x10000};
 
-// GLOBAL: MW2 0x100adf0c
 undefined4 g_unk0x100adf0c = 0;
 
-// GLOBAL: MW2 0x100c3360
 MechChar g_bottomMessageText[0x100];
 
-// GLOBAL: MW2 0x100c3460
 MechChar g_topMessageText[0x100];
 
-// GLOBAL: MW2 0x100adf10
 TimedOverlay g_timedOverlays[2] = {
 	{g_topMessageText, {0x28f, 0}, 0, 0, 1, 0x4c, 0, &g_topMessagePane},
 	{g_bottomMessageText, {0x28f, 0}, 0, 0, 1, 0x4c, 0, &g_bottomMessagePane}
@@ -45,8 +36,6 @@ TimedOverlay g_timedOverlays[2] = {
 // Lays out the message boxes: scales their rectangles to the screen and to their background
 // shapes, moves them to the top (the first) and bottom (the second) edge, and centers the
 // text vertically.
-// Stack-slot permutation: the locals.
-// FUNCTION: MW2 0x1006ee60
 void LayoutMessageBoxes(void)
 {
 	MechS32 fontHeight;
@@ -102,8 +91,6 @@ void LayoutMessageBoxes(void)
 
 // Shows p_text in a free message box for p_duration ticks, or replaces the one of the lowest
 // priority not above p_priority (of those, the one that expires last). Returns 1 if shown.
-// Stack-slot permutation: the locals.
-// FUNCTION: MW2 0x1006efd4
 MechS32 ShowInGameMessage(MechChar* p_text, MechS32 p_font, MechS32 p_duration, MechS32 p_priority)
 {
 	MechS32 result;
@@ -163,8 +150,6 @@ MechS32 ShowInGameMessage(MechChar* p_text, MechS32 p_font, MechS32 p_duration, 
 	return result;
 }
 
-// Stack-slot permutation: the locals.
-// FUNCTION: MW2 0x1006f179
 void DrawTimedOverlays(void)
 {
 	MechS32 i;
@@ -211,8 +196,6 @@ void DrawTimedOverlays(void)
 
 // Draws text in a box sized to it, on a tiled background shape (p_background, -1 for none),
 // at p_x, p_y or centered on the screen along an axis where that is negative.
-// Stack-slot permutation: the locals.
-// FUNCTION: MW2 0x1006f28f
 void DrawTextBox(MechS32 p_background, MechS32 p_font, MechChar* p_text, MechS32 p_x, MechS32 p_y)
 {
 	PANE centered;
@@ -265,7 +248,6 @@ void DrawTextBox(MechS32 p_background, MechS32 p_font, MechChar* p_text, MechS32
 }
 
 // Draws a TEXT resource, stored with each character negated (mod 256), as DrawTextBox does.
-// FUNCTION: MW2 0x1006f3ea
 void DrawTextResourceBox(MechS32 p_background, MechS32 p_font, MechS32 p_id, MechS32 p_x, MechS32 p_y)
 {
 	MechChar* text;

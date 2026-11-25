@@ -6,7 +6,6 @@
 
 class TextGlyph;
 
-// SIZE 0x2c
 // One labelled field of a shell screen. Screens keep them in tables ended by m_left == -1; the
 // callback at 0x1c draws the field and returns its glyph. Its data at 0x24 depends on the callback:
 // a MechS32* or MechChar** to the value shown, a string, a flag, or an index.

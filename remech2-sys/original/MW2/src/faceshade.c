@@ -15,11 +15,9 @@
 
 // Set by the world stream (BwdExecuteStream): GetFaceColor brightens damaged shapes instead of
 // dimming them.
-// GLOBAL: MW2 0x100a555c
 MechS32 g_brightenDamage = 0;
 
 // The eyepoint's ambient light (SelectEyepoint): ComputeShade's base shade, out of 0x80.
-// GLOBAL: MW2 0x1010b540
 MechS32 g_ambientLight;
 
 MechS32 ComputeShade(MechS32 p_light, MechS32 p_value, MechS32 p_distance);
@@ -28,8 +26,6 @@ MechS32 ComputeShade(MechS32 p_light, MechS32 p_value, MechS32 p_distance);
 // (ComputeShade, from the face's light and p_distance) with the color bits of p_color, or in the
 // wireframe views (m_wireframe) a fixed color by the shape's type. Textured faces of the kinds in
 // m_untexturedKinds are drawn in a flat color instead.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10036230
 MechU32 GetFaceColor(Face* p_face, Vertex* p_vertices, MechU32 p_color, MechS32 p_distance)
 {
 	MechS32 shade;
@@ -207,7 +203,6 @@ MechU32 GetFaceColor(Face* p_face, Vertex* p_vertices, MechU32 p_color, MechS32 
 
 // Returns a shade from 0 to 15 for a light level p_light (out of 0x80) and a brightness
 // p_value, dimmed with the distance p_distance.
-// FUNCTION: MW2 0x100367c5
 MechS32 ComputeShade(MechS32 p_light, MechS32 p_value, MechS32 p_distance)
 {
 	MechS32 shade;
@@ -229,19 +224,16 @@ MechS32 ComputeShade(MechS32 p_light, MechS32 p_value, MechS32 p_distance)
 
 // Switches the texture maps of the shape kinds in p_flags on or off (the TOGGLE_..._TEXT_MAPS
 // keys).
-// FUNCTION: MW2 0x10036853
 void ToggleTextureMaps(MechU32 p_flags)
 {
 	g_renderSettings.m_untexturedKinds ^= p_flags;
 }
 
-// FUNCTION: MW2 0x10036867
 MechS32 AreTextureMapsOn(MechU32 p_flags)
 {
 	return !(p_flags & g_renderSettings.m_untexturedKinds);
 }
 
-// FUNCTION: MW2 0x10036891
 void EnableTextureMaps(MechU32 p_flags, MechS32 p_enable)
 {
 	if (p_enable) {
@@ -253,13 +245,11 @@ void EnableTextureMaps(MechU32 p_flags, MechS32 p_enable)
 }
 
 // The display detail setting: textures with perspective correction.
-// FUNCTION: MW2 0x100368bf
 MechS32 ArePerspectiveTexturesOn(undefined4 p_unk0x00)
 {
 	return !g_renderSettings.m_affineTextures;
 }
 
-// FUNCTION: MW2 0x100368e8
 void EnablePerspectiveTextures(undefined4 p_unk0x00, MechS32 p_enable)
 {
 	if (!p_enable) {

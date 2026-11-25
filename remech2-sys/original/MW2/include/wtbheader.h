@@ -6,7 +6,6 @@
 
 // The header of a shape record ("WTBO") that LoadShapeRecord reads: m_vertexCount WtbVertex
 // entries and m_faceCount WtbFace entries follow it.
-// SIZE 0x20
 typedef struct WtbHeader {
 	MechS32 m_tag;         // 0x00 — "WTBO"
 	MechS32 m_checksum;    // 0x04 — of the vertices and faces, modulo 0x100000

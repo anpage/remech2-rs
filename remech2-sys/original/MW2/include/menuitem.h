@@ -20,7 +20,6 @@ typedef void (*MenuItemRunFn)(
 );
 
 // An item of a menu page.
-// SIZE 0x14
 typedef struct MenuItem {
 	MechS32 m_type; // 0x00 — 0: opens m_subpage, 2: accepts (and goes back), 3: a heading without a
 					// number, 5 and 6: close the page (ApplyMenuKey)

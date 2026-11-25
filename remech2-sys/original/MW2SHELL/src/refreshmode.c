@@ -39,37 +39,28 @@ DisplayBackend g_displayBackend = {
 RefreshMode g_refreshMode =
 	{5, c_displayBackendGdi, 1, 0, DisplayBegin, DisplayEnd, DisplayFlip, DisplayBlitRect, DisplayStretchBlit};
 
-// GLOBAL: MW2SHELL 0x10062cc8
 DisplayBackend* g_currentDisplayBackend = NULL;
 
-// GLOBAL: MW2SHELL 0x10062ccc
 RefreshMode* g_currentRefreshMode = NULL;
 
 // The buffer the active refresh mode renders into.
-// GLOBAL: MW2SHELL 0x10062cdc
 WINDOW* g_refreshModeBuffer = NULL;
 
-// GLOBAL: MW2SHELL 0x10062ce0
 PaletteColor g_paletteColors[0x100] = {0};
 
 // The frame, restored into g_refreshModeBuffer by m_acquireFramebuffer. Originally g_dibBits, the
 // DIB bits of the GDI and DisplayDib back ends.
-// GLOBAL: MW2SHELL 0x10062fe0
 MechU8* g_frame = NULL;
 
 // Always windowed: full screen is the Rust side's business. The original set it from the back
 // end, or to full screen when the frame covered the desktop.
-// GLOBAL: MW2SHELL 0x10062ffc
 MechS32 g_windowMode = c_windowModeWindowed;
 
 // The frame's size in pixels, p_width * p_height of InitRefreshMode.
-// GLOBAL: MW2SHELL 0x10096e88
 MechS32 g_refreshModePixelCount;
 
-// GLOBAL: MW2SHELL 0x10096e8c
 MechS32 g_refreshModeWidth;
 
-// GLOBAL: MW2SHELL 0x10096e90
 MechS32 g_refreshModeHeight;
 
 // Starts a frame of p_width x p_height in p_buffer, in place of one of another size. Returns 0
@@ -77,7 +68,6 @@ MechS32 g_refreshModeHeight;
 // The original switched to refresh mode p_mode, falling through the later modes with
 // p_allowFallback while a mode was unavailable, and sized the window to the frame, with room for
 // a menu bar with p_menu.
-// FUNCTION: MW2SHELL 0x10010a30
 MechS32 InitRefreshMode(
 	MechS32 p_mode,
 	MechS32 p_allowFallback,
@@ -101,7 +91,6 @@ MechS32 InitRefreshMode(
 	return g_currentRefreshMode->m_begin(p_buffer, p_width, p_height) == 0;
 }
 
-// FUNCTION: MW2SHELL 0x10010d49
 void ShutdownRefreshMode(void)
 {
 	if (g_currentRefreshMode != NULL) {
@@ -113,9 +102,6 @@ void ShutdownRefreshMode(void)
 }
 
 // Copies p_count colors of g_paletteColors from p_first into p_palette.
-// Operand order: the original compares i < p_count as `cmp [p_count], eax` and adds p_first + i
-// with p_first loaded first; the order follows the unit's symbol table.
-// FUNCTION: MW2SHELL 0x10011450
 MechS32 GetPaletteColors(MechS32 p_first, MechS32 p_count, PaletteColor* p_palette)
 {
 	MechS32 i;

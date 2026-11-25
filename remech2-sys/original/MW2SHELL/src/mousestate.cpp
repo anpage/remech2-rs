@@ -10,12 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-DECOMP_SIZE_ASSERT(MouseState, 0x43)
-
-// GLOBAL: MW2SHELL 0x100904a8
 MechChar g_cursorPositionText[0x20];
 
-// ReadMouseState's bounds test keeps a jmp per return: an /Ob1-expanded inline function.
 inline MechS32 IsInsideWindow(MechPoint& p_point)
 {
 	if (p_point.x < 0 || p_point.x >= g_windowWidth) {
@@ -28,7 +24,6 @@ inline MechS32 IsInsideWindow(MechPoint& p_point)
 	return TRUE;
 }
 
-// FUNCTION: MW2SHELL 0x1003a790
 MouseState::MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_cursorShape)
 {
 	m_videoDriver = p_videoDriver;
@@ -49,7 +44,6 @@ MouseState::MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_cursorS
 	FUN_1003a91c(0);
 }
 
-// FUNCTION: MW2SHELL 0x1003a884
 void MouseState::MoveCursorTo(MechS32 p_x, MechS32 p_y)
 {
 	if (!m_enabled) {
@@ -59,7 +53,6 @@ void MouseState::MoveCursorTo(MechS32 p_x, MechS32 p_y)
 	MechMouseSetPosition(p_x, p_y);
 }
 
-// FUNCTION: MW2SHELL 0x1003a8d8
 MouseState::~MouseState()
 {
 	if (!m_enabled) {
@@ -67,7 +60,6 @@ MouseState::~MouseState()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003a900
 undefined MouseState::GetDoubleClicked()
 {
 	return m_doubleClicked;
@@ -75,30 +67,25 @@ undefined MouseState::GetDoubleClicked()
 
 // Empty. The constructor calls it with 0, but neither the body nor the call says what it was
 // for, so it keeps its placeholder.
-// FUNCTION: MW2SHELL 0x1003a91c
 void MouseState::FUN_1003a91c(undefined4)
 {
 }
 
-// FUNCTION: MW2SHELL 0x1003a934
 undefined4 MouseState::GetLeftPressed()
 {
 	return m_leftPressed;
 }
 
-// FUNCTION: MW2SHELL 0x1003a950
 undefined4 MouseState::GetRightPressed()
 {
 	return m_rightPressed;
 }
 
-// FUNCTION: MW2SHELL 0x1003a96c
 undefined4 MouseState::GetMiddlePressed()
 {
 	return m_middlePressed;
 }
 
-// FUNCTION: MW2SHELL 0x1003a988
 void MouseState::DrawCursorPosition()
 {
 	if (m_rightDown == 1) {
@@ -112,7 +99,6 @@ void MouseState::DrawCursorPosition()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003aa2a
 void MouseState::PressButton(MechS32 p_button)
 {
 	switch (p_button) {
@@ -133,8 +119,6 @@ void MouseState::PressButton(MechS32 p_button)
 	}
 }
 
-// The only diff is a stack-slot permutation of point, leftDown, rightDown and middleDown.
-// FUNCTION: MW2SHELL 0x1003aac5
 void MouseState::ReadMouseState()
 {
 	MechPoint point;

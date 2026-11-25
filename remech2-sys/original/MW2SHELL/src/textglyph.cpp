@@ -12,22 +12,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(TextGlyph, 0x3e)
-
 // Color remap tables for Font text. The first colors a link word, from its "\A" escape to the
 // next space.
-// GLOBAL: MW2SHELL 0x10074658
 undefined g_linkColorMap[256] = {0xff, 1};
 
 // Two more color maps like g_linkColorMap, mapping color 1 to 5 and to 8. InitTextColorMaps
 // builds them and nothing reads them, so nothing says what they were for.
-// GLOBAL: MW2SHELL 0x10074758
 undefined g_unk0x10074758[256] = {0xff, 5};
 
-// GLOBAL: MW2SHELL 0x10074858
 undefined g_unk0x10074858[256] = {0xff, 8};
 
-// FUNCTION: MW2SHELL 0x10047370
 void InitTextColorMaps()
 {
 	MechS32 i;
@@ -42,13 +36,11 @@ void InitTextColorMaps()
 	g_unk0x10074858[1] = 8;
 }
 
-// FUNCTION: MW2SHELL 0x10047404
 void TextGlyph::SetTyped(undefined4 p_typed)
 {
 	m_typed = p_typed;
 }
 
-// FUNCTION: MW2SHELL 0x10047425
 void TextGlyph::Draw()
 {
 	if (m_text != NULL && strlen(m_text) != 0) {
@@ -62,7 +54,6 @@ void TextGlyph::Draw()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100474ab
 void TextGlyph::DrawAllChars()
 {
 	MechS32 textIndex;
@@ -75,7 +66,6 @@ void TextGlyph::DrawAllChars()
 }
 
 // Draws the next character of the text, or handles the escape sequence starting at it.
-// FUNCTION: MW2SHELL 0x100474f0
 MechU8 TextGlyph::DrawNextChar()
 {
 	MechS32 i;
@@ -164,7 +154,6 @@ MechU8 TextGlyph::DrawNextChar()
 	return FALSE;
 }
 
-// FUNCTION: MW2SHELL 0x1004795e
 MechU8 TextGlyph::TypeStep()
 {
 	if (m_done == 1) {
@@ -178,9 +167,6 @@ MechU8 TextGlyph::TypeStep()
 	return DrawNextChar();
 }
 
-// Operand order: the original computes m_right from m_left + m_width with m_left loaded first; it
-// follows the unit's symbol table.
-// FUNCTION: MW2SHELL 0x100479b7
 TextGlyph::TextGlyph(MechChar* p_text, MechS32 p_left, MechS32 p_top, undefined* p_colors, Font* p_font)
 {
 	m_font = p_font;
@@ -222,7 +208,6 @@ TextGlyph::TextGlyph(MechChar* p_text, MechS32 p_left, MechS32 p_top, undefined*
 }
 
 // Restores the background under the text and rewinds it.
-// FUNCTION: MW2SHELL 0x10047b03
 void TextGlyph::Shutdown()
 {
 	m_done = 0;
@@ -233,7 +218,6 @@ void TextGlyph::Shutdown()
 	m_videoDriver->RestoreBackground(m_left, m_top, m_width, m_height);
 }
 
-// FUNCTION: MW2SHELL 0x10047b71
 TextGlyph::~TextGlyph()
 {
 	Shutdown();

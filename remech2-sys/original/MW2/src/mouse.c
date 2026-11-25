@@ -5,27 +5,21 @@
 #include "simmain.h"
 #include "types.h"
 
-// The sim's mouse: it keeps the pointer grabbed during a mission. Without /Ob1, the __inline bounds
-// test IsInsideWindow isn't expanded as in the shell: the compiler emits it after the unit's
-// functions, in its own 16-byte aligned section.
+// The sim's mouse: it keeps the pointer grabbed during a mission.
 
 __inline MechS32 IsInsideWindow(MechS32 p_x, MechS32 p_y);
 
-// GLOBAL: MW2 0x100ad244
 MechS32 g_cursorClipped = FALSE;
 
-// GLOBAL: MW2 0x100ad248
 undefined4 g_reclipCursor = 0;
 
 // Lets go of the pointer at the end of a mission. The original's MouseCloseDevice.
-// FUNCTION: MW2 0x10068998
 void MouseRelease(void)
 {
 	MechMouseGrab(FALSE);
 	g_cursorClipped = FALSE;
 }
 
-// FUNCTION: MW2 0x100689bc
 MechS32 CenterCursor(void* p_data, MechS32 p_axis)
 {
 	MechS32 x;
@@ -46,7 +40,6 @@ MechS32 CenterCursor(void* p_data, MechS32 p_axis)
 	return 0;
 }
 
-// FUNCTION: MW2 0x10068a49
 MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons)
 {
 	MechPoint point;
@@ -80,10 +73,6 @@ MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons)
 }
 
 // Whether a client point lies inside the game window.
-// The original compares p_x >= g_gameWindowWidth (and p_y) with the global loaded first; moving
-// the definition and LONG parameters don't flip it. A POINT by value does, but the caller then
-// pushes its members through ecx, where the original pushes two scalars through eax.
-// FUNCTION: MW2 0x10068cb0
 __inline MechS32 IsInsideWindow(MechS32 p_x, MechS32 p_y)
 {
 	if (p_x < 0 || p_x >= g_gameWindowWidth) {

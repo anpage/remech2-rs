@@ -15,7 +15,6 @@ class VideoDriver;
 // nn, and \Bnnn (back nnn pixels) and \Gnnn (to nnn pixels from the left) pass through to the
 // glyphs. The lines become TextGlyph items that
 // type themselves out to a looping sound.
-// SIZE 0x34
 class Page {
 public:
 	enum {
@@ -30,7 +29,6 @@ public:
 		c_tokenGoTo = 8
 	};
 
-	// SIZE 0x14
 	// The area of a link word and its id.
 	struct Link {
 		MechS32 m_left;   // 0x00

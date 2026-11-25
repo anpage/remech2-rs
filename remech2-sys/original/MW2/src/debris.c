@@ -18,25 +18,17 @@
 #include "shots.h"
 #include "types.h"
 
-DECOMP_SIZE_ASSERT(DebrisPiece, 0x24)
-DECOMP_SIZE_ASSERT(DebrisChunk, 0x14)
-
 // Wreckage: scene objects knocked off a model fly as debris pieces, bounce on the terrain and
 // come to rest; the chunks among them can be shot to pieces and time out.
 
-// GLOBAL: MW2 0x100a1150
 MechS32 g_debrisCount = 0;
 
-// GLOBAL: MW2 0x100a1158
 DebrisChunk g_emptyDebrisChunk = {0};
 
-// GLOBAL: MW2 0x10179ec0
 DebrisPiece g_debrisPieces[0x80];
 
-// GLOBAL: MW2 0x1017b0c0
 DebrisChunk g_debrisChunks[0x80];
 
-// FUNCTION: MW2 0x100040b0
 MechS32 IsDebrisFull(void)
 {
 	MechS32 i;
@@ -47,8 +39,6 @@ MechS32 IsDebrisFull(void)
 	return i == 0x80;
 }
 
-// Stack-slot permutation: i and piece.
-// FUNCTION: MW2 0x10004111
 MechS32 AddDebrisPiece(SceneObject* p_obj, MechS32 p_unk0x00)
 {
 	MechS32 i;
@@ -82,7 +72,6 @@ MechS32 AddDebrisPiece(SceneObject* p_obj, MechS32 p_unk0x00)
 }
 
 // Throws the piece off in a random direction, spinning.
-// FUNCTION: MW2 0x10004218
 void ThrowDebrisPiece(MechS32 p_index)
 {
 	DebrisPiece* piece;
@@ -101,8 +90,6 @@ void ThrowDebrisPiece(MechS32 p_index)
 }
 
 // Blows p_obj off its model as a chunk of debris; p_callback gets it when it's gone.
-// Stack-slot permutation: i and chunk.
-// FUNCTION: MW2 0x10004356
 void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x16)
 {
 	MechS32 i;
@@ -149,8 +136,6 @@ void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x
 	}
 }
 
-// Stack-slot permutation: child and sibling.
-// FUNCTION: MW2 0x100044f3
 void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x16)
 {
 	SceneObject* child;
@@ -173,7 +158,6 @@ void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk
 	BlowOffChunk(p_obj, p_callback, p_unk0x16);
 }
 
-// FUNCTION: MW2 0x1000457e
 void DisposeDebris(SceneObject* p_obj, ObjectCallback p_callback)
 {
 	MechS32 index;
@@ -191,7 +175,6 @@ void DisposeDebris(SceneObject* p_obj, ObjectCallback p_callback)
 	}
 }
 
-// FUNCTION: MW2 0x100045db
 void UpdateDebris(void)
 {
 	MechS32 i;
@@ -210,7 +193,6 @@ void UpdateDebris(void)
 }
 
 // Blows the chunk up.
-// FUNCTION: MW2 0x100046b2
 void ExplodeChunk(MechS32 p_index)
 {
 	DebrisChunk* chunk;
@@ -239,7 +221,6 @@ void ExplodeChunk(MechS32 p_index)
 	}
 }
 
-// FUNCTION: MW2 0x10004783
 void DamageChunk(MechS32 p_index, MechS32 p_damage)
 {
 	g_debrisChunks[p_index].m_health -= p_damage;
@@ -248,8 +229,6 @@ void DamageChunk(MechS32 p_index, MechS32 p_damage)
 	}
 }
 
-// Stack-slot permutation of the locals, and the operand order of newY <= ground.
-// FUNCTION: MW2 0x100047c2
 void UpdateDebrisPiece(MechS32 p_index)
 {
 	MechS32 velocityY;
@@ -323,8 +302,6 @@ void UpdateDebrisPiece(MechS32 p_index)
 }
 
 // Pushes the piece by (p_x, p_y, p_z) on top of a random throw.
-// Stack-slot permutation: length, speed and piece; and the operand order of length < speed.
-// FUNCTION: MW2 0x10004a45
 void PushDebrisPiece(MechS32 p_index, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 length;
@@ -355,9 +332,6 @@ void PushDebrisPiece(MechS32 p_index, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 	piece->m_velocityZ += p_z;
 }
 
-// The only diff is the indirect call's displacement (g_debrisChunks[0].m_callback), which
-// reccmp leaves unmapped.
-// FUNCTION: MW2 0x10004b4f
 void ZeroChunx(void)
 {
 	MechS32 i;
@@ -377,7 +351,6 @@ void ZeroChunx(void)
 	}
 }
 
-// FUNCTION: MW2 0x10004c06
 void ResetDebrisPiece(MechS32 p_index)
 {
 	DebrisPiece* piece;
@@ -390,8 +363,6 @@ void ResetDebrisPiece(MechS32 p_index)
 	piece->m_acceleration = 0;
 }
 
-// Stack-slot permutation: index and i.
-// FUNCTION: MW2 0x10004c86
 MechS32 FindDebrisPiece(SceneObject* p_obj)
 {
 	MechS32 index;
@@ -409,8 +380,6 @@ MechS32 FindDebrisPiece(SceneObject* p_obj)
 }
 
 // Damages the chunks within p_radius of (p_x, p_y, p_z) by p_damage per second.
-// Stack-slot permutation of the locals, and the operand order of radius + p_radius.
-// FUNCTION: MW2 0x10004ce5
 void DamageChunksInRadius(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_radius, MechS32 p_damage)
 {
 	DebrisChunk* chunk;
@@ -442,7 +411,6 @@ void DamageChunksInRadius(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_radiu
 	}
 }
 
-// FUNCTION: MW2 0x10004dcb
 void RemoveChunk(SceneObject* p_obj, ObjectCallback p_callback)
 {
 	MechS32 i;
@@ -461,7 +429,6 @@ void RemoveChunk(SceneObject* p_obj, ObjectCallback p_callback)
 	DisposeDebris(p_obj, p_callback);
 }
 
-// FUNCTION: MW2 0x10004e4d
 void HideDebrisObj(SceneObject* p_obj)
 {
 	if (p_obj) {

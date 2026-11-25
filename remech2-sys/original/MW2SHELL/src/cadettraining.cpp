@@ -24,37 +24,29 @@
 #include <stdlib.h>
 
 // The trainer's idle video alternates between two takes; a countdown to the next.
-// GLOBAL: MW2SHELL 0x1006acc8
 MechS32 g_trainerTake = 0;
 
-// GLOBAL: MW2SHELL 0x1006accc
 MechS32 g_trainerIdleCountdown = -1;
 
 // Set once the trainer's welcome video is over and the mission buttons are up.
-// GLOBAL: MW2SHELL 0x1006acd0
 MechS32 g_trainingButtonsShown = 0;
 
 // The trainer's video playing before a training mission starts, -1 for none.
-// GLOBAL: MW2SHELL 0x1006acd4
 MechS32 g_trainingExitVideo = -1;
 
 // The room's sound, database item 0x4c, looped once the welcome is over.
-// GLOBAL: MW2SHELL 0x1006acd8
 AudioSample* g_trainingAmbience = NULL;
 
-// GLOBAL: MW2SHELL 0x10090668
 ButtonMenu* g_cadetTrainingMenu;
 
 // DrawCadetTraining's p_wParam: the quick tips show when it comes from the clan hall
 // (c_msgClanHall).
-// GLOBAL: MW2SHELL 0x1009066c
 size_t g_trainingMessage;
 
 void CadetTrainingCallback(TMPackDataBase*, MechS32*, MechU8*, MechChar**, MechS32);
 
 // Sets up the campaign's training screen: its first button, its background and the videos of
 // the trainer.
-// FUNCTION: MW2SHELL 0x1003c7e0
 void DrawCadetTraining(TMPackDataBase* p_database, MechS32 p_campaign, char**, size_t p_wParam)
 {
 	g_trainingMessage = p_wParam;
@@ -80,8 +72,6 @@ void DrawCadetTraining(TMPackDataBase* p_database, MechS32 p_campaign, char**, s
 
 // The training screen's frame: once the trainer's welcome is over, the mission buttons and the
 // room's sound; EXIT, or a training mission after the trainer's video.
-// Not 100%: the stack slots of the locals are permuted.
-// FUNCTION: MW2SHELL 0x1003c966
 void CadetTrainingCallback(
 	TMPackDataBase* p_database,
 	MechS32* p_campaign,

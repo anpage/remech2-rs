@@ -7,7 +7,6 @@ struct Shape;
 
 // The head of a list of shapes: the first 0x18 bytes of a Shape, which the list
 // code links and unlinks as if it were a shape (shapelists.c).
-// SIZE 0x18
 typedef struct ShapeListHead {
 	MechU16 m_flags;              // 0x00
 	MechU16 m_kind;               // 0x02

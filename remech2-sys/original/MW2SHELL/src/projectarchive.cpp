@@ -16,9 +16,6 @@
 #include <string.h>
 #include <strings.h>
 
-DECOMP_SIZE_ASSERT(ProjectArchive, 0x10)
-DECOMP_SIZE_ASSERT(MechChassis, 0x18)
-
 // Every node of a .bwd file starts with a type tag from g_bwdTags and the node's
 // size in bytes. The shell assembles .bwd files for the simulator in g_bwdTemplateRegistry.
 
@@ -31,28 +28,24 @@ enum BwdTag {
 	c_tagGps = 52
 };
 
-// SIZE 0x0c
 struct BwdRootNode {
 	MechS32 m_type;       // 0x00
 	MechS32 m_size;       // 0x04
 	undefined4 m_unk0x08; // 0x08 — written as 0 for the simulator
 };
 
-// SIZE 0x0c
 struct BwdRevisionNode {
 	MechS32 m_type;     // 0x00
 	MechS32 m_size;     // 0x04
 	char m_revision[4]; // 0x08
 };
 
-// SIZE 0x1c
 struct BwdTableNode {
 	MechS32 m_type;          // 0x00
 	MechS32 m_size;          // 0x04
 	undefined4 m_unk0x08[5]; // 0x08 — written as zeros for the simulator
 };
 
-// SIZE 0x0c
 struct BwdLinkNode {
 	MechS32 m_type;    // 0x00
 	MechS32 m_size;    // 0x04
@@ -60,7 +53,6 @@ struct BwdLinkNode {
 	MechS16 m_unk0x0a; // 0x0a — written as -1 for the simulator
 };
 
-// SIZE 0x5c
 // One mech of a star; the registry takes its first 0x5a bytes.
 struct BwdGpsNode {
 	MechS32 m_type;                   // 0x00
@@ -101,7 +93,6 @@ void BwdInitRegistry();
 void BwdWriteRegistry(char* p_fileName);
 void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, MechS32 p_index, MechS32 p_level, MechS32 p_difficulty);
 
-// GLOBAL: MW2SHELL 0x100668c0
 char g_bwdTags[][4] = {
 	{'B', 'W', 'D', 0},   {'R', 'E', 'V', 0},   {'D', 'T', 'B', 'L'}, {'P', 'L', 'N', 'T'}, {'P', 'A', 'L', 'G'},
 	{'T', 'E', 'R', 'R'}, {'C', 'L', 'I', 'M'}, {'L', 'I', 'T', 'E'}, {'V', 'W', 'S', 'P'}, {'V', 'W', 'S', 'T'},
@@ -120,13 +111,10 @@ char g_bwdTags[][4] = {
 	{'S', 'D', 'S', 'C'}, {'S', 'U', 'P', 'S'},
 };
 
-// GLOBAL: MW2SHELL 0x100669e0
 MechS32 g_bwdRegistrySize = 0;
 
-// GLOBAL: MW2SHELL 0x100669e4
 MechS32 g_bwdLargestTemplate = 0;
 
-// GLOBAL: MW2SHELL 0x100669e8
 MechS16 g_bwdDifficultySettings[9][5] = {
 	{0, 0, 0, 0, 0},
 	{1, 850, 1, 850, 1},
@@ -141,17 +129,13 @@ MechS16 g_bwdDifficultySettings[9][5] = {
 
 // The enemy star's difficulty, from the mission's BWD file (ShellApplyMissionUiInfo).
 // PrjWriteStarTemplates starts the enemy templates at this less 2, adjusted by the enemy skill.
-// GLOBAL: MW2SHELL 0x10066a44
 MechS32 g_enemyStarDifficulty = 8;
 
 // The clans' type 8 resources, by clan; the player's clan and rival go into instmap1.bwd.
-// GLOBAL: MW2SHELL 0x10066a48
 char* g_clanBitmapNames[] = {"l1wolfcl", "l1jadefn", "l1gostbr", "l1smojag", "l1novact", "l1steelv"};
 
-// GLOBAL: MW2SHELL 0x1008f758
 MechS32 g_bwdTemplateRegistry[0x200];
 
-// FUNCTION: MW2SHELL 0x1002e280
 ProjectArchive::ProjectArchive(const char* p_name)
 {
 	m_bwdTable = 0xe;
@@ -167,19 +151,16 @@ ProjectArchive::ProjectArchive(const char* p_name)
 	LoadArchiveEntries(g_mw2PrjHandle);
 }
 
-// FUNCTION: MW2SHELL 0x1002e302
 void* PrjHeapAlloc(undefined4 p_size)
 {
 	return MechHeapAlloc(g_primaryHeap, p_size);
 }
 
-// FUNCTION: MW2SHELL 0x1002e324
 void PrjHeapFree(void* p_block)
 {
 	MechHeapFree(g_primaryHeap, p_block);
 }
 
-// FUNCTION: MW2SHELL 0x1002e346
 MechS32 ProjectArchive::FindResourceId(char* p_name, MechS32 p_type)
 {
 	if (m_handle < 0) {
@@ -189,7 +170,6 @@ MechS32 ProjectArchive::FindResourceId(char* p_name, MechS32 p_type)
 	return FindResourceIdByName(p_type, p_name);
 }
 
-// FUNCTION: MW2SHELL 0x1002e384
 void* ProjectArchive::GetResource(MechS32 p_id, char* p_tag)
 {
 	if (p_id == -1 || p_id == -2) {
@@ -199,13 +179,11 @@ void* ProjectArchive::GetResource(MechS32 p_id, char* p_tag)
 	return LoadCachedResource(m_handle, p_id, p_tag, 0);
 }
 
-// FUNCTION: MW2SHELL 0x1002e3cf
 void* ProjectArchive::GetResourceByName(char* p_name, MechS32 p_type, char* p_tag)
 {
 	return GetResource(FindResourceId(p_name, p_type), p_tag);
 }
 
-// FUNCTION: MW2SHELL 0x1002e404
 void ProjectArchive::ReleaseResource(MechS32 p_id, char* p_tag)
 {
 	if (p_id == -1 || p_id == -2) {
@@ -215,14 +193,11 @@ void ProjectArchive::ReleaseResource(MechS32 p_id, char* p_tag)
 	FreeCachedResource(p_id, p_tag);
 }
 
-// FUNCTION: MW2SHELL 0x1002e445
 void ProjectArchive::ReleaseResourceByName(char* p_name, MechS32 p_type, char* p_tag)
 {
 	ReleaseResource(FindResourceId(p_name, p_type), p_tag);
 }
 
-// Stack-slot permutation: node and end.
-// FUNCTION: MW2SHELL 0x1002e47a
 MechS32* ProjectArchive::FindNextBwdNode(MechS32* p_list, MechS32 p_index, MechS32* p_previous)
 {
 	MechS32* node;
@@ -247,7 +222,6 @@ MechS32* ProjectArchive::FindNextBwdNode(MechS32* p_list, MechS32 p_index, MechS
 	return NULL;
 }
 
-// FUNCTION: MW2SHELL 0x1002e512
 MechU8 ProjectArchive::LoadBwd(char* p_name)
 {
 	MechS32 id;
@@ -274,7 +248,6 @@ MechU8 ProjectArchive::LoadBwd(char* p_name)
 	return TRUE;
 }
 
-// FUNCTION: MW2SHELL 0x1002e5d8
 MechS32* ProjectArchive::FindBwdNode(MechS32 p_type)
 {
 	MechS32* node;
@@ -293,7 +266,6 @@ MechS32* ProjectArchive::FindBwdNode(MechS32 p_type)
 	return NULL;
 }
 
-// FUNCTION: MW2SHELL 0x1002e638
 ProjectArchive::~ProjectArchive()
 {
 	MechS32 result;
@@ -308,8 +280,6 @@ ProjectArchive::~ProjectArchive()
 	}
 }
 
-// Operand order: the original loads g_bwdLargestTemplate first for p_size > g_bwdLargestTemplate.
-// FUNCTION: MW2SHELL 0x1002e67f
 void BwdAddRegistryTemplate(void* p_node, MechS32 p_size)
 {
 	char* destination;
@@ -327,8 +297,6 @@ void BwdAddRegistryTemplate(void* p_node, MechS32 p_size)
 	}
 }
 
-// Stack-slot permutation: root, revision and table.
-// FUNCTION: MW2SHELL 0x1002e703
 void BwdInitRegistry()
 {
 	BwdRootNode root;
@@ -358,7 +326,6 @@ void BwdInitRegistry()
 	BwdAddRegistryTemplate(&table, sizeof(table));
 }
 
-// FUNCTION: MW2SHELL 0x1002e7cb
 void BwdWriteRegistry(char* p_fileName)
 {
 	g_bwdTemplateRegistry[1] = g_bwdRegistrySize;
@@ -367,8 +334,6 @@ void BwdWriteRegistry(char* p_fileName)
 
 // Adds the template of one mech of a star to the registry: its chassis and variant, and the
 // settings of p_difficulty (1 to 8; 0 for a mech without a level).
-// Not 100%: the stack slots of i and variant are permuted.
-// FUNCTION: MW2SHELL 0x1002e830
 void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, MechS32 p_index, MechS32 p_level, MechS32 p_difficulty)
 {
 	MechS32 i;
@@ -438,9 +403,6 @@ void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, MechS32 p_index,
 	BwdAddRegistryTemplate(&node, 0x5a);
 }
 
-// Operand order: the original loads i first for both i < count comparisons; the locals
-// also take different [ebp-N] slots.
-// FUNCTION: MW2SHELL 0x1002ea62
 void PrjWriteStarTemplates(MechS32 p_count, StarMech* p_mechs, MechS32 p_enemyCount, StarMech* p_enemies)
 {
 	MechS32 i;
@@ -479,8 +441,6 @@ void PrjWriteStarTemplates(MechS32 p_count, StarMech* p_mechs, MechS32 p_enemyCo
 	}
 }
 
-// Stack-slot permutation: size, node, buffer and link.
-// FUNCTION: MW2SHELL 0x1002ec0e
 void PrjBuildPlayerStarTemplates(MechS32 p_clan, MechS32 p_rival)
 {
 	MechS32 size;

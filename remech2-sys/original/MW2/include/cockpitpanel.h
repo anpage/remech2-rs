@@ -11,7 +11,6 @@ typedef struct CockpitPanel CockpitPanel;
 /* One of the 26 cockpit panels InitCockpitPanels allocates (g_cockpitPanels): a named rectangle
    of a pane with a table of methods. InitCockpitPanel sets the defaults, and InitCockpitPanels
    installs the drawing handlers, which UpdateCockpit calls by the local mech's power state. */
-// SIZE 0x88
 struct CockpitPanel {
 	CockpitPanel* m_self;  // 0x00
 	MechS16 m_enabled;     // 0x04

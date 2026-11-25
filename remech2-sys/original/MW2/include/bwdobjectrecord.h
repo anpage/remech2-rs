@@ -9,7 +9,6 @@
 
 // A world stream's object record (CreateObjectNode): a shape, from a resource or a file, with its
 // scale, rotation and position.
-// SIZE 0x46
 typedef struct BwdObjectRecord {
 	BwdRecord m_header;           // 0x00
 	MechS16 m_id;                 // 0x08

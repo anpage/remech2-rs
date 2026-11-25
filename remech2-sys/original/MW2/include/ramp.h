@@ -4,7 +4,6 @@
 #include "decomp.h"
 #include "types.h"
 
-// SIZE 0x10
 typedef struct Ramp {
 	MechS32 m_time;     // 0x00 — the clock at the last update
 	MechS32 m_target;   // 0x04
@@ -13,7 +12,6 @@ typedef struct Ramp {
 } Ramp;
 
 // A ramp whose value wraps around a period (an angle).
-// SIZE 0x14
 typedef struct WrappedRamp {
 	MechS32 m_time;     // 0x00
 	MechS32 m_target;   // 0x04
@@ -22,7 +20,6 @@ typedef struct WrappedRamp {
 	MechS32 m_period;   // 0x10
 } WrappedRamp;
 
-// SIZE 0x0c
 typedef struct EasedValue {
 	MechS32 m_value;  // 0x00
 	MechS32 m_target; // 0x04

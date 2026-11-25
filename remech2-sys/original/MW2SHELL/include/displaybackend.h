@@ -21,7 +21,6 @@ enum WindowMode {
 
 #pragma pack(1)
 // Function table of the active display back end (DirectDraw, DisplayDib or GDI).
-// SIZE 0x28
 struct DisplayBackend {
 	MechS32 m_id;                                                            // 0x00 — DisplayBackendId
 	MechS32 m_windowMode;                                                    // 0x04 — WindowMode

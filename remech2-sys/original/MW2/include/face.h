@@ -8,7 +8,6 @@ struct Shape;
 
 // A face of a model (Model): its vertex indices are bytes at m_indexOffset from
 // the face itself, m_indexCount of them, and its plane's normal.
-// SIZE 0x24
 typedef struct Face {
 	MechU16 m_color;       // 0x00 — bits 0-11: color or shade, 12-14: the draw mode (m_drawFace)
 	MechU16 m_indexCount;  // 0x02

@@ -34,15 +34,6 @@
 
 // The two stars of a custom battle: the player's and the enemy's.
 
-DECOMP_SIZE_ASSERT(StarMech, 0x24)
-DECOMP_SIZE_ASSERT(CustomStar, 0x80)
-DECOMP_SIZE_ASSERT(FormationOption, 0x08)
-DECOMP_SIZE_ASSERT(FormationSlot, 0x10)
-DECOMP_SIZE_ASSERT(FormationPositions, 0x30)
-DECOMP_SIZE_ASSERT(MechChassis, 0x18)
-DECOMP_SIZE_ASSERT(MenuScreen, 0x10)
-DECOMP_SIZE_ASSERT(MainMenuButton, 0x1c)
-
 MechS32 PlayVideo(
 	MechS32 p_index,
 	const char* p_name,
@@ -54,7 +45,6 @@ MechS32 PlayVideo(
 
 // The formations of the Wolf and Inner Sphere stars (Jade Falcon's differ): six formations of
 // three mechs.
-// GLOBAL: MW2SHELL 0x1005b4c0
 FormationPositions g_formationLayouts[6] = {
 	{{{2, 430, 346, 2}, {1, 333, 353, 1}, {0, 204, 359, 0}}},
 	{{{2, 295, 330, 0}, {1, 332, 352, 1}, {0, 385, 395, 2}}},
@@ -64,7 +54,6 @@ FormationPositions g_formationLayouts[6] = {
 	{{{2, 295, 330, 0}, {1, 430, 346, 2}, {0, 288, 376, 1}}},
 };
 
-// GLOBAL: MW2SHELL 0x1005b5e0
 FormationPositions g_jadeFalconFormationLayouts[6] = {
 	{{{2, 425, 345, 2}, {1, 325, 354, 1}, {0, 181, 362, 0}}},
 	{{{2, 297, 329, 0}, {1, 325, 354, 1}, {0, 377, 408, 2}}},
@@ -74,27 +63,20 @@ FormationPositions g_jadeFalconFormationLayouts[6] = {
 	{{{2, 297, 329, 0}, {1, 425, 345, 2}, {0, 258, 385, 1}}},
 };
 
-// GLOBAL: MW2SHELL 0x1005b700
 MechChar g_wolfStarVideo[] = "awosc%s";
 
-// GLOBAL: MW2SHELL 0x1005b708
 MechChar g_jadeFalconStarVideo[] = "ajfsc%s";
 
-// GLOBAL: MW2SHELL 0x1005b710
 MechChar g_trialStarVideo[] = "aiasc%s";
 
-// GLOBAL: MW2SHELL 0x1005b718
 CustomStar g_playerStar =
 	{0, 0, 3, 3, 100, {{12, "tbr00std", "MechWarrior"}, {0, "drw00std", "Friend 1"}, {1, "frm00std", "Friend 2"}}};
 
-// GLOBAL: MW2SHELL 0x1005b798
 CustomStar g_enemyStar =
 	{0, 0, 3, 3, 100, {{12, "tbr00std", "Enemy 1"}, {0, "drw00std", "Enemy 2"}, {1, "frm00std", "Enemy 3"}}};
 
-// GLOBAL: MW2SHELL 0x1005b818
 CustomStar* g_selectedStar = &g_playerStar;
 
-// GLOBAL: MW2SHELL 0x1005b820
 FormationOption g_formationOptions[6] = {
 	{"~Echelon Left", "echelonl"},
 	{"~Echelon Right", "echelonr"},
@@ -106,72 +88,51 @@ FormationOption g_formationOptions[6] = {
 
 // Where the name labels go, by position: left edges and tops, for the Wolf and Inner Sphere
 // screens and for the Jade Falcon one.
-// GLOBAL: MW2SHELL 0x1005b850
 MechS32 g_starLabelLefts[4] = {81, 313, 508, 0};
 
-// GLOBAL: MW2SHELL 0x1005b860
 MechS32 g_starLabelTops[4] = {166, 133, 189, 0};
 
-// GLOBAL: MW2SHELL 0x1005b870
 MechS32 g_jadeFalconLabelLefts[4] = {47, 280, 495, 0};
 
-// GLOBAL: MW2SHELL 0x1005b880
 MechS32 g_jadeFalconLabelTops[3] = {172, 127, 217};
 
 // The formation, mission, star size, tonnage limit and star mass lines.
-// GLOBAL: MW2SHELL 0x1005b88c
 TextGlyph* g_formationLine = NULL;
 
-// GLOBAL: MW2SHELL 0x1005b890
 TextGlyph* g_missionLine = NULL;
 
-// GLOBAL: MW2SHELL 0x1005b894
 TextGlyph* g_starSizeLine = NULL;
 
-// GLOBAL: MW2SHELL 0x1005b898
 TextGlyph* g_tonnageLine = NULL;
 
-// GLOBAL: MW2SHELL 0x1005b89c
 TextGlyph* g_starMassLine = NULL;
 
 // Per position: the name, type and mass glyphs.
-// GLOBAL: MW2SHELL 0x10079438
 TextGlyph* g_positionGlyphs[3][3];
 
 // The mass of each mech of the star.
-// GLOBAL: MW2SHELL 0x10079460
 MechS32 g_mechMasses[3];
 
-// GLOBAL: MW2SHELL 0x1007946c
 FormationPositions* g_formationLayout;
 
-// GLOBAL: MW2SHELL 0x10079470
 AudioSample* g_mechLabSound;
 
-// GLOBAL: MW2SHELL 0x10079478
 MechChar g_starInfoText[0x100];
 
-// GLOBAL: MW2SHELL 0x10079578
 MechS32* g_labelTops;
 
-// GLOBAL: MW2SHELL 0x1007957c
 MechS32* g_labelLefts;
 
-// GLOBAL: MW2SHELL 0x10079580
 AudioSample* g_starSound;
 
-// GLOBAL: MW2SHELL 0x10079584
 ButtonMenu* g_starMenu;
 
-// GLOBAL: MW2SHELL 0x10079588
 MechChar g_fitTextBuffer[0x100];
 
-// GLOBAL: MW2SHELL 0x10079688
 MechChar* g_starVideoFormat;
 
 // Saves both stars and which one is selected in the mw2prm.cfg record, for RestoreStars to
 // restore.
-// FUNCTION: MW2SHELL 0x10002d30
 void SaveStars()
 {
 	if (g_selectedStar == &g_playerStar) {
@@ -185,7 +146,6 @@ void SaveStars()
 	g_simHandoff.m_enemyStar = g_enemyStar;
 }
 
-// FUNCTION: MW2SHELL 0x10002d8d
 void RestoreStars()
 {
 	if (g_simHandoff.m_playerStarSelected) {
@@ -201,7 +161,6 @@ void RestoreStars()
 
 // Sets a mech of the selected star: its pilot name and its variant file. A three-letter variant
 // name is the mech's standard variant. Returns 0 when the mech is too heavy for the star.
-// FUNCTION: MW2SHELL 0x10002de7
 MechS32 SetStarMech(MechS32 p_index, MechChar* p_variant, MechChar* p_name)
 {
 	MechS32 type;
@@ -256,7 +215,6 @@ MechS32 SetStarMech(MechS32 p_index, MechChar* p_variant, MechChar* p_name)
 	return -1;
 }
 
-// FUNCTION: MW2SHELL 0x10003013
 MechChar* GetStarMechVariant(MechS32 p_index)
 {
 	if (p_index < 0) {
@@ -271,7 +229,6 @@ MechChar* GetStarMechVariant(MechS32 p_index)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000307c
 MechS32 GetStarMechChassis(MechS32 p_index)
 {
 	if (p_index < 0) {
@@ -288,7 +245,6 @@ MechS32 GetStarMechChassis(MechS32 p_index)
 
 // Returns a star's formation: the selected star's for a negative p_star, else the player's (0) or
 // the enemy's.
-// FUNCTION: MW2SHELL 0x100030e5
 MechS32 GetStarFormation(MechS32 p_star)
 {
 	if (p_star < 0) {
@@ -302,7 +258,6 @@ MechS32 GetStarFormation(MechS32 p_star)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1000312e
 CustomStar* GetStar(MechS32 p_star)
 {
 	if (p_star < 0) {
@@ -318,7 +273,6 @@ CustomStar* GetStar(MechS32 p_star)
 
 // Selects a star (negative arguments leave the setting alone) and sets its formation, its size,
 // its mech count and its tonnage limit.
-// FUNCTION: MW2SHELL 0x10003175
 void SelectStar(MechS32 p_star, MechS32 p_formation, MechS32 p_size, MechS32 p_count, MechS32 p_tonnage)
 {
 	if (p_star >= 0) {
@@ -348,7 +302,6 @@ void SelectStar(MechS32 p_star, MechS32 p_formation, MechS32 p_size, MechS32 p_c
 }
 
 // Adds the formations to the simulator's command line and writes the stars' .bwd files.
-// FUNCTION: MW2SHELL 0x10003221
 void WriteStarFiles()
 {
 	strcat(g_simHandoff.m_cmdLine, " -of=");
@@ -364,8 +317,6 @@ void WriteStarFiles()
 #define STAR_LAYOUT(formation, i) g_formationLayout[formation].m_posts[i]
 
 // Returns the mech whose video is under a point, or -1.
-// Stack-slot permutation: mech, left, right, i, top and bottom.
-// FUNCTION: MW2SHELL 0x10003320
 MechS32 FindMechAt(MechS32 p_x, MechS32 p_y)
 {
 	MechS32 mech;
@@ -392,9 +343,6 @@ MechS32 FindMechAt(MechS32 p_x, MechS32 p_y)
 }
 
 // Returns as much of p_text as fits in p_width pixels of p_font.
-// Stack-slot permutation: out and width. The original compares p_width against width; the
-// declaration order doesn't flip it.
-// FUNCTION: MW2SHELL 0x1000345a
 MechChar* FitText(MechChar* p_text, Font* p_font, MechS32 p_width)
 {
 	MechChar* out = g_fitTextBuffer;
@@ -417,9 +365,6 @@ MechChar* FitText(MechChar* p_text, Font* p_font, MechS32 p_width)
 }
 
 // A click on a pilot name edits it.
-// Stack-slot permutation: i, mech, label, left and top. The original loads left and top ahead of
-// p_x and p_y in the bounds test; the declaration order doesn't flip it.
-// FUNCTION: MW2SHELL 0x100034de
 void EditPilotName(MechS32 p_x, MechS32 p_y, MechS32 p_campaign)
 {
 	MechS32 i;
@@ -454,8 +399,6 @@ void EditPilotName(MechS32 p_x, MechS32 p_y, MechS32 p_campaign)
 
 // Shows the mech at a formation position: its video, pilot name, type and mass, or hides the
 // position when the star has fewer mechs.
-// Stack-slot permutation: label, type and mech.
-// FUNCTION: MW2SHELL 0x10003690
 void ShowFormationMech(MechS32 p_formation, MechS32 p_position, ButtonMenu* p_menu)
 {
 	MechS32 label;
@@ -509,8 +452,6 @@ void ShowFormationMech(MechS32 p_formation, MechS32 p_position, ButtonMenu* p_me
 }
 
 // Redraws the formation, mission, star size, tonnage limit and star mass lines.
-// Stack-slot permutation: i and mass.
-// FUNCTION: MW2SHELL 0x10003a4e
 void DrawStarInfo(MechS32 p_campaign)
 {
 	MechS32 i;
@@ -558,7 +499,6 @@ void DrawStarInfo(MechS32 p_campaign)
 void StarConfigCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, char**, MechS32 p_msg);
 
 // Opens the star screen of a campaign (2: a trial of grievance).
-// FUNCTION: MW2SHELL 0x10003d3a
 void DrawStarConfig(TMPackDataBase* p_database, MechS32 p_campaign)
 {
 	void* audioData;
@@ -646,8 +586,6 @@ void DrawStarConfig(TMPackDataBase* p_database, MechS32 p_campaign)
 // The star screen's buttons: 0 exits, 1 opens the mech lab, 2 and 3 cycle the formation, 4 and 5
 // add and remove a mech, 6 to 8 change the mech at a label position. A double click on a mech
 // changes it too.
-// Stack-slot permutation: i, button and mech.
-// FUNCTION: MW2SHELL 0x100043c2
 void StarConfigCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, char**, MechS32 p_msg)
 {
 	MechS32 i;

@@ -14,28 +14,18 @@
 // Animated textures: up to 0x200 animations, each playing one of 0x200 sets of up to 0x20 CEL
 // frames. The frames load on first use; each animation advances with the clock.
 
-DECOMP_SIZE_ASSERT(AnimFrame, 0x08)
-DECOMP_SIZE_ASSERT(Animation, 0x0e)
-
-// GLOBAL: MW2 0x100ad288
 MechS32 g_animInitialized = -2;
 
-// GLOBAL: MW2 0x100ad28c
 MechS32 g_lumaResourceId = 0;
 
-// GLOBAL: MW2 0x100ad290
 MechS32 g_currentAnimSet = 0;
 
-// GLOBAL: MW2 0x100ad294
 MechS32 g_animSetUsed = 0;
 
-// GLOBAL: MW2 0x100ad298
 MechS32 g_animSetIsSequence = 0;
 
-// GLOBAL: MW2 0x100ad29c
 MechU16* g_lumaTables = NULL;
 
-// GLOBAL: MW2 0x100ad2a0
 MechS32 g_preloadCels[] = {
 	562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582,
 	583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 593, 88,  89,  90,  91,  92,  93,  94,  95,  96,  97,
@@ -44,17 +34,12 @@ MechS32 g_preloadCels[] = {
 	238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, -1,
 };
 
-// GLOBAL: MW2 0x100c7610
 AnimFrame g_animFrames[0x200][0x20];
 
-// GLOBAL: MW2 0x100e7610
 Animation g_animations[0x200];
 
-// GLOBAL: MW2 0x100e9210
 WINDOW g_animFrameBuffer;
 
-// Stack-slot permutation: anim, data, height, i, luma, mode and useLuma and width.
-// FUNCTION: MW2 0x10068d10
 MechS32 DrawAnimatedPolygon(
 	MechS32 p_index,
 	MechS32 p_count,
@@ -147,8 +132,6 @@ MechS32 DrawAnimatedPolygon(
 	return 1;
 }
 
-// Stack-slot permutation: frame, i and now and remainder.
-// FUNCTION: MW2 0x10068fb8
 void AdvanceAnimations(void)
 {
 	MechS32 remainder;
@@ -193,8 +176,6 @@ void AdvanceAnimations(void)
 	}
 }
 
-// Stack-slot permutation: found and slot.
-// FUNCTION: MW2 0x10069124
 MechS32 AddAnimFrame(MechS32 p_resourceId, MechS32 p_set)
 {
 	MechS32 found;
@@ -240,7 +221,6 @@ MechS32 AddAnimFrame(MechS32 p_resourceId, MechS32 p_set)
 	return 0;
 }
 
-// FUNCTION: MW2 0x1006923c
 void PreloadAnimCels(void)
 {
 	MechS32 i;
@@ -250,7 +230,6 @@ void PreloadAnimCels(void)
 	}
 }
 
-// FUNCTION: MW2 0x10069288
 MechS32 StartAnimation(MechS32 p_index, MechS32 p_set)
 {
 	if (p_set == -1) {
@@ -273,7 +252,6 @@ MechS32 StartAnimation(MechS32 p_index, MechS32 p_set)
 	return 1;
 }
 
-// FUNCTION: MW2 0x10069360
 void InitAnimations(void)
 {
 	MechS32 j;
@@ -306,7 +284,6 @@ void InitAnimations(void)
 	g_animSetIsSequence = 0;
 }
 
-// FUNCTION: MW2 0x1006946f
 void SetAnimMode(MechS16 p_index, MechS16 p_mode)
 {
 	if (g_animations[p_index].m_flags != -2) {
@@ -318,7 +295,6 @@ void SetAnimMode(MechS16 p_index, MechS16 p_mode)
 	}
 }
 
-// FUNCTION: MW2 0x100694df
 void SetAnimFrame(MechS16 p_index, MechU16 p_frame)
 {
 	Animation* anim;
@@ -338,25 +314,19 @@ void SetAnimFrame(MechS16 p_index, MechU16 p_frame)
 	}
 }
 
-// FUNCTION: MW2 0x10069564
 void SetAnimDelay(MechS16 p_index, MechU16 p_delay)
 {
 	g_animations[p_index].m_delay = p_delay;
 }
 
-// FUNCTION: MW2 0x10069586
 void FUN_10069586(void)
 {
 }
 
-// FUNCTION: MW2 0x10069591
 void FUN_10069591(void)
 {
 }
 
-// Index order: &g_animFrames[i][j] loads i first in the original (InitAnimations matches with the
-// same statement).
-// FUNCTION: MW2 0x1006959c
 void FreeAnimations(void)
 {
 	MechS32 j;

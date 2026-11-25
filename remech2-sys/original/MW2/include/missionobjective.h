@@ -10,7 +10,6 @@
 // before its star: TestObjectiveCondition scales the word at 0x08 by a star's mission and the one at 0x04 by
 // an objective (a Trials of Grievance star waits on the player's objective that destroys the star
 // before it).
-// SIZE 0xc
 typedef struct ObjectiveCondition {
 	MechS32 m_kind;      // 0x00 — 0 ends the list; 1 done, 2 successful, 3 failed
 	MechS32 m_objective; // 0x04
@@ -18,7 +17,6 @@ typedef struct ObjectiveCondition {
 } ObjectiveCondition;
 
 // One objective of a star's mission.
-// SIZE 0x13f
 typedef struct MissionObjective {
 	MechU8 m_state;                     // 0x00 — 5 when successful, 6 when failed
 	MechU8 m_priority;                  // 0x01 — 1 primary, 2 secondary, 4 tertiary, 8 return

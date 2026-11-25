@@ -18,7 +18,6 @@ typedef MechChar* (*MenuChoicesSuffixFn)(
 );
 
 // The data of a list control (MenuControl::m_data): the texts of its choices.
-// SIZE 0x48
 typedef struct MenuChoices {
 	MenuChoicesSuffixFn m_suffix; // 0x00
 	MechS32 m_count;              // 0x04

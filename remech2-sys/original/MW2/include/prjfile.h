@@ -7,7 +7,6 @@
 #pragma pack(push, 1)
 
 // A resource type in a PROJ file's header: its tag and its index of resources.
-// SIZE 0x18
 typedef struct PrjType {
 	MechChar m_tag[4];                // 0x00
 	MechS32 m_indexOffset;            // 0x04 — in the file, 0: no index
@@ -24,7 +23,6 @@ typedef struct PrjHeader {
 	PrjType m_types[1];        // 0x0e
 } PrjHeader;
 
-// SIZE 0x08
 typedef struct PrjIndexEntry {
 	MechS32 m_offset; // 0x00 — from the type's base
 	MechS32 m_end;    // 0x04 — from the type's base
@@ -36,14 +34,12 @@ typedef struct PrjIndex {
 	PrjIndexEntry m_entries[1]; // 0x16
 } PrjIndex;
 
-// SIZE 0x08
 typedef struct PrjTypeSlot {
 	PrjIndex* m_index; // 0x00 — loaded on first use
 	void* m_unk0x04;   // 0x04
 } PrjTypeSlot;
 
 // An open PROJ file.
-// SIZE 0x14a
 typedef struct PrjFile {
 	MechS32 m_fd;                     // 0x00
 	MechU16 m_open;                   // 0x04

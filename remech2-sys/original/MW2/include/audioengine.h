@@ -8,7 +8,6 @@
 
 // The digital sound effects: up to 16 Miles samples, each streamed from its sound resource
 // through two 8K halves of a 16K buffer. Slots 8-15 also hold the looping ambient sounds.
-// SIZE 0x508
 typedef struct AudioEngine {
 	HDIGDRIVER m_driver;        // 0x000
 	HSAMPLE m_samples[16];      // 0x004

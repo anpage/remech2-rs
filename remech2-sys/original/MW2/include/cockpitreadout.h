@@ -7,7 +7,6 @@
 
 // A text readout of the cockpit (g_cockpitReadout): a font, a label and the text formatted after
 // it, at a place in 16.16 fractions of the screen.
-// SIZE 0x1c
 typedef struct CockpitReadout {
 	MechS32 m_font;           // 0x00 — its font, from g_artResolution
 	MechS32 m_unk0x04;        // 0x04

@@ -20,8 +20,6 @@
 // of the heading p_heading (always against the local player, else one time in three) it aims at
 // its goal and may fire (DecideAIFire). Then turns and pitches the torso. Returns whether it
 // fired.
-// Stack-slot permutation: fired, roll and delta.
-// FUNCTION: MW2 0x1004b5a0
 MechS32 RunAIWeapons(Player* p_player, MechS32 p_heading)
 {
 	MechS32 fired;
@@ -60,8 +58,6 @@ MechS32 RunAIWeapons(Player* p_player, MechS32 p_heading)
 // Decides whether p_player's AI fires its selected weapon: in range of its target, cool enough, the
 // weapon ready and loaded, and by chance per recycle time; otherwise it selects the next weapon.
 // Firing weapon types 0 and 4 also steers; a guided weapon's volley may lock on.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1004b724
 MechS32 DecideAIFire(Player* p_player)
 {
 	MechS32 fire;

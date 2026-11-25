@@ -44,78 +44,51 @@
 
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(Shot, 0x50)
-DECOMP_SIZE_ASSERT(Effect, 0x28)
-DECOMP_SIZE_ASSERT(EffectInfo, 0x1c)
-
-// GLOBAL: MW2 0x100ad440
 MechS32 g_effectCameraActive = 0;
 
-// GLOBAL: MW2 0x100ad444
 MechS32 g_effectCameraEffect = -1;
 
-// GLOBAL: MW2 0x100ad448
 MechS32 g_lastLocalMissile = -1;
 
-// GLOBAL: MW2 0x100ad44c
 MechS32 g_trackedShot = -1;
 
-// GLOBAL: MW2 0x100ad450
 Player* g_launchEffectPlayer = NULL;
 
-// GLOBAL: MW2 0x100ad454
 MechS32 g_effectCameraEnabled = 1;
 
 // The player whose shot hit something last.
-// GLOBAL: MW2 0x100ad458
 MechS32 g_lastHitShooter = -1;
 
-// GLOBAL: MW2 0x100ad45c
 MechS32 g_nukeTimeLeft = 0;
 
-// GLOBAL: MW2 0x100bee50
 MechS32 g_nukeMaxRadius;
 
 // The view that follows a tracked shot: its position, heading and three more angles.
-// GLOBAL: MW2 0x100bee58
 MechS32 g_trackedShotView[7];
 
-// GLOBAL: MW2 0x100bee74
 MechS32 g_nukeRadius;
 
-// GLOBAL: MW2 0x100bee78
 Vector3 g_nukePosition;
 
 // The eyepoint's settings while an effect has the camera.
-// GLOBAL: MW2 0x100c75f0
 MechS32 g_savedLightX;
 
-// GLOBAL: MW2 0x100c75f4
 MechS32 g_savedLightY;
 
-// GLOBAL: MW2 0x100c75f8
 MechS32 g_savedLightZ;
 
-// GLOBAL: MW2 0x100c75fc
 MechS32 g_savedDirectionalLight;
 
-// GLOBAL: MW2 0x100c7600
 MechS32 g_savedAmbientLight;
 
-// GLOBAL: MW2 0x100c7604
 MechS32 g_savedDistanceFade;
 
-// GLOBAL: MW2 0x100e9250
 CareerRecord g_careerRecord;
 
-// GLOBAL: MW2 0x1017bac0
 Shot g_shots[0xaf];
 
-// GLOBAL: MW2 0x1017f170
 Effect g_effects[0x100];
 
-// Stack-slot permutation: i, shot and effect.
-// FUNCTION: MW2 0x1006a230
 void FirstShots(void)
 {
 	MechS32 i;
@@ -144,7 +117,6 @@ void FirstShots(void)
 	memset(&g_careerRecord, 0, sizeof(g_careerRecord));
 }
 
-// FUNCTION: MW2 0x1006a349
 void ResetEffectSlot(MechS32 p_index)
 {
 	Effect* effect;
@@ -157,7 +129,6 @@ void ResetEffectSlot(MechS32 p_index)
 	effect->m_owner = -1;
 }
 
-// FUNCTION: MW2 0x1006a3b1
 void ResetShotSlot(MechS32 p_index)
 {
 	Shot* shot;
@@ -177,9 +148,7 @@ void ResetShotSlot(MechS32 p_index)
 }
 
 // Ages every shot in flight by g_deltaTime and moves it on.
-// Stack-slot permutation: i and shot.
 // UpdateAllShots on the Rust side (src/sim/shots.rs) wraps it, skipping frames of no time.
-// FUNCTION: MW2 0x1006a486
 void UpdateAllShotsC(void)
 {
 	MechS32 i;
@@ -204,9 +173,6 @@ void UpdateAllShotsC(void)
 // Moves the shot on by g_deltaTime and tests the segment it covered for a hit: a mech, a game
 // thing or the ground. A hit detonates the shot, just short of the point of impact; otherwise
 // it detonates when its lifetime runs out, or steers on toward its target.
-// Stack-slot permutation of the locals; the y < groundY comparison has its operands the
-// other way around.
-// FUNCTION: MW2 0x1006a533
 void UpdateShot(MechS32 p_index)
 {
 	MechS32 hitResult;
@@ -422,7 +388,6 @@ void UpdateShot(MechS32 p_index)
 
 // Sways (p_x, p_y, p_z) sideways and up and down around the shot's line of flight, by the
 // phase in m_swayPhase, and advances the phase.
-// FUNCTION: MW2 0x1006ad78
 void SwayShot(Shot* p_shot, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	MechS32 sideZ;
@@ -442,10 +407,8 @@ void SwayShot(Shot* p_shot, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 
 // Steers a guided missile at (p_x, p_y, p_z) toward its target, and arms its proximity fuse
 // within 100 units of it.
-// Stack-slot permutation: every local but distance.
 // GuideMissileToTarget on the Rust side (src/sim/shots.rs) wraps it, arming the fuse at the rate
 // of a 45 FPS sim.
-// FUNCTION: MW2 0x1006ae5a
 void GuideMissileToTargetC(Shot* p_shot, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechS32 targetY;
@@ -517,7 +480,6 @@ void GuideMissileToTargetC(Shot* p_shot, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 
 // Removes the shot from the world and frees its slot; p_explode spawns the effect its impact
 // calls for at (p_x, p_y, p_z), with the camera looking from (p_camX, p_camY, p_camZ).
-// FUNCTION: MW2 0x1006b0b4
 void DetonateShot(
 	MechS32 p_index,
 	MechS32 p_explode,
@@ -546,7 +508,6 @@ void DetonateShot(
 	}
 }
 
-// FUNCTION: MW2 0x1006b152
 void SpawnEffect(
 	MechS32 p_owner,
 	MechS32 p_type,
@@ -561,7 +522,6 @@ void SpawnEffect(
 	SpawnEffectEx(p_owner, p_type, p_x, p_y, p_z, p_camX, p_camY, p_camZ, 0, 0, 0);
 }
 
-// FUNCTION: MW2 0x1006b18b
 void SpawnRotatedEffect(
 	MechS32 p_type,
 	MechS32 p_rotX,
@@ -575,7 +535,6 @@ void SpawnRotatedEffect(
 	SpawnEffectEx(-2, p_type, p_x, p_y, p_z, p_x, p_y, p_z, p_rotX, p_rotY, p_rotZ);
 }
 
-// FUNCTION: MW2 0x1006b1c8
 void SpawnLaunchEffect(MechS32 p_type, Player* p_player)
 {
 	g_launchEffectPlayer = p_player;
@@ -586,9 +545,6 @@ void SpawnLaunchEffect(MechS32 p_type, Player* p_player)
 // (c_impactMech etc.), which picks a variant of it, and 0x4000 keeps its sound at full volume.
 // The effect takes a free slot of its type (none if three of them already burn within 500
 // units), and the effect camera may follow it from (p_camX, p_camY, p_camZ).
-// Stack-slot permutation of the locals; one distance comparison has its operands the other
-// way around.
-// FUNCTION: MW2 0x1006b1fb
 void SpawnEffectEx(
 	MechS32 p_owner,
 	MechS32 p_type,
@@ -855,9 +811,6 @@ void SpawnEffectEx(
 
 // Counts down the effects, lets the damaging ones hurt what is near them, and frees them when
 // their time runs out, giving the camera back if one had it.
-// Stack-slot permutation of the locals; the i == g_effectCameraEffect comparison has its
-// operands the other way around.
-// FUNCTION: MW2 0x1006b99a
 void UpdateEffects(void)
 {
 	MechS32 release;
@@ -935,9 +888,6 @@ void UpdateEffects(void)
 
 // Damages every mech within p_radius (plus its own radius) of (p_x, p_y, p_z) by p_rate per
 // tick in each of its sections, twice as much when its power is off.
-// Stack-slot permutation of the locals; the i != g_localPlayerId comparison and the
-// p_rate * g_deltaTime product have their operands the other way around.
-// FUNCTION: MW2 0x1006bc13
 void DamageMechsInRadius(MechS32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_radius, MechS32 p_rate)
 {
 	Player* player;
@@ -989,9 +939,6 @@ void DamageMechsInRadius(MechS32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z,
 }
 
 // Damages every game thing whose shape comes within p_radius of (p_x, p_y, p_z).
-// Stack-slot permutation of the locals; the distance < reach comparison has its operands the
-// other way around.
-// FUNCTION: MW2 0x1006bdb4
 void DamageThingsInRadius(MechS32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_radius, MechS32 p_rate)
 {
 	MechS32 distance;
@@ -1031,7 +978,6 @@ void DamageThingsInRadius(MechS32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z
 	}
 }
 
-// FUNCTION: MW2 0x1006beb5
 MechS32* GetTrackedShotView(void)
 {
 	if (g_trackedShot != -1 && g_shots[g_trackedShot].m_tracked) {
@@ -1044,7 +990,6 @@ MechS32* GetTrackedShotView(void)
 }
 
 // Starts tracking the local player's last shot, if it is still in flight.
-// FUNCTION: MW2 0x1006bf05
 MechS32 TrackLastShot(void)
 {
 	if (g_lastLocalMissile > 0 && g_shots[g_lastLocalMissile].m_flags &&
@@ -1060,8 +1005,6 @@ MechS32 TrackLastShot(void)
 
 // Counts the destruction of game thing p_index for the last shooter's side and team, and
 // removes it.
-// The shooter and local player comparisons have their operands the other way around.
-// FUNCTION: MW2 0x1006bf8c
 void KillGameThing(MechU32 p_index)
 {
 	GameThing* thing;
@@ -1114,8 +1057,6 @@ void KillGameThing(MechU32 p_index)
 
 // Takes p_damage off the hit points of the game thing p_shape belongs to; when they run out,
 // blows it up and counts it destroyed.
-// Stack-slot permutation: index and thing.
-// FUNCTION: MW2 0x1006c11c
 void DamageGameThing(MechS32 p_owner, Shape* p_shape, MechS32 p_damage, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	MechU32 index;
@@ -1151,9 +1092,6 @@ void DamageGameThing(MechS32 p_owner, Shape* p_shape, MechS32 p_damage, MechS32 
 }
 
 // Shows up to p_count free effects of type 0xb (all when 0) at (p_x, p_y, p_z) as debris.
-// Stack-slot permutation of the locals; the shown < p_count comparison has its operands the
-// other way around.
-// FUNCTION: MW2 0x1006c237
 void ScatterDebris(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_count)
 {
 	MechS32 shown;
@@ -1185,7 +1123,6 @@ void ScatterDebris(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_count)
 	}
 }
 
-// FUNCTION: MW2 0x1006c345
 void SaveCareerRecord(void)
 {
 	if (g_missionReport != NULL) {
@@ -1194,9 +1131,6 @@ void SaveCareerRecord(void)
 }
 
 // Heats up the mechs near burning game things (shapes of type 0x10), the more the closer.
-// Stack-slot permutation of the locals; the i != g_localPlayerId and distance < reach
-// comparisons have their operands the other way around.
-// FUNCTION: MW2 0x1006c362
 void HeatMechsNearFires(void)
 {
 	Shape* root;
@@ -1254,8 +1188,6 @@ void HeatMechsNearFires(void)
 
 // Sets off a nuke at the player's position: the palette flash, the effect, and the blast that
 // grows over the next ticks (UpdateNuke).
-// Stack-slot permutation: duration, effect and shape.
-// FUNCTION: MW2 0x1006c4e2
 void StartNuke(Player* p_player)
 {
 	MechS32 i;
@@ -1291,9 +1223,6 @@ void StartNuke(Player* p_player)
 }
 
 // Grows the nuke's blast and damages everything in it.
-// The g_nukeRadius > g_nukeMaxRadius comparison has its operands the other way around;
-// defining the two globals the other way around didn't flip it.
-// FUNCTION: MW2 0x1006c5e7
 void UpdateNuke(void)
 {
 	if (g_nukeTimeLeft <= 0) {

@@ -21,7 +21,6 @@ extern "C"
 
 	// Whitespace-separated tokens read ahead from a text file, up to 100 at a time. Line ends and
 	// '=' are tokens of their own, and trailing commas are dropped.
-	// SIZE 0x14
 	typedef struct TokenStream {
 		MechS32 m_capacity;  // 0x00
 		MechS32 m_count;     // 0x04

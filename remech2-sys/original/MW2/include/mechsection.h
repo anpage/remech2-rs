@@ -7,7 +7,6 @@
 // One of a mech's eight sections (Mech::m_sections), as the network state message carries it.
 // The low two nibbles of m_flags scale the damage level of m_armor[0] and m_armor[1]; a
 // section with m_unk0x08 used up and m_flags bit 0x2000 clear is destroyed.
-// SIZE 0x28
 typedef struct MechSection {
 	MechS32 m_armor[2];  // 0x00 — front and rear
 	MechS32 m_internal;  // 0x08

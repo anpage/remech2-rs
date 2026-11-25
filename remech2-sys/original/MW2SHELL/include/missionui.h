@@ -10,7 +10,6 @@ class AudioSample;
 class ButtonMenu;
 class TextGlyph;
 
-// SIZE 0x08
 // A mech's name on the briefing screen: its glyph and the mech type it shows.
 struct MechNameTag {
 	TextGlyph* m_glyph; // 0x00

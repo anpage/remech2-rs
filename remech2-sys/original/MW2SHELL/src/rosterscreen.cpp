@@ -39,18 +39,13 @@
 // mission list.
 
 // DrawPilotRoster's p_campaign.
-// GLOBAL: MW2SHELL 0x1007cc98
 MechS32 g_rosterCampaign;
 
-// GLOBAL: MW2SHELL 0x1007cca0
 MechChar g_rosterFieldText[0x100];
 
 // The campaign's ten slots of g_pilotRoster.
-// GLOBAL: MW2SHELL 0x1007cda8
 PilotRecord* g_rosterPilots[10];
 
-// Stack-slot permutation: top and i.
-// FUNCTION: MW2SHELL 0x10014b60
 void ShowPilotCallsigns()
 {
 	PilotRecord* pilot;
@@ -71,7 +66,6 @@ void ShowPilotCallsigns()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10014c1e
 void HidePilotCallsigns()
 {
 	PilotRecord* pilot;
@@ -86,7 +80,6 @@ void HidePilotCallsigns()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10014caa
 void ClearPilot(PilotRecord* p_pilot)
 {
 	p_pilot->m_inUse = 0;
@@ -97,7 +90,6 @@ void ClearPilot(PilotRecord* p_pilot)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10014d3e
 void SetActivePilot(PilotRecord* p_pilot)
 {
 	MechS32 i;
@@ -109,7 +101,6 @@ void SetActivePilot(PilotRecord* p_pilot)
 }
 
 // Draws the tab's data, a string, in the button font.
-// FUNCTION: MW2SHELL 0x10014dc4
 TextGlyph* DrawRosterLabel(ScreenField* p_tab)
 {
 	MechChar* text = (MechChar*) p_tab->m_data;
@@ -118,7 +109,6 @@ TextGlyph* DrawRosterLabel(ScreenField* p_tab)
 }
 
 // The mission list: the tab's data is the mission index. Missions the pilot hasn't reached stay blank.
-// FUNCTION: MW2SHELL 0x10014dfe
 TextGlyph* DrawMissionListEntry(ScreenField* p_tab)
 {
 	if (MECH_PTR_TO_S32(p_tab->m_data) >= g_currentPilot->m_mission) {
@@ -131,7 +121,6 @@ TextGlyph* DrawMissionListEntry(ScreenField* p_tab)
 
 // The pilot record callbacks below open with a test of p_tab that does nothing.
 
-// FUNCTION: MW2SHELL 0x10014e83
 TextGlyph* DrawPilotCallsign(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -141,7 +130,6 @@ TextGlyph* DrawPilotCallsign(ScreenField* p_tab)
 	return g_titleFont->AddText(p_tab->m_left, p_tab->m_top, g_rosterFieldText, NULL);
 }
 
-// FUNCTION: MW2SHELL 0x10014ed7
 TextGlyph* DrawPilotRank(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -151,7 +139,6 @@ TextGlyph* DrawPilotRank(ScreenField* p_tab)
 	return g_titleFont->AddText(p_tab->m_left, p_tab->m_top, g_rosterFieldText, NULL);
 }
 
-// FUNCTION: MW2SHELL 0x10014f32
 TextGlyph* DrawPilotHonor(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -161,7 +148,6 @@ TextGlyph* DrawPilotHonor(ScreenField* p_tab)
 	return g_titleFont->AddText(p_tab->m_left, p_tab->m_top, g_rosterFieldText, NULL);
 }
 
-// FUNCTION: MW2SHELL 0x10014f86
 TextGlyph* DrawPilotMission(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -172,7 +158,6 @@ TextGlyph* DrawPilotMission(ScreenField* p_tab)
 }
 
 // The mission list's click callback.
-// FUNCTION: MW2SHELL 0x10014fee
 void ClickMissionListEntry(ScreenField* p_tab)
 {
 	if (p_tab) {
@@ -185,7 +170,6 @@ void ClickMissionListEntry(ScreenField* p_tab)
 #define ROSTER_END {-1, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL}
 
 // The selected pilot's record.
-// GLOBAL: MW2SHELL 0x10063c78
 ScreenField g_pilotRecordFields[8] = {
 	ROSTER_TAB(0x1d4, 0x5c, -1, DrawPilotCallsign, NULL, NULL),
 	ROSTER_TAB(0x1d4, 0xd1, -1, DrawRosterLabel, NULL, "~RANK"),
@@ -198,7 +182,6 @@ ScreenField g_pilotRecordFields[8] = {
 };
 
 // The mission list.
-// GLOBAL: MW2SHELL 0x10063dd8
 ScreenField g_missionListFields[] = {
 	ROSTER_TAB(0x1d4, 0x5c, -1, DrawPilotCallsign, NULL, NULL),
 	ROSTER_TAB(0x1d4, 0xc8, -1, DrawRosterLabel, NULL, "~Select Mission"),
@@ -226,20 +209,15 @@ ScreenField g_missionListFields[] = {
 #undef ROSTER_END
 
 // Database item 0x51, started when the roster opens.
-// GLOBAL: MW2SHELL 0x1006411c
 AudioSample* g_rosterSound = NULL;
 
 // Set while the mission list shows instead of the pilot's record.
-// GLOBAL: MW2SHELL 0x10064120
 MechS32 g_missionListShown = 0;
 
-// GLOBAL: MW2SHELL 0x1007cda0
 ButtonMenu* g_rosterMenu;
 
 // Opens the pilot roster of the campaign's clan hall: the ten pilot slots, the active pilot's
 // record, and the menu.
-// Not 100%: the stack slots of data, slot, i and size are permuted.
-// FUNCTION: MW2SHELL 0x10015008
 void DrawPilotRoster(TMPackDataBase* p_database, MechS32 p_campaign, MechU8* p_pilotChosen, char**)
 {
 	void* data = NULL;

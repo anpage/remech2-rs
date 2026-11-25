@@ -1,5 +1,4 @@
-/* VFX3D, Miles Design VFX's polygon fillers (3rdparty/vfx/VFX3D.ASM), in portable C, which both
-   DLLs compile in place of the assembly.
+/* VFX3D, Miles Design VFX's polygon fillers, reimplemented in C, which both DLLs compile.
 
    The fillers take a polygon as an array of six-dword vertices: x and y, then the vertex's color
    (16.16) or texture coordinates (16.16, at +0x0c and +0x10). They walk its left and right edges

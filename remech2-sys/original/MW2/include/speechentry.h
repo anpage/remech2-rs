@@ -8,7 +8,6 @@
 
 // A queued voice message (QueueSpeech): a line and an optional suffix, played one after the
 // other, with their joined text.
-// SIZE 0x53
 typedef struct SpeechEntry {
 	MechS32 m_used;             // 0x00
 	MechS32 m_id;               // 0x04

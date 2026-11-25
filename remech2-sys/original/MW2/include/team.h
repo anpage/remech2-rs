@@ -5,7 +5,6 @@
 #include "teamformation.h"
 #include "types.h"
 
-// SIZE 0x38
 typedef struct Team {
 	MechS32 m_leader;         // 0x00 — a player index, or -1
 	MechS32 m_memberCount;    // 0x04

@@ -1,6 +1,5 @@
-/* VFXA, Miles Design VFX's 2D primitives (3rdparty/vfx/VFXA.ASM), in portable C, which both DLLs
-   compile in place of the assembly through their own vfxa.h. The names are VFX's; the C's own
-   helpers have names of their own.
+/* VFXA, Miles Design VFX's 2D primitives, reimplemented in C, which both DLLs compile through their
+   own vfxa.h. The names are VFX's; the C's own helpers have names of their own.
 
    Most routines start by clipping their pane to its window: a window whose x_max or y_max is
    negative returns -1, a pane that leaves nothing of it -2. Coordinates are relative to the

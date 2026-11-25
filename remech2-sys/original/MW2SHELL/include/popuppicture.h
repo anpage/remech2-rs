@@ -11,7 +11,6 @@ class VideoDriver;
 
 // A picture shown centered over the back buffer. It saves the pixels it covers, so hiding it
 // restores the screen.
-// SIZE 0x35c
 class PopupPicture {
 public:
 	PopupPicture(

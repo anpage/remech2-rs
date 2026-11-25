@@ -26,46 +26,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(ArchiveReader, 0x1b9)
-DECOMP_SIZE_ASSERT(ArchiveReader::Topic, 0x06)
-
-// GLOBAL: MW2SHELL 0x100665f8
 ArchiveReader* g_archiveReader = NULL;
 
 // The message to post when the archive is left.
-// GLOBAL: MW2SHELL 0x100665fc
 size_t g_archiveReturnMessage = 0;
 
 // Database item 103: started when the archive opens, and again once a long entry's text has
 // been read.
-// GLOBAL: MW2SHELL 0x10066600
 AudioSample* g_archiveSound = NULL;
 
 // The text of the entry being loaded.
-// GLOBAL: MW2SHELL 0x1007ce10
 MechChar g_archiveText[0x10000];
 
 // The entry's title, the topic link names and the text line being read.
-// GLOBAL: MW2SHELL 0x1008ce10
 MechChar g_archiveTitle[0x200];
 
-// GLOBAL: MW2SHELL 0x1008d010
 MechChar g_archiveTopicName[0x200];
 
 // The link buttons of PrevPage and NextPage.
-// GLOBAL: MW2SHELL 0x1008d210
 MainMenuButton g_prevPageLinkButton;
 
-// GLOBAL: MW2SHELL 0x1008d230
 MainMenuButton g_nextPageLinkButton;
 
-// GLOBAL: MW2SHELL 0x1008d250
 MechChar g_archiveLine[0x400];
 
 void ArchiveCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg);
 
 // Opens the clan hall archive of a campaign.
-// FUNCTION: MW2SHELL 0x10029010
 void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam)
 {
 	void* audioData;
@@ -91,7 +78,6 @@ void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam
 	RegisterScreenFunction(ArchiveCallback);
 }
 
-// FUNCTION: MW2SHELL 0x10029181
 void ArchiveCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg)
 {
 	if (p_msg == c_msgScreenFrame) {
@@ -117,7 +103,6 @@ void ArchiveCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100292c2
 void ArchiveReader::AddTopic(MechS16 p_entry, MechS32 p_index)
 {
 	Topic* topic = NULL;
@@ -129,13 +114,11 @@ void ArchiveReader::AddTopic(MechS16 p_entry, MechS32 p_index)
 }
 
 // Clears the screen's glyphs, without deleting them.
-// FUNCTION: MW2SHELL 0x1002931d
 void ArchiveReader::ClearGlyphs()
 {
 	g_videoDriver->ClearGlyphs(FALSE);
 }
 
-// FUNCTION: MW2SHELL 0x10029340
 void ArchiveReader::FirstPage()
 {
 	Page* page = NULL;
@@ -156,8 +139,6 @@ void ArchiveReader::FirstPage()
 	PrevPage();
 }
 
-// Stack-slot permutation: page, unused, link and button.
-// FUNCTION: MW2SHELL 0x100293fc
 void ArchiveReader::PrevPage()
 {
 	Page* page = NULL;
@@ -214,8 +195,6 @@ void ArchiveReader::PrevPage()
 	}
 }
 
-// Stack-slot permutation: page, button, i and link.
-// FUNCTION: MW2SHELL 0x100296df
 void ArchiveReader::NextPage()
 {
 	Page* page = NULL;
@@ -262,8 +241,6 @@ void ArchiveReader::NextPage()
 }
 
 // Follows a topic link: opens its entry in a child reader.
-// Stack-slot permutation: topic and unused.
-// FUNCTION: MW2SHELL 0x1002991e
 void ArchiveReader::OpenTopic(MechS32 p_id)
 {
 	Page* page = NULL;
@@ -294,7 +271,6 @@ void ArchiveReader::OpenTopic(MechS32 p_id)
 }
 
 // Returns c_msgArchive while the reader stays open.
-// FUNCTION: MW2SHELL 0x10029ade
 MechS32 ArchiveReader::Run()
 {
 	MechS32 result;
@@ -384,8 +360,6 @@ MechS32 ArchiveReader::Run()
 
 // Reads an archive entry: a title command, then text, picture and topic commands up to the end
 // command. The text is laid out into as many pages as it needs.
-// Stack-slot permutation: most of the locals.
-// FUNCTION: MW2SHELL 0x10029db5
 void ArchiveReader::Load(MechS32 p_entry)
 {
 	Page* page;
@@ -520,7 +494,6 @@ void ArchiveReader::Load(MechS32 p_entry)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1002a490
 ArchiveReader::ArchiveReader(
 	MechChar* p_name,
 	Font* p_font,
@@ -578,7 +551,6 @@ ArchiveReader::ArchiveReader(
 	PrevPage();
 }
 
-// FUNCTION: MW2SHELL 0x1002a7b0
 ArchiveReader::~ArchiveReader()
 {
 	MechS32 i;

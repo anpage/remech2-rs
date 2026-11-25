@@ -29,9 +29,6 @@
 // stops it at the first mech (CollideWithMechs), building (CollideWithBuildings) or terrain shape it hits,
 // bouncing its velocity off the surface. Returns the number of ticks it has been colliding (0:
 // free); *p_hit is the shape it hit and *p_player the mech's player.
-// Stack-slot permutation of the locals. The original sums dot's three products in source order;
-// the build starts with the second.
-// FUNCTION: MW2 0x100758a0
 MechS32 MoveMechWithCollisions(
 	Mech* p_mech,
 	Shape** p_hit,
@@ -172,8 +169,6 @@ MechS32 MoveMechWithCollisions(
 // gives p_mech a velocity away from it. A mech pushing into one that pushed into it first (whose
 // m_collidedWith is p_mech's player) always collides. A mech in state 4 is knocked down
 // (KnockMechOver) instead. Returns 1 on a collision, with *p_hit the other mech's player.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10075d7b
 MechS32 CollideWithMechs(Mech* p_mech, MechS32* p_x, MechS32* p_y, MechS32* p_z, Player** p_hit)
 {
 	MechS32 radius;
@@ -316,9 +311,6 @@ MechS32 CollideWithMechs(Mech* p_mech, MechS32* p_x, MechS32* p_y, MechS32* p_z,
 // Pushes the point (*p_x, *p_y, *p_z) of p_mech out of the first building (a shape of type 6)
 // it overlaps and bounces its velocity away. A shape of kind 0x50 isn't solid: it only gets a
 // push and a sound. Returns 1 on a collision, with *p_hit the shape.
-// Stack-slot permutation of the locals. Operand order: dist < reach loads reach first in the
-// original.
-// FUNCTION: MW2 0x10076295
 MechS32 CollideWithBuildings(Mech* p_mech, MechS32* p_x, MechS32* p_y, MechS32* p_z, Shape** p_hit)
 {
 	MechS32 dz;
@@ -410,8 +402,6 @@ MechS32 CollideWithBuildings(Mech* p_mech, MechS32* p_x, MechS32* p_y, MechS32* 
 
 // Damages p_mech and p_other by their collision, when the difficulty has collision damage and
 // they met faster than 200000.
-// The only diff is a stack-slot permutation of speed and damage.
-// FUNCTION: MW2 0x100765f8
 void DamageMechsInCollision(Mech* p_mech, Mech* p_other)
 {
 	MechS32 speed;
@@ -435,9 +425,6 @@ void DamageMechsInCollision(Mech* p_mech, Mech* p_other)
 // Damages p_mech by a collision along the last collision normal: from below (the normal points
 // down) the legs, scaled by the other mech's mass, from above both side torsos at half, and
 // otherwise the section facing the normal. p_other is NULL for a building or the ground.
-// Stack-slot permutation: attacker and angle. Operand order: damage < p_damage loads p_damage
-// first in the original.
-// FUNCTION: MW2 0x1007669e
 void ApplyCollisionDamage(Mech* p_mech, Mech* p_other, MechS32 p_damage)
 {
 	MechS32 attacker;
@@ -498,8 +485,6 @@ void ApplyCollisionDamage(Mech* p_mech, Mech* p_other, MechS32 p_damage)
 
 // Damages p_mech for hitting p_shape (NULL: the ground) faster than 200000, and the shape too
 // when it can be damaged. In a network game, a shape of kind 0xb0 destroys both legs and itself.
-// Stack-slot permutation: damage and speed.
-// FUNCTION: MW2 0x100768a8
 void DamageMechHittingShape(Mech* p_mech, Shape* p_shape)
 {
 	MechS32 damage;
@@ -544,7 +529,6 @@ void DamageMechHittingShape(Mech* p_mech, Shape* p_shape)
 
 // Knocks p_mech over: plays its fall (unless another machine of a network game controls it),
 // marks it fallen and plays the crash sound.
-// FUNCTION: MW2 0x10076a23
 void KnockMechOver(Mech* p_mech)
 {
 	MechS32 x;

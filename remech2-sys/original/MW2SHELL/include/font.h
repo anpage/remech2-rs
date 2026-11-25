@@ -7,7 +7,6 @@
 class TextGlyph;
 class VideoDriver;
 
-// SIZE 0x414
 class Font {
 public:
 	Font(void* p_data, VideoDriver* p_videoDriver);
@@ -29,7 +28,6 @@ private:
 	MechS32 m_typedCount;        // 0x404
 
 public:
-	// TextGlyph and MouseState read these directly: an inline accessor would leave a jmp at /Ob1.
 	void* m_dataCopy;           // 0x408 — m_data, for VideoDriver::DrawString
 	MechS32 m_height;           // 0x40c
 	VideoDriver* m_videoDriver; // 0x410

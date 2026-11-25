@@ -27,79 +27,59 @@
 // section's front and rear armor.
 
 // The section each of the outline's sixteen parts shows, plus one (0: none).
-// GLOBAL: MW2 0x100a5c78
 MechS32 g_outlinePartSections[16] = {1, 3, 3, 2, 2, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 0};
 
 // The places of the armor bars' four labels, in 16.16 fractions of the panel until InitDamagePanel
 // scales them.
 
-// GLOBAL: MW2 0x100a5cb8
 Point g_htalLabelHPosition = {0x1e1e, 0x199a};
 
-// GLOBAL: MW2 0x100a5cc0
 Point g_htalLabelTPosition = {0x5050, 0x199a};
 
-// GLOBAL: MW2 0x100a5cc8
 Point g_htalLabelAPosition = {0x9697, 0x199a};
 
-// GLOBAL: MW2 0x100a5cd0
 Point g_htalLabelLPosition = {0xd2d3, 0x199a};
 
 // The largest armor value of the local mech's sections.
-// GLOBAL: MW2 0x100a5cd8
 MechS32 g_maxSectionArmor = 0;
 
 // The outline's rectangle, centered in the panel.
-// GLOBAL: MW2 0x100a5ce0
 PANE g_outlineRect = {NULL, 0, 0, 0, 0};
 
 // The outline's sixteen parts: rectangles in the outline shape's pixels (LoadHudFile reads them)
 // until InitDamagePanel places them on the screen.
-// GLOBAL: MW2 0x100a5cf8
 PANE g_outlinePartRects[16] = {0};
 
 // Where each part's shape is drawn from, relative to its rectangle.
-// GLOBAL: MW2 0x100a5e38
 Point g_outlinePartOffsets[16] = {0};
 
 // Frames the outline's parts (OutlinePane) when set.
-// GLOBAL: MW2 0x100a5eb8
 MechS32 g_frameOutlineParts = 0;
 
 // The armor bars' labels.
 
-// GLOBAL: MW2 0x100a5ebc
 MechChar g_htalLabelH[4] = "H";
 
-// GLOBAL: MW2 0x100a5ec0
 MechChar g_htalLabelT[4] = "T";
 
-// GLOBAL: MW2 0x100a5ec4
 MechChar g_htalLabelA[4] = "A";
 
-// GLOBAL: MW2 0x100a5ec8
 MechChar g_htalLabelL[4] = "L";
 
 // The armor bars' places, one per section (m_x the bar's left, m_y its bottom).
-// GLOBAL: MW2 0x100be418
 Point g_armorBarPositions[8];
 
 // Each section's full front and rear armor.
-// GLOBAL: MW2 0x100be458
 Point g_fullSectionArmor[8];
 
 // The remap table that colors an outline part (entry 6) by its damage.
-// GLOBAL: MW2 0x100be498
 MechU8 g_outlineRemap[0x100];
 
 // The armor bars' width and full height.
-// GLOBAL: MW2 0x100be598
 Point g_armorBarSize;
 
 // Sets up the damage panel: the identity remap table, the outline's rectangle and parts, the
 // labels and armor bars' places, and the local mech's full armor.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10040020
 void InitDamagePanel(void)
 {
 	CockpitPanel* panel;
@@ -204,8 +184,6 @@ void InitDamagePanel(void)
 
 // Draws the damage panel's outline, each part shaded by its section's damage: yellow, then red
 // as its armor goes, black once the section is destroyed.
-// The original loads m_sections before scaling index, and the locals are a stack-slot permutation.
-// FUNCTION: MW2 0x10040511
 void DrawDamageOutline(Mech* p_mech, PANE* p_target)
 {
 	MechS32 rear;
@@ -295,9 +273,6 @@ void DrawDamageOutline(Mech* p_mech, PANE* p_target)
 
 // Draws the damage panel's armor bars: each section's front armor, and the rear armor of the
 // torso sections (1 to 3) beside it, full height for the section's full armor.
-// The two full > armor tests take their operands in the other order, and the locals are a
-// stack-slot permutation.
-// FUNCTION: MW2 0x100407b6
 void DrawArmorBars(Mech* p_mech, PANE* p_target)
 {
 	MechS32 full;

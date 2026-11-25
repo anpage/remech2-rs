@@ -9,14 +9,12 @@ class AudioSample;
 class ButtonMenu;
 class TextGlyph;
 
-// SIZE 0x08
 // A formation: its label and its simulator option.
 struct FormationOption {
 	MechChar* m_label;  // 0x00
 	MechChar* m_option; // 0x04
 };
 
-// SIZE 0x10
 // A mech's place in a formation on the star screen: the star's mech it shows, where its video
 // plays and which label position its name takes.
 struct FormationSlot {
@@ -26,7 +24,6 @@ struct FormationSlot {
 	MechS32 m_label; // 0x0c
 };
 
-// SIZE 0x30
 // A formation's three positions.
 struct FormationPositions {
 	FormationSlot m_posts[3]; // 0x00

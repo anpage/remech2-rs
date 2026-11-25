@@ -50,41 +50,31 @@
 #include <stdio.h>
 
 // The satellite view's display option, 0 or 1 (DrawSatelliteStatic).
-// GLOBAL: MW2 0x100a5a18
 MechS32 g_satelliteStaticState = 0;
 
 // The frame callback the satellite view replaces (SwitchCockpitView).
-// GLOBAL: MW2 0x100a5a1c
 void (*g_savedFrameDrawCallback)(void) = DrawScene;
 
 // The overlay settings the satellite view keeps while a cockpit view shows (SwitchCockpitView):
 // g_showCrosshair's, g_showHud's and g_showTargetMarker's, and whether they are held.
 
-// GLOBAL: MW2 0x100a5a20
 MechS32 g_savedShowCrosshair = 1;
 
-// GLOBAL: MW2 0x100a5a24
 undefined4 g_savedShowHud = 1;
 
-// GLOBAL: MW2 0x100a5a28
 MechS32 g_savedShowTargetMarker = 1;
 
-// GLOBAL: MW2 0x100a5a2c
 MechS32 g_hudSettingsSaved = 0;
 
 // The height the map view's shading starts at (GetMapHeightShade).
-// GLOBAL: MW2 0x100a5a30
 MechS32 g_mapShadeBase = 0;
 
-// GLOBAL: MW2 0x100a5a34
 MechS32 g_mapShadeTop = 0x1900;
 
 // The height range the map view's shading spans (GetMapHeightShade).
-// GLOBAL: MW2 0x100a5a38
 MechS32 g_mapShadeRange = 0x1900;
 
 // The gauge functions of the cockpit layouts, by index.
-// GLOBAL: MW2 0x100a5a40
 CockpitGaugeFn g_cockpitGauges[10] = {
 	NULL,
 	(CockpitGaugeFn) OutlinePane,
@@ -98,7 +88,6 @@ CockpitGaugeFn g_cockpitGauges[10] = {
 	NULL
 };
 
-// GLOBAL: MW2 0x100a5a68
 PANE g_cockpitGaugePanes[5] = {
 	{&g_mainPixelBuffer, 0, 0, 0, 0},
 	{&g_mainPixelBuffer, 0, 0, 0, 0},
@@ -107,7 +96,6 @@ PANE g_cockpitGaugePanes[5] = {
 	{&g_mainPixelBuffer, 0, 0, 0, 0}
 };
 
-// GLOBAL: MW2 0x100a5ad0
 PANE g_unk0x100a5ad0[8] = {
 	{&g_mainPixelBuffer, 0, 0, 0, 0},
 	{&g_mainPixelBuffer, 0, 0, 0, 0},
@@ -119,63 +107,47 @@ PANE g_unk0x100a5ad0[8] = {
 	{&g_mainPixelBuffer, 0, 0, 0, 0}
 };
 
-// GLOBAL: MW2 0x100a5b70
 Point g_unk0x100a5b70[4] = {0};
 
-// GLOBAL: MW2 0x100a5b90
 Point g_unk0x100a5b90[4] = {0};
 
-// GLOBAL: MW2 0x100a5bb0
 Point g_unk0x100a5bb0 = {0, 0};
 
-// GLOBAL: MW2 0x100a5bb8
 void* g_unk0x100a5bb8[4] = {g_unk0x100a5b90, g_unk0x100a5b70, g_unk0x100a5ad0, &g_unk0x100a5bb0};
 
 // Whether cockpit view 1 and 2's map animation shows this frame (DrawDamagedMapView).
-// GLOBAL: MW2 0x100a5bc8
 MechS32 g_mapDamageAnimShown = 0;
 
 // The clock times the satellite view's static starts and stops at (DrawSatelliteStatic).
 
-// GLOBAL: MW2 0x100be410
 MechS32 g_staticCleanUntil;
 
-// GLOBAL: MW2 0x100be414
 MechS32 g_staticNoiseUntil;
 
 // The cockpit view before the current one (SwitchCockpitView).
-// GLOBAL: MW2 0x10109c5c
 MechS32 g_previousCockpitView;
 
 // The map view's power mode, and the one before: 1 sliding in while the mech starts up
 // (PowerUpMapView), 3 sliding out while it shuts down (PowerDownMapView), 4 running (RunMapView),
 // 0 reset (ResetMapView). The readouts draw only while it runs.
-// GLOBAL: MW2 0x10109c60
 MechS32 g_previousMapViewMode;
 
-// GLOBAL: MW2 0x10109c64
 MechS32 g_cockpitLayoutIndex;
 
-// GLOBAL: MW2 0x10109c68
 MechS32 g_mapViewMode;
 
 // The view g_cockpitLayoutIndex switches to; 3 and 5 enter and leave the satellite view (4).
-// GLOBAL: MW2 0x10109c6c
 MechS32 g_requestedCockpitView;
 
 // Set while the map views follow the free eyepoint instead of the player (the free-eye cheat).
-// GLOBAL: MW2 0x10109c70
 MechS32 g_mapFollowsFreeEye;
 
 // Set to draw the satellite view without its static once (DrawSatelliteStatic).
-// GLOBAL: MW2 0x10109c74
 MechS32 g_satelliteClean;
 
 // Places the cockpit view p_cockpit on the screen: its viewport (kept in the render-target table,
 // and for the normal cockpit also in g_cockpitPanelPanes), its points and extra rectangles, and its
 // gauge functions.
-// Stack-slot permutation: index, rect, transition and viewport.
-// FUNCTION: MW2 0x1003dab0
 void LoadCockpitLayout(MechS32 p_cockpit, CockpitLayout* p_layout)
 {
 	MechS32 index;
@@ -239,7 +211,6 @@ void LoadCockpitLayout(MechS32 p_cockpit, CockpitLayout* p_layout)
 
 // Places every cockpit view's layout on the screen and starts in cockpit view 0, then the text
 // readout and the map view's shading range.
-// FUNCTION: MW2 0x1003dce8
 void InitCockpitViews(void)
 {
 	MechS32 i;
@@ -258,7 +229,6 @@ void InitCockpitViews(void)
 
 // The map view while the local mech runs: switches views as asked, drawing through the frame
 // callback (DrawCockpitView), or the satellite view's own.
-// FUNCTION: MW2 0x1003dd82
 void RunMapView(void)
 {
 	g_previousMapViewMode = g_mapViewMode;
@@ -275,9 +245,6 @@ void RunMapView(void)
 // (4) with its own frame callback, and 5 back out to the view it was entered from. Keeps the
 // overlay settings the satellite view changes while a cockpit view shows, and leaves it when the
 // player dies. Returns whether the view changed.
-// Stack-slot permutation; g_cockpitLayoutIndex != g_requestedCockpitView compares in the other operand
-// order.
-// FUNCTION: MW2 0x1003ddd7
 MechS32 SwitchCockpitView(void)
 {
 	MechS32 changed;
@@ -357,7 +324,6 @@ MechS32 SwitchCockpitView(void)
 
 // Draws the current cockpit view (the frame callback in the satellite view): switches views as
 // asked, then draws the map, damaged while the radar panel is.
-// FUNCTION: MW2 0x1003e03c
 void DrawCockpitView(void)
 {
 	SwitchCockpitView();
@@ -373,9 +339,7 @@ void DrawCockpitView(void)
 // the player's weapon object (or the free eyepoint) from the view's range. The satellite view (4)
 // draws the terrain with its own shape filter, face and polygon hooks, over a cleared view. Then
 // the field of view, the icons, the view's own gauge and, in the map views, the readouts.
-// The pose has a seventh element nothing uses. The only diff is a stack-slot permutation of the
-// locals.
-// FUNCTION: MW2 0x1003e06c
+// The pose has a seventh element nothing uses.
 void DrawMapView(void)
 {
 	MechS32 farPlane;
@@ -481,8 +445,6 @@ void DrawMapView(void)
 
 // Draws the map view's contents: the nav points, the center icon and the other players and
 // things, and the target.
-// The only diff is a stack-slot permutation of the locals. The original has an unused local (unused).
-// FUNCTION: MW2 0x1003e32c
 void DrawMapContents(CockpitLayout* p_layout)
 {
 	MechS32 id;
@@ -512,7 +474,6 @@ void DrawMapContents(CockpitLayout* p_layout)
 }
 
 // Draws icon p_icon at the world position p_pos, if the map view shows it.
-// FUNCTION: MW2 0x1003e40a
 void DrawMapIcon(CockpitLayout* p_layout, MapPoint p_pos, MechS32 p_icon)
 {
 	PANE* viewport;
@@ -535,8 +496,6 @@ void DrawMapIcon(CockpitLayout* p_layout, MapPoint p_pos, MechS32 p_icon)
 }
 
 // Draws the other live players and the live game things, by side.
-// Stack-slot permutation; i < g_gameThingCount compares in the other operand order.
-// FUNCTION: MW2 0x1003e4cd
 void DrawMapUnits(CockpitLayout* p_layout)
 {
 	Player* player;
@@ -571,15 +530,12 @@ void DrawMapUnits(CockpitLayout* p_layout)
 
 // Returns whether team p_team has reached the nav point. The team test is an | where an & was
 // meant: any reached nav counts.
-// FUNCTION: MW2 0x1003e645
 MechS32 IsNavReached(NavPoint* p_nav, MechS32 p_team)
 {
 	return (p_nav->m_flags & 0x20) && (p_nav->m_teamsReached | (1 << p_team));
 }
 
 // Draws the local player's target: in the view, or clamped to its edge when outside it.
-// Stack-slot permutation; m_icons[row][side] loads the table before the row (index order).
-// FUNCTION: MW2 0x1003e689
 void DrawMapTarget(CockpitLayout* p_layout)
 {
 	MechS32 index;
@@ -675,8 +631,6 @@ void DrawMapTarget(CockpitLayout* p_layout)
 }
 
 // Draws the local team's nav points, marking the ones reached.
-// Stack-slot permutation; i < g_navCount compares in the other operand order.
-// FUNCTION: MW2 0x1003e974
 void DrawMapNavPoints(CockpitLayout* p_layout)
 {
 	MapPoint pos;
@@ -727,8 +681,6 @@ void DrawMapNavPoints(CockpitLayout* p_layout)
 }
 
 // Draws the two lines of the view's field of view from the center, around heading p_heading.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1003eb22
 void DrawMapFieldOfView(CockpitLayout* p_layout, MechS32 p_heading)
 {
 	MechS32 halfFov;
@@ -755,8 +707,6 @@ void DrawMapFieldOfView(CockpitLayout* p_layout, MechS32 p_heading)
 
 // Draws the view's range readout and, in the satellite view, the heading readout, formatting them
 // again only when they change.
-// Stack-slot permutation: every local.
-// FUNCTION: MW2 0x1003ec35
 void DrawMapViewText(CockpitLayout* p_layout)
 {
 	MechDouble value;
@@ -829,7 +779,6 @@ void DrawMapViewText(CockpitLayout* p_layout)
 }
 
 // Cycles the three cockpit views.
-// FUNCTION: MW2 0x1003ee26
 void CycleCockpitView(void)
 {
 	if (g_cockpitLayoutIndex <= 2 && g_requestedCockpitView <= 2) {
@@ -838,13 +787,11 @@ void CycleCockpitView(void)
 	}
 }
 
-// FUNCTION: MW2 0x1003ee69
 MechS32 IsSatelliteView(void)
 {
 	return g_cockpitLayoutIndex == 4;
 }
 
-// FUNCTION: MW2 0x1003ee92
 void LeaveSatelliteView(void)
 {
 	if (g_cockpitLayoutIndex == 4) {
@@ -853,7 +800,6 @@ void LeaveSatelliteView(void)
 }
 
 // Leaves the satellite view, or else enters it from a cockpit view.
-// FUNCTION: MW2 0x1003eeaf
 void ToggleSatelliteView(void)
 {
 	if (g_cockpitLayoutIndex == 4 && g_requestedCockpitView == 4) {
@@ -866,7 +812,6 @@ void ToggleSatelliteView(void)
 
 // Zooms the current view's map: p_zoom 0 resets the range, 1 halves it (wrapping to the longest
 // below the shortest) and 2 doubles it (wrapping to the shortest).
-// FUNCTION: MW2 0x1003ef07
 void ZoomMapView(MechS32 p_zoom)
 {
 	CockpitLayout* layout;
@@ -899,8 +844,6 @@ void ZoomMapView(MechS32 p_zoom)
 
 // The map view's shape filter (RenderSettings::m_shapeFilter): skips dead players' shapes and
 // shapes of types 0x30 and 0x70, then culls through CullMapViewShape.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1003f00d
 MechS32 MapShapeFilter(Shape* p_shape)
 {
 	MechS32 type;
@@ -941,8 +884,6 @@ MechS32 MapShapeFilter(Shape* p_shape)
 // The satellite view's face hook (RenderSettings::m_drawFace): the color a face of p_face's shape
 // draws in, from the view's colors by the shape's kind and side, or the face's own (p_flags).
 // Faces of a textured kind (0x3000) draw in the view's color 10.
-// The only diff is a stack-slot permutation of the locals (and the jump tables' addresses).
-// FUNCTION: MW2 0x1003f0e7
 MechU32 SatelliteFaceColor(Face* p_face, Vertex* p_vertices, MechU32 p_flags, MechS32 p_distance)
 {
 	MechU32 color;
@@ -1026,8 +967,6 @@ MechU32 SatelliteFaceColor(Face* p_face, Vertex* p_vertices, MechU32 p_flags, Me
 // The satellite view's polygon hook (RenderSettings::m_drawPolygon): terrain faces (0x4000) are
 // shaded by height, textured ones (0x3000) drawn as bands, and the rest as usual; plain faces
 // (0) twice, the second time outlined (0x2000).
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1003f393
 void SatelliteDrawPolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
 {
 	MechU32 shade;
@@ -1075,8 +1014,6 @@ void SatelliteDrawPolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
 }
 
 // Returns the shade (0-15) of a height p_height in the map view.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1003f513
 MechS32 GetMapHeightShade(CockpitLayout* p_layout, MechS32 p_height)
 {
 	MechS32 shade;
@@ -1100,7 +1037,6 @@ MechS32 GetMapHeightShade(CockpitLayout* p_layout, MechS32 p_height)
 // Draws the layout's view into the rectangle p_transition has reached, restoring the viewport
 // afterwards. Returns FALSE once the transition is over; then, with p_final, it draws into the
 // transition's final rectangle and has it stretched to the screen.
-// FUNCTION: MW2 0x1003f594
 MechS32 DrawMapViewTransition(MechS32 p_reverse, CockpitLayout* p_layout, RectTransition* p_transition, MechS32 p_final)
 {
 	MechS32 result;
@@ -1138,7 +1074,6 @@ MechS32 DrawMapViewTransition(MechS32 p_reverse, CockpitLayout* p_layout, RectTr
 
 // The map view while the local mech starts up: slides the view's rectangle in (its transition),
 // then draws it.
-// FUNCTION: MW2 0x1003f66d
 void PowerUpMapView(void)
 {
 	RectTransition* transition;
@@ -1177,8 +1112,6 @@ void PowerUpMapView(void)
 // Draws the satellite view through its static: while the mission menu is open, or after a
 // reset (g_satelliteClean), cleanly; otherwise clean until a random time, then the view's
 // transition breaks it up until another random time.
-// The two clock comparisons compare in the other operand order.
-// FUNCTION: MW2 0x1003f74e
 void DrawSatelliteStatic(void)
 {
 	RectTransition* transition;
@@ -1224,8 +1157,6 @@ void DrawSatelliteStatic(void)
 // Draws the current cockpit view while the radar panel is damaged: the satellite view through its
 // static, or the map with the view's damage animation over it, flickering at damage 1 and steady
 // at 2.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1003f8d1
 void DrawDamagedMapView(void)
 {
 	MechS32 threshold;
@@ -1276,7 +1207,6 @@ void DrawDamagedMapView(void)
 }
 
 // The map view while the local mech shuts down or is off: slides the view's rectangle out.
-// FUNCTION: MW2 0x1003fa05
 void PowerDownMapView(void)
 {
 	RectTransition* transition;
@@ -1311,7 +1241,6 @@ void PowerDownMapView(void)
 }
 
 // Resets the map view's power modes (ShutdownCockpitPanels).
-// FUNCTION: MW2 0x1003fad9
 void ResetMapView(void)
 {
 	g_previousMapViewMode = 0;

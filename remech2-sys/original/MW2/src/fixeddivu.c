@@ -6,7 +6,6 @@
 #include "types.h"
 
 // Divides two 16.16 fixed-point values like FixedDiv16, but with an unsigned divide.
-// FUNCTION: MW2 0x10044700
 MechS32 FixedDivU16(MechS32 p_a, MechS32 p_b)
 {
 	/* The dividend is p_a sign-extended, then divided unsigned: the div faults for any negative

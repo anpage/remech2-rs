@@ -20,18 +20,15 @@
 #include <string.h>
 
 // The lancemates a message addresses.
-// GLOBAL: MW2 0x100a96c8
 SpeechLine g_slotSpeech[3] = {
 	{2, "All points", NULL},
 	{0x108, "Point 2", NULL},
 	{0x109, "Point 3", NULL},
 };
 
-// GLOBAL: MW2 0x100a96ec
 MechS32 g_unk0x100a96ec = 0;
 
 // What a lancemate reports.
-// GLOBAL: MW2 0x100a96f0
 SpeechLine g_lancemateSpeech[11] = {
 	{0, "cannot do this", NULL},
 	{0xa, "attacking your target", NULL},
@@ -46,10 +43,8 @@ SpeechLine g_lancemateSpeech[11] = {
 	{0x2a, "reports task complete. Rejoining formation", NULL},
 };
 
-// GLOBAL: MW2 0x100a9774
 MechS32 g_unk0x100a9774 = 0;
 
-// GLOBAL: MW2 0x100a9778
 SpeechLine g_formationSpeech[7] = {
 	{0xb, "Formation change to", NULL},
 	{0x4f, "echelon left", NULL},
@@ -60,20 +55,16 @@ SpeechLine g_formationSpeech[7] = {
 	{0x57, "wedge", NULL},
 };
 
-// GLOBAL: MW2 0x100a97cc
 MechS32 g_unk0x100a97cc = 0;
 
-// GLOBAL: MW2 0x100a97d0
 SpeechLine g_engageSpeech[3] = {
 	{0x54, "disengaged", NULL},
 	{0x50, "engaged", NULL},
 	{0x54, "disengaged", NULL},
 };
 
-// GLOBAL: MW2 0x100a97f4
 MechS32 g_unk0x100a97f4 = 0;
 
-// GLOBAL: MW2 0x100a97f8
 SpeechLine g_cockpitSpeech[34] = {
 	{0x40, "Heat level critical", NULL},
 	{0x4b, "Thermal threshold has been exceeded. Shutdown sequence initiated", NULL},
@@ -112,7 +103,6 @@ SpeechLine g_cockpitSpeech[34] = {
 };
 
 // The damaged parts "Critical hit : " names.
-// GLOBAL: MW2 0x100a9990
 SpeechLine g_damageSpeech[39] = {
 	{0x14, "weapon destroyed", NULL},
 	{0x30, "internal ammo explosion detected", NULL},
@@ -155,23 +145,16 @@ SpeechLine g_damageSpeech[39] = {
 	{0x3d, "MASC", NULL},
 };
 
-// GLOBAL: MW2 0x100a9b64
 SpeechEntry* g_speechQueue = NULL;
 
-// GLOBAL: MW2 0x100a9b68
 HSAMPLE g_speechSample = 0;
 
-// GLOBAL: MW2 0x100a9b6c
 MechS32 g_speechLocked = 0;
 
-// GLOBAL: MW2 0x100bea10
 SpeechEntry g_speechEntries[8];
 
 // Queues p_line, followed by p_suffix, by priority (-1: the sound's own). Returns whether it
 // was queued.
-// Stack slots: entry, i, prev and cur are permuted. Operand order: cur->m_priority <
-// entry->m_priority.
-// FUNCTION: MW2 0x10059390
 MechS32 QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, MechS32 p_priority)
 {
 	SpeechEntry* entry;
@@ -309,7 +292,6 @@ MechS32 QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, MechS32 p_priority
 }
 
 // Moves to the next queued message once the current one has finished.
-// FUNCTION: MW2 0x10059827
 void AdvanceSpeechQueue(void)
 {
 	MechS32 done;
@@ -340,8 +322,6 @@ void AdvanceSpeechQueue(void)
 }
 
 // Plays a queued message: the line and its suffix as sounds, or its text.
-// Stack slots: id and slot are swapped.
-// FUNCTION: MW2 0x100598f6
 MechS32 StartSpeech(SpeechEntry* p_entry)
 {
 	MechS32 id;
@@ -429,7 +409,6 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 	return g_speechSample != 0;
 }
 
-// FUNCTION: MW2 0x10059b7b
 void PlayVoiceVolumeTest(void)
 {
 	if (g_soundConfig.m_simFlags & 2) {
@@ -442,8 +421,6 @@ void PlayVoiceVolumeTest(void)
 
 // Stops the queue taking messages and drops the queued ones; p_keep keeps sound data and
 // messages of priority 0x50 and above.
-// Stack slots: remove and cur are swapped.
-// FUNCTION: MW2 0x10059be3
 void FlushSpeechQueue(MechS32 p_keep)
 {
 	SpeechEntry* prev;
@@ -490,7 +467,6 @@ void FlushSpeechQueue(MechS32 p_keep)
 }
 
 // Frees an entry's sound data. Returns the next entry.
-// FUNCTION: MW2 0x10059d15
 SpeechEntry* FreeSpeechEntry(SpeechEntry* p_entry)
 {
 	SpeechEntry* next;
@@ -510,7 +486,6 @@ SpeechEntry* FreeSpeechEntry(SpeechEntry* p_entry)
 }
 
 // Drops the messages after the current one and stops it.
-// FUNCTION: MW2 0x10059d8b
 void StopSpeech(void)
 {
 	SpeechEntry* entry;
@@ -528,8 +503,6 @@ void StopSpeech(void)
 	}
 }
 
-// Stack slots: slot and volume are swapped.
-// FUNCTION: MW2 0x10059deb
 void ResumeSpeech(void)
 {
 	MechS32 slot;
@@ -548,7 +521,6 @@ void ResumeSpeech(void)
 }
 
 // A lancemate's report: p_message of g_lancemateSpeech, addressed by p_slot (-1: none).
-// FUNCTION: MW2 0x10059e63
 void SayLancemateReport(MechS32 p_message, MechS32 p_slot)
 {
 	SpeechLine* slot;
@@ -569,7 +541,6 @@ void SayLancemateReport(MechS32 p_message, MechS32 p_slot)
 	QueueSpeech(slot, message, -1);
 }
 
-// FUNCTION: MW2 0x10059ed2
 void SayFormation(MechS32 p_formation)
 {
 	if (p_formation >= 0 && p_formation < 6) {
@@ -577,7 +548,6 @@ void SayFormation(MechS32 p_formation)
 	}
 }
 
-// FUNCTION: MW2 0x10059f0f
 void PlayCockpitSound(MechS32 p_message, MechS32 p_engage)
 {
 	SpeechLine* suffix;
@@ -597,13 +567,11 @@ void PlayCockpitSound(MechS32 p_message, MechS32 p_engage)
 }
 
 // "Critical hit : " and the part of g_damageSpeech.
-// FUNCTION: MW2 0x10059f6e
 void SayCriticalHit(MechS32 p_part)
 {
 	QueueSpeech(&g_cockpitSpeech[11], &g_damageSpeech[p_part], -1);
 }
 
-// FUNCTION: MW2 0x10059f9c
 MechS32 QueueSpeechLine(SpeechLine* p_line)
 {
 	return QueueSpeech(p_line, NULL, 0x50);

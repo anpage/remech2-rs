@@ -43,52 +43,38 @@
 #include <stdio.h>
 #include <string.h>
 
-// GLOBAL: MW2 0x100aa290
 MechS32 g_missionEndTime = 0;
 
-// GLOBAL: MW2 0x100aa294
 MechS32 g_speechFlushTime = 0;
 
 // A game-key toggle (GetSystemSetting's setting 0x40).
-// GLOBAL: MW2 0x100aa298
 MechS32 g_overrideShutdown = 0;
 
 // Set by game key 0x11.
-// GLOBAL: MW2 0x100aa2a0
 MechS32 g_feetToTorso = 0;
 
-// GLOBAL: MW2 0x100aa2a4
 MechS32 g_mechViewMode = 1;
 
-// GLOBAL: MW2 0x100aa2a8
 MechS32 g_missionEnded = 0;
 
-// GLOBAL: MW2 0x100aa2ac
 MechS32 g_missionTimerStopped = 0;
 
 // The "meepmeep" cheat: enables the time compression key.
-// GLOBAL: MW2 0x100aa2b0
 MechS32 g_timeCompressionCheat = 0;
 
 // The length of the chat message being typed (HandleChatKey).
-// GLOBAL: MW2 0x100aa2b8
 MechS32 g_chatLength = 0;
 
-// GLOBAL: MW2 0x100aa2bc
 MechS32 g_missionResolved = 0;
 
-// GLOBAL: MW2 0x100aa2c0
 MechS32 g_statusMessage = 0;
 
 // The last 15 characters typed, the newest last.
-// GLOBAL: MW2 0x100e9620
 MechChar g_typedKeys[0xf];
 
-// GLOBAL: MW2 0x100ea3e4
 MechS32 g_frontViewForRear;
 
 // Appends a character key (key code type 7) to the typed keys. Returns whether it was one.
-// FUNCTION: MW2 0x1005b7c0
 MechS32 AppendTypedKey(MechS16 p_key)
 {
 	if ((p_key & 0xff00) != 0x700) {
@@ -102,8 +88,6 @@ MechS32 AppendTypedKey(MechS16 p_key)
 
 // Returns whether the typed keys end with the code p_code, whose characters are stored XORed
 // with 0x1a.
-// Stack-slot permutation of n and c.
-// FUNCTION: MW2 0x1005b807
 MechS32 TypedCodeMatches(MechChar* p_code)
 {
 	MechChar* typed;
@@ -123,8 +107,6 @@ MechS32 TypedCodeMatches(MechChar* p_code)
 
 // Takes a typed key for the cheat codes: when the last keys typed spell one (TypedCodeMatches; the codes
 // are stored XORed with 0x1a), toggles or runs its cheat and says so.
-// Stack-slot permutation: target and victim.
-// FUNCTION: MW2 0x1005b883
 void HandleCheatInput(MechS16 p_key)
 {
 	MechS32 target;
@@ -305,7 +287,6 @@ void HandleCheatInput(MechS16 p_key)
 }
 
 // Turns a typed character into the one its key gives with shift held (the US layout).
-// FUNCTION: MW2 0x1005bf7c
 void ShiftCharacter(MechChar* p_char)
 {
 	MechChar shifted[16] = {'<', '_', '>', '?', ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', ':', ':'};
@@ -328,8 +309,6 @@ void ShiftCharacter(MechChar* p_char)
 // Takes a key while a chat message is being typed (g_chatRecipient is the recipient): Backspace
 // edits, Enter sends it (to everyone from -1), Esc cancels, F-keys e and f pick the team (-3) or
 // everyone (-2), and printable characters are added up to 40. Returns whether it took the key.
-// Stack-slot permutation; g_localPlayerId == g_chatRecipient compares in the other operand order.
-// FUNCTION: MW2 0x1005c057
 MechS32 HandleChatKey(MechU32 p_keyCode)
 {
 	MechChar text[80];
@@ -423,7 +402,6 @@ MechS32 HandleChatKey(MechU32 p_keyCode)
 // Runs the frame's game keys: after the mission ends, waits a while before offering to quit (or,
 // with DifficultyCfg::m_regenerate, to regenerate); otherwise passes the key code (from the local
 // steering, through the cheat codes, the chat message and LookupGameKey) to RunGameKey.
-// FUNCTION: MW2 0x1005c2e1
 void HandleGameKeys(MechS32 p_unk0x00, MechS32 p_unk0x04, MechU16 p_key)
 {
 	if (g_simPaused) {
@@ -550,8 +528,6 @@ void HandleGameKeys(MechS32 p_unk0x00, MechS32 p_unk0x04, MechU16 p_key)
 // the controls the local steering takes (a flag set for the frame), the menus, the chat
 // recipients, ejecting (0x3b) and the screenshot (0x5b). Any other key goes to HandleDebugKey while
 // the mission timer is stopped.
-// Stack-slot permutation: mech, step and text.
-// FUNCTION: MW2 0x1005c78a
 void RunGameKey(MechS32 p_key)
 {
 	Mech* mech;

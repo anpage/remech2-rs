@@ -22,29 +22,22 @@
 #include <stdio.h>
 
 // The CD track the mission plays, or -1.
-// GLOBAL: MW2 0x100a1490
 MechS32 g_cdTrack = -1;
 
-// GLOBAL: MW2 0x100a1498
 SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 0x10000, 11, 1, 1, 1, 1, 1, 9};
 
-// GLOBAL: MW2 0x100a14d4
 SoundConfig* g_mw2SndCfgData = NULL;
 
-// GLOBAL: MW2 0x100a14d8
 MechS32 g_audioPaused = 0;
 
-// GLOBAL: MW2 0x100a14dc
 MechS32 g_musicStarted = 0;
 
-// GLOBAL: MW2 0x10179e80
 MechS32 g_nextEngageCheck;
 
 // The in-mission sound menu's settings: 0 the effects volume, 1 the voice volume, 2 the music
 // volume, 3 the first word of the sound configuration, 4 whether speech is on.
 
 // Returns setting p_setting. Asking for the music volume turns the CD music on.
-// FUNCTION: MW2 0x10006760
 MechS32 GetSoundSetting(MechS32 p_setting)
 {
 	MechS32 value;
@@ -81,7 +74,6 @@ MechS32 GetSoundSetting(MechS32 p_setting)
 }
 
 // Sets setting p_setting to p_value, and lets the sound system that uses it know.
-// FUNCTION: MW2 0x10006845
 void PreviewSoundSetting(MechS32 p_setting, MechS32 p_value)
 {
 	MechS32 old;
@@ -151,7 +143,6 @@ void PreviewSoundSetting(MechS32 p_setting, MechS32 p_value)
 }
 
 // Sets setting p_setting to p_value, in the player's settings too.
-// FUNCTION: MW2 0x100069c9
 void SetSoundSetting(MechS32 p_setting, MechS32 p_value)
 {
 	if (p_setting >= 0 && p_setting < 5) {
@@ -205,7 +196,6 @@ void SetSoundSetting(MechS32 p_setting, MechS32 p_value)
 }
 
 // Restores setting p_setting from the player's settings.
-// FUNCTION: MW2 0x10006b3a
 void RestoreSoundSetting(MechS32 p_setting)
 {
 	if (p_setting >= 0 && p_setting < 5) {
@@ -250,7 +240,6 @@ void RestoreSoundSetting(MechS32 p_setting)
 	}
 }
 
-// FUNCTION: MW2 0x10006c5c
 void StartMissionMusic(void)
 {
 	MechChar* music;
@@ -278,7 +267,6 @@ void StartMissionMusic(void)
 	}
 }
 
-// FUNCTION: MW2 0x10006d73
 void PauseMusic(void)
 {
 	if (!g_audioPaused) {
@@ -290,7 +278,6 @@ void PauseMusic(void)
 	}
 }
 
-// FUNCTION: MW2 0x10006dd3
 void ResumeMusic(void)
 {
 	if (g_audioPaused) {
@@ -302,7 +289,6 @@ void ResumeMusic(void)
 	}
 }
 
-// FUNCTION: MW2 0x10006e33
 void StopMusic(void)
 {
 	if (g_cdTrack != -1) {
@@ -310,7 +296,6 @@ void StopMusic(void)
 	}
 }
 
-// FUNCTION: MW2 0x10006e62
 void LoopCdMusic(void)
 {
 	if (!g_audioPaused && (g_soundConfig.m_simFlags & 8)) {
@@ -321,7 +306,6 @@ void LoopCdMusic(void)
 	}
 }
 
-// FUNCTION: MW2 0x10006eb4
 MechS32 FirstAudio(void)
 {
 	InitializeDigitalAudio(8);
@@ -333,9 +317,6 @@ MechS32 FirstAudio(void)
 
 // Serves the samples and, every five seconds, sounds a warning while an AI player within
 // 150000 attacks the local player.
-// Operand order: g_nextEngageCheck <= g_currentClock and i < g_playerCount load the other
-// operand first in the original.
-// FUNCTION: MW2 0x10006ef1
 void DoAudio(void)
 {
 	Player* player;
@@ -363,7 +344,6 @@ void DoAudio(void)
 	}
 }
 
-// FUNCTION: MW2 0x10006ffa
 void ShutdownAudio(void)
 {
 	StopMusic();
@@ -373,7 +353,6 @@ void ShutdownAudio(void)
 	MechHeapFree(g_primaryHeap, g_mw2SndCfgData);
 }
 
-// FUNCTION: MW2 0x10007040
 void PauseAudio(void)
 {
 	StopSamples(0);
@@ -381,7 +360,6 @@ void PauseAudio(void)
 	PauseMusic();
 }
 
-// FUNCTION: MW2 0x10007064
 void ResumeAudio(void)
 {
 	ResumeMusic();
@@ -389,7 +367,6 @@ void ResumeAudio(void)
 }
 
 // Opens the digital driver at 11025 Hz, 8-bit stereo.
-// FUNCTION: MW2 0x10007079
 HDIGDRIVER OpenDigitalDriver(void)
 {
 	HDIGDRIVER driver;

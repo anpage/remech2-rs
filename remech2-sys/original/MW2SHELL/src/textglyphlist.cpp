@@ -3,28 +3,22 @@
 #include "textglyph.h"
 #include "windowstate.h"
 
-DECOMP_SIZE_ASSERT(TextGlyphList, 0x04)
-
-// FUNCTION: MW2SHELL 0x1003e100
 TextGlyphList::TextGlyphList()
 {
 	CreateCollection(&m_items, 25, NULL, 4, NULL);
 }
 
-// FUNCTION: MW2SHELL 0x1003e12d
 TextGlyphList::~TextGlyphList()
 {
 	MechHeapFree(g_primaryHeap, m_items->m_items);
 	MechHeapFree(g_primaryHeap, m_items->m_items);
 }
 
-// FUNCTION: MW2SHELL 0x1003e171
 void TextGlyphList::Add(TextGlyph* p_item)
 {
 	ExpandCollection(m_items, p_item);
 }
 
-// FUNCTION: MW2SHELL 0x1003e19b
 void TextGlyphList::Remove(TextGlyph* p_item)
 {
 	MechS32 index;
@@ -35,7 +29,6 @@ void TextGlyphList::Remove(TextGlyph* p_item)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003e1e6
 void TextGlyphList::Clear(MechU8 p_delete)
 {
 	TextGlyph* item;
@@ -53,7 +46,6 @@ void TextGlyphList::Clear(MechU8 p_delete)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003e286
 void TextGlyphList::DrawAll()
 {
 	MechS32 i;

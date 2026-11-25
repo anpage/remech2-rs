@@ -9,7 +9,6 @@
 // allocates the three buffers as one block; StepPaletteFade adds m_delta / m_steps to each
 // channel, carrying the remainders in m_accum, and frees the block after the last step.
 #pragma pack(push, 1)
-// SIZE 0x19
 typedef struct PaletteFade {
 	MechU8* m_palette; // 0x00
 	MechS8* m_delta;   // 0x04

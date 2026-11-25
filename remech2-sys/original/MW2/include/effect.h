@@ -7,7 +7,6 @@
 
 // An explosion, fire or other visual effect in the world (g_effects). Each slot keeps the scene
 // object for its type once one is created.
-// SIZE 0x28
 typedef struct Effect {
 	SceneObject* m_object; // 0x00
 	MechS32 m_position[3]; // 0x04

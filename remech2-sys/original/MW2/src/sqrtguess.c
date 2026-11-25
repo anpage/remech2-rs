@@ -7,7 +7,6 @@
 
 // Estimates the square root of a 16.16 fixed-point value from its highest set bit, for
 // FixedSqrt16 to refine.
-// FUNCTION: MW2 0x10016a90
 MechU32 FixedSqrtGuess(MechU32 p_value)
 {
 	/* bsr of 0 leaves the shift undefined */

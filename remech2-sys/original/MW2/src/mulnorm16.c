@@ -7,7 +7,6 @@
 
 // Multiplies p_a by p_b (unsigned) into *p_low; *p_scaled gets the product shifted right until it
 // fits in 16 bits, and *p_shift is increased by the shift.
-// FUNCTION: MW2 0x1004c820
 void MulNormalize16(MechS32* p_low, MechS32* p_scaled, MechS16* p_shift, MechU32 p_a, MechU32 p_b)
 {
 	/* bsr of a zero low dword leaves the cleared ecx as it is (the processors' behaviour, which

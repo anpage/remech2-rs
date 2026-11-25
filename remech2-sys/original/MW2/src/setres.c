@@ -22,13 +22,10 @@
 #include <stdlib.h>
 
 // The largest coordinates of the three resolutions the art comes in.
-// GLOBAL: MW2 0x100aa718
 Point g_artResolutionSizes[3] = {{319, 199}, {639, 479}, {1023, 767}};
 
-// GLOBAL: MW2 0x100e9610
 MechS32 g_pixelAspect;
 
-// GLOBAL: MW2 0x100e9614
 MechS32 g_artResolution;
 
 // SetPixelAspect is implemented on the Rust side (src/sim/window.rs).
@@ -38,7 +35,6 @@ MechS32 g_artResolution;
 
 // Rescales the tables authored in 320x200 coordinates to the screen, and sets up what depends on
 // the resolution.
-// FUNCTION: MW2 0x1005d4d3
 void SetRes(void)
 {
 	MechS32 i;

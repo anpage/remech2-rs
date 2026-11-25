@@ -13,7 +13,6 @@ struct SceneObject;
 // An entry of the static object cache (g_staticObjects, 0x402 of them): the resource
 // LoadStaticObject loads as its shape, the block and parent it hangs from, its placement and
 // its timed callbacks. ResetStaticObject resets it.
-// SIZE 0x7c
 typedef struct StaticObject {
 	MechS32 m_resource;           // 0x00 — resource ID, -1: none
 	MechS32 m_block;              // 0x04 — block, -1: none

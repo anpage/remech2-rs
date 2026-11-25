@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <time.h>
 
-// FUNCTION: MW2 0x100717e0
 MechS32 OpenMw2Log(void)
 {
 	time_t now;
@@ -21,7 +20,6 @@ MechS32 OpenMw2Log(void)
 	return TRUE;
 }
 
-// FUNCTION: MW2 0x10071869
 MechS32 CloseMw2Log(void)
 {
 	MechChar line[80];
@@ -34,7 +32,6 @@ MechS32 CloseMw2Log(void)
 	return TRUE;
 }
 
-// FUNCTION: MW2 0x100718da
 MechS32 WriteToMw2Log(MechChar* p_text)
 {
 	MechLogTracef("mw2.log: %s", p_text);

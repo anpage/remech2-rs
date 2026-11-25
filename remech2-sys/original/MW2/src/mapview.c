@@ -21,39 +21,28 @@
 
 // The map (satellite) view's projection: a top-down view of p_worldSpan units across.
 
-// GLOBAL: MW2 0x10109ab0
 MechS32 g_savedPalettePending;
 
-// GLOBAL: MW2 0x10109ac0
 Eyepoint g_savedEyepoint;
 
-// GLOBAL: MW2 0x10109ba0
 MechS32 g_mapViewMinX;
 
-// GLOBAL: MW2 0x10109ba4
 MechS32 g_mapViewMaxX;
 
-// GLOBAL: MW2 0x10109ba8
 MechS32 g_mapViewMaxY;
 
-// GLOBAL: MW2 0x10109bac
 MechS32 g_mapViewMinY;
 
-// GLOBAL: MW2 0x10109bb0
 MechS32 g_mapViewNear;
 
-// GLOBAL: MW2 0x10109bb4
 MechS32 g_mapViewFar;
 
-// GLOBAL: MW2 0x10109bb8
 MechS32 g_mapViewScale;
 
-// GLOBAL: MW2 0x10109bc0
 RenderSettings g_savedRenderSettings;
 
 // Saves the eyepoint and the rendering settings, and sets up a view from p_pose (position, then
 // rotation) of p_worldSpan units across pane p_slot, as far as p_far.
-// FUNCTION: MW2 0x10041fa0
 void BeginMapView(MechS32* p_pose, MechS32 p_slot, MechS32 p_worldSpan, MechS32 p_far)
 {
 	p_worldSpan = MechWidenMapSpan(p_slot, p_worldSpan);
@@ -86,7 +75,6 @@ void BeginMapView(MechS32* p_pose, MechS32 p_slot, MechS32 p_worldSpan, MechS32 
 }
 
 // Draws the map view's scene: the terrain when bit 0 of p_flags is set, then the shapes.
-// FUNCTION: MW2 0x1004215f
 void DrawMapViewScene(MechU32 p_flags)
 {
 	if (p_flags & 1) {
@@ -98,7 +86,6 @@ void DrawMapViewScene(MechU32 p_flags)
 }
 
 // Restores the eyepoint and the rendering settings BeginMapView saved.
-// FUNCTION: MW2 0x10042195
 void EndMapView(void)
 {
 	g_renderSettings = g_savedRenderSettings;
@@ -113,8 +100,6 @@ void EndMapView(void)
 
 // Culls a shape against the map view's frustum: 1 hidden, 4 in front of the near plane, 5 past
 // the far plane, 6 and 7 outside the side planes, 0 visible. Keeps its depth in g_queueDepth.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10042206
 MechS32 CullMapViewShape(Shape* p_shape)
 {
 	MechS32 y;
@@ -178,8 +163,6 @@ MechS32 CullMapViewShape(Shape* p_shape)
 
 // Projects a vertex onto the map view (ProjectCoordinate's scaling) once per frame, with its clip
 // outcodes, and adds it to the polygon being built: ProjectVertex's map-view counterpart.
-// Stack-slot permutation: outcode and y.
-// FUNCTION: MW2 0x100423b3
 ProjectedVertex* ProjectMapViewVertex(ProjectedVertex* p_vertex)
 {
 	MechS32 x;
@@ -229,8 +212,6 @@ ProjectedVertex* ProjectMapViewVertex(ProjectedVertex* p_vertex)
 
 // Projects p_point onto the map view in place. Returns whether it is in front of the eye and
 // on the screen.
-// Stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1004251e
 MechS32 ProjectMapPoint(MapPoint* p_point)
 {
 	MechS32 visible;

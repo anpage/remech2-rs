@@ -4,7 +4,6 @@
 #include "types.h"
 
 // A rectangle without a pixel buffer: PANE's last four fields.
-// SIZE 0x10
 typedef struct Rect {
 	MechS32 m_left;   // 0x00
 	MechS32 m_top;    // 0x04

@@ -15,7 +15,6 @@ extern "C"
 
 #pragma pack(1)
 	// A growable array of item pointers, optionally kept sorted by m_compare.
-	// SIZE 0x1d
 	typedef struct Collection {
 		MechS32 m_capacity;                         // 0x00
 		MechS32 m_count;                            // 0x04

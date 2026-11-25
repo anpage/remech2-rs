@@ -4,7 +4,6 @@
 #include "types.h"
 
 // A sink: a named game control and the variable the input layer writes.
-// SIZE 0x20
 typedef struct InputSink {
 	MechChar* m_name;      // 0x00
 	void* m_output;        // 0x04 — an axis's MechS32, or a button's MechS8

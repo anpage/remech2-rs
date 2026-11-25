@@ -5,7 +5,6 @@
 #include "starmech.h"
 #include "types.h"
 
-// SIZE 0x80
 // A star of a custom battle: the player's (userstar.bwd) or the enemy's.
 struct CustomStar {
 	MechS32 m_formation; // 0x00 — an index into g_formationOptions (mechvariant.cpp)

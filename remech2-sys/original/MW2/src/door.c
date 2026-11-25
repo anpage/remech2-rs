@@ -28,7 +28,6 @@
 
 // Resets the player's mech of this class: clears its state, stands its object up at its current
 // place and starts its position ramps there.
-// FUNCTION: MW2 0x100680a0
 void FirstDoor(Player* p_player)
 {
 	Mech* mech;
@@ -81,7 +80,6 @@ void FirstDoor(Player* p_player)
 
 // Moves a mech in state 2 along its position ramps and places its object there, facing its
 // player's heading.
-// FUNCTION: MW2 0x1006831a
 void UpdateDoor(Mech* p_mech)
 {
 	MechS32 heading;
@@ -122,9 +120,6 @@ void UpdateDoor(Mech* p_mech)
 // Updates a mech of this class: in state 2 it heads for the nav point of its team's current
 // objective, when that is a nav objective; states 0, 1 and 3 go to 2, and in state 4 it is
 // destroyed after a delay.
-// Stack-slot permutation of the locals. The original tests the target's kind by loading its high
-// byte and shifting it back ((MechU16) (kind << 8) == 0x100); the mask compiles to a byte compare.
-// FUNCTION: MW2 0x1006844e
 void LateUpdateDoor(Mech* p_mech)
 {
 	Mech* mech;
@@ -207,7 +202,6 @@ void LateUpdateDoor(Mech* p_mech)
 	}
 }
 
-// FUNCTION: MW2 0x10068758
 void ShutdownDoor(Mech* p_mech)
 {
 	if (!p_mech) {
@@ -216,8 +210,6 @@ void ShutdownDoor(Mech* p_mech)
 }
 
 // Allocates p_player's mech, its weapons and sections, and sets them up.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x10068772
 MechS32 CreateDoor(MechS32 p_index, Player* p_player)
 {
 	void* buffer = NULL;

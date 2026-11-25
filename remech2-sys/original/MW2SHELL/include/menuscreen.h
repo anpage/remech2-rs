@@ -5,7 +5,6 @@
 #include "mainmenubutton.h"
 #include "types.h"
 
-// SIZE 0x10
 // A menu screen of one campaign: its buttons, its background picture and its song. The song is
 // -1 on the screens without one of their own, and matches PlayMidiSong's entry for the screen's
 // message (0x24 to 0x29 for the clan halls, ready rooms and cadet training), but PlayMidiSong

@@ -9,7 +9,6 @@
    transforms it). */
 typedef struct Model Model;
 
-// SIZE 0x18
 struct Model {
 	MechS32 m_key;                    // 0x00 — the list is sorted by it, ascending
 	MechS16 m_vertexCount;            // 0x04

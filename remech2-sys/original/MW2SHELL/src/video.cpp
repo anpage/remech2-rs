@@ -23,29 +23,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-// GLOBAL: MW2SHELL 0x100641a8
 FmvSlot g_fmvSlots[32] = {0};
 
-// GLOBAL: MW2SHELL 0x10064b2c
 MechS32 g_fullscreenVideoMsg = c_msgScreenFrame;
 
-// GLOBAL: MW2SHELL 0x10064b30
 MechS32 g_fullscreenVideoWParam = c_msgScreenFrame;
 
-// GLOBAL: MW2SHELL 0x1007cdd0
 MechChar g_videoPath[0x20];
 
-// GLOBAL: MW2SHELL 0x1007cdf0
 MechChar g_shpPath[0x20];
 
-// FUNCTION: MW2SHELL 0x10015d30
 MechChar* GetPathToVideo(const MechChar* p_name)
 {
 	sprintf(g_videoPath, "smk\\%s.smk", p_name);
 	return g_videoPath;
 }
 
-// FUNCTION: MW2SHELL 0x10015da1
 MechChar* GetPathToShp(const MechChar* p_name)
 {
 	sprintf(g_shpPath, "smk\\%s.shp", p_name);
@@ -54,7 +47,6 @@ MechChar* GetPathToShp(const MechChar* p_name)
 
 // The original looked for the video on the game CD when it wasn't on the hard disk, here and
 // wherever a video or its SHP animation is opened.
-// FUNCTION: MW2SHELL 0x10015e12
 MechS32 CheckVideoExists(const MechChar* p_name)
 {
 	return MechFileExists(GetPathToVideo(p_name));
@@ -62,7 +54,6 @@ MechS32 CheckVideoExists(const MechChar* p_name)
 
 // The screen callback while a full-screen video plays: a click, a key or any other message ends
 // it.
-// FUNCTION: MW2SHELL 0x10015e8e
 void FullscreenVideoCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg)
 {
 	FmvSlot* video;
@@ -90,7 +81,6 @@ void FullscreenVideoCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10015f58
 MechS32 BeginFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam)
 {
 	MechS32 result;
@@ -108,7 +98,6 @@ MechS32 BeginFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam
 	return 1;
 }
 
-// FUNCTION: MW2SHELL 0x10015fed
 MechS32 PlayFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam)
 {
 	if (BeginFullscreenVideo(p_name, p_msg, p_wParam) == 0) {
@@ -120,11 +109,8 @@ MechS32 PlayFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam)
 	return 1;
 }
 
-DECOMP_SIZE_ASSERT(LoopingMovie, 0x18)
-
 // Opens the movie p_name and draws its first
 // frame at (p_left, p_top). Without a framebuffer it closes the movie again.
-// FUNCTION: MW2SHELL 0x1001603a
 LoopingMovie::LoopingMovie(MechChar* p_name, MechS32 p_left, MechS32 p_top)
 {
 	MechS32 result;
@@ -153,7 +139,6 @@ LoopingMovie::LoopingMovie(MechChar* p_name, MechS32 p_left, MechS32 p_top)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100161a8
 LoopingMovie::~LoopingMovie()
 {
 	if (m_smack == NULL) {
@@ -165,7 +150,6 @@ LoopingMovie::~LoopingMovie()
 
 // Moves the movie: restores the background under the old rectangle and draws the current
 // frame at the new position.
-// FUNCTION: MW2SHELL 0x100161dd
 void LoopingMovie::MoveTo(MechS32 p_left, MechS32 p_top)
 {
 	MechS32 result;
@@ -189,20 +173,17 @@ void LoopingMovie::MoveTo(MechS32 p_left, MechS32 p_top)
 // Allocates p_size bytes and drops the pointer; FUN_100162ef frees a block. Neither is called,
 // and the bodies don't say what they served (a codec's allocation callbacks?), so they keep
 // their placeholders.
-// FUNCTION: MW2SHELL 0x100162d3
 void FUN_100162d3(size_t p_size)
 {
 	malloc(p_size);
 }
 
 // Frees p_block. See FUN_100162d3.
-// FUNCTION: MW2SHELL 0x100162ef
 void FUN_100162ef(void* p_block)
 {
 	free(p_block);
 }
 
-// FUNCTION: MW2SHELL 0x1001630b
 void LoopingMovie::Update()
 {
 	if (m_smack == NULL) {
@@ -226,7 +207,6 @@ void LoopingMovie::Update()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100163ff
 MechS32 IsVideoFrameDue(FmvSlot* p_video, MechU32 p_time)
 {
 	if (p_time >= p_video->m_nextFrameTime) {
@@ -240,15 +220,12 @@ MechS32 IsVideoFrameDue(FmvSlot* p_video, MechU32 p_time)
 
 // The original also streamed the video's sound track to a VideoSound object here, but no slot
 // ever had one: Smacker plays the sound itself.
-// FUNCTION: MW2SHELL 0x1001643e
 void StreamVideoSound(FmvSlot* p_video)
 {
 	AIL_serve();
 }
 
 // Plays the next frame of the full-screen video in slot 0, closing it after the last.
-// Stack-slot permutation: video, palette and result.
-// FUNCTION: MW2SHELL 0x100164f2
 void PlayFullscreenVideoFrame()
 {
 	MechS32 result;
@@ -291,9 +268,6 @@ void PlayFullscreenVideoFrame()
 // Advances and draws the videos of all slots: Smacker videos frame by frame, sprite sheets
 // (m_shp) on their timer. A video past its last frame stops (flag 4), loops (flag 8) or
 // closes.
-// Not 100%: the stack slots of video and i are permuted, and m_drawnTop != m_top loads m_drawnTop
-// first (reversing the operands or retyping the member doesn't flip it).
-// FUNCTION: MW2SHELL 0x1001661b
 void UpdateVideos()
 {
 	FmvSlot* video;
@@ -449,7 +423,6 @@ void UpdateVideos()
 	g_videoDriver->RedrawGlyphs(1);
 }
 
-// FUNCTION: MW2SHELL 0x10016b11
 MechS32 IsVideoPlaying(MechS32 p_index)
 {
 	if (p_index >= 0 && p_index < 0x20 && (g_fmvSlots[p_index].m_flags & 0x80000000) &&
@@ -462,7 +435,6 @@ MechS32 IsVideoPlaying(MechS32 p_index)
 }
 
 // Whether any video plays Smacker's sound (flag 0x2000). Unused.
-// FUNCTION: MW2SHELL 0x10016b78
 MechS32 IsVideoSoundPlaying()
 {
 	MechS32 i;
@@ -476,7 +448,6 @@ MechS32 IsVideoSoundPlaying()
 	return 0;
 }
 
-// FUNCTION: MW2SHELL 0x10016be7
 MechS32 IsFullscreenVideoPlaying()
 {
 	if ((g_fmvSlots[0].m_flags & 0x80000000) && (g_fmvSlots[0].m_flags & 0x1000)) {
@@ -486,10 +457,8 @@ MechS32 IsFullscreenVideoPlaying()
 	return 0;
 }
 
-// The original loads p_mask before p_value in p_mask & p_value; swapping the operands didn't flip it.
 // The first statement reloads and stores the flags instead of and-ing them in place: an unsigned
 // operation on a signed field does that, which is why the mask is cast.
-// FUNCTION: MW2SHELL 0x10016cc0
 void SetVideoFlags(MechS32 p_index, MechS32 p_mask, MechS32 p_value)
 {
 	if (p_index >= 0 && p_index < 0x20) {
@@ -499,7 +468,6 @@ void SetVideoFlags(MechS32 p_index, MechS32 p_mask, MechS32 p_value)
 }
 
 // Shows a video opened hidden (flag 0x20), redrawing it.
-// FUNCTION: MW2SHELL 0x10016d27
 void ShowVideo(MechS32 p_index)
 {
 	if (p_index >= 0 && p_index < 0x20 && (g_fmvSlots[p_index].m_flags & 0x20)) {
@@ -507,7 +475,6 @@ void ShowVideo(MechS32 p_index)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10016d90
 void CloseVideo(MechS32 p_index)
 {
 	if (p_index < 0 || p_index >= 0x20) {
@@ -536,7 +503,6 @@ void CloseVideo(MechS32 p_index)
 	g_fmvSlots[p_index].m_frameBuffer = NULL;
 }
 
-// FUNCTION: MW2SHELL 0x10016f45
 void CloseAllVideos()
 {
 	MechS32 i;
@@ -546,7 +512,6 @@ void CloseAllVideos()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10016f82
 void MoveVideo(MechS32 p_index, MechS32 p_left, MechS32 p_top)
 {
 	if (p_index >= 0 && p_index < 0x20 && (g_fmvSlots[p_index].m_flags & 0x80000000)) {
@@ -563,7 +528,6 @@ void MoveVideo(MechS32 p_index, MechS32 p_left, MechS32 p_top)
 // Opens the video p_name in the slot. A video with sound that the audio subsystem can play gets
 // Smacker's sound (flag 0x2000). With flag 0x1000 the first frame goes straight to the screen, with
 // flag 2 to the back buffer, otherwise to a buffer of its own.
-// FUNCTION: MW2SHELL 0x1001703b
 MechS32 LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 {
 	MechS32 result;
@@ -642,7 +606,6 @@ MechS32 LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 }
 
 // Loads the SHP animation p_name into the slot.
-// FUNCTION: MW2SHELL 0x10017376
 MechS32 LoadShpFile(FmvSlot* p_slot, const MechChar* p_name)
 {
 	MechS32 size;
@@ -671,7 +634,6 @@ MechS32 LoadShpFile(FmvSlot* p_slot, const MechChar* p_name)
 
 // Plays the video or SHP animation p_name in slot p_index at (p_left, p_top), p_fps frames a
 // second (10 for 0), replacing what the slot played. Returns the slot, or -1.
-// FUNCTION: MW2SHELL 0x10017460
 MechS32 PlayVideo(
 	MechS32 p_index,
 	const char* p_name,
@@ -720,7 +682,6 @@ MechS32 PlayVideo(
 }
 
 // Plays a video in the first free slot.
-// FUNCTION: MW2SHELL 0x100175e2
 MechS32 PlayVideoInFreeSlot(MechChar* p_name, MechS32 p_left, MechS32 p_top, MechU32 p_flags, MechU32 p_fps)
 {
 	MechS32 i;
@@ -734,7 +695,6 @@ MechS32 PlayVideoInFreeSlot(MechChar* p_name, MechS32 p_left, MechS32 p_top, Mec
 	return -1;
 }
 
-// FUNCTION: MW2SHELL 0x10017656
 MechS32 GetVideoFrame(MechS32 p_index)
 {
 	if (p_index >= 0 && p_index < 0x20) {
@@ -745,7 +705,6 @@ MechS32 GetVideoFrame(MechS32 p_index)
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10017698
 void SetVideoFrame(MechS32 p_index, MechS32 p_frame)
 {
 	if (p_index >= 0 && p_index < 0x20) {

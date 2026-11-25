@@ -9,25 +9,21 @@
 // side (shellaudio.h), keeping only what the shell's own state decides: whether MIDI and digital
 // audio are on, and the heap blocks the objects own.
 
-// FUNCTION: MW2SHELL 0x1003ceb0
 AudioSubsystem::AudioSubsystem()
 {
 	m_impl = ShellAudioSubsystem_New();
 }
 
-// FUNCTION: MW2SHELL 0x1003cf5d
 AudioSubsystem::~AudioSubsystem()
 {
 	ShellAudioSubsystem_Delete(m_impl);
 }
 
-// FUNCTION: MW2SHELL 0x1003d0fc
 void AudioSubsystem::ApplyMidiVolume()
 {
 	ShellAudioSubsystem_ApplyMidiVolume(m_impl);
 }
 
-// FUNCTION: MW2SHELL 0x1003d198
 MidiSequence::MidiSequence(AudioSubsystem* p_subsystem, void* p_data, undefined4 p_size)
 {
 	m_data = p_data;
@@ -38,7 +34,6 @@ MidiSequence::MidiSequence(AudioSubsystem* p_subsystem, void* p_data, undefined4
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d29e
 MidiSequence::~MidiSequence()
 {
 	if (m_impl) {
@@ -47,7 +42,6 @@ MidiSequence::~MidiSequence()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d2f7
 void MidiSequence::Start()
 {
 	if (m_impl) {
@@ -55,7 +49,6 @@ void MidiSequence::Start()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d341
 void MidiSequence::Stop()
 {
 	if (m_impl) {
@@ -63,7 +56,6 @@ void MidiSequence::Stop()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d371
 void MidiSequence::SetVolume(MechS32 p_volume)
 {
 	if (m_impl) {
@@ -72,13 +64,11 @@ void MidiSequence::SetVolume(MechS32 p_volume)
 }
 
 // A sequence always loops, so it plays for as long as it exists.
-// FUNCTION: MW2SHELL 0x1003d3d4
 undefined MidiSequence::IsAnySequencePlaying()
 {
 	return m_impl ? TRUE : FALSE;
 }
 
-// FUNCTION: MW2SHELL 0x1003d419
 AudioSample::AudioSample(AudioSubsystem* p_subsystem, void* p_data, undefined4 p_size)
 {
 	m_data = p_data;
@@ -93,7 +83,6 @@ AudioSample::AudioSample(AudioSubsystem* p_subsystem, void* p_data, undefined4 p
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d50f
 AudioSample::~AudioSample()
 {
 	if (m_impl) {
@@ -102,7 +91,6 @@ AudioSample::~AudioSample()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d561
 void AudioSample::SetFade(MechS32 p_initFadeRate, MechS32 p_maxFade, MechS32 p_startVolume, MechS32 p_endVolume)
 {
 	if (m_impl) {
@@ -110,7 +98,6 @@ void AudioSample::SetFade(MechS32 p_initFadeRate, MechS32 p_maxFade, MechS32 p_s
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d5ca
 void AudioSample::DoFade()
 {
 	if (m_impl) {
@@ -118,7 +105,6 @@ void AudioSample::DoFade()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d67f
 void AudioSample::EnableLoop()
 {
 	if (m_impl) {
@@ -126,7 +112,6 @@ void AudioSample::EnableLoop()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d6bb
 void AudioSample::Start()
 {
 	if (m_impl) {
@@ -134,7 +119,6 @@ void AudioSample::Start()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d709
 void AudioSample::PlayAndWait()
 {
 	if (m_impl) {
@@ -144,7 +128,6 @@ void AudioSample::PlayAndWait()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d74e
 void AudioSample::Stop()
 {
 	if (m_impl) {
@@ -152,7 +135,6 @@ void AudioSample::Stop()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1003d77e
 undefined AudioSample::IsPlaying()
 {
 	if (m_impl && ShellAudioSample_IsPlaying(m_impl)) {
@@ -162,7 +144,6 @@ undefined AudioSample::IsPlaying()
 	return FALSE;
 }
 
-// FUNCTION: MW2SHELL 0x1003d7c0
 void AudioSample::SetVolume(MechS32 p_volume)
 {
 	if (m_impl) {

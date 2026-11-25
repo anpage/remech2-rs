@@ -25,27 +25,20 @@
 
 #include <string.h>
 
-// GLOBAL: MW2 0x100ba620
 MechS32 g_temperature = 25;
 
 // Set on a planet without a breathable atmosphere: the local player can't eject (the cockpit says
 // so), a life support hit kills, and a mech whose pilot ejects counts as lost.
-// GLOBAL: MW2 0x100ba624
 MechS32 g_hostileAtmosphere = 0;
 
-// GLOBAL: MW2 0x100ba628
 MechS32 g_sampleRates[10] = {9922, 10143, 10364, 10584, 10804, 11025, 11246, 11466, 11686, 11907};
 
-// GLOBAL: MW2 0x100ba650
 AudioEngine* g_audioEngine = NULL;
 
-// GLOBAL: MW2 0x100ba654
 MechChar g_sampleTag[] = "SFLX";
 
-// GLOBAL: MW2 0x10174930
 SoundInfo g_soundInfo[1200];
 
-// FUNCTION: MW2 0x1007d9d0
 MechS32 InitializeDigitalAudio(MechU32 p_numSamples)
 {
 	MechU32 i;
@@ -99,7 +92,6 @@ MechS32 InitializeDigitalAudio(MechU32 p_numSamples)
 	return 1;
 }
 
-// FUNCTION: MW2 0x1007dbce
 void ShutdownDigitalAudio(void)
 {
 	MechU32 i;
@@ -123,9 +115,6 @@ void ShutdownDigitalAudio(void)
 
 // Loads the next part of each playing sample into whichever half of its buffer Miles has
 // finished with.
-// Stack slots: i, size and buffer are permuted. Operand order: the index of m_buffers[i][buffer],
-// m_remaining[i] <= m_chunkFrames[i] and the product for size.
-// FUNCTION: MW2 0x1007dc89
 void ServeSamples(void)
 {
 	MechU32 i;
@@ -193,8 +182,6 @@ void ServeSamples(void)
 
 // Plays a sound resource (p_id), or the sound data at p_data, after p_delay clock ticks.
 // Returns the sample slot, or a negative error.
-// Operand order: p_delay > g_deltaTime.
-// FUNCTION: MW2 0x1007dfe7
 MechS32 PlaySample(
 	MechS32 p_delay,
 	MechS32 p_bearing,
@@ -268,9 +255,6 @@ MechS32 PlaySample(
 // Sets up a sample slot for a sound: p_slot, or a free one, or one playing a sound of lower
 // priority. The m_flags bits: 0x100 keeps the slot, 0x200 restarts the same sound, 0x400
 // plays it only once, 0x1000 loops.
-// Stack slots: sample, victim, i, slot and flags are permuted. Operand order:
-// m_chunkFrames[slot] > m_remaining[slot].
-// FUNCTION: MW2 0x1007e1cf
 MechS32 StartSample(MechS32 p_id, void* p_data, MechU16 p_flags, MechS16 p_slot, MechS32* p_userData)
 {
 	HSAMPLE sample;
@@ -411,8 +395,6 @@ MechS32 StartSample(MechS32 p_id, void* p_data, MechU16 p_flags, MechS16 p_slot,
 
 // The sample's user data: 0 the flag to clear, 1 the sound, 2 the slot, 3 the sound to play
 // next (-1 for none), 4 heap data to free.
-// Stack slots: id, data, next, slot and done are permuted.
-// FUNCTION: MW2 0x1007e80e
 void AILCALLBACK SampleEosCallback(HSAMPLE p_sample)
 {
 	MechS32 id;
@@ -475,19 +457,16 @@ void AILCALLBACK SampleEosCallback(HSAMPLE p_sample)
 	}
 }
 
-// FUNCTION: MW2 0x1007e9dc
 void PlayEffectsVolumeTest(void)
 {
 	PlaySample(0, 0, 0xd2, NULL, 100, g_soundConfig.m_effectsVolume, 0x40, RandomSampleRate(), (MechS32*) -1, 0x250);
 }
 
-// FUNCTION: MW2 0x1007ea11
 MechS32 PlaySoundOnce(MechS32 p_id, MechU32 p_volume, MechS32 p_pan, MechS32 p_rate)
 {
 	return PlaySample(0, 0, p_id, NULL, p_volume, g_soundConfig.m_effectsVolume, p_pan, p_rate, (MechS32*) -1, 0x450);
 }
 
-// FUNCTION: MW2 0x1007ea4c
 MechS32 PlaySoundRandomRate(
 	MechS32 p_delay,
 	MechS32 p_bearing,
@@ -513,8 +492,6 @@ MechS32 PlaySoundRandomRate(
 
 // Plays p_sound at the offset (p_dx, p_dy, p_dz) from the eyepoint, delayed by its distance
 // and fading with it; p_half halves the volume. Returns the distance.
-// Stack slots: horizontal, delay, pitch, volume, bearing, distance and range are permuted.
-// FUNCTION: MW2 0x1007ea8c
 MechS32 PlayPositionalSound(MechS32 p_dx, MechS32 p_dy, MechS32 p_dz, MechS32 p_sound, MechS32 p_half)
 {
 	MechS32 horizontal;
@@ -540,7 +517,6 @@ MechS32 PlayPositionalSound(MechS32 p_dx, MechS32 p_dy, MechS32 p_dz, MechS32 p_
 	return distance;
 }
 
-// FUNCTION: MW2 0x1007eb23
 MechS32 PlaySoundEffect(MechS32 p_id, MechU32 p_volume, MechS32 p_pan, MechS32 p_rate, MechU16 p_flags)
 {
 	return PlaySample(
@@ -557,7 +533,6 @@ MechS32 PlaySoundEffect(MechS32 p_id, MechU32 p_volume, MechS32 p_pan, MechS32 p
 	);
 }
 
-// FUNCTION: MW2 0x1007eb64
 MechS32 PlayDelayedSound(
 	MechS32 p_delay,
 	MechS32 p_bearing,
@@ -570,13 +545,11 @@ MechS32 PlayDelayedSound(
 	return PlaySoundRandomRate(p_delay, p_bearing, p_id, p_volume, p_pan, p_flags);
 }
 
-// FUNCTION: MW2 0x1007ebd1
 MechS32 PlaySoundAt(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_sound, MechS32 p_half)
 {
 	return PlayPositionalSound(p_x, p_y, p_z, p_sound, p_half);
 }
 
-// FUNCTION: MW2 0x1007ebfd
 MechS32 CalculateSamplePan(MechS32 p_bearing)
 {
 	MechS32 pan;
@@ -595,14 +568,12 @@ MechS32 CalculateSamplePan(MechS32 p_bearing)
 	return pan;
 }
 
-// FUNCTION: MW2 0x1007ec5e
 MechS32 RandomSampleRate(void)
 {
 	return g_sampleRates[RandomIntBelow(10)];
 }
 
 // Stops the playing samples; p_all stops the speech sample too.
-// FUNCTION: MW2 0x1007ec7f
 void StopSamples(MechS32 p_all)
 {
 	MechS32 i;
@@ -623,8 +594,6 @@ void StopSamples(MechS32 p_all)
 	}
 }
 
-// Stack slots: i, x, started, distance and y are permuted.
-// FUNCTION: MW2 0x1007ed1e
 void UpdateAmbientSound(AmbientSound* p_sound)
 {
 	HSAMPLE sample;
@@ -714,7 +683,6 @@ void UpdateAmbientSound(AmbientSound* p_sound)
 	}
 }
 
-// FUNCTION: MW2 0x1007f01f
 void StopAmbientSound(AmbientSound* p_sound)
 {
 	HSAMPLE sample;
@@ -735,7 +703,6 @@ void StopAmbientSound(AmbientSound* p_sound)
 }
 
 // The volume, 0-100, at p_distance: full at 0, silent from 50000.
-// FUNCTION: MW2 0x1007f0d9
 MechS32 GetDistanceVolume(MechS32 p_distance)
 {
 	MechS32 volume;

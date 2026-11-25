@@ -10,42 +10,29 @@
 // PROJ resource files: a header listing resource types, each with an index of resources by ID.
 // One file can be open at a time. Memory comes from the allocator SetPrjAllocator installs.
 
-DECOMP_SIZE_ASSERT(PrjType, 0x18)
-DECOMP_SIZE_ASSERT(PrjIndexEntry, 0x08)
-DECOMP_SIZE_ASSERT(PrjTypeSlot, 0x08)
-DECOMP_SIZE_ASSERT(PrjFile, 0x14a)
-
-// GLOBAL: MW2 0x100ae734
 PrjAllocFn g_prjAlloc = NULL;
 
-// GLOBAL: MW2 0x100ae738
 PrjFreeFn g_prjFree = NULL;
 
-// GLOBAL: MW2 0x100c3120
 PrjFile g_prjFiles[1];
 
-// FUNCTION: MW2 0x10071ad0
 void SetPrjAllocator(PrjAllocFn p_alloc, PrjFreeFn p_free)
 {
 	g_prjAlloc = p_alloc;
 	g_prjFree = p_free;
 }
 
-// FUNCTION: MW2 0x10071aeb
 void* PrjAlloc(MechU32 p_size)
 {
 	return g_prjAlloc(p_size);
 }
 
-// FUNCTION: MW2 0x10071b08
 void PrjFreeBlock(void* p_block)
 {
 	g_prjFree(p_block);
 }
 
 // Writes in chunks of at most 16K. Returns p_length, or -1 on a short write.
-// Stack-slot permutation: chunk, left and buffer.
-// FUNCTION: MW2 0x10071b20
 MechS32 WritePrjBytes(MechS32 p_fd, void* p_buffer, MechU32 p_length)
 {
 	MechU32 chunk;
@@ -69,8 +56,6 @@ MechS32 WritePrjBytes(MechS32 p_fd, void* p_buffer, MechU32 p_length)
 }
 
 // Reads in chunks of at most 16K. Returns p_length, or -1 on a short read.
-// Stack-slot permutation: chunk, left and buffer.
-// FUNCTION: MW2 0x10071b9e
 MechS32 ReadPrjBytes(MechS32 p_fd, void* p_buffer, MechU32 p_length)
 {
 	MechU32 chunk;
@@ -95,8 +80,6 @@ MechS32 ReadPrjBytes(MechS32 p_fd, void* p_buffer, MechU32 p_length)
 
 // Opens a PROJ file (p_mode 0: read-only, 2: read-write, which rejects a file marked 0xfe).
 // Returns its slot, -1 on failure or -2 for a rejected file.
-// Stack-slot permutation: tag, fd, size, slot and header.
-// FUNCTION: MW2 0x10071c1c
 MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 {
 	MechChar tag[12];
@@ -170,7 +153,6 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 	return slot;
 }
 
-// FUNCTION: MW2 0x10071f09
 MechS32 ClosePrjFile(MechS32 p_file)
 {
 	MechU16 i;
@@ -195,8 +177,6 @@ MechS32 ClosePrjFile(MechS32 p_file)
 }
 
 // Returns the type's index in the header, or 0xffff.
-// Operand order: the original tests count > i with setg.
-// FUNCTION: MW2 0x100720b7
 MechU16 FindPrjType(MechS32 p_file, const MechChar* p_type)
 {
 	MechS8 found;
@@ -226,8 +206,6 @@ MechU16 FindPrjType(MechS32 p_file, const MechChar* p_type)
 }
 
 // Loads every type's index.
-// Stack-slot permutation: types, count, index, i and size.
-// FUNCTION: MW2 0x1007218f
 MechS32 LoadPrjIndexes(MechS32 p_file)
 {
 	PrjType* types;
@@ -259,8 +237,6 @@ MechS32 LoadPrjIndexes(MechS32 p_file)
 	return 0;
 }
 
-// Stack-slot permutation: entries, size, types, type and id.
-// FUNCTION: MW2 0x100722f5
 MechS32 GetPrjResourceSize(MechS32 p_file, const MechChar* p_type, MechU16 p_id)
 {
 	PrjIndexEntry* entries;
@@ -292,8 +268,6 @@ MechS32 GetPrjResourceSize(MechS32 p_file, const MechChar* p_type, MechU16 p_id)
 
 // Seeks the file to a resource, and returns its offset and size. The type test never fails (a
 // 16-bit index compared with -1).
-// Stack-slot permutation: entries, types, offset and type.
-// FUNCTION: MW2 0x10072405
 MechS32 SeekPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, MechS32* p_offset, MechS32* p_size)
 {
 	PrjIndexEntry* entries;
@@ -327,7 +301,6 @@ MechS32 SeekPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, Me
 	return 0;
 }
 
-// FUNCTION: MW2 0x10072560
 MechS32 ReadPrjAt(void* p_buffer, MechS32 p_file, MechS32 p_offset, MechU32 p_length)
 {
 	p_file = g_prjFiles[p_file].m_fd;
@@ -335,8 +308,6 @@ MechS32 ReadPrjAt(void* p_buffer, MechS32 p_file, MechS32 p_offset, MechU32 p_le
 	return ReadPrjBytes(p_file, p_buffer, p_length);
 }
 
-// Stack-slot permutation: entries, types, offset, type, size and id.
-// FUNCTION: MW2 0x100725ae
 MechS32 ReadPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, void* p_buffer)
 {
 	PrjIndexEntry* entries;
@@ -374,8 +345,6 @@ MechS32 ReadPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, vo
 }
 
 // Returns a resource's offset in the file, and the file's descriptor.
-// Stack-slot permutation: entries, types, offset, type and id.
-// FUNCTION: MW2 0x10072734
 MechS32 GetPrjResourceOffset(MechS32 p_file, const MechChar* p_type, MechU16 p_id, MechS32* p_fd)
 {
 	PrjIndexEntry* entries;

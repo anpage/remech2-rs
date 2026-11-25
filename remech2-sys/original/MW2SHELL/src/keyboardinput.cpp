@@ -14,8 +14,6 @@
 #include <ctype.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(KeyboardInput, 0x110)
-
 enum {
 	c_keyBackspace = 0x08,
 	c_keyReturn = 0x0d,
@@ -26,10 +24,8 @@ enum {
 	c_keyCodeAlt = 0x400
 };
 
-// GLOBAL: MW2SHELL 0x10093978
 MechChar g_editTextBuffer[0x100];
 
-// FUNCTION: MW2SHELL 0x100440a0
 KeyboardInput::KeyboardInput()
 {
 	m_key = 0;
@@ -37,19 +33,16 @@ KeyboardInput::KeyboardInput()
 	FlushKeys();
 }
 
-// FUNCTION: MW2SHELL 0x100440d7
 KeyboardInput::~KeyboardInput()
 {
 }
 
-// FUNCTION: MW2SHELL 0x100440ed
 void KeyboardInput::FlushKeys()
 {
 	KeyboardFlushKeyCodes();
 	m_key = 0;
 }
 
-// FUNCTION: MW2SHELL 0x10044112
 MechS32 KeyboardInput::WaitForKey()
 {
 	while (!PollKey()) {
@@ -64,14 +57,12 @@ MechS32 KeyboardInput::WaitForKey()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1004416a
 undefined4 KeyboardInput::GetKeyPressed()
 {
 	return m_keyPressed;
 }
 
 // Returns 0 without a key, 3 for Escape and 1 for any other key.
-// FUNCTION: MW2SHELL 0x10044189
 MechS32 KeyboardInput::PollKey()
 {
 	m_key = KeyboardPollKeyCode();
@@ -96,7 +87,6 @@ MechS32 KeyboardInput::PollKey()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10044230
 void KeyboardInput::ResetText(undefined4 p_maxLength)
 {
 	m_key = 0;
@@ -105,7 +95,6 @@ void KeyboardInput::ResetText(undefined4 p_maxLength)
 	strcpy(m_text, "");
 }
 
-// FUNCTION: MW2SHELL 0x1004428e
 void KeyboardInput::SetText(undefined4 p_maxLength, const MechChar* p_text)
 {
 	strcpy(m_text, p_text);
@@ -115,7 +104,6 @@ void KeyboardInput::SetText(undefined4 p_maxLength, const MechChar* p_text)
 }
 
 // Returns 1 after an edit, 2 when Return copies the text out, 3 for Escape and 0 otherwise.
-// FUNCTION: MW2SHELL 0x100442f7
 MechS32 KeyboardInput::EditText(MechChar* p_text, MechU8 p_upperCase)
 {
 	if (PollKey() == 1) {
@@ -159,9 +147,6 @@ MechS32 KeyboardInput::EditText(MechChar* p_text, MechU8 p_upperCase)
 
 // Edits p_text with a cursor ('_') drawn after it. Return, a click or the window closing store
 // the text and return 1; Escape stores it and returns 0.
-// Stack-slot permutation: key and glyph. The p_maxLength == length comparison also loads its
-// operands in the opposite order, and swapping them in the source doesn't change the output.
-// FUNCTION: MW2SHELL 0x10044451
 MechS32 EditTextField(
 	Font* p_font,
 	MechS32 p_left,

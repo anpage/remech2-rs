@@ -8,14 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(TMPackDataBase::TMPackDBEntry, 0x08)
-
 // The ring buffer of GetDBItemLZ's LZSS decoder.
-// GLOBAL: MW2SHELL 0x10094c90
 MechU8 g_lzWindow[c_lzWindowSize];
 
 // Prints the database's entries to stdout. Unused.
-// FUNCTION: MW2SHELL 0x10047bc0
 void TMPackDataBase::DumpEntries()
 {
 	TMPackDBEntry* entry;
@@ -35,7 +31,6 @@ void TMPackDataBase::DumpEntries()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x10047c6c
 TMPackDataBase::TMPackDataBase(char* p_name)
 {
 	MechS32 result;
@@ -83,8 +78,6 @@ TMPackDataBase::TMPackDataBase(char* p_name)
 	next->m_size = m_size - next->m_offset;
 }
 
-// Stack-slot permutation: entry and i.
-// FUNCTION: MW2SHELL 0x10047f03
 TMPackDataBase::~TMPackDataBase()
 {
 	TMPackDBEntry* entry;
@@ -100,14 +93,12 @@ TMPackDataBase::~TMPackDataBase()
 	MechHeapFree(g_primaryHeap, m_data);
 }
 
-// FUNCTION: MW2SHELL 0x10047fd4
 MechS32 TMPackDataBase::GetEntryCount()
 {
 	return m_entries->m_count;
 }
 
 // The ids are 1-based.
-// FUNCTION: MW2SHELL 0x10047ff6
 TMPackDataBase::TMPackDBEntry* TMPackDataBase::GetEntry(MechS32 p_id)
 {
 	TMPackDBEntry* entry;
@@ -120,8 +111,6 @@ TMPackDataBase::TMPackDBEntry* TMPackDataBase::GetEntry(MechS32 p_id)
 	return entry;
 }
 
-// Stack-slot permutation: entry and data.
-// FUNCTION: MW2SHELL 0x10048051
 MechS32 TMPackDataBase::GetDBItem(MechS32 p_id, void** p_data, MechS32* p_size)
 {
 	TMPackDBEntry* entry;
@@ -149,8 +138,6 @@ MechS32 TMPackDataBase::GetDBItem(MechS32 p_id, void** p_data, MechS32* p_size)
 	return 0;
 }
 
-// Stack-slot permutation: remaining, entry, dst and out.
-// FUNCTION: MW2SHELL 0x1004813f
 MechS32 TMPackDataBase::GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size)
 {
 	MechU32 flags;
@@ -230,7 +217,6 @@ MechS32 TMPackDataBase::GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size
 }
 
 // Reads p_size bytes of item p_id, from p_offset on.
-// FUNCTION: MW2SHELL 0x100483c8
 MechS32 TMPackDataBase::ReadDBItemData(MechS32 p_id, MechS32 p_offset, void* p_buffer, size_t p_size)
 {
 	TMPackDBEntry* entry = GetEntry(p_id);
@@ -249,8 +235,6 @@ MechS32 TMPackDataBase::ReadDBItemData(MechS32 p_id, MechS32 p_offset, void* p_b
 }
 
 // Reads a line; returns 2 if it ended at a NUL rather than a newline.
-// Stack-slot permutation: entry, c and i.
-// FUNCTION: MW2SHELL 0x1004843e
 MechS32 TMPackDataBase::ReadDBItemLine(MechS32 p_id, MechS32 p_offset, MechChar* p_buffer)
 {
 	TMPackDBEntry* entry;
@@ -279,8 +263,6 @@ MechS32 TMPackDataBase::ReadDBItemLine(MechS32 p_id, MechS32 p_offset, MechChar*
 }
 
 // Reads a NUL-terminated string.
-// Stack-slot permutation: entry, c and i.
-// FUNCTION: MW2SHELL 0x10048501
 MechS32 TMPackDataBase::ReadDBItemString(MechS32 p_id, MechS32 p_offset, MechChar* p_buffer)
 {
 	TMPackDBEntry* entry;
@@ -309,14 +291,12 @@ MechS32 TMPackDataBase::ByteAt(MechS32 p_offset)
 	return p_offset >= 0 && p_offset < m_size ? m_data[p_offset] : -1;
 }
 
-// FUNCTION: MW2SHELL 0x100485a1
 TMPackDataBase::TMPackDBEntry::TMPackDBEntry(undefined4 p_offset, undefined4 p_size)
 {
 	m_offset = p_offset;
 	m_size = p_size;
 }
 
-// FUNCTION: MW2SHELL 0x100485cd
 TMPackDataBase::TMPackDBEntry::~TMPackDBEntry()
 {
 }

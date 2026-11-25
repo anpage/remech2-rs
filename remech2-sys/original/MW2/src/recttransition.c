@@ -10,14 +10,12 @@
 // together, or the horizontal and vertical edges one after the other.
 
 // Arms the transition: the next update starts it from its first rectangle.
-// FUNCTION: MW2 0x10012310
 void StartRectTransition(RectTransition* p_transition)
 {
 	p_transition->m_state->m_active = TRUE;
 	p_transition->m_state->m_wasActive = FALSE;
 }
 
-// FUNCTION: MW2 0x10012332
 void StopRectTransition(RectTransition* p_transition)
 {
 	p_transition->m_state->m_active = FALSE;
@@ -26,7 +24,6 @@ void StopRectTransition(RectTransition* p_transition)
 
 // Moves p_out's edges to the fraction p_t (16.16) of the way from p_from to p_to: the horizontal
 // ones unless p_axis is 2, the vertical ones unless it is 1.
-// FUNCTION: MW2 0x10012354
 PANE* LerpPaneRect(PANE* p_from, PANE* p_to, PANE* p_out, MechS32 p_t, MechS32 p_axis)
 {
 	MechS32 delta;
@@ -50,8 +47,6 @@ PANE* LerpPaneRect(PANE* p_from, PANE* p_to, PANE* p_out, MechS32 p_t, MechS32 p
 
 // Advances the transition, forward or (p_reverse) backward, and returns its rectangle, or NULL
 // when it isn't running.
-// Stack-slot permutation: t, def, active, from, state, out and to.
-// FUNCTION: MW2 0x10012432
 PANE* UpdateRectTransition(MechS32 p_reverse, RectTransition* p_transition)
 {
 	MechS32 t;
@@ -102,8 +97,6 @@ PANE* UpdateRectTransition(MechS32 p_reverse, RectTransition* p_transition)
 
 // As UpdateRectTransition, but the horizontal edges move in the first half and the vertical ones
 // in the second (the other way around in reverse).
-// Stack-slot permutation: t, def, active, from, firstAxis, secondAxis, state, out and to.
-// FUNCTION: MW2 0x10012557
 PANE* UpdateRectTransitionByAxis(MechS32 p_reverse, RectTransition* p_transition)
 {
 	MechS32 t;

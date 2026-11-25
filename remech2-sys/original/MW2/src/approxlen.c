@@ -7,7 +7,6 @@
 
 // Approximates the length of (p_x, p_y, p_z) as (max * 4 + the other two) / 4 of the absolute
 // values.
-// FUNCTION: MW2 0x100035c0
 MechS32 ApproximateVectorLength(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	/* neg leaves INT_MIN negative, and the comparisons are signed; the sum wraps. */

@@ -30,70 +30,50 @@
 #include <string.h>
 
 // The debriefing screen.
-// GLOBAL: MW2SHELL 0x1005b040
 ButtonMenu* g_debriefMenu = NULL;
 
-// GLOBAL: MW2SHELL 0x1005b044
 Page* g_debriefPage = NULL;
 
-// GLOBAL: MW2SHELL 0x1005b048
 Collection* g_debriefPages = NULL;
 
 // The aftermath reader, while it is open.
-// GLOBAL: MW2SHELL 0x1005b04c
 ArchiveReader* g_aftermathReader = NULL;
 
 // The debriefing's text buffers.
-// GLOBAL: MW2SHELL 0x10076860
 MechChar g_objectiveStatus[0x80];
 
-// GLOBAL: MW2SHELL 0x100768e0
 MechChar g_debriefText[0x1000];
 
 // The mission's objectives, in the order CompareObjectives sorts them.
-// GLOBAL: MW2SHELL 0x100778e0
 MissionResultObjective* g_sortedObjectives[48];
 
-// GLOBAL: MW2SHELL 0x100779a0
 MechChar g_objectiveLine[0x400];
 
-// GLOBAL: MW2SHELL 0x10077da0
 MechChar g_careerHonor[0x200];
 
 // The pilot as the mission found them, restored by a replay.
-// GLOBAL: MW2SHELL 0x10077fa0
 PilotRecord g_pilotBeforeMission;
 
 // An identity color map (0 maps to 0xff) that BuildDebriefText builds and nothing reads.
-// GLOBAL: MW2SHELL 0x10077fe0
 undefined g_unk0x10077fe0[0x100];
 
-// GLOBAL: MW2SHELL 0x100780e0
 MissionResult g_missionResults;
 
-// GLOBAL: MW2SHELL 0x10078ab8
 MechChar g_objectiveDescription[0x80];
 
-// GLOBAL: MW2SHELL 0x10078b38
 MechChar g_honorPoints[0x200];
 
-// GLOBAL: MW2SHELL 0x10078d38
 MechChar g_objectiveType[0x80];
 
-// GLOBAL: MW2SHELL 0x10078db8
 MechChar g_skillName[0x200];
 
-// GLOBAL: MW2SHELL 0x10078fb8
 MechChar g_careerHonorLine[0x200];
 
-// GLOBAL: MW2SHELL 0x100791b8
 MechChar g_honorLine[0x200];
 
-// GLOBAL: MW2SHELL 0x100793b8
 MechChar g_objectiveTime[0x80];
 
 // Returns TRUE when one of the options that makes a trial easier is set.
-// FUNCTION: MW2SHELL 0x10001000
 MechU8 HasEasyOptions()
 {
 	if (g_difficultyConfig.m_unlimitedAmmo == 1) {
@@ -111,8 +91,6 @@ MechU8 HasEasyOptions()
 
 // The qsort order of the debriefing's objectives: by the time they were reached, the ones never
 // reached last.
-// Not 100%: the stack slots of a, b, first and second are permuted.
-// FUNCTION: MW2SHELL 0x10001056
 int CompareObjectives(const void* p_a, const void* p_b)
 {
 	MissionResultObjective** a = (MissionResultObjective**) p_a;
@@ -137,8 +115,6 @@ int CompareObjectives(const void* p_a, const void* p_b)
 }
 
 // Appends the honor breakdown of the mission to p_text and returns the honor it earns.
-// Not 100%: the stack slots of the locals are permuted.
-// FUNCTION: MW2SHELL 0x100010ed
 MechS32 AppendHonorBreakdown(
 	DifficultyConfig* p_difficulty,
 	CareerRecord* p_career,
@@ -400,7 +376,6 @@ MechS32 AppendHonorBreakdown(
 }
 
 // Copies p_src to p_dst with every run of spaces and control characters turned into one space.
-// FUNCTION: MW2SHELL 0x10001c28
 void CollapseWhitespace(MechChar* p_dst, MechChar* p_src)
 {
 	MechS32 space = FALSE;
@@ -423,8 +398,6 @@ void CollapseWhitespace(MechChar* p_dst, MechChar* p_src)
 
 // Builds the debriefing's text in p_text: the objectives, sorted by time, and the honor
 // breakdown, whose honor a completed mission adds to the pilot's.
-// Not 100%: the stack slots of i, seconds, minutes, honor and width are permuted.
-// FUNCTION: MW2SHELL 0x10001ca0
 void BuildDebriefText(
 	CareerRecord* p_career,
 	MissionResult* p_results,
@@ -533,7 +506,6 @@ void BuildDebriefText(
 // Lays out the debriefing's text on pages, under the scenario's debriefing project (its first four
 // letters and DBFS after a completed mission, DBFF otherwise; a pilot of the highest rank gets
 // the clan's own).
-// FUNCTION: MW2SHELL 0x10002207
 void LayoutDebriefPages(
 	MissionResult* p_results,
 	MechChar* p_name,
@@ -584,8 +556,6 @@ void LayoutDebriefPages(
 
 // Returns the rank a trial earns: its successful primary objectives, when a clan pilot has
 // completed a trial without the options that make it easier (p_difficulty, g_difficultyConfig).
-// Not 100%: the stack slots of count and i are permuted.
-// FUNCTION: MW2SHELL 0x100023bf
 MechS32 GetTrialRank(MissionResult* p_results, DifficultyConfig* p_difficulty)
 {
 	MechS32 count;
@@ -609,7 +579,6 @@ MechS32 GetTrialRank(MissionResult* p_results, DifficultyConfig* p_difficulty)
 
 // Opens the debriefing screen: reads the mission's results and statistics, scores them for the
 // pilot and lays the text out on pages under the menu.
-// FUNCTION: MW2SHELL 0x100024a3
 void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scenario)
 {
 	MechS32 left;

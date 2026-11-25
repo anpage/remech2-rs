@@ -74,54 +74,35 @@
 #include <string.h>
 #include <strings.h>
 
-DECOMP_SIZE_ASSERT(SoundConfig, 0x3c)
-DECOMP_SIZE_ASSERT(StarMission, 0x3c0a)
-DECOMP_SIZE_ASSERT(MissionObjective, 0x13f)
-
-// GLOBAL: MW2 0x100acb18
 MechS32 g_shouldQuit = 0;
 
-// GLOBAL: MW2 0x100acb1c
 MechS32 g_quitStage = 0;
 
-// GLOBAL: MW2 0x100acb20
 TimedCallback* g_detachedTasks = NULL;
 
-// GLOBAL: MW2 0x100acb24
 DifficultyCfg* g_difficulty = NULL;
 
-// GLOBAL: MW2 0x100acb28
 MechS32 g_localPlayerId = 0;
 
-// GLOBAL: MW2 0x100acb2c
 MechS32 g_remoteWaitTime = 0;
 
 // Set when the local player starts on the autopilot (FirstMech).
-// GLOBAL: MW2 0x100acb34
 MechS32 g_startOnAutopilot = 0;
 
-// GLOBAL: MW2 0x100acb68
 MechHeap* g_primaryHeap = NULL;
 
-// GLOBAL: MW2 0x100acb6c
 MechS32 g_gameWindowWidth = 0;
 
-// GLOBAL: MW2 0x100acb70
 MechS32 g_gameWindowHeight = 0;
 
-// GLOBAL: MW2 0x100acb78
 MechS32 g_drawModeReady = 0;
 
-// GLOBAL: MW2 0x100acb88
 MechS32 g_simPaused = 0;
 
-// GLOBAL: MW2 0x100acb8c
 MechS32 g_pauseRequested = 0;
 
-// GLOBAL: MW2 0x100acb94
 MechS32 g_mouseOutsideClientWindow = 0;
 
-// GLOBAL: MW2 0x100acb98
 MechS32 g_goLaunch = 0;
 
 const MissionLaunch* g_missionLaunch = NULL;
@@ -129,11 +110,6 @@ MissionReport* g_missionReport = NULL;
 
 static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
 
-// Matches except for the stack slots of seven locals (a consistent permutation; the original
-// assigns them in declaration order, which VC++ 4.1 doesn't reproduce from this source). The
-// operand order of the DoFirstObjtv loop test and of the network start test follows the unit's
-// symbol table: both have flipped back and forth as declarations moved between units.
-// FUNCTION: MW2 0x10066a50
 int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_netLaunch, MissionReport* p_report)
 {
 	MechMessage msg;
@@ -447,7 +423,6 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 }
 
 // The simulator's message handler, originally its window procedure (SimWindowProc).
-// FUNCTION: MW2 0x10067757
 static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
 	if (p_msg >= c_mechMsgKeyFirst && p_msg <= c_mechMsgKeyLast) {
@@ -490,7 +465,6 @@ static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR 
 	return 0;
 }
 
-// FUNCTION: MW2 0x10067bbc
 void HandleMessages(void)
 {
 	MechMessage msg;
@@ -515,7 +489,6 @@ void HandleMessages(void)
 	}
 }
 
-// FUNCTION: MW2 0x10067c79
 void UpdatePauseState(void)
 {
 	if (g_pauseRequested) {

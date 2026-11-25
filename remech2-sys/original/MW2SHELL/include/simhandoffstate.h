@@ -5,7 +5,6 @@
 #include "decomp.h"
 #include "types.h"
 
-// SIZE 0x218
 // The shell's state across a mission, kept by the Rust side before the simulator runs and read
 // back after it.
 struct SimHandoffState {

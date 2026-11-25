@@ -17,15 +17,10 @@
 #include <string.h>
 #include <strings.h>
 
-DECOMP_SIZE_ASSERT(SceneObject, 0x7c)
-
 // The countdown the next object starts with, stepped through 64 to 191 so that objects
 // renormalize on different frames.
-// GLOBAL: MW2 0x100a00c8
 MechU32 g_nextRenormalizeCountdown = 100;
 
-// The only diff is a stack-slot permutation of obj and last.
-// FUNCTION: MW2 0x100012d0
 SceneObject* CreateObj(SceneObject* p_parent, MechU32 p_flags)
 {
 	SceneObject* obj;
@@ -88,7 +83,6 @@ SceneObject* CreateObj(SceneObject* p_parent, MechU32 p_flags)
 	return obj;
 }
 
-// FUNCTION: MW2 0x1000145a
 SceneObject* InitObj(SceneObject* p_parent, void* p_memory)
 {
 	SceneObject* obj = p_memory;
@@ -121,44 +115,37 @@ SceneObject* InitObj(SceneObject* p_parent, void* p_memory)
 	return obj;
 }
 
-// FUNCTION: MW2 0x10001532
 void SetObjShape(SceneObject* p_obj, Shape* p_shape)
 {
 	p_obj->m_shape = p_shape;
 	p_obj->m_flags |= c_objectDirty;
 }
 
-// FUNCTION: MW2 0x1000154d
 Shape* GetObjShape(SceneObject* p_obj)
 {
 	return p_obj->m_shape;
 }
 
-// FUNCTION: MW2 0x10001563
 MechChar* GetObjName(SceneObject* p_obj)
 {
 	return p_obj->m_name;
 }
 
-// FUNCTION: MW2 0x10001579
 void SetObjName(SceneObject* p_obj, MechChar* p_name)
 {
 	p_obj->m_name = strdup(p_name);
 }
 
-// FUNCTION: MW2 0x10001596
 void GetObjWorldAngles(SceneObject* p_obj, undefined4* p_angleX, undefined4* p_angleY, undefined4* p_angleZ)
 {
 	GetMatrixAngles(&p_obj->m_world, p_angleX, p_angleY, p_angleZ);
 }
 
-// FUNCTION: MW2 0x100015bc
 void GetObjAngles(SceneObject* p_obj, undefined4* p_angleX, undefined4* p_angleY, undefined4* p_angleZ)
 {
 	GetMatrixAngles(&p_obj->m_local, p_angleX, p_angleY, p_angleZ);
 }
 
-// FUNCTION: MW2 0x100015e2
 void GetObjPosition(SceneObject* p_obj, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	*p_x = p_obj->m_world.m_rows[3][0];
@@ -166,7 +153,6 @@ void GetObjPosition(SceneObject* p_obj, MechS32* p_x, MechS32* p_y, MechS32* p_z
 	*p_z = p_obj->m_world.m_rows[3][2];
 }
 
-// FUNCTION: MW2 0x1000160e
 void GetObjLocalPosition(SceneObject* p_obj, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 {
 	*p_x = p_obj->m_local.m_rows[3][0];
@@ -174,7 +160,6 @@ void GetObjLocalPosition(SceneObject* p_obj, MechS32* p_x, MechS32* p_y, MechS32
 	*p_z = p_obj->m_local.m_rows[3][2];
 }
 
-// FUNCTION: MW2 0x1000163a
 void SetObjPosition(SceneObject* p_obj, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	p_obj->m_local.m_rows[3][0] = p_x;
@@ -183,7 +168,6 @@ void SetObjPosition(SceneObject* p_obj, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 	p_obj->m_flags |= c_objectDirty;
 }
 
-// FUNCTION: MW2 0x10001667
 void MoveObj(SceneObject* p_obj, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 {
 	p_obj->m_local.m_rows[3][0] += p_x;
@@ -192,7 +176,6 @@ void MoveObj(SceneObject* p_obj, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 	p_obj->m_flags |= c_objectDirty;
 }
 
-// FUNCTION: MW2 0x10001694
 void SetObjTransform(SceneObject* p_obj, Matrix* p_matrix)
 {
 	p_obj->m_local = *p_matrix;
@@ -200,7 +183,6 @@ void SetObjTransform(SceneObject* p_obj, Matrix* p_matrix)
 }
 
 // Multiplies the object's local matrix by p_matrix, renormalizing the rotation now and then.
-// FUNCTION: MW2 0x100016b6
 void TransformObj(SceneObject* p_obj, Matrix* p_matrix)
 {
 	MultiplyMatrix(&p_obj->m_local, p_matrix, &p_obj->m_local);
@@ -214,7 +196,6 @@ void TransformObj(SceneObject* p_obj, Matrix* p_matrix)
 	}
 }
 
-// FUNCTION: MW2 0x10001722
 void SetObjRotationMatrix(SceneObject* p_obj, Matrix* p_matrix)
 {
 	p_obj->m_local.m_rows[0][0] = p_matrix->m_rows[0][0];
@@ -229,7 +210,6 @@ void SetObjRotationMatrix(SceneObject* p_obj, Matrix* p_matrix)
 	p_obj->m_flags |= c_objectDirty;
 }
 
-// FUNCTION: MW2 0x1000179f
 void RotateObjMatrix(SceneObject* p_obj, Matrix* p_matrix)
 {
 	MultiplyRotations(&p_obj->m_local, p_matrix, &p_obj->m_local);
@@ -243,7 +223,6 @@ void RotateObjMatrix(SceneObject* p_obj, Matrix* p_matrix)
 	}
 }
 
-// FUNCTION: MW2 0x1000180b
 void SetObjRotation(SceneObject* p_obj, MechS32 p_angleX, MechS32 p_angleY, MechS32 p_angleZ, MechU32 p_flags)
 {
 	Matrix matrix;
@@ -252,7 +231,6 @@ void SetObjRotation(SceneObject* p_obj, MechS32 p_angleX, MechS32 p_angleY, Mech
 	SetObjRotationMatrix(p_obj, &matrix);
 }
 
-// FUNCTION: MW2 0x1000184b
 void RotateObj(SceneObject* p_obj, MechS32 p_angleX, MechS32 p_angleY, MechS32 p_angleZ, MechU32 p_flags)
 {
 	Matrix matrix;
@@ -261,8 +239,6 @@ void RotateObj(SceneObject* p_obj, MechS32 p_angleX, MechS32 p_angleY, MechS32 p
 	RotateObjMatrix(p_obj, &matrix);
 }
 
-// The only diff is a stack-slot permutation of model and obj.
-// FUNCTION: MW2 0x1000188b
 void TransformShapeModel(Shape* p_shape)
 {
 	Model* model = p_shape->m_model;
@@ -272,7 +248,6 @@ void TransformShapeModel(Shape* p_shape)
 	model->m_transformCount = p_shape->m_transformCount;
 }
 
-// FUNCTION: MW2 0x100018ca
 void HideObjTree(SceneObject* p_obj)
 {
 	SceneObject* child;
@@ -286,7 +261,6 @@ void HideObjTree(SceneObject* p_obj)
 	}
 }
 
-// FUNCTION: MW2 0x10001926
 void ShowObjTree(SceneObject* p_obj)
 {
 	SceneObject* child;
@@ -300,7 +274,6 @@ void ShowObjTree(SceneObject* p_obj)
 	}
 }
 
-// FUNCTION: MW2 0x1000199a
 void DisableObjTreeCollision(SceneObject* p_obj)
 {
 	SceneObject* child;
@@ -314,7 +287,6 @@ void DisableObjTreeCollision(SceneObject* p_obj)
 	}
 }
 
-// FUNCTION: MW2 0x100019f6
 void EnableObjTreeCollision(SceneObject* p_obj)
 {
 	SceneObject* child;
@@ -328,7 +300,6 @@ void EnableObjTreeCollision(SceneObject* p_obj)
 	}
 }
 
-// FUNCTION: MW2 0x10001a52
 void DetachObjTreeShapes(SceneObject* p_obj)
 {
 	SceneObject* child;
@@ -342,7 +313,6 @@ void DetachObjTreeShapes(SceneObject* p_obj)
 	}
 }
 
-// FUNCTION: MW2 0x10001aae
 void SetObjTreeKind(SceneObject* p_obj, MechS32 p_kind)
 {
 	SceneObject* child;
@@ -356,7 +326,6 @@ void SetObjTreeKind(SceneObject* p_obj, MechS32 p_kind)
 	}
 }
 
-// FUNCTION: MW2 0x10001b0c
 void SetObjTreeOwner(SceneObject* p_obj, MechS32 p_owner)
 {
 	SceneObject* child;
@@ -370,7 +339,6 @@ void SetObjTreeOwner(SceneObject* p_obj, MechS32 p_owner)
 	}
 }
 
-// FUNCTION: MW2 0x10001b6a
 void SetObjTreeCollisionType(SceneObject* p_obj, MechS32 p_collisionType)
 {
 	SceneObject* child;
@@ -384,7 +352,6 @@ void SetObjTreeCollisionType(SceneObject* p_obj, MechS32 p_collisionType)
 	}
 }
 
-// FUNCTION: MW2 0x10001bce
 void ClearObjTreeKind(SceneObject* p_obj, MechS32 p_flags)
 {
 	SceneObject* child;
@@ -399,7 +366,6 @@ void ClearObjTreeKind(SceneObject* p_obj, MechS32 p_flags)
 }
 
 // Recomputes the world matrices of the object and its subtree, and their shapes' centers.
-// FUNCTION: MW2 0x10001c3f
 void UpdateObjWorld(SceneObject* p_obj)
 {
 	Shape* shape;
@@ -425,7 +391,6 @@ void UpdateObjWorld(SceneObject* p_obj)
 	}
 }
 
-// FUNCTION: MW2 0x10001cf8
 void UpdateObj(SceneObject* p_obj)
 {
 	SceneObject* child;
@@ -440,7 +405,6 @@ void UpdateObj(SceneObject* p_obj)
 	}
 }
 
-// FUNCTION: MW2 0x10001d63
 SceneObject* GetObjRoot(SceneObject* p_obj)
 {
 	while (p_obj->m_parent) {
@@ -450,51 +414,42 @@ SceneObject* GetObjRoot(SceneObject* p_obj)
 	return p_obj;
 }
 
-// FUNCTION: MW2 0x10001d8f
 SceneObject* GetObjParent(SceneObject* p_obj)
 {
 	return p_obj->m_parent;
 }
 
-// FUNCTION: MW2 0x10001da4
 SceneObject* GetObjFirstChild(SceneObject* p_obj)
 {
 	return p_obj->m_firstChild;
 }
 
-// FUNCTION: MW2 0x10001dba
 SceneObject* GetObjNextSibling(SceneObject* p_obj)
 {
 	return p_obj->m_nextSibling;
 }
 
-// FUNCTION: MW2 0x10001dd0
 Matrix* GetObjLocalMatrix(SceneObject* p_obj)
 {
 	return &p_obj->m_local;
 }
 
-// FUNCTION: MW2 0x10001de6
 void SetObjLocalMatrix(SceneObject* p_obj, Matrix* p_matrix)
 {
 	p_obj->m_local = *p_matrix;
 }
 
-// FUNCTION: MW2 0x10001e01
 Matrix* GetObjWorldMatrix(SceneObject* p_obj)
 {
 	return &p_obj->m_world;
 }
 
-// FUNCTION: MW2 0x10001e17
 void SetObjWorldMatrix(SceneObject* p_obj, Matrix* p_matrix)
 {
 	p_obj->m_world = *p_matrix;
 }
 
-// The only diff is a stack-slot permutation of parent and first.
 // Unlinks the object from its parent, keeping its world placement.
-// FUNCTION: MW2 0x10001e32
 void DetachObj(SceneObject* p_obj)
 {
 	SceneObject* parent;
@@ -529,7 +484,6 @@ void DetachObj(SceneObject* p_obj)
 }
 
 // Links the object under p_parent, keeping its world placement.
-// FUNCTION: MW2 0x10001ef8
 void AttachObj(SceneObject* p_obj, SceneObject* p_parent)
 {
 	Matrix inverse;
@@ -549,7 +503,6 @@ void AttachObj(SceneObject* p_obj, SceneObject* p_parent)
 	UpdateObj(p_parent);
 }
 
-// FUNCTION: MW2 0x10001f82
 void DestroyObjTree(SceneObject* p_obj, ShapeCallback p_callback)
 {
 	SceneObject* child;
@@ -573,7 +526,6 @@ void DestroyObjTree(SceneObject* p_obj, ShapeCallback p_callback)
 	}
 }
 
-// FUNCTION: MW2 0x10002016
 SceneObject* FindObjByName(SceneObject* p_obj, const MechChar* p_name)
 {
 	SceneObject* child;
@@ -592,8 +544,6 @@ SceneObject* FindObjByName(SceneObject* p_obj, const MechChar* p_name)
 	return NULL;
 }
 
-// The only diff is a stack-slot permutation of child and last.
-// FUNCTION: MW2 0x100020a6
 SceneObject* GetObjLastChild(SceneObject* p_obj)
 {
 	SceneObject* child;
@@ -612,8 +562,6 @@ SceneObject* GetObjLastChild(SceneObject* p_obj)
 }
 
 // Returns child p_index in the order the children were added (they are prepended), or NULL.
-// The only diff is a stack-slot permutation of child and count.
-// FUNCTION: MW2 0x100020fa
 SceneObject* GetObjChild(SceneObject* p_obj, MechS32 p_index)
 {
 	SceneObject* result;
@@ -651,7 +599,6 @@ SceneObject* GetObjChild(SceneObject* p_obj, MechS32 p_index)
 	return result;
 }
 
-// FUNCTION: MW2 0x100021b6
 SceneObject* FindObjByPart(SceneObject* p_obj, MechU32 p_partId)
 {
 	SceneObject* child;
@@ -672,9 +619,6 @@ SceneObject* FindObjByPart(SceneObject* p_obj, MechU32 p_partId)
 }
 
 // Raises the damage level (shape flags 0xf0) of mech part p_partId's shapes to p_level (1 to 15).
-// The remaining diffs are a stack-slot permutation of current and child, and the operand
-// order of p_level > current (declaration order didn't flip it).
-// FUNCTION: MW2 0x10002246
 void RaisePartDamageLevel(SceneObject* p_obj, MechS32 p_level, MechU32 p_partId)
 {
 	MechS32 current;
@@ -701,7 +645,6 @@ void RaisePartDamageLevel(SceneObject* p_obj, MechS32 p_level, MechU32 p_partId)
 }
 
 // Blows mech part p_partId's objects off the tree as debris.
-// FUNCTION: MW2 0x10002314
 void BlowOffPart(SceneObject* p_obj, MechU32 p_partId)
 {
 	if (p_obj == NULL) {
@@ -719,7 +662,6 @@ void BlowOffPart(SceneObject* p_obj, MechU32 p_partId)
 	}
 }
 
-// FUNCTION: MW2 0x100023a8
 MechS32 GetObjSize(void)
 {
 	return sizeof(SceneObject);

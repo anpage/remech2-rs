@@ -9,12 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-DECOMP_SIZE_ASSERT(TokenStream, 0x14)
-
 // Reads up to 100 more tokens from the file. Returns c_tokenEndOfFile when the file is already
 // at its end.
-// Stack-slot permutation: token and count.
-// FUNCTION: MW2SHELL 0x10039280
 MechS32 ReadTokens(TokenStream* p_stream)
 {
 	MechChar token[500];
@@ -38,7 +34,6 @@ MechS32 ReadTokens(TokenStream* p_stream)
 	return c_tokenOk;
 }
 
-// FUNCTION: MW2SHELL 0x10039334
 TokenStream* CreateTokenStream(FILE* p_file)
 {
 	TokenStream* stream;
@@ -69,7 +64,6 @@ TokenStream* CreateTokenStream(FILE* p_file)
 	return stream;
 }
 
-// FUNCTION: MW2SHELL 0x10039428
 void SkipBlanks(FILE* p_file)
 {
 	MechChar c;
@@ -84,8 +78,6 @@ void SkipBlanks(FILE* p_file)
 	}
 }
 
-// Stack-slot permutation: buffer, length, last, c and trimmed.
-// FUNCTION: MW2SHELL 0x1003949e
 MechS32 ReadFileToken(FILE* p_file, MechChar* p_token)
 {
 	MechS32 last;
@@ -142,7 +134,6 @@ MechS32 ReadFileToken(FILE* p_file, MechChar* p_token)
 }
 
 // Refills the stream once every token has been handed out.
-// FUNCTION: MW2SHELL 0x100396c2
 MechS32 RefillTokens(TokenStream* p_stream)
 {
 	MechS32 result;
@@ -164,7 +155,6 @@ MechS32 RefillTokens(TokenStream* p_stream)
 // Takes the next token if it starts with p_key (any token for an empty key), copying it to
 // p_value. Line ends are skipped unless p_key is one. A mismatch leaves the token in place, still
 // copied, and returns c_tokenMismatch.
-// FUNCTION: MW2SHELL 0x1003972c
 MechS32 TakeToken(TokenStream* p_stream, MechChar* p_key, MechChar* p_value)
 {
 	if (RefillTokens(p_stream) == c_tokenEndOfFile) {
@@ -208,7 +198,6 @@ MechS32 TakeToken(TokenStream* p_stream, MechChar* p_key, MechChar* p_value)
 	return c_tokenMismatch;
 }
 
-// FUNCTION: MW2SHELL 0x1003994b
 void AddToken(TokenStream* p_stream, MechChar* p_token)
 {
 	MechChar** tokens;
@@ -233,7 +222,6 @@ void AddToken(TokenStream* p_stream, MechChar* p_token)
 }
 
 // Skips the tokens up to the next line end.
-// FUNCTION: MW2SHELL 0x100399fd
 void SkipLine(TokenStream* p_stream)
 {
 	MechChar value[512];
@@ -252,7 +240,6 @@ void SkipLine(TokenStream* p_stream)
 }
 
 // Joins the tokens up to the next line end into p_line, each followed by a space.
-// FUNCTION: MW2SHELL 0x10039a6b
 void ReadLine(TokenStream* p_stream, MechChar* p_line)
 {
 	MechChar value[512];

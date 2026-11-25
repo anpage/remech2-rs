@@ -43,7 +43,6 @@
 
 // The current screen's function (RegisterScreenFunction): ShellMain's loop calls it every frame
 // with c_msgScreenFrame, and a menu command or leaving the shell with the message to move on to.
-// GLOBAL: MW2SHELL 0x10062978
 void (*g_screenFunction)(
 	TMPackDataBase* p_database,
 	MechS32* p_campaign,
@@ -55,32 +54,23 @@ void (*g_screenFunction)(
 // The screen a menu command opened over the current one (RegisterMenuFunction), called instead of
 // g_screenFunction while set: every frame with p_active TRUE, and with FALSE to close it
 // (CloseMenuFunction).
-// GLOBAL: MW2SHELL 0x1006297c
 void (*g_menuFunction)(MechS32 p_active) = NULL;
 
-// GLOBAL: MW2SHELL 0x10062980
 MidiSequence* g_midiBackgroundMusic = NULL;
 
-// GLOBAL: MW2SHELL 0x10062984
 MechS32 g_cursorHidden = 0;
 
 // PlayMidiSong's state: whether the base song id is set, the base, and the song playing.
-// GLOBAL: MW2SHELL 0x10062988
 MechU8 g_midiSongBaseSet = 0;
 
-// GLOBAL: MW2SHELL 0x1006298c
 MechS32 g_midiSongBase = 0;
 
-// GLOBAL: MW2SHELL 0x10062990
 MechS32 g_midiSongPlaying = 0;
 
-// GLOBAL: MW2SHELL 0x1007cc84
 char* g_scenario;
 
-// GLOBAL: MW2SHELL 0x1007cc88
 MechS32 g_selectedCampaign;
 
-// GLOBAL: MW2SHELL 0x1007cc8c
 MechU8 g_pilotChosen;
 
 void PlayMidiSong(MechU32 p_msg, MechS32 p_campaign);
@@ -90,7 +80,6 @@ void CloseMenuFunction();
 // The shell's message handler, originally its window procedure (ShellWindowProc).
 // ShellHandleMessage on the Rust side (src/shell/screens/debug.rs) wraps it, for the debug menu's
 // jumps between screens and to hold back the landing and ending videos while a prompt is up.
-// FUNCTION: MW2SHELL 0x1000e670
 MECH_INTPTR ShellHandleMessageC(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
 	MechU32 msg;
@@ -315,10 +304,7 @@ MECH_INTPTR ShellHandleMessageC(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lP
 	return 0;
 }
 
-// Matches except for the stack slots of itemData, unk0x14 and itemSize (a consistent
-// permutation that VC++ 4.1 doesn't reproduce from this source).
 // The original was WinMain-shaped, with the module, the command line and the launcher's window.
-// FUNCTION: MW2SHELL 0x1000f35e
 extern "C" int ShellMain(char* p_cmdLine)
 {
 	void* itemData = NULL;
@@ -469,7 +455,6 @@ extern "C" int ShellMain(char* p_cmdLine)
 }
 
 // Handles one pending message. Returns 0 on c_mechMsgQuit (posting it again), 1 otherwise.
-// FUNCTION: MW2SHELL 0x1000fe0d
 MechS32 PumpMessage()
 {
 	MechMessage msg;
@@ -490,10 +475,6 @@ MechS32 PumpMessage()
 }
 
 // Starts the song of the shell message p_msg for the campaign, unless it is already playing.
-// Not 100%: the stack slots of size, data and result are permuted, and the table loads'
-// displacements (each table less c_msgBriefing entries) land on unrelated data, which reccmp names
-// after whatever symbol is there on each side.
-// FUNCTION: MW2SHELL 0x1000fe86
 void PlayMidiSong(MechU32 p_msg, MechS32 p_campaign)
 {
 	MechS32 size;
@@ -596,25 +577,21 @@ void EnableShellMenuCommand(MechS32 p_command, MechS32 p_enabled)
 }
 
 // The original also enabled the Options menu itself.
-// FUNCTION: MW2SHELL 0x1001023c
 void EnableShellMenu()
 {
 	memset(g_menuCommandEnabled, 1, sizeof(g_menuCommandEnabled));
 }
 
-// FUNCTION: MW2SHELL 0x10010320
 void DisableShellMenu()
 {
 	memset(g_menuCommandEnabled, 0, sizeof(g_menuCommandEnabled));
 }
 
-// FUNCTION: MW2SHELL 0x100108e5
 void RegisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32))
 {
 	g_screenFunction = p_callback;
 }
 
-// FUNCTION: MW2SHELL 0x100108fd
 void UnregisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32))
 {
 	g_screenFunction = p_callback;
@@ -626,7 +603,6 @@ void UnregisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, Mech
 	}
 }
 
-// FUNCTION: MW2SHELL 0x1001093e
 void RunScreenFrame()
 {
 	if (g_menuFunction != NULL) {
@@ -640,13 +616,11 @@ void RunScreenFrame()
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100109a0
 void RegisterMenuFunction(void (*p_callback)(MechS32 p_active))
 {
 	g_menuFunction = p_callback;
 }
 
-// FUNCTION: MW2SHELL 0x100109b8
 void UnregisterMenuFunction(void (*p_callback)(MechS32 p_active))
 {
 	g_menuFunction = p_callback;
@@ -658,7 +632,6 @@ void UnregisterMenuFunction(void (*p_callback)(MechS32 p_active))
 	}
 }
 
-// FUNCTION: MW2SHELL 0x100109f9
 void CloseMenuFunction()
 {
 	if (g_menuFunction != NULL) {

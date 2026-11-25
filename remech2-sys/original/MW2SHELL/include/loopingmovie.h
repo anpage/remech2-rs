@@ -7,7 +7,6 @@
 
 // A looping Smacker movie drawn into a rectangle of the shell (the "amwlogo1" logo on the
 // options, leaderboard and credits screens).
-// SIZE 0x18
 class LoopingMovie {
 public:
 	LoopingMovie(MechChar* p_name, MechS32 p_left, MechS32 p_top);

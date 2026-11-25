@@ -5,7 +5,6 @@
 #include "types.h"
 
 // An offset of the eyepoint's first six fields (its position and orientation).
-// SIZE 0x1c
 typedef struct CameraShakeKey {
 	MechS32 m_x;        // 0x00
 	MechS32 m_y;        // 0x04

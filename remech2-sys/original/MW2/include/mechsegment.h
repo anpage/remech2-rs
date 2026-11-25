@@ -8,7 +8,6 @@ struct SceneObject;
 
 // A saved scene object of a mech (RememberMechSegments): its links, position and rotation,
 // restored with the object by FUN_10080014.
-// SIZE 0x28
 typedef struct MechSegment {
 	struct MechSegment* m_firstChild;  // 0x00
 	struct MechSegment* m_nextSibling; // 0x04

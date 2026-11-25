@@ -4,7 +4,6 @@
 #include "types.h"
 
 // A point in the world.
-// SIZE 0xc
 typedef struct Vector3 {
 	MechS32 m_x; // 0x00
 	MechS32 m_y; // 0x04

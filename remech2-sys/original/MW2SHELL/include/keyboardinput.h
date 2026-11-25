@@ -6,7 +6,6 @@
 #include "types.h"
 
 // Keyboard input for the shell: the last key code polled, and a line of edited text.
-// SIZE 0x110
 class KeyboardInput {
 public:
 	KeyboardInput();
@@ -20,7 +19,6 @@ public:
 	void SetText(undefined4 p_maxLength, const MechChar* p_text);
 	MechS32 EditText(MechChar* p_text, MechU8 p_upperCase);
 
-	// The text entry loop reads the key directly: an inline accessor would leave a jmp at /Ob1.
 	MechU32 m_key; // 0x00
 
 private:

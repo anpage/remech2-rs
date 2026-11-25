@@ -27,25 +27,20 @@ enum KeyStateWord {
 	c_modifierWord = 3
 };
 
-// GLOBAL: MW2 0x100be5d0
 undefined4 g_keyCodeWriteIndex;
 
-// GLOBAL: MW2 0x100be5cc
 undefined4 g_keyCodeReadIndex;
 
 // A ring buffer of key codes, filled by KeyboardQueueKeyCode.
-// GLOBAL: MW2 0x10109a30
 MechS16 g_keyCodes[c_keyCodeBufferSize];
 
 // One bit per (remapped) scan code, set while the key is down. Word 3 also holds the modifier
 // bits (see KeyModifier): the original keeps them in the same memory, so clearing the states
 // clears the modifiers too, and a copy of the states carries them.
-// GLOBAL: MW2 0x10109a20
 undefined4 g_keyStates[4];
 
 // clang-format off
 // The key code for each virtual key; 0 falls back to MapVirtualKey.
-// GLOBAL: MW2 0x100a6308
 MechS16 g_keyCodeMap[256] = {
 	0,     0,     0,     0,     0,     0,     0,     0,     0x08,  0x09,  0,     0,     0,     0x0d,  0,     0,
 	0,     0,     0,     0x1ff, 0,     0,     0,     0,     0,     0,     0,     0x1b,  0,     0,     0,     0,
@@ -60,7 +55,6 @@ MechS16 g_keyCodeMap[256] = {
 
 // clang-format off
 // The key state index of the extended (0xe0-prefixed) scan codes.
-// GLOBAL: MW2 0x100a6508
 MechS32 g_extendedScanCodeMap[0x59] = {
 	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0x55,  0x70,  0,     0,
@@ -74,7 +68,6 @@ MechS32 g_extendedScanCodeMap[0x59] = {
 void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam);
 void KeyboardRecordKeyState(size_t p_virtualKey, MechU32 p_lParam, MechS32 p_pressed);
 
-// FUNCTION: MW2 0x100428a9
 MechS32 KeyboardReadKeyCode(MechS16* p_keyCode)
 {
 	if (g_keyCodeReadIndex == g_keyCodeWriteIndex) {
@@ -91,7 +84,6 @@ MechS32 KeyboardReadKeyCode(MechS16* p_keyCode)
 	return 0;
 }
 
-// FUNCTION: MW2 0x10042909
 MechS32 KeyboardFlushKeyCodes(void)
 {
 	MechMessage msg;
@@ -106,7 +98,6 @@ MechS32 KeyboardFlushKeyCodes(void)
 
 // The original simulator queued a key's code when the key was released. We queue it on the
 // press, as the bindings fire, and only once however long the key is held.
-// FUNCTION: MW2 0x10042966
 void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
 	MechMessage msg;
@@ -142,7 +133,6 @@ void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam
 	} while (!done);
 }
 
-// FUNCTION: MW2 0x10042a71
 void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam)
 {
 	MechS16 keyCode;
@@ -180,7 +170,6 @@ void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam)
 	}
 }
 
-// FUNCTION: MW2 0x10042b90
 void KeyboardRecordKeyState(size_t p_virtualKey, MechU32 p_lParam, MechS32 p_pressed)
 {
 	MechS32 key;
@@ -231,7 +220,6 @@ void KeyboardRecordKeyState(size_t p_virtualKey, MechU32 p_lParam, MechS32 p_pre
 	}
 }
 
-// FUNCTION: MW2 0x10042d8f
 MechS16 KeyboardPollKeyCode(void)
 {
 	MechMessage msg;

@@ -8,7 +8,6 @@
 #pragma pack(push, 1)
 
 // A star's (a team's) mission: its objectives, and how it went.
-// SIZE 0x3c0a
 typedef struct StarMission {
 	MechS32 m_objectiveCount;          // 0x00
 	MechS32 m_startTime;               // 0x04

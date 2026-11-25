@@ -11,7 +11,6 @@ struct Collection;
 
 #pragma pack(1)
 
-// SIZE 0x10d
 // The buttons of a menu screen.
 class ButtonMenu {
 public:

@@ -6,7 +6,6 @@
 
 class TextGlyph;
 
-// SIZE 0x3c
 // One pilot career record; the roster file MW2REG.CFG holds 20 of them.
 struct PilotRecord {
 	undefined4 m_inUse;        // 0x00 — 1 for a registered pilot, 0 for an empty slot

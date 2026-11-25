@@ -27,7 +27,6 @@
 
 // A .MEK file's header. The file goes on with the eight sections (MechSection), the weapons
 // (MekWeapon) and the ammunition bins (MekAmmo).
-// SIZE 0x18
 typedef struct MekHeader {
 	MechS32 m_tons;        // 0x00
 	MechS32 m_speed;       // 0x04
@@ -38,21 +37,18 @@ typedef struct MekHeader {
 } MekHeader;
 
 // A .MEK file's weapon: its type and the part it fires from.
-// SIZE 0x08
 typedef struct MekWeapon {
 	MechS32 m_type;      // 0x00 — a weapon type, times 100, and its id in MechSection::m_slots
 	MechS32 m_hardpoint; // 0x04 — an index into Mech::m_objects; negative: the section holding it
 } MekWeapon;
 
 // A .MEK file's ammunition bin.
-// SIZE 0x08
 typedef struct MekAmmo {
 	MechS32 m_id;   // 0x00 — its id in MechSection::m_slots
 	MechS32 m_type; // 0x04 — the MekWeapon::m_type it feeds
 } MekAmmo;
 
 // The value each weapon type adds to a mech's (GetMechValue).
-// GLOBAL: MW2 0x100aa730
 MechU16 g_weaponValues[30] = {183, 137, 91,  46,  51,  34, 17,  74,  49, 25, 2,   228, 42, 82, 123,
 							  157, 74,  144, 247, 329, 4,  228, 166, 51, 21, 177, 74,  16, 50, 40};
 
@@ -61,8 +57,6 @@ MechU16 g_weaponValues[30] = {183, 137, 91,  46,  51,  34, 17,  74,  49, 25, 2, 
 // scales (the local player's by g_localArmorPerLevel, its side's by armorScale, the others' by
 // g_otherArmorPerLevel), the weapons and their ammunition bins, the heat sinks (scaled by the difficulty
 // and the temperature, g_temperature) and the jump jets. Returns TRUE.
-// The only diff is a stack-slot permutation of the locals.
-// FUNCTION: MW2 0x1005d6d0
 MechS32 LoadMechConfig(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p_config)
 {
 	MechS32 armorScale;
@@ -373,9 +367,6 @@ MechS32 LoadMechConfig(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p
 
 // Returns a mech's value: its tonnage, scaled by the critical slots it fills (by kind), plus its
 // armor and the value of each of its weapons (up to ten).
-// Stack-slot permutation: the kinds table sits elsewhere in the frame, so its accesses and the
-// jumps over them differ in their encoding.
-// FUNCTION: MW2 0x1005e534
 MechU16 GetMechValue(MekHeader* p_header, MechSection* p_sections, MekWeapon* p_weapons)
 {
 	MechS32 armor;

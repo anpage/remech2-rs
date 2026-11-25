@@ -19,25 +19,19 @@
 // The dropship of the loading screen ("sup anim"). The original animated it from an AIL timer's
 // thread while the mission loaded; for now it's one frame.
 
-// GLOBAL: MW2 0x100a0154
 void* g_supAnimBackdrop = NULL;
 
-// GLOBAL: MW2 0x100a0158
 void* g_supAnimShape = NULL;
 
-// GLOBAL: MW2 0x100a015c
 MechS32 g_supAnimFrameCount = 0;
 
 // The command line's overrides of the backdrop and dropship file names (ProcessCmdLineArgs).
 
-// GLOBAL: MW2 0x100a0160
 MechChar* g_supAnimBackdropName = NULL;
 
-// GLOBAL: MW2 0x100a0164
 MechChar* g_supAnimShapeName = NULL;
 
 // The first 16 palette entries in single player.
-// GLOBAL: MW2 0x100a0168
 PaletteColor g_supAnimPalette[16] = {
 	{0x00, 0x00, 0x00},
 	{0x33, 0x34, 0x36},
@@ -57,22 +51,17 @@ PaletteColor g_supAnimPalette[16] = {
 	{0x01, 0x01, 0x02},
 };
 
-// GLOBAL: MW2 0x100bcd50
 MechS32 g_supAnimY;
 
-// GLOBAL: MW2 0x100bcd54
 MechS32 g_supAnimX;
 
-// GLOBAL: MW2 0x100bcd58
 PANE g_supAnimTarget;
 
-// GLOBAL: MW2 0x100bcd70
 WINDOW g_supAnimBuffer;
 
 // Starts the dropship loading screen: loads the backdrop (launch\\supanm6.shp, netmech6.shp
 // in a network game, or the command line's override), draws it and fades its palette in (slowly with p_slowFade), then
-// loads the dropship (launch6.shp) and draws its first frame. Stack-slot permutation: backdropPath, shapePath and
-// palette. FUNCTION: MW2 0x10003a70
+// loads the dropship (launch6.shp) and draws its first frame.
 void StartSupAnim(MechS32 p_slowFade)
 {
 	MechChar backdropPath[256];
@@ -151,7 +140,6 @@ void StartSupAnim(MechS32 p_slowFade)
 }
 
 // Frees the backdrop and the dropship.
-// FUNCTION: MW2 0x10004031
 void StopSupAnim(void)
 {
 	if (g_supAnimBackdrop) {

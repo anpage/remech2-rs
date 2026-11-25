@@ -9,7 +9,6 @@ struct NetLaunchInfo;
 #pragma pack(push, 1)
 
 // DA: a player's state, filled from the local player every g_stateInterval ticks.
-// SIZE 0x85
 typedef struct NetStateMsg {
 	MechChar m_tag[2];       // 0x00
 	MechU8 m_player;         // 0x02
@@ -36,7 +35,6 @@ typedef struct NetStateMsg {
 } NetStateMsg;
 
 // WE: the weapons a player fired since the last one, a bit each.
-// SIZE 0x05
 typedef struct NetWeaponsMsg {
 	MechChar m_tag[2]; // 0x00
 	MechU8 m_player;   // 0x02
@@ -44,7 +42,6 @@ typedef struct NetWeaponsMsg {
 } NetWeaponsMsg;
 
 // CO: a collision push, sent to the player pushed.
-// SIZE 0x1a
 typedef struct NetCollisionMsg {
 	MechChar m_tag[2];   // 0x00
 	MechS32 m_normalX;   // 0x02
@@ -56,7 +53,6 @@ typedef struct NetCollisionMsg {
 } NetCollisionMsg;
 
 // CH: a chat line.
-// SIZE 0x52
 typedef struct NetChatMsg {
 	MechChar m_tag[2];     // 0x00
 	MechChar m_text[0x50]; // 0x02

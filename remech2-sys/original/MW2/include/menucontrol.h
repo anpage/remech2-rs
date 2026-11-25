@@ -10,7 +10,6 @@ struct MenuPage;
 // value, the control's own data and the callbacks that read and apply it (the brightness menu's
 // are GetBrightnessFraction, PreviewBrightnessFraction, SetBrightnessFraction and
 // RestoreBrightness).
-// SIZE 0x28
 typedef struct MenuControl {
 	MechU32 m_flags; // 0x00 — 1: read the value through m_get every time
 	MechS32 m_value; // 0x04

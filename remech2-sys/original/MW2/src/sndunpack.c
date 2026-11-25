@@ -1,4 +1,4 @@
-/* sndunpack.asm's routines and data, in portable C.
+/* The sound-block decoder.
 
    The decoder keeps its frame, its delta table and the upsampling's output in these globals
    between calls, and reads what earlier frames left there: a frame that repeats the previous

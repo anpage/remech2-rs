@@ -17,52 +17,36 @@
 
 #include <string.h>
 
-// GLOBAL: MW2 0x100a00cc
 MechS32 g_paneIndex = -1;
 
-// GLOBAL: MW2 0x100a00d0
 MechS32 g_currentPalette = 0x10;
 
-// GLOBAL: MW2 0x100a00d4
 MechS32 g_palettePending = 0;
 
-// GLOBAL: MW2 0x100a00d8
 MechS32 g_basePalette = 0;
 
-// GLOBAL: MW2 0x100a00dc
 MechS32 g_settledPalette = 0x10;
 
-// GLOBAL: MW2 0x100a00e0
 MechS32 g_paletteFadeTarget = -1;
 
-// GLOBAL: MW2 0x100a00e4
 MechS32 g_paletteFadeBack = -1;
 
-// GLOBAL: MW2 0x100a00e8
 MechS32 g_paletteFadeBackSteps = 0;
 
-// GLOBAL: MW2 0x100a00ec
 MechS32 g_paletteFadeSteps = 0;
 
-// GLOBAL: MW2 0x100a00f0
 MechS32 g_paletteCycling = 0;
 
-// GLOBAL: MW2 0x100a00f4
 MechS32 g_paletteCycleResource = -1;
 
-// GLOBAL: MW2 0x100bcd20
 PaletteFade g_paletteFade;
 
-// GLOBAL: MW2 0x100bcd40
 PaletteCycle g_paletteCycle;
 
-// GLOBAL: MW2 0x10181a60
 PANE g_panes[11];
 
-// GLOBAL: MW2 0x10181b40
 MechS32 g_paletteResourceIds[20];
 
-// FUNCTION: MW2 0x100023c0
 void InitPanes(PANE* p_target)
 {
 	MechS32 i;
@@ -79,7 +63,6 @@ void InitPanes(PANE* p_target)
 // SelectPane is implemented on the Rust side (src/sim/window.rs). In widescreen the 3D views
 // cover the whole frame.
 
-// FUNCTION: MW2 0x100024f0
 void GetViewCenter(Eyepoint* p_eyepoint, MechS32* p_x, MechS32* p_y)
 {
 	MechS32 x;
@@ -91,7 +74,6 @@ void GetViewCenter(Eyepoint* p_eyepoint, MechS32* p_x, MechS32* p_y)
 	*p_y = y;
 }
 
-// FUNCTION: MW2 0x10002546
 void ApplyPendingPalette(void)
 {
 	if (g_palettePending && g_paletteFadeSteps <= 0) {
@@ -101,7 +83,6 @@ void ApplyPendingPalette(void)
 	}
 }
 
-// FUNCTION: MW2 0x1000258d
 void ApplyPaletteResource(MechS32 p_slot)
 {
 	MechU8* palette;
@@ -117,7 +98,6 @@ void ApplyPaletteResource(MechS32 p_slot)
 	}
 }
 
-// FUNCTION: MW2 0x10002600
 void UpdatePaletteFade(void)
 {
 	MechS32 ticks;
@@ -138,8 +118,6 @@ void UpdatePaletteFade(void)
 	}
 }
 
-// Matches except for the stack slots of fromSlot, steps and to (a consistent permutation).
-// FUNCTION: MW2 0x10002687
 MechS32 StartPaletteFade(MechS32 p_palette, MechS32 p_duration, MechS32 p_mode)
 {
 	MechU8* to;
@@ -200,13 +178,11 @@ MechS32 StartPaletteFade(MechS32 p_palette, MechS32 p_duration, MechS32 p_mode)
 	return result;
 }
 
-// FUNCTION: MW2 0x1000288e
 MechS32 StartPaletteFlash(MechS32 p_offset, MechS32 p_duration, MechS32 p_mode)
 {
 	return StartPaletteFade(p_offset + g_basePalette, p_duration, p_mode);
 }
 
-// FUNCTION: MW2 0x100028b7
 void StartPaletteCycle(MechU8 p_first, MechS32 p_count)
 {
 	MechU8* palette;
@@ -229,7 +205,6 @@ void StartPaletteCycle(MechU8 p_first, MechS32 p_count)
 	g_paletteCycling = 1;
 }
 
-// FUNCTION: MW2 0x10002971
 void StopPaletteCycle(void)
 {
 	if (!g_paletteCycling) {
@@ -243,7 +218,6 @@ void StopPaletteCycle(void)
 	ApplyPendingPalette();
 }
 
-// FUNCTION: MW2 0x100029c8
 MechS32 SetPaletteResourceId(MechS32 p_id, MechS32 p_slot)
 {
 	MechS32 old;
@@ -255,7 +229,6 @@ MechS32 SetPaletteResourceId(MechS32 p_id, MechS32 p_slot)
 	return old;
 }
 
-// FUNCTION: MW2 0x10002a24
 void FadeToBasePalette(MechS32 p_palette, MechS32 p_duration)
 {
 	MechS32 palette;
@@ -266,7 +239,6 @@ void FadeToBasePalette(MechS32 p_palette, MechS32 p_duration)
 	g_settledPalette = palette;
 }
 
-// FUNCTION: MW2 0x10002a5a
 void SetBasePalette(MechS32 p_palette)
 {
 	g_basePalette = p_palette;
@@ -276,8 +248,6 @@ void SetBasePalette(MechS32 p_palette)
 // Brings up the start palette (slot 0x10): with p_dissolve, it dissolves the screen to black
 // over 0x10f ticks first. It passes the result of the slot test, not the slot's resource id,
 // to the loader, so it always loads PAL resource 1 (SimMain has the same test).
-// Matches except for the stack slots of all its locals (a consistent permutation).
-// FUNCTION: MW2 0x10002a75
 void StartPalettes(MechS32 p_dissolve)
 {
 	MechU8* palette;
@@ -339,7 +309,6 @@ void StartPalettes(MechS32 p_dissolve)
 	g_settledPalette = 0x10;
 }
 
-// FUNCTION: MW2 0x10002c76
 MechS32 GetPaletteFadeSteps(void)
 {
 	return g_paletteFadeSteps;
