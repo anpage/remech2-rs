@@ -11,7 +11,7 @@ Point g_bandTexCoords[4] = {{0, 0}, {0x10000, 0}, {0x10000, 0x10000}, {0, 0x1000
 
 // Draws a polygon of p_count points in the mode in p_flags' low four bits, in the color in bits
 // 4-11: modes 0 and 3 draw it filled (DrawBand) when the render settings allow.
-void DrawBandPolygon(uint32_t p_flags, int32_t p_count, uint32_t* p_points, int32_t p_unk0x0c)
+void DrawBandPolygon(uint32_t p_flags, int32_t p_count, uint32_t* p_points, int32_t p_luma)
 {
 	uint32_t color;
 	uint32_t mode;
@@ -22,7 +22,7 @@ void DrawBandPolygon(uint32_t p_flags, int32_t p_count, uint32_t* p_points, int3
 	case 0:
 	case 3:
 		if (g_renderSettings.m_flags & 1) {
-			DrawBand(color, p_count, (int32_t*) p_points, p_unk0x0c, 0);
+			DrawBand(color, p_count, (int32_t*) p_points, p_luma, 0);
 		}
 		break;
 	case 1:

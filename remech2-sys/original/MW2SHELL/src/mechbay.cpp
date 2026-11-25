@@ -428,7 +428,7 @@ void RemoveUnassigned(int32_t p_id)
 	}
 }
 
-void AddUnassigned(int32_t p_id, int32_t p_unk0x04)
+void AddUnassigned(int32_t p_id, int32_t p_criticals)
 {
 	if (p_id <= 0) {
 		return;
@@ -436,7 +436,7 @@ void AddUnassigned(int32_t p_id, int32_t p_unk0x04)
 
 	if (g_variant.m_unassignedCount < 78) {
 		g_variant.m_unassigned[g_variant.m_unassignedCount].m_id = p_id;
-		g_variant.m_unassigned[g_variant.m_unassignedCount].m_criticals = p_unk0x04;
+		g_variant.m_unassigned[g_variant.m_unassignedCount].m_criticals = p_criticals;
 		g_variant.m_unassignedCount++;
 	}
 }

@@ -20,8 +20,8 @@ extern "C"
 	int32_t IsDebrisFull(void);
 	int32_t AddDebrisPiece(SceneObject* p_obj);
 	void ThrowDebrisPiece(int32_t p_index);
-	void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0x16);
-	void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0x16);
+	void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_destroyPartZero);
+	void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_destroyPartZero);
 	void DisposeDebris(SceneObject* p_obj, ObjectCallback p_callback);
 	void UpdateDebris(void);
 	void ExplodeChunk(int32_t p_index);

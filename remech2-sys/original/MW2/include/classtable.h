@@ -20,14 +20,14 @@ extern "C"
 
 	int32_t LoadBaseLevelShapes(struct Player* p_player);
 	int32_t AddClassEntryLevel(
-		int32_t p_unk0x00,
-		uint32_t p_unk0x04,
-		uint32_t p_unk0x08,
-		uint32_t p_unk0x0c,
-		int32_t p_unk0x10,
+		int32_t p_resourceId,
+		uint32_t p_x,
+		uint32_t p_y,
+		uint32_t p_z,
+		int32_t p_parent,
 		int32_t p_level,
 		int32_t p_index,
-		int16_t p_unk0x1c
+		int16_t p_kind
 	);
 	void ResetClassTable(void);
 	void ClaimNewClassEntries(struct Player* p_player);

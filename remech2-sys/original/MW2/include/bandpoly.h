@@ -12,7 +12,7 @@ extern "C"
 
 	extern Point g_bandTexCoords[4];
 
-	void DrawBandPolygon(uint32_t p_flags, int32_t p_count, uint32_t* p_points, int32_t p_unk0x0c);
+	void DrawBandPolygon(uint32_t p_flags, int32_t p_count, uint32_t* p_points, int32_t p_luma);
 	int32_t DrawBand(uint32_t p_color, int32_t p_count, int32_t* p_points, int32_t p_luma, int32_t p_mode);
 
 #ifdef __cplusplus

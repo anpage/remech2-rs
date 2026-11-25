@@ -88,7 +88,7 @@ void ThrowDebrisPiece(int32_t p_index)
 }
 
 // Blows p_obj off its model as a chunk of debris; p_callback gets it when it's gone.
-void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0x16)
+void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_destroyPartZero)
 {
 	int32_t i;
 	int32_t destroy;
@@ -100,7 +100,7 @@ void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0
 	}
 
 	destroy = false;
-	if ((p_obj->m_shape->m_kind & 0xf0) == 0x70 || (p_unk0x16 && p_obj->m_shape->m_partId == 0)) {
+	if ((p_obj->m_shape->m_kind & 0xf0) == 0x70 || (p_destroyPartZero && p_obj->m_shape->m_partId == 0)) {
 		SetShapeKind(p_obj->m_shape, 0x50);
 		destroy = true;
 	}
@@ -134,7 +134,7 @@ void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0
 	}
 }
 
-void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0x16)
+void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_destroyPartZero)
 {
 	SceneObject* child;
 	SceneObject* sibling;
@@ -145,15 +145,15 @@ void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_un
 
 	child = GetObjFirstChild(p_obj);
 	if (child) {
-		BlowOffObjTree(child, p_callback, p_unk0x16);
+		BlowOffObjTree(child, p_callback, p_destroyPartZero);
 	}
 
 	sibling = GetObjNextSibling(p_obj);
 	if (sibling) {
-		BlowOffObjTree(sibling, p_callback, p_unk0x16);
+		BlowOffObjTree(sibling, p_callback, p_destroyPartZero);
 	}
 
-	BlowOffChunk(p_obj, p_callback, p_unk0x16);
+	BlowOffChunk(p_obj, p_callback, p_destroyPartZero);
 }
 
 void DisposeDebris(SceneObject* p_obj, ObjectCallback p_callback)

@@ -62,18 +62,18 @@ int32_t LoadBaseLevelShapes(Player* p_player)
 	return 1;
 }
 
-// Adds p_unk0x00 as level p_level of a class entry: level 0 starts a new entry, a later level
-// goes to entry p_index. The unset levels above it take the same value. Returns the entry's
-// index, or -1.
+// Adds resource p_resourceId as level p_level of a class entry: level 0 starts a new entry,
+// a later level goes to entry p_index. The unset levels above it take the same value.
+// Returns the entry's index, or -1.
 int32_t AddClassEntryLevel(
-	int32_t p_unk0x00,
-	uint32_t p_unk0x04,
-	uint32_t p_unk0x08,
-	uint32_t p_unk0x0c,
-	int32_t p_unk0x10,
+	int32_t p_resourceId,
+	uint32_t p_x,
+	uint32_t p_y,
+	uint32_t p_z,
+	int32_t p_parent,
 	int32_t p_level,
 	int32_t p_index,
-	int16_t p_unk0x1c
+	int16_t p_kind
 )
 {
 	int32_t index;
@@ -89,19 +89,19 @@ int32_t AddClassEntryLevel(
 		return -1;
 	}
 
-	if (p_unk0x10 == -1) {
-		p_unk0x10 = -2;
+	if (p_parent == -1) {
+		p_parent = -2;
 	}
 
 	if (p_level == 0) {
 		entry = &g_classTable[g_classEntryCount];
 		entry->m_owner = -2;
 		entry->m_loadedLevel = -1;
-		entry->m_parent = p_unk0x10;
-		entry->m_x = p_unk0x04;
-		entry->m_y = p_unk0x08;
-		entry->m_z = p_unk0x0c;
-		entry->m_resourceIds[p_level] = p_unk0x00;
+		entry->m_parent = p_parent;
+		entry->m_x = p_x;
+		entry->m_y = p_y;
+		entry->m_z = p_z;
+		entry->m_resourceIds[p_level] = p_resourceId;
 		entry->m_shape = NULL;
 		entry->m_obj = NULL;
 		entry->m_partId = 0;
@@ -117,13 +117,13 @@ int32_t AddClassEntryLevel(
 		entry = &g_classTable[index];
 	}
 
-	entry->m_resourceIds[p_level] = p_unk0x00;
-	entry->m_kinds[p_level] = p_unk0x1c;
+	entry->m_resourceIds[p_level] = p_resourceId;
+	entry->m_kinds[p_level] = p_kind;
 	if (p_level < 5) {
 		for (i = p_level + 1; i < 5; i++) {
 			if (entry->m_resourceIds[i] == -1) {
-				entry->m_resourceIds[i] = p_unk0x00;
-				entry->m_kinds[i] = p_unk0x1c;
+				entry->m_resourceIds[i] = p_resourceId;
+				entry->m_kinds[i] = p_kind;
 			}
 		}
 	}
