@@ -338,11 +338,10 @@ void OptionsCallback(MechS32 p_active)
 
 // Callbacks and value pointers come from the original 15-entry options table. The widescreen row
 // is new, in the empty row below the resolution, with a label the screen's art doesn't have.
-#define OPTION_ROW(x, y, width, draw, click, value) {x, y, width, -1, 0, NULL, NULL, draw, click, value, NULL}
-#define OPTION_BAR(x, y, width, height, draw, click, value)                                                            \
-	{x, y, width, height, 0, NULL, NULL, draw, click, value, NULL}
+#define OPTION_ROW(x, y, width, draw, click, value) {x, y, width, -1, NULL, NULL, draw, click, value, NULL}
+#define OPTION_BAR(x, y, width, height, draw, click, value) {x, y, width, height, NULL, NULL, draw, click, value, NULL}
 // A label right-aligned at x 0x16a, where the art's labels end
-#define OPTION_LABEL(y, text) {0xb4, y, 0xb6, 0x13, 0, NULL, NULL, DrawOptionLabel, NULL, (void*) text, NULL}
+#define OPTION_LABEL(y, text) {0xb4, y, 0xb6, 0x13, NULL, NULL, DrawOptionLabel, NULL, (void*) text, NULL}
 ScreenField g_optionFields[18] = {
 	OPTION_ROW(0x189, 0xdb, 100, DrawSkillOption, CycleByteOption, &g_difficultyConfig.m_enemySkill),
 	OPTION_ROW(0x189, 0xef, 100, DrawByteToggle, ToggleByteOption, &g_difficultyConfig.m_heatTracking),
@@ -368,7 +367,7 @@ ScreenField g_optionFields[18] = {
 	OPTION_BAR(0x14f, 0x80, 0x11d, 0x15, DrawVolumeSlider, DragVolumeSlider, &g_soundConfig.m_midiVolume),
 	OPTION_BAR(0x14f, 0x98, 0x11d, 0x15, DrawVolumeSlider, DragVolumeSlider, &g_soundConfig.m_effectsVolume),
 	OPTION_BAR(0x14f, 0xb0, 0x11d, 0x15, DrawVolumeSlider, DragVolumeSlider, &g_soundConfig.m_voiceVolume),
-	{-1, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL},
+	{-1, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL},
 };
 #undef OPTION_ROW
 #undef OPTION_BAR

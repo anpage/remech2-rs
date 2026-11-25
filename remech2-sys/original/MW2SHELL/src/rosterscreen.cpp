@@ -153,8 +153,8 @@ void ClickMissionListEntry(ScreenField* p_tab)
 
 // Negative m_top: rows (times the previous tab's height) and an offset below the previous tab.
 #define TAB_BELOW(rows, offset) ((MechS32) (0x80000000 | ((rows) << 4) | (offset)))
-#define ROSTER_TAB(x, y, width, draw, click, data) {x, y, width, -1, 0, NULL, NULL, draw, click, (void*) (data), NULL}
-#define ROSTER_END {-1, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL}
+#define ROSTER_TAB(x, y, width, draw, click, data) {x, y, width, -1, NULL, NULL, draw, click, (void*) (data), NULL}
+#define ROSTER_END {-1, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL}
 
 // The selected pilot's record.
 ScreenField g_pilotRecordFields[8] = {

@@ -2572,8 +2572,8 @@ MechS32 SaveUserVariant()
 // A field's m_top: a packed row and offset below the previous field (see ScreenField).
 #define MB_ROW(row, offset) ((MechS32) (0x80000000 | ((row) << 4) | (offset)))
 #define MB_TAB(left, top, width, height, colors, draw, click, data, next)                                              \
-	{left, top, width, height, 0, colors, NULL, draw, click, (void*) (data), next}
-#define MB_END {-1, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL}
+	{left, top, width, height, colors, NULL, draw, click, (void*) (data), next}
+#define MB_END {-1, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL}
 
 extern ScreenField g_engineFields[];
 extern ScreenField g_heatSinkFields[];
