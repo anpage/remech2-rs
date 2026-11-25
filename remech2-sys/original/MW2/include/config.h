@@ -87,9 +87,6 @@ extern "C"
 		struct ResourceRef* p_ref,
 		MechS32* p_height,
 		MechS32* p_cockpitHeight,
-		MechS32* p_unk0x0c,
-		MechS32* p_unk0x10,
-		MechS32* p_unk0x14,
 		MechS32* p_maxTorsoTwist,
 		MechS32* p_radius
 	);

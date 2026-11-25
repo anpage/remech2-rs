@@ -35,10 +35,6 @@ pub unsafe extern "C" fn init_game_window_geometry() -> i32 {
         let (width, height) = (sim::g_gameWindowWidth, sim::g_gameWindowHeight);
         geometry.m_width = (height * 4 / 3).min(width);
         geometry.m_height = height;
-        geometry.m_unk0x08 = 1;
-        geometry.m_numColors = 0x100;
-        geometry.m_unk0x10 = 1;
-        geometry.m_unk0x14 = 0;
         sim::g_screenPixelCount = height * width;
         sim::g_screenWidth = width;
         sim::g_screenHeight = height;

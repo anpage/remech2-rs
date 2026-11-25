@@ -125,7 +125,6 @@ void FirstMech(struct Player* p_player)
 	mech->m_powerState = 0;
 	mech->m_stateTime = 0;
 	mech->m_deltaHeat = 0;
-	mech->m_unk0xb4 = 0;
 	mech->m_autopilot = 0;
 	mech->m_velocityX = 0;
 	mech->m_velocityY = 0;
@@ -1116,15 +1115,12 @@ void UpdateLocalMech(Mech* p_mech)
 		break;
 	case 2:
 		if (g_manualWeaponCycle) {
-			if (!mech->m_unk0xb4) {
-				PlaySoundEffect(0xfd, 0x32, 0x40, 5, 0x32);
-				SelectNextWeapon(mech);
-			}
-
+			PlaySoundEffect(0xfd, 0x32, 0x40, 5, 0x32);
+			SelectNextWeapon(mech);
 			g_manualWeaponCycle = 0;
 		}
 
-		if (mech->m_player->m_steering->m_weaponCycle && !mech->m_unk0xb4) {
+		if (mech->m_player->m_steering->m_weaponCycle) {
 			PlaySoundEffect(0xfd, 0x32, 0x40, 5, 0x32);
 			g_manualWeaponCycle = 1;
 			SelectNextWeapon(mech);

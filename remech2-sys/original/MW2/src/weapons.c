@@ -357,7 +357,6 @@ MechS32 SpawnShot(Player* p_player, WeaponSlot* p_slot)
 			shot->m_damage = def->m_damage;
 			shot->m_heat = def->m_shotHeat;
 			shot->m_flags = 1;
-			shot->m_unk0x3c = 0;
 			shot->m_target = p_slot->m_target;
 			shot->m_targetKind = p_slot->m_targetKind;
 			shot->m_shooter = p_player->m_index;

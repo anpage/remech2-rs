@@ -18,7 +18,7 @@ extern "C"
 	extern DebrisChunk g_debrisChunks[0x80];
 
 	MechS32 IsDebrisFull(void);
-	MechS32 AddDebrisPiece(SceneObject* p_obj, MechS32 p_unk0x00);
+	MechS32 AddDebrisPiece(SceneObject* p_obj);
 	void ThrowDebrisPiece(MechS32 p_index);
 	void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x16);
 	void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x16);

@@ -159,14 +159,6 @@ typedef struct BwdIdPairRecord {
 	MechS16 m_b;        // 0x0a
 } BwdIdPairRecord;
 
-// frameprj.
-typedef struct BwdFramePrjRecord {
-	BwdRecord m_header; // 0x00
-	MechS16 m_unk0x08;  // 0x08 — -1 for 1
-	MechS16 m_unk0x0a;  // 0x0a — -1 for 0
-	MechS16 m_id;       // 0x0c — -1 for none
-} BwdFramePrjRecord;
-
 // polyoffset: the shape offset.
 typedef struct BwdOffsetRecord {
 	BwdRecord m_header; // 0x00
@@ -557,25 +549,7 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			SetAnimMode(index, mode);
 		}
 		else if (type == g_bwdTypeCodes[c_bwdFramePrj]) {
-			MechS16 b;
-			MechS16 id;
-			BwdFramePrjRecord* frame = (BwdFramePrjRecord*) node;
-			MechS16 a;
-
-			a = frame->m_unk0x08;
-			b = frame->m_unk0x0a;
-			id = frame->m_id;
-			if (a == -1) {
-				a = 1;
-			}
-
-			if (b == -1) {
-				b = 0;
-			}
-
-			if (id != -1) {
-				LoadFramePrj(id, a, b);
-			}
+			// Unused
 		}
 		else if (type == g_bwdTypeCodes[c_bwdPolyOffset]) {
 			MechS32 x;
@@ -819,9 +793,6 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 					ref,
 					&mech->m_height,
 					&mech->m_cockpitHeight,
-					&mech->m_unk0xd4,
-					&mech->m_unk0xd8,
-					&mech->m_unk0xdc,
 					&mech->m_maxTorsoTwist,
 					&mech->m_radius
 				);
@@ -958,7 +929,6 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 						if (obj) {
 							g_shots[g_nextShotRecord].m_type = shotType;
 							g_shots[g_nextShotRecord].m_object = obj;
-							g_shots[g_nextShotRecord].m_unk0x3c = 0;
 							HideObjTree(obj);
 							DisableObjTreeCollision(obj);
 							SetObjTreeKind(obj, 0x400);

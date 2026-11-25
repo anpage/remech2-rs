@@ -39,7 +39,7 @@ MechS32 IsDebrisFull(void)
 	return i == 0x80;
 }
 
-MechS32 AddDebrisPiece(SceneObject* p_obj, MechS32 p_unk0x00)
+MechS32 AddDebrisPiece(SceneObject* p_obj)
 {
 	MechS32 i;
 	DebrisPiece* piece;
@@ -65,7 +65,6 @@ MechS32 AddDebrisPiece(SceneObject* p_obj, MechS32 p_unk0x00)
 	DetachObj(p_obj);
 
 	piece = &g_debrisPieces[i];
-	piece->m_unk0x00 = p_unk0x00;
 	piece->m_obj = p_obj;
 	piece->m_acceleration = -g_gravity;
 	return i;
@@ -119,7 +118,7 @@ void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x
 		chunk = &g_debrisChunks[i];
 	}
 
-	piece = AddDebrisPiece(p_obj, 2);
+	piece = AddDebrisPiece(p_obj);
 	if (piece >= 0) {
 		chunk->m_active = TRUE;
 		chunk->m_obj = p_obj;
@@ -356,7 +355,6 @@ void ResetDebrisPiece(MechS32 p_index)
 	DebrisPiece* piece;
 
 	piece = &g_debrisPieces[p_index];
-	piece->m_unk0x00 = 0;
 	piece->m_obj = NULL;
 	piece->m_velocityX = piece->m_velocityY = piece->m_velocityZ = 0;
 	piece->m_spinX = piece->m_spinY = piece->m_spinZ = 0;

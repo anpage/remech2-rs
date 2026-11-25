@@ -348,7 +348,7 @@ MechS32 CollideWithBuildings(Mech* p_mech, MechS32* p_x, MechS32* p_y, MechS32* 
 				obj = shape->m_object;
 				dist = ApproximateVectorLength(p_mech->m_velocityX, p_mech->m_velocityY, p_mech->m_velocityZ);
 				if (dist > 0) {
-					index = AddDebrisPiece(obj, 1);
+					index = AddDebrisPiece(obj);
 					if (index >= 0) {
 						PushDebrisPiece(
 							index,

@@ -142,7 +142,6 @@ void ResetShotSlot(MechS32 p_index)
 	shot->m_target = 0;
 	shot->m_targetKind = 0;
 	shot->m_flags = 0;
-	shot->m_unk0x3c = 0;
 	shot->m_damage = shot->m_heat = 0;
 	shot->m_tracked = 0;
 }
@@ -159,13 +158,7 @@ void UpdateAllShotsC(void)
 		if (shot->m_flags && shot->m_object) {
 			shot->m_age += g_deltaTime;
 			shot->m_lifetime -= g_deltaTime;
-			switch (shot->m_unk0x3c) {
-			case 0:
-				UpdateShot(i);
-				break;
-			default:
-				break;
-			}
+			UpdateShot(i);
 		}
 	}
 }
@@ -1105,7 +1098,7 @@ void ScatterDebris(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_count)
 		effect = &g_effects[i];
 		if (!effect->m_active && effect->m_type == 0xb && effect->m_object) {
 			object = effect->m_object;
-			piece = AddDebrisPiece(object, 1);
+			piece = AddDebrisPiece(object);
 			if (piece != -1) {
 				effect->m_active = 1;
 				effect->m_timeLeft = g_effectInfo[0xb].m_duration;

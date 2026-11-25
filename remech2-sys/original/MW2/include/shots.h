@@ -39,7 +39,6 @@ typedef struct Shot {
 	MechS32 m_target;      // 0x30
 	MechS32 m_targetKind;  // 0x34
 	MechU32 m_flags;       // 0x38
-	MechS32 m_unk0x3c;     // 0x3c
 	MechS32 m_shooter;     // 0x40 — a player index
 	MechS32 m_damage;      // 0x44
 	MechS32 m_heat;        // 0x48 — added to the heat of the mech it hits

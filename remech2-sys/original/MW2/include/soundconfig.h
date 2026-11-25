@@ -4,9 +4,8 @@
 #include "decomp.h"
 #include "types.h"
 
-// The sound settings, read from and written to the player's settings: the shell's SoundConfig,
+// The sound and display settings, copied field by field to and from the player's settings.
 struct SoundConfig {
-	MechS32 m_unk0x00;
 	MechS32 m_effectsVolume;
 	MechS32 m_voiceVolume;
 	// the simulator plays its music from CD

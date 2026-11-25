@@ -24,7 +24,7 @@
 // The CD track the mission plays, or -1.
 MechS32 g_cdTrack = -1;
 
-SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 0x10000, 11, 1, 1, 1, 1, 1, 9};
+SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 11, 1, 1, 1, 1, 1, 9};
 
 SoundConfig* g_mw2SndCfgData = NULL;
 
@@ -35,7 +35,7 @@ MechS32 g_musicStarted = 0;
 MechS32 g_nextEngageCheck;
 
 // The in-mission sound menu's settings: 0 the effects volume, 1 the voice volume, 2 the music
-// volume, 3 the first word of the sound configuration, 4 whether speech is on.
+// volume, 4 whether speech is on (3 does nothing).
 
 // Returns setting p_setting. Asking for the music volume turns the CD music on.
 MechS32 GetSoundSetting(MechS32 p_setting)
@@ -45,9 +45,6 @@ MechS32 GetSoundSetting(MechS32 p_setting)
 	value = 0;
 	if (p_setting >= 0 && p_setting < 5) {
 		switch (p_setting) {
-		case 3:
-			value = g_soundConfig.m_unk0x00;
-			break;
 		case 0:
 			value = g_soundConfig.m_effectsVolume;
 			break;
@@ -87,13 +84,6 @@ void PreviewSoundSetting(MechS32 p_setting, MechS32 p_value)
 		}
 
 		switch (p_setting) {
-		case 3:
-			old = g_soundConfig.m_unk0x00;
-			g_soundConfig.m_unk0x00 = p_value;
-			if (g_soundConfig.m_unk0x00 != old) {
-				notify = NULL;
-			}
-			break;
 		case 0:
 			old = g_soundConfig.m_effectsVolume;
 			g_soundConfig.m_effectsVolume = p_value;
@@ -147,9 +137,6 @@ void SetSoundSetting(MechS32 p_setting, MechS32 p_value)
 {
 	if (p_setting >= 0 && p_setting < 5) {
 		switch (p_setting) {
-		case 3:
-			g_mw2SndCfgData->m_unk0x00 = g_soundConfig.m_unk0x00 = p_value;
-			break;
 		case 0:
 			g_mw2SndCfgData->m_effectsVolume = g_soundConfig.m_effectsVolume = p_value;
 			break;
@@ -200,9 +187,6 @@ void RestoreSoundSetting(MechS32 p_setting)
 {
 	if (p_setting >= 0 && p_setting < 5) {
 		switch (p_setting) {
-		case 3:
-			g_soundConfig.m_unk0x00 = g_mw2SndCfgData->m_unk0x00;
-			break;
 		case 0:
 			g_soundConfig.m_effectsVolume = g_mw2SndCfgData->m_effectsVolume;
 			break;

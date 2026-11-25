@@ -708,14 +708,11 @@ void DrawPanelAnim(PANE* p_target, MechS32 p_index, MechS32 p_x, MechS32 p_y)
 	DrawAnim2d(p_target, p_index, p_x, p_y);
 }
 
-// Loads seven values from resource p_ref.
+// Loads the mech geometry resource p_ref: seven values, of which the third to fifth are unused.
 MechS32 LoadMgdFile(
 	ResourceRef* p_ref,
 	MechS32* p_height,
 	MechS32* p_cockpitHeight,
-	MechS32* p_unk0x0c,
-	MechS32* p_unk0x10,
-	MechS32* p_unk0x14,
 	MechS32* p_maxTorsoTwist,
 	MechS32* p_radius
 )
@@ -741,13 +738,7 @@ MechS32 LoadMgdFile(
 	*p_height = *cursor;
 	cursor++;
 	*p_cockpitHeight = *cursor;
-	cursor++;
-	*p_unk0x0c = *cursor;
-	cursor++;
-	*p_unk0x10 = *cursor;
-	cursor++;
-	*p_unk0x14 = *cursor;
-	cursor++;
+	cursor += 4;
 	*p_maxTorsoTwist = *cursor;
 	cursor++;
 	*p_radius = *cursor;

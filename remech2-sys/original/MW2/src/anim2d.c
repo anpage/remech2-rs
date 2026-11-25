@@ -11,55 +11,12 @@
 
 #include <string.h>
 
-// Frame projections (a table of 96) and 2D animations: up to seven SHP resources whose frames
-// play on the clock, once or looping, drawn into a pane.
-
-MechS32 g_framePrjCount = -1;
+// 2D animations: up to seven SHP resources whose frames play on the clock, once or looping,
+// drawn into a pane.
 
 MechS32 g_anim2dCount = 0;
 
 Anim2d* g_anim2ds[7];
-
-FramePrj g_framePrjs[0x60];
-
-MechS32 LoadFramePrj(MechU16 p_id, MechS16 p_unk0x04, MechS16 p_unk0x06)
-{
-	FramePrj* prj;
-
-	if (g_framePrjCount == -1) {
-		ResetFramePrjs();
-	}
-
-	if (g_framePrjCount == -1 || g_framePrjCount >= 0x60) {
-		return -1;
-	}
-
-	prj = &g_framePrjs[g_framePrjCount];
-	prj->m_id = p_id;
-	prj->m_unk0x04 = p_unk0x04;
-	prj->m_unk0x06 = p_unk0x06;
-	return g_framePrjCount++;
-}
-
-void ResetFramePrjs(void)
-{
-	MechS32 i;
-	FramePrj* prj;
-
-	for (i = 0; i < 0x60; i++) {
-		prj = &g_framePrjs[i];
-		ClearFramePrj(prj);
-	}
-
-	g_framePrjCount = 0;
-}
-
-void ClearFramePrj(FramePrj* p_prj)
-{
-	p_prj->m_id = -1;
-	p_prj->m_unk0x04 = 0;
-	p_prj->m_unk0x06 = 0;
-}
 
 MechS16 LoadAnim2d(MechU32 p_flags, MechS32 p_frameTime, MechS32 p_type, MechS16* p_resourceId)
 {

@@ -161,11 +161,11 @@ void BreakUpMech(Mech* p_mech)
 	obj = p_mech->m_player->m_obj;
 	upper = p_mech->m_pitchObj;
 	lower = p_mech->m_torsoObj;
-	upperIndex = AddDebrisPiece(upper, 1);
+	upperIndex = AddDebrisPiece(upper);
 	ThrowDebrisPiece(upperIndex);
-	lowerIndex = AddDebrisPiece(lower, 1);
+	lowerIndex = AddDebrisPiece(lower);
 	ThrowDebrisPiece(lowerIndex);
-	objIndex = AddDebrisPiece(obj, 1);
+	objIndex = AddDebrisPiece(obj);
 	ThrowDebrisPiece(objIndex);
 }
 

@@ -37,7 +37,6 @@ typedef struct Mech {
 	MechS32 m_weaponCount;            // 0xa8
 	MechS32 m_selectedWeapon;         // 0xac — an index into m_weapons, or -1
 	MechS32 m_mobility;               // 0xb0 — 16.16, scales the throttle: each leg hit takes 0.1
-	MechS32 m_unk0xb4;                // 0xb4 — blocks the weapon cycle when set, but nothing sets it
 	MechS32 m_lastSelectedWeapon;     // 0xb8 — m_selectedWeapon before this tick's weapon input
 	MechS32 m_autopilot;              // 0xbc — 1 and 2 are on
 	MechS32 m_jumpFuel;               // 0xc0 — the jump jets fire while it is positive; -2 without jets
@@ -45,9 +44,6 @@ typedef struct Mech {
 	MechS32 m_ammoBinCount;           // 0xc8
 	MechS32 m_height;                 // 0xcc — of its object's origin above its feet (the MGD's)
 	MechS32 m_cockpitHeight;          // 0xd0 — added to the eyepoint (g_eyeHeightOffset)
-	MechS32 m_unk0xd4;                // 0xd4 — the MGD's third to fifth values: nothing reads them
-	MechS32 m_unk0xd8;                // 0xd8
-	MechS32 m_unk0xdc;                // 0xdc
 	MechS32 m_maxTorsoTwist;          // 0xe0 — 16.16 degrees either way
 	MechS32 m_tons;                   // 0xe4 — ApplyCollisionDamage scales collision damage by it
 	MechS32 m_radius;                 // 0xe8 — splash damage reaches it this much further

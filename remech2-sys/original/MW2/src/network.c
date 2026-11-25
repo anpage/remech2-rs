@@ -1059,13 +1059,6 @@ MechS32 StartExternalIO(NetLaunchInfo* p_netLaunch)
 		g_realClock = GetRealClock();
 		return 1;
 	}
-
-	// Unreachable: both arms return.
-	if (p_netLaunch && (p_netLaunch->m_unk0x14 & 1)) {
-		g_stateInterval = 0x2d;
-	}
-
-	return 1;
 }
 
 // Sends SS and leaves the session, then stops the network.

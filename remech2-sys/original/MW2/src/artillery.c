@@ -47,7 +47,6 @@ void FirstArtillery(Player* p_player)
 	mech->m_powerState = 0;
 	mech->m_stateTime = 0;
 	mech->m_deltaHeat = 0;
-	mech->m_unk0xb4 = 0;
 	mech->m_autopilot = 0;
 	mech->m_velocityY = 0;
 	MoveObj(mech->m_player->m_obj, 0, mech->m_height, 0);

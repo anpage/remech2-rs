@@ -11,7 +11,6 @@ typedef struct NetLaunchInfo {
 	LPDIRECTPLAY m_directPlay;        // 0x00
 	DPID m_localPlayerId;             // 0x04
 	DPID* m_playerIds;                // 0x10
-	undefined4 m_unk0x14;             // 0x14
 	char* m_missionName;              // 0x24
 } NetLaunchInfo;
 

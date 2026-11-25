@@ -7,12 +7,8 @@
 #include "window.h"
 
 typedef struct GameWindowGeometry {
-	MechS32 m_width;      // 0x00
-	MechS32 m_height;     // 0x04
-	undefined4 m_unk0x08; // 0x08
-	MechS32 m_numColors;  // 0x0c
-	undefined4 m_unk0x10; // 0x10
-	undefined4 m_unk0x14; // 0x14
+	MechS32 m_width;  // 0x00
+	MechS32 m_height; // 0x04
 } GameWindowGeometry;
 
 struct Shape;

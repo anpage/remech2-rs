@@ -146,10 +146,8 @@ static const struct {
 	RESET_GLOBAL(g_aiStateTime),
 
 	// anim2d.c
-	RESET_GLOBAL(g_framePrjCount),
 	RESET_GLOBAL(g_anim2dCount),
 	RESET_GLOBAL(g_anim2ds),
-	RESET_GLOBAL(g_framePrjs),
 
 	// animation.c
 	RESET_GLOBAL(g_animInitialized),

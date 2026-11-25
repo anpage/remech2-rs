@@ -5,12 +5,6 @@
 #include "targeting.h"
 #include "types.h"
 
-typedef struct FramePrj {
-	MechS32 m_id;      // 0x00 — -1: free
-	MechS16 m_unk0x04; // 0x04
-	MechS16 m_unk0x06; // 0x06
-} FramePrj;
-
 // Anim2d::m_state.
 enum {
 	c_anim2dNew = 0,
@@ -42,14 +36,9 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_framePrjCount;
 	extern MechS32 g_anim2dCount;
 	extern Anim2d* g_anim2ds[7];
-	extern FramePrj g_framePrjs[0x60];
 
-	MechS32 LoadFramePrj(MechU16 p_id, MechS16 p_unk0x04, MechS16 p_unk0x06);
-	void ResetFramePrjs(void);
-	void ClearFramePrj(FramePrj* p_prj);
 	MechS16 LoadAnim2d(MechU32 p_flags, MechS32 p_frameTime, MechS32 p_type, MechS16* p_resourceId);
 	void FreeAnim2ds(MechS32 p_index);
 	void FreeAnim2d(MechS32 p_index);
