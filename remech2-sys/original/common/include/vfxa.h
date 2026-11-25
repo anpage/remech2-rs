@@ -113,7 +113,6 @@ extern "C"
 	int32_t VFX_ILBM_resolution(uint8_t* p_ilbmBuffer);
 	int32_t VFX_PCX_draw(PANE* p_pane, uint8_t* p_pcxBuffer);
 	void VFX_PCX_palette(uint8_t* p_pcxBuffer, int32_t p_pcxFileSize, void* p_palette);
-	int32_t VFX_PCX_resolution(uint8_t* p_pcxBuffer);
 	int32_t VFX_GIF_draw(PANE* p_pane, uint8_t* p_gifBuffer, uint8_t* p_gifScratch);
 	void VFX_GIF_palette(uint8_t* p_gifBuffer, uint8_t* p_palette);
 	int32_t VFX_GIF_resolution(void* p_gifBuffer);

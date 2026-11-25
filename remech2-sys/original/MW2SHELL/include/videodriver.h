@@ -25,9 +25,7 @@ public:
 	void DrawFmv();
 	void GetPalette(PaletteColor* p_palette);
 	void SetPalette(PaletteColor* p_palette, uint32_t p_allColors);
-	void ReadPictureSize(int32_t* p_maxX, int32_t* p_maxY, uint8_t* p_data, int32_t p_size, int32_t p_type);
 	void LoadBackground(TMPackDataBase* p_database, int32_t p_id);
-	void DrawPicture(uint8_t* p_data, int32_t p_type, PANE* p_view);
 	void DrawLine(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom, int32_t p_color);
 	void DrawPixels(uint8_t* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
 	void DrawPixelsClipped(uint8_t* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
@@ -54,7 +52,6 @@ public:
 	void ActivateFramebuffer();
 
 private:
-	int32_t m_pictureSize;          // 0x00 — the last picture's, see VFX_PCX_resolution
 	TextGlyphList* m_overlayGlyphs; // 0x16 — redrawn after the videos' frames
 	TextGlyphList* m_glyphs;        // 0x1a — redrawn before them
 	uint32_t m_paletteChanged;      // 0x1e — the next draw loads m_palette

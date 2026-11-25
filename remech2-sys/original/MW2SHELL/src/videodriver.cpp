@@ -279,21 +279,6 @@ void VideoDriver::SetPalette(PaletteColor* p_palette, uint32_t p_allColors)
 	m_allColors = p_allColors;
 }
 
-void VideoDriver::ReadPictureSize(int32_t* p_maxX, int32_t* p_maxY, uint8_t* p_data, int32_t p_size, int32_t p_type)
-{
-	switch (p_type) {
-	case 2:
-		m_pictureSize = VFX_PCX_resolution(p_data);
-		break;
-	default:
-		m_pictureSize = 0;
-		QuitWithVDriverError(0);
-	}
-
-	*p_maxX = (m_pictureSize >> 16) - 1;
-	*p_maxY = (m_pictureSize & 0xffff) - 1;
-}
-
 void VideoDriver::LoadBackground(TMPackDataBase* p_database, int32_t p_id)
 {
 	int32_t size;
@@ -322,21 +307,6 @@ void VideoDriver::LoadBackground(TMPackDataBase* p_database, int32_t p_id)
 	}
 
 	MechHeapFree(g_primaryHeap, data);
-}
-
-void VideoDriver::DrawPicture(uint8_t* p_data, int32_t p_type, PANE* p_view)
-{
-	switch (p_type) {
-	case 2:
-		if (ACQUIRE_FRAMEBUFFER() == 0) {
-			VFX_PCX_draw(p_view, p_data);
-		}
-		break;
-	default:
-		QuitWithVDriverError(0);
-	}
-
-	ExpandRect(m_screenView.m_x0, m_screenView.m_y0, m_screenView.m_x1, m_screenView.m_y1);
 }
 
 void VideoDriver::DrawLine(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom, int32_t p_color)

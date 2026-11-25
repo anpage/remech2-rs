@@ -2144,7 +2144,7 @@ void ReleaseMekImage(char* p_name)
 }
 
 // Copies p_size bytes and returns the source position after them.
-uint8_t* ReadBytes(uint8_t* p_dst, uint8_t* p_src, uint32_t p_size)
+uint8_t* ReadBytes(void* p_dst, uint8_t* p_src, uint32_t p_size)
 {
 	memcpy(p_dst, p_src, p_size);
 	return p_src + p_size;
@@ -2188,13 +2188,13 @@ void LoadMekFile(char* p_name)
 	memset(g_mekAmmo, 0, sizeof(g_mekAmmo));
 	memset(g_mekVariantName, 0, sizeof(g_mekVariantName));
 
-	data = ReadBytes((uint8_t*) &g_mekHeader, data, 0x18);
-	data = ReadBytes((uint8_t*) g_mekLocations, data, 0x140);
-	ReadBytes((uint8_t*) g_mekWeapons, data, (g_mekHeader.m_weaponCount < 10 ? g_mekHeader.m_weaponCount : 10) * 8);
+	data = ReadBytes(&g_mekHeader, data, 0x18);
+	data = ReadBytes(g_mekLocations, data, 0x140);
+	ReadBytes(g_mekWeapons, data, (g_mekHeader.m_weaponCount < 10 ? g_mekHeader.m_weaponCount : 10) * 8);
 	data += g_mekHeader.m_weaponCount * 8;
-	ReadBytes((uint8_t*) g_mekAmmo, data, (g_mekHeader.m_ammoCount < 25 ? g_mekHeader.m_ammoCount : 25) * 8);
+	ReadBytes(g_mekAmmo, data, (g_mekHeader.m_ammoCount < 25 ? g_mekHeader.m_ammoCount : 25) * 8);
 	data += g_mekHeader.m_ammoCount * 8;
-	data = ReadBytes((uint8_t*) g_mekVariantName, data, 0x32);
+	data = ReadBytes(g_mekVariantName, data, 0x32);
 	ReleaseMekImage(p_name);
 
 	memset(&g_variant, 0, sizeof(g_variant));

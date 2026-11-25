@@ -2108,15 +2108,6 @@ void VFX_PCX_palette(uint8_t* p_pcxBuffer, int32_t p_pcxFileSize, void* p_palett
 	}
 }
 
-// The image's width << 16 | height, from its header's bounds, as words.
-int32_t VFX_PCX_resolution(uint8_t* p_pcxBuffer)
-{
-	uint32_t width = (ReadU16(p_pcxBuffer + 8) - ReadU16(p_pcxBuffer + 4) + 1) & 0xffff;
-	uint32_t height = (ReadU16(p_pcxBuffer + 0xa) - ReadU16(p_pcxBuffer + 6) + 1) & 0xffff;
-
-	return PortableS32(width << 16 | height);
-}
-
 // --- GIF ---
 
 // VFX_GIF_draw's state, in the caller's p_state block: its fields, then the decoded string's stack and

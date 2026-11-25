@@ -475,7 +475,7 @@ void ArchiveReader::Load(int32_t p_entry)
 				page = new Page(m_font, g_videoDriver, m_colors, 0x58, 0x46, 0x1d2, 0xde);
 				ExpandCollection(m_pages, page);
 			}
-			page->SetBanner((uint8_t*) data, size);
+			page->SetBanner(data, size);
 			break;
 		case -0x100:
 			break;

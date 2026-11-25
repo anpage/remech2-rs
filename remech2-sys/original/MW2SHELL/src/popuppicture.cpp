@@ -6,7 +6,7 @@
 #include "windowstate.h"
 
 PopupPicture::PopupPicture(
-	uint8_t* p_data,
+	void* p_data,
 	int32_t p_size,
 	VideoDriver* p_videoDriver,
 	int32_t p_left,
@@ -20,7 +20,6 @@ PopupPicture::PopupPicture(
 	m_size = p_size;
 	m_videoDriver = p_videoDriver;
 	m_sample = p_sample;
-	m_videoDriver->ReadPictureSize(&m_width, &m_height, m_data, m_size, 2);
 
 	size = VFX_shape_bounds(p_data, 0);
 	m_width = (size >> 16) + 2;

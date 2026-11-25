@@ -13,7 +13,7 @@ class VideoDriver;
 class PopupPicture {
 public:
 	PopupPicture(
-		uint8_t* p_data,
+		void* p_data,
 		int32_t p_size,
 		VideoDriver* p_videoDriver,
 		int32_t p_left,
@@ -26,7 +26,7 @@ public:
 	void Hide();
 
 private:
-	uint8_t* m_data;            // 0x00
+	void* m_data;               // 0x00
 	int32_t m_size;             // 0x04
 	VideoDriver* m_videoDriver; // 0x08
 	int32_t m_left;             // 0x0c

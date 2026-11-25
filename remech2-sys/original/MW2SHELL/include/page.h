@@ -58,7 +58,7 @@ public:
 	void Restart();
 	void TypeStep();
 	void Hide();
-	void SetBanner(uint8_t* p_data, int32_t p_size);
+	void SetBanner(void* p_data, int32_t p_size);
 
 private:
 	Collection* m_glyphs;       // 0x00
