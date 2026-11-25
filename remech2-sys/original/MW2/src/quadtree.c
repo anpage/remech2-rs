@@ -20,7 +20,6 @@ void BuildShapeQuadtree(Shape* p_shape)
 {
 	Model* model;
 	QuadtreeNode* root;
-	Vertex* vertices;
 	Vertex* vertex;
 	MechS32 i;
 	MechS32 j;
@@ -32,7 +31,6 @@ void BuildShapeQuadtree(Shape* p_shape)
 	model = p_shape->m_models;
 	if (model) {
 		vertex = (Vertex*) (model + 1);
-		vertices = vertex;
 		root = AllocQuadtreeNode(
 			vertex->m_worldX,
 			vertex->m_worldX,

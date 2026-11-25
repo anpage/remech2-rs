@@ -1220,7 +1220,6 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		}
 		else if (type == g_bwdTypeCodes[c_bwdGpSpec]) {
 			Mech* mech;
-			MechS32 isLocal;
 			MechS32 leader;
 			MechChar name[9];
 			MechU32 events;
@@ -1228,16 +1227,13 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			MechS32 index;
 			IncludeRecord2* gpSpec = (IncludeRecord2*) node;
 			MechChar config[9];
-			MechS32 id;
 			MechS32 mekId;
 			MechU16 team;
 			MechU16 target;
 			MechS32 ai;
 
 			index = 0;
-			isLocal = FALSE;
 			mekId = gpSpec->m_mekId;
-			id = gpSpec->m_id;
 			strncpy(name, gpSpec->m_name, 8);
 			name[8] = '\0';
 			strncpy(config, gpSpec->m_config, 8);
@@ -1282,9 +1278,6 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 					g_teams[team].m_members[g_teams[team].m_memberCount] = index;
 					g_teams[team].m_memberCount++;
 					mech = g_lastPlayer->m_mech;
-					if (ai == 0) {
-						isLocal = TRUE;
-					}
 
 					if (mech && !LoadMechConfig(mech, name, mekId, config)) {
 						Error(0x43, NULL);
@@ -1320,10 +1313,6 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		else {
 			Error(8, NULL);
 		}
-	}
-
-	if (eventList) {
-		FlushEventLists(eventList);
 	}
 
 	return result;

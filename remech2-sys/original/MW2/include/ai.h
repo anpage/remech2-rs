@@ -123,7 +123,6 @@ extern "C"
 	void ResetAI(struct Player* p_player);
 	void TargetAttacker(struct Player* p_player);
 	const MechChar* FindAIName(MechS16 p_value, AiName* p_names, MechS16 p_count);
-	void ClearAILog(void);
 	void LogPlayerStatusLines(void);
 	MechU32 GetPointDistance(MechS32* p_a, MechS32* p_b);
 	MechS32 ChooseTeamLeader(MechS32 p_team);

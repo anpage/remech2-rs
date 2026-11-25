@@ -509,9 +509,6 @@ void FirstAI(void)
 {
 	MechS32 i;
 
-	if (g_monoEnabled) {
-	}
-
 	for (i = 0; i < g_objectiveCount; i++) {
 		AssignTeamSlots(i, 0);
 		ResetStarOrders(i);
@@ -648,17 +645,6 @@ const MechChar* FindAIName(MechS16 p_value, AiName* p_names, MechS16 p_count)
 	return NULL;
 }
 
-// Clears the AI log page's lines (the drawing is compiled out).
-void ClearAILog(void)
-{
-	MechS32 i;
-
-	for (i = 3; i < 25; i++) {
-		if (g_monoEnabled) {
-		}
-	}
-}
-
 void LogPlayerStatusLines(void)
 {
 	const MechChar* behavior;
@@ -667,19 +653,12 @@ void LogPlayerStatusLines(void)
 	PlayerSteering* steering;
 	MechS8 input;
 	MechS32 secondsLeft;
-	MechS32 color;
 	MechS32 i;
 	MissionObjective* objective;
 	MechChar line[100];
 	Player* player;
 	Player saved;
 	MechS16 target;
-
-	if (g_monoEnabled) {
-	}
-
-	if (g_monoEnabled) {
-	}
 
 	for (i = 0; i < g_playerCount; i++) {
 		input = ' ';
@@ -770,14 +749,6 @@ void LogPlayerStatusLines(void)
 			player->m_steering->m_weaponFire ? '*' : ' ',
 			sensor
 		);
-
-		color = 7;
-		if (!(player->m_mech->m_powerState & 4)) {
-			color |= 8;
-		}
-
-		if (player->m_index + 4 < 25 && g_monoEnabled) {
-		}
 
 		if ((player->m_ai.m_goal == 0 || player->m_ai.m_target == 0) && ++g_invalidTargetLogCount < 10) {
 			sprintf(
@@ -962,13 +933,9 @@ MechS16 AiMessageProx(Player* p_player, MechS16 p_target, MechS16 p_arg)
 
 void LogPlayerSkillLines(void)
 {
-	MechS32 color;
 	MechS32 i;
 	MechChar line[100];
 	Player* player;
-
-	if (g_monoEnabled) {
-	}
 
 	for (i = 0; i < g_playerCount; i++) {
 		player = g_players[i];
@@ -982,14 +949,6 @@ void LogPlayerSkillLines(void)
 			player->m_gunnery,
 			player->m_name
 		);
-
-		color = 7;
-		if (!(player->m_mech->m_powerState & 4)) {
-			color |= 8;
-		}
-
-		if (player->m_index + 4 < 25 && g_monoEnabled) {
-		}
 	}
 }
 
@@ -1043,7 +1002,6 @@ void LogStarMissionLines(MechS32 p_team)
 	const MechChar* activity;
 	StarMission* mission;
 	MechChar prefix[256];
-	MechS32 color;
 	MechS32 i;
 	const MechChar* typeName;
 	MechS32 secondsLeft;
@@ -1053,7 +1011,6 @@ void LogStarMissionLines(MechS32 p_team)
 	const MechChar* priority;
 
 	mission = &g_objectiveTable[p_team];
-	color = 7;
 	switch (mission->m_status) {
 	case 0:
 		if (mission->m_timeLimit > 0) {
@@ -1075,9 +1032,6 @@ void LogStarMissionLines(MechS32 p_team)
 		break;
 	}
 
-	if (g_monoEnabled) {
-	}
-
 	if (g_debugFirstLine == -1) {
 		g_debugFirstLine = 0;
 		g_debugLastLine = mission->m_objectiveCount - 1 < 20 ? mission->m_objectiveCount - 1 : 20;
@@ -1088,7 +1042,6 @@ void LogStarMissionLines(MechS32 p_team)
 			g_debugFirstLine = g_debugObjective;
 			g_debugLastLine = mission->m_objectiveCount - 1 < g_debugFirstLine + 20 ? mission->m_objectiveCount - 1
 																					: g_debugFirstLine + 20;
-			ClearAILog();
 		}
 		else {
 			g_debugObjective = g_debugFirstLine;
@@ -1098,7 +1051,6 @@ void LogStarMissionLines(MechS32 p_team)
 		if (mission->m_objectiveCount > g_debugObjective) {
 			g_debugLastLine = g_debugObjective;
 			g_debugFirstLine = g_debugLastLine - 20 > 0 ? g_debugLastLine - 20 : 0;
-			ClearAILog();
 		}
 		else {
 			g_debugObjective = g_debugLastLine;
@@ -1107,11 +1059,6 @@ void LogStarMissionLines(MechS32 p_team)
 
 	for (i = g_debugFirstLine; i <= g_debugLastLine; i++) {
 		objective = &g_objectiveTable[p_team].m_objectives[i];
-
-		color = 7;
-		if (objective->m_active) {
-			color |= 8;
-		}
 
 		switch (objective->m_priority) {
 		case 1:
@@ -1187,9 +1134,6 @@ void LogStarMissionLines(MechS32 p_team)
 				snprintf(line, sizeof(line), "%s %s             %s", prefix, activity, objective->m_name);
 			}
 			break;
-		}
-
-		if (g_monoEnabled) {
 		}
 	}
 }
@@ -1296,12 +1240,6 @@ Player* FindNearestTarget(Player* p_player, MechS16 p_target, MechS16 p_arg, Mec
 				*p_nearest = target;
 			}
 		}
-		else if (target & c_aiTargetThing) {
-		}
-		else if (target & c_aiTargetNav) {
-		}
-		else {
-		}
 	}
 
 	if (*p_nearest && !AiMessageProx(p_player, *p_nearest, p_arg)) {
@@ -1323,7 +1261,6 @@ void LogAIStatus(void)
 		g_debugListedStar = g_debugStar;
 		g_debugFirstLine = g_debugLastLine = -1;
 		g_debugObjective = 0;
-		ClearAILog();
 	}
 
 	if (g_debugStar == -1) {
@@ -1385,7 +1322,6 @@ MechS16 AiMessageDestroy(Player* p_player, MechS16 p_target, MechS16 p_arg)
 void AiStateIdle(Player* p_player, MechU16 p_target)
 {
 	p_player->m_targetInfo.m_distance = 0;
-	return;
 }
 
 // Drives p_player towards p_target, or away from it when fleeing.
@@ -1775,8 +1711,6 @@ void EnterAIState(Player* p_player, MechU16 p_state)
 		if (logged->m_player->m_ai.m_target & c_aiTargetNav) {
 			targetType = navName;
 		}
-		else {
-		}
 
 		if (logged->m_player->m_ai.m_goal & c_aiTargetPlayer) {
 			goalType = mech;
@@ -1787,8 +1721,6 @@ void EnterAIState(Player* p_player, MechU16 p_state)
 
 		if (logged->m_player->m_ai.m_goal & c_aiTargetNav) {
 			goalType = navName;
-		}
-		else {
 		}
 
 		if (logged->m_player->m_ai.m_goal & 0x6000) {
@@ -2128,17 +2060,10 @@ void PlacePatrolNavs(Player* p_player)
 		return;
 	}
 
-	if (AddNavPoint(owner, x - range, y, z) == -1) {
-	}
-
-	if (AddNavPoint(owner, x, y, z - range) == -1) {
-	}
-
-	if (AddNavPoint(owner, x + range, y, z) == -1) {
-	}
-
-	if (AddNavPoint(owner, x, y, z + range) == -1) {
-	}
+	AddNavPoint(owner, x - range, y, z);
+	AddNavPoint(owner, x, y, z - range);
+	AddNavPoint(owner, x + range, y, z);
+	AddNavPoint(owner, x, y, z + range);
 
 	AdvanceNavTarget(p_player, c_aiTargetNav);
 }
@@ -2383,12 +2308,10 @@ MechS32 OrderStarSlot(MechS32 p_slot, MechS16 p_command)
 	}
 
 	if (index == g_localPlayerId) {
-		if (OrderPlayers(local, c_aiTargetFriendly, p_command, target)) {
-		}
+		OrderPlayers(local, c_aiTargetFriendly, p_command, target);
 	}
 	else {
-		if (OrderPlayers(local, p_slot | c_aiTargetPlayer, p_command, target)) {
-		}
+		OrderPlayers(local, p_slot | c_aiTargetPlayer, p_command, target);
 	}
 
 	if (speech != -1) {
@@ -2426,7 +2349,6 @@ void ResetStarOrders(MechS32 p_team)
 // or follow the leader.
 void AssignStarObjective(MechS32 p_team)
 {
-	MechS16 target;
 	MechS16 leader;
 	MechS32 count;
 	Player* members[8];
@@ -2439,7 +2361,6 @@ void AssignStarObjective(MechS32 p_team)
 	Player* member;
 	MechS16 flags;
 
-	target = 0;
 	leader = GetTeamLeader(p_team);
 	if (leader == -1) {
 		leader = ChooseTeamLeader(p_team);
@@ -2469,7 +2390,6 @@ void AssignStarObjective(MechS32 p_team)
 		state = c_aiStateShutdown;
 	}
 	else {
-		target = leader | c_aiTargetPlayer;
 		state = c_aiStateFollow;
 	}
 
@@ -2626,7 +2546,6 @@ MechS32 AssignStarTarget(MechS32 p_team, MechU16 p_target)
 {
 	MechS32 required;
 	StarMission* mission;
-	Team* team;
 	MissionObjective* objective;
 	MechS32 result;
 	MechS32 nearest;
@@ -2664,7 +2583,6 @@ MechS32 AssignStarTarget(MechS32 p_team, MechU16 p_target)
 
 	if (g_currentObjective[p_team] == 4) {
 		result = FALSE;
-		team = &g_teams[p_team];
 		mission = &g_objectiveTable[p_team];
 		objective = &mission->m_objectives[g_currentObjective[p_team]];
 		required = objective->m_requiredCount;
@@ -2735,7 +2653,6 @@ void LeadStar(MechS32 p_team)
 	MechS16 state;
 	StarMission* mission;
 	Player* player;
-	Team* team;
 	MissionObjective* objective;
 	MechS16 flags;
 
@@ -2754,7 +2671,6 @@ void LeadStar(MechS32 p_team)
 		return;
 	}
 
-	team = &g_teams[p_team];
 	mission = &g_objectiveTable[p_team];
 	objectiveIndex = g_currentObjective[p_team];
 	if (objectiveIndex == -1) {

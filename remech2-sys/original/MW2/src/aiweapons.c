@@ -102,8 +102,6 @@ MechS32 DecideAIFire(Player* p_player)
 		else if (type == 4) {
 			p_player->m_steering->m_torsoTilt += 0x3c000;
 		}
-		else if (type == 21) {
-		}
 
 		if (g_weaponDefs[type].m_guided) {
 			if (p_player->m_gunnery <= 4 && !RandomIntBelow(p_player->m_gunnery + 1)) {

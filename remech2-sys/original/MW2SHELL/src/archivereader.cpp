@@ -142,7 +142,6 @@ void ArchiveReader::FirstPage()
 void ArchiveReader::PrevPage()
 {
 	Page* page = NULL;
-	undefined4 unused = 0;
 	Page::Link* link = NULL;
 	MainMenuButton* button = &g_prevPageLinkButton;
 	MechS32 i;
@@ -245,7 +244,6 @@ void ArchiveReader::OpenTopic(MechS32 p_id)
 {
 	Page* page = NULL;
 	Topic* topic = NULL;
-	undefined4 unused = 0;
 	MechS32 i;
 
 	page = (Page*) CollectionGet(m_pages, m_page);
@@ -364,7 +362,6 @@ void ArchiveReader::Load(MechS32 p_entry)
 {
 	Page* page;
 	void* data;
-	undefined4 unused;
 	MechU8 soundStarted;
 	MechS32 topics;
 	MechS32 length;
@@ -382,7 +379,6 @@ void ArchiveReader::Load(MechS32 p_entry)
 
 	page = NULL;
 	data = NULL;
-	unused = 0;
 	topics = 0;
 	soundStarted = FALSE;
 	topics = 0;

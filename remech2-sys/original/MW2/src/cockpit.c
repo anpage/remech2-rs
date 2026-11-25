@@ -449,14 +449,11 @@ void DrawMapContents(CockpitLayout* p_layout)
 {
 	MechS32 id;
 	PANE* viewport;
-	MechS32 unused;
 	MechS32 y;
 	MechS32 x;
-	Player* player;
 	void* shape;
 
 	viewport = p_layout->m_viewport;
-	player = g_players[g_localPlayerId];
 	DrawMapNavPoints(p_layout);
 	if (g_cockpitLayoutIndex != 4) {
 		x = (viewport->m_x1 - viewport->m_x0 + 1) >> 1;

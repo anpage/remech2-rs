@@ -123,36 +123,24 @@ TextGlyph* DrawMissionListEntry(ScreenField* p_tab)
 
 TextGlyph* DrawPilotCallsign(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	sprintf(g_rosterFieldText, "~%s", g_currentPilot->m_callsign);
 	return g_titleFont->AddText(p_tab->m_left, p_tab->m_top, g_rosterFieldText, NULL);
 }
 
 TextGlyph* DrawPilotRank(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	sprintf(g_rosterFieldText, "~%s", g_rankNames[g_currentPilot->m_rank]);
 	return g_titleFont->AddText(p_tab->m_left, p_tab->m_top, g_rosterFieldText, NULL);
 }
 
 TextGlyph* DrawPilotHonor(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	sprintf(g_rosterFieldText, "~%d", g_currentPilot->m_honor);
 	return g_titleFont->AddText(p_tab->m_left, p_tab->m_top, g_rosterFieldText, NULL);
 }
 
 TextGlyph* DrawPilotMission(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	sprintf(g_rosterFieldText, "~%s", g_campaignMissions[g_rosterCampaign][g_currentPilot->m_mission].m_title);
 	return g_titleFont->AddText(p_tab->m_left, p_tab->m_top, g_rosterFieldText, NULL);
 }
@@ -160,8 +148,7 @@ TextGlyph* DrawPilotMission(ScreenField* p_tab)
 // The mission list's click callback.
 void ClickMissionListEntry(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
+	// Left for the button
 }
 
 // Negative m_top: rows (times the previous tab's height) and an offset below the previous tab.

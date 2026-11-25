@@ -556,7 +556,6 @@ MechS32 TargetNavPoint(MechU32 p_player, MechS32 p_nav, MechU32 p_flags)
 // pick, and -8 for a player without a shape.
 MechS32 TargetGamePiece(MechS32 p_player, MechS32 p_index, MechU32 p_flags)
 {
-	MechS32 breakpoint;
 	Player* player;
 	Player* target;
 	MechS32 x;
@@ -569,10 +568,6 @@ MechS32 TargetGamePiece(MechS32 p_player, MechS32 p_index, MechU32 p_flags)
 	MechS32 range;
 	MechU32 distance;
 	MechS32 pitch;
-
-	if (p_index == 1 && p_player == g_localPlayerId) {
-		breakpoint = 0;
-	}
 
 	if (p_index < 0) {
 		return -1;

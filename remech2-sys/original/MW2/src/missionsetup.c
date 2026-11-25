@@ -109,7 +109,6 @@ void SetUpStarMission(MissionTable* p_table)
 // waiting (7): bit j for objective j, bit 16 + i for mission table i.
 MechU32 FindEventList(MechChar* p_name)
 {
-	MechU32 unk0x04;
 	MechS32 j;
 	MechU8 state;
 	MechS32 i;
@@ -125,7 +124,6 @@ MechU32 FindEventList(MechChar* p_name)
 			for (j = 0; j < g_objectiveTable[i].m_objectiveCount; j++) {
 				state = g_objectiveTable[i].m_objectives[j].m_state;
 				if (state == 0 || state == 1 || state == 7) {
-					unk0x04 = (MechU8) g_objectiveTable[i].m_objectives[j].m_targets[0];
 					if (!strcasecmp(p_name, g_missionTables[i]->m_entries[j].m_name)) {
 						lists |= 1 << j;
 						lists |= (1 << i) << 16;
@@ -159,25 +157,6 @@ void PostEventToList(MechChar* p_name, MechS32 p_types, MechU16 p_target)
 					g_objectiveTable[i].m_objectives[j].m_targetCount++;
 					g_objectiveTable[i].m_objectives[j].m_targets[count] = p_target;
 					FUN_1001cde1(p_target);
-				}
-			}
-		}
-	}
-}
-
-// Walks the waiting objectives of the lists p_lists (FindEventList's bits) and does nothing
-// with them.
-void FlushEventLists(MechU32 p_lists)
-{
-	MechS32 j;
-	MechS32 i;
-
-	for (i = 0; i < g_objectiveCount; i++) {
-		if (g_missionTables[i]) {
-			for (j = 0; j < 48; j++) {
-				// x86's shl takes the count modulo 32, which C leaves undefined past 31
-				if ((p_lists & (1u << (j & 31))) && (p_lists & ((1u << (i & 31)) << 16)) &&
-					g_objectiveTable[i].m_objectives[j].m_state == 7) {
 				}
 			}
 		}

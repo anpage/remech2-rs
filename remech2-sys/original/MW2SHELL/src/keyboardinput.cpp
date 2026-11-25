@@ -158,7 +158,6 @@ MechS32 EditTextField(
 )
 {
 	MechS32 key;
-	MechS32 width;
 	MechS32 length;
 	TextGlyph* glyph;
 
@@ -166,7 +165,6 @@ MechS32 EditTextField(
 	length = strlen(p_text);
 	strcpy(g_editTextBuffer, p_text);
 	strcat(g_editTextBuffer, "_");
-	width = p_font->GetTextWidth(g_editTextBuffer);
 	glyph = p_font->AddOverlayText(p_left, p_top, g_editTextBuffer, p_colors);
 
 	for (;;) {

@@ -393,16 +393,12 @@ MechS32 ReelMotionTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS
 						motion->m_player->m_motionState != motion->m_player->m_nextMotionState) {
 						jump |= TRUE;
 					}
-					else {
-					}
 				}
 
 				if (motion->m_reel->m_events[frame].m_flags & 0x100) {
 					target = motion->m_reel->m_events[frame].m_values[2];
 					if (motion->m_player->m_nextMotionState == -1) {
 						jump |= TRUE;
-					}
-					else {
 					}
 				}
 

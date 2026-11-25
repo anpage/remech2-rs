@@ -117,7 +117,6 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 	MechS32 i;
 	char missionName[64];
 	undefined4 unk0x28;
-	MechS32 unk0x24;
 	MechS32 seed;
 	MechS32 quitLatched;
 
@@ -133,7 +132,6 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 		Error(9, "Insufficient memory available.");
 	}
 
-	unk0x24 = 1;
 	unk0x28 = 0;
 	// The original strcpy'd, with no limit
 	if (getenv("MECHWARRIOR")) {

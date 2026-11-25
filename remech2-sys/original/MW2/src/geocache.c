@@ -1047,7 +1047,6 @@ void ShowQuadtreeBoxes(QuadtreeNode* p_root)
 // Loads model p_data scaled to the box of p_node at its center, then to its children's.
 void LoadQuadtreeBoxes(QuadtreeNode* p_node, MechU8* p_data, MechS32 p_size)
 {
-	MechS32 result;
 	MechS32 dz;
 	MechS32 dy;
 	MechS32 dx;
@@ -1062,7 +1061,6 @@ void LoadQuadtreeBoxes(QuadtreeNode* p_node, MechU8* p_data, MechS32 p_size)
 	MechS32 y;
 	Matrix matrix;
 
-	result = FALSE;
 	if (!p_node) {
 		return;
 	}
@@ -1081,7 +1079,6 @@ void LoadQuadtreeBoxes(QuadtreeNode* p_node, MechU8* p_data, MechS32 p_size)
 	offset = 0;
 	shape = LoadShapes(p_data, &offset, p_size, NULL);
 	if (shape) {
-		result = TRUE;
 		SetShapeCollisionType(shape, 4);
 		x = (p_node->m_maxX + p_node->m_minX) >> 1;
 		y = (p_node->m_minY + p_node->m_maxY) >> 1;

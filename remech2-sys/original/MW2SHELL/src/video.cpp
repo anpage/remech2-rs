@@ -56,10 +56,8 @@ MechS32 CheckVideoExists(const MechChar* p_name)
 // it.
 void FullscreenVideoCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg)
 {
-	FmvSlot* video;
 	MechS32 msg;
 
-	video = &g_fmvSlots[0];
 	if (!IsVideoPlaying(0) || g_mouseState->GetLeftPressed() == 1 || g_keyboardInput->PollKey() ||
 		p_msg != c_msgScreenFrame) {
 		CloseVideo(0);
@@ -457,8 +455,6 @@ MechS32 IsFullscreenVideoPlaying()
 	return 0;
 }
 
-// The first statement reloads and stores the flags instead of and-ing them in place: an unsigned
-// operation on a signed field does that, which is why the mask is cast.
 void SetVideoFlags(MechS32 p_index, MechS32 p_mask, MechS32 p_value)
 {
 	if (p_index >= 0 && p_index < 0x20) {

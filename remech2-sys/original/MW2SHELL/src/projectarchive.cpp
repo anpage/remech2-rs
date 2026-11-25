@@ -268,16 +268,12 @@ MechS32* ProjectArchive::FindBwdNode(MechS32 p_type)
 
 ProjectArchive::~ProjectArchive()
 {
-	MechS32 result;
-
 	ShutdownResourceCache();
 	if (m_handle < 0) {
 		return;
 	}
 
-	result = CloseArchive(m_handle);
-	if (result < 0) {
-	}
+	CloseArchive(m_handle);
 }
 
 void BwdAddRegistryTemplate(void* p_node, MechS32 p_size)

@@ -853,10 +853,6 @@ void UpdateAmmoMass()
 
 TextGlyph* DrawLocationMap(ScreenField* p_tab)
 {
-	// An empty test of the unused parameter: the original compiles it to a cmp with a zero-length je.
-	if (p_tab) {
-	}
-
 	SetVideoFrame(12, g_variant.m_selectedLocation);
 	MoveVideo(
 		12,
@@ -1429,9 +1425,6 @@ void ClickFaster(ScreenField* p_tab)
 {
 	MechS32 rating;
 
-	if (p_tab) {
-	}
-
 	rating = ((g_variant.m_walkingSpeed + 1) * (g_variant.m_maxMass / 100) * 5 + 4) / 5;
 	if (rating < 10) {
 		return;
@@ -1457,9 +1450,6 @@ void ClickFaster(ScreenField* p_tab)
 void ClickSlower(ScreenField* p_tab)
 {
 	MechS32 rating;
-
-	if (p_tab) {
-	}
 
 	if (!g_variant.m_walkingSpeed) {
 		return;
@@ -1490,9 +1480,6 @@ void ClickSlower(ScreenField* p_tab)
 void ToggleEngineType(ScreenField* p_tab)
 {
 	MechS32 i;
-
-	if (p_tab) {
-	}
 
 	if (g_variant.m_engine >= 10000) {
 		g_variant.m_engine -= 10000;
@@ -1532,9 +1519,6 @@ void ToggleEngineType(ScreenField* p_tab)
 
 void AddJumpJet(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	if (g_variant.m_jumpJets >= g_variant.m_walkingSpeed) {
 		return;
 	}
@@ -1547,9 +1531,6 @@ void AddJumpJet(ScreenField* p_tab)
 
 void RemoveJumpJet(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	if (g_variant.m_jumpJets) {
 		DeleteItem(g_variant.m_jumpJets + 7000);
 		g_variant.m_jumpJets--;
@@ -1561,9 +1542,6 @@ void RemoveJumpJet(ScreenField* p_tab)
 
 void AddHeatSink(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	g_variant.m_heatSinkMass += 100;
 	UpdateHeatSinks();
 	UpdateStats();
@@ -1571,9 +1549,6 @@ void AddHeatSink(ScreenField* p_tab)
 
 void RemoveHeatSink(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	if (g_variant.m_heatSinkMass) {
 		g_variant.m_heatSinkMass -= 100;
 	}
@@ -1585,9 +1560,6 @@ void RemoveHeatSink(ScreenField* p_tab)
 void ToggleHeatSinkType(ScreenField* p_tab)
 {
 	MechS32 i;
-
-	if (p_tab) {
-	}
 
 	g_variant.m_heatSinkType = 3 - g_variant.m_heatSinkType;
 	UpdateHeatSinks();
@@ -1603,9 +1575,6 @@ void ToggleHeatSinkType(ScreenField* p_tab)
 
 void ClickAddArmor(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	g_variant.m_armorMass += 50;
 	UpdateArmor();
 	UpdateStats();
@@ -1613,9 +1582,6 @@ void ClickAddArmor(ScreenField* p_tab)
 
 void ClickRemoveArmor(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	if (g_variant.m_armorMass) {
 		g_variant.m_armorMass -= 50;
 	}
@@ -1626,9 +1592,6 @@ void ClickRemoveArmor(ScreenField* p_tab)
 
 void ToggleArmorType(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	g_variant.m_ferroFibrous = 1 - g_variant.m_ferroFibrous;
 	if (!g_variant.m_ferroFibrous) {
 		DeleteItem(9001);
@@ -1655,9 +1618,6 @@ void ToggleArmorType(ScreenField* p_tab)
 
 void ToggleInternalType(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	g_variant.m_endoSteel = 1 - g_variant.m_endoSteel;
 	if (!g_variant.m_endoSteel) {
 		DeleteItem(8001);
@@ -1688,9 +1648,6 @@ void ClickAddWeapon(ScreenField* p_tab)
 {
 	MechS32 id;
 
-	if (p_tab) {
-	}
-
 	if (g_variant.m_selectedWeapon < 0) {
 		return;
 	}
@@ -1715,9 +1672,6 @@ void ClickAddWeapon(ScreenField* p_tab)
 
 void ClickDeleteWeapon(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	if (g_variant.m_selectedWeapon < 0) {
 		return;
 	}
@@ -1736,9 +1690,6 @@ void ClickDeleteWeapon(ScreenField* p_tab)
 void ClickAddAmmo(ScreenField* p_tab)
 {
 	MechS32 id;
-
-	if (p_tab) {
-	}
 
 	if (g_variant.m_selectedWeapon < 0) {
 		return;
@@ -1761,9 +1712,6 @@ void ClickAddAmmo(ScreenField* p_tab)
 void ClickDeleteAmmo(ScreenField* p_tab)
 {
 	MechS32 count;
-
-	if (p_tab) {
-	}
 
 	if (g_variant.m_selectedWeapon < 0) {
 		return;
@@ -1801,9 +1749,6 @@ void SelectWeapon(ScreenField* p_tab)
 
 void SelectWeaponType(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	if (MECH_PTR_TO_S32(p_tab->m_data) * 100 == g_variant.m_selectedWeapon) {
 		if (g_mouseState->GetDoubleClicked()) {
 			ClickAddWeapon(p_tab);
@@ -1816,9 +1761,6 @@ void SelectWeaponType(ScreenField* p_tab)
 
 void NextLocation(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
-
 	g_locationSound->Start();
 	g_variant.m_selectedLocation++;
 	if (g_variant.m_selectedLocation >= 8) {
@@ -1858,8 +1800,7 @@ void ClickUnassigned(ScreenField* p_tab)
 
 void ClickMore(ScreenField* p_tab)
 {
-	if (p_tab) {
-	}
+	// Left for the button
 }
 
 void ClickCritical(ScreenField* p_tab)
@@ -1888,8 +1829,6 @@ void AddFrontArmor(ScreenField* p_tab)
 	MekVariant::Armor* armor;
 
 	armor = &g_variant.m_armor[g_variant.m_selectedLocation];
-	if (p_tab) {
-	}
 
 	if (g_variant.m_armorAllocated >= g_variant.m_armorFactor) {
 		if (armor->m_rear > 0) {
@@ -1918,8 +1857,6 @@ void RemoveFrontArmor(ScreenField* p_tab)
 	MekVariant::Armor* armor;
 
 	armor = &g_variant.m_armor[g_variant.m_selectedLocation];
-	if (p_tab) {
-	}
 
 	if (armor->m_front > 0) {
 		armor->m_front--;
@@ -1932,8 +1869,6 @@ void AddRearArmor(ScreenField* p_tab)
 	MekVariant::Armor* armor;
 
 	armor = &g_variant.m_armor[g_variant.m_selectedLocation];
-	if (p_tab) {
-	}
 
 	if (armor->m_rear < 0) {
 		return;
@@ -1960,8 +1895,6 @@ void RemoveRearArmor(ScreenField* p_tab)
 	MekVariant::Armor* armor;
 
 	armor = &g_variant.m_armor[g_variant.m_selectedLocation];
-	if (p_tab) {
-	}
 
 	if (armor->m_rear > 0) {
 		armor->m_rear--;

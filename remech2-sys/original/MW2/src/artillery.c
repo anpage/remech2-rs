@@ -192,7 +192,6 @@ void LateUpdateArtillery(Mech* p_mech)
 	case 4:
 		if (!mech->m_stateTime) {
 			mech->m_stateTime = g_currentClock + 0x712;
-			FUN_1001cdd1();
 		}
 
 		if (mech->m_stateTime > g_currentClock) {

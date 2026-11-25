@@ -158,7 +158,6 @@ void SetControlSlot(MenuPage* p_page, MenuControl* p_control)
 // Installs GetSlotGoalName as the suffix of the control's choices.
 void InstallGoalSuffix(MenuPage* p_page, MenuControl* p_control)
 {
-	MenuChoicesSuffixFn old;
 	MenuChoices* choices;
 
 	if (!p_page) {
@@ -174,7 +173,6 @@ void InstallGoalSuffix(MenuPage* p_page, MenuControl* p_control)
 		return;
 	}
 
-	old = choices->m_suffix;
 	choices->m_suffix = GetSlotGoalName;
 }
 

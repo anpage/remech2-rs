@@ -291,7 +291,6 @@ void ChooseNetworkWinner(void)
 {
 	MissionObjective* objective;
 	MechS32 best;
-	MechS32 team;
 	MechS32 winner;
 	MechS32 i;
 	MechS32 player;
@@ -305,7 +304,6 @@ void ChooseNetworkWinner(void)
 	best = -0x7fff;
 	deathmatch = FALSE;
 	mission = &g_objectiveTable[g_localStar];
-	team = g_localStar;
 	if (g_isNetworkGame && !g_difficulty->m_teamGame) {
 		listed = 0;
 		secondary = FALSE;
@@ -893,7 +891,6 @@ void UpdateObjectives(void)
 void EndTheMission1(void)
 {
 	g_missionTime = g_currentClock / 181;
-	return;
 }
 
 // Hands the local team's mission result to the shell. Returns whether it could.
@@ -976,11 +973,6 @@ void RestartStarMission(MechS32 p_star)
 	mission->m_status = 0;
 	mission->m_startTime = g_missionTime;
 	mission->m_endTime = -1;
-}
-
-void FUN_1001cdd1(void)
-{
-	return;
 }
 
 MechS32 FUN_1001cde1(undefined4 p_unk0x00)

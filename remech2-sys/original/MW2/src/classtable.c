@@ -426,7 +426,6 @@ void ChoosePlayerDetailLevels(void)
 	MechS32 range2;
 	PlayerDetail* entry;
 	MechS32 ex;
-	MechS32 range3;
 	MechS32 ground;
 	MechS32 heading;
 	MechS32 ey;
@@ -449,7 +448,6 @@ void ChoosePlayerDetailLevels(void)
 	range0 = FixedMul16(scale, 0xe10);
 	range1 = FixedMul16(scale, 0x2134);
 	range2 = FixedMul16(scale, 0x57e4);
-	range3 = FixedMul16(scale, 40000);
 	best = range0;
 	ex = g_eyepoint->m_x;
 	ey = g_eyepoint->m_y;

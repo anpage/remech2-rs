@@ -308,7 +308,6 @@ MECH_INTPTR ShellHandleMessageC(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lP
 extern "C" int ShellMain(char* p_cmdLine)
 {
 	void* itemData = NULL;
-	MechS32 unk0x14 = c_msgQuit;
 	MechS32 itemSize;
 	MechMessage msg;
 	MechS32 fromSim = FALSE;

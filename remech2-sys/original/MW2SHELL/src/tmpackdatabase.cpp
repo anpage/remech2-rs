@@ -33,7 +33,6 @@ void TMPackDataBase::DumpEntries()
 
 TMPackDataBase::TMPackDataBase(char* p_name)
 {
-	MechS32 result;
 	TMPackDBEntry* entry;
 	TMPackDBEntry* next;
 	TMPackDBEntry* current;
@@ -58,11 +57,11 @@ TMPackDataBase::TMPackDataBase(char* p_name)
 		exit(1);
 	}
 
-	result = CreateCollection(&m_entries, m_numEntries, NULL, 4, NULL);
+	CreateCollection(&m_entries, m_numEntries, NULL, 4, NULL);
 	for (MechS32 i = 0; i < m_numEntries; i++) {
 		memcpy(&offset, m_data + 4 + i * 4, 4);
 		entry = new TMPackDBEntry(offset, 0);
-		result = ExpandCollection(m_entries, entry);
+		ExpandCollection(m_entries, entry);
 	}
 
 	current = (TMPackDBEntry*) CollectionGet(m_entries, 0);

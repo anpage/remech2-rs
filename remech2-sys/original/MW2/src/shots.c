@@ -1048,10 +1048,6 @@ void KillGameThing(MechU32 p_index)
 		}
 	}
 
-	if (thing->m_flags & 0x40) {
-		FUN_1001cdd1();
-	}
-
 	DestroyThingObject(thing);
 }
 

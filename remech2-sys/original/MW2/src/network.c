@@ -685,12 +685,10 @@ void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 void SendWeaponsMsg(void)
 {
 	Player* player;
-	Mech* mech;
 	MechS32 i;
 
 	memcpy(g_weaponsMsg->m_tag, "WE", 2);
 	player = g_players[g_localPlayerId];
-	mech = player->m_mech;
 	g_weaponsMsg->m_player = player->m_index;
 	g_weaponsMsg->m_weapons = 0;
 	for (i = 0; i < 10; i++) {
@@ -971,11 +969,7 @@ MechS32 StartExternalIO(NetLaunchInfo* p_netLaunch)
 {
 	HRESULT result;
 	DPSESSIONDESC desc;
-	GUID guid;
-	MechS32 unk0x04;
 
-	guid = g_sessionGuid;
-	unk0x04 = 1;
 	if (p_netLaunch) {
 		g_launchedByShell = 1;
 		g_directPlay = p_netLaunch->m_directPlay;
@@ -1118,12 +1112,10 @@ MechS32 StopExternalIO(void)
 // Counts the players and elects the one with the lowest id master. Alone, the network stops.
 void ElectMaster(void)
 {
-	HRESULT result;
-
 	if (g_directPlay) {
 		g_masterDpid = g_localDpid;
 		g_playersFound = 0;
-		result = g_directPlay->lpVtbl->EnumPlayers(g_directPlay, 0, CountPlayersCallback, NULL, DPENUMPLAYERS_GROUP);
+		g_directPlay->lpVtbl->EnumPlayers(g_directPlay, 0, CountPlayersCallback, NULL, DPENUMPLAYERS_GROUP);
 	}
 
 	DebugPrint("ElectMaster() found %d players.  MasterDPID is %d\n", g_playersFound, g_masterDpid);

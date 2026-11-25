@@ -629,7 +629,6 @@ void PlaceOffsetNav(Player* p_player, MechU32 p_target, MechS16 p_direction, Mec
 // Finds the point p_distance units out in direction p_direction (of g_probeDirections's 16) from
 // target p_target, a player (0x200) or a game thing (0x400), in world coordinates; for a player
 // *p_y takes its heading. A game thing without an object is offset from its position.
-// The empty else arms give the original's jmp to the next statement after each offset.
 void GetOffsetPoint(MechU32 p_target, MechS16 p_direction, MechS32* p_x, MechS32* p_z, MechS32* p_y, MechS16 p_distance)
 {
 	MechU32 index;
@@ -654,13 +653,9 @@ void GetOffsetPoint(MechU32 p_target, MechS16 p_direction, MechS32* p_x, MechS32
 			if (g_probeDirections[p_direction].m_x) {
 				*p_x += p_distance / g_probeDirections[p_direction].m_x;
 			}
-			else {
-			}
 
 			if (g_probeDirections[p_direction].m_y) {
 				*p_z += p_distance / g_probeDirections[p_direction].m_y;
-			}
-			else {
 			}
 
 			return;
@@ -946,7 +941,6 @@ MechS32 ManeuverAdfa(Player* p_player, MechS16 p_target)
 	MechS32 turn;
 	MechS16 side;
 	Mech* mech;
-	Mech* targetMech;
 
 	SetTarget(p_player, p_target);
 	turn = GetTargetBearing(p_player);
@@ -963,7 +957,6 @@ MechS32 ManeuverAdfa(Player* p_player, MechS16 p_target)
 	}
 
 	turn = abs(turn);
-	targetMech = g_players[p_target & 0xff]->m_mech;
 	mech = p_player->m_mech;
 	if (turn > mech->m_maxTorsoTwist && turn < mech->m_maxTorsoTwist * 3) {
 		side = 1;
@@ -1062,11 +1055,9 @@ MechS32 ManeuverCircle(Player* p_player, MechS16 p_target)
 // jump jets (its jump fuel not negative).
 MechS32 IsBelowHiddenTarget(Player* p_player)
 {
-	MechS16 index;
 	MechS32 below;
 
 	below = 0;
-	index = p_player->m_targetInfo.m_target & 0xff;
 	switch (p_player->m_targetInfo.m_target & 0xf00) {
 	default:
 		break;

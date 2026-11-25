@@ -86,9 +86,6 @@ void RunAutopilot(Mech* p_mech)
 				if (!(g_navTable[index].m_flags & 0x20)) {
 					g_navTable[index].m_flags |= 0x20;
 					g_navTable[index].m_teamsReached |= 1 << p_mech->m_player->m_team;
-					if (g_navTable[index].m_flags & 0x40) {
-						FUN_1001cdd1();
-					}
 
 					PlaySoundEffect(0xe7, 100, 0x40, 5, 0x50);
 				}
@@ -285,7 +282,6 @@ void CalculateHeat(Mech* p_mech)
 void KillMech(MechS32 p_killer, Mech* p_mech)
 {
 	MechS32 leader;
-	MechS32 next;
 	MechChar text[80];
 
 	if (p_mech->m_player->m_index == g_localPlayerId && g_difficulty->m_invulnerable) {
@@ -354,10 +350,6 @@ void KillMech(MechS32 p_killer, Mech* p_mech)
 				break;
 			}
 		}
-	}
-	else {
-		next = p_mech->m_player->m_index;
-		next++;
 	}
 
 	if (p_mech->m_player->m_flags & 0x1400) {
@@ -903,12 +895,10 @@ void ApplyDamageToMech(MechS32 p_attacker, Mech* p_mech, MechS32 p_damage, MechS
 	MechS32 rear;
 	MechS32 i;
 	MechS32 level;
-	MechS32 front;
 	MechS32 roll;
 	MechSection* section;
 
 	side = 0;
-	front = TRUE;
 	rear = FALSE;
 	level = 0;
 	roll = 0;
@@ -955,7 +945,6 @@ void ApplyDamageToMech(MechS32 p_attacker, Mech* p_mech, MechS32 p_damage, MechS
 	section = p_mech->m_sections + p_section - 1;
 	if (rear && (p_section == 2 || p_section == 4 || p_section == 3)) {
 		side = 1;
-		front = FALSE;
 		levels = (section->m_flags & 0xf0) >> 4;
 	}
 	else {
@@ -1009,7 +998,6 @@ void ApplyDamageToMech(MechS32 p_attacker, Mech* p_mech, MechS32 p_damage, MechS
 	}
 
 	RaisePartDamageLevel(p_mech->m_player->m_obj, level, p_section);
-	return;
 }
 
 // Ejects from p_mech, unless it is already shutting down or ejecting: the local player (p_eject)
@@ -1031,7 +1019,6 @@ void EjectPlayer(Mech* p_mech, MechS32 p_eject)
 	}
 
 	KillMech(p_mech->m_player->m_index, p_mech);
-	return;
 }
 
 // Toggles the local player's object between HideObjTree and ShowObjTree.

@@ -304,7 +304,6 @@ void ReadArchiveAt(void* p_data, MechS32 p_handle, void* p_offset, MechU32 p_siz
 	p_handle = g_archiveSlots[p_handle].m_fd;
 	MechSeek(p_handle, MECH_PTR_TO_S32(p_offset), SEEK_SET);
 	ArchiveRead(p_handle, (MechU8*) p_data, p_size);
-	return;
 }
 
 // Read a cached archive subresource into the caller's buffer.

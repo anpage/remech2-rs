@@ -289,9 +289,6 @@ void VideoDriver::LoadPicturePalette(undefined* p_data, MechS32 p_size, PaletteC
 
 void VideoDriver::ReadPictureSize(MechS32* p_maxX, MechS32* p_maxY, undefined* p_data, MechS32 p_size, MechS32 p_type)
 {
-	if (p_size) {
-	}
-
 	switch (p_type) {
 	case 2:
 		m_pictureSize = VFX_PCX_resolution(p_data);

@@ -1060,7 +1060,6 @@ void LateUpdateMechC(Mech* p_mech)
 		if (mech->m_stateTime == 0) {
 			EmitWreckSmoke(mech);
 			mech->m_stateTime = g_currentClock + 0x712;
-			FUN_1001cdd1();
 		}
 
 		if (mech->m_stateTime > g_currentClock) {

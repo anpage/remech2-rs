@@ -7,11 +7,22 @@
 
 // The sim's mouse: it keeps the pointer grabbed during a mission.
 
-__inline MechS32 IsInsideWindow(MechS32 p_x, MechS32 p_y);
-
 MechS32 g_cursorClipped = FALSE;
 
 undefined4 g_reclipCursor = 0;
+
+// Whether a client point lies inside the game window.
+static MechS32 IsInsideWindow(MechS32 p_x, MechS32 p_y)
+{
+	if (p_x < 0 || p_x >= g_gameWindowWidth) {
+		return FALSE;
+	}
+	if (p_y < 0 || p_y >= g_gameWindowHeight) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
 
 // Lets go of the pointer at the end of a mission. The original's MouseCloseDevice.
 void MouseRelease(void)
@@ -42,7 +53,6 @@ MechS32 CenterCursor(void* p_data, MechS32 p_axis)
 
 MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons)
 {
-	MechPoint point;
 	MechS32 x;
 	MechS32 y;
 
@@ -61,26 +71,11 @@ MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons)
 	}
 
 	if (p_position && MechMouseGetPosition(&x, &y)) {
-		point.x = x;
-		point.y = y;
-		if (IsInsideWindow(point.x, point.y)) {
-			p_position[0] = ((point.y * 2 - g_gameWindowHeight) << 16) / g_gameWindowHeight;
-			p_position[1] = ((point.x * 2 - g_gameWindowWidth) << 16) / g_gameWindowWidth;
+		if (IsInsideWindow(x, y)) {
+			p_position[0] = ((y * 2 - g_gameWindowHeight) << 16) / g_gameWindowHeight;
+			p_position[1] = ((x * 2 - g_gameWindowWidth) << 16) / g_gameWindowWidth;
 		}
 	}
 
 	return 0;
-}
-
-// Whether a client point lies inside the game window.
-__inline MechS32 IsInsideWindow(MechS32 p_x, MechS32 p_y)
-{
-	if (p_x < 0 || p_x >= g_gameWindowWidth) {
-		return FALSE;
-	}
-	if (p_y < 0 || p_y >= g_gameWindowHeight) {
-		return FALSE;
-	}
-
-	return TRUE;
 }

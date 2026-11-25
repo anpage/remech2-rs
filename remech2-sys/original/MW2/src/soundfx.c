@@ -641,8 +641,6 @@ void UpdateAmbientSound(AmbientSound* p_sound)
 
 		if (!p_sound->m_data) {
 			p_sound->m_data = LoadCachedResource(0, p_sound->m_id, g_resourceTypeTags[c_resTagSnds], 0);
-			if (p_sound->m_data) {
-			}
 		}
 
 		if (!p_sound->m_data ||

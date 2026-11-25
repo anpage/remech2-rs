@@ -638,14 +638,12 @@ void UpdateFreeEyeView(MechS32 p_climb, MechS32 p_speed, MechS32 p_strafe, MechS
 {
 	MechS32 sinHeading;
 	MechS32 cosHeading;
-	MechS32 sinPitch;
 	MechS32 floor;
 	MechS32 speed;
 	MechS32 cosPitch;
 
 	sinHeading = FixedSin(g_eyepoint->m_heading);
 	cosHeading = FixedCos(g_eyepoint->m_heading);
-	sinPitch = FixedSin(g_eyepoint->m_pitch);
 	cosPitch = FixedCos(g_eyepoint->m_pitch);
 	if (g_viewMode != c_viewFreeEye) {
 		if (g_localMechLost) {

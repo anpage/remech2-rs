@@ -45,7 +45,6 @@ void ClanHallCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**,
 // pilot's star first.
 void DrawClanHall(TMPackDataBase* p_database, MechS32 p_campaign, MechU8, size_t p_wParam)
 {
-	MechS32 unused = -1;
 	void* data = NULL;
 	MechS32 size;
 

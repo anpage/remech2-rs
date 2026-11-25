@@ -185,7 +185,6 @@ void DumpResourceCache(void)
 	ResourceCacheEntry* entry;
 	MechChar type[5];
 	MechS32 i;
-	FILE* file;
 
 	snprintf(name, sizeof(name), "dbugcch%d.log", g_cacheDumpNumber++);
 	MechLogDebugf("%s: Cache table", name);

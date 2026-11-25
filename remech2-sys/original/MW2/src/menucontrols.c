@@ -430,7 +430,6 @@ void RunMenuChoice(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_ind
 
 		apply = FALSE;
 		break;
-	case 3:;
 	}
 
 	if (((MenuChoices*) p_control->m_data)->m_count > 0) {
