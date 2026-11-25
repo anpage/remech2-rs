@@ -27,10 +27,11 @@ enum BwdTag {
 	c_tagGps = 52
 };
 
+// The simulator's BwdHeader.
 struct BwdRootNode {
-	int32_t m_type;     // 0x00
-	int32_t m_size;     // 0x04
-	uint32_t m_unk0x08; // 0x08 — written as 0 for the simulator
+	int32_t m_type;        // 0x00
+	int32_t m_size;        // 0x04
+	int32_t m_maxNodeSize; // 0x08 — BwdAddRegistryTemplate keeps it at the largest node's size
 };
 
 struct BwdRevisionNode {
@@ -39,39 +40,39 @@ struct BwdRevisionNode {
 	char m_revision[4]; // 0x08
 };
 
+// The simulator's DtblRecord.
 struct BwdTableNode {
-	int32_t m_type;        // 0x00
-	int32_t m_size;        // 0x04
-	uint32_t m_unk0x08[5]; // 0x08 — written as zeros for the simulator
+	int32_t m_type;           // 0x00
+	int32_t m_size;           // 0x04
+	uint32_t m_poolCounts[5]; // 0x08 — the counts the static pools are sized for, all 0
 };
 
+// A bmid record: the simulator reads it as a ResourceRef.
 struct BwdLinkNode {
-	int32_t m_type;    // 0x00
-	int32_t m_size;    // 0x04
-	int16_t m_unk0x08; // 0x08 — 0x114, 0x115 or 0x101 after each bitmap name node
-	int16_t m_unk0x0a; // 0x0a — written as -1 for the simulator
+	int32_t m_type;         // 0x00
+	int32_t m_size;         // 0x04
+	int16_t m_animation;    // 0x08 — the animation StartAnimation plays the bitmap before it in
+	int16_t m_reserved0x0a; // 0x0a — the start of the unused ResourceRef::m_name
 };
 
-// One mech of a star; the registry takes its first 0x5a bytes.
+// One mech of a star, the simulator's IncludeRecord2 (gpspec); the registry takes its first 0x5a
+// bytes.
 struct BwdGpsNode {
-	int32_t m_type;                  // 0x00
-	int32_t m_size;                  // 0x04
-	int16_t m_variantId;             // 0x08 — the variant's resource, -2 for a user variant
-	int16_t m_chassisId;             // 0x0a — the chassis' resource
-	uint8_t m_level;                 // 0x0c
-	uint8_t m_firstInStar;           // 0x0d
-	uint8_t m_unk0x0e;               // 0x0e — 0 for a star's leader at level 0, else 2; written for the simulator
-	uint8_t m_unk0x0f;               // 0x0f — never written, the node is cleared first
-	int16_t m_difficultySettings[5]; // 0x10 — g_bwdDifficultySettings' row
-	int16_t m_unk0x1a;               // 0x1a — written as 0 for the simulator
-	int16_t m_unk0x1c;               // 0x1c — written as 0 for the simulator
-	int16_t m_unk0x1e;               // 0x1e — written as 0 for the simulator
-	int16_t m_unk0x20;               // 0x20 — written as 6 for the simulator
-	int16_t m_unk0x22;               // 0x22 — written as 0x400 for the simulator
-	char m_chassis[9];               // 0x24
-	char m_mech[9];                  // 0x2d
-	char m_variant[16];              // 0x36
-	uint8_t m_unk0x46[0x5c - 0x46];  // 0x46 — cleared, never written
+	int32_t m_type;                      // 0x00
+	int32_t m_size;                      // 0x04
+	int16_t m_mekId;                     // 0x08 — the variant's MEK resource, -2 for a user variant
+	int16_t m_id;                        // 0x0a — the chassis' gamepiece stream
+	uint8_t m_team;                      // 0x0c — the star's level: 0 the player's, 1 to 5 the enemy's
+	uint8_t m_leader;                    // 0x0d — 1: the first mech of the star
+	uint8_t m_ai;                        // 0x0e — Player::m_aiMode: 0 for the player's own mech, else 2
+	uint8_t m_reserved0x0f;              // 0x0f
+	int16_t m_aiParams[8];               // 0x10 — Player::m_aiParams: g_bwdDifficultySettings' row, then 0
+	int16_t m_events;                    // 0x20 — event types (WidenEventFlags)
+	int16_t m_flags;                     // 0x22 — Player::m_flags
+	char m_chassis[9];                   // 0x24
+	char m_config[9];                    // 0x2d — the variant's file name
+	char m_playerName[16];               // 0x36 — the pilot
+	uint8_t m_reserved0x46[0x5c - 0x46]; // 0x46 — the rest of the player's name, and the short name
 };
 
 // A node whose size depends on the name it carries.
@@ -90,7 +91,13 @@ void PrjHeapFree(void* p_block);
 void BwdAddRegistryTemplate(void* p_node, int32_t p_size);
 void BwdInitRegistry();
 void BwdWriteRegistry(char* p_fileName);
-void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, int32_t p_index, int32_t p_level, int32_t p_difficulty);
+void PrjBuildMechVariantTemplate(
+	char* p_variant,
+	char* p_pilot,
+	int32_t p_index,
+	int32_t p_level,
+	int32_t p_difficulty
+);
 
 char g_bwdTags[][4] = {
 	{'B', 'W', 'D', 0},   {'R', 'E', 'V', 0},   {'D', 'T', 'B', 'L'}, {'P', 'L', 'N', 'T'}, {'P', 'A', 'L', 'G'},
@@ -304,7 +311,7 @@ void BwdInitRegistry()
 
 	root.m_type = *(int32_t*) g_bwdTags[c_tagBwd];
 	root.m_size = 0;
-	root.m_unk0x08 = 0;
+	root.m_maxNodeSize = 0;
 	BwdAddRegistryTemplate(&root, sizeof(root));
 
 	revision.m_type = *(int32_t*) g_bwdTags[c_tagRev];
@@ -317,7 +324,7 @@ void BwdInitRegistry()
 
 	table.m_type = *(int32_t*) g_bwdTags[c_tagDtbl];
 	table.m_size = sizeof(table);
-	memset(table.m_unk0x08, 0, sizeof(table.m_unk0x08));
+	memset(table.m_poolCounts, 0, sizeof(table.m_poolCounts));
 	BwdAddRegistryTemplate(&table, sizeof(table));
 }
 
@@ -327,16 +334,16 @@ void BwdWriteRegistry(char* p_fileName)
 	MechKeepBwd(p_fileName, g_bwdTemplateRegistry, g_bwdRegistrySize);
 }
 
-// Adds the template of one mech of a star to the registry: its chassis and variant, and the
-// settings of p_difficulty (1 to 8; 0 for a mech without a level).
-void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, int32_t p_index, int32_t p_level, int32_t p_difficulty)
+// Adds the template of one mech of a star to the registry: its chassis, variant and pilot, and
+// the settings of p_difficulty (1 to 8; 0 for a mech without a level).
+void PrjBuildMechVariantTemplate(char* p_variant, char* p_pilot, int32_t p_index, int32_t p_level, int32_t p_difficulty)
 {
 	int32_t i;
 	BwdGpsNode node;
 	int16_t variant;
 
 	for (i = 0; g_mechChassis[i].m_prefix; i++) {
-		if (!strncasecmp(p_mech, g_mechChassis[i].m_prefix, 3)) {
+		if (!strncasecmp(p_variant, g_mechChassis[i].m_prefix, 3)) {
 			break;
 		}
 	}
@@ -358,43 +365,43 @@ void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, int32_t p_index,
 	memset(&node, 0, 0x5a);
 	node.m_type = *(int32_t*) g_bwdTags[c_tagGps];
 	node.m_size = sizeof(node);
-	strncpy(node.m_mech, p_mech, 8);
-	node.m_mech[8] = '\0';
+	strncpy(node.m_config, p_variant, 8);
+	node.m_config[8] = '\0';
 	strncpy(node.m_chassis, g_mechChassis[i].m_chassis, 8);
 	node.m_chassis[8] = '\0';
-	strncpy(node.m_variant, p_variant, 15);
-	node.m_variant[15] = '\0';
-	node.m_unk0x22 = 0x400;
-	if (strncasecmp(p_mech + 5, "std", 3)) {
+	strncpy(node.m_playerName, p_pilot, 15);
+	node.m_playerName[15] = '\0';
+	node.m_flags = 0x400;
+	if (strncasecmp(p_variant + 5, "std", 3)) {
 		variant = -2;
 	}
 	else {
-		variant = FindResourceIdByName(6, node.m_mech);
+		variant = FindResourceIdByName(6, node.m_config);
 	}
-	node.m_variantId = variant;
-	node.m_chassisId = FindResourceIdByName(14, node.m_chassis);
-	node.m_level = p_level;
+	node.m_mekId = variant;
+	node.m_id = FindResourceIdByName(14, node.m_chassis);
+	node.m_team = p_level;
 	if (p_index == 0) {
-		node.m_firstInStar = 1;
+		node.m_leader = 1;
 	}
 	else {
-		node.m_firstInStar = 0;
+		node.m_leader = 0;
 	}
 	if (p_index == 0 && p_level == 0) {
-		node.m_unk0x0e = 0;
+		node.m_ai = 0;
 	}
 	else {
-		node.m_unk0x0e = 2;
+		node.m_ai = 2;
 	}
-	node.m_difficultySettings[0] = g_bwdDifficultySettings[p_difficulty][0];
-	node.m_difficultySettings[1] = g_bwdDifficultySettings[p_difficulty][1];
-	node.m_difficultySettings[2] = g_bwdDifficultySettings[p_difficulty][2];
-	node.m_difficultySettings[3] = g_bwdDifficultySettings[p_difficulty][3];
-	node.m_difficultySettings[4] = g_bwdDifficultySettings[p_difficulty][4];
-	node.m_unk0x1a = 0;
-	node.m_unk0x1c = 0;
-	node.m_unk0x1e = 0;
-	node.m_unk0x20 = 6;
+	node.m_aiParams[0] = g_bwdDifficultySettings[p_difficulty][0];
+	node.m_aiParams[1] = g_bwdDifficultySettings[p_difficulty][1];
+	node.m_aiParams[2] = g_bwdDifficultySettings[p_difficulty][2];
+	node.m_aiParams[3] = g_bwdDifficultySettings[p_difficulty][3];
+	node.m_aiParams[4] = g_bwdDifficultySettings[p_difficulty][4];
+	node.m_aiParams[5] = 0;
+	node.m_aiParams[6] = 0;
+	node.m_aiParams[7] = 0;
+	node.m_events = 6;
 	BwdAddRegistryTemplate(&node, 0x5a);
 }
 
@@ -447,8 +454,8 @@ void PrjBuildPlayerStarTemplates(int32_t p_clan, int32_t p_rival)
 	node->m_type = *(int32_t*) g_bwdTags[c_tagBmpj];
 	link.m_type = *(int32_t*) g_bwdTags[c_tagBmid];
 	link.m_size = sizeof(link);
-	link.m_unk0x08 = 0;
-	link.m_unk0x0a = -1;
+	link.m_animation = 0;
+	link.m_reserved0x0a = -1;
 	BwdInitRegistry();
 
 	node->m_resourceId = FindResourceIdByName(8, g_clanBitmapNames[p_clan]);
@@ -456,7 +463,7 @@ void PrjBuildPlayerStarTemplates(int32_t p_clan, int32_t p_rival)
 	size = strlen(g_clanBitmapNames[p_clan]) + 0x14;
 	node->m_size = (size + 3) & ~3;
 	BwdAddRegistryTemplate(node, (size + 3) & ~3);
-	link.m_unk0x08 = 0x114;
+	link.m_animation = 0x114;
 	BwdAddRegistryTemplate(&link, sizeof(link));
 
 	node->m_resourceId = FindResourceIdByName(8, g_clanBitmapNames[p_rival]);
@@ -464,7 +471,7 @@ void PrjBuildPlayerStarTemplates(int32_t p_clan, int32_t p_rival)
 	size = strlen(g_clanBitmapNames[p_rival]) + 0x14;
 	node->m_size = (size + 3) & ~3;
 	BwdAddRegistryTemplate(node, (size + 3) & ~3);
-	link.m_unk0x08 = 0x115;
+	link.m_animation = 0x115;
 	BwdAddRegistryTemplate(&link, sizeof(link));
 
 	node->m_resourceId = FindResourceIdByName(8, "jscamoia");
@@ -472,7 +479,7 @@ void PrjBuildPlayerStarTemplates(int32_t p_clan, int32_t p_rival)
 	size = strlen("jscamoia") + 0x14;
 	node->m_size = (size + 3) & ~3;
 	BwdAddRegistryTemplate(node, (size + 3) & ~3);
-	link.m_unk0x08 = 0x101;
+	link.m_animation = 0x101;
 	BwdAddRegistryTemplate(&link, sizeof(link));
 
 	BwdWriteRegistry("instmap1.bwd");
