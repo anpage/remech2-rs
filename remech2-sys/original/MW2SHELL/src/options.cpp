@@ -28,18 +28,6 @@
 void OptionsCallback(MechS32);
 extern ScreenField g_optionFields[18];
 
-// A button with a centered caption. Nothing calls its two functions.
-struct PewterPlaque0x9c {
-	MechS32 m_left;        // 0x00
-	MechS32 m_top;         // 0x04
-	MechS32 m_right;       // 0x08
-	MechS32 m_bottom;      // 0x0c
-	MechS32 m_textLeft;    // 0x10
-	MechS32 m_textTop;     // 0x14
-	MechChar m_text[0x80]; // 0x18
-	undefined4 m_unk0x98;  // 0x98 — only cleared, by LayoutButton
-};
-
 LoopingMovie* g_optionsMovie = NULL;
 
 MechChar g_optionsMovieName[0x10] = "amwlogo1";
@@ -49,33 +37,6 @@ PaletteColor g_savedPalette[0x100];
 void* g_sliderImages;
 
 MechChar* g_skillNames[] = {"~EASY", "~MEDIUM", "~HARD"};
-
-// Lay out a button: its rectangle around a center, and its caption centered in it. Unused.
-void LayoutButton(
-	PewterPlaque0x9c* p_plaque,
-	MechS32 p_centerX,
-	MechS32 p_centerY,
-	MechS32 p_width,
-	MechS32 p_height,
-	Font* p_font
-)
-{
-	p_plaque->m_textLeft = p_centerX;
-	p_plaque->m_textTop = p_centerY;
-	p_plaque->m_left = p_plaque->m_textLeft - p_width / 2;
-	p_plaque->m_right = p_plaque->m_left + p_width - 1;
-	p_plaque->m_top = p_plaque->m_textTop - p_height / 2;
-	p_plaque->m_bottom = p_plaque->m_top + p_height - 1;
-	p_plaque->m_textTop -= p_font->m_height / 2;
-	p_plaque->m_textLeft -= p_font->GetTextWidth(p_plaque->m_text) / 2;
-	p_plaque->m_unk0x98 = 0;
-}
-
-// Whether a point lies in a button. Unused.
-MechS32 IsPointInButton(PewterPlaque0x9c* p_plaque, MechS32 p_x, MechS32 p_y)
-{
-	return p_x >= p_plaque->m_left && p_x <= p_plaque->m_right && p_y >= p_plaque->m_top && p_y <= p_plaque->m_bottom;
-}
 
 TextGlyph* DrawSkillOption(ScreenField* p_option)
 {

@@ -23,7 +23,6 @@ extern MechChar g_debriefText[0x1000];
 extern MissionResultObjective* g_sortedObjectives[48];
 extern MechChar g_objectiveLine[0x400];
 extern MechChar g_careerHonor[0x200];
-extern undefined g_unk0x10077fe0[0x100];
 extern MechChar g_objectiveDescription[0x80];
 extern MechChar g_honorPoints[0x200];
 extern MechChar g_objectiveType[0x80];

@@ -13,9 +13,7 @@ extern "C"
 #endif
 
 	extern PANE g_topMessagePane;
-	extern undefined4 g_unk0x100adef4;
 	extern PANE g_bottomMessagePane;
-	extern undefined4 g_unk0x100adf0c;
 	extern MechChar g_bottomMessageText[0x100];
 	extern MechChar g_topMessageText[0x100];
 	extern TimedOverlay g_timedOverlays[2];

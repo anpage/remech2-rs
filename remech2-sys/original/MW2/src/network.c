@@ -114,8 +114,6 @@ MechS32 g_nextStateTime = 0;
 
 MechChar* g_netRecvBuffer;
 
-void* g_unk0x101770cc;
-
 MechU32 g_stateMsgSize;
 
 // When each player was last heard from.
@@ -178,7 +176,6 @@ void FirstNetwork(NetLaunchInfo* p_netLaunch)
 		memset(g_thingsMsg, 0, g_thingsMsgSize);
 		g_chatMsg = MechHeapAlloc(g_primaryHeap, sizeof(NetChatMsg));
 		memset(g_chatMsg, 0, sizeof(NetChatMsg));
-		g_unk0x101770cc = MechHeapAlloc(g_primaryHeap, 0x100);
 		g_netRecvBuffer = MechHeapAlloc(g_primaryHeap, 0x100);
 		for (i = 0; i < 8; i++) {
 			g_lastStateClock[i] = 0;
@@ -338,7 +335,6 @@ void ShutdownNetwork(void)
 			MechHeapFree(g_primaryHeap, g_chatMsg);
 		}
 
-		MechHeapFree(g_primaryHeap, g_unk0x101770cc);
 		MechHeapFree(g_primaryHeap, g_netRecvBuffer);
 	}
 }

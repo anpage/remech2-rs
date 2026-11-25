@@ -67,7 +67,6 @@ void RenderViewToPane(MechU32 p_target, MechS32 p_fovX, MechS32* p_view, struct 
 		DrawShapeList(g_sceneShapes);
 	}
 
-	FUN_10069591();
 	g_palettePending = palette;
 	ResetPane();
 	g_eyepoint->m_fovX = fovX;

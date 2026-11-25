@@ -13,8 +13,6 @@ extern "C"
 #endif
 
 	extern MechS32 g_shapeLoadError;
-	extern MechS32 g_unk0x100ba660;
-	extern MechS32 g_unk0x100ba664;
 	extern MechU32 g_shapeFlags;
 	extern MechS32 g_subShapeCollisionType;
 	extern MechS32 g_shapeOwnerSet;
@@ -27,7 +25,6 @@ extern "C"
 	extern MechS32 g_shapeScaleY;
 	extern MechS32 g_shapeScaleZ;
 	extern MechU32 g_faceIdCount;
-	extern MechS32 g_unk0x100ba68c;
 	extern MechS32 g_shapeHasObject;
 	extern MechU32* g_faceIds;
 	extern MechS32 g_shapeHasKey;

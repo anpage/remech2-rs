@@ -7,8 +7,8 @@
 struct SceneObject;
 struct Shape;
 
-// A sound that loops on an object while the eyepoint is in range (FUN_1007ed1e). AmbientSoundTask
-// allocates 0x1e bytes for it, so it is packed.
+// A sound that loops on an object while the eyepoint is in range (UpdateAmbientSound).
+// AmbientSoundTask allocates 0x1e bytes for it, so it is packed.
 #pragma pack(2)
 typedef struct AmbientSound {
 	MechS32 m_range;           // 0x00

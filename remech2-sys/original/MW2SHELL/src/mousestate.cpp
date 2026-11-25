@@ -40,8 +40,6 @@ MouseState::MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_cursorS
 	m_y = 0;
 	m_enabled = 0;
 	m_enabled = 1;
-
-	FUN_1003a91c(0);
 }
 
 void MouseState::MoveCursorTo(MechS32 p_x, MechS32 p_y)
@@ -63,12 +61,6 @@ MouseState::~MouseState()
 undefined MouseState::GetDoubleClicked()
 {
 	return m_doubleClicked;
-}
-
-// Empty. The constructor calls it with 0, but neither the body nor the call says what it was
-// for, so it keeps its placeholder.
-void MouseState::FUN_1003a91c(undefined4)
-{
 }
 
 undefined4 MouseState::GetLeftPressed()

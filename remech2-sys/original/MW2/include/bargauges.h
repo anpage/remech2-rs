@@ -13,13 +13,9 @@ extern "C"
 #endif
 
 	extern EasedValue g_heatBarLevel;
-	extern undefined4 g_unk0x100a82fc;
 	extern EasedValue g_throttleBarLevel;
-	extern undefined4 g_unk0x100a830c;
 	extern EasedValue g_heatRateBarLevel;
-	extern undefined4 g_unk0x100a831c;
 	extern EasedValue g_jumpFuelBarLevel;
-	extern undefined4 g_unk0x100a832c;
 	extern Point g_throttleGaugeSize;
 	extern MechS32 g_throttleFrameLeft;
 	extern MechS32 g_throttleFrameTop;

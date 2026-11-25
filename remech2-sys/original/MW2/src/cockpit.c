@@ -96,25 +96,6 @@ PANE g_cockpitGaugePanes[5] = {
 	{&g_mainPixelBuffer, 0, 0, 0, 0}
 };
 
-PANE g_unk0x100a5ad0[8] = {
-	{&g_mainPixelBuffer, 0, 0, 0, 0},
-	{&g_mainPixelBuffer, 0, 0, 0, 0},
-	{&g_mainPixelBuffer, 0, 0, 0, 0},
-	{&g_mainPixelBuffer, 0, 0, 0, 0},
-	{&g_mainPixelBuffer, 0, 0, 0, 0},
-	{&g_mainPixelBuffer, 0, 0, 0, 0},
-	{&g_mainPixelBuffer, 0, 0, 0, 0},
-	{&g_mainPixelBuffer, 0, 0, 0, 0}
-};
-
-Point g_unk0x100a5b70[4] = {0};
-
-Point g_unk0x100a5b90[4] = {0};
-
-Point g_unk0x100a5bb0 = {0, 0};
-
-void* g_unk0x100a5bb8[4] = {g_unk0x100a5b90, g_unk0x100a5b70, g_unk0x100a5ad0, &g_unk0x100a5bb0};
-
 // Whether cockpit view 1 and 2's map animation shows this frame (DrawDamagedMapView).
 MechS32 g_mapDamageAnimShown = 0;
 

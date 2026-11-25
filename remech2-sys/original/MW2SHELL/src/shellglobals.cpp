@@ -43,11 +43,6 @@ Font* g_titleFont = NULL;
 // The menu buttons (item 0x1c): Bank Gothic Bold. ButtonMenu always uses it.
 Font* g_buttonFont = NULL;
 
-// Items 0x1e and 0x1f: loaded, never used, so they keep their placeholders.
-Font* g_unk0x1007121c = NULL;
-
-Font* g_unk0x10071220 = NULL;
-
 // The archive reader's font, in the archive, the briefing and the debriefing.
 Font* g_archiveFont = NULL;
 
@@ -61,9 +56,6 @@ ProjectArchive* g_projectArchive = NULL;
 MechS32 g_midiAudio = 1;
 
 MechS32 g_digitalAudio = 1;
-
-// Cleared with the audio flags when there is no command line; nothing reads it.
-MechS32 g_unk0x1007123c = 1;
 
 // Cleared when the shell runs without a command line, outside MECH2.EXE: LAUNCH then skips the
 // simulator (ShellWindowProc posts the result message straight away) and the mouse shows its

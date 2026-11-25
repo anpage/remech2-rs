@@ -9,7 +9,6 @@ class ButtonMenu;
 class Page;
 
 // The functions and globals of briefing.cpp that other units use.
-extern MechChar g_unk0x10071cd8[0x04];
 extern ButtonMenu* g_briefingMenu;
 extern Page* g_briefingPage;
 extern Collection* g_briefingPages;

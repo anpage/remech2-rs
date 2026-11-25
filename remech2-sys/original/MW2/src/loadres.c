@@ -130,10 +130,6 @@ void InitializeResourceCache(void)
 	AllocateCacheTable();
 }
 
-void FUN_10019da1(void)
-{
-}
-
 // Returns the cached item of an ID and type, or NULL.
 ResourceCacheEntry* FindCacheEntry(MechS32 p_id, const char* p_type)
 {
@@ -243,10 +239,6 @@ void DumpResourceCache(void)
 	}
 }
 
-void FUN_1001a158(void)
-{
-}
-
 void UnlockCachedResource(MechS32 p_id, const char* p_type)
 {
 	ResourceCacheEntry* entry;
@@ -354,20 +346,6 @@ void FreeCachedResource(MechS32 p_id, const char* p_type)
 	}
 
 	FreeCacheEntry(entry);
-}
-
-void FUN_1001a521(undefined4 p_unk0x00)
-{
-}
-
-undefined4 FUN_1001a52c(undefined4 p_unk0x00)
-{
-	return p_unk0x00;
-}
-
-void* FUN_1001a53f(MechS32 p_id, const char* p_type)
-{
-	return LoadCachedResource(0, p_id, p_type, 0);
 }
 
 MechS32 PurgeOldestCacheEntry(void)

@@ -59,15 +59,9 @@ MechU32 g_staticPoolTags[10] =
 
 MechS16 g_missionPlayers;
 
-MechS16 g_unk0x100e9daa;
-
 MechS16 g_missionObjects;
 
 MechS16 g_missionClassEntries;
-
-MechS16 g_unk0x100e9db0;
-
-MechS16 g_unk0x100e9db2;
 
 MechS16 g_missionAnims;
 
@@ -165,11 +159,8 @@ MechS32 CountMissionStream(BwdStream* p_stream)
 
 			table = (DtblRecord*) node;
 			g_missionPlayers += table->m_players;
-			g_unk0x100e9daa += table->m_unk0x0a;
 			g_missionObjects += table->m_objects;
 			g_missionClassEntries += table->m_classEntries;
-			g_unk0x100e9db0 += table->m_unk0x10;
-			g_unk0x100e9db2 += table->m_unk0x12;
 			g_missionAnims += table->m_anims;
 			if (!known) {
 				g_missionAnimTracks += table->m_animTracks;

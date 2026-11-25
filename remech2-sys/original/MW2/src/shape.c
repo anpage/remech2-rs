@@ -161,30 +161,6 @@ MechS32 GetModelKey(Shape* p_shape)
 	return model->m_key;
 }
 
-void FUN_1003a859(Shape* p_shape, MechS32 p_unk0x14)
-{
-	Model* model;
-
-	model = p_shape->m_model;
-	if (!model) {
-		return;
-	}
-
-	model->m_unk0x14 = p_unk0x14;
-}
-
-MechU32 FUN_1003a889(Shape* p_shape)
-{
-	Model* model;
-
-	model = p_shape->m_model;
-	if (!model) {
-		return 0;
-	}
-
-	return model->m_unk0x14;
-}
-
 // Allocates a shape with one model (AddModel).
 Shape* CreateShape(MechS32 p_vertexCount, MechS32 p_faceCount, MechS32 p_extra, void** p_extraData)
 {

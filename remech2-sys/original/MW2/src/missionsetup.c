@@ -156,7 +156,6 @@ void PostEventToList(MechChar* p_name, MechS32 p_types, MechU16 p_target)
 					count = g_objectiveTable[i].m_objectives[j].m_targetCount;
 					g_objectiveTable[i].m_objectives[j].m_targetCount++;
 					g_objectiveTable[i].m_objectives[j].m_targets[count] = p_target;
-					FUN_1001cde1(p_target);
 				}
 			}
 		}

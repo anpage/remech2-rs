@@ -36,8 +36,6 @@ MechS32 g_clockHandle = -1;
 // clock didn't arrive.
 MechS32 g_syncTicksHandle = -1;
 
-MechS32 g_unk0x100ba574 = -1;
-
 MechS32 g_realClockHandle = -1;
 
 MechS32 g_previousClock = 0;

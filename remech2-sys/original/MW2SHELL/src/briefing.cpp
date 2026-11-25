@@ -26,10 +26,6 @@
 
 // The mission briefing screen.
 
-// The briefing's p_quote for LoadTextPages: empty, so the quote escapes in a briefing's text
-// expand to nothing. That is its only use, and it gives no name.
-MechChar g_unk0x10071cd8[0x04] = "";
-
 ButtonMenu* g_briefingMenu = NULL;
 
 Page* g_briefingPage = NULL;
@@ -100,7 +96,7 @@ void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, MechS32 p_campai
 	}
 
 	UppercaseString(name);
-	LoadTextPages(g_briefingPages, left, top, width, height, name, g_bodyFont, g_unk0x10071cd8);
+	LoadTextPages(g_briefingPages, left, top, width, height, name, g_bodyFont, (MechChar*) "");
 
 	g_briefingPage = (Page*) CollectionGet(g_briefingPages, 0);
 	if (!g_briefingPage) {

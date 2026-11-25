@@ -26,8 +26,6 @@ SpeechLine g_slotSpeech[3] = {
 	{0x109, "Point 3", NULL},
 };
 
-MechS32 g_unk0x100a96ec = 0;
-
 // What a lancemate reports.
 SpeechLine g_lancemateSpeech[11] = {
 	{0, "cannot do this", NULL},
@@ -43,8 +41,6 @@ SpeechLine g_lancemateSpeech[11] = {
 	{0x2a, "reports task complete. Rejoining formation", NULL},
 };
 
-MechS32 g_unk0x100a9774 = 0;
-
 SpeechLine g_formationSpeech[7] = {
 	{0xb, "Formation change to", NULL},
 	{0x4f, "echelon left", NULL},
@@ -55,15 +51,11 @@ SpeechLine g_formationSpeech[7] = {
 	{0x57, "wedge", NULL},
 };
 
-MechS32 g_unk0x100a97cc = 0;
-
 SpeechLine g_engageSpeech[3] = {
 	{0x54, "disengaged", NULL},
 	{0x50, "engaged", NULL},
 	{0x54, "disengaged", NULL},
 };
-
-MechS32 g_unk0x100a97f4 = 0;
 
 SpeechLine g_cockpitSpeech[34] = {
 	{0x40, "Heat level critical", NULL},
@@ -364,18 +356,7 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 				UnlockCachedResource(suffix, g_resourceTypeTags[c_resTagSnds]);
 			}
 			else {
-				slot = PlaySample(
-					0,
-					0,
-					id,
-					NULL,
-					100,
-					g_soundConfig.m_voiceVolume,
-					0x40,
-					11025,
-					(MechS32*) -1,
-					0x150
-				);
+				slot = PlaySample(0, 0, id, NULL, 100, g_soundConfig.m_voiceVolume, 0x40, 11025, (MechS32*) -1, 0x150);
 				if (slot >= 0) {
 					g_speechSample = g_audioEngine->m_samples[slot];
 					AIL_set_sample_user_data(g_speechSample, 1, id);
@@ -386,18 +367,8 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 		}
 	}
 	else if (id) {
-		slot = PlaySample(
-			0,
-			0,
-			id,
-			p_entry->m_data,
-			100,
-			g_soundConfig.m_voiceVolume,
-			0x40,
-			11025,
-			(MechS32*) -1,
-			0x150
-		);
+		slot =
+			PlaySample(0, 0, id, p_entry->m_data, 100, g_soundConfig.m_voiceVolume, 0x40, 11025, (MechS32*) -1, 0x150);
 		if (slot >= 0) {
 			g_speechSample = g_audioEngine->m_samples[slot];
 		}

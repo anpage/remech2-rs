@@ -18,11 +18,7 @@
 
 PANE g_topMessagePane = {&g_mainPixelBuffer, 0, 0, 0x10000, 0x10000};
 
-undefined4 g_unk0x100adef4 = 0;
-
 PANE g_bottomMessagePane = {&g_mainPixelBuffer, 0, 0, 0x10000, 0x10000};
-
-undefined4 g_unk0x100adf0c = 0;
 
 MechChar g_bottomMessageText[0x100];
 

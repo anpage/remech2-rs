@@ -18,10 +18,3 @@ MechHeap* g_primaryHeap = NULL;
 MechS32 g_windowHeight;
 
 MechS32 g_windowWidth;
-
-// Always 0. Where the simulator's copy of AdjustWindowSize calls this, it asks for a field of
-// the entry for id 4 of its menu list. That field has no name yet, so this keeps its placeholder.
-undefined4 FUN_1003bf90(MechS32 p_unk0x00)
-{
-	return 0;
-}

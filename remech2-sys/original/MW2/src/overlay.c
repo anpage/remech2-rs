@@ -32,22 +32,14 @@ MechChar g_blankText[] = "                                 ";
 
 MechS32 g_showPalette = 0;
 
-MechS32 g_unk0x100a94a0 = 0;
-
 // The row MonoPrint last wrote to; MonoClear resets it and its neighbours to the top row.
 MechS32 g_monoLastRow = 3;
-
-MechS32 g_unk0x100a94a8 = 3;
-
-MechChar g_unk0x100a94ac[4] = "";
 
 MechS32 g_frameRateShown = 0;
 
 MechS32 g_showFrameRate = 0;
 
 MechS32 g_showFrameRateMain = 0;
-
-MechS32 g_unk0x100a94bc = 0;
 
 // Where the _MAIN readouts are drawn, in 16.16 fractions of the screen until
 // ScaleOverlayPositions scales them to pixels.
@@ -83,16 +75,6 @@ MechS32 g_showSpinner = 1;
 
 // The spinner StepSpinner steps through: the CP437 arrows up, left, down and right.
 MechChar g_spinnerArrows[4] = {0x1e, 0x11, 0x1f, 0x10};
-
-// A repeated cache dump (DUMP_CACHE_REPEAT, whose key does nothing in this build) every
-// second.
-MechS32 g_nextCacheDump = 0;
-
-MechS32 g_dumpCacheRepeat = 0;
-
-MechS32 g_unk0x100a9514 = 0;
-
-MechS32 g_unk0x100a9518 = 0;
 
 // The frame rate, in whole frames per second and tenths, over the last ten frames.
 MechS32 g_frameRate = 0;
@@ -181,14 +163,6 @@ void DrawDebugOverlays(void)
 	}
 	else if (g_cacheInfoShown) {
 		HideCacheInfo();
-	}
-
-	if (g_unk0x100a9518) {
-		g_unk0x100a9514 = 1;
-	}
-	if (g_dumpCacheRepeat && g_nextCacheDump < g_currentClock) {
-		g_nextCacheDump = g_currentClock + 0xb5;
-		FUN_1001a521(g_mw2PrjHandle);
 	}
 }
 
@@ -498,8 +472,6 @@ void MonoClear(void)
 		DRAW_DEBUG_TEXT();
 	}
 
-	g_unk0x100a94ac[0] = '\0';
-	g_unk0x100a94a8 = 3;
 	g_monoLastRow = 3;
 }
 

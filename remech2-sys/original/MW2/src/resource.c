@@ -88,8 +88,6 @@ typedef struct FormationNames {
 
 ScenarioTable* g_scenarios = NULL;
 
-void* g_unk0x100a860c = NULL;
-
 // The next name of g_scenarios ExecuteInclude substitutes.
 MechS32 g_nextScenario = 0;
 
@@ -404,12 +402,6 @@ void FreeMissionTables(void)
 
 		g_missionTables[i] = NULL;
 	}
-
-	if (g_unk0x100a860c) {
-		MechHeapFree(g_primaryHeap, g_unk0x100a860c);
-	}
-
-	g_unk0x100a860c = NULL;
 }
 
 // Scales the vector (p_a, p_b, p_c) to integers whose absolute values add up to 2^29. A vector

@@ -24,8 +24,6 @@
 // The player whose mech ReloadPlayerMech is reloading, or -1.
 MechS32 g_reloadingPlayer = -1;
 
-MechS32 g_unk0x100ba694 = 0;
-
 RememberedMech g_rememberedMechs[60] = {0};
 
 MechSegment* g_mechSegments[60] = {NULL};

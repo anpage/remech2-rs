@@ -168,20 +168,6 @@ void LoopingMovie::MoveTo(MechS32 p_left, MechS32 p_top)
 	}
 }
 
-// Allocates p_size bytes and drops the pointer; FUN_100162ef frees a block. Neither is called,
-// and the bodies don't say what they served (a codec's allocation callbacks?), so they keep
-// their placeholders.
-void FUN_100162d3(size_t p_size)
-{
-	malloc(p_size);
-}
-
-// Frees p_block. See FUN_100162d3.
-void FUN_100162ef(void* p_block)
-{
-	free(p_block);
-}
-
 void LoopingMovie::Update()
 {
 	if (m_smack == NULL) {

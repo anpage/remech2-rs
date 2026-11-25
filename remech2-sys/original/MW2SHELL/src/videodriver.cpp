@@ -63,8 +63,6 @@ VideoDriver::VideoDriver()
 
 	m_width = g_windowWidth;
 	m_height = g_windowHeight;
-	m_pictureMaxX = m_width - 1;
-	m_pictureMaxY = m_height - 1;
 	m_screenBuffer.m_xMax = m_backBuffer.m_xMax = m_width - 1;
 	m_screenBuffer.m_yMax = m_backBuffer.m_yMax = m_height - 1;
 
@@ -282,11 +280,6 @@ void VideoDriver::SetPalette(PaletteColor* p_palette, undefined4 p_allColors)
 	m_allColors = p_allColors;
 }
 
-void VideoDriver::LoadPicturePalette(undefined* p_data, MechS32 p_size, PaletteColor* p_palette)
-{
-	VFX_PCX_palette(p_data, p_size, p_palette);
-}
-
 void VideoDriver::ReadPictureSize(MechS32* p_maxX, MechS32* p_maxY, undefined* p_data, MechS32 p_size, MechS32 p_type)
 {
 	switch (p_type) {
@@ -300,34 +293,6 @@ void VideoDriver::ReadPictureSize(MechS32* p_maxX, MechS32* p_maxY, undefined* p
 
 	*p_maxX = (m_pictureSize >> 16) - 1;
 	*p_maxY = (m_pictureSize & 0xffff) - 1;
-}
-
-// Loads a picture, with its palette, and draws it to the screen and the background.
-void VideoDriver::ShowPicture(
-	undefined* p_picture,
-	MechS32 p_pictureLength,
-	MechS32 p_pictureType,
-	MechU8 p_unk0x08,
-	MechU8 p_unk0x09
-)
-{
-	m_picture = p_picture;
-	m_pictureLength = p_pictureLength;
-	m_pictureType = p_pictureType;
-	m_unk0x08 = p_unk0x08;
-	m_unk0x09 = p_unk0x09;
-
-	ReadPictureSize(&m_pictureMaxX, &m_pictureMaxY, m_picture, m_pictureLength, m_pictureType);
-	LoadPicturePalette(m_picture, m_pictureLength, m_palette);
-	m_paletteChanged = 1;
-	m_allColors = 1;
-
-	if (ACQUIRE_FRAMEBUFFER() == 0) {
-		VFX_PCX_draw(&m_screenView, m_picture);
-		VFX_pane_copy(&m_screenView, 0, 0, &m_backView, 0, 0, -1);
-	}
-
-	ExpandRect(m_screenView.m_x0, m_screenView.m_y0, m_screenView.m_x1, m_screenView.m_y1);
 }
 
 void VideoDriver::LoadBackground(TMPackDataBase* p_database, MechS32 p_id)
@@ -419,26 +384,6 @@ void VideoDriver::DrawPixelsClipped(
 	if (!IntersectsRectBySize(p_left, p_top, p_width, p_height)) {
 		return;
 	}
-
-	view.m_window = &buffer;
-	view.m_x0 = 0;
-	view.m_y0 = 0;
-	view.m_x1 = buffer.m_xMax = p_width - 1;
-	view.m_y1 = buffer.m_yMax = p_height - 1;
-	buffer.m_buffer = p_pixels;
-
-	if (ACQUIRE_FRAMEBUFFER() == 0) {
-		VFX_pane_copy(&view, 0, 0, &m_screenView, p_left, p_top, -1);
-	}
-
-	ExpandRectBySize(p_left, p_top, p_width, p_height);
-}
-
-// The same as DrawPixels. Unused: a duplicate keeps its placeholder rather than a second name.
-void VideoDriver::FUN_1000705f(undefined* p_pixels, MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
-{
-	PANE view;
-	WINDOW buffer;
 
 	view.m_window = &buffer;
 	view.m_x0 = 0;

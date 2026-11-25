@@ -35,7 +35,6 @@ extern "C"
 	extern MechS32 g_nextThingRecord;
 	extern MechS32 g_thingRecordIndices[0x96];
 	extern struct ScenarioTable* g_scenarios;
-	extern void* g_unk0x100a860c;
 	extern MechS32 g_nextScenario;
 	extern MechS32 g_mangleBase;
 	extern MechS32 g_scenarioCount;

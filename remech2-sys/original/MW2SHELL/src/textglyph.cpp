@@ -16,24 +16,16 @@
 // next space.
 undefined g_linkColorMap[256] = {0xff, 1};
 
-// Two more color maps like g_linkColorMap, mapping color 1 to 5 and to 8. InitTextColorMaps
-// builds them and nothing reads them, so nothing says what they were for.
-undefined g_unk0x10074758[256] = {0xff, 5};
-
-undefined g_unk0x10074858[256] = {0xff, 8};
-
 void InitTextColorMaps()
 {
 	MechS32 i;
 
-	g_unk0x10074758[0] = g_linkColorMap[0] = g_unk0x10074858[0] = 0xff;
+	g_linkColorMap[0] = 0xff;
 	for (i = 1; i < 256; i++) {
-		g_unk0x10074758[i] = g_linkColorMap[i] = g_unk0x10074858[i] = i;
+		g_linkColorMap[i] = i;
 	}
 
-	g_unk0x10074758[1] = 5;
 	g_linkColorMap[1] = 1;
-	g_unk0x10074858[1] = 8;
 }
 
 void TextGlyph::SetTyped(undefined4 p_typed)

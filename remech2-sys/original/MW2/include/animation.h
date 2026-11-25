@@ -52,8 +52,6 @@ extern "C"
 	void SetAnimMode(MechS16 p_index, MechS16 p_mode);
 	void SetAnimFrame(MechS16 p_index, MechU16 p_frame);
 	void SetAnimDelay(MechS16 p_index, MechU16 p_delay);
-	void FUN_10069586(void);
-	void FUN_10069591(void);
 	void FreeAnimations(void);
 
 #ifdef __cplusplus

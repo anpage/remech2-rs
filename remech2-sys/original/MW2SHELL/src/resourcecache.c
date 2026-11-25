@@ -116,11 +116,6 @@ void InitializeResourceCache(void)
 	AllocateCacheTable();
 }
 
-// Empty and never called: there is nothing to name it after.
-void FUN_10013935(void)
-{
-}
-
 ResourceCacheEntry* FindCacheEntry(MechS32 p_id, char* p_type)
 {
 	MechS32 bucket;
@@ -203,11 +198,6 @@ void DumpResourceCache(void)
 	}
 }
 
-// Empty and never called: there is nothing to name it after.
-void FUN_10013c6e(void)
-{
-}
-
 void UnlockCachedResource(MechS32 p_id, char* p_type)
 {
 	ResourceCacheEntry* entry = FindCacheEntry(p_id, p_type);
@@ -287,24 +277,6 @@ void FreeCachedResource(MechS32 p_id, char* p_type)
 	}
 
 	FreeCacheEntry(entry);
-}
-
-// Empty and never called: there is nothing to name it after.
-void FUN_10013f30(void)
-{
-}
-
-// Returns its argument. Never called, and the body gives no name.
-undefined4 FUN_10013f3b(undefined4 p_value)
-{
-	return p_value;
-}
-
-// LoadCachedResource from archive handle 0. Never called; it keeps its placeholder because what
-// handle 0 stands for here isn't known.
-void* FUN_10013f4e(MechS32 p_id, char* p_type)
-{
-	return LoadCachedResource(0, p_id, p_type, 0);
 }
 
 MechS32 PurgeOldestCacheEntry(void)

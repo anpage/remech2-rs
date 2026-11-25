@@ -27,7 +27,6 @@ extern "C"
 	extern MechS32 g_clockPaused;
 	extern MechS32 g_clockHandle;
 	extern MechS32 g_syncTicksHandle;
-	extern MechS32 g_unk0x100ba574;
 	extern MechS32 g_realClockHandle;
 	extern MechS32 g_previousClock;
 	extern MechS32 g_clockModeBeforePause;

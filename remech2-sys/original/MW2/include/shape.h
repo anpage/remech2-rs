@@ -63,8 +63,6 @@ extern "C"
 	void SelectModelByKey(Shape* p_shape, MechS32 p_key);
 	void SetModelKey(Shape* p_shape, MechS32 p_key);
 	MechS32 GetModelKey(Shape* p_shape);
-	void FUN_1003a859(Shape* p_shape, MechS32 p_unk0x14);
-	MechU32 FUN_1003a889(Shape* p_shape);
 	Shape* CreateShape(MechS32 p_vertexCount, MechS32 p_faceCount, MechS32 p_extra, void** p_extraData);
 	void AddShapeVertex(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z, undefined4 p_u, undefined4 p_v);
 	struct Face* AddShapeFace(Shape* p_shape, MechU16 p_color, MechU8* p_indices);

@@ -95,7 +95,7 @@ extern "C"
 	);
 	MechS32 LoadReels(struct ResourceRef* p_ref);
 	MechS32 LoadHudFile(struct ResourceRef* p_ref);
-	MechS32 LoadCptFile(struct ResourceRef* p_ref, struct PANE* p_gauges, struct PANE* p_panels, struct Point* p_point);
+	MechS32 LoadCptFile(struct ResourceRef* p_ref, struct PANE* p_gauges, struct PANE* p_panels);
 	void PreloadCockpitSounds(void);
 
 #ifdef __cplusplus

@@ -13,8 +13,6 @@
 // The list of BWD names AddBwdName adds to.
 BwdNameNode* g_bwdNames = NULL;
 
-undefined4 g_unk0x100a9474 = 0;
-
 BwdNameNode* g_bwdNamesTail;
 
 // Appends a copy of a BWD name to the list.

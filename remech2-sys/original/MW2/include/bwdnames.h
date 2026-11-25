@@ -12,7 +12,6 @@ extern "C"
 #endif
 
 	extern struct BwdNameNode* g_bwdNames;
-	extern undefined4 g_unk0x100a9474;
 	extern struct BwdNameNode* g_bwdNamesTail;
 
 	MechS32 AddBwdName(BwdName* p_name);

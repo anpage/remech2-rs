@@ -188,13 +188,9 @@ static const struct {
 
 	// bargauges.c
 	RESET_GLOBAL(g_heatBarLevel),
-	RESET_GLOBAL(g_unk0x100a82fc),
 	RESET_GLOBAL(g_throttleBarLevel),
-	RESET_GLOBAL(g_unk0x100a830c),
 	RESET_GLOBAL(g_heatRateBarLevel),
-	RESET_GLOBAL(g_unk0x100a831c),
 	RESET_GLOBAL(g_jumpFuelBarLevel),
-	RESET_GLOBAL(g_unk0x100a832c),
 	RESET_GLOBAL(g_throttleGaugeSize),
 	RESET_GLOBAL(g_throttleFrameLeft),
 	RESET_GLOBAL(g_throttleFrameTop),
@@ -218,7 +214,6 @@ static const struct {
 	// bwd.c
 	RESET_GLOBAL(g_streamsFromFiles),
 	RESET_GLOBAL(g_logStreams),
-	RESET_GLOBAL(g_unk0x10109c40),
 
 	// bwdkeywords.c
 	RESET_GLOBAL(g_bwdVersion),
@@ -228,7 +223,6 @@ static const struct {
 
 	// bwdnames.c
 	RESET_GLOBAL(g_bwdNames),
-	RESET_GLOBAL(g_unk0x100a9474),
 	RESET_GLOBAL(g_bwdNamesTail),
 
 	// callbacks.c
@@ -263,7 +257,6 @@ static const struct {
 	RESET_GLOBAL(g_framerateLimit),
 	RESET_GLOBAL(g_clockHandle),
 	RESET_GLOBAL(g_syncTicksHandle),
-	RESET_GLOBAL(g_unk0x100ba574),
 	RESET_GLOBAL(g_realClockHandle),
 	RESET_GLOBAL(g_previousClock),
 	RESET_GLOBAL(g_clockModeBeforePause),
@@ -287,11 +280,6 @@ static const struct {
 	RESET_GLOBAL(g_mapShadeRange),
 	RESET_GLOBAL(g_cockpitGauges),
 	RESET_GLOBAL(g_cockpitGaugePanes),
-	RESET_GLOBAL(g_unk0x100a5ad0),
-	RESET_GLOBAL(g_unk0x100a5b70),
-	RESET_GLOBAL(g_unk0x100a5b90),
-	RESET_GLOBAL(g_unk0x100a5bb0),
-	RESET_GLOBAL(g_unk0x100a5bb8),
 	RESET_GLOBAL(g_mapDamageAnimShown),
 	RESET_GLOBAL(g_staticCleanUntil),
 	RESET_GLOBAL(g_staticNoiseUntil),
@@ -318,7 +306,6 @@ static const struct {
 	RESET_GLOBAL(g_skyColor),
 	RESET_GLOBAL(g_groundColor),
 	RESET_GLOBAL(g_horizonMapColor),
-	RESET_GLOBAL(g_unk0x100a5558),
 
 	// commandmenu.c
 	RESET_GLOBAL(g_commandPoint2MenuTarget),
@@ -593,7 +580,6 @@ static const struct {
 	RESET_GLOBAL(g_soundDelayPerUnit),
 	RESET_GLOBAL(g_gravity),
 	RESET_GLOBAL(g_gravityScale),
-	RESET_GLOBAL(g_unk0x100ba608),
 	RESET_GLOBAL(g_secondsPerDay),
 	RESET_GLOBAL(g_daysPerYear),
 	RESET_GLOBAL(g_dayOfYear),
@@ -862,10 +848,7 @@ static const struct {
 	RESET_GLOBAL(g_jettisonAmmoRequested),
 	RESET_GLOBAL(g_toggleMascRequested),
 	RESET_GLOBAL(g_mascEngaged),
-	RESET_GLOBAL(g_unk0x100a2bf4),
 	RESET_GLOBAL(g_manualWeaponCycle),
-	RESET_GLOBAL(g_unk0x100a2bfc),
-	RESET_GLOBAL(g_unk0x100a2c00),
 	RESET_GLOBAL(g_localMechLost),
 	RESET_GLOBAL(g_powerRequest),
 	RESET_GLOBAL(g_recenterLastHeading),
@@ -886,7 +869,6 @@ static const struct {
 
 	// mechreload.c
 	RESET_GLOBAL(g_reloadingPlayer),
-	RESET_GLOBAL(g_unk0x100ba694),
 	RESET_GLOBAL(g_rememberedMechs),
 	RESET_GLOBAL(g_mechSegments),
 
@@ -951,7 +933,6 @@ static const struct {
 	RESET_GLOBAL(g_serviceProvider),
 	RESET_GLOBAL(g_nextStateTime),
 	RESET_GLOBAL(g_netRecvBuffer),
-	RESET_GLOBAL(g_unk0x101770cc),
 	RESET_GLOBAL(g_stateMsgSize),
 	RESET_GLOBAL(g_lastHeard),
 	RESET_GLOBAL(g_lastStateClock),
@@ -997,14 +978,10 @@ static const struct {
 	// overlay.c
 	RESET_GLOBAL(g_blankText),
 	RESET_GLOBAL(g_showPalette),
-	RESET_GLOBAL(g_unk0x100a94a0),
 	RESET_GLOBAL(g_monoLastRow),
-	RESET_GLOBAL(g_unk0x100a94a8),
-	RESET_GLOBAL(g_unk0x100a94ac),
 	RESET_GLOBAL(g_frameRateShown),
 	RESET_GLOBAL(g_showFrameRate),
 	RESET_GLOBAL(g_showFrameRateMain),
-	RESET_GLOBAL(g_unk0x100a94bc),
 	RESET_GLOBAL(g_frameRateOrigin),
 	RESET_GLOBAL(g_memInfoOrigin),
 	RESET_GLOBAL(g_eyePositionOrigin),
@@ -1021,10 +998,6 @@ static const struct {
 	RESET_GLOBAL(g_cacheInfoShown),
 	RESET_GLOBAL(g_showSpinner),
 	RESET_GLOBAL(g_spinnerArrows),
-	RESET_GLOBAL(g_nextCacheDump),
-	RESET_GLOBAL(g_dumpCacheRepeat),
-	RESET_GLOBAL(g_unk0x100a9514),
-	RESET_GLOBAL(g_unk0x100a9518),
 	RESET_GLOBAL(g_frameRate),
 	RESET_GLOBAL(g_frameRateTenths),
 	RESET_GLOBAL(g_frameRateTime),
@@ -1100,11 +1073,8 @@ static const struct {
 	// poolsizes.c
 	RESET_GLOBAL(g_staticPoolTags),
 	RESET_GLOBAL(g_missionPlayers),
-	RESET_GLOBAL(g_unk0x100e9daa),
 	RESET_GLOBAL(g_missionObjects),
 	RESET_GLOBAL(g_missionClassEntries),
-	RESET_GLOBAL(g_unk0x100e9db0),
-	RESET_GLOBAL(g_unk0x100e9db2),
 	RESET_GLOBAL(g_missionAnims),
 	RESET_GLOBAL(g_missionAnimTracks),
 	RESET_GLOBAL(g_missionAnimFrameBytes),
@@ -1166,7 +1136,6 @@ static const struct {
 	RESET_GLOBAL(g_screenPane),
 	RESET_GLOBAL(g_gameWindowGeometry),
 	RESET_GLOBAL(g_screenHeight),
-	RESET_GLOBAL(g_unk0x10176eb0),
 	RESET_GLOBAL(g_stretchPending),
 	RESET_GLOBAL(g_screenHeightMinus1),
 	RESET_GLOBAL(g_screenPixelCount),
@@ -1179,7 +1148,6 @@ static const struct {
 
 	// resource.c
 	RESET_GLOBAL(g_scenarios),
-	RESET_GLOBAL(g_unk0x100a860c),
 	RESET_GLOBAL(g_nextScenario),
 	RESET_GLOBAL(g_thingRecordCount),
 	RESET_GLOBAL(g_nextThingRecord),
@@ -1296,13 +1264,9 @@ static const struct {
 
 	// speech.c
 	RESET_GLOBAL(g_slotSpeech),
-	RESET_GLOBAL(g_unk0x100a96ec),
 	RESET_GLOBAL(g_lancemateSpeech),
-	RESET_GLOBAL(g_unk0x100a9774),
 	RESET_GLOBAL(g_formationSpeech),
-	RESET_GLOBAL(g_unk0x100a97cc),
 	RESET_GLOBAL(g_engageSpeech),
-	RESET_GLOBAL(g_unk0x100a97f4),
 	RESET_GLOBAL(g_cockpitSpeech),
 	RESET_GLOBAL(g_damageSpeech),
 	RESET_GLOBAL(g_speechQueue),
@@ -1415,9 +1379,7 @@ static const struct {
 
 	// timedoverlays.c
 	RESET_GLOBAL(g_topMessagePane),
-	RESET_GLOBAL(g_unk0x100adef4),
 	RESET_GLOBAL(g_bottomMessagePane),
-	RESET_GLOBAL(g_unk0x100adf0c),
 	RESET_GLOBAL(g_bottomMessageText),
 	RESET_GLOBAL(g_topMessageText),
 	RESET_GLOBAL(g_timedOverlays),
@@ -1490,8 +1452,6 @@ static const struct {
 
 	// wtbshapes.c
 	RESET_GLOBAL(g_shapeLoadError),
-	RESET_GLOBAL(g_unk0x100ba660),
-	RESET_GLOBAL(g_unk0x100ba664),
 	RESET_GLOBAL(g_shapeOffsetX),
 	RESET_GLOBAL(g_shapeOffsetY),
 	RESET_GLOBAL(g_shapeOffsetZ),
@@ -1501,7 +1461,6 @@ static const struct {
 	RESET_GLOBAL(g_shapeFlags),
 	RESET_GLOBAL(g_faceIdCount),
 	RESET_GLOBAL(g_subShapeCollisionType),
-	RESET_GLOBAL(g_unk0x100ba68c),
 	RESET_GLOBAL(g_shapeHasObject),
 	RESET_GLOBAL(g_faceIds),
 	RESET_GLOBAL(g_shapeHasKey),

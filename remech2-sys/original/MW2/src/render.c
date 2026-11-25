@@ -70,8 +70,6 @@ GameWindowGeometry* g_gameWindowGeometry;
 
 MechS32 g_screenHeight;
 
-undefined4 g_unk0x10176eb0;
-
 // Set when the next Blit should stretch the current pane over the window.
 MechS32 g_stretchPending;
 
@@ -130,7 +128,6 @@ void FirstRender(void)
 	g_renderSettings.m_projectVertex = ProjectVertex;
 	g_renderSettings.m_drawFace = GetFaceColor;
 	g_renderSettings.m_drawPolygon = DrawScenePolygon;
-	g_unk0x100a5558 = 0xff;
 	if (g_renderSettings.m_drawSky || g_renderSettings.m_drawGround) {
 		g_renderSettings.m_clearFrame = 0;
 	}
@@ -243,7 +240,6 @@ void DrawScene(void)
 		DrawBoundingSpheres(g_sceneShapes);
 	}
 
-	FUN_10069591();
 	SelectPane(0);
 }
 
@@ -293,16 +289,6 @@ void ShutdownRender(void)
 
 	g_displayReady = 0;
 	ShutdownRefreshMode();
-}
-
-undefined4 FUN_10012f14(void)
-{
-	return g_unk0x10176eb0;
-}
-
-void FUN_10012f29(undefined4 p_unk0x00, undefined4 p_value)
-{
-	g_unk0x10176eb0 = p_value;
 }
 
 // Draws the bounding spheres (the "michelin" cheat) of the list p_root's colliding mech shapes

@@ -43,7 +43,6 @@ extern "C"
 	extern MechS32 g_screenWidthMinus1;
 	extern MechS32 g_screenHalfWidth;
 	extern MechS32 g_screenHalfHeight;
-	extern undefined4 g_unk0x10176eb0;
 	extern MechS32 g_stretchPending;
 	extern MechS32 g_framePane;
 	extern MechS32 g_drawnPolygonCount;
@@ -59,8 +58,6 @@ extern "C"
 	void ResetPane(void);
 	void Blit(void);
 	void ShutdownRender(void);
-	undefined4 FUN_10012f14(void);
-	void FUN_10012f29(undefined4 p_unk0x00, undefined4 p_value);
 	void DrawBoundingSpheres(struct Shape* p_root);
 
 #ifdef __cplusplus

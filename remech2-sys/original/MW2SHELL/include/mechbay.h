@@ -159,7 +159,6 @@ extern AudioSample* g_chassisNameSound;
 extern ButtonMenu* g_mechBayMenu;
 extern AudioSample* g_mechBayAmbience;
 extern MechS32 g_mechBayWParam;
-extern MechS32 g_unk0x1006178c;
 extern MechS32 g_pickingStarMech;
 extern AudioSample* g_acceptSound;
 extern AudioSample* g_variantSound;

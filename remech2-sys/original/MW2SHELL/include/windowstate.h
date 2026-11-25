@@ -17,8 +17,6 @@ extern "C"
 	extern MechS32 g_menuDialogOpen;
 	extern MechHeap* g_primaryHeap;
 
-	undefined4 FUN_1003bf90(MechS32 p_unk0x00);
-
 #ifdef __cplusplus
 }
 #endif

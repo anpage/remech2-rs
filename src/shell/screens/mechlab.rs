@@ -258,8 +258,6 @@ impl Screen for Mechbay {
                 delete(sample, shell::AudioSample_AudioSample_destructor);
             }
 
-            shell::g_unk0x1006178c = 1;
-
             delete(
                 &raw mut shell::g_mechBayMenu,
                 shell::ButtonMenu_ButtonMenu_destructor,

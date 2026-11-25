@@ -90,7 +90,6 @@ extern "C"
 	extern DPID g_masterDpid;
 	extern LPGUID g_serviceProvider;
 	extern MechS32 g_nextStateTime;
-	extern void* g_unk0x101770cc;
 	extern MechU32 g_stateMsgSize;
 	extern MechS32 g_lastHeard[8];
 	extern MechS32 g_lastStateClock[8];

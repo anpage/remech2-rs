@@ -9,7 +9,6 @@ class VideoDriver;
 class HitRect {
 public:
 	HitRect(undefined4 p_left, undefined4 p_top, undefined4 p_right, undefined4 p_bottom);
-	void FUN_10049183();
 	void Draw(VideoDriver* p_videoDriver);
 	MechU8 Contains(MechS32 p_x, MechS32 p_y);
 

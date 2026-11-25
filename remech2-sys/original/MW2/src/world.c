@@ -85,13 +85,6 @@ typedef struct BwdPlanetRecord {
 	MechS32 m_noHorizonBand;  // 0x4c
 } BwdPlanetRecord;
 
-// The second planet record (c_bwdClimate).
-typedef struct BwdClimateRecord {
-	BwdRecord m_header;   // 0x00
-	undefined4 m_unk0x08; // 0x08
-	MechS16 m_unk0x0c;    // 0x0c
-} BwdClimateRecord;
-
 // hiddentext.
 typedef struct BwdTextRecord {
 	BwdRecord m_header; // 0x00
@@ -355,9 +348,7 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdClimate]) {
-			BwdClimateRecord* climate = (BwdClimateRecord*) node;
-
-			g_unk0x100ba608 = climate->m_unk0x0c;
+			// Unused
 		}
 		else if (type == g_bwdTypeCodes[c_bwdHiddenText]) {
 			BwdTextRecord* text = (BwdTextRecord*) node;
@@ -758,12 +749,10 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdCptFile]) {
-			ResourceRef* ref;
 			BwdResourceRecord* cockpit = (BwdResourceRecord*) node;
 
-			ref = &cockpit->m_ref;
 			if (g_lastPlayer && !g_lastPlayer->m_aiMode) {
-				LoadCptFile(ref, g_cockpitGaugePanes, g_cockpitPanelPanes, g_unk0x100a5bb8[3]);
+				LoadCptFile(&cockpit->m_ref, g_cockpitGaugePanes, g_cockpitPanelPanes);
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdPitFile]) {

@@ -20,19 +20,11 @@
 
 EasedValue g_heatBarLevel = {0, 0, 1};
 
-undefined4 g_unk0x100a82fc = 0;
-
 EasedValue g_throttleBarLevel = {0, 0, 1};
-
-undefined4 g_unk0x100a830c = 0;
 
 EasedValue g_heatRateBarLevel = {0, 0, 4};
 
-undefined4 g_unk0x100a831c = 0;
-
 EasedValue g_jumpFuelBarLevel = {0, 0, 1};
-
-undefined4 g_unk0x100a832c = 0;
 
 // The size of the throttle gauge.
 Point g_throttleGaugeSize = {0x1e7a, 0x8dc9};

@@ -19,7 +19,6 @@ extern "C"
 
 	extern MechS32 g_soundDelayPerUnit;
 	extern MechS32 g_gravity;
-	extern MechS32 g_unk0x100ba608;
 	extern MechS32 g_daysPerYear;
 	extern MechS32 g_dayOfYear;
 	extern MechS32 g_secondsPerDay;

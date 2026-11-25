@@ -23,12 +23,8 @@ extern "C"
 	extern MechS32 g_showMemInfoMain;
 	extern MechS32 g_monoEnabled;
 	extern MechChar g_blankText[34];
-	extern MechS32 g_unk0x100a94a0;
 	extern MechS32 g_monoLastRow;
-	extern MechS32 g_unk0x100a94a8;
-	extern MechChar g_unk0x100a94ac[4];
 	extern MechS32 g_frameRateShown;
-	extern MechS32 g_unk0x100a94bc;
 	extern Point g_frameRateOrigin;
 	extern Point g_memInfoOrigin;
 	extern Point g_eyePositionOrigin;
@@ -39,10 +35,6 @@ extern "C"
 	extern MechS32 g_cacheInfoShown;
 	extern MechS32 g_showSpinner;
 	extern MechChar g_spinnerArrows[4];
-	extern MechS32 g_nextCacheDump;
-	extern MechS32 g_dumpCacheRepeat;
-	extern MechS32 g_unk0x100a9514;
-	extern MechS32 g_unk0x100a9518;
 	extern MechS32 g_frameRate;
 	extern MechS32 g_frameRateTenths;
 	extern MechS32 g_frameRateTime;

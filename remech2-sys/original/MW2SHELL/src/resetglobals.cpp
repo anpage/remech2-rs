@@ -61,7 +61,6 @@ static const struct {
 	RESET_GLOBAL(g_archiveLine),
 
 	// briefing.cpp
-	RESET_GLOBAL(g_unk0x10071cd8),
 	RESET_GLOBAL(g_briefingMenu),
 	RESET_GLOBAL(g_briefingPage),
 	RESET_GLOBAL(g_briefingPages),
@@ -103,7 +102,6 @@ static const struct {
 	RESET_GLOBAL(g_objectiveLine),
 	RESET_GLOBAL(g_careerHonor),
 	RESET_GLOBAL(g_pilotBeforeMission),
-	RESET_GLOBAL(g_unk0x10077fe0),
 	RESET_GLOBAL(g_missionResults),
 	RESET_GLOBAL(g_objectiveDescription),
 	RESET_GLOBAL(g_honorPoints),
@@ -164,7 +162,6 @@ static const struct {
 	RESET_GLOBAL(g_mechBayMenu),
 	RESET_GLOBAL(g_mechBayAmbience),
 	RESET_GLOBAL(g_mechBayWParam),
-	RESET_GLOBAL(g_unk0x1006178c),
 	RESET_GLOBAL(g_chassisVideoLeft),
 	RESET_GLOBAL(g_chassisVideoTop),
 	RESET_GLOBAL(g_pickingStarMech),
@@ -598,15 +595,12 @@ static const struct {
 	RESET_GLOBAL(g_textFont),
 	RESET_GLOBAL(g_titleFont),
 	RESET_GLOBAL(g_buttonFont),
-	RESET_GLOBAL(g_unk0x1007121c),
-	RESET_GLOBAL(g_unk0x10071220),
 	RESET_GLOBAL(g_archiveFont),
 	RESET_GLOBAL(g_bodyFont),
 	RESET_GLOBAL(g_mw2Database),
 	RESET_GLOBAL(g_projectArchive),
 	RESET_GLOBAL(g_midiAudio),
 	RESET_GLOBAL(g_digitalAudio),
-	RESET_GLOBAL(g_unk0x1007123c),
 	RESET_GLOBAL(g_runSim),
 	RESET_GLOBAL(g_movieOpenFlags),
 	RESET_GLOBAL(g_drawFmv),
@@ -641,8 +635,6 @@ static const struct {
 
 	// textglyph.cpp
 	RESET_GLOBAL(g_linkColorMap),
-	RESET_GLOBAL(g_unk0x10074758),
-	RESET_GLOBAL(g_unk0x10074858),
 
 	// textpages.cpp
 	RESET_GLOBAL(g_textPageColors),

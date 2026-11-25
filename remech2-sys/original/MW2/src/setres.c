@@ -49,8 +49,6 @@ void SetRes(void)
 		ScaleRectToScreen(&g_mainPixelBuffer, &g_cockpitGaugePanes[i], &g_cockpitGaugePanes[i]);
 	}
 
-	ScalePointFromLowRes(g_unk0x100a5bb8[3], g_unk0x100a5bb8[3]);
-	ScalePointToScreen(&g_mainPixelBuffer, g_unk0x100a5bb8[3], g_unk0x100a5bb8[3]);
 	for (i = 0; i < 6; i++) {
 		ScalePointFromLowRes(&g_hudGaugePositions[i], &g_hudGaugePositions[i]);
 		ScalePointToScreen(&g_mainPixelBuffer, &g_hudGaugePositions[i], &g_hudGaugePositions[i]);

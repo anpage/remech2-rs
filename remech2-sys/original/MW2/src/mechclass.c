@@ -63,14 +63,7 @@ MechS32 g_toggleMascRequested = 0;
 
 MechS32 g_mascEngaged = 0;
 
-MechS32 g_unk0x100a2bf4 = 0;
-
 MechS32 g_manualWeaponCycle = 0;
-
-// Set when the local mech lands while g_unk0x100a2c00 is on (UpdateMech).
-MechS32 g_unk0x100a2bfc = 0;
-
-MechS32 g_unk0x100a2c00 = 1;
 
 MechS32 g_localMechLost = 0;
 
@@ -507,9 +500,6 @@ void UpdateMech(Mech* p_mech)
 		if (height > mech->m_height) {
 			mech->m_player->m_animFlags &= ~1;
 			mech->m_player->m_animFlags |= 4;
-			if (isLocal && g_unk0x100a2c00) {
-				g_unk0x100a2bfc = 1;
-			}
 		}
 		else {
 			mech->m_player->m_animFlags &= ~4;

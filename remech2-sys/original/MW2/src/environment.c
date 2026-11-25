@@ -24,8 +24,6 @@ MechS32 g_gravity = 0x794;
 
 MechS32 g_gravityScale = 0x10000;
 
-MechS32 g_unk0x100ba608 = 0;
-
 MechS32 g_secondsPerDay = 86400;
 
 MechS32 g_daysPerYear = 365;

@@ -62,8 +62,6 @@ MechS32 g_groundColor = 0xef;
 // The horizon map's (LoadMapBitmap, from the world stream's hrzm record).
 MechS32 g_horizonMapColor = 0xea;
 
-MechS32 g_unk0x100a5558 = -1;
-
 void SetShapeCollisionType(Shape* p_shape, MechS32 p_collisionType)
 {
 	p_shape->m_collisionType = p_collisionType;

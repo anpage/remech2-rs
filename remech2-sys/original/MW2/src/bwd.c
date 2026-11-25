@@ -24,9 +24,6 @@ MechS32 g_streamsFromFiles = 0;
 // Set by a command-line switch: OpenBwdStream logs each stream it opens
 MechS32 g_logStreams = 0;
 
-// Only LogKeywordName's dead first store takes its address.
-MechChar g_unk0x10109c40[1];
-
 // Copies a BWD file from the buffer passed in from the shell
 static void* CopyLaunchBwd(const MechChar* p_name, MechS32* p_size)
 {
@@ -218,7 +215,6 @@ void LogKeywordName(MechU32 p_code)
 	MechChar line[256];
 	MechChar* name;
 
-	name = g_unk0x10109c40;
 	name = GetKeywordName(p_code);
 	sprintf(line, "%s, ", name);
 	LogDebugLine(line);

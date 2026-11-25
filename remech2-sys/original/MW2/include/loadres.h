@@ -34,17 +34,12 @@ extern "C"
 	void RebuildPurgeList(void);
 	void ShutdownResourceCache(void);
 	void InitializeResourceCache(void);
-	void FUN_10019da1(void);
 	ResourceCacheEntry* FindCacheEntry(MechS32 p_id, const char* p_type);
 	void FreeCacheEntry(ResourceCacheEntry* p_item);
 	void DumpResourceCache(void);
-	void FUN_1001a158(void);
 	void UnlockCachedResource(MechS32 p_id, const char* p_type);
 	void* LoadCachedResource(MechS32 p_file, MechS32 p_id, const char* p_type, undefined4 p_unk0x0c);
 	void FreeCachedResource(MechS32 p_id, const char* p_type);
-	void FUN_1001a521(undefined4 p_unk0x00);
-	undefined4 FUN_1001a52c(undefined4 p_unk0x00);
-	void* FUN_1001a53f(MechS32 p_id, const char* p_type);
 	MechS32 PurgeOldestCacheEntry(void);
 	void* MemAlloc(MechU32 p_size);
 	void* MemCopy(void* p_dst, const void* p_src, MechU32 p_size);

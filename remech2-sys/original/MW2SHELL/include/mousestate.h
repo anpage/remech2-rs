@@ -16,7 +16,6 @@ public:
 
 	void MoveCursorTo(MechS32 p_x, MechS32 p_y);
 	undefined GetDoubleClicked();
-	void FUN_1003a91c(undefined4);
 	undefined4 GetLeftPressed();
 	undefined4 GetRightPressed();
 	undefined4 GetMiddlePressed();

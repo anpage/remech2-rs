@@ -54,9 +54,6 @@ MechChar g_careerHonor[0x200];
 // The pilot as the mission found them, restored by a replay.
 PilotRecord g_pilotBeforeMission;
 
-// An identity color map (0 maps to 0xff) that BuildDebriefText builds and nothing reads.
-undefined g_unk0x10077fe0[0x100];
-
 MissionResult g_missionResults;
 
 MechChar g_objectiveDescription[0x80];
@@ -413,11 +410,6 @@ void BuildDebriefText(
 	MechS32 width;
 
 	strcpy(p_text, "");
-
-	g_unk0x10077fe0[0] = 0xff;
-	for (i = 1; i < 0x100; i++) {
-		g_unk0x10077fe0[i] = i;
-	}
 
 	for (i = 0; i < p_results->m_objectiveCount; i++) {
 		g_sortedObjectives[i] = &p_results->m_objectives[i];

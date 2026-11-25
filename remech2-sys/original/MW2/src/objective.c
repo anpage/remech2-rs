@@ -975,11 +975,6 @@ void RestartStarMission(MechS32 p_star)
 	mission->m_endTime = -1;
 }
 
-MechS32 FUN_1001cde1(undefined4 p_unk0x00)
-{
-	return 1;
-}
-
 // The target of team p_team's return objective (type 0x20), or else its first objective's
 // first target: the AI's "home" nav.
 MechU16 GetTeamHomeTarget(MechS32 p_team)

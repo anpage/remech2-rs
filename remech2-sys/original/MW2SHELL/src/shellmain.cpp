@@ -329,7 +329,6 @@ extern "C" int ShellMain(char* p_cmdLine)
 	if (*p_cmdLine == '\0') {
 		g_digitalAudio = 0;
 		g_midiAudio = 0;
-		g_unk0x1007123c = 0;
 		g_runSim = 0;
 	}
 	else if (strstr(p_cmdLine, "sim") != NULL) {
@@ -359,10 +358,6 @@ extern "C" int ShellMain(char* p_cmdLine)
 	g_titleFont = new Font(itemData, g_videoDriver);
 	g_mw2Database->GetDBItem(0x1c, &itemData, &itemSize);
 	g_buttonFont = new Font(itemData, g_videoDriver);
-	g_mw2Database->GetDBItem(0x1e, &itemData, &itemSize);
-	g_unk0x1007121c = new Font(itemData, g_videoDriver);
-	g_mw2Database->GetDBItem(0x1f, &itemData, &itemSize);
-	g_unk0x10071220 = new Font(itemData, g_videoDriver);
 	g_defaultFont = g_textFont;
 	g_mw2Database->GetDBItem(0x20, &itemData, &itemSize);
 	g_bodyFont = new Font(itemData, g_videoDriver);

@@ -22,10 +22,6 @@ const MechS32 g_wtbTag = 0x4f425457;
 
 MechS32 g_shapeLoadError = 0;
 
-MechS32 g_unk0x100ba660 = 0;
-
-MechS32 g_unk0x100ba664 = 0;
-
 MechS32 g_shapeOffsetX = 0;
 
 MechS32 g_shapeOffsetY = 0;
@@ -43,8 +39,6 @@ MechU32 g_shapeFlags = 0;
 MechU32 g_faceIdCount = 0;
 
 MechS32 g_subShapeCollisionType = 4;
-
-MechS32 g_unk0x100ba68c = 0;
 
 MechS32 g_shapeHasObject;
 
@@ -158,8 +152,6 @@ MechS32 LoadShapeRecord(MechU8* p_data, MechS32* p_offset, Shape** p_shape, Scen
 	if (!*p_shape) {
 		g_shapeHasObject = 0;
 		g_shapeHasKey = 0;
-		g_unk0x100ba660 = 0;
-		g_unk0x100ba664 = 0;
 	}
 
 	record = p_data + *p_offset;
@@ -174,20 +166,6 @@ MechS32 LoadShapeRecord(MechU8* p_data, MechS32* p_offset, Shape** p_shape, Scen
 	}
 	else if (header->m_flags & 0x1000) {
 		g_shapeHasKey = 1;
-	}
-
-	switch (header->m_flags & ~0x3000) {
-	case 1:
-		g_unk0x100ba660 = 0;
-		g_unk0x100ba664 = 1;
-		break;
-	case 2:
-		g_unk0x100ba664 = 0;
-		g_unk0x100ba660 = 1;
-		break;
-	default:
-		g_unk0x100ba660 = g_unk0x100ba664 = 0;
-		break;
 	}
 
 	if (header->m_name[0] > 0x80) {

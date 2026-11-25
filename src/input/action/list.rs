@@ -503,7 +503,6 @@ pub static ACTIONS: &[Action] = &[
     debug("toggle_heat_tracking", "TOGGLE_HEAT_TRACKING", 141),
     debug("toggle_lod_quality", "TOGGLE_LOD_QUALITY", 142),
     debug("dump_cache_once", "DUMP_CACHE_ONCE", 143),
-    debug("dump_cache_repeat", "DUMP_CACHE_REPEAT", 144),
     debug("toggle_framerate", "TOGGLE_FRAMERATE", 145),
     debug("crack_mode", "CRACK_MODE", 146),
     debug("toggle_eye_position", "TOGGLE_EYE_POSITION", 147),

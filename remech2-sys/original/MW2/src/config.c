@@ -911,18 +911,16 @@ MechS32 LoadHudFile(ResourceRef* p_ref)
 	return TRUE;
 }
 
-// Loads the cockpit layout resource p_ref: five rectangles into p_gauges, fifteen into p_panels
-// and a point.
-MechS32 LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels, Point* p_point)
+// Loads the cockpit layout resource p_ref: five rectangles into p_gauges and fifteen into p_panels
+MechS32 LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels)
 {
 	MechS32 size;
 	PANE* target;
 	MechS32 i;
 	CockpitFrame* frame;
 	void* data;
-	MechS16* value;
 
-	if (!p_gauges || !p_panels || !p_point) {
+	if (!p_gauges || !p_panels) {
 		return FALSE;
 	}
 
@@ -960,11 +958,6 @@ MechS32 LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels, Point* p
 		target++;
 	}
 
-	value = (MechS16*) frame;
-	p_point->m_x = *value;
-	value++;
-	p_point->m_y = *value;
-	value++;
 	if (p_ref->m_id == -1) {
 		MechHeapFree(g_primaryHeap, data);
 	}

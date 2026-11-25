@@ -15,7 +15,7 @@
 #pragma pack(1)
 struct MenuEntry {
 	MechChar* m_text;    // 0x00
-	MechPoint m_textPos;     // 0x04
+	MechPoint m_textPos; // 0x04
 	MechS32 m_bottom;    // 0x0c
 	Font* m_font;        // 0x10
 	undefined* m_colors; // 0x14
@@ -322,11 +322,6 @@ HitRect::HitRect(undefined4 p_left, undefined4 p_top, undefined4 p_right, undefi
 	m_top = p_top;
 	m_right = p_right;
 	m_bottom = p_bottom;
-}
-
-// Empty, and nothing in the original calls it: there is nothing to name it after.
-void HitRect::FUN_10049183()
-{
 }
 
 void HitRect::Draw(VideoDriver* p_videoDriver)

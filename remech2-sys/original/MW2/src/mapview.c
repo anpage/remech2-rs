@@ -82,7 +82,6 @@ void DrawMapViewScene(MechU32 p_flags)
 	}
 
 	DrawShapeList(g_sceneShapes);
-	FUN_10069591();
 }
 
 // Restores the eyepoint and the rendering settings BeginMapView saved.

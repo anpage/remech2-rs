@@ -319,14 +319,6 @@ void SetAnimDelay(MechS16 p_index, MechU16 p_delay)
 	g_animations[p_index].m_delay = p_delay;
 }
 
-void FUN_10069586(void)
-{
-}
-
-void FUN_10069591(void)
-{
-}
-
 void FreeAnimations(void)
 {
 	MechS32 j;

@@ -203,9 +203,6 @@ AudioSample* g_mechBayAmbience = NULL;
 // The wParam the screen was opened with.
 MechS32 g_mechBayWParam = c_msgScreenFrame;
 
-// Set to 1 when the mech bay closes; nothing reads it.
-MechS32 g_unk0x1006178c = 1;
-
 undefined4 g_chassisVideoLeft;
 
 undefined4 g_chassisVideoTop;
@@ -709,12 +706,6 @@ void UpdateSpeed()
 	g_variant.m_runningSpeed = (g_variant.m_walkingSpeed * 3 + 2) / 2;
 }
 
-// Empty. UpdateStats calls it after UpdateSpeed, so it is probably an update step whose body
-// was removed; nothing says which.
-void FUN_10008776()
-{
-}
-
 void UpdateHeatSinks()
 {
 	MechS32 count;
@@ -781,7 +772,6 @@ void UpdateStats()
 {
 	UpdateMass();
 	UpdateSpeed();
-	FUN_10008776();
 }
 
 void UpdateWeaponMass()
