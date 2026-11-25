@@ -131,6 +131,8 @@ struct Compiled {
     counter: Option<(Option<usize>, i64)>,
     /// Whether the binding was engaged and its input held last frame
     was_active: bool,
+    /// Held since it was unavailable and ignored until pressed again
+    stale: bool,
     toggled: bool,
     waiting: Option<Option<f64>>,
 }
@@ -493,12 +495,19 @@ fn stick_counts(binding: &mut Compiled, value: Option<f64>) -> bool {
 }
 
 fn digital(binding: &mut Compiled, status: &Status, engaged: bool) -> (bool, u32) {
-    if !engaged {
+    let pulses = status.delta.max(0) as u32;
+
+    if (!status.available || status.blocked) && status.held {
+        binding.stale = true;
+    } else if !status.held || pulses > 0 {
+        binding.stale = false;
+    }
+
+    if !engaged || binding.stale {
         binding.was_active = (!status.available || status.blocked) && status.held;
         return (false, 0);
     }
 
-    let pulses = status.delta.max(0) as u32;
     let active = status.held || pulses > 0;
     let rising = active && !binding.was_active;
     binding.was_active = status.held;
@@ -728,6 +737,7 @@ fn compile(binding: &Binding, slots: &[String]) -> Result<Compiled, String> {
         tuning: binding.tuning.clone(),
         counter: None,
         was_active: true,
+        stale: false,
         toggled: false,
         waiting: None,
     })
