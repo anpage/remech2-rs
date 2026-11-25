@@ -121,6 +121,8 @@ struct Compiled {
     action: ActionId,
     trigger: Input,
     modifiers: Vec<Input>,
+    /// Only fires when exactly the correct modifiers are held
+    exact_modifiers: bool,
     /// Bindings on the same input that win over this one
     outranked_by: Vec<usize>,
     role: Role,
@@ -148,6 +150,7 @@ struct Status {
     value: Option<f64>,
     available: bool,
     chord: bool,
+    blocked: bool,
 }
 
 #[derive(Clone, Copy, Default)]
@@ -256,23 +259,31 @@ impl Evaluator {
                 let motion = matches!(binding.trigger, Input::MouseAxis(_));
                 let delta = take_delta(&mut binding.counter, reading.counter, motion);
                 let typed = matches!(binding.trigger, Input::Key(_) | Input::Modifier(_));
+
                 // An open menu takes the digits
                 let menu_digit =
                     context.menu && matches!(binding.trigger, Input::Key(key) if key.is_digit());
+
                 let available = binding.action.action().availability.includes(context)
                     && !(frame.typing && typed)
                     && !menu_digit;
+
+                let blocked = binding.exact_modifiers && extra_modifier_held(binding, frame.kbm);
+
                 let chord = available
                     && binding
                         .modifiers
                         .iter()
-                        .all(|modifier| read(modifier, frame.kbm, &devices).held);
+                        .all(|modifier| read(modifier, frame.kbm, &devices).held)
+                    && !blocked;
+
                 Status {
                     held: reading.held,
                     delta,
                     value: reading.value,
                     available,
                     chord,
+                    blocked,
                 }
             })
             .collect();
@@ -442,6 +453,30 @@ fn outranks(a: &[Input], b: &[Input]) -> bool {
     a.len() > b.len() && b.iter().all(|input| a.contains(input))
 }
 
+/// Whether the binding's trigger or chord matches `modifier`
+fn uses_modifier(binding: &Compiled, modifier: Modifier) -> bool {
+    let [left, right] = modifier.keys();
+
+    std::iter::once(&binding.trigger)
+        .chain(&binding.modifiers)
+        .any(|input| match *input {
+            Input::Modifier(used) => used == modifier,
+            Input::Key(key) => key == left || key == right,
+            _ => false,
+        })
+}
+
+/// Whether a non-matching modifier is held
+fn extra_modifier_held(binding: &Compiled, kbm: &KbmState) -> bool {
+    Modifier::ALL.into_iter().any(|modifier| {
+        !uses_modifier(binding, modifier)
+            && modifier
+                .keys()
+                .iter()
+                .any(|key| kbm.keys_held.contains(key))
+    })
+}
+
 fn stick_counts(binding: &mut Compiled, value: Option<f64>) -> bool {
     let Some(start) = binding.waiting else {
         return true;
@@ -459,13 +494,15 @@ fn stick_counts(binding: &mut Compiled, value: Option<f64>) -> bool {
 
 fn digital(binding: &mut Compiled, status: &Status, engaged: bool) -> (bool, u32) {
     if !engaged {
-        binding.was_active = !status.available && status.held;
+        binding.was_active = (!status.available || status.blocked) && status.held;
         return (false, 0);
     }
+
     let pulses = status.delta.max(0) as u32;
     let active = status.held || pulses > 0;
     let rising = active && !binding.was_active;
     binding.was_active = status.held;
+
     (active, pulses.max(u32::from(rising)))
 }
 
@@ -678,10 +715,14 @@ fn compile(binding: &Binding, slots: &[String]) -> Result<Compiled, String> {
         }
     };
 
+    let exact_modifiers =
+        matches!(trigger, Input::Key(_)) && matches!(action.action().kind, ActionKind::OneShot);
+
     Ok(Compiled {
         action,
         trigger,
         modifiers,
+        exact_modifiers,
         outranked_by: Vec::new(),
         role,
         tuning: binding.tuning.clone(),
