@@ -1,7 +1,6 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 
-#include "decomp.h"
 #include "types.h"
 
 typedef struct TimeOfDayPhase {
@@ -35,8 +34,8 @@ extern "C"
 	void FirstEnvironment(void);
 	void UpdateTimeOfDay(void);
 	void FadeToTimeOfDayPhase(int32_t p_index);
-	int32_t IsInfraredOn(undefined4 p_unk0x00);
-	void SetInfrared(undefined4 p_unk0x00, int32_t p_state);
+	int32_t IsInfraredOn(uint32_t p_unk0x00);
+	void SetInfrared(uint32_t p_unk0x00, int32_t p_state);
 	void QuadrupleMechCooling(void);
 	void QuarterMechCooling(void);
 

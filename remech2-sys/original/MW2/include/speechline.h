@@ -1,7 +1,6 @@
 #ifndef SPEECHLINE_H
 #define SPEECHLINE_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A voice message: the sound resource and the text shown without digital sound.

@@ -1,7 +1,6 @@
 #ifndef NETLAUNCHINFO_H
 #define NETLAUNCHINFO_H
 
-#include "decomp.h"
 #include "dplay.h"
 #include "types.h"
 

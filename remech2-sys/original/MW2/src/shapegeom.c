@@ -5,7 +5,6 @@
 #include "shapegeom.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "face.h"
 #include "portable.h"
 #include "ray.h"

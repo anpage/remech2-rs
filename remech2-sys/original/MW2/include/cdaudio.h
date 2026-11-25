@@ -1,7 +1,6 @@
 #ifndef CDAUDIO_H
 #define CDAUDIO_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The mission's music, implemented on the Rust side (src/sim/cd_audio.rs). The original played

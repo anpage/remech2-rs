@@ -1,7 +1,6 @@
 #ifndef WEAPONDEF_H
 #define WEAPONDEF_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A weapon type, from the table of weapon definitions (g_weaponDefs: LLASER, MLASER, ...).

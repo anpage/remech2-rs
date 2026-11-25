@@ -2,7 +2,6 @@
    HashName, and the directory the files are read from. */
 #include "missionaudio.h"
 
-#include "decomp.h"
 #include "error.h"
 #include "files.h"
 #include "namehash.h"

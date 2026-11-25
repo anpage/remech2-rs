@@ -1,7 +1,6 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
-#include "decomp.h"
 #include "types.h"
 
 /* A 2.29 fixed-point transform: three rotation rows and a translation row
@@ -48,7 +47,7 @@ extern "C"
 		int32_t p_y,
 		int32_t p_z
 	);
-	void GetMatrixAngles(Matrix* p_matrix, undefined4* p_angleX, undefined4* p_angleY, undefined4* p_angleZ);
+	void GetMatrixAngles(Matrix* p_matrix, uint32_t* p_angleX, uint32_t* p_angleY, uint32_t* p_angleZ);
 
 #ifdef __cplusplus
 }

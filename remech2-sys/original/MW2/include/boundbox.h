@@ -1,7 +1,6 @@
 #ifndef BOUNDBOX_H
 #define BOUNDBOX_H
 
-#include "decomp.h"
 #include "shape.h"
 #include "types.h"
 

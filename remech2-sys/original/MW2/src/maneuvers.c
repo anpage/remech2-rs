@@ -5,7 +5,6 @@
 #include "approxlen.h"
 #include "clock.h"
 #include "collision.h"
-#include "decomp.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"
 #include "geocache.h"

@@ -5,7 +5,6 @@
 #include "clock.h"
 #include "cockpitpanel.h"
 #include "config.h"
-#include "decomp.h"
 #include "fixeddiv.h"
 #include "mech.h"
 #include "palette.h"
@@ -127,12 +126,12 @@ void FadeToTimeOfDayPhase(int32_t p_phase)
 	}
 }
 
-int32_t IsInfraredOn(undefined4 p_unk0x00)
+int32_t IsInfraredOn(uint32_t p_unk0x00)
 {
 	return g_infraredOn;
 }
 
-void SetInfrared(undefined4 p_unk0x00, int32_t p_state)
+void SetInfrared(uint32_t p_unk0x00, int32_t p_state)
 {
 	if (g_infraredOn != p_state) {
 		if (p_state == 1) {

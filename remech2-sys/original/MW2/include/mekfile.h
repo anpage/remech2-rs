@@ -6,7 +6,6 @@ struct MekHeader;
 struct MekWeapon;
 struct Mech;
 
-#include "decomp.h"
 #include "types.h"
 
 // The functions and globals of mekfile.c that other units use.

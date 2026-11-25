@@ -16,7 +16,6 @@
 #include "config.h"
 #include "debris.h"
 #include "debugprint.h"
-#include "decomp.h"
 #include "displaybackend.h"
 #include "dorcs.h"
 #include "effectinfo.h"

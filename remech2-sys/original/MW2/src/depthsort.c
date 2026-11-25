@@ -4,7 +4,6 @@
 #include "depthsort.h"
 
 #include "crossdiv.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "face.h"
 #include "fixedmul.h"

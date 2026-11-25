@@ -1,7 +1,6 @@
 #ifndef OBJECTIVE_H
 #define OBJECTIVE_H
 
-#include "decomp.h"
 #include "starmission.h"
 #include "types.h"
 

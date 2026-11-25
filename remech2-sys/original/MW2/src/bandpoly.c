@@ -1,7 +1,6 @@
 #include "bandpoly.h"
 
 #include "animation.h"
-#include "decomp.h"
 #include "palette.h"
 #include "polydraw.h"
 #include "types.h"
@@ -139,7 +138,7 @@ int32_t DrawBand(uint32_t p_color, int32_t p_count, int32_t* p_points, int32_t p
 	return dx;
 }
 
-int32_t DrawBandWithFlash(undefined4 p_unk0x00, int32_t p_unk0x04, undefined4* p_unk0x08)
+int32_t DrawBandWithFlash(uint32_t p_unk0x00, int32_t p_unk0x04, uint32_t* p_unk0x08)
 {
 	int32_t result;
 

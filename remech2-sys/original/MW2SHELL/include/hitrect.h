@@ -1,14 +1,13 @@
 #ifndef HITRECT_H
 #define HITRECT_H
 
-#include "decomp.h"
 #include "types.h"
 
 class VideoDriver;
 
 class HitRect {
 public:
-	HitRect(undefined4 p_left, undefined4 p_top, undefined4 p_right, undefined4 p_bottom);
+	HitRect(uint32_t p_left, uint32_t p_top, uint32_t p_right, uint32_t p_bottom);
 	void Draw(VideoDriver* p_videoDriver);
 	uint8_t Contains(int32_t p_x, int32_t p_y);
 

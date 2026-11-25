@@ -1,6 +1,5 @@
 #include "settings.h"
 
-#include "decomp.h"
 #include "environment.h"
 #include "gamekeys.h"
 #include "hud.h"

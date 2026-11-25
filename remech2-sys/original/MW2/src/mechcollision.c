@@ -5,7 +5,6 @@
 #include "collision.h"
 #include "config.h"
 #include "debris.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"

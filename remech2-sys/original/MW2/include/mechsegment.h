@@ -1,7 +1,6 @@
 #ifndef MECHSEGMENT_H
 #define MECHSEGMENT_H
 
-#include "decomp.h"
 #include "types.h"
 
 struct SceneObject;
@@ -14,7 +13,7 @@ typedef struct MechSegment {
 	struct SceneObject* m_obj;         // 0x08
 	struct SceneObject* m_parent;      // 0x0c
 	int32_t m_position[3];             // 0x10
-	undefined4 m_rotation[3];          // 0x1c
+	uint32_t m_rotation[3];            // 0x1c
 } MechSegment;
 
 #endif // MECHSEGMENT_H

@@ -3,7 +3,6 @@
 
 #include "audiosample.h"
 #include "buttonmenu.h"
-#include "decomp.h"
 #include "mechchassis.h"
 #include "screenfield.h"
 #include "tmpackdatabase.h"
@@ -29,7 +28,7 @@ struct Weapon {
 	int32_t m_mediumRange;  // 0x10 — -1 for none
 	int32_t m_range;        // 0x14 — -1 for none
 	int32_t m_mass;         // 0x18
-	undefined4 m_criticals; // 0x1c — critical slots it takes
+	uint32_t m_criticals;   // 0x1c — critical slots it takes
 	int32_t m_ammoPerTon;   // 0x20 — rounds per ton of ammo, 0 for weapons without ammo
 	char* m_name;           // 0x24
 };
@@ -55,7 +54,7 @@ struct MekLocation {
 	int32_t m_internal;   // 0x08
 	uint16_t m_items[12]; // 0x0c — item ids, ammunition as g_mekAmmo ids
 	int16_t m_slotCount;  // 0x24 — 12, or 6 for the head and legs
-	undefined2 m_unk0x26; // 0x26 — always 1 in a saved .mek file, never read
+	uint16_t m_unk0x26;   // 0x26 — always 1 in a saved .mek file, never read
 };
 
 // The header of a .mek file.
@@ -171,8 +170,8 @@ extern char g_wolfChassisVideo[8];
 extern char g_jadeFalconChassisVideo[8];
 extern char g_trialChassisVideo[8];
 extern char* g_chassisVideoFormat;
-extern undefined4 g_chassisVideoLeft;
-extern undefined4 g_chassisVideoTop;
+extern uint32_t g_chassisVideoLeft;
+extern uint32_t g_chassisVideoTop;
 extern char g_userMekName[0x20];
 extern char g_callsignLine[0x80];
 extern char g_tempBuffer[0x100];
@@ -183,11 +182,11 @@ extern char g_mekVariantName[0x32];
 extern MekItem g_mekWeapons[10];
 extern int32_t g_mechBayMessage;
 extern char g_variantFileName[0x20];
-extern undefined g_mekFileBuffer[0x800];
+extern uint8_t g_mekFileBuffer[0x800];
 extern MekLocation g_mekLocations[8];
-extern undefined g_warningColors[0x100];
-extern undefined g_activeColors[0x100];
-extern undefined g_textColors[0x100];
+extern uint8_t g_warningColors[0x100];
+extern uint8_t g_activeColors[0x100];
+extern uint8_t g_textColors[0x100];
 extern char g_mekPath[0x20];
 extern ScreenField g_heatSinkFields[10];
 extern ScreenField g_jumpJetFields[8];

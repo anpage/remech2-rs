@@ -1,7 +1,6 @@
 #include "supanim.h"
 
 #include "debugprint.h"
-#include "decomp.h"
 #include "displaybackend.h"
 #include "files.h"
 #include "network.h"

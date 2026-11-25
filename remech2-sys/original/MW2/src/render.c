@@ -3,7 +3,6 @@
 #include "animation.h"
 #include "cockpit.h"
 #include "collision.h"
-#include "decomp.h"
 #include "depthsort.h"
 #include "displaybackend.h"
 #include "error.h"

@@ -1,7 +1,6 @@
 #ifndef AUDIOSUBSYSTEM_H
 #define AUDIOSUBSYSTEM_H
 
-#include "decomp.h"
 #include "shellaudio.h"
 #include "types.h"
 

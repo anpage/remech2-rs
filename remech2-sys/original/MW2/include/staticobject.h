@@ -2,7 +2,6 @@
 #define STATICOBJECT_H
 
 #include "callbacks.h"
-#include "decomp.h"
 #include "shape.h"
 #include "transform.h"
 #include "types.h"
@@ -18,7 +17,7 @@ typedef struct StaticObject {
 	int32_t m_block;              // 0x04 — block, -1: none
 	int32_t m_parent;             // 0x08 — parent entry; -1: none, -2: a shape only
 	uint32_t m_flags;             // 0x0c — bits 0-8: flags; 12-15: kind
-	undefined4 m_shapeKind;       // 0x10 — the kind its shape gets (0x200 once a game thing owns it)
+	uint32_t m_shapeKind;         // 0x10 — the kind its shape gets (0x200 once a game thing owns it)
 	int32_t m_replacement;        // 0x14 — LinkStaticObjectThing
 	int32_t m_thing;              // 0x18 — an index into g_gameThings, -1: none
 	Shape* m_shape;               // 0x1c

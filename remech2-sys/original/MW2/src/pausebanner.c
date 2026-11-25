@@ -5,7 +5,6 @@
 #include "audio.h"
 #include "config.h"
 #include "debugbreak.h"
-#include "decomp.h"
 #include "environment.h"
 #include "eyepoint.h"
 #include "faceshade.h"

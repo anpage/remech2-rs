@@ -2,7 +2,6 @@
 
 #include "commandmenu.h"
 #include "commandpointmenu.h"
-#include "decomp.h"
 #include "dorcs.h"
 #include "fixeddiv.h"
 #include "inputmap.h"
@@ -45,7 +44,7 @@ MenuDefinition* g_menuDefinitions[11] = {
 	NULL,
 };
 
-undefined g_textColors[0x100];
+uint8_t g_textColors[0x100];
 
 int32_t g_openMenuCount;
 

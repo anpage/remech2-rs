@@ -1,7 +1,6 @@
 #ifndef FORMATION_H
 #define FORMATION_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A star formation: the positions of its three mechs and its name.

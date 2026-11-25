@@ -1,7 +1,6 @@
 #ifndef WINDOWSTATE_H
 #define WINDOWSTATE_H
 
-#include "decomp.h"
 #include "heap.h"
 #include "types.h"
 

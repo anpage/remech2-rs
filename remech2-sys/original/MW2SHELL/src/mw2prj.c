@@ -1,6 +1,5 @@
 #include "mw2prj.h"
 
-#include "decomp.h"
 #include "prjfile.h"
 #include "resourcecache.h"
 #include "resourcefile.h"
@@ -9,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void* Mw2PrjAlloc(undefined4 p_size);
+void* Mw2PrjAlloc(uint32_t p_size);
 void Mw2PrjFree(void* p_mem);
 
 // Resource type tags in the mw2.prj archive and their file extensions.
@@ -53,7 +52,7 @@ void ShutdownMw2Prj(void)
 	CloseArchive(g_mw2PrjHandle);
 }
 
-void* Mw2PrjAlloc(undefined4 p_size)
+void* Mw2PrjAlloc(uint32_t p_size)
 {
 	return AllocateMemory(p_size);
 }

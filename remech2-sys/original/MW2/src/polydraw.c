@@ -3,7 +3,6 @@
 #include "animation.h"
 #include "bandpoly.h"
 #include "collision.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "fixeddivu.h"
 #include "fixedmul.h"

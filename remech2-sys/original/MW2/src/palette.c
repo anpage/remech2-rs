@@ -1,7 +1,6 @@
 #include "palette.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "fixeddiv.h"
 #include "loadres.h"
 #include "mw2prj.h"

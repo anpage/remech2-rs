@@ -1,6 +1,5 @@
 #include "texpoly.h"
 
-#include "decomp.h"
 #include "polydraw.h"
 #include "types.h"
 #include "vfxrend.h"

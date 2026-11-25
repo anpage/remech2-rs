@@ -1,7 +1,6 @@
 #ifndef RESOURCENAME_H
 #define RESOURCENAME_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The functions and globals of resourcename.c that other units use.

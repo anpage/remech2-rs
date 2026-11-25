@@ -4,7 +4,6 @@
 #include "clock.h"
 #include "cockpitpanel.h"
 #include "config.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "fadepal.h"
 #include "fixedmul29.h"

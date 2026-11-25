@@ -1,7 +1,6 @@
 #ifndef TOKENSTREAM_H
 #define TOKENSTREAM_H
 
-#include "decomp.h"
 #include "types.h"
 
 #include <stdio.h>

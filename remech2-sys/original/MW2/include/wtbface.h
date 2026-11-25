@@ -1,7 +1,6 @@
 #ifndef WTBFACE_H
 #define WTBFACE_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A face of a shape record (WtbHeader): 0x0c bytes with up to four vertex indices, 0x12 with

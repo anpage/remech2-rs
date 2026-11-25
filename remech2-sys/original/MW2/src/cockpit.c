@@ -8,7 +8,6 @@
 #include "cockpitreadout.h"
 #include "collision.h"
 #include "config.h"
-#include "decomp.h"
 #include "environment.h"
 #include "eyepoint.h"
 #include "face.h"
@@ -60,7 +59,7 @@ void (*g_savedFrameDrawCallback)(void) = DrawScene;
 
 int32_t g_savedShowCrosshair = 1;
 
-undefined4 g_savedShowHud = 1;
+uint32_t g_savedShowHud = 1;
 
 int32_t g_savedShowTargetMarker = 1;
 

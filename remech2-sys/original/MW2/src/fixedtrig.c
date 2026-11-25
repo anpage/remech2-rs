@@ -3,7 +3,6 @@
 #include "fixedtrig.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "portable.h"
 #include "types.h"
 

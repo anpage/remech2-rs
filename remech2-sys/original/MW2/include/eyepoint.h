@@ -1,7 +1,6 @@
 #ifndef EYEPOINT_H
 #define EYEPOINT_H
 
-#include "decomp.h"
 #include "ramp.h"
 #include "savedview.h"
 #include "transform.h"
@@ -72,7 +71,7 @@ extern "C"
 	extern int32_t g_zoomFov;
 	extern int32_t g_requestedViewMode;
 	extern int32_t g_initialViewMode;
-	extern undefined4 g_inCockpitView;
+	extern uint32_t g_inCockpitView;
 	extern int32_t g_lostViewMode;
 	extern int32_t g_spectating;
 	extern struct Player* g_localPlayer;

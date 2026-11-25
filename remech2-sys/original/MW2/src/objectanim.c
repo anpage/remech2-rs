@@ -8,7 +8,6 @@
 #include "classtable.h"
 #include "clock.h"
 #include "config.h"
-#include "decomp.h"
 #include "depthsort.h"
 #include "face.h"
 #include "fixeddiv.h"

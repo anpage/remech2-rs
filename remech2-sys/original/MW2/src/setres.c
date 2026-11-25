@@ -2,7 +2,6 @@
 
 #include "cockpit.h"
 #include "config.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"

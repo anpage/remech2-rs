@@ -1,7 +1,6 @@
 #ifndef PALCYCLE_H
 #define PALCYCLE_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A palette colour cycle (palette.c's g_paletteCycle): the palette it started from, a working

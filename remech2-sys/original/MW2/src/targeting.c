@@ -2,7 +2,6 @@
 
 #include "cockpit.h"
 #include "cockpitreadout.h"
-#include "decomp.h"
 #include "fixeddiv29.h"
 #include "fixedtrig.h"
 #include "gamething.h"

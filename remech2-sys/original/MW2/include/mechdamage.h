@@ -1,7 +1,6 @@
 #ifndef MECHDAMAGE_H
 #define MECHDAMAGE_H
 
-#include "decomp.h"
 #include "types.h"
 
 struct Mech;

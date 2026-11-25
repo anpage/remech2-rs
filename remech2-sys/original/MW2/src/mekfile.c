@@ -1,7 +1,6 @@
 #include "mekfile.h"
 
 #include "config.h"
-#include "decomp.h"
 #include "error.h"
 #include "files.h"
 #include "fixeddiv.h"

@@ -59,7 +59,7 @@ uint32_t g_typeOwed;
 Page::Page(
 	Font* p_font,
 	VideoDriver* p_videoDriver,
-	undefined* p_colors,
+	uint8_t* p_colors,
 	int32_t p_left,
 	int32_t p_top,
 	int32_t p_width,
@@ -506,7 +506,7 @@ void Page::Hide()
 	}
 }
 
-void Page::SetBanner(undefined* p_data, int32_t p_size)
+void Page::SetBanner(uint8_t* p_data, int32_t p_size)
 {
 	m_banner = new PopupPicture(p_data, p_size, m_videoDriver, 0, 0, m_sample);
 }

@@ -1,7 +1,6 @@
 #ifndef EFFECTINFO_H
 #define EFFECTINFO_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The properties of an effect type (g_effectInfo).

@@ -1,7 +1,6 @@
 #ifndef SOUNDINFO_H
 #define SOUNDINFO_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The playback limits of one sound resource, from the table InitSoundInfo unpacks; -1 is unset.

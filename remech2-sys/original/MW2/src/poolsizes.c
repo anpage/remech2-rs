@@ -6,7 +6,6 @@
 #include "bwdrecord.h"
 #include "bwdstreamkey.h"
 #include "callbacks.h"
-#include "decomp.h"
 #include "error.h"
 #include "geocache.h"
 #include "includerecord.h"

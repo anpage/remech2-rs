@@ -1,7 +1,6 @@
 #include "fixedsqrt.h"
 
 #include "approxlen.h"
-#include "decomp.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"
 #include "sqrtguess.h"

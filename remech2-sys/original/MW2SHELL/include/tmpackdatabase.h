@@ -2,7 +2,6 @@
 #define TMPACKDATABASE_H
 
 #include "collection.h"
-#include "decomp.h"
 #include "types.h"
 
 #include <stdio.h>
@@ -15,11 +14,11 @@ class TMPackDataBase {
 public:
 	class TMPackDBEntry {
 	public:
-		TMPackDBEntry(undefined4 p_offset, undefined4 p_size);
+		TMPackDBEntry(uint32_t p_offset, uint32_t p_size);
 		~TMPackDBEntry();
 
-		undefined4 m_offset; // 0x00
-		undefined4 m_size;   // 0x04
+		uint32_t m_offset; // 0x00
+		uint32_t m_size;   // 0x04
 	};
 
 	TMPackDataBase(char* p_name);

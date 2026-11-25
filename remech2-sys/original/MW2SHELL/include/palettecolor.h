@@ -1,7 +1,6 @@
 #ifndef PALETTECOLOR_H
 #define PALETTECOLOR_H
 
-#include "decomp.h"
 #include "types.h"
 
 #pragma pack(1)

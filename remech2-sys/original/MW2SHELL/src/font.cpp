@@ -41,7 +41,7 @@ int32_t Font::GetCharacterWidth(int32_t p_char)
 }
 
 // Draws p_text and keeps its glyph among the glyphs drawn under the videos.
-TextGlyph* Font::AddText(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors)
+TextGlyph* Font::AddText(int32_t p_left, int32_t p_top, char* p_text, uint8_t* p_colors)
 {
 	TextGlyph* glyph;
 
@@ -56,7 +56,7 @@ TextGlyph* Font::AddText(int32_t p_left, int32_t p_top, char* p_text, undefined*
 }
 
 // Draws p_text and keeps its glyph among the glyphs drawn over the videos.
-TextGlyph* Font::AddOverlayText(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors)
+TextGlyph* Font::AddOverlayText(int32_t p_left, int32_t p_top, char* p_text, uint8_t* p_colors)
 {
 	TextGlyph* glyph;
 
@@ -71,7 +71,7 @@ TextGlyph* Font::AddOverlayText(int32_t p_left, int32_t p_top, char* p_text, und
 }
 
 // Like AddText, but starts typing the text out (TextGlyph::TypeStep) instead of drawing it whole.
-TextGlyph* Font::AddTypedText(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors)
+TextGlyph* Font::AddTypedText(int32_t p_left, int32_t p_top, char* p_text, uint8_t* p_colors)
 {
 	TextGlyph* glyph;
 
@@ -81,18 +81,18 @@ TextGlyph* Font::AddTypedText(int32_t p_left, int32_t p_top, char* p_text, undef
 	return glyph;
 }
 
-int32_t Font::DrawString(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors)
+int32_t Font::DrawString(int32_t p_left, int32_t p_top, char* p_text, uint8_t* p_colors)
 {
 	return m_videoDriver->DrawString(p_left, p_top, m_data, p_text, p_colors);
 }
 
-int32_t Font::DrawChar(int32_t p_left, int32_t p_top, int32_t p_char, undefined* p_colors)
+int32_t Font::DrawChar(int32_t p_left, int32_t p_top, int32_t p_char, uint8_t* p_colors)
 {
 	return m_videoDriver->DrawChar(p_left, p_top, m_data, p_char, p_colors);
 }
 
 // Text entry: m_typedRight holds the right edge of each typed character, m_typedCount their count.
-void Font::TypeKey(int32_t p_left, int32_t p_top, int32_t p_key, undefined* p_colors)
+void Font::TypeKey(int32_t p_left, int32_t p_top, int32_t p_key, uint8_t* p_colors)
 {
 	int32_t width;
 	int32_t x;

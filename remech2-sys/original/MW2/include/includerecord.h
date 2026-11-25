@@ -2,7 +2,6 @@
 #define INCLUDERECORD_H
 
 #include "bwdrecord.h"
-#include "decomp.h"
 #include "types.h"
 
 // An include record: the stream to run, by id or name.

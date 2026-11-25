@@ -4,7 +4,6 @@
 #include "camerashake.h"
 #include "clock.h"
 #include "debris.h"
-#include "decomp.h"
 #include "depthsort.h"
 #include "displaybackend.h"
 #include "eyepoint.h"
@@ -30,7 +29,7 @@
 #include "view.h"
 
 // The launch sound of the local player's weapon, in the cockpit (p_shotType is unused).
-void PlayWeaponLaunchSound(undefined4 p_shotType, int32_t p_sound, undefined4 p_pan)
+void PlayWeaponLaunchSound(uint32_t p_shotType, int32_t p_sound, uint32_t p_pan)
 {
 	if (p_sound > 0) {
 		PlayDelayedSound(0, 0, p_sound, 0x32, p_pan, 0x32);

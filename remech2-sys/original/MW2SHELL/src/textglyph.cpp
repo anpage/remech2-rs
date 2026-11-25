@@ -1,6 +1,5 @@
 #include "textglyph.h"
 
-#include "decomp.h"
 #include "font.h"
 #include "menudata.h"
 #include "stringutil.h"
@@ -14,7 +13,7 @@
 
 // Color remap tables for Font text. The first colors a link word, from its "\A" escape to the
 // next space.
-undefined g_linkColorMap[256] = {0xff, 1};
+uint8_t g_linkColorMap[256] = {0xff, 1};
 
 void InitTextColorMaps()
 {
@@ -28,7 +27,7 @@ void InitTextColorMaps()
 	g_linkColorMap[1] = 1;
 }
 
-void TextGlyph::SetTyped(undefined4 p_typed)
+void TextGlyph::SetTyped(uint32_t p_typed)
 {
 	m_typed = p_typed;
 }
@@ -159,7 +158,7 @@ uint8_t TextGlyph::TypeStep()
 	return DrawNextChar();
 }
 
-TextGlyph::TextGlyph(char* p_text, int32_t p_left, int32_t p_top, undefined* p_colors, Font* p_font)
+TextGlyph::TextGlyph(char* p_text, int32_t p_left, int32_t p_top, uint8_t* p_colors, Font* p_font)
 {
 	m_font = p_font;
 	m_videoDriver = p_font->m_videoDriver;

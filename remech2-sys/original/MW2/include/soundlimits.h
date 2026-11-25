@@ -1,7 +1,6 @@
 #ifndef SOUNDLIMITS_H
 #define SOUNDLIMITS_H
 
-#include "decomp.h"
 #include "types.h"
 
 // An entry of the sound table InitSoundInfo unpacks into g_soundInfo.

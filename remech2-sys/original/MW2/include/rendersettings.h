@@ -1,7 +1,6 @@
 #ifndef RENDERSETTINGS_H
 #define RENDERSETTINGS_H
 
-#include "decomp.h"
 #include "types.h"
 
 struct Face;
@@ -14,7 +13,7 @@ typedef struct RenderSettings {
 	int32_t m_blankScene;              // 0x00 — the frame draw callback only clears the pane
 	int32_t m_gouraud;                 // 0x04 — DrawScenePolygon blends shaded polygons (VFX_dithered_Gouraud_polygon)
 	int32_t m_textures;                // 0x0c — DrawScenePolygon draws textured polygons
-	undefined4 m_flags;                // 0x10 — 1: bands are filled (DrawBandPolygon); FirstRender sets 8
+	uint32_t m_flags;                  // 0x10 — 1: bands are filled (DrawBandPolygon); FirstRender sets 8
 	int32_t m_drawLines;               // 0x14 — two-point polygons are drawn as lines
 	int32_t m_drawPixels;              // 0x18 — one-point polygons are drawn as pixels
 	int32_t m_drawSky;                 // 0x1c — the planet's sky (DrawSkyAndGround)
@@ -28,7 +27,7 @@ typedef struct RenderSettings {
 									   // collision type (1) or flags (2) (COLLISION_WIREFRAME)
 	int32_t m_distanceFade;            // 0x3c — set with a fade distance, cleared while an effect lights
 									   // the scene
-	undefined4 m_greyscale;            // 0x40
+	uint32_t m_greyscale;              // 0x40
 	int32_t m_fadeDistance;            // 0x44 — shades dim with the distance over it (ComputeShade)
 	int32_t m_affineTextures;          // 0x4c — textures without perspective correction (low display
 									   // detail)

@@ -2,7 +2,6 @@
 #define SHOTS_H
 
 #include "careerrecord.h"
-#include "decomp.h"
 #include "effect.h"
 #include "object.h"
 #include "types.h"

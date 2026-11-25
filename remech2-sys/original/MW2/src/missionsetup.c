@@ -1,6 +1,5 @@
 #include "missionsetup.h"
 
-#include "decomp.h"
 #include "error.h"
 #include "missiontable.h"
 #include "objective.h"

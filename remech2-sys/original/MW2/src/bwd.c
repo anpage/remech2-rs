@@ -3,7 +3,6 @@
 #include "bwdkeywords.h"
 #include "bwdstreamkey.h"
 #include "config.h"
-#include "decomp.h"
 #include "error.h"
 #include "files.h"
 #include "loadres.h"

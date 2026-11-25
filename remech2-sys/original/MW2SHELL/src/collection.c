@@ -1,6 +1,5 @@
 #include "collection.h"
 
-#include "decomp.h"
 #include "types.h"
 #include "windowstate.h"
 

@@ -1,7 +1,6 @@
 #ifndef REMEMBEREDMECH_H
 #define REMEMBEREDMECH_H
 
-#include "decomp.h"
 #include "types.h"
 
 #pragma pack(push, 1)

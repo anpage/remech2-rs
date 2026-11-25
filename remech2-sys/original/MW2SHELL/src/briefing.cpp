@@ -3,7 +3,6 @@
 #include "archivereader.h"
 #include "buttonmenu.h"
 #include "collection.h"
-#include "decomp.h"
 #include "font.h"
 #include "keyboardinput.h"
 #include "mainmenubutton.h"

@@ -1,7 +1,6 @@
 #ifndef MECHRELOAD_H
 #define MECHRELOAD_H
 
-#include "decomp.h"
 #include "mech.h"
 #include "mechsegment.h"
 #include "object.h"

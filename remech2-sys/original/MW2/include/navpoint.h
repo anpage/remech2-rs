@@ -1,7 +1,6 @@
 #ifndef NAVPOINT_H
 #define NAVPOINT_H
 
-#include "decomp.h"
 #include "types.h"
 
 struct SceneObject;
@@ -9,7 +8,7 @@ struct SceneObject;
 // A nav point (AI target type 0x100): mission navs, and the ones AI players place for
 // themselves.
 typedef struct NavPoint {
-	undefined4 m_used;             // 0x00 — nonzero when in use
+	uint32_t m_used;               // 0x00 — nonzero when in use
 	struct SceneObject* m_obj;     // 0x04 — the object it follows, or NULL
 	uint32_t m_owner;              // 0x08 — the AI target id (player | 0x200) that placed it
 	int32_t m_team;                // 0x0c

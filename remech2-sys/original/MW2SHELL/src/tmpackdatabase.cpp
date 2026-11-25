@@ -36,7 +36,7 @@ TMPackDataBase::TMPackDataBase(char* p_name)
 	TMPackDBEntry* entry;
 	TMPackDBEntry* next;
 	TMPackDBEntry* current;
-	undefined4 offset;
+	uint32_t offset;
 
 	strcpy(m_name, p_name);
 	m_data = (uint8_t*) MechReadFile(g_primaryHeap, m_name);
@@ -116,8 +116,7 @@ int32_t TMPackDataBase::GetDBItem(int32_t p_id, void** p_data, int32_t* p_size)
 	void* data;
 
 	entry = GetEntry(p_id);
-	if (entry == NULL || entry->m_offset > (undefined4) m_size ||
-		entry->m_size > (undefined4) m_size - entry->m_offset) {
+	if (entry == NULL || entry->m_offset > (uint32_t) m_size || entry->m_size > (uint32_t) m_size - entry->m_offset) {
 		*p_data = NULL;
 		*p_size = 0;
 		return 1;
@@ -290,7 +289,7 @@ int32_t TMPackDataBase::ByteAt(int32_t p_offset)
 	return p_offset >= 0 && p_offset < m_size ? m_data[p_offset] : -1;
 }
 
-TMPackDataBase::TMPackDBEntry::TMPackDBEntry(undefined4 p_offset, undefined4 p_size)
+TMPackDataBase::TMPackDBEntry::TMPackDBEntry(uint32_t p_offset, uint32_t p_size)
 {
 	m_offset = p_offset;
 	m_size = p_size;

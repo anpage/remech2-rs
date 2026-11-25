@@ -2,7 +2,6 @@
 
 #include "bwdname.h"
 #include "bwdnamenode.h"
-#include "decomp.h"
 #include "error.h"
 #include "loadres.h"
 #include "simmain.h"

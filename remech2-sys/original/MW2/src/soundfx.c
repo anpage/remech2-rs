@@ -6,7 +6,6 @@
 #include "audio.h"
 #include "audioengine.h"
 #include "clock.h"
-#include "decomp.h"
 #include "environment.h"
 #include "fixedmul.h"
 #include "fixedtrig.h"

@@ -4,7 +4,6 @@
 #include "buttonmenu.h"
 #include "campaignmission.h"
 #include "customstar.h"
-#include "decomp.h"
 #include "font.h"
 #include "keyboardinput.h"
 #include "mechbay.h"
@@ -37,8 +36,8 @@
 int32_t PlayVideo(
 	int32_t p_index,
 	const char* p_name,
-	undefined4 p_unk0x08,
-	undefined4 p_unk0x0c,
+	uint32_t p_unk0x08,
+	uint32_t p_unk0x0c,
 	uint32_t p_unk0x10,
 	uint32_t p_unk0x14
 );

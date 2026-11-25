@@ -1,7 +1,6 @@
 #ifndef MENUCONTROL_H
 #define MENUCONTROL_H
 
-#include "decomp.h"
 #include "types.h"
 
 struct MenuPage;

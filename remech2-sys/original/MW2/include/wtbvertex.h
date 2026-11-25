@@ -1,7 +1,6 @@
 #ifndef WTBVERTEX_H
 #define WTBVERTEX_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A vertex of a shape record (WtbHeader).

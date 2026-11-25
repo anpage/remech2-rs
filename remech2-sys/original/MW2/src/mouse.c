@@ -1,6 +1,5 @@
 #include "mouse.h"
 
-#include "decomp.h"
 #include "pointer.h"
 #include "simmain.h"
 #include "types.h"
@@ -9,7 +8,7 @@
 
 int32_t g_cursorClipped = FALSE;
 
-undefined4 g_reclipCursor = 0;
+uint32_t g_reclipCursor = 0;
 
 // Whether a client point lies inside the game window.
 static int32_t IsInsideWindow(int32_t p_x, int32_t p_y)

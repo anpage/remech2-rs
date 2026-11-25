@@ -2,7 +2,6 @@
 
 #include "ai.h"
 #include "clock.h"
-#include "decomp.h"
 #include "lineofsight.h"
 #include "mech.h"
 #include "players.h"

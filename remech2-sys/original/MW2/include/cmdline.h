@@ -1,7 +1,6 @@
 #ifndef CMDLINE_H
 #define CMDLINE_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The functions of cmdline.c that other units use.

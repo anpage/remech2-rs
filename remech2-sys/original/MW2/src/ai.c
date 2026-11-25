@@ -3,7 +3,6 @@
 #include "aiweapons.h"
 #include "clock.h"
 #include "debugbreak.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "fixedmul.h"
 #include "geocache.h"

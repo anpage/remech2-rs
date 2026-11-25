@@ -4,7 +4,6 @@
 #include "aimessage.h"
 #include "airule.h"
 #include "aistackentry.h"
-#include "decomp.h"
 #include "gamething.h"
 #include "mech.h"
 #include "playerai.h"
@@ -46,7 +45,7 @@ struct Player {
 	int32_t m_baseLevel;   // 0x18 — the world stream's repeat pass it was made in (LoadBaseLevelShapes)
 	int32_t m_detailLevel; // 0x1c — the level of detail whose shapes are loaded, or -1
 	Mech* m_mech;          // 0x20
-	undefined4 m_mechSize; // 0x24 — sizeof(Mech) for the types that have one
+	uint32_t m_mechSize;   // 0x24 — sizeof(Mech) for the types that have one
 	void (*m_firstClassFn)(Player* p_player); // 0x28
 	PlayerMechFn m_updateFn;                  // 0x2c
 	PlayerMechFn m_lateUpdateFn;              // 0x30

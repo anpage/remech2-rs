@@ -1,6 +1,5 @@
 #include "prjfile.h"
 
-#include "decomp.h"
 #include "files.h"
 #include "types.h"
 

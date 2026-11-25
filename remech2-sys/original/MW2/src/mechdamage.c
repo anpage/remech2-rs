@@ -5,7 +5,6 @@
 #include "classtable.h"
 #include "clock.h"
 #include "config.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "maneuvers.h"
 #include "mech.h"

@@ -2,7 +2,6 @@
 
 #include "approxlen.h"
 #include "boundbox.h"
-#include "decomp.h"
 #include "face.h"
 #include "object.h"
 #include "shapegeom.h"
@@ -193,7 +192,7 @@ Shape* CreateShape(int32_t p_vertexCount, int32_t p_faceCount, int32_t p_extra, 
 }
 
 // Appends a vertex to the selected model.
-void AddShapeVertex(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z, undefined4 p_u, undefined4 p_v)
+void AddShapeVertex(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z, uint32_t p_u, uint32_t p_v)
 {
 	Model* model;
 	Vertex* vertex;

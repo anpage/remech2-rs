@@ -1,7 +1,6 @@
 #ifndef REFRESHMODE_H
 #define REFRESHMODE_H
 
-#include "decomp.h"
 #include "displaybackend.h"
 #include "palettecolor.h"
 #include "types.h"

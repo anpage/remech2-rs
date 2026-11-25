@@ -1,6 +1,5 @@
 #include "soundlimits.h"
 
-#include "decomp.h"
 #include "soundfx.h"
 #include "soundinfo.h"
 #include "types.h"

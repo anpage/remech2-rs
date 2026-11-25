@@ -1,7 +1,6 @@
 #ifndef PANE_H
 #define PANE_H
 
-#include "decomp.h"
 #include "types.h"
 
 typedef struct WINDOW WINDOW;

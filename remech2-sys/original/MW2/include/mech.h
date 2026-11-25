@@ -1,7 +1,6 @@
 #ifndef MECH_H
 #define MECH_H
 
-#include "decomp.h"
 #include "mechsection.h"
 #include "ramp.h"
 #include "types.h"

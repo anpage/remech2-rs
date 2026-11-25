@@ -15,7 +15,6 @@
 #include "clock.h"
 #include "collision.h"
 #include "debugprint.h"
-#include "decomp.h"
 #include "gamekeys.h"
 #include "keyboard.h"
 #include "mech.h"

@@ -1,7 +1,6 @@
 #ifndef SPEECH_H
 #define SPEECH_H
 
-#include "decomp.h"
 #include "mss.h"
 #include "speechentry.h"
 #include "speechline.h"

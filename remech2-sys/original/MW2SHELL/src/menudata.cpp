@@ -1,7 +1,6 @@
 #include "menudata.h"
 
 #include "campaignmission.h"
-#include "decomp.h"
 #include "formation.h"
 #include "mainmenubutton.h"
 #include "menuscreen.h"

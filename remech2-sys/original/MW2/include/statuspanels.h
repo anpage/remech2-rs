@@ -1,7 +1,6 @@
 #ifndef STATUSPANELS_H
 #define STATUSPANELS_H
 
-#include "decomp.h"
 #include "types.h"
 
 struct CockpitPanel;

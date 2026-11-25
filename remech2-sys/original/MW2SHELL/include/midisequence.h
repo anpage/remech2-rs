@@ -1,7 +1,6 @@
 #ifndef MIDISEQUENCE_H
 #define MIDISEQUENCE_H
 
-#include "decomp.h"
 #include "shellaudio.h"
 #include "types.h"
 
@@ -9,13 +8,13 @@ class AudioSubsystem;
 
 class MidiSequence {
 public:
-	MidiSequence(AudioSubsystem* p_subsystem, void* p_data, undefined4 p_size);
+	MidiSequence(AudioSubsystem* p_subsystem, void* p_data, uint32_t p_size);
 	~MidiSequence();
 
 	void Start();
 	void Stop();
 	void SetVolume(int32_t p_volume);
-	undefined IsAnySequencePlaying();
+	uint8_t IsAnySequencePlaying();
 
 private:
 	ShellMidiSequence* m_impl; // NULL when MIDI is off or the sequence couldn't be loaded

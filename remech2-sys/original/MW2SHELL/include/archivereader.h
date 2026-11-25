@@ -1,7 +1,6 @@
 #ifndef ARCHIVEREADER_H
 #define ARCHIVEREADER_H
 
-#include "decomp.h"
 #include "mainmenubutton.h"
 #include "tmpackdatabase.h"
 #include "types.h"
@@ -66,7 +65,7 @@ private:
 	ArchiveReader* m_child;     // 0x10
 	TextGlyph* m_titleGlyph;    // 0x1c
 	Collection* m_topics;       // 0x20
-	undefined m_colors[0x100];  // 0x24
+	uint8_t m_colors[0x100];    // 0x24
 	uint8_t m_ownsDatabase;     // 0x124
 	MainMenuButton* m_buttons;  // 0x125
 	int32_t m_count;            // 0x129

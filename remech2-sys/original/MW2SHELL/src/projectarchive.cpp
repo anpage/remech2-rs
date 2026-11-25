@@ -1,6 +1,5 @@
 #include "projectarchive.h"
 
-#include "decomp.h"
 #include "gamesettings.h"
 #include "mechbay.h"
 #include "mechchassis.h"
@@ -29,9 +28,9 @@ enum BwdTag {
 };
 
 struct BwdRootNode {
-	int32_t m_type;       // 0x00
-	int32_t m_size;       // 0x04
-	undefined4 m_unk0x08; // 0x08 — written as 0 for the simulator
+	int32_t m_type;     // 0x00
+	int32_t m_size;     // 0x04
+	uint32_t m_unk0x08; // 0x08 — written as 0 for the simulator
 };
 
 struct BwdRevisionNode {
@@ -41,9 +40,9 @@ struct BwdRevisionNode {
 };
 
 struct BwdTableNode {
-	int32_t m_type;          // 0x00
-	int32_t m_size;          // 0x04
-	undefined4 m_unk0x08[5]; // 0x08 — written as zeros for the simulator
+	int32_t m_type;        // 0x00
+	int32_t m_size;        // 0x04
+	uint32_t m_unk0x08[5]; // 0x08 — written as zeros for the simulator
 };
 
 struct BwdLinkNode {
@@ -55,24 +54,24 @@ struct BwdLinkNode {
 
 // One mech of a star; the registry takes its first 0x5a bytes.
 struct BwdGpsNode {
-	int32_t m_type;                   // 0x00
-	int32_t m_size;                   // 0x04
-	int16_t m_variantId;              // 0x08 — the variant's resource, -2 for a user variant
-	int16_t m_chassisId;              // 0x0a — the chassis' resource
-	uint8_t m_level;                  // 0x0c
-	uint8_t m_firstInStar;            // 0x0d
-	uint8_t m_unk0x0e;                // 0x0e — 0 for a star's leader at level 0, else 2; written for the simulator
-	undefined m_unk0x0f;              // 0x0f — never written, the node is cleared first
-	int16_t m_difficultySettings[5];  // 0x10 — g_bwdDifficultySettings' row
-	int16_t m_unk0x1a;                // 0x1a — written as 0 for the simulator
-	int16_t m_unk0x1c;                // 0x1c — written as 0 for the simulator
-	int16_t m_unk0x1e;                // 0x1e — written as 0 for the simulator
-	int16_t m_unk0x20;                // 0x20 — written as 6 for the simulator
-	int16_t m_unk0x22;                // 0x22 — written as 0x400 for the simulator
-	char m_chassis[9];                // 0x24
-	char m_mech[9];                   // 0x2d
-	char m_variant[16];               // 0x36
-	undefined m_unk0x46[0x5c - 0x46]; // 0x46 — cleared, never written
+	int32_t m_type;                  // 0x00
+	int32_t m_size;                  // 0x04
+	int16_t m_variantId;             // 0x08 — the variant's resource, -2 for a user variant
+	int16_t m_chassisId;             // 0x0a — the chassis' resource
+	uint8_t m_level;                 // 0x0c
+	uint8_t m_firstInStar;           // 0x0d
+	uint8_t m_unk0x0e;               // 0x0e — 0 for a star's leader at level 0, else 2; written for the simulator
+	uint8_t m_unk0x0f;               // 0x0f — never written, the node is cleared first
+	int16_t m_difficultySettings[5]; // 0x10 — g_bwdDifficultySettings' row
+	int16_t m_unk0x1a;               // 0x1a — written as 0 for the simulator
+	int16_t m_unk0x1c;               // 0x1c — written as 0 for the simulator
+	int16_t m_unk0x1e;               // 0x1e — written as 0 for the simulator
+	int16_t m_unk0x20;               // 0x20 — written as 6 for the simulator
+	int16_t m_unk0x22;               // 0x22 — written as 0x400 for the simulator
+	char m_chassis[9];               // 0x24
+	char m_mech[9];                  // 0x2d
+	char m_variant[16];              // 0x36
+	uint8_t m_unk0x46[0x5c - 0x46];  // 0x46 — cleared, never written
 };
 
 // A node whose size depends on the name it carries.
@@ -85,7 +84,7 @@ struct BwdNameNode {
 
 // Heap callbacks registered with the archive unit (prjfile.c); the file unit's
 // allocator calls them instead of the CRT heap.
-void* PrjHeapAlloc(undefined4 p_size);
+void* PrjHeapAlloc(uint32_t p_size);
 void PrjHeapFree(void* p_block);
 
 void BwdAddRegistryTemplate(void* p_node, int32_t p_size);
@@ -151,7 +150,7 @@ ProjectArchive::ProjectArchive(const char* p_name)
 	LoadArchiveEntries(g_mw2PrjHandle);
 }
 
-void* PrjHeapAlloc(undefined4 p_size)
+void* PrjHeapAlloc(uint32_t p_size)
 {
 	return MechHeapAlloc(g_primaryHeap, p_size);
 }

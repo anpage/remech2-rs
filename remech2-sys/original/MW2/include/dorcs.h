@@ -1,7 +1,6 @@
 #ifndef DORCS_H
 #define DORCS_H
 
-#include "decomp.h"
 #include "menu.h"
 #include "menucontrol.h"
 #include "menupage.h"

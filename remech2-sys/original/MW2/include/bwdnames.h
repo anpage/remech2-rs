@@ -2,7 +2,6 @@
 #define BWDNAMES_H
 
 #include "bwdname.h"
-#include "decomp.h"
 #include "types.h"
 
 // The functions and globals of bwdnames.c that other units use.

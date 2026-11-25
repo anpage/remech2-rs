@@ -1,7 +1,6 @@
 #ifndef COLLECTION_H
 #define COLLECTION_H
 
-#include "decomp.h"
 #include "types.h"
 
 #ifdef __cplusplus

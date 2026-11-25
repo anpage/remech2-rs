@@ -1,7 +1,6 @@
 #include "view.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "depthsort.h"
 #include "eyepoint.h"
 #include "faceshade.h"
@@ -509,12 +508,12 @@ int32_t CullHiddenShape(Shape* p_shape)
 	return FALSE;
 }
 
-int32_t IsLodQualityHigh(undefined4 p_unk0x00)
+int32_t IsLodQualityHigh(uint32_t p_unk0x00)
 {
 	return g_lodQuality == 1;
 }
 
-void SetLodQualityHigh(undefined4 p_unk0x00, int32_t p_enable)
+void SetLodQualityHigh(uint32_t p_unk0x00, int32_t p_enable)
 {
 	if (p_enable) {
 		g_lodQuality = 1;

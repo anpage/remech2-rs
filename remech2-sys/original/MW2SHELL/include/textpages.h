@@ -2,7 +2,6 @@
 #define TEXTPAGES_H
 
 #include "collection.h"
-#include "decomp.h"
 #include "font.h"
 #include "types.h"
 

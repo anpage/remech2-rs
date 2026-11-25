@@ -1,7 +1,6 @@
 #include "players.h"
 
 #include "artillery.h"
-#include "decomp.h"
 #include "door.h"
 #include "gamething.h"
 #include "inputmap.h"

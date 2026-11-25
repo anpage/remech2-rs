@@ -1,6 +1,5 @@
 #include "cockpitpanel.h"
 
-#include "decomp.h"
 #include "recttransition.h"
 #include "targeting.h"
 #include "types.h"
@@ -40,7 +39,7 @@ void ShutdownCockpitPanel(CockpitPanel* p_panel)
 {
 }
 
-void SetCockpitPanelLightUpTime(CockpitPanel* p_panel, undefined4 p_lightUpTime)
+void SetCockpitPanelLightUpTime(CockpitPanel* p_panel, uint32_t p_lightUpTime)
 {
 	p_panel->m_lightUpTime = p_lightUpTime;
 }

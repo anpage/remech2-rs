@@ -2,7 +2,6 @@
 
 #include "boundbox.h"
 #include "collision.h"
-#include "decomp.h"
 #include "face.h"
 #include "quadtree.h"
 #include "ray.h"

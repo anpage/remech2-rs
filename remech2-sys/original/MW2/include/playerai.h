@@ -2,7 +2,6 @@
 #define PLAYERAI_H
 
 #include "aimessage.h"
-#include "decomp.h"
 #include "types.h"
 
 // A player's AI state (Player::m_ai): the posted message, its state and its target and goal.

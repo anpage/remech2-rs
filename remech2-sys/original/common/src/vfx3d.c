@@ -15,7 +15,6 @@
    edges stay between their vertices, and so do the spans and the texture coordinates. */
 #include "vfx3d.h"
 
-#include "decomp.h"
 #include "pane.h"
 #include "portable.h"
 #include "types.h"

@@ -1,7 +1,6 @@
 #ifndef VFX3D_H
 #define VFX3D_H
 
-#include "decomp.h"
 #include "pane.h"
 #include "types.h"
 #include "window.h"

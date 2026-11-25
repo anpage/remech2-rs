@@ -1,6 +1,5 @@
 #include "gridobject.h"
 
-#include "decomp.h"
 #include "eyepoint.h"
 #include "object.h"
 #include "polydraw.h"

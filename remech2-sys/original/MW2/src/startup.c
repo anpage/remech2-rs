@@ -1,6 +1,5 @@
 #include "startup.h"
 
-#include "decomp.h"
 #include "types.h"
 
 #include <stdio.h>

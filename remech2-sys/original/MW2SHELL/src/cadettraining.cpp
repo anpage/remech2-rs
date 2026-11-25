@@ -3,7 +3,6 @@
 #include "audiosample.h"
 #include "audiosubsystem.h"
 #include "buttonmenu.h"
-#include "decomp.h"
 #include "elapsed.h"
 #include "mainmenubutton.h"
 #include "mechrand.h"

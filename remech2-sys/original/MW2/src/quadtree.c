@@ -1,7 +1,6 @@
 #include "quadtree.h"
 
 #include "collision.h"
-#include "decomp.h"
 #include "face.h"
 #include "overlay.h"
 #include "ray.h"
@@ -190,12 +189,12 @@ QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, int32_t p_quadrant, Model
 
 // Allocates a quadtree node with room for p_faceCount entries, cleared.
 QuadtreeNode* AllocQuadtreeNode(
-	undefined4 p_minX,
-	undefined4 p_maxX,
-	undefined4 p_minY,
-	undefined4 p_maxY,
-	undefined4 p_minZ,
-	undefined4 p_maxZ,
+	uint32_t p_minX,
+	uint32_t p_maxX,
+	uint32_t p_minY,
+	uint32_t p_maxY,
+	uint32_t p_minZ,
+	uint32_t p_maxZ,
 	int32_t p_faceCount
 )
 {

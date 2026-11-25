@@ -1,7 +1,6 @@
 #ifndef CLASSENTRY_H
 #define CLASSENTRY_H
 
-#include "decomp.h"
 #include "types.h"
 
 struct SceneObject;
@@ -16,9 +15,9 @@ typedef struct ClassEntry {
 	int32_t m_partId;          // 0x20
 	struct Shape* m_shape;     // 0x24
 	struct SceneObject* m_obj; // 0x28
-	undefined4 m_x;            // 0x2c
-	undefined4 m_y;            // 0x30
-	undefined4 m_z;            // 0x34
+	uint32_t m_x;              // 0x2c
+	uint32_t m_y;              // 0x30
+	uint32_t m_z;              // 0x34
 	uint16_t m_kinds[5];       // 0x38 — by level; the shape kind in bits 4-7
 	int16_t m_released;        // 0x42
 } ClassEntry;

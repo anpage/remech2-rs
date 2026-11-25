@@ -4,7 +4,6 @@
 #include "clock.h"
 #include "collision.h"
 #include "config.h"
-#include "decomp.h"
 #include "effectinfo.h"
 #include "environment.h"
 #include "eyepoint.h"
@@ -864,10 +863,10 @@ void BuildAimRay(Player* p_player, Ray* p_ray)
 void GetEyeAimDirection(Player* p_player, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	Matrix matrix;
-	undefined4 z;
-	undefined4 y;
+	uint32_t z;
+	uint32_t y;
 	Mech* mech;
-	undefined4 x;
+	uint32_t x;
 
 	*p_x = *p_y = 0;
 	*p_z = 0x10000;

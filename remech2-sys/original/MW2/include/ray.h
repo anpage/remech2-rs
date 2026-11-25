@@ -1,7 +1,6 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A segment from (x0, y0, z0) to (x1, y1, z1) in 16.16 fixed point, with its delta and, once

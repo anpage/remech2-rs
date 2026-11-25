@@ -1,7 +1,6 @@
 #ifndef ANIM2D_H
 #define ANIM2D_H
 
-#include "decomp.h"
 #include "targeting.h"
 #include "types.h"
 

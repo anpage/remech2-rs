@@ -1,7 +1,6 @@
 #include "textpages.h"
 
 #include "collection.h"
-#include "decomp.h"
 #include "font.h"
 #include "page.h"
 #include "pilotrecord.h"
@@ -118,7 +117,7 @@ void LayoutTextPages(
 	int32_t p_size,
 	Collection* p_pages,
 	Font* p_font,
-	undefined* p_colors,
+	uint8_t* p_colors,
 	int32_t p_left,
 	int32_t p_top,
 	int32_t p_width,

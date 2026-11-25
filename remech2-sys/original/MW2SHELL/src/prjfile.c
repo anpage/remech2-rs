@@ -1,6 +1,5 @@
 #include "prjfile.h"
 
-#include "decomp.h"
 #include "files.h"
 #include "types.h"
 
@@ -13,17 +12,17 @@ ArchiveSlot g_archiveSlots[1];
 
 // The heap callbacks the archive unit allocates through, registered by SetArchiveAllocator
 // (ProjectArchive passes PrjHeapAlloc and PrjHeapFree).
-void* (*g_archiveAlloc)(undefined4) = NULL;
+void* (*g_archiveAlloc)(uint32_t) = NULL;
 
 void (*g_archiveFree)(void*) = NULL;
 
-void SetArchiveAllocator(void* (*p_alloc)(undefined4), void (*p_free)(void*))
+void SetArchiveAllocator(void* (*p_alloc)(uint32_t), void (*p_free)(void*))
 {
 	g_archiveAlloc = p_alloc;
 	g_archiveFree = p_free;
 }
 
-void* ArchiveAlloc(undefined4 p_size)
+void* ArchiveAlloc(uint32_t p_size)
 {
 	return g_archiveAlloc(p_size);
 }

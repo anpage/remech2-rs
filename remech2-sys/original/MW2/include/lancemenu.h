@@ -1,7 +1,6 @@
 #ifndef LANCEMENU_H
 #define LANCEMENU_H
 
-#include "decomp.h"
 #include "menu.h"
 #include "menuchoices.h"
 #include "menucontrol.h"

@@ -1,7 +1,6 @@
 /* The sim's keyboard: the key states, and the queue of typed key codes. */
 #include "keyboard.h"
 
-#include "decomp.h"
 #include "messages.h"
 #include "types.h"
 
@@ -27,9 +26,9 @@ enum KeyStateWord {
 	c_modifierWord = 3
 };
 
-undefined4 g_keyCodeWriteIndex;
+uint32_t g_keyCodeWriteIndex;
 
-undefined4 g_keyCodeReadIndex;
+uint32_t g_keyCodeReadIndex;
 
 // A ring buffer of key codes, filled by KeyboardQueueKeyCode.
 int16_t g_keyCodes[c_keyCodeBufferSize];
@@ -37,7 +36,7 @@ int16_t g_keyCodes[c_keyCodeBufferSize];
 // One bit per (remapped) scan code, set while the key is down. Word 3 also holds the modifier
 // bits (see KeyModifier): the original keeps them in the same memory, so clearing the states
 // clears the modifiers too, and a copy of the states carries them.
-undefined4 g_keyStates[4];
+uint32_t g_keyStates[4];
 
 // clang-format off
 // The key code for each virtual key; 0 falls back to MapVirtualKey.

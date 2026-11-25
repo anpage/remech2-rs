@@ -3,7 +3,6 @@
 
 #include "ai.h"
 #include "clock.h"
-#include "decomp.h"
 #include "fadepal.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"

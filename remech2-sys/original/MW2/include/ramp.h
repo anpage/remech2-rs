@@ -1,7 +1,6 @@
 #ifndef RAMP_H
 #define RAMP_H
 
-#include "decomp.h"
 #include "types.h"
 
 typedef struct Ramp {

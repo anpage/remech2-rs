@@ -1,7 +1,6 @@
 #ifndef BRIGHTNESSMENU_H
 #define BRIGHTNESSMENU_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The functions of brightnessmenu.c that other units use.

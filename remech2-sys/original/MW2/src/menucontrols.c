@@ -2,7 +2,6 @@
    list with a suffix and a text box, and edit their values while the item is selected. */
 #include "menucontrols.h"
 
-#include "decomp.h"
 #include "fixedmul.h"
 #include "loadres.h"
 #include "menu.h"

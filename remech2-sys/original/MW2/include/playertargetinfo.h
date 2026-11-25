@@ -1,7 +1,6 @@
 #ifndef PLAYERTARGETINFO_H
 #define PLAYERTARGETINFO_H
 
-#include "decomp.h"
 #include "types.h"
 #include "vector3.h"
 

@@ -1,7 +1,6 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include "decomp.h"
 #include "types.h"
 
 #include <stddef.h>
@@ -16,10 +15,10 @@ extern "C"
 {
 #endif
 
-	extern undefined4 g_keyCodeWriteIndex;
-	extern undefined4 g_keyCodeReadIndex;
+	extern uint32_t g_keyCodeWriteIndex;
+	extern uint32_t g_keyCodeReadIndex;
 	extern int16_t g_keyCodes[c_keyCodeBufferSize];
-	extern undefined4 g_keyStates[4];
+	extern uint32_t g_keyStates[4];
 	extern int16_t g_keyCodeMap[256];
 	extern int32_t g_extendedScanCodeMap[0x59];
 

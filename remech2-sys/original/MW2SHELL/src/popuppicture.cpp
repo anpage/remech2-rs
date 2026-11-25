@@ -6,7 +6,7 @@
 #include "windowstate.h"
 
 PopupPicture::PopupPicture(
-	undefined* p_data,
+	uint8_t* p_data,
 	int32_t p_size,
 	VideoDriver* p_videoDriver,
 	int32_t p_left,
@@ -32,7 +32,7 @@ PopupPicture::PopupPicture(
 
 	m_saved.m_xMax = m_width - 1;
 	m_saved.m_yMax = m_height - 1;
-	m_saved.m_buffer = (undefined*) MechHeapAlloc(g_primaryHeap, m_width * m_height);
+	m_saved.m_buffer = (uint8_t*) MechHeapAlloc(g_primaryHeap, m_width * m_height);
 
 	m_savedView.m_x0 = 0;
 	m_savedView.m_y0 = 0;

@@ -6,7 +6,6 @@
 #include "clock.h"
 #include "collision.h"
 #include "config.h"
-#include "decomp.h"
 #include "environment.h"
 #include "eyepoint.h"
 #include "fadepal.h"

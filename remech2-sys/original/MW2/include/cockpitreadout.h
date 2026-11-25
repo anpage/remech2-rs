@@ -1,7 +1,6 @@
 #ifndef COCKPITREADOUT_H
 #define COCKPITREADOUT_H
 
-#include "decomp.h"
 #include "point.h"
 #include "types.h"
 

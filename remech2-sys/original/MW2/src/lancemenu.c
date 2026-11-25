@@ -1,7 +1,6 @@
 #include "lancemenu.h"
 
 #include "ai.h"
-#include "decomp.h"
 #include "menu.h"
 #include "menupage.h"
 #include "navpoint.h"

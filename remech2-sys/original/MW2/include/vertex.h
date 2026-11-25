@@ -1,7 +1,6 @@
 #ifndef VERTEX_H
 #define VERTEX_H
 
-#include "decomp.h"
 #include "types.h"
 
 struct ProjectedVertex;
@@ -15,9 +14,9 @@ typedef struct Vertex {
 	int32_t m_worldX;                     // 0x0c — the position TransformModel computes
 	int32_t m_worldY;                     // 0x10
 	int32_t m_worldZ;                     // 0x14
-	undefined4 m_u;                       // 0x18 — texture coordinates
-	undefined4 m_v;                       // 0x1c
-	undefined4 m_depth;                   // 0x20 — the view-space depth
+	uint32_t m_u;                         // 0x18 — texture coordinates
+	uint32_t m_v;                         // 0x1c
+	uint32_t m_depth;                     // 0x20 — the view-space depth
 	struct ProjectedVertex* m_projection; // 0x24 — the projected copy (GetViewVertex), once made
 	uint8_t m_flags; // 0x28 — bit 0: nearer than the near plane, 1: farther than the far plane, 2: depth computed this
 					 // frame

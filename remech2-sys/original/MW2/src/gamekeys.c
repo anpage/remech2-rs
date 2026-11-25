@@ -7,7 +7,6 @@
 #include "cockpit.h"
 #include "config.h"
 #include "damagepanel.h"
-#include "decomp.h"
 #include "displaybackend.h"
 #include "dorcs.h"
 #include "environment.h"

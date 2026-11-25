@@ -4,7 +4,6 @@
 #include "archivereader.h"
 #include "buttonmenu.h"
 #include "collection.h"
-#include "decomp.h"
 #include "mission.h"
 #include "page.h"
 #include "pilotrecord.h"

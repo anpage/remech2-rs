@@ -1,7 +1,6 @@
 #ifndef MENUPAGE_H
 #define MENUPAGE_H
 
-#include "decomp.h"
 #include "menuitem.h"
 #include "types.h"
 

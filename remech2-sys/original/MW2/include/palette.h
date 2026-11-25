@@ -1,7 +1,6 @@
 #ifndef PALETTE_H
 #define PALETTE_H
 
-#include "decomp.h"
 #include "eyepoint.h"
 #include "palcycle.h"
 #include "palfade.h"

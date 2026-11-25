@@ -1,7 +1,6 @@
 #ifndef SCREENFIELD_H
 #define SCREENFIELD_H
 
-#include "decomp.h"
 #include "types.h"
 
 class TextGlyph;
@@ -14,7 +13,7 @@ struct ScreenField {
 	int32_t m_top;                      // 0x04 — negative: packed row (bits 4-11) and offset (bits 0-3)
 	int32_t m_width;                    // 0x08
 	int32_t m_height;                   // 0x0c
-	undefined* m_colors;                // 0x14 — color map for the glyph
+	uint8_t* m_colors;                  // 0x14 — color map for the glyph
 	TextGlyph* m_glyph;                 // 0x18
 	TextGlyph* (*m_draw)(ScreenField*); // 0x1c
 	void (*m_click)(ScreenField*);      // 0x20 — click callback

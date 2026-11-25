@@ -1,6 +1,5 @@
 #include "collision.h"
 
-#include "decomp.h"
 #include "face.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"

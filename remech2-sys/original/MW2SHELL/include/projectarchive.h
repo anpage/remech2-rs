@@ -1,7 +1,6 @@
 #ifndef PROJECTARCHIVE_H
 #define PROJECTARCHIVE_H
 
-#include "decomp.h"
 #include "starmech.h"
 #include "types.h"
 
@@ -20,10 +19,10 @@ public:
 	int32_t* FindBwdNode(int32_t p_type);
 
 private:
-	int32_t m_handle;      // 0x00 — from OpenArchive
-	undefined4 m_bwdTable; // 0x04 — the TABL resource that names the .bwd files
-	int32_t* m_bwd;        // 0x08 — the .bwd LoadBwd loaded
-	int32_t m_bwdSize;     // 0x0c
+	int32_t m_handle;    // 0x00 — from OpenArchive
+	uint32_t m_bwdTable; // 0x04 — the TABL resource that names the .bwd files
+	int32_t* m_bwd;      // 0x08 — the .bwd LoadBwd loaded
+	int32_t m_bwdSize;   // 0x0c
 };
 
 // The functions and globals of projectarchive.cpp that other units use.

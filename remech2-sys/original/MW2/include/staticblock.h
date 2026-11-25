@@ -1,7 +1,6 @@
 #ifndef STATICBLOCK_H
 #define STATICBLOCK_H
 
-#include "decomp.h"
 #include "transform.h"
 #include "types.h"
 #include "xform.h"

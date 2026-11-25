@@ -3,7 +3,6 @@
 #include "bargauges.h"
 #include "cockpitpanel.h"
 #include "config.h"
-#include "decomp.h"
 #include "environment.h"
 #include "eyepoint.h"
 #include "fixedmul.h"
@@ -43,7 +42,7 @@ Point g_hudGaugePositions[6] = {{0x73, 0x10}, {8, 0x4a}, {4, 0x28}, {4, 0x4a}, {
 
 // The HUD's display options: the HUD itself, the crosshair, the target marker, the compass and
 // the altimeter.
-undefined4 g_showHud = 1;
+uint32_t g_showHud = 1;
 
 int32_t g_showCrosshair = 1;
 

@@ -2,7 +2,6 @@
 #define TEXTGLYPHLIST_H
 
 #include "collection.h"
-#include "decomp.h"
 #include "types.h"
 
 class TextGlyph;

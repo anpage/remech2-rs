@@ -1,7 +1,6 @@
 #ifndef PLAYERSTEERING_H
 #define PLAYERSTEERING_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A player's controls, set each frame by the input layer for the local player (g_localSteering) and

@@ -6,7 +6,6 @@
 #include "cdaudio.h"
 #include "clock.h"
 #include "config.h"
-#include "decomp.h"
 #include "loadres.h"
 #include "mss.h"
 #include "mw2prj.h"

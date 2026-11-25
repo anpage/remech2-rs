@@ -1,7 +1,6 @@
 #ifndef MAINMENUBUTTON_H
 #define MAINMENUBUTTON_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A button of a menu screen: its hit rectangle and a label. A label starting with '<' is drawn

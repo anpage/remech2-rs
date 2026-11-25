@@ -1,7 +1,6 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include "decomp.h"
 #include "fmvslot.h"
 #include "types.h"
 
@@ -26,8 +25,8 @@ void SetVideoFrame(int32_t p_index, int32_t p_frame);
 int32_t PlayVideo(
 	int32_t p_index,
 	const char* p_name,
-	undefined4 p_left,
-	undefined4 p_top,
+	uint32_t p_left,
+	uint32_t p_top,
 	uint32_t p_flags,
 	uint32_t p_fps
 );

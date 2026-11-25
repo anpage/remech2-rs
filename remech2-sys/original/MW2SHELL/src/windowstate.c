@@ -1,6 +1,5 @@
 #include "windowstate.h"
 
-#include "decomp.h"
 #include "types.h"
 
 // The shell window's state. The original keeps these in this object's data, between joystick.c's

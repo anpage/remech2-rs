@@ -1,7 +1,6 @@
 #ifndef WEAPONSLOT_H
 #define WEAPONSLOT_H
 
-#include "decomp.h"
 #include "types.h"
 
 // An ammunition bin of a weapon (WeaponSlot::m_bin).

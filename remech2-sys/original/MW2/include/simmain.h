@@ -1,7 +1,6 @@
 #ifndef SIMMAIN_H
 #define SIMMAIN_H
 
-#include "decomp.h"
 #include "heap.h"
 #include "mission.h"
 #include "types.h"

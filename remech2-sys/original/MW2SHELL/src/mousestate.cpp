@@ -58,22 +58,22 @@ MouseState::~MouseState()
 	}
 }
 
-undefined MouseState::GetDoubleClicked()
+uint8_t MouseState::GetDoubleClicked()
 {
 	return m_doubleClicked;
 }
 
-undefined4 MouseState::GetLeftPressed()
+uint32_t MouseState::GetLeftPressed()
 {
 	return m_leftPressed;
 }
 
-undefined4 MouseState::GetRightPressed()
+uint32_t MouseState::GetRightPressed()
 {
 	return m_rightPressed;
 }
 
-undefined4 MouseState::GetMiddlePressed()
+uint32_t MouseState::GetMiddlePressed()
 {
 	return m_middlePressed;
 }
@@ -116,9 +116,9 @@ void MouseState::ReadMouseState()
 	MechPoint point;
 	int32_t x;
 	int32_t y;
-	undefined4 middleDown;
-	undefined4 leftDown;
-	undefined4 rightDown;
+	uint32_t middleDown;
+	uint32_t leftDown;
+	uint32_t rightDown;
 
 	if (!g_runSim) {
 		DrawCursorPosition();

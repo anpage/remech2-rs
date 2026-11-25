@@ -1,7 +1,6 @@
 #ifndef HUD_H
 #define HUD_H
 
-#include "decomp.h"
 #include "mech.h"
 #include "point.h"
 #include "targeting.h"
@@ -18,7 +17,7 @@ extern "C"
 	extern Point g_altimeterOrigin;
 	extern Point g_compassOrigin;
 	extern Point g_hudGaugePositions[6];
-	extern undefined4 g_showHud;
+	extern uint32_t g_showHud;
 	extern int32_t g_showCrosshair;
 	extern int32_t g_showTargetMarker;
 	extern int32_t g_showCompass;

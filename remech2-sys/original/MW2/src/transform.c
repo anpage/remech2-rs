@@ -5,7 +5,6 @@
 #include "transform.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "fixedtrig.h"
 #include "loadres.h"
 #include "portable.h"
@@ -337,7 +336,7 @@ void BuildMatrix(
 // Reads the three rotation angles (16.16 degrees) back out of p_matrix. Near straight up or down
 // (the pitch sine within 0.001 of 1), the angle comes from the other rows; with nothing to go on,
 // the yaw is taken as 90 degrees and the roll from the first row.
-void GetMatrixAngles(Matrix* p_matrix, undefined4* p_angleX, undefined4* p_angleY, undefined4* p_angleZ)
+void GetMatrixAngles(Matrix* p_matrix, uint32_t* p_angleX, uint32_t* p_angleY, uint32_t* p_angleZ)
 {
 	int32_t pitch;
 	int32_t roll;

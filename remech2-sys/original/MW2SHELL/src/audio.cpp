@@ -24,7 +24,7 @@ void AudioSubsystem::ApplyMidiVolume()
 	ShellAudioSubsystem_ApplyMidiVolume(m_impl);
 }
 
-MidiSequence::MidiSequence(AudioSubsystem* p_subsystem, void* p_data, undefined4 p_size)
+MidiSequence::MidiSequence(AudioSubsystem* p_subsystem, void* p_data, uint32_t p_size)
 {
 	m_data = p_data;
 	m_impl = NULL;
@@ -64,12 +64,12 @@ void MidiSequence::SetVolume(int32_t p_volume)
 }
 
 // A sequence always loops, so it plays for as long as it exists.
-undefined MidiSequence::IsAnySequencePlaying()
+uint8_t MidiSequence::IsAnySequencePlaying()
 {
 	return m_impl ? TRUE : FALSE;
 }
 
-AudioSample::AudioSample(AudioSubsystem* p_subsystem, void* p_data, undefined4 p_size)
+AudioSample::AudioSample(AudioSubsystem* p_subsystem, void* p_data, uint32_t p_size)
 {
 	m_data = p_data;
 	m_impl = NULL;
@@ -135,7 +135,7 @@ void AudioSample::Stop()
 	}
 }
 
-undefined AudioSample::IsPlaying()
+uint8_t AudioSample::IsPlaying()
 {
 	if (m_impl && ShellAudioSample_IsPlaying(m_impl)) {
 		return TRUE;

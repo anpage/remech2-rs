@@ -1,7 +1,6 @@
 #include "overlay.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "gamekeys.h"
 #include "loadres.h"

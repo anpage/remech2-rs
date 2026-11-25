@@ -32,7 +32,6 @@
    vertices, and a Gouraud fill through p_cueing by a color above 0xffff (beyond the table). */
 #include "vfxrend.h"
 
-#include "decomp.h"
 #include "pane.h"
 #include "portable.h"
 #include "types.h"
@@ -207,10 +206,10 @@ void VFX_set_Gouraud_dither_level(int32_t p_dither1, int32_t p_dither2)
 // The assembly returns its code segment's selector, and the range of its primitives and its size;
 // the C patches no code, and returns its working vertices instead, which the caller can make
 // writable all the same. The start is a 32-bit address, as the game's caller takes it.
-int32_t GetCodeBlock(undefined4* p_start, undefined4* p_selector)
+int32_t GetCodeBlock(uint32_t* p_start, uint32_t* p_selector)
 {
 	*p_selector = 0;
-	*p_start = (undefined4) (size_t) g_workPoints;
+	*p_start = (uint32_t) (size_t) g_workPoints;
 	return (int32_t) sizeof(g_workPoints);
 }
 
@@ -839,7 +838,7 @@ static void RenderPolygon(
 	const uint32_t* p_vlist,
 	int32_t p_nvertices,
 	int32_t p_operation,
-	undefined4 p_color,
+	uint32_t p_color,
 	VFX_TEXTURE* p_texture,
 	void* p_cueing,
 	void* p_translucency
@@ -873,7 +872,7 @@ void VFX_polygon_render(
 	uint32_t* p_vlist,
 	int32_t p_nvertices,
 	int32_t p_operation,
-	undefined4 p_color,
+	uint32_t p_color,
 	VFX_TEXTURE* p_texture,
 	void* p_cueing,
 	void* p_translucency
@@ -997,7 +996,7 @@ void VFX_polygon_clip_XY_and_render(
 	uint32_t* p_vlist,
 	int32_t p_nvertices,
 	int32_t p_operation,
-	undefined4 p_color,
+	uint32_t p_color,
 	VFX_TEXTURE* p_texture,
 	void* p_cueing,
 	void* p_translucency

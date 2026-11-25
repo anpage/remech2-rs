@@ -1,7 +1,6 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "decomp.h"
 #include "types.h"
 
 #pragma pack(1)
@@ -9,11 +8,11 @@
 // are rectangles of. The game's display back ends kept their bitmap info where VFX has the
 // window's stencil; now nothing uses it.
 struct WINDOW {
-	undefined* m_buffer; // 0x00
-	int32_t m_xMax;      // 0x04
-	int32_t m_yMax;      // 0x08
-	void* m_stencil;     // 0x0c, always NULL
-	undefined4 m_shadow; // 0x10, only cleared, by the back ends' begin functions
+	uint8_t* m_buffer; // 0x00
+	int32_t m_xMax;    // 0x04
+	int32_t m_yMax;    // 0x08
+	void* m_stencil;   // 0x0c, always NULL
+	uint32_t m_shadow; // 0x10, only cleared, by the back ends' begin functions
 };
 typedef struct WINDOW WINDOW;
 #pragma pack()

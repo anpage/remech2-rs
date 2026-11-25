@@ -5,7 +5,6 @@
 #include "collision.h"
 #include "debrischunk.h"
 #include "debrispiece.h"
-#include "decomp.h"
 #include "environment.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"

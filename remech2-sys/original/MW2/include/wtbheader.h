@@ -1,7 +1,6 @@
 #ifndef WTBHEADER_H
 #define WTBHEADER_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The header of a shape record ("WTBO") that LoadShapeRecord reads: m_vertexCount WtbVertex
@@ -13,7 +12,7 @@ typedef struct WtbHeader {
 	int16_t m_vertexCount; // 0x18
 	int16_t m_faceCount;   // 0x1a
 	int16_t m_flags;       // 0x1c
-	undefined2 m_unk0x1e;  // 0x1e
+	uint16_t m_unk0x1e;    // 0x1e
 } WtbHeader;
 
 #endif // WTBHEADER_H

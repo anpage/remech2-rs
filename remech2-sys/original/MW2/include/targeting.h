@@ -2,7 +2,6 @@
 #define TARGETING_H
 
 #include "cockpitreadout.h"
-#include "decomp.h"
 #include "navpoint.h"
 #include "pane.h"
 #include "recttransition.h"

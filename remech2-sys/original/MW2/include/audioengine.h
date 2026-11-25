@@ -1,7 +1,6 @@
 #ifndef AUDIOENGINE_H
 #define AUDIOENGINE_H
 
-#include "decomp.h"
 #include "mss.h"
 #include "sampleheader.h"
 #include "types.h"

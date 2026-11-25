@@ -1,7 +1,6 @@
 #ifndef PALFADE_H
 #define PALFADE_H
 
-#include "decomp.h"
 #include "palcycle.h"
 #include "types.h"
 

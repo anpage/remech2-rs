@@ -6,7 +6,6 @@
 #include "config.h"
 #include "debris.h"
 #include "debugprint.h"
-#include "decomp.h"
 #include "gpanim.h"
 #include "mech.h"
 #include "mechclass.h"

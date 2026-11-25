@@ -1,7 +1,6 @@
 #ifndef WEAPONS_H
 #define WEAPONS_H
 
-#include "decomp.h"
 #include "types.h"
 #include "weapondef.h"
 

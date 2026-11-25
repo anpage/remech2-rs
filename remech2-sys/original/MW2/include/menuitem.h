@@ -1,7 +1,6 @@
 #ifndef MENUITEM_H
 #define MENUITEM_H
 
-#include "decomp.h"
 #include "point.h"
 #include "types.h"
 

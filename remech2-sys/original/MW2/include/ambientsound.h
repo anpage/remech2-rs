@@ -1,7 +1,6 @@
 #ifndef AMBIENTSOUND_H
 #define AMBIENTSOUND_H
 
-#include "decomp.h"
 #include "types.h"
 
 struct SceneObject;

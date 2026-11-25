@@ -1,7 +1,6 @@
 #ifndef MECHCHASSIS_H
 #define MECHCHASSIS_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A mech the bay can load. The table ends with a zeroed entry; only the first 15 are offered.

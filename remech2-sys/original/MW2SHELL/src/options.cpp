@@ -3,7 +3,6 @@
 #include "app.h"
 #include "audiosample.h"
 #include "audiosubsystem.h"
-#include "decomp.h"
 #include "difficultyconfig.h"
 #include "font.h"
 #include "gamesettings.h"

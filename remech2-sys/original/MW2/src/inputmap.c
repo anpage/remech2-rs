@@ -1,7 +1,6 @@
 /* The local player's steering, and the sinks the input layer writes it through. */
 #include "inputmap.h"
 
-#include "decomp.h"
 #include "types.h"
 
 // The local player's steering: the outputs of the sinks.

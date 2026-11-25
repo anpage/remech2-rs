@@ -1,7 +1,6 @@
 #include "ray.h"
 
 #include "approxlen.h"
-#include "decomp.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"
 #include "muldiv.h"

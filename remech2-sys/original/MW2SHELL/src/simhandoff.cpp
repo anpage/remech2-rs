@@ -1,6 +1,5 @@
 #include "simhandoff.h"
 
-#include "decomp.h"
 #include "mechvariant.h"
 #include "messages.h"
 #include "shellglobals.h"

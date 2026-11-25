@@ -9,7 +9,6 @@
 #include "cockpitframe.h"
 #include "cockpitpanel.h"
 #include "damagepanel.h"
-#include "decomp.h"
 #include "environment.h"
 #include "eyepoint.h"
 #include "fadepal.h"
@@ -150,9 +149,9 @@ int32_t g_punchInAutoHeadingRequested = 0;
 int32_t g_hitFadePending = 0;
 
 // The clock times the panels light up at on startup (CockpitPanel::m_lightUpTime): the weapon panels in turn.
-undefined4 g_cockpitPanelLightUpTimes[c_panelCount] = {0x16a, 0xb5,  0xb5,  0x21f, 0x23d, 0x25b, 0x279, 0x297, 0x32e,
-													   0x310, 0x2f2, 0x2d4, 0x2b5, 0xb5,  0xb5,  0xb5,  0xb5,  0xb5,
-													   0xb5,  0xb5,  0xb5,  0xb5,  0xb5,  0x0,   0x0,   0x0};
+uint32_t g_cockpitPanelLightUpTimes[c_panelCount] = {0x16a, 0xb5,  0xb5,  0x21f, 0x23d, 0x25b, 0x279, 0x297, 0x32e,
+													 0x310, 0x2f2, 0x2d4, 0x2b5, 0xb5,  0xb5,  0xb5,  0xb5,  0xb5,
+													 0xb5,  0xb5,  0xb5,  0xb5,  0xb5,  0x0,   0x0,   0x0};
 
 // The local mech's state (Mech::m_powerState) when PlayCockpitWarnings last ran.
 int32_t g_lastWarningPowerState = 0;
@@ -965,7 +964,7 @@ int32_t WriteScreenPicture(char* p_path, void* p_palette)
 {
 	void* header;
 	int32_t file;
-	undefined* pixels;
+	uint8_t* pixels;
 
 	header = NULL;
 	file = MechOpen(p_path, c_mechOpenCreate);

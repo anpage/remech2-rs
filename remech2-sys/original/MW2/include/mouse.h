@@ -1,7 +1,6 @@
 #ifndef MOUSE_H
 #define MOUSE_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The functions and globals of mouse.c that other units use.
@@ -10,7 +9,7 @@ extern "C"
 {
 #endif
 
-	extern undefined4 g_reclipCursor;
+	extern uint32_t g_reclipCursor;
 	extern int32_t g_cursorClipped;
 
 	void MouseRelease(void);

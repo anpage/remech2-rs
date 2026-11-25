@@ -1,7 +1,6 @@
 #include "animation.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "loadres.h"
 #include "mw2prj.h"
 #include "render.h"
@@ -123,7 +122,7 @@ int32_t DrawAnimatedPolygon(
 			mode |= 1;
 		}
 
-		g_animFrameBuffer.m_buffer = (undefined*) data;
+		g_animFrameBuffer.m_buffer = (uint8_t*) data;
 		g_animFrameBuffer.m_xMax = width - 1;
 		g_animFrameBuffer.m_yMax = height - 1;
 		VFX_map_polygon(&g_currentPane, p_count, p_points, &g_animFrameBuffer, mode);

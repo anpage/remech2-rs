@@ -1,7 +1,6 @@
 #ifndef BWD_H
 #define BWD_H
 
-#include "decomp.h"
 #include "types.h"
 
 struct BwdStreamKey;

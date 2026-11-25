@@ -1,6 +1,5 @@
 #include "resourcename.h"
 
-#include "decomp.h"
 #include "mw2prj.h"
 #include "resourcecache.h"
 #include "types.h"
@@ -17,9 +16,9 @@ typedef struct ResourceEntry {
 } ResourceEntry;
 
 typedef struct ResourceTable {
-	undefined m_unk0x00[0x08];  // 0x00 — never accessed
+	uint8_t m_unk0x00[0x08];    // 0x00 — never accessed
 	int16_t m_count;            // 0x08
-	undefined2 m_unk0x0a;       // 0x0a — never accessed
+	uint16_t m_unk0x0a;         // 0x0a — never accessed
 	ResourceEntry m_entries[1]; // 0x0c
 } ResourceTable;
 

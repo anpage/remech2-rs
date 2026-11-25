@@ -4,7 +4,6 @@
 #include "cockpitpanel.h"
 #include "config.h"
 #include "damagepanel.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "fadepal.h"
 #include "gamekeys.h"

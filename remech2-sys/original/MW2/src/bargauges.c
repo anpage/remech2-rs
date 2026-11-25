@@ -3,7 +3,6 @@
 #include "clock.h"
 #include "cockpitpanel.h"
 #include "config.h"
-#include "decomp.h"
 #include "environment.h"
 #include "muldiv.h"
 #include "players.h"

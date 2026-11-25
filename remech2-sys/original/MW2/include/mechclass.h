@@ -4,7 +4,6 @@
 struct Mech;
 struct Player;
 
-#include "decomp.h"
 #include "types.h"
 
 // The functions and globals of mechclass.c that other units use.

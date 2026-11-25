@@ -1,7 +1,6 @@
 #include "hallofhonor.h"
 
 #include "campaignmission.h"
-#include "decomp.h"
 #include "font.h"
 #include "keyboardinput.h"
 #include "loopingmovie.h"

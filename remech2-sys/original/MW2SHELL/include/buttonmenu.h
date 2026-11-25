@@ -1,7 +1,6 @@
 #ifndef BUTTONMENU_H
 #define BUTTONMENU_H
 
-#include "decomp.h"
 #include "mainmenubutton.h"
 #include "types.h"
 
@@ -34,7 +33,7 @@ private:
 	Collection* m_items;        // 0x00
 	VideoDriver* m_videoDriver; // 0x04
 	Font* m_font;               // 0x08
-	undefined m_colors[0x100];  // 0x0c
+	uint8_t m_colors[0x100];    // 0x0c
 
 public:
 	// The archive reader passes it on to the buttons it adds.

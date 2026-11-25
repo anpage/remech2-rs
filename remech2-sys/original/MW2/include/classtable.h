@@ -2,7 +2,6 @@
 #define CLASSTABLE_H
 
 #include "classentry.h"
-#include "decomp.h"
 #include "shape.h"
 #include "types.h"
 
@@ -22,9 +21,9 @@ extern "C"
 	int32_t LoadBaseLevelShapes(struct Player* p_player);
 	int32_t AddClassEntryLevel(
 		int32_t p_unk0x00,
-		undefined4 p_unk0x04,
-		undefined4 p_unk0x08,
-		undefined4 p_unk0x0c,
+		uint32_t p_unk0x04,
+		uint32_t p_unk0x08,
+		uint32_t p_unk0x0c,
 		int32_t p_unk0x10,
 		int32_t p_level,
 		int32_t p_index,

@@ -1,7 +1,6 @@
 #ifndef CUSTOMSTAR_H
 #define CUSTOMSTAR_H
 
-#include "decomp.h"
 #include "starmech.h"
 #include "types.h"
 

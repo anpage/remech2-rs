@@ -2,7 +2,6 @@
 #define PAGE_H
 
 #include "collection.h"
-#include "decomp.h"
 #include "types.h"
 
 class AudioSample;
@@ -41,7 +40,7 @@ public:
 	Page(
 		Font* p_font,
 		VideoDriver* p_videoDriver,
-		undefined* p_colors,
+		uint8_t* p_colors,
 		int32_t p_left,
 		int32_t p_top,
 		int32_t p_width,
@@ -59,11 +58,11 @@ public:
 	void Restart();
 	void TypeStep();
 	void Hide();
-	void SetBanner(undefined* p_data, int32_t p_size);
+	void SetBanner(uint8_t* p_data, int32_t p_size);
 
 private:
 	Collection* m_glyphs;       // 0x00
-	undefined* m_colors;        // 0x04
+	uint8_t* m_colors;          // 0x04
 	Font* m_font;               // 0x08
 	int32_t m_left;             // 0x0c
 	int32_t m_top;              // 0x10

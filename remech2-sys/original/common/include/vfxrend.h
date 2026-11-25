@@ -1,7 +1,6 @@
 #ifndef VFXREND_H
 #define VFXREND_H
 
-#include "decomp.h"
 #include "pane.h"
 #include "types.h"
 
@@ -26,13 +25,13 @@ extern "C"
 #endif
 
 	void VFX_set_Gouraud_dither_level(int32_t p_dither1, int32_t p_dither2);
-	int32_t GetCodeBlock(undefined4* p_start, undefined4* p_selector);
+	int32_t GetCodeBlock(uint32_t* p_start, uint32_t* p_selector);
 	void VFX_polygon_render(
 		PANE* p_pane,
 		uint32_t* p_vlist,
 		int32_t p_nvertices,
 		int32_t p_operation,
-		undefined4 p_color,
+		uint32_t p_color,
 		VFX_TEXTURE* p_texture,
 		void* p_cueing,
 		void* p_translucency
@@ -45,7 +44,7 @@ extern "C"
 		uint32_t* p_vlist,
 		int32_t p_nvertices,
 		int32_t p_operation,
-		undefined4 p_color,
+		uint32_t p_color,
 		VFX_TEXTURE* p_texture,
 		void* p_cueing,
 		void* p_translucency

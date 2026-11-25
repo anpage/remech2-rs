@@ -8,7 +8,6 @@
 #include "collision.h"
 #include "config.h"
 #include "debris.h"
-#include "decomp.h"
 #include "effect.h"
 #include "effectinfo.h"
 #include "eyepoint.h"

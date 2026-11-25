@@ -1,7 +1,6 @@
 #ifndef SOUNDCONFIG_H
 #define SOUNDCONFIG_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The sound and display settings, copied field by field to and from the game settings

@@ -1,7 +1,6 @@
 #include "team.h"
 
 #include "ai.h"
-#include "decomp.h"
 #include "gamething.h"
 #include "object.h"
 #include "players.h"

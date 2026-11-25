@@ -1,21 +1,20 @@
 #ifndef PRJFILE_H
 #define PRJFILE_H
 
-#include "decomp.h"
 #include "types.h"
 
 #pragma pack(1)
 typedef struct ArchiveEntry {
-	char m_name[4];                   // 0x00
-	uint32_t m_offset;                // 0x04
-	uint32_t m_size;                  // 0x08
-	undefined m_unk0x0c[0x14 - 0x0c]; // 0x0c — never accessed
-	uint16_t m_baseOffset;            // 0x14
-	undefined m_unk0x16[0x18 - 0x16]; // 0x16 — never accessed
+	char m_name[4];                 // 0x00
+	uint32_t m_offset;              // 0x04
+	uint32_t m_size;                // 0x08
+	uint8_t m_unk0x0c[0x14 - 0x0c]; // 0x0c — never accessed
+	uint16_t m_baseOffset;          // 0x14
+	uint8_t m_unk0x16[0x18 - 0x16]; // 0x16 — never accessed
 } ArchiveEntry;
 
 typedef struct ArchiveHeader {
-	undefined m_unk0x00[0x0c]; // 0x00 — never accessed
+	uint8_t m_unk0x00[0x0c];   // 0x00 — never accessed
 	uint16_t m_entryCount;     // 0x0c
 	ArchiveEntry m_entries[1]; // 0x0e
 } ArchiveHeader;
@@ -40,10 +39,10 @@ extern "C"
 #endif
 
 	extern ArchiveSlot g_archiveSlots[1];
-	extern void* (*g_archiveAlloc)(undefined4);
+	extern void* (*g_archiveAlloc)(uint32_t);
 	extern void (*g_archiveFree)(void*);
 
-	void SetArchiveAllocator(void* (*p_alloc)(undefined4), void (*p_free)(void*));
+	void SetArchiveAllocator(void* (*p_alloc)(uint32_t), void (*p_free)(void*));
 	int32_t OpenArchive(char* p_name, char p_mode);
 	int32_t CloseArchive(int32_t p_handle);
 	int32_t LoadArchiveEntries(int32_t p_handle);

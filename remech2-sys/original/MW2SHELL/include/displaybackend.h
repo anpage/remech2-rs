@@ -1,7 +1,6 @@
 #ifndef DISPLAYBACKEND_H
 #define DISPLAYBACKEND_H
 
-#include "decomp.h"
 #include "palettecolor.h"
 #include "types.h"
 #include "window.h"

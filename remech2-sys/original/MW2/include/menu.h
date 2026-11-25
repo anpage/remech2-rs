@@ -1,7 +1,6 @@
 #ifndef MENU_H
 #define MENU_H
 
-#include "decomp.h"
 #include "point.h"
 #include "targeting.h"
 #include "types.h"
@@ -49,7 +48,7 @@ extern "C"
 {
 #endif
 
-	extern undefined g_textColors[0x100];
+	extern uint8_t g_textColors[0x100];
 	extern int32_t g_menuRepeatTimer;
 	extern int32_t g_menuKey;
 	extern MenuDefinition* g_menuDefinitions[11];

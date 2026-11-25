@@ -1,6 +1,5 @@
 #include "resourcecache.h"
 
-#include "decomp.h"
 #include "log.h"
 #include "prjfile.h"
 #include "types.h"
@@ -127,7 +126,7 @@ ResourceCacheEntry* FindCacheEntry(int32_t p_id, char* p_type)
 
 	bucket = ((int8_t) p_type[3] + (int8_t) p_type[2] + (int8_t) p_type[0] + (int8_t) p_type[1] + p_id) % 0x3f1;
 	for (entry = g_cacheTable[bucket]; entry != NULL; entry = entry->m_next) {
-		if (entry->m_id == p_id && entry->m_type == *(undefined4*) p_type) {
+		if (entry->m_id == p_id && entry->m_type == *(uint32_t*) p_type) {
 			break;
 		}
 	}
@@ -149,7 +148,7 @@ void FreeCacheEntry(ResourceCacheEntry* p_entry)
 	p_entry->m_lock = 0;
 	LockCacheEntry(p_entry);
 	type[4] = '\0';
-	*(undefined4*) type = p_entry->m_type;
+	*(uint32_t*) type = p_entry->m_type;
 	bucket = ((int8_t) type[2] + (int8_t) type[3] + (int8_t) type[0] + (int8_t) type[1] + p_entry->m_id) % 0x3f1;
 	if (g_cacheTable[bucket] == p_entry) {
 		g_cacheTable[bucket] = p_entry->m_next;
@@ -262,7 +261,7 @@ void* LoadCachedResource(int32_t p_handle, int32_t p_id, char* p_type, int32_t p
 	g_cacheTable[bucket] = block;
 	block->m_lock = 1;
 	block->m_id = p_id;
-	block->m_type = *(undefined4*) p_type;
+	block->m_type = *(uint32_t*) p_type;
 	block->m_purgeNext = NULL;
 	block->m_purgePrev = NULL;
 	g_cacheEntryCount++;
@@ -290,7 +289,7 @@ int32_t PurgeOldestCacheEntry(void)
 }
 
 // Zeroed, with calloc.
-void* AllocateMemory(undefined4 p_size)
+void* AllocateMemory(uint32_t p_size)
 {
 	return calloc(p_size, 1);
 }

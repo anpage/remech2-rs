@@ -1,7 +1,6 @@
 #ifndef STARMISSION_H
 #define STARMISSION_H
 
-#include "decomp.h"
 #include "missionobjective.h"
 #include "types.h"
 
@@ -18,7 +17,7 @@ typedef struct StarMission {
 	char m_successSound[0x10];         // 0x18 — a sound file, loaded by ReadSoundFile
 	char m_failSound[0x10];            // 0x28
 	uint8_t m_status;                  // 0x38 — 0 in progress, 2 successful, 3 failed, 4 out of time
-	undefined m_affiliation;           // 0x39
+	uint8_t m_affiliation;             // 0x39
 	MissionObjective m_objectives[48]; // 0x3a
 } StarMission;
 

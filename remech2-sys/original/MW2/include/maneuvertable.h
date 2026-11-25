@@ -1,7 +1,6 @@
 #ifndef MANEUVERTABLE_H
 #define MANEUVERTABLE_H
 
-#include "decomp.h"
 #include "types.h"
 
 // An entry of an AI maneuver table: a maneuver ([0]), how many may follow it ([1]) and those

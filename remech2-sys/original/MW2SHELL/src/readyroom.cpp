@@ -4,7 +4,6 @@
 #include "audiosubsystem.h"
 #include "buttonmenu.h"
 #include "campaignmission.h"
-#include "decomp.h"
 #include "font.h"
 #include "mainmenubutton.h"
 #include "mechbay.h"

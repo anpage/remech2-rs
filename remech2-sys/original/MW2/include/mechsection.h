@@ -1,7 +1,6 @@
 #ifndef MECHSECTION_H
 #define MECHSECTION_H
 
-#include "decomp.h"
 #include "types.h"
 
 // One of a mech's eight sections (Mech::m_sections), as the network state message carries it.

@@ -1,6 +1,5 @@
 #include "faceshade.h"
 
-#include "decomp.h"
 #include "face.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"
@@ -245,12 +244,12 @@ void EnableTextureMaps(uint32_t p_flags, int32_t p_enable)
 }
 
 // The display detail setting: textures with perspective correction.
-int32_t ArePerspectiveTexturesOn(undefined4 p_unk0x00)
+int32_t ArePerspectiveTexturesOn(uint32_t p_unk0x00)
 {
 	return !g_renderSettings.m_affineTextures;
 }
 
-void EnablePerspectiveTextures(undefined4 p_unk0x00, int32_t p_enable)
+void EnablePerspectiveTextures(uint32_t p_unk0x00, int32_t p_enable)
 {
 	if (!p_enable) {
 		g_renderSettings.m_affineTextures = TRUE;

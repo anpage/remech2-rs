@@ -1,7 +1,6 @@
 #include "perf.h"
 
 #include "audio.h"
-#include "decomp.h"
 #include "faceshade.h"
 #include "geocache.h"
 #include "gridobject.h"

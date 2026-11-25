@@ -1,7 +1,6 @@
 #include "lineofsight.h"
 
 #include "collision.h"
-#include "decomp.h"
 #include "fixedmul.h"
 #include "fixedtrig.h"
 #include "players.h"

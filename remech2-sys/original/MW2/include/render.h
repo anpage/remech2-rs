@@ -1,7 +1,6 @@
 #ifndef RENDER_H
 #define RENDER_H
 
-#include "decomp.h"
 #include "targeting.h"
 #include "types.h"
 #include "window.h"

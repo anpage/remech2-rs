@@ -5,7 +5,6 @@
 #include "audio.h"
 #include "audioengine.h"
 #include "clock.h"
-#include "decomp.h"
 #include "fixedmul.h"
 #include "loadres.h"
 #include "mss.h"

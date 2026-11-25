@@ -5,7 +5,6 @@
 #include "campaignmission.h"
 #include "collection.h"
 #include "customstar.h"
-#include "decomp.h"
 #include "font.h"
 #include "keyboardinput.h"
 #include "mechbay.h"

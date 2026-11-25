@@ -1,7 +1,6 @@
 #ifndef XFORM_H
 #define XFORM_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The transform the next block opens with (ApplyBlockXform) and a static object's placement:

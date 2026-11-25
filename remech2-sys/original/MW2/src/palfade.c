@@ -1,6 +1,5 @@
 #include "palfade.h"
 
-#include "decomp.h"
 #include "palcycle.h"
 #include "refreshmode.h"
 #include "simmain.h"

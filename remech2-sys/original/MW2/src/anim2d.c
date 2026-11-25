@@ -1,7 +1,6 @@
 #include "anim2d.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "loadres.h"
 #include "mw2prj.h"
 #include "setres.h"

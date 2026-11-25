@@ -1,6 +1,5 @@
 #include "boundbox.h"
 
-#include "decomp.h"
 #include "object.h"
 #include "quadtree.h"
 #include "shape.h"

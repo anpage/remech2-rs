@@ -1,7 +1,6 @@
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The callback's event: 0 when created, 1 when due, 2 when removed, -1 from SignalTask.

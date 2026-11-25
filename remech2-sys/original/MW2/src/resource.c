@@ -8,7 +8,6 @@
 #include "classtable.h"
 #include "collision.h"
 #include "config.h"
-#include "decomp.h"
 #include "error.h"
 #include "files.h"
 #include "geocache.h"
@@ -403,7 +402,7 @@ void FreeMissionTables(void)
 
 // Scales the vector (p_a, p_b, p_c) to integers whose absolute values add up to 2^29. A vector
 // that small is left alone.
-void ScaleNormal(float p_a, float p_b, float p_c, undefined4* p_x, undefined4* p_y, undefined4* p_z)
+void ScaleNormal(float p_a, float p_b, float p_c, uint32_t* p_x, uint32_t* p_y, uint32_t* p_z)
 {
 	float scale;
 
@@ -418,16 +417,7 @@ void ScaleNormal(float p_a, float p_b, float p_c, undefined4* p_x, undefined4* p
 }
 
 // Scales the plane (p_a, p_b, p_c, p_d) like ScaleNormal.
-void ScalePlane(
-	float p_a,
-	float p_b,
-	float p_c,
-	float p_d,
-	undefined4* p_x,
-	undefined4* p_y,
-	undefined4* p_z,
-	undefined4* p_w
-)
+void ScalePlane(float p_a, float p_b, float p_c, float p_d, uint32_t* p_x, uint32_t* p_y, uint32_t* p_z, uint32_t* p_w)
 {
 	float scale;
 
@@ -455,9 +445,9 @@ void GetTriangleNormal(
 	float p_x3,
 	float p_y3,
 	float p_z3,
-	undefined4* p_x,
-	undefined4* p_y,
-	undefined4* p_z
+	uint32_t* p_x,
+	uint32_t* p_y,
+	uint32_t* p_z
 )
 {
 	float a;
@@ -493,10 +483,10 @@ void GetTrianglePlane(
 	float p_x3,
 	float p_y3,
 	float p_z3,
-	undefined4* p_x,
-	undefined4* p_y,
-	undefined4* p_z,
-	undefined4* p_w
+	uint32_t* p_x,
+	uint32_t* p_y,
+	uint32_t* p_z,
+	uint32_t* p_w
 )
 {
 	float a;
@@ -529,10 +519,10 @@ void GetPointNormalPlane(
 	float p_nx,
 	float p_ny,
 	float p_nz,
-	undefined4* p_planeX,
-	undefined4* p_planeY,
-	undefined4* p_planeZ,
-	undefined4* p_planeW
+	uint32_t* p_planeX,
+	uint32_t* p_planeY,
+	uint32_t* p_planeZ,
+	uint32_t* p_planeW
 )
 {
 	float a;
@@ -562,7 +552,7 @@ void SetMangleBase(int32_t p_base)
 // in the world or under its parent's object.
 void CreateObjectNode(
 	BwdObjectRecord* p_record,
-	undefined4 p_unk0x04,
+	uint32_t p_unk0x04,
 	int32_t p_unk0x08,
 	int32_t p_static,
 	int32_t p_class,

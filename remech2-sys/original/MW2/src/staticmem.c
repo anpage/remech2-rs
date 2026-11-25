@@ -1,7 +1,6 @@
 #include "staticmem.h"
 
 #include "bwd.h"
-#include "decomp.h"
 #include "error.h"
 #include "loadres.h"
 #include "mw2log.h"

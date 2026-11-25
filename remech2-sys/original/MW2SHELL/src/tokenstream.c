@@ -1,6 +1,5 @@
 #include "tokenstream.h"
 
-#include "decomp.h"
 #include "stringutil.h"
 #include "types.h"
 #include "windowstate.h"

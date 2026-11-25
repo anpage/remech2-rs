@@ -1,7 +1,6 @@
 #ifndef COCKPIT_H
 #define COCKPIT_H
 
-#include "decomp.h"
 #include "mappoint.h"
 #include "navpoint.h"
 #include "point.h"
@@ -71,7 +70,7 @@ extern "C"
 	extern int32_t g_satelliteStaticState;
 	extern void (*g_savedFrameDrawCallback)(void);
 	extern int32_t g_savedShowCrosshair;
-	extern undefined4 g_savedShowHud;
+	extern uint32_t g_savedShowHud;
 	extern int32_t g_savedShowTargetMarker;
 	extern int32_t g_hudSettingsSaved;
 	extern int32_t g_mapShadeTop;

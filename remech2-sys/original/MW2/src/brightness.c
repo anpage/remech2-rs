@@ -1,6 +1,5 @@
 #include "brightness.h"
 
-#include "decomp.h"
 #include "displaybackend.h"
 #include "palettecolor.h"
 #include "refreshmode.h"

@@ -1,7 +1,6 @@
 #include "timedoverlays.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "loadres.h"
 #include "menu.h"
 #include "mw2prj.h"

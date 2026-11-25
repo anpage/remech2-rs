@@ -1,6 +1,5 @@
 #include "shapelists.h"
 
-#include "decomp.h"
 #include "shape.h"
 #include "shapelisthead.h"
 #include "types.h"

@@ -1,17 +1,16 @@
 #ifndef TEAM_H
 #define TEAM_H
 
-#include "decomp.h"
 #include "teamformation.h"
 #include "types.h"
 
 typedef struct Team {
-	int32_t m_leader;         // 0x00 — a player index, or -1
-	int32_t m_memberCount;    // 0x04
-	undefined4 m_affiliation; // 0x08
-	int32_t m_side;           // 0x10
-	int32_t m_formation;      // 0x14 — the template g_teamFormations copies
-	int32_t m_members[8];     // 0x18 — player indices
+	int32_t m_leader;       // 0x00 — a player index, or -1
+	int32_t m_memberCount;  // 0x04
+	uint32_t m_affiliation; // 0x08
+	int32_t m_side;         // 0x10
+	int32_t m_formation;    // 0x14 — the template g_teamFormations copies
+	int32_t m_members[8];   // 0x18 — player indices
 } Team;
 
 // The functions and globals of team.c that other units use.

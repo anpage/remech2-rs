@@ -1,6 +1,5 @@
 #include "gpanim.h"
 
-#include "decomp.h"
 #include "eyepoint.h"
 #include "mech.h"
 #include "players.h"

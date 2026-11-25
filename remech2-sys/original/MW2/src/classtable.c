@@ -2,7 +2,6 @@
 
 #include "classentry.h"
 #include "collision.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "fixedmul.h"
 #include "loadres.h"
@@ -38,7 +37,7 @@ int32_t LoadBaseLevelShapes(Player* p_player)
 {
 	int32_t i;
 	int32_t count;
-	undefined* buffer;
+	uint8_t* buffer;
 
 	count = 0;
 	for (i = 0; i < g_classEntryCount; i++) {
@@ -68,9 +67,9 @@ int32_t LoadBaseLevelShapes(Player* p_player)
 // index, or -1.
 int32_t AddClassEntryLevel(
 	int32_t p_unk0x00,
-	undefined4 p_unk0x04,
-	undefined4 p_unk0x08,
-	undefined4 p_unk0x0c,
+	uint32_t p_unk0x04,
+	uint32_t p_unk0x08,
+	uint32_t p_unk0x0c,
 	int32_t p_unk0x10,
 	int32_t p_level,
 	int32_t p_index,

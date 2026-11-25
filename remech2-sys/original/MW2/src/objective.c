@@ -4,7 +4,6 @@
 #include "careerrecord.h"
 #include "clock.h"
 #include "config.h"
-#include "decomp.h"
 #include "gamekeys.h"
 #include "gamething.h"
 #include "geocache.h"

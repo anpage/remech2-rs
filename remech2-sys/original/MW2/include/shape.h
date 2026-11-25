@@ -1,7 +1,6 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
-#include "decomp.h"
 #include "shapegeom.h"
 #include "types.h"
 
@@ -17,7 +16,7 @@ struct Shape {
 	uint16_t m_flags; // 0x00 — 0x10f: the load flags (SetShapeLoadFlags), 0xf0: the damage level
 					  // (RaisePartDamageLevel), 0x200: transformed bounds current, 0x800: not in the collision list,
 					  // 0x1000: hidden (in g_hiddenShapes)
-	uint16_t m_kind;              // 0x02 — 0xf00: the owner class (0x100 player, 0x200 thing), 0xf0: the type
+	uint16_t m_kind;  // 0x02 — 0xf00: the owner class (0x100 player, 0x200 thing), 0xf0: the type
 	struct Shape* m_prev;         // 0x04 — the previous shape in its list
 	struct Shape* m_next;         // 0x08 — the next shape in its list
 	struct Shape* m_prevCollider; // 0x0c — the collision list
@@ -36,7 +35,7 @@ struct Shape {
 	int32_t m_centerZ;            // 0x3c
 	int32_t m_radius;             // 0x40 — the bounding sphere around the center
 	void* m_collisionData;        // 0x44 — a BoundBox (type 0) or a QuadtreeNode (type 5)
-	undefined4 m_transformCount;  // 0x48 — bumped per transform; Model::m_transformCount stamps it
+	uint32_t m_transformCount;    // 0x48 — bumped per transform; Model::m_transformCount stamps it
 };
 
 // The functions and globals of shape.c that other units use.
@@ -64,7 +63,7 @@ extern "C"
 	void SetModelKey(Shape* p_shape, int32_t p_key);
 	int32_t GetModelKey(Shape* p_shape);
 	Shape* CreateShape(int32_t p_vertexCount, int32_t p_faceCount, int32_t p_extra, void** p_extraData);
-	void AddShapeVertex(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z, undefined4 p_u, undefined4 p_v);
+	void AddShapeVertex(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z, uint32_t p_u, uint32_t p_v);
 	struct Face* AddShapeFace(Shape* p_shape, uint16_t p_color, uint8_t* p_indices);
 	void AddShapeFaceIndex(Shape* p_shape, struct Face* p_face, uint32_t p_index);
 	void FreeModel(Model* p_model);

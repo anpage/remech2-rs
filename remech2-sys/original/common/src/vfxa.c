@@ -16,7 +16,6 @@
    them. Where the DLLs' headers declare a routine void, the C returns nothing. */
 #include "vfxa.h"
 
-#include "decomp.h"
 #include "pane.h"
 #include "portable.h"
 #include "types.h"
@@ -859,12 +858,12 @@ static void DrawShapeUnclippedWith(
 	}
 }
 
-void DrawShapeUnclipped(PANE* p_pane, void* p_shape, int32_t p_hotX, int32_t p_hotY, undefined4 p_cpW)
+void DrawShapeUnclipped(PANE* p_pane, void* p_shape, int32_t p_hotX, int32_t p_hotY, uint32_t p_cpW)
 {
 	DrawShapeUnclippedWith(p_pane, (const uint8_t*) p_shape, p_hotX, p_hotY, NULL);
 }
 
-int32_t XlatShapeUnclipped(PANE* p_pane, void* p_shape, int32_t p_hotX, int32_t p_hotY, undefined4 p_cpW)
+int32_t XlatShapeUnclipped(PANE* p_pane, void* p_shape, int32_t p_hotX, int32_t p_hotY, uint32_t p_cpW)
 {
 	DrawShapeUnclippedWith(p_pane, (const uint8_t*) p_shape, p_hotX, p_hotY, lookaside);
 	return 0;
@@ -1014,7 +1013,7 @@ int32_t VFX_shape_visible_rectangle(
 	int32_t p_shapeNumber,
 	int32_t p_hotX,
 	int32_t p_hotY,
-	undefined4 p_mirror,
+	uint32_t p_mirror,
 	int32_t* p_rectangle
 )
 {
@@ -1444,7 +1443,7 @@ int32_t VFX_pane_scroll(PANE* p_pane, int32_t p_dx, int32_t p_dy, int32_t p_mode
 		}
 
 		PORTABLE_ASSERT(sizeof(void*) == 4);
-		scratch.m_buffer = (undefined*) (size_t) (uint32_t) p_parm;
+		scratch.m_buffer = (uint8_t*) (size_t) (uint32_t) p_parm;
 		scratch.m_xMax = width - 1;
 		scratch.m_yMax = height - 1;
 		scratch.m_stencil = NULL;

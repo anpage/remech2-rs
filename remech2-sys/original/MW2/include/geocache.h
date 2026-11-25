@@ -2,7 +2,6 @@
 #define GEOCACHE_H
 
 #include "callbacks.h"
-#include "decomp.h"
 #include "quadtree.h"
 #include "shape.h"
 #include "staticblock.h"
@@ -42,7 +41,7 @@ extern "C"
 	extern int32_t g_classCapacity;
 	extern GeoClass* g_classes;
 	extern int32_t g_staticObjectCount;
-	extern undefined4 g_staticCacheReady;
+	extern uint32_t g_staticCacheReady;
 	extern int32_t g_nextBlock;
 	extern Xform g_pendingXform;
 	extern Xform g_defaultXform;
@@ -70,11 +69,11 @@ extern "C"
 		int32_t p_unk0x3c,
 		uint32_t p_flags,
 		uint32_t p_kind,
-		undefined4 p_shapeKind
+		uint32_t p_shapeKind
 	);
 	void UpdateGeoCache(void);
 	void BeginBlock(struct BwdBlockRecord* p_record);
-	int32_t AllocStaticObject(undefined4 p_id);
+	int32_t AllocStaticObject(uint32_t p_id);
 	void HandleElseBlock(void);
 	void EndBlock(struct BwdStream* p_stream);
 	int32_t FindStarIdxById(int32_t p_id);

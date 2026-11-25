@@ -1,6 +1,5 @@
 #include "credits.h"
 
-#include "decomp.h"
 #include "elapsed.h"
 #include "font.h"
 #include "keyboardinput.h"
@@ -574,7 +573,7 @@ char g_creditsMovieName[0x10] = "amwlogo1";
 // The first line still on screen.
 int32_t g_creditsFirstLine;
 
-undefined g_creditsTitleColors[0x100];
+uint8_t g_creditsTitleColors[0x100];
 
 // The screen position of line 0.
 int32_t g_creditsScrollTop;

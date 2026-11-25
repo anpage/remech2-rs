@@ -57,7 +57,7 @@ int32_t KeyboardInput::WaitForKey()
 	}
 }
 
-undefined4 KeyboardInput::GetKeyPressed()
+uint32_t KeyboardInput::GetKeyPressed()
 {
 	return m_keyPressed;
 }
@@ -87,7 +87,7 @@ int32_t KeyboardInput::PollKey()
 	}
 }
 
-void KeyboardInput::ResetText(undefined4 p_maxLength)
+void KeyboardInput::ResetText(uint32_t p_maxLength)
 {
 	m_key = 0;
 	m_length = 0;
@@ -95,7 +95,7 @@ void KeyboardInput::ResetText(undefined4 p_maxLength)
 	strcpy(m_text, "");
 }
 
-void KeyboardInput::SetText(undefined4 p_maxLength, const char* p_text)
+void KeyboardInput::SetText(uint32_t p_maxLength, const char* p_text)
 {
 	strcpy(m_text, p_text);
 	m_key = 0;
@@ -152,7 +152,7 @@ int32_t EditTextField(
 	int32_t p_left,
 	int32_t p_top,
 	char* p_text,
-	undefined* p_colors,
+	uint8_t* p_colors,
 	int32_t p_maxLength,
 	int32_t p_width
 )

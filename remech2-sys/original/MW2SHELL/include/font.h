@@ -1,7 +1,6 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "decomp.h"
 #include "types.h"
 
 class TextGlyph;
@@ -14,12 +13,12 @@ public:
 
 	int32_t GetTextWidth(char* p_text);
 	int32_t GetCharacterWidth(int32_t p_char);
-	TextGlyph* AddText(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors);
-	TextGlyph* AddOverlayText(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors);
-	int32_t DrawString(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors);
-	TextGlyph* AddTypedText(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors);
-	int32_t DrawChar(int32_t p_left, int32_t p_top, int32_t p_char, undefined* p_colors);
-	void TypeKey(int32_t p_left, int32_t p_top, int32_t p_key, undefined* p_colors);
+	TextGlyph* AddText(int32_t p_left, int32_t p_top, char* p_text, uint8_t* p_colors);
+	TextGlyph* AddOverlayText(int32_t p_left, int32_t p_top, char* p_text, uint8_t* p_colors);
+	int32_t DrawString(int32_t p_left, int32_t p_top, char* p_text, uint8_t* p_colors);
+	TextGlyph* AddTypedText(int32_t p_left, int32_t p_top, char* p_text, uint8_t* p_colors);
+	int32_t DrawChar(int32_t p_left, int32_t p_top, int32_t p_char, uint8_t* p_colors);
+	void TypeKey(int32_t p_left, int32_t p_top, int32_t p_key, uint8_t* p_colors);
 	void ResetTyping();
 
 private:

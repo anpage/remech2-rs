@@ -1,7 +1,6 @@
 #ifndef VFXA_H
 #define VFXA_H
 
-#include "decomp.h"
 #include "pane.h"
 #include "types.h"
 #include "window.h"
@@ -43,8 +42,8 @@ extern "C"
 		int32_t p_parm
 	);
 	void VFX_rectangle_hash(PANE* p_pane, int32_t p_x0, int32_t p_y0, int32_t p_x1, int32_t p_y1, uint8_t p_color);
-	void DrawShapeUnclipped(PANE* p_pane, void* p_shape, int32_t p_hotX, int32_t p_hotY, undefined4 p_cpW);
-	int32_t XlatShapeUnclipped(PANE* p_pane, void* p_shape, int32_t p_hotX, int32_t p_hotY, undefined4 p_cpW);
+	void DrawShapeUnclipped(PANE* p_pane, void* p_shape, int32_t p_hotX, int32_t p_hotY, uint32_t p_cpW);
+	int32_t XlatShapeUnclipped(PANE* p_pane, void* p_shape, int32_t p_hotX, int32_t p_hotY, uint32_t p_cpW);
 	void VFX_shape_draw(PANE* p_pane, void* p_shapeTable, int32_t p_shapeNumber, int32_t p_hotX, int32_t p_hotY);
 	void VFX_shape_lookaside(uint8_t* p_table);
 	int32_t VFX_shape_translate_draw(
@@ -60,7 +59,7 @@ extern "C"
 		int32_t p_shapeNumber,
 		int32_t p_hotX,
 		int32_t p_hotY,
-		undefined4 p_mirror,
+		uint32_t p_mirror,
 		int32_t* p_rectangle
 	);
 	int32_t VFX_shape_bounds(void* p_shapeTable, int32_t p_shapeNum);

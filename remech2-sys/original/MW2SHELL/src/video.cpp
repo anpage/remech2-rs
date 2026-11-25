@@ -1,6 +1,5 @@
 #include "video.h"
 
-#include "decomp.h"
 #include "displaybackend.h"
 #include "elapsed.h"
 #include "files.h"
@@ -312,7 +311,7 @@ void UpdateVideos()
 					video->m_flags |= 0x10;
 					if (video->m_flags & 0x100) {
 						g_videoDriver->DrawPixels(
-							(undefined*) video->m_frameBuffer,
+							(uint8_t*) video->m_frameBuffer,
 							video->m_left,
 							video->m_top,
 							video->m_width,
@@ -321,7 +320,7 @@ void UpdateVideos()
 					}
 					else {
 						g_videoDriver->DrawPixelsClipped(
-							(undefined*) video->m_frameBuffer,
+							(uint8_t*) video->m_frameBuffer,
 							video->m_left,
 							video->m_top,
 							video->m_width,
@@ -619,8 +618,8 @@ int32_t LoadShpFile(FmvSlot* p_slot, const char* p_name)
 int32_t PlayVideo(
 	int32_t p_index,
 	const char* p_name,
-	undefined4 p_left,
-	undefined4 p_top,
+	uint32_t p_left,
+	uint32_t p_top,
 	uint32_t p_flags,
 	uint32_t p_fps
 )

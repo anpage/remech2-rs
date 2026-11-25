@@ -3,7 +3,6 @@
 #include "audiosample.h"
 #include "buttonmenu.h"
 #include "customstar.h"
-#include "decomp.h"
 #include "font.h"
 #include "formation.h"
 #include "mainmenubutton.h"

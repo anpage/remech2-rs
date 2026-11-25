@@ -1,7 +1,6 @@
 #ifndef QUADTREE_H
 #define QUADTREE_H
 
-#include "decomp.h"
 #include "ray.h"
 #include "types.h"
 
@@ -10,7 +9,7 @@ struct Shape;
 #include "shapegeom.h"
 
 // A quadtree node: its bounds, its four children (m_faceCount == 0) and m_faceCount entries
-// after the header (undefined4 each). AllocQuadtreeNode allocates it; Shape::m_collisionData holds the root
+// after the header (uint32_t each). AllocQuadtreeNode allocates it; Shape::m_collisionData holds the root
 // when the shape's m_collisionType is 5.
 typedef struct QuadtreeNode {
 	int32_t m_minX;                     // 0x00
@@ -34,12 +33,12 @@ extern "C"
 	void BuildShapeQuadtree(struct Shape* p_shape);
 	QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, int32_t p_quadrant, Model* p_model);
 	QuadtreeNode* AllocQuadtreeNode(
-		undefined4 p_minX,
-		undefined4 p_maxX,
-		undefined4 p_minY,
-		undefined4 p_maxY,
-		undefined4 p_minZ,
-		undefined4 p_maxZ,
+		uint32_t p_minX,
+		uint32_t p_maxX,
+		uint32_t p_minY,
+		uint32_t p_maxY,
+		uint32_t p_minZ,
+		uint32_t p_maxZ,
 		int32_t p_faceCount
 	);
 	void FreeQuadtree(QuadtreeNode* p_node);

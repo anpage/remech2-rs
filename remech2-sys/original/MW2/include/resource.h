@@ -3,7 +3,6 @@
 
 #include "bwd.h"
 #include "callbacks.h"
-#include "decomp.h"
 #include "missiontable.h"
 #include "types.h"
 
@@ -53,7 +52,7 @@ extern "C"
 	void SetMangleBase(int32_t p_base);
 	void CreateObjectNode(
 		struct BwdObjectRecord* p_record,
-		undefined4 p_unk0x04,
+		uint32_t p_unk0x04,
 		int32_t p_unk0x08,
 		int32_t p_static,
 		int32_t p_class,

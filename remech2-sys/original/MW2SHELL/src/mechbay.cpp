@@ -4,7 +4,6 @@
 #include "buttonmenu.h"
 #include "customstar.h"
 #include "debugprint.h"
-#include "decomp.h"
 #include "files.h"
 #include "font.h"
 #include "keyboardinput.h"
@@ -35,8 +34,8 @@
 int32_t PlayVideo(
 	int32_t p_index,
 	const char* p_name,
-	undefined4 p_unk0x08,
-	undefined4 p_unk0x0c,
+	uint32_t p_unk0x08,
+	uint32_t p_unk0x0c,
 	uint32_t p_unk0x10,
 	uint32_t p_unk0x14
 );
@@ -203,9 +202,9 @@ AudioSample* g_mechBayAmbience = NULL;
 // The wParam the screen was opened with.
 int32_t g_mechBayWParam = c_msgScreenFrame;
 
-undefined4 g_chassisVideoLeft;
+uint32_t g_chassisVideoLeft;
 
-undefined4 g_chassisVideoTop;
+uint32_t g_chassisVideoTop;
 
 // g_pickStarMech as the bay was opened: ACCEPT MECH checks the star's tonnage, and the other
 // screens are out of reach.
@@ -242,17 +241,17 @@ int32_t g_mechBayMessage;
 
 char g_variantFileName[0x20];
 
-undefined g_mekFileBuffer[0x800];
+uint8_t g_mekFileBuffer[0x800];
 
 MekLocation g_mekLocations[8];
 
 // The color maps of the fields: over the maximum mass, clickable or highlighted, and plain
 // text.
-undefined g_warningColors[0x100];
+uint8_t g_warningColors[0x100];
 
-undefined g_activeColors[0x100];
+uint8_t g_activeColors[0x100];
 
-undefined g_textColors[0x100];
+uint8_t g_textColors[0x100];
 
 // The path of the .mek file being saved.
 char g_mekPath[0x20];
@@ -856,7 +855,7 @@ TextGlyph* DrawMass(ScreenField* p_tab)
 TextGlyph* DrawUsedMass(ScreenField* p_tab)
 {
 	int32_t value;
-	undefined* colors;
+	uint8_t* colors;
 
 	value = *(int32_t*) p_tab->m_data;
 	colors = p_tab->m_colors;
@@ -1046,7 +1045,7 @@ TextGlyph* DrawWeaponEntry(ScreenField* p_tab)
 {
 	int32_t value;
 	int32_t count;
-	undefined* colors;
+	uint8_t* colors;
 
 	value = *(int32_t*) p_tab->m_data;
 	colors = p_tab->m_colors;
@@ -1085,7 +1084,7 @@ TextGlyph* DrawWeaponEntry(ScreenField* p_tab)
 TextGlyph* DrawWeaponTableEntry(ScreenField* p_tab)
 {
 	int32_t index;
-	undefined* colors;
+	uint8_t* colors;
 
 	index = MECH_PTR_TO_S32(p_tab->m_data);
 	colors = p_tab->m_colors;
@@ -2154,7 +2153,7 @@ void ReleaseMekImage(char* p_name)
 }
 
 // Copies p_size bytes and returns the source position after them.
-undefined* ReadBytes(undefined* p_dst, undefined* p_src, uint32_t p_size)
+uint8_t* ReadBytes(uint8_t* p_dst, uint8_t* p_src, uint32_t p_size)
 {
 	memcpy(p_dst, p_src, p_size);
 	return p_src + p_size;
@@ -2181,12 +2180,12 @@ void SetCritical(int32_t p_location, int32_t p_slot, int32_t p_id)
 void LoadMekFile(char* p_name)
 {
 	int32_t id;
-	undefined* data;
+	uint8_t* data;
 	int32_t i;
 	int32_t j;
 	int32_t k;
 
-	data = (undefined*) LoadMekImage(p_name);
+	data = (uint8_t*) LoadMekImage(p_name);
 	if (data == NULL) {
 		return;
 	}
@@ -2198,13 +2197,13 @@ void LoadMekFile(char* p_name)
 	memset(g_mekAmmo, 0, sizeof(g_mekAmmo));
 	memset(g_mekVariantName, 0, sizeof(g_mekVariantName));
 
-	data = ReadBytes((undefined*) &g_mekHeader, data, 0x18);
-	data = ReadBytes((undefined*) g_mekLocations, data, 0x140);
-	ReadBytes((undefined*) g_mekWeapons, data, (g_mekHeader.m_weaponCount < 10 ? g_mekHeader.m_weaponCount : 10) * 8);
+	data = ReadBytes((uint8_t*) &g_mekHeader, data, 0x18);
+	data = ReadBytes((uint8_t*) g_mekLocations, data, 0x140);
+	ReadBytes((uint8_t*) g_mekWeapons, data, (g_mekHeader.m_weaponCount < 10 ? g_mekHeader.m_weaponCount : 10) * 8);
 	data += g_mekHeader.m_weaponCount * 8;
-	ReadBytes((undefined*) g_mekAmmo, data, (g_mekHeader.m_ammoCount < 25 ? g_mekHeader.m_ammoCount : 25) * 8);
+	ReadBytes((uint8_t*) g_mekAmmo, data, (g_mekHeader.m_ammoCount < 25 ? g_mekHeader.m_ammoCount : 25) * 8);
 	data += g_mekHeader.m_ammoCount * 8;
-	data = ReadBytes((undefined*) g_mekVariantName, data, 0x32);
+	data = ReadBytes((uint8_t*) g_mekVariantName, data, 0x32);
 	ReleaseMekImage(p_name);
 
 	memset(&g_variant, 0, sizeof(g_variant));

@@ -1,7 +1,6 @@
 #ifndef PROJECTEDVERTEX_H
 #define PROJECTEDVERTEX_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A vertex projected for drawing, one of AllocProjectedVertex's per-frame records: its view-space

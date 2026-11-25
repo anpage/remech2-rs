@@ -3,7 +3,6 @@
 #include "bwdnames.h"
 #include "clock.h"
 #include "debugprint.h"
-#include "decomp.h"
 #include "inputmap.h"
 #include "loadres.h"
 #include "log.h"

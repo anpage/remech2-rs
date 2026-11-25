@@ -1,7 +1,6 @@
 #ifndef TEXTGLYPH_H
 #define TEXTGLYPH_H
 
-#include "decomp.h"
 #include "types.h"
 
 class Font;
@@ -11,10 +10,10 @@ class VideoDriver;
 #pragma pack(1)
 class TextGlyph {
 public:
-	TextGlyph(char* p_text, int32_t p_left, int32_t p_top, undefined* p_colors, Font* p_font);
+	TextGlyph(char* p_text, int32_t p_left, int32_t p_top, uint8_t* p_colors, Font* p_font);
 	~TextGlyph();
 
-	void SetTyped(undefined4 p_typed);
+	void SetTyped(uint32_t p_typed);
 	void Draw();
 	void DrawAllChars();
 	uint8_t DrawNextChar();
@@ -23,10 +22,10 @@ public:
 
 private:
 	Font* m_font;               // 0x00
-	undefined* m_colors;        // 0x04
-	undefined* m_currentColors; // 0x08 — m_colors, or the "\A" escape's map
+	uint8_t* m_colors;          // 0x04
+	uint8_t* m_currentColors;   // 0x08 — m_colors, or the "\A" escape's map
 	VideoDriver* m_videoDriver; // 0x0c
-	undefined4 m_typed;         // 0x10 — 1: drawn one character per TypeStep
+	uint32_t m_typed;           // 0x10 — 1: drawn one character per TypeStep
 	uint8_t m_registered;       // 0x14 — in the video driver's typed glyph list
 	char* m_text;               // 0x19
 
@@ -54,7 +53,7 @@ public:
 #pragma pack()
 
 // The functions and globals of textglyph.cpp that other units use.
-extern undefined g_linkColorMap[256];
+extern uint8_t g_linkColorMap[256];
 void InitTextColorMaps();
 
 #endif // TEXTGLYPH_H

@@ -1,7 +1,6 @@
 #ifndef AUDIOSAMPLE_H
 #define AUDIOSAMPLE_H
 
-#include "decomp.h"
 #include "shellaudio.h"
 #include "types.h"
 
@@ -9,7 +8,7 @@ class AudioSubsystem;
 
 class AudioSample {
 public:
-	AudioSample(AudioSubsystem* p_subsystem, void* p_data, undefined4 p_size);
+	AudioSample(AudioSubsystem* p_subsystem, void* p_data, uint32_t p_size);
 	~AudioSample();
 
 	void SetFade(int32_t p_initFadeRate, int32_t p_maxFade, int32_t p_startVolume, int32_t p_endVolume);
@@ -18,7 +17,7 @@ public:
 	void Start();
 	void PlayAndWait();
 	void Stop();
-	undefined IsPlaying();
+	uint8_t IsPlaying();
 	void SetVolume(int32_t p_volume);
 
 private:

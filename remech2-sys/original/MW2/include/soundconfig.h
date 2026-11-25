@@ -1,7 +1,6 @@
 #ifndef SOUNDCONFIG_H
 #define SOUNDCONFIG_H
 
-#include "decomp.h"
 #include "types.h"
 
 // The sound and display settings, copied field by field to and from the player's settings.
@@ -11,7 +10,7 @@ struct SoundConfig {
 	// the simulator plays its music from CD
 	int32_t m_midiVolume;
 	// the simulator's sound flags
-	undefined4 m_simFlags;
+	uint32_t m_simFlags;
 	int32_t m_objectTextmaps;
 	int32_t m_terrainTextmaps;
 	// high or low

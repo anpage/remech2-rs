@@ -1,7 +1,6 @@
 #ifndef STATICMEM_H
 #define STATICMEM_H
 
-#include "decomp.h"
 #include "types.h"
 
 // A static pool: the room reserved for the blocks of one tag, inside one of the groups.
@@ -15,9 +14,9 @@ typedef struct StaticPool {
 
 // One allocation that static pools share.
 typedef struct StaticPoolGroup {
-	undefined* m_block; // 0x00
-	int32_t m_size;     // 0x04
-	int32_t m_free;     // 0x08
+	uint8_t* m_block; // 0x00
+	int32_t m_size;   // 0x04
+	int32_t m_free;   // 0x08
 } StaticPoolGroup;
 
 // The functions and globals of staticmem.c that other units use.

@@ -1,7 +1,6 @@
 #ifndef MENUSCREEN_H
 #define MENUSCREEN_H
 
-#include "decomp.h"
 #include "mainmenubutton.h"
 #include "types.h"
 

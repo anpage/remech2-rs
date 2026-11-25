@@ -3,7 +3,6 @@
 #include "callbacks.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "poolsizes.h"
 #include "simmain.h"
 #include "staticmem.h"

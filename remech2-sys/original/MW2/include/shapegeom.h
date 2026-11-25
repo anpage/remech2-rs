@@ -1,7 +1,6 @@
 #ifndef SHAPEGEOM_H
 #define SHAPEGEOM_H
 
-#include "decomp.h"
 #include "model.h"
 #include "transform.h"
 #include "types.h"

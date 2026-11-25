@@ -1,7 +1,6 @@
 #ifndef VIDEODRIVER_H
 #define VIDEODRIVER_H
 
-#include "decomp.h"
 #include "palettecolor.h"
 #include "pane.h"
 #include "types.h"
@@ -25,36 +24,29 @@ public:
 	void DrawShell();
 	void DrawFmv();
 	void GetPalette(PaletteColor* p_palette);
-	void SetPalette(PaletteColor* p_palette, undefined4 p_allColors);
-	void ReadPictureSize(int32_t* p_maxX, int32_t* p_maxY, undefined* p_data, int32_t p_size, int32_t p_type);
+	void SetPalette(PaletteColor* p_palette, uint32_t p_allColors);
+	void ReadPictureSize(int32_t* p_maxX, int32_t* p_maxY, uint8_t* p_data, int32_t p_size, int32_t p_type);
 	void LoadBackground(TMPackDataBase* p_database, int32_t p_id);
-	void DrawPicture(undefined* p_data, int32_t p_type, PANE* p_view);
+	void DrawPicture(uint8_t* p_data, int32_t p_type, PANE* p_view);
 	void DrawLine(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom, int32_t p_color);
-	void DrawPixels(undefined* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
-	void DrawPixelsClipped(undefined* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
-	void ReadPixels(undefined* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
+	void DrawPixels(uint8_t* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
+	void DrawPixelsClipped(uint8_t* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
+	void ReadPixels(uint8_t* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
 	void RestoreBackground(int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
 	void CopyScreenToBackground();
 	void CopyBackgroundToScreen();
 	void LoadPalette(int32_t p_id);
-	void DrawShpFrame(
-		void* p_shp,
-		undefined4 p_frame,
-		int32_t p_left,
-		int32_t p_top,
-		int32_t p_width,
-		int32_t p_height
-	);
+	void DrawShpFrame(void* p_shp, uint32_t p_frame, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
 	void DrawShpFrameClipped(
 		void* p_shp,
-		undefined4 p_frame,
+		uint32_t p_frame,
 		int32_t p_left,
 		int32_t p_top,
 		int32_t p_width,
 		int32_t p_height
 	);
-	int32_t DrawString(int32_t p_left, int32_t p_top, void* p_font, char* p_text, undefined* p_colorMap);
-	int32_t DrawChar(int32_t p_left, int32_t p_top, void* p_font, char p_char, undefined* p_colorMap);
+	int32_t DrawString(int32_t p_left, int32_t p_top, void* p_font, char* p_text, uint8_t* p_colorMap);
+	int32_t DrawChar(int32_t p_left, int32_t p_top, void* p_font, char p_char, uint8_t* p_colorMap);
 	void AddGlyph(TextGlyph* p_item, int32_t p_overlay);
 	void RemoveGlyph(TextGlyph* p_item);
 	void RedrawGlyphs(int32_t p_overlay);
@@ -65,8 +57,8 @@ private:
 	int32_t m_pictureSize;          // 0x00 — the last picture's, see VFX_PCX_resolution
 	TextGlyphList* m_overlayGlyphs; // 0x16 — redrawn after the videos' frames
 	TextGlyphList* m_glyphs;        // 0x1a — redrawn before them
-	undefined4 m_paletteChanged;    // 0x1e — the next draw loads m_palette
-	undefined4 m_allColors;         // 0x22 — for m_setPalette
+	uint32_t m_paletteChanged;      // 0x1e — the next draw loads m_palette
+	uint32_t m_allColors;           // 0x22 — for m_setPalette
 
 public:
 	// LoopingMovie decodes into m_screenBuffer.m_pixels directly.
@@ -93,7 +85,7 @@ public:
 
 	// Set by the full-screen video player on its first frame: the next draw keeps the frame as
 	// the background before loading the palette.
-	undefined4 m_fmvFirstFrame; // 0x3aa
+	uint32_t m_fmvFirstFrame; // 0x3aa
 };
 #pragma pack()
 

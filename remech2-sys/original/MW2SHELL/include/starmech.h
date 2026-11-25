@@ -1,7 +1,6 @@
 #ifndef STARMECH_H
 #define STARMECH_H
 
-#include "decomp.h"
 #include "types.h"
 
 // One mech of a star: a negative m_chassis leaves the slot empty.

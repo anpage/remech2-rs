@@ -3,7 +3,6 @@
 
 #include "ambientsound.h"
 #include "audioengine.h"
-#include "decomp.h"
 #include "mss.h"
 #include "soundinfo.h"
 #include "types.h"

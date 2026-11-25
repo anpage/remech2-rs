@@ -18,7 +18,7 @@ struct MenuEntry {
 	MechPoint m_textPos; // 0x04
 	int32_t m_bottom;    // 0x0c
 	Font* m_font;        // 0x10
-	undefined* m_colors; // 0x14
+	uint8_t* m_colors;   // 0x14
 	HitRect* m_rect;     // 0x18
 	TextGlyph* m_hover;  // 0x1c
 	TextGlyph* m_label;  // 0x20
@@ -37,7 +37,7 @@ struct MenuEntry {
 		Font* p_font,
 		char* p_text,
 		MechPoint p_textPos,
-		undefined* p_colors,
+		uint8_t* p_colors,
 		uint8_t p_enabled
 	);
 	~MenuEntry();
@@ -261,7 +261,7 @@ MenuEntry::MenuEntry(
 	Font* p_font,
 	char* p_text,
 	MechPoint p_textPos,
-	undefined* p_colors,
+	uint8_t* p_colors,
 	uint8_t p_enabled
 )
 {
@@ -316,7 +316,7 @@ uint8_t MenuEntry::HitTest(int32_t p_x, int32_t p_y)
 	}
 }
 
-HitRect::HitRect(undefined4 p_left, undefined4 p_top, undefined4 p_right, undefined4 p_bottom)
+HitRect::HitRect(uint32_t p_left, uint32_t p_top, uint32_t p_right, uint32_t p_bottom)
 {
 	m_left = p_left;
 	m_top = p_top;

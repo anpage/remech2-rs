@@ -2,7 +2,6 @@
 #define CONFIG_H
 
 #include "cockpitpanel.h"
-#include "decomp.h"
 #include "recttransition.h"
 #include "soundconfig.h"
 #include "targeting.h"
@@ -15,20 +14,20 @@ struct ResourceRef;
 #pragma pack(1)
 // The difficulty settings, read from a .cfg file as one block.
 typedef struct DifficultyCfg {
-	undefined m_unlimitedAmmo;   // 0x00 — the "cia" cheat; cleared in network games with more than one player
-	undefined m_invulnerable;    // 0x01 — the "blorb" cheat; cleared in network games
-	undefined m_splashDamage;    // 0x02 — splash damage hurts mechs; set in network games with more than one player
-	undefined m_collisionDamage; // 0x03 — collisions hurt mechs; set in network games with more than one player
-	undefined m_heatTracking;    // 0x04 — fires heat mechs nearby; set in network games with more than one player
-	undefined m_enemySkill;      // 0x05 — 0 easy, 1 medium, 2 hard (MW2SHELL); 2 in network games
-	undefined m_unk0x06[2];      // 0x06
-	undefined m_regenerate;      // 0x08 — after the mission ends, the local player can regenerate
-	undefined
+	uint8_t m_unlimitedAmmo;   // 0x00 — the "cia" cheat; cleared in network games with more than one player
+	uint8_t m_invulnerable;    // 0x01 — the "blorb" cheat; cleared in network games
+	uint8_t m_splashDamage;    // 0x02 — splash damage hurts mechs; set in network games with more than one player
+	uint8_t m_collisionDamage; // 0x03 — collisions hurt mechs; set in network games with more than one player
+	uint8_t m_heatTracking;    // 0x04 — fires heat mechs nearby; set in network games with more than one player
+	uint8_t m_enemySkill;      // 0x05 — 0 easy, 1 medium, 2 hard (MW2SHELL); 2 in network games
+	uint8_t m_unk0x06[2];      // 0x06
+	uint8_t m_regenerate;      // 0x08 — after the mission ends, the local player can regenerate
+	uint8_t
 		m_radar; // 0x09 — the radar and auto targeting (NETMECHW's "Radar + Auto Targeting"); set outside network games
-	undefined m_teamGame;     // 0x0a
-	undefined4 m_timeOfDay;   // 0x0b — the time of day phase a network game starts at; cleared outside network games
-	undefined4 m_gravity;     // 0x0f — overrides the planet's gravity when set; cleared outside network games
-	undefined4 m_temperature; // 0x13 — overrides the planet's temperature when set; cleared outside network games
+	uint8_t m_teamGame;     // 0x0a
+	uint32_t m_timeOfDay;   // 0x0b — the time of day phase a network game starts at; cleared outside network games
+	uint32_t m_gravity;     // 0x0f — overrides the planet's gravity when set; cleared outside network games
+	uint32_t m_temperature; // 0x13 — overrides the planet's temperature when set; cleared outside network games
 } DifficultyCfg;
 #pragma pack()
 
@@ -62,7 +61,7 @@ extern "C"
 	extern RectTransitionDef g_mechViewTransitionDef;
 	extern RectTransition g_mechViewTransition;
 	extern RectTransition* g_cockpitPanelTransitions[c_panelCount];
-	extern undefined4 g_cockpitPanelLightUpTimes[c_panelCount];
+	extern uint32_t g_cockpitPanelLightUpTimes[c_panelCount];
 	extern int32_t g_lastWarningPowerState;
 	extern int32_t g_lockedTonePlayed;
 	extern int32_t g_lockingTonePlayed;

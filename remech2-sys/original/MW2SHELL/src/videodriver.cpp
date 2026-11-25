@@ -15,8 +15,8 @@
 
 // Only the height field of the font data header is used by the text drawing wrappers.
 struct VideoFontHeader {
-	undefined m_unk0x00[8]; // 0x00
-	int32_t m_height;       // 0x08
+	uint8_t m_unk0x00[8]; // 0x00
+	int32_t m_height;     // 0x08
 };
 
 // Set while RedrawGlyphs runs: text outside the dirty rectangle is skipped.
@@ -66,7 +66,7 @@ VideoDriver::VideoDriver()
 	m_screenBuffer.m_xMax = m_backBuffer.m_xMax = m_width - 1;
 	m_screenBuffer.m_yMax = m_backBuffer.m_yMax = m_height - 1;
 
-	m_backBuffer.m_buffer = (undefined*) MechHeapAllocZeroed(g_primaryHeap, m_width * m_height);
+	m_backBuffer.m_buffer = (uint8_t*) MechHeapAllocZeroed(g_primaryHeap, m_width * m_height);
 	if (!m_backBuffer.m_buffer) {
 		QuitWithVDriverError(1);
 	}
@@ -272,14 +272,14 @@ void VideoDriver::GetPalette(PaletteColor* p_palette)
 	memcpy(p_palette, m_palette, sizeof(m_palette));
 }
 
-void VideoDriver::SetPalette(PaletteColor* p_palette, undefined4 p_allColors)
+void VideoDriver::SetPalette(PaletteColor* p_palette, uint32_t p_allColors)
 {
 	memcpy(m_palette, p_palette, sizeof(m_palette));
 	m_paletteChanged = 1;
 	m_allColors = p_allColors;
 }
 
-void VideoDriver::ReadPictureSize(int32_t* p_maxX, int32_t* p_maxY, undefined* p_data, int32_t p_size, int32_t p_type)
+void VideoDriver::ReadPictureSize(int32_t* p_maxX, int32_t* p_maxY, uint8_t* p_data, int32_t p_size, int32_t p_type)
 {
 	switch (p_type) {
 	case 2:
@@ -297,7 +297,7 @@ void VideoDriver::ReadPictureSize(int32_t* p_maxX, int32_t* p_maxY, undefined* p
 void VideoDriver::LoadBackground(TMPackDataBase* p_database, int32_t p_id)
 {
 	int32_t size;
-	undefined* data;
+	uint8_t* data;
 
 	if (p_database->GetDBItemLZ(p_id, (void**) &data, &size)) {
 		return;
@@ -324,7 +324,7 @@ void VideoDriver::LoadBackground(TMPackDataBase* p_database, int32_t p_id)
 	MechHeapFree(g_primaryHeap, data);
 }
 
-void VideoDriver::DrawPicture(undefined* p_data, int32_t p_type, PANE* p_view)
+void VideoDriver::DrawPicture(uint8_t* p_data, int32_t p_type, PANE* p_view)
 {
 	switch (p_type) {
 	case 2:
@@ -349,7 +349,7 @@ void VideoDriver::DrawLine(int32_t p_left, int32_t p_top, int32_t p_right, int32
 }
 
 // Draws a block of pixels (a video's frame) to the screen.
-void VideoDriver::DrawPixels(undefined* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height)
+void VideoDriver::DrawPixels(uint8_t* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height)
 {
 	PANE view;
 	WINDOW buffer;
@@ -369,13 +369,7 @@ void VideoDriver::DrawPixels(undefined* p_pixels, int32_t p_left, int32_t p_top,
 }
 
 // DrawPixels, skipped unless the block meets the dirty rectangle.
-void VideoDriver::DrawPixelsClipped(
-	undefined* p_pixels,
-	int32_t p_left,
-	int32_t p_top,
-	int32_t p_width,
-	int32_t p_height
-)
+void VideoDriver::DrawPixelsClipped(uint8_t* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height)
 {
 	PANE view;
 	WINDOW buffer;
@@ -398,7 +392,7 @@ void VideoDriver::DrawPixelsClipped(
 	ExpandRectBySize(p_left, p_top, p_width, p_height);
 }
 
-void VideoDriver::ReadPixels(undefined* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height)
+void VideoDriver::ReadPixels(uint8_t* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height)
 {
 	PANE view;
 	WINDOW buffer;
@@ -445,7 +439,7 @@ void VideoDriver::CopyBackgroundToScreen()
 void VideoDriver::LoadPalette(int32_t p_id)
 {
 	int32_t size;
-	undefined* data;
+	uint8_t* data;
 
 	if (g_mw2Database->GetDBItemLZ(p_id, (void**) &data, &size)) {
 		return;
@@ -467,7 +461,7 @@ void VideoDriver::LoadPalette(int32_t p_id)
 // Draws frame p_frame of an SHP animation to the screen.
 void VideoDriver::DrawShpFrame(
 	void* p_shp,
-	undefined4 p_frame,
+	uint32_t p_frame,
 	int32_t p_left,
 	int32_t p_top,
 	int32_t p_width,
@@ -484,7 +478,7 @@ void VideoDriver::DrawShpFrame(
 // DrawShpFrame, skipped unless the frame meets the dirty rectangle.
 void VideoDriver::DrawShpFrameClipped(
 	void* p_shp,
-	undefined4 p_frame,
+	uint32_t p_frame,
 	int32_t p_left,
 	int32_t p_top,
 	int32_t p_width,
@@ -502,7 +496,7 @@ void VideoDriver::DrawShpFrameClipped(
 	ExpandRectBySize(p_left, p_top, p_width, p_height);
 }
 
-int32_t VideoDriver::DrawString(int32_t p_left, int32_t p_top, void* p_font, char* p_text, undefined* p_colorMap)
+int32_t VideoDriver::DrawString(int32_t p_left, int32_t p_top, void* p_font, char* p_text, uint8_t* p_colorMap)
 {
 	char* cursor;
 	int32_t width;
@@ -538,7 +532,7 @@ int32_t VideoDriver::DrawString(int32_t p_left, int32_t p_top, void* p_font, cha
 	return width;
 }
 
-int32_t VideoDriver::DrawChar(int32_t p_left, int32_t p_top, void* p_font, char p_char, undefined* p_colorMap)
+int32_t VideoDriver::DrawChar(int32_t p_left, int32_t p_top, void* p_font, char p_char, uint8_t* p_colorMap)
 {
 	int32_t width;
 	int32_t acquired;

@@ -1,7 +1,6 @@
 #include "camerashake.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "eyepoint.h"
 #include "polydraw.h"
 #include "ramp.h"

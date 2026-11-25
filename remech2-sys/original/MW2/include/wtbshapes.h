@@ -1,7 +1,6 @@
 #ifndef WTBSHAPES_H
 #define WTBSHAPES_H
 
-#include "decomp.h"
 #include "object.h"
 #include "shape.h"
 #include "types.h"

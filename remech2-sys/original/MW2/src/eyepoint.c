@@ -4,7 +4,6 @@
 #include "clock.h"
 #include "cockpit.h"
 #include "collision.h"
-#include "decomp.h"
 #include "fixedmul.h"
 #include "fixedtrig.h"
 #include "gridobject.h"
@@ -69,7 +68,7 @@ int32_t g_cockpitEyeSteady = 0;
 
 // Set while the camera is in the cockpit view: the cockpit's own shape (g_cockpitObject) is drawn
 // separately, and the 3D sound calls get it.
-undefined4 g_inCockpitView = 0;
+uint32_t g_inCockpitView = 0;
 
 // The view mode SetViewMode forces once the local mech is lost (g_localMechLost): the track view.
 int32_t g_lostViewMode = -1;

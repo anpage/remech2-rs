@@ -1,7 +1,6 @@
 #include "screenscale.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "fixeddiv.h"
 #include "fixedmul.h"
 #include "fixedtrig.h"

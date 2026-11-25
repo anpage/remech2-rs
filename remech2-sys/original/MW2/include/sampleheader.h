@@ -1,7 +1,6 @@
 #ifndef SAMPLEHEADER_H
 #define SAMPLEHEADER_H
 
-#include "decomp.h"
 #include "types.h"
 
 #pragma pack(push, 1)
@@ -10,7 +9,7 @@
 // sample. The sample data follows.
 typedef struct SampleHeader {
 	char m_tag[4];        // 0x00 — "SFLX"
-	undefined4 m_size;    // 0x04
+	uint32_t m_size;      // 0x04
 	uint32_t m_length;    // 0x08 — in samples
 	uint16_t m_frameSize; // 0x0c — bytes per sample
 } SampleHeader;

@@ -1,7 +1,6 @@
 #include "mapview.h"
 
 #include "animation.h"
-#include "decomp.h"
 #include "depthsort.h"
 #include "eyepoint.h"
 #include "fixeddot27.h"

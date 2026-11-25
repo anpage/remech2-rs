@@ -2,7 +2,6 @@
 
 #include "bwd.h"
 #include "clock.h"
-#include "decomp.h"
 #include "error.h"
 #include "files.h"
 #include "gamekeys.h"

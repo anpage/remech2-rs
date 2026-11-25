@@ -4,7 +4,6 @@
 #include "cockpit.h"
 #include "cockpitpanel.h"
 #include "config.h"
-#include "decomp.h"
 #include "environment.h"
 #include "loadres.h"
 #include "mech.h"

@@ -1,7 +1,6 @@
 #ifndef AMMOBIN_H
 #define AMMOBIN_H
 
-#include "decomp.h"
 #include "types.h"
 
 // An ammunition bin of a mech (Mech::m_ammoBins, Mech::m_ammoBinCount of them): the weapon it feeds and

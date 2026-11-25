@@ -1,7 +1,6 @@
 #ifndef TIMEDOVERLAYS_H
 #define TIMEDOVERLAYS_H
 
-#include "decomp.h"
 #include "pane.h"
 #include "timedoverlay.h"
 #include "types.h"

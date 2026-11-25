@@ -3,7 +3,6 @@
 #include "wtbshapes.h"
 
 #include "collision.h"
-#include "decomp.h"
 #include "object.h"
 #include "players.h"
 #include "shape.h"

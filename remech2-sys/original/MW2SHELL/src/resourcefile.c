@@ -1,6 +1,5 @@
 #include "resourcefile.h"
 
-#include "decomp.h"
 #include "files.h"
 #include "log.h"
 #include "types.h"

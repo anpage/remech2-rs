@@ -6,7 +6,6 @@
 #include "classtable.h"
 #include "collision.h"
 #include "debris.h"
-#include "decomp.h"
 #include "error.h"
 #include "files.h"
 #include "gamething.h"
@@ -60,7 +59,7 @@ GeoClass* g_classes = NULL;
 
 int32_t g_staticObjectCount = 0;
 
-undefined4 g_staticCacheReady = 0;
+uint32_t g_staticCacheReady = 0;
 
 // The block BeginBlock opens next.
 int32_t g_nextBlock = 0;
@@ -257,7 +256,7 @@ int32_t FindStarIdxById(int32_t p_id)
 
 // Takes the next free static object for ID p_id, mapping the ID to it. Returns its index, or -1
 // when the cache or the map is full.
-int32_t AllocStaticObject(undefined4 p_id)
+int32_t AllocStaticObject(uint32_t p_id)
 {
 	int32_t result = -1;
 
@@ -297,7 +296,7 @@ int32_t PlaceStaticObject(
 	int32_t p_unk0x3c,
 	uint32_t p_flags,
 	uint32_t p_kind,
-	undefined4 p_shapeKind
+	uint32_t p_shapeKind
 )
 {
 	int32_t index;

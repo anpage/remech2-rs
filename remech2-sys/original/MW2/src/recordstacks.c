@@ -7,7 +7,6 @@
 #include "recordstacks.h"
 
 #include "clock.h"
-#include "decomp.h"
 #include "depthsort.h"
 #include "error.h"
 #include "loadres.h"
