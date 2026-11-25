@@ -12,9 +12,9 @@ extern "C"
 #endif
 
 	// Milliseconds since the program started, wrapping around after 2^32 as timeGetTime did
-	MechU32 MechMilliseconds(void);
+	uint32_t MechMilliseconds(void);
 	// Blocks for p_milliseconds without pumping the window
-	void MechSleep(MechU32 p_milliseconds);
+	void MechSleep(uint32_t p_milliseconds);
 
 #ifdef __cplusplus
 }

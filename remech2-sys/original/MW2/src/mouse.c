@@ -7,12 +7,12 @@
 
 // The sim's mouse: it keeps the pointer grabbed during a mission.
 
-MechS32 g_cursorClipped = FALSE;
+int32_t g_cursorClipped = FALSE;
 
 undefined4 g_reclipCursor = 0;
 
 // Whether a client point lies inside the game window.
-static MechS32 IsInsideWindow(MechS32 p_x, MechS32 p_y)
+static int32_t IsInsideWindow(int32_t p_x, int32_t p_y)
 {
 	if (p_x < 0 || p_x >= g_gameWindowWidth) {
 		return FALSE;
@@ -31,10 +31,10 @@ void MouseRelease(void)
 	g_cursorClipped = FALSE;
 }
 
-MechS32 CenterCursor(void* p_data, MechS32 p_axis)
+int32_t CenterCursor(void* p_data, int32_t p_axis)
 {
-	MechS32 x;
-	MechS32 y;
+	int32_t x;
+	int32_t y;
 
 	x = g_gameWindowWidth / 2;
 	y = g_gameWindowHeight / 2;
@@ -51,10 +51,10 @@ MechS32 CenterCursor(void* p_data, MechS32 p_axis)
 	return 0;
 }
 
-MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons)
+int32_t MousePoll(void* p_data, int32_t* p_position, uint32_t* p_buttons)
 {
-	MechS32 x;
-	MechS32 y;
+	int32_t x;
+	int32_t y;
 
 	if (!g_cursorClipped || g_reclipCursor) {
 		// The original clipped the cursor to the window's client area.

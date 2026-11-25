@@ -25,7 +25,7 @@
 // cycles through five views of the local mech (CycleMechViewMode), drawn into the panel's render
 // target, optionally through the panel's rectangle transition.
 
-MechS32 g_mechViewStatic = 0;
+int32_t g_mechViewStatic = 0;
 
 void CycleMechViewMode(void)
 {
@@ -37,8 +37,8 @@ void CycleMechViewMode(void)
 
 void DrawMechViewPanel(CockpitPanel* p_panel)
 {
-	MechS32* camera;
-	MechS32 view[7];
+	int32_t* camera;
+	int32_t view[7];
 	RenderSettings saved;
 	Mech* mech;
 
@@ -157,11 +157,11 @@ void DrawMechViewStatic(CockpitPanel* p_panel)
 	DrawPanelAnim(p_panel->m_target, 0, 0, 0);
 }
 
-void DrawMechViewFrame(CockpitPanel* p_panel, MechS32 p_color, MechS32 p_shapeId)
+void DrawMechViewFrame(CockpitPanel* p_panel, int32_t p_color, int32_t p_shapeId)
 {
 	PANE* target;
-	MechS32 x;
-	MechS32 y;
+	int32_t x;
+	int32_t y;
 
 	target = p_panel->m_target;
 	OutlinePane(target, p_color);

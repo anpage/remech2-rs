@@ -6,7 +6,7 @@
 // Fills g_textColors with the identity mapping of the 256 palette indices.
 void ResetTextColors(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x100; i++) {
 		g_textColors[i] = i;

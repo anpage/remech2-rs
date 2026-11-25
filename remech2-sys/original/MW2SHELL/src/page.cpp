@@ -15,24 +15,24 @@
 #include <string.h>
 
 // Set by a \A escape and never read.
-MechU8 g_pageLinkRead = FALSE;
+uint8_t g_pageLinkRead = FALSE;
 
 // A \B or \G escape was read: the next ReadToken passes it on to the glyph as a word.
-MechU8 g_pageBackUpPending = FALSE;
+uint8_t g_pageBackUpPending = FALSE;
 
-MechU8 g_pageGoToPending = FALSE;
+uint8_t g_pageGoToPending = FALSE;
 
 // Layout's word, line and scratch buffers.
-MechChar g_pageWord[0x400];
+char g_pageWord[0x400];
 
-MechChar g_pageLine[0x400];
+char g_pageLine[0x400];
 
-MechChar g_pageTemp[0x400];
+char g_pageTemp[0x400];
 
 #define c_typeCharsPerSecond 1200
 
-MechU32 g_typeLastTime;
-MechU32 g_typeOwed;
+uint32_t g_typeLastTime;
+uint32_t g_typeOwed;
 
 // Records the area of the link word just placed. Layout does this in three places.
 #define PAGE_ADD_LINK(WORD_WIDTH)                                                                                      \
@@ -60,16 +60,16 @@ Page::Page(
 	Font* p_font,
 	VideoDriver* p_videoDriver,
 	undefined* p_colors,
-	MechS32 p_left,
-	MechS32 p_top,
-	MechS32 p_width,
-	MechS32 p_height
+	int32_t p_left,
+	int32_t p_top,
+	int32_t p_width,
+	int32_t p_height
 )
 {
 	Collection* glyphs;
-	MechS32 result;
+	int32_t result;
 	void* data;
-	MechS32 size;
+	int32_t size;
 
 	m_font = p_font;
 	m_videoDriver = p_videoDriver;
@@ -105,9 +105,9 @@ Page::Page(
 }
 
 // Returns the number of spaces skipped.
-MechS32 Page::SkipSpaces(MechChar* p_text, MechS32* p_pos, MechS32 p_end)
+int32_t Page::SkipSpaces(char* p_text, int32_t* p_pos, int32_t p_end)
 {
-	MechS32 count;
+	int32_t count;
 
 	count = 0;
 	while (*p_pos < p_end && p_text[*p_pos] == ' ') {
@@ -119,19 +119,12 @@ MechS32 Page::SkipSpaces(MechChar* p_text, MechS32* p_pos, MechS32 p_end)
 }
 
 // Reads the next word or escape code at *p_pos into p_word and returns its c_token kind.
-MechS32 Page::ReadToken(
-	MechChar* p_text,
-	MechChar* p_word,
-	MechS32* p_pos,
-	MechS32 p_end,
-	MechS32* p_link,
-	MechS32* p_offset
-)
+int32_t Page::ReadToken(char* p_text, char* p_word, int32_t* p_pos, int32_t p_end, int32_t* p_link, int32_t* p_offset)
 {
-	MechS32 count;
-	MechChar number[5];
-	MechS32 i;
-	MechS32 j;
+	int32_t count;
+	char number[5];
+	int32_t i;
+	int32_t j;
 
 	if (*p_pos >= p_end) {
 		return c_tokenEnd;
@@ -248,7 +241,7 @@ nextChar:
 
 // Moves down a line and turns p_line into a glyph, then starts the next line with p_word.
 // Returns the width of the new line.
-MechS32 Page::FlushLine(MechChar* p_line, MechChar* p_word)
+int32_t Page::FlushLine(char* p_line, char* p_word)
 {
 	m_top += m_lineHeight;
 	if (strlen(p_line) == 0) {
@@ -266,7 +259,7 @@ MechS32 Page::FlushLine(MechChar* p_line, MechChar* p_word)
 }
 
 // Returns the width p_word adds, measuring it unless p_width gives it.
-MechS32 Page::AppendWord(MechChar* p_line, MechChar* p_word, MechS32 p_width)
+int32_t Page::AppendWord(char* p_line, char* p_word, int32_t p_width)
 {
 	strcat(p_line, p_word);
 	if (p_width != -1) {
@@ -278,25 +271,25 @@ MechS32 Page::AppendWord(MechChar* p_line, MechChar* p_word, MechS32 p_width)
 
 // Lays out p_text until the page is full or a \S code. Returns where the next page starts, or
 // NULL at the end of the text.
-MechChar* Page::Layout(MechChar* p_text)
+char* Page::Layout(char* p_text)
 {
-	MechS32 offset;
-	MechS32 link;
-	MechS32 gap;
-	MechS32 count;
-	MechS32 i;
-	MechS32 tabs;
-	MechS32 lineWidth;
-	MechU8 wrapped;
-	MechS32 pos;
-	MechS32 token;
-	MechS32 length;
-	MechChar* wordStart;
-	MechS32 stop;
-	MechS32 width;
+	int32_t offset;
+	int32_t link;
+	int32_t gap;
+	int32_t count;
+	int32_t i;
+	int32_t tabs;
+	int32_t lineWidth;
+	uint8_t wrapped;
+	int32_t pos;
+	int32_t token;
+	int32_t length;
+	char* wordStart;
+	int32_t stop;
+	int32_t width;
 	Link* rect;
-	MechS32 half;
-	MechU8 center;
+	int32_t half;
+	uint8_t center;
 
 	rect = NULL;
 	length = strlen(p_text);
@@ -414,7 +407,7 @@ MechChar* Page::Layout(MechChar* p_text)
 	return NULL;
 }
 
-void Page::AddGlyph(MechChar* p_text, MechS32 p_left, MechS32 p_top)
+void Page::AddGlyph(char* p_text, int32_t p_left, int32_t p_top)
 {
 	TextGlyph* glyph;
 
@@ -425,7 +418,7 @@ void Page::AddGlyph(MechChar* p_text, MechS32 p_left, MechS32 p_top)
 void Page::Show()
 {
 	TextGlyph* glyph;
-	MechS32 i;
+	int32_t i;
 
 	if (m_banner) {
 		m_banner->Show();
@@ -441,7 +434,7 @@ void Page::Show()
 void Page::Restart()
 {
 	TextGlyph* glyph;
-	MechS32 i;
+	int32_t i;
 
 	if (m_banner) {
 		m_banner->Show();
@@ -468,9 +461,9 @@ void Page::Restart()
 void Page::TypeStep()
 {
 	TextGlyph* glyph;
-	MechS32 i;
-	MechU32 now;
-	MechU32 steps;
+	int32_t i;
+	uint32_t now;
+	uint32_t steps;
 
 	now = MechMilliseconds();
 	g_typeOwed += (now - g_typeLastTime) * c_typeCharsPerSecond;
@@ -497,7 +490,7 @@ void Page::TypeStep()
 void Page::Hide()
 {
 	TextGlyph* glyph;
-	MechS32 i;
+	int32_t i;
 
 	if (m_banner) {
 		m_banner->Hide();
@@ -513,7 +506,7 @@ void Page::Hide()
 	}
 }
 
-void Page::SetBanner(undefined* p_data, MechS32 p_size)
+void Page::SetBanner(undefined* p_data, int32_t p_size)
 {
 	m_banner = new PopupPicture(p_data, p_size, m_videoDriver, 0, 0, m_sample);
 }
@@ -521,7 +514,7 @@ void Page::SetBanner(undefined* p_data, MechS32 p_size)
 Page::~Page()
 {
 	TextGlyph* glyph;
-	MechS32 i;
+	int32_t i;
 
 	if (m_banner) {
 		delete m_banner;

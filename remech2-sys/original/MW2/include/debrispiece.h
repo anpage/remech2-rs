@@ -9,13 +9,13 @@ struct SceneObject;
 // terrain until it comes to rest (UpdateDebrisPiece).
 typedef struct DebrisPiece {
 	struct SceneObject* m_obj; // 0x04
-	MechS32 m_velocityX;       // 0x08
-	MechS32 m_velocityY;       // 0x0c
-	MechS32 m_velocityZ;       // 0x10
-	MechS32 m_spinX;           // 0x14
-	MechS32 m_spinY;           // 0x18
-	MechS32 m_spinZ;           // 0x1c
-	MechS32 m_acceleration;    // 0x20
+	int32_t m_velocityX;       // 0x08
+	int32_t m_velocityY;       // 0x0c
+	int32_t m_velocityZ;       // 0x10
+	int32_t m_spinX;           // 0x14
+	int32_t m_spinY;           // 0x18
+	int32_t m_spinZ;           // 0x1c
+	int32_t m_acceleration;    // 0x20
 } DebrisPiece;
 
 #endif // DEBRISPIECE_H

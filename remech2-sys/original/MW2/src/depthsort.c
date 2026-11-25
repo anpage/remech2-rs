@@ -25,36 +25,36 @@
 #include <string.h>
 
 // The number of entries in the list being built.
-MechS32 g_depthEntryCount = 0;
+int32_t g_depthEntryCount = 0;
 
-MechS32 g_polygonCount = 0;
+int32_t g_polygonCount = 0;
 
-MechS32 g_maxPolygons = 0;
+int32_t g_maxPolygons = 0;
 
-MechS32 g_shapesDrawn;
+int32_t g_shapesDrawn;
 
 // The depth the shapes are queued at.
-MechS32 g_queueDepth;
+int32_t g_queueDepth;
 
 // The list being built: g_depthQueue or g_drawList.
 DepthEntry* g_depthList;
 
 // The flags of the shape being queued.
-MechU32 g_queuedShapeFlags;
+uint32_t g_queuedShapeFlags;
 
-MechS32 g_shapesConsidered;
+int32_t g_shapesConsidered;
 
 // Selects the shape's level of detail for p_depth (the first model whose distance, scaled by the
 // eyepoint, lies beyond it, or the last) and queues its faces. Returns 1 if it has no model.
-MechS32 QueueShapeLod(Shape* p_shape, MechS32 p_depth)
+int32_t QueueShapeLod(Shape* p_shape, int32_t p_depth)
 {
 	Model* model;
 	Face* face;
 	Model* cursor;
 	Vertex* vertices;
 	Vertex* vertex;
-	MechS32 n;
-	MechS32 i;
+	int32_t n;
+	int32_t i;
 	Model* prev;
 	Shape* shape;
 
@@ -108,7 +108,7 @@ MechS32 QueueShapeLod(Shape* p_shape, MechS32 p_depth)
 		vertex++;
 	}
 
-	face = (Face*) (model->m_faceOffset + (MechU8*) model);
+	face = (Face*) (model->m_faceOffset + (uint8_t*) model);
 	i = n = model->m_faceCount;
 	while (i--) {
 		QueueFace(face, vertices);
@@ -124,7 +124,7 @@ MechS32 QueueShapeLod(Shape* p_shape, MechS32 p_depth)
 // Sorts the entries from p_first to p_last, farthest first (a quicksort).
 void SortDepthEntries(DepthEntry* p_first, DepthEntry* p_last)
 {
-	MechS32 pivot;
+	int32_t pivot;
 	DepthEntry* lo;
 	DepthEntry* hi;
 
@@ -154,7 +154,7 @@ void SortDepthEntries(DepthEntry* p_first, DepthEntry* p_last)
 			hi->m_poly = poly;
 		}
 		{
-			MechS32 depth = lo->m_depth;
+			int32_t depth = lo->m_depth;
 			lo->m_depth = hi->m_depth;
 			hi->m_depth = depth;
 		}
@@ -167,7 +167,7 @@ void SortDepthEntries(DepthEntry* p_first, DepthEntry* p_last)
 		hi->m_poly = poly;
 	}
 	{
-		MechS32 depth = lo->m_depth;
+		int32_t depth = lo->m_depth;
 		lo->m_depth = hi->m_depth;
 		hi->m_depth = depth;
 	}
@@ -223,9 +223,9 @@ void DrawShapeList(Shape* p_root)
 // each whole shape into its own sorted run of polygons, and draws them.
 void DrawDepthQueue(void)
 {
-	MechS32 count;
-	MechS32 i;
-	MechS32 start;
+	int32_t count;
+	int32_t i;
+	int32_t start;
 
 	start = 0;
 	if (g_depthEntryCount > 1) {
@@ -265,7 +265,7 @@ void DrawDepthQueue(void)
 // Draws the shapes of the scene tree p_root, farthest first.
 void DrawObjTreeShapes(SceneObject* p_root)
 {
-	MechS32 i;
+	int32_t i;
 
 	ResetDrawBuffer();
 	g_depthEntryCount = 0;
@@ -316,13 +316,13 @@ void DrawShapeListFrom(Shape* p_root, Eyepoint* p_eyepoint)
 void DrawQueuedPolygon(QueuedPolygon* p_poly)
 {
 	ProjectedVertex* vertex;
-	MechS32 count;
+	int32_t count;
 	ProjectedVertex** vertices;
-	MechU32 points[10 * 6];
-	MechU32* point;
-	MechS32 i;
-	MechS32 x;
-	MechS32 y;
+	uint32_t points[10 * 6];
+	uint32_t* point;
+	int32_t i;
+	int32_t x;
+	int32_t y;
 
 	count = p_poly->m_count;
 	vertices = (ProjectedVertex**) (p_poly + 1);
@@ -354,24 +354,24 @@ void DrawQueuedPolygon(QueuedPolygon* p_poly)
 
 // Clips a queued polygon to the screen (right, left, top and bottom in turn) and stores the
 // result in p_points, six dwords per vertex. Returns the number of vertices.
-MechS32 ClipPolygonToScreen(QueuedPolygon* p_poly, MechU32* p_points)
+int32_t ClipPolygonToScreen(QueuedPolygon* p_poly, uint32_t* p_points)
 {
 	ProjectedVertex* cur;
-	MechS32 bottom;
-	MechS32 right;
+	int32_t bottom;
+	int32_t right;
 	ProjectedVertex* out;
 	ProjectedVertex* prev;
-	MechS32 top;
+	int32_t top;
 	ProjectedVertex* src;
-	MechS32 n;
+	int32_t n;
 	ProjectedVertex** vertices;
 	ProjectedVertex* in;
 	ProjectedVertex bufferA[20];
 	ProjectedVertex clip;
 	ProjectedVertex bufferB[20];
-	MechS32 i;
-	MechS32 left;
-	MechS32 count;
+	int32_t i;
+	int32_t left;
+	int32_t count;
 
 	right = bottom = 0x3fff;
 	left = top = -0x4000;
@@ -539,12 +539,12 @@ MechS32 ClipPolygonToScreen(QueuedPolygon* p_poly, MechU32* p_points)
 
 // Returns the depth where the edge from (p_a0, p_z0) to (p_a1, p_z1), in view space, crosses
 // the screen column (p_isX) or row p_edge.
-MechS32 GetEdgeCrossingDepth(MechS32 p_a0, MechS32 p_a1, MechS32 p_edge, MechS32 p_isX, MechS32 p_z0, MechS32 p_z1)
+int32_t GetEdgeCrossingDepth(int32_t p_a0, int32_t p_a1, int32_t p_edge, int32_t p_isX, int32_t p_z0, int32_t p_z1)
 {
-	MechS32 dz;
-	MechS32 t;
-	MechS32 z;
-	MechS32 da;
+	int32_t dz;
+	int32_t t;
+	int32_t z;
+	int32_t da;
 
 	da = p_a1 - p_a0;
 	dz = p_z1 - p_z0;
@@ -574,11 +574,11 @@ MechS32 GetEdgeCrossingDepth(MechS32 p_a0, MechS32 p_a1, MechS32 p_edge, MechS32
 }
 
 // Stores in p_out the point where the edge from p_a to p_b crosses the screen column p_x.
-void ClipEdgeToColumn(ProjectedVertex* p_a, ProjectedVertex* p_b, MechS32 p_x, ProjectedVertex* p_out)
+void ClipEdgeToColumn(ProjectedVertex* p_a, ProjectedVertex* p_b, int32_t p_x, ProjectedVertex* p_out)
 {
-	MechS32 z;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t z;
+	int32_t dx;
+	int32_t dy;
 
 	p_out->m_z = GetEdgeCrossingDepth(p_a->m_x, p_b->m_x, p_x, 1, p_a->m_z, p_b->m_z);
 	z = p_out->m_z;
@@ -612,11 +612,11 @@ void ClipEdgeToColumn(ProjectedVertex* p_a, ProjectedVertex* p_b, MechS32 p_x, P
 }
 
 // Stores in p_out the point where the edge from p_a to p_b crosses the screen row p_y.
-void ClipEdgeToRow(ProjectedVertex* p_a, ProjectedVertex* p_b, MechS32 p_y, ProjectedVertex* p_out)
+void ClipEdgeToRow(ProjectedVertex* p_a, ProjectedVertex* p_b, int32_t p_y, ProjectedVertex* p_out)
 {
-	MechS32 z;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t z;
+	int32_t dx;
+	int32_t dy;
 
 	p_out->m_z = GetEdgeCrossingDepth(p_a->m_y, p_b->m_y, p_y, 0, p_a->m_z, p_b->m_z);
 	z = p_out->m_z;

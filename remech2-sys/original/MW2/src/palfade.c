@@ -6,11 +6,11 @@
 #include "simmain.h"
 #include "types.h"
 
-MechS32 InitPaletteCycle(PaletteCycle* p_cycle, MechU8* p_palette, MechU8 p_first, MechS32 p_count)
+int32_t InitPaletteCycle(PaletteCycle* p_cycle, uint8_t* p_palette, uint8_t p_first, int32_t p_count)
 {
-	MechU8* working;
-	MechS32 i;
-	MechU8* dst;
+	uint8_t* working;
+	int32_t i;
+	uint8_t* dst;
 
 	working = MechHeapAlloc(g_primaryHeap, p_count * 3);
 	if (working == NULL) {
@@ -30,10 +30,10 @@ MechS32 InitPaletteCycle(PaletteCycle* p_cycle, MechU8* p_palette, MechU8 p_firs
 
 void RotatePaletteCycle(PaletteCycle* p_cycle)
 {
-	MechU8* p;
-	MechU8 first[3];
-	MechS32 i;
-	MechU8* start;
+	uint8_t* p;
+	uint8_t first[3];
+	int32_t i;
+	uint8_t* start;
 
 	p = p_cycle->m_working + p_cycle->m_first * 3;
 	start = p;
@@ -64,20 +64,20 @@ void FreePaletteCycle(PaletteCycle* p_cycle)
 	g_currentDisplayBackend->m_setPaletteWithBrightness((PaletteColor*) p_cycle->m_original);
 }
 
-MechS32 InitPaletteFade(
+int32_t InitPaletteFade(
 	PaletteFade* p_fade,
-	MechU8* p_from,
-	MechU8* p_to,
-	MechS32 p_first,
-	MechS32 p_count,
-	MechS32 p_steps
+	uint8_t* p_from,
+	uint8_t* p_to,
+	int32_t p_first,
+	int32_t p_count,
+	int32_t p_steps
 )
 {
-	MechU8* palette;
-	MechS16* accum;
-	MechS32 i;
-	MechS8* delta;
-	MechU8* block;
+	uint8_t* palette;
+	int16_t* accum;
+	int32_t i;
+	int8_t* delta;
+	uint8_t* block;
 
 	block = MechHeapAlloc(g_primaryHeap, p_count * 12);
 	if (block == NULL) {
@@ -85,8 +85,8 @@ MechS32 InitPaletteFade(
 	}
 
 	p_fade->m_palette = block;
-	p_fade->m_delta = (MechS8*) (block + 0x300);
-	p_fade->m_accum = (MechS16*) (block + 0x600);
+	p_fade->m_delta = (int8_t*) (block + 0x300);
+	p_fade->m_accum = (int16_t*) (block + 0x600);
 
 	for (i = p_first * 3, delta = p_fade->m_delta, palette = p_fade->m_palette, accum = p_fade->m_accum;
 		 i < p_count * 3 + p_first * 3;
@@ -103,12 +103,12 @@ MechS32 InitPaletteFade(
 	return 1;
 }
 
-void StepPaletteFade(PaletteFade* p_fade, MechS32 p_count)
+void StepPaletteFade(PaletteFade* p_fade, int32_t p_count)
 {
-	MechU8* palette;
-	MechS16* accum;
-	MechS32 i;
-	MechS8* delta;
+	uint8_t* palette;
+	int16_t* accum;
+	int32_t i;
+	int8_t* delta;
 
 	if (p_fade->m_step >= p_fade->m_steps) {
 		return;

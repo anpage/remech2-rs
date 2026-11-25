@@ -14,23 +14,23 @@
 #include "queuedpolygon.h"
 #include "types.h"
 
-MechS32 g_drawBufferSize = 0x80;
+int32_t g_drawBufferSize = 0x80;
 
-MechU8* g_drawBufferMemory = NULL;
+uint8_t* g_drawBufferMemory = NULL;
 
-MechS32 g_depthListCapacity;
+int32_t g_depthListCapacity;
 
-MechU8* g_drawBuffer;
+uint8_t* g_drawBuffer;
 
-MechU8* g_drawBufferTop;
+uint8_t* g_drawBufferTop;
 
 DepthEntry* g_drawList;
 
-MechU8* g_drawBufferBottom;
+uint8_t* g_drawBufferBottom;
 
 DepthEntry* g_depthQueue;
 
-MechS32 g_queueHasRoom;
+int32_t g_queueHasRoom;
 
 void ShutdownDrawBuffer(void)
 {
@@ -41,9 +41,9 @@ void ShutdownDrawBuffer(void)
 }
 
 // The << 4 was two lists of 8-byte DepthEntry.
-void InitializeDrawBuffer(MechS32 p_kilobytes, MechS32 p_entries)
+void InitializeDrawBuffer(int32_t p_kilobytes, int32_t p_entries)
 {
-	MechU32 size;
+	uint32_t size;
 
 	g_depthListCapacity = p_entries;
 	g_drawBufferSize = p_kilobytes << 10;
@@ -72,7 +72,7 @@ void ResetDrawBuffer(void)
 
 ProjectedVertex* AllocProjectedVertex(void)
 {
-	MechS32 recordSize;
+	int32_t recordSize;
 	ProjectedVertex* record;
 
 	recordSize = sizeof(ProjectedVertex);
@@ -87,10 +87,10 @@ ProjectedVertex* AllocProjectedVertex(void)
 	return record;
 }
 
-MechU8* AllocQueuedPolygon(void)
+uint8_t* AllocQueuedPolygon(void)
 {
-	MechS32 recordSize;
-	MechU8* record;
+	int32_t recordSize;
+	uint8_t* record;
 
 	recordSize = sizeof(QueuedPolygon);
 	record = g_drawBufferBottom;

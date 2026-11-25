@@ -21,13 +21,13 @@ char* g_resourceTypeExtensions[25] = {".sfl", ".xel", ".xyc", ".shp", ".fnt", ".
 									  ".tbl", ".wtb", ".xxt", ".3di", ".mgi", ".hdi", ".cpi", ".vpi", ".pit",
 									  ".bwd", ".ait", ".mek", ".lum", ".mus", ".gif", ".txt"};
 
-MechS32 g_mw2PrjHandle = -1;
+int32_t g_mw2PrjHandle = -1;
 
 char* g_mw2PrjPath = NULL;
 
-MechS32 InitializeMw2Prj(void)
+int32_t InitializeMw2Prj(void)
 {
-	MechS32 result;
+	int32_t result;
 
 	result = TRUE;
 	SetArchiveAllocator(Mw2PrjAlloc, Mw2PrjFree);

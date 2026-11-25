@@ -7,21 +7,21 @@
 #include "types.h"
 
 // The functions and globals of mainmenu.cpp that other units use.
-extern MechChar g_mainMenuLogoVideo[9];
-void* AllocateAllowNew(MechS32 p_size);
+extern char g_mainMenuLogoVideo[9];
+void* AllocateAllowNew(int32_t p_size);
 extern ButtonMenu* g_mainMenu;
 extern AudioSample* g_mainMenuMusic;
 extern AudioSample* g_mainMenuIntro;
-extern MechS32 g_mainMenuMusicStarted;
+extern int32_t g_mainMenuMusicStarted;
 
-void DrawMainMenu(TMPackDataBase* p_database, MechS32*);
+void DrawMainMenu(TMPackDataBase* p_database, int32_t*);
 // The main menu's frame, implemented on the Rust side (src/shell/screens/main_menu.rs)
 extern "C" void MainMenuCallback(
 	TMPackDataBase* p_database,
-	MechS32* p_campaign,
-	MechU8* p_pilotChosen,
+	int32_t* p_campaign,
+	uint8_t* p_pilotChosen,
 	char** p_scenario,
-	MechS32 p_msg
+	int32_t p_msg
 );
 
 #endif // MAINMENU_H

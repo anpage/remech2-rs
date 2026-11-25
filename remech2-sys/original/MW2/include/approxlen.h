@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-	MechS32 ApproximateVectorLength(MechS32 p_x, MechS32 p_y, MechS32 p_z);
+	int32_t ApproximateVectorLength(int32_t p_x, int32_t p_y, int32_t p_z);
 
 #ifdef __cplusplus
 }

@@ -15,31 +15,31 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_classEntryCount;
-	extern MechS32 g_classTableReady;
+	extern int32_t g_classEntryCount;
+	extern int32_t g_classTableReady;
 	extern ClassEntry g_classTable[0x30c];
 
-	MechS32 LoadBaseLevelShapes(struct Player* p_player);
-	MechS32 AddClassEntryLevel(
-		MechS32 p_unk0x00,
+	int32_t LoadBaseLevelShapes(struct Player* p_player);
+	int32_t AddClassEntryLevel(
+		int32_t p_unk0x00,
 		undefined4 p_unk0x04,
 		undefined4 p_unk0x08,
 		undefined4 p_unk0x0c,
-		MechS32 p_unk0x10,
-		MechS32 p_level,
-		MechS32 p_index,
-		MechS16 p_unk0x1c
+		int32_t p_unk0x10,
+		int32_t p_level,
+		int32_t p_index,
+		int16_t p_unk0x1c
 	);
 	void ResetClassTable(void);
 	void ClaimNewClassEntries(struct Player* p_player);
-	MechS32 LoadClassLevel(MechS32 p_owner, MechS32 p_level);
-	void ReleaseClassLevel(MechS32 p_owner, MechS32 p_level);
-	MechS32 LoadClassEntryShape(MechS32 p_index, MechS32 p_level, void* p_buffer);
+	int32_t LoadClassLevel(int32_t p_owner, int32_t p_level);
+	void ReleaseClassLevel(int32_t p_owner, int32_t p_level);
+	int32_t LoadClassEntryShape(int32_t p_index, int32_t p_level, void* p_buffer);
 	void ReleasePendingDetailLevel(void);
-	void ReleaseClassEntryShape(MechS32 p_index, MechS32 p_level);
-	struct SceneObject* GetClassObject(MechS32 p_index);
-	Shape* GetClassShape(MechS32 p_index);
-	void SetClassEntryPartId(MechS32 p_index, MechU16 p_value);
+	void ReleaseClassEntryShape(int32_t p_index, int32_t p_level);
+	struct SceneObject* GetClassObject(int32_t p_index);
+	Shape* GetClassShape(int32_t p_index);
+	void SetClassEntryPartId(int32_t p_index, uint16_t p_value);
 	void ChoosePlayerDetailLevels(void);
 	void ReleaseObjShape(struct SceneObject* p_obj);
 	void ForgetObjShape(struct SceneObject* p_obj);

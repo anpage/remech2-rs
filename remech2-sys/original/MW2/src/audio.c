@@ -22,25 +22,25 @@
 #include <stdio.h>
 
 // The CD track the mission plays, or -1.
-MechS32 g_cdTrack = -1;
+int32_t g_cdTrack = -1;
 
 SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 11, 1, 1, 1, 1, 1, 9};
 
 SoundConfig* g_mw2SndCfgData = NULL;
 
-MechS32 g_audioPaused = 0;
+int32_t g_audioPaused = 0;
 
-MechS32 g_musicStarted = 0;
+int32_t g_musicStarted = 0;
 
-MechS32 g_nextEngageCheck;
+int32_t g_nextEngageCheck;
 
 // The in-mission sound menu's settings: 0 the effects volume, 1 the voice volume, 2 the music
 // volume, 4 whether speech is on (3 does nothing).
 
 // Returns setting p_setting. Asking for the music volume turns the CD music on.
-MechS32 GetSoundSetting(MechS32 p_setting)
+int32_t GetSoundSetting(int32_t p_setting)
 {
-	MechS32 value;
+	int32_t value;
 
 	value = 0;
 	if (p_setting >= 0 && p_setting < 5) {
@@ -71,9 +71,9 @@ MechS32 GetSoundSetting(MechS32 p_setting)
 }
 
 // Sets setting p_setting to p_value, and lets the sound system that uses it know.
-void PreviewSoundSetting(MechS32 p_setting, MechS32 p_value)
+void PreviewSoundSetting(int32_t p_setting, int32_t p_value)
 {
-	MechS32 old;
+	int32_t old;
 	void (*notify)(void);
 
 	old = 0;
@@ -133,7 +133,7 @@ void PreviewSoundSetting(MechS32 p_setting, MechS32 p_value)
 }
 
 // Sets setting p_setting to p_value, in the player's settings too.
-void SetSoundSetting(MechS32 p_setting, MechS32 p_value)
+void SetSoundSetting(int32_t p_setting, int32_t p_value)
 {
 	if (p_setting >= 0 && p_setting < 5) {
 		switch (p_setting) {
@@ -183,7 +183,7 @@ void SetSoundSetting(MechS32 p_setting, MechS32 p_value)
 }
 
 // Restores setting p_setting from the player's settings.
-void RestoreSoundSetting(MechS32 p_setting)
+void RestoreSoundSetting(int32_t p_setting)
 {
 	if (p_setting >= 0 && p_setting < 5) {
 		switch (p_setting) {
@@ -226,7 +226,7 @@ void RestoreSoundSetting(MechS32 p_setting)
 
 void StartMissionMusic(void)
 {
-	MechChar* music;
+	char* music;
 
 	if (!g_musicStarted) {
 		g_musicStarted = 1;
@@ -290,7 +290,7 @@ void LoopCdMusic(void)
 	}
 }
 
-MechS32 FirstAudio(void)
+int32_t FirstAudio(void)
 {
 	InitializeDigitalAudio(8);
 	StartCdAudio();
@@ -304,7 +304,7 @@ MechS32 FirstAudio(void)
 void DoAudio(void)
 {
 	Player* player;
-	MechS32 i;
+	int32_t i;
 
 	AIL_serve();
 	ServeSamples();

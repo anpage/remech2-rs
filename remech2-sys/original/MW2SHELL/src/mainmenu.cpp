@@ -34,20 +34,20 @@ AudioSample* g_mainMenuMusic = NULL;
 // Database item 104, played when the menu opens.
 AudioSample* g_mainMenuIntro = NULL;
 
-MechS32 g_mainMenuMusicStarted = 0;
+int32_t g_mainMenuMusicStarted = 0;
 
-MechChar g_mainMenuLogoVideo[] = "amwlogo1";
+char g_mainMenuLogoVideo[] = "amwlogo1";
 
 // The original is the CRT operator new.
-void* AllocateAllowNew(MechS32 p_size)
+void* AllocateAllowNew(int32_t p_size)
 {
 	return ::operator new(p_size);
 }
 
-void DrawMainMenu(TMPackDataBase* p_database, MechS32*)
+void DrawMainMenu(TMPackDataBase* p_database, int32_t*)
 {
 	void* audioData = NULL;
-	MechS32 audioSize;
+	int32_t audioSize;
 
 	SelectStar(1, 0, 0, 0, 100);
 	p_database->GetDBItem(104, &audioData, &audioSize);

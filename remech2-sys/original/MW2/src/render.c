@@ -35,26 +35,26 @@
 
 #include <string.h>
 
-MechS32 g_drawModeIndex = -1;
+int32_t g_drawModeIndex = -1;
 
-MechS32 g_initDrawModeParam2 = 1;
+int32_t g_initDrawModeParam2 = 1;
 
-MechS32 g_showBoundingSpheres = 0;
+int32_t g_showBoundingSpheres = 0;
 
 void* g_bannerBuffer = NULL;
 
-MechS32 g_projectionDirty = 1;
+int32_t g_projectionDirty = 1;
 
-MechS32 g_displayReady = 0;
+int32_t g_displayReady = 0;
 
-MechS32 g_framePane = 0;
+int32_t g_framePane = 0;
 
-MechS32 g_hasLightObject = 0;
+int32_t g_hasLightObject = 0;
 
 // Cleared while an effect has the camera, set again when it gives it back.
-MechS32 g_lightFollowsObject = 1;
+int32_t g_lightFollowsObject = 1;
 
-MechS32 g_lightObject = -1;
+int32_t g_lightObject = -1;
 
 // The object of the scene's shape of kind 0x90, made by SecondRender.
 SceneObject* g_skyObject = NULL;
@@ -62,39 +62,39 @@ SceneObject* g_skyObject = NULL;
 // The object of the scene's shape of kind 0xa0.
 SceneObject* g_cockpitObject = NULL;
 
-MechS32 g_drawnPolygonCount = 0;
+int32_t g_drawnPolygonCount = 0;
 
 PANE g_screenPane;
 
 GameWindowGeometry* g_gameWindowGeometry;
 
-MechS32 g_screenHeight;
+int32_t g_screenHeight;
 
 // Set when the next Blit should stretch the current pane over the window.
-MechS32 g_stretchPending;
+int32_t g_stretchPending;
 
-MechS32 g_screenHeightMinus1;
+int32_t g_screenHeightMinus1;
 
-MechS32 g_screenPixelCount;
+int32_t g_screenPixelCount;
 
-MechS32 g_screenWidth;
+int32_t g_screenWidth;
 
 PANE g_currentPane;
 
-MechS32 g_screenWidthMinus1;
+int32_t g_screenWidthMinus1;
 
-MechS32 g_screenHalfWidth;
+int32_t g_screenHalfWidth;
 
-MechS32 g_screenHalfHeight;
+int32_t g_screenHalfHeight;
 
 WINDOW g_mainPixelBuffer;
 
 // InitGameWindowGeometry is implemented on the Rust side (src/sim/window.rs). In widescreen the
 // geometry is the 4:3 box the HUD is laid out in, not the whole frame.
 
-MechS32 InitDisplayGeometry(void)
+int32_t InitDisplayGeometry(void)
 {
-	MechS32 result;
+	int32_t result;
 
 	result = 0;
 	if (InitGameWindowGeometry()) {
@@ -181,7 +181,7 @@ void SecondRender(void)
 // 0x90 and 0xa0 with their own clip distances, the scene's objects, and the animations.
 void DrawScene(void)
 {
-	MechS32 saved;
+	int32_t saved;
 
 	if (g_framePane) {
 		memset(g_mainPixelBuffer.m_buffer, g_backgroundColor, g_refreshModePixelCount);
@@ -243,7 +243,7 @@ void DrawScene(void)
 	SelectPane(0);
 }
 
-void SetFramePane(MechS32 p_value)
+void SetFramePane(int32_t p_value)
 {
 	if (p_value >= 0 && p_value < 11) {
 		g_framePane = p_value;
@@ -295,13 +295,13 @@ void ShutdownRender(void)
 // (kind 0x100 without flag 0x800) and of kind 0x50, as circles of their radius in color 0xf.
 void DrawBoundingSpheres(Shape* p_root)
 {
-	MechS32 color;
+	int32_t color;
 	Shape* shape;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 radius;
-	MechS32 radiusY;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t radius;
+	int32_t radiusY;
 
 	if (!p_root || !p_root->m_next || p_root->m_prev == p_root->m_next) {
 		return;

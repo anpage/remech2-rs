@@ -30,39 +30,39 @@ ShapeCollisionFns g_shapeCollisionFns[8] = {
 };
 
 // The normal of the surface the last collision test hit, 16.16.
-MechS32 g_hitNormalX = 0;
+int32_t g_hitNormalX = 0;
 
-MechS32 g_hitNormalY = 0;
+int32_t g_hitNormalY = 0;
 
-MechS32 g_hitNormalZ = 0;
+int32_t g_hitNormalZ = 0;
 
 // The normal of the ground GetTerrainHeight found.
-MechS32 g_groundNormalX = 0;
+int32_t g_groundNormalX = 0;
 
-MechS32 g_groundNormalY = 0;
+int32_t g_groundNormalY = 0;
 
-MechS32 g_groundNormalZ = 0;
+int32_t g_groundNormalZ = 0;
 
 // The normal of the surface TestSegmentCollision hit.
-MechS32 g_segmentNormalX = 0;
+int32_t g_segmentNormalX = 0;
 
-MechS32 g_segmentNormalY = 0;
+int32_t g_segmentNormalY = 0;
 
-MechS32 g_segmentNormalZ = 0;
+int32_t g_segmentNormalZ = 0;
 
 // The background color the 3D view is cleared to.
-MechS32 g_backgroundColor = 0;
+int32_t g_backgroundColor = 0;
 
 // The sky's color (DrawSkyAndGround; the ground's is g_groundColor).
-MechS32 g_skyColor = 0xe0;
+int32_t g_skyColor = 0xe0;
 
 // The ground's color (DrawSkyAndGround; the sky's is g_skyColor).
-MechS32 g_groundColor = 0xef;
+int32_t g_groundColor = 0xef;
 
 // The horizon map's (LoadMapBitmap, from the world stream's hrzm record).
-MechS32 g_horizonMapColor = 0xea;
+int32_t g_horizonMapColor = 0xea;
 
-void SetShapeCollisionType(Shape* p_shape, MechS32 p_collisionType)
+void SetShapeCollisionType(Shape* p_shape, int32_t p_collisionType)
 {
 	p_shape->m_collisionType = p_collisionType;
 
@@ -76,11 +76,11 @@ void SetShapeCollisionType(Shape* p_shape, MechS32 p_collisionType)
 
 // Returns whether p_y lies below the plane of the face at (p_x, p_z), with the plane's height
 // there in p_height, and sets the hit normal to the face's.
-MechS32 IsBelowFacePlane(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32* p_height)
+int32_t IsBelowFacePlane(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p_y, int32_t p_z, int32_t* p_height)
 {
 	Vertex* vertex;
 
-	vertex = &p_vertices[*((MechU8*) p_face + p_face->m_indexOffset)];
+	vertex = &p_vertices[*((uint8_t*) p_face + p_face->m_indexOffset)];
 	*p_height = vertex->m_worldY - SolvePlaneY(
 									   p_face->m_normal[0],
 									   p_face->m_normal[1],
@@ -98,15 +98,15 @@ MechS32 IsBelowFacePlane(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 
 // Returns the height of the ground at (p_x, p_z): the highest surface of the world's shapes
 // within 1000 units of p_y, else the highest one below p_y, else 0. Its normal goes to
 // g_groundNormal.
-MechS32 GetTerrainHeight(MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t GetTerrainHeight(int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	Shape* root;
-	MechS32 best;
-	MechS32 below;
-	MechS32 top;
+	int32_t best;
+	int32_t below;
+	int32_t top;
 	Shape* shape;
-	MechS32 (*getHeight)(Shape*, MechS32, MechS32, MechS32, MechS32*);
-	MechS32 type;
+	int32_t (*getHeight)(Shape*, int32_t, int32_t, int32_t, int32_t*);
+	int32_t type;
 
 	root = g_sceneShapes;
 	if (!root) {
@@ -156,14 +156,14 @@ MechS32 GetTerrainHeight(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 
 // Returns the height of the highest surface of the world's shapes at (p_x, p_z), or 0. Its
 // normal goes to g_groundNormal.
-MechS32 GetHighestSurface(MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t GetHighestSurface(int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	Shape* root;
-	MechS32 best;
-	MechS32 top;
+	int32_t best;
+	int32_t top;
 	Shape* shape;
-	MechS32 (*getHeight)(Shape*, MechS32, MechS32, MechS32, MechS32*);
-	MechS32 type;
+	int32_t (*getHeight)(Shape*, int32_t, int32_t, int32_t, int32_t*);
+	int32_t type;
 
 	root = g_sceneShapes;
 	if (!root) {
@@ -194,13 +194,13 @@ MechS32 GetHighestSurface(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 	return best > -0x7fffffff ? best : 0;
 }
 
-MechS32 HasHeightTest(Shape* p_shape)
+int32_t HasHeightTest(Shape* p_shape)
 {
 	return g_shapeCollisionFns[p_shape->m_collisionType].m_getHeight != NULL;
 }
 
 // Tests the point against the world's shape nearest to it, returned in p_hit.
-MechS32 TestPointCollision(MechS32 p_x, MechS32 p_y, MechS32 p_z, Shape** p_hit)
+int32_t TestPointCollision(int32_t p_x, int32_t p_y, int32_t p_z, Shape** p_hit)
 {
 	*p_hit = FindNearestShape(g_sceneShapes, p_x, p_y, p_z);
 	if (*p_hit && TestShapePoint(*p_hit, p_x, p_y, p_z)) {
@@ -212,10 +212,10 @@ MechS32 TestPointCollision(MechS32 p_x, MechS32 p_y, MechS32 p_z, Shape** p_hit)
 }
 
 // Returns the shape under p_root nearest to (p_x, p_y, p_z).
-Shape* FindNearestShape(Shape* p_root, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+Shape* FindNearestShape(Shape* p_root, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 best;
-	MechS32 distance;
+	int32_t best;
+	int32_t distance;
 	Shape* nearest;
 	Shape* shape;
 
@@ -237,9 +237,9 @@ Shape* FindNearestShape(Shape* p_root, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 }
 
 // Tests the point against the shape; a shape type without a point test always hits.
-MechS32 TestShapePoint(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t TestShapePoint(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 (*testPoint)(Shape*, MechS32, MechS32, MechS32);
+	int32_t (*testPoint)(Shape*, int32_t, int32_t, int32_t);
 
 	testPoint = g_shapeCollisionFns[p_shape->m_collisionType].m_testPoint;
 	if (testPoint) {
@@ -252,17 +252,17 @@ MechS32 TestShapePoint(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 // Tests the segment against the world's shapes, other than those of player p_exclude (-1 for
 // none). On a hit, returns the shape in p_hit and moves the ray's end to the nearest point of
 // impact; its normal goes to g_segmentNormal.
-MechS32 TestSegmentCollision(Ray* p_ray, Shape** p_hit, MechS32 p_exclude)
+int32_t TestSegmentCollision(Ray* p_ray, Shape** p_hit, int32_t p_exclude)
 {
-	MechU16 surface;
-	MechS32 best;
+	uint16_t surface;
+	int32_t best;
 	Shape* root;
 	Ray hitRay;
-	MechS32 distance;
+	int32_t distance;
 	Shape* nearest;
 	Ray ray;
 	Shape* shape;
-	MechS32 length;
+	int32_t length;
 
 	nearest = NULL;
 	best = 0x7fffffff;
@@ -308,13 +308,13 @@ MechS32 TestSegmentCollision(Ray* p_ray, Shape** p_hit, MechS32 p_exclude)
 }
 
 // TestSegmentCollision against the world's scenery only: no mechs, nor shapes of type 6.
-MechS32 TestSceneryCollision(Ray* p_ray, Shape** p_hit)
+int32_t TestSceneryCollision(Ray* p_ray, Shape** p_hit)
 {
-	MechU16 surface;
-	MechS32 best;
+	uint16_t surface;
+	int32_t best;
 	Shape* root;
 	Ray hitRay;
-	MechS32 distance;
+	int32_t distance;
 	Shape* nearest;
 	Ray ray;
 	Shape* shape;
@@ -361,18 +361,18 @@ MechS32 TestSceneryCollision(Ray* p_ray, Shape** p_hit)
 
 // Tests the ray against the shape: with the type's ray test, else by its point test at four
 // steps along the ray (cutting the ray at the first hit), else by the shape's bounding sphere.
-MechS32 TestShapeRay(Shape* p_shape, Ray* p_ray, MechS32 p_distance)
+int32_t TestShapeRay(Shape* p_shape, Ray* p_ray, int32_t p_distance)
 {
-	MechS32 (*testRay)(Shape*, Ray*);
-	MechS32 (*testPoint)(Shape*, MechS32, MechS32, MechS32);
-	MechS32 type;
-	MechS32 y;
-	MechS32 z;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 dz;
-	MechS32 i;
-	MechS32 x;
+	int32_t (*testRay)(Shape*, Ray*);
+	int32_t (*testPoint)(Shape*, int32_t, int32_t, int32_t);
+	int32_t type;
+	int32_t y;
+	int32_t z;
+	int32_t dx;
+	int32_t dy;
+	int32_t dz;
+	int32_t i;
+	int32_t x;
 
 	if (GetRayLength(p_ray) <= 0) {
 		return 1;
@@ -412,7 +412,7 @@ MechS32 TestShapeRay(Shape* p_shape, Ray* p_ray, MechS32 p_distance)
 
 // Cuts the ray at p_distance along it and sets the hit normal to point from the shape's
 // centre to the ray's end (to its start when p_distance is 10).
-void EndRayAtShape(Shape* p_shape, Ray* p_ray, MechS32 p_distance)
+void EndRayAtShape(Shape* p_shape, Ray* p_ray, int32_t p_distance)
 {
 	if (p_distance > 0) {
 		SetRayLength(p_ray, p_distance);
@@ -434,19 +434,19 @@ void EndRayAtShape(Shape* p_shape, Ray* p_ray, MechS32 p_distance)
 
 // Intersects p_ray with the face's plane from its front side and, if the point lies within the
 // face, ends the ray there and keeps the face's normal as the hit normal.
-MechS32 IntersectRayFace(Face* p_face, Vertex* p_vertices, Ray* p_ray)
+int32_t IntersectRayFace(Face* p_face, Vertex* p_vertices, Ray* p_ray)
 {
-	MechS32 nx;
-	MechS32 denom;
-	MechS32 t;
-	MechS32 d;
+	int32_t nx;
+	int32_t denom;
+	int32_t t;
+	int32_t d;
 	Vertex* vertex;
-	MechS32 ny;
-	MechS32 nz;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 num;
+	int32_t ny;
+	int32_t nz;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t num;
 
 	nx = p_face->m_normal[0];
 	ny = p_face->m_normal[1];
@@ -456,7 +456,7 @@ MechS32 IntersectRayFace(Face* p_face, Vertex* p_vertices, Ray* p_ray)
 		return FALSE;
 	}
 
-	vertex = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset]];
+	vertex = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset]];
 	d = -(FixedMul29(nx, vertex->m_worldX) + FixedMul29(ny, vertex->m_worldY) + FixedMul29(nz, vertex->m_worldZ));
 	num = FixedMul29(nx, p_ray->m_x0) + FixedMul29(ny, p_ray->m_y0) + FixedMul29(nz, p_ray->m_z0) + d;
 	if (num <= 0) {
@@ -489,11 +489,11 @@ MechS32 IntersectRayFace(Face* p_face, Vertex* p_vertices, Ray* p_ray)
 
 // Tests whether the point (p_x, p_y, p_z) lies within the face, projected on the plane its normal
 // is closest to.
-MechS32 IsPointInFace(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t IsPointInFace(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 nx;
-	MechS32 ny;
-	MechS32 nz;
+	int32_t nx;
+	int32_t ny;
+	int32_t nz;
 
 	if (p_face->m_indexCount < 3) {
 		return FALSE;
@@ -515,17 +515,17 @@ MechS32 IsPointInFace(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p_y
 
 // Tests whether (p_x, p_z) lies within the face, seen from above: the point must have vertices on
 // each side, and the edges crossing its z must pass it on both sides.
-MechS32 IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p_z)
+int32_t IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p_z)
 {
-	MechS32 count;
+	int32_t count;
 	Vertex* prev;
-	MechS32 sides;
-	MechU8* indices;
-	MechS32 i;
-	MechS32 right;
-	MechS32 offset;
+	int32_t sides;
+	uint8_t* indices;
+	int32_t i;
+	int32_t right;
+	int32_t offset;
 	Vertex* vertex;
-	MechS32 left;
+	int32_t left;
 
 	left = FALSE;
 	right = FALSE;
@@ -534,7 +534,7 @@ MechS32 IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p
 		return FALSE;
 	}
 
-	indices = (MechU8*) p_face + p_face->m_indexOffset;
+	indices = (uint8_t*) p_face + p_face->m_indexOffset;
 	sides = 0;
 	i = count;
 	while (i--) {
@@ -650,17 +650,17 @@ MechS32 IsPointInFaceXZ(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p
 }
 
 // Tests whether (p_x, p_y) lies within the face, seen along z.
-MechS32 IsPointInFaceXY(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p_y)
+int32_t IsPointInFaceXY(Face* p_face, Vertex* p_vertices, int32_t p_x, int32_t p_y)
 {
-	MechS32 count;
+	int32_t count;
 	Vertex* prev;
-	MechS32 sides;
-	MechU8* indices;
-	MechS32 i;
-	MechS32 right;
-	MechS32 offset;
+	int32_t sides;
+	uint8_t* indices;
+	int32_t i;
+	int32_t right;
+	int32_t offset;
 	Vertex* vertex;
-	MechS32 left;
+	int32_t left;
 
 	left = FALSE;
 	right = FALSE;
@@ -669,7 +669,7 @@ MechS32 IsPointInFaceXY(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p
 		return FALSE;
 	}
 
-	indices = (MechU8*) p_face + p_face->m_indexOffset;
+	indices = (uint8_t*) p_face + p_face->m_indexOffset;
 	sides = 0;
 	i = count;
 	while (i--) {
@@ -785,17 +785,17 @@ MechS32 IsPointInFaceXY(Face* p_face, Vertex* p_vertices, MechS32 p_x, MechS32 p
 }
 
 // Tests whether (p_y, p_z) lies within the face, seen along x.
-MechS32 IsPointInFaceYZ(Face* p_face, Vertex* p_vertices, MechS32 p_y, MechS32 p_z)
+int32_t IsPointInFaceYZ(Face* p_face, Vertex* p_vertices, int32_t p_y, int32_t p_z)
 {
-	MechS32 count;
+	int32_t count;
 	Vertex* prev;
-	MechS32 sides;
-	MechU8* indices;
-	MechS32 i;
-	MechS32 right;
-	MechS32 offset;
+	int32_t sides;
+	uint8_t* indices;
+	int32_t i;
+	int32_t right;
+	int32_t offset;
 	Vertex* vertex;
-	MechS32 left;
+	int32_t left;
 
 	left = FALSE;
 	right = FALSE;
@@ -804,7 +804,7 @@ MechS32 IsPointInFaceYZ(Face* p_face, Vertex* p_vertices, MechS32 p_y, MechS32 p
 		return FALSE;
 	}
 
-	indices = (MechU8*) p_face + p_face->m_indexOffset;
+	indices = (uint8_t*) p_face + p_face->m_indexOffset;
 	sides = 0;
 	i = count;
 	while (i--) {

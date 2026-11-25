@@ -10,9 +10,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-MechChar g_cursorPositionText[0x20];
+char g_cursorPositionText[0x20];
 
-inline MechS32 IsInsideWindow(MechPoint& p_point)
+inline int32_t IsInsideWindow(MechPoint& p_point)
 {
 	if (p_point.x < 0 || p_point.x >= g_windowWidth) {
 		return FALSE;
@@ -42,7 +42,7 @@ MouseState::MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_cursorS
 	m_enabled = 1;
 }
 
-void MouseState::MoveCursorTo(MechS32 p_x, MechS32 p_y)
+void MouseState::MoveCursorTo(int32_t p_x, int32_t p_y)
 {
 	if (!m_enabled) {
 		return;
@@ -91,7 +91,7 @@ void MouseState::DrawCursorPosition()
 	}
 }
 
-void MouseState::PressButton(MechS32 p_button)
+void MouseState::PressButton(int32_t p_button)
 {
 	switch (p_button) {
 	case 0:
@@ -114,8 +114,8 @@ void MouseState::PressButton(MechS32 p_button)
 void MouseState::ReadMouseState()
 {
 	MechPoint point;
-	MechS32 x;
-	MechS32 y;
+	int32_t x;
+	int32_t y;
 	undefined4 middleDown;
 	undefined4 leftDown;
 	undefined4 rightDown;
@@ -132,7 +132,7 @@ void MouseState::ReadMouseState()
 		point.x = x;
 		point.y = y;
 		if (IsInsideWindow(point)) {
-			MechU32 buttons = MechMouseButtons();
+			uint32_t buttons = MechMouseButtons();
 
 			m_x = point.x;
 			m_y = point.y;

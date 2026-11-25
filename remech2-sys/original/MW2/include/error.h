@@ -11,15 +11,15 @@ extern "C"
 {
 #endif
 
-	extern MechChar* g_fatalErrorTitle;
-	extern MechChar* g_warningTitle;
-	extern MechS32 g_errorCode;
-	extern MechChar g_errorMessage[0x400];
+	extern char* g_fatalErrorTitle;
+	extern char* g_warningTitle;
+	extern int32_t g_errorCode;
+	extern char g_errorMessage[0x400];
 
-	void Error(MechS32 p_code, const char* p_format, ...);
+	void Error(int32_t p_code, const char* p_format, ...);
 	void ShutdownOnError(void);
 	void ShowFatalError(const char* p_format, va_list p_args);
-	MechChar* FormatErrorMessage(MechChar* p_title, MechS32 p_code, const char* p_format, va_list p_args);
+	char* FormatErrorMessage(char* p_title, int32_t p_code, const char* p_format, va_list p_args);
 	void LogWarning(const char* p_format, va_list p_args);
 
 #ifdef __cplusplus

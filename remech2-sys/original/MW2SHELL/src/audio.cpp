@@ -56,7 +56,7 @@ void MidiSequence::Stop()
 	}
 }
 
-void MidiSequence::SetVolume(MechS32 p_volume)
+void MidiSequence::SetVolume(int32_t p_volume)
 {
 	if (m_impl) {
 		ShellMidiSequence_SetVolume(m_impl, p_volume);
@@ -91,7 +91,7 @@ AudioSample::~AudioSample()
 	}
 }
 
-void AudioSample::SetFade(MechS32 p_initFadeRate, MechS32 p_maxFade, MechS32 p_startVolume, MechS32 p_endVolume)
+void AudioSample::SetFade(int32_t p_initFadeRate, int32_t p_maxFade, int32_t p_startVolume, int32_t p_endVolume)
 {
 	if (m_impl) {
 		ShellAudioSample_SetFade(m_impl, p_initFadeRate, p_maxFade, p_startVolume, p_endVolume);
@@ -144,7 +144,7 @@ undefined AudioSample::IsPlaying()
 	return FALSE;
 }
 
-void AudioSample::SetVolume(MechS32 p_volume)
+void AudioSample::SetVolume(int32_t p_volume)
 {
 	if (m_impl) {
 		ShellAudioSample_SetVolume(m_impl, p_volume);

@@ -10,14 +10,14 @@
 #include "soundfx.h"
 #include "types.h"
 
-MechS32 g_motionSounds[4][4] =
+int32_t g_motionSounds[4][4] =
 	{{-1, 0x12e, 0x12e, -1}, {0x14f, -1, -1, 0x14f}, {0x11a, 0x11a, 0x148, 0x11a}, {0x119, 0x119, 0x119, 0x12d}};
 
-MechS32 g_lastMotionSound[60];
+int32_t g_lastMotionSound[60];
 
 void FirstGPAnim(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 60; i++) {
 		g_lastMotionSound[i] = -2;
@@ -40,7 +40,7 @@ void StopMotion(Player* p_player)
 	p_player->m_nextMotionState = -1;
 }
 
-MechS32* GetEyepointOffset(Player* p_player, MechS32* p_offset)
+int32_t* GetEyepointOffset(Player* p_player, int32_t* p_offset)
 {
 	p_offset[0] = g_eyepoint->m_x - p_player->m_position.m_x;
 	p_offset[1] = g_eyepoint->m_y - p_player->m_position.m_y;
@@ -53,9 +53,9 @@ MechS32* GetEyepointOffset(Player* p_player, MechS32* p_offset)
 // m_animFlags), and for the local player updates the looping sounds (UpdateMotionSounds).
 void UpdateMotion(Player* p_player)
 {
-	MechS32* offset;
-	MechS32 position[3];
-	MechS32 height;
+	int32_t* offset;
+	int32_t position[3];
+	int32_t height;
 
 	offset = NULL;
 	if (p_player->m_mech->m_throttle.m_value <= 0x420) {
@@ -103,11 +103,11 @@ void UpdateMotion(Player* p_player)
 	}
 }
 
-void UpdateMotionSounds(Player* p_player, MechS32 (*p_sounds)[4], MechS32* p_offset)
+void UpdateMotionSounds(Player* p_player, int32_t (*p_sounds)[4], int32_t* p_offset)
 {
-	MechS32 offset[3];
-	MechS32 sound;
-	MechS32 id;
+	int32_t offset[3];
+	int32_t sound;
+	int32_t id;
 
 	id = p_player->m_index;
 	if ((p_player->m_motionState != p_player->m_nextMotionState && g_lastMotionSound[id] != p_player->m_motionState) ||
@@ -138,7 +138,7 @@ void UpdateMotionSounds(Player* p_player, MechS32 (*p_sounds)[4], MechS32* p_off
 
 void ResetMotion(Player* p_player)
 {
-	MechS32 id;
+	int32_t id;
 
 	id = p_player->m_index;
 	p_player->m_speedLevel = 0;

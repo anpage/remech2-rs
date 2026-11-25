@@ -14,15 +14,21 @@ struct Collection;
 // The buttons of a menu screen.
 class ButtonMenu {
 public:
-	ButtonMenu(VideoDriver* p_videoDriver, Font* p_font, MechU8 p_drawRect, MainMenuButton* p_buttons, MechS32 p_count);
+	ButtonMenu(
+		VideoDriver* p_videoDriver,
+		Font* p_font,
+		uint8_t p_drawRect,
+		MainMenuButton* p_buttons,
+		int32_t p_count
+	);
 	~ButtonMenu();
-	void RemoveButtonsFrom(MechS32 p_id);
-	MechS32 HitTest(MechS32 p_x, MechS32 p_y);
+	void RemoveButtonsFrom(int32_t p_id);
+	int32_t HitTest(int32_t p_x, int32_t p_y);
 	void DrawRects();
-	void RemoveButton(MechS32 p_id);
-	void AddButton(MainMenuButton p_button, MechS32 p_id, MechU8 p_drawRect);
-	void EnableButton(MechS32 p_id);
-	void DisableButton(MechS32 p_id);
+	void RemoveButton(int32_t p_id);
+	void AddButton(MainMenuButton p_button, int32_t p_id, uint8_t p_drawRect);
+	void EnableButton(int32_t p_id);
+	void DisableButton(int32_t p_id);
 
 private:
 	Collection* m_items;        // 0x00
@@ -32,7 +38,7 @@ private:
 
 public:
 	// The archive reader passes it on to the buttons it adds.
-	MechU8 m_drawRect; // 0x10c
+	uint8_t m_drawRect; // 0x10c
 };
 
 #pragma pack()

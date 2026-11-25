@@ -44,44 +44,44 @@
 
 #include <string.h>
 
-MechS32 g_effectCameraActive = 0;
+int32_t g_effectCameraActive = 0;
 
-MechS32 g_effectCameraEffect = -1;
+int32_t g_effectCameraEffect = -1;
 
-MechS32 g_lastLocalMissile = -1;
+int32_t g_lastLocalMissile = -1;
 
-MechS32 g_trackedShot = -1;
+int32_t g_trackedShot = -1;
 
 Player* g_launchEffectPlayer = NULL;
 
-MechS32 g_effectCameraEnabled = 1;
+int32_t g_effectCameraEnabled = 1;
 
 // The player whose shot hit something last.
-MechS32 g_lastHitShooter = -1;
+int32_t g_lastHitShooter = -1;
 
-MechS32 g_nukeTimeLeft = 0;
+int32_t g_nukeTimeLeft = 0;
 
-MechS32 g_nukeMaxRadius;
+int32_t g_nukeMaxRadius;
 
 // The view that follows a tracked shot: its position, heading and three more angles.
-MechS32 g_trackedShotView[7];
+int32_t g_trackedShotView[7];
 
-MechS32 g_nukeRadius;
+int32_t g_nukeRadius;
 
 Vector3 g_nukePosition;
 
 // The eyepoint's settings while an effect has the camera.
-MechS32 g_savedLightX;
+int32_t g_savedLightX;
 
-MechS32 g_savedLightY;
+int32_t g_savedLightY;
 
-MechS32 g_savedLightZ;
+int32_t g_savedLightZ;
 
-MechS32 g_savedDirectionalLight;
+int32_t g_savedDirectionalLight;
 
-MechS32 g_savedAmbientLight;
+int32_t g_savedAmbientLight;
 
-MechS32 g_savedDistanceFade;
+int32_t g_savedDistanceFade;
 
 CareerRecord g_careerRecord;
 
@@ -91,7 +91,7 @@ Effect g_effects[0x100];
 
 void FirstShots(void)
 {
-	MechS32 i;
+	int32_t i;
 	Shot* shot;
 	Effect* effect;
 
@@ -117,7 +117,7 @@ void FirstShots(void)
 	memset(&g_careerRecord, 0, sizeof(g_careerRecord));
 }
 
-void ResetEffectSlot(MechS32 p_index)
+void ResetEffectSlot(int32_t p_index)
 {
 	Effect* effect;
 
@@ -129,7 +129,7 @@ void ResetEffectSlot(MechS32 p_index)
 	effect->m_owner = -1;
 }
 
-void ResetShotSlot(MechS32 p_index)
+void ResetShotSlot(int32_t p_index)
 {
 	Shot* shot;
 
@@ -150,7 +150,7 @@ void ResetShotSlot(MechS32 p_index)
 // UpdateAllShots on the Rust side (src/sim/shots.rs) wraps it, skipping frames of no time.
 void UpdateAllShotsC(void)
 {
-	MechS32 i;
+	int32_t i;
 	Shot* shot;
 
 	for (i = 0; i < 0xaf; i++) {
@@ -166,33 +166,33 @@ void UpdateAllShotsC(void)
 // Moves the shot on by g_deltaTime and tests the segment it covered for a hit: a mech, a game
 // thing or the ground. A hit detonates the shot, just short of the point of impact; otherwise
 // it detonates when its lifetime runs out, or steers on toward its target.
-void UpdateShot(MechS32 p_index)
+void UpdateShot(int32_t p_index)
 {
-	MechS32 hitResult;
-	MechS32 velZ;
-	MechU16 surface;
+	int32_t hitResult;
+	int32_t velZ;
+	uint16_t surface;
 	Shape* hit;
 	Shot* shot;
-	MechS32 victim;
-	MechS32 backX;
-	MechS32 x;
-	MechS32 backY;
-	MechS32 x0;
-	MechS32 damageFlags;
-	MechS32 y;
-	MechS32 backZ;
-	MechS32 y0;
-	MechS32 z;
-	MechS32 z0;
-	MechS32 dt;
-	MechS32 hitX;
-	MechS32 hitY;
+	int32_t victim;
+	int32_t backX;
+	int32_t x;
+	int32_t backY;
+	int32_t x0;
+	int32_t damageFlags;
+	int32_t y;
+	int32_t backZ;
+	int32_t y0;
+	int32_t z;
+	int32_t z0;
+	int32_t dt;
+	int32_t hitX;
+	int32_t hitY;
 	Ray ray;
-	MechS32 hitZ;
-	MechS32 velX;
-	MechS32 bearing;
-	MechS32 velY;
-	MechS32 groundY;
+	int32_t hitZ;
+	int32_t velX;
+	int32_t bearing;
+	int32_t velY;
+	int32_t groundY;
 
 	hit = NULL;
 	dt = g_deltaTime;
@@ -381,11 +381,11 @@ void UpdateShot(MechS32 p_index)
 
 // Sways (p_x, p_y, p_z) sideways and up and down around the shot's line of flight, by the
 // phase in m_swayPhase, and advances the phase.
-void SwayShot(Shot* p_shot, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void SwayShot(Shot* p_shot, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
-	MechS32 sideZ;
-	MechS32 sideY;
-	MechS32 sideX;
+	int32_t sideZ;
+	int32_t sideY;
+	int32_t sideX;
 
 	sideX = -p_shot->m_velocity[2];
 	sideY = 0;
@@ -402,20 +402,20 @@ void SwayShot(Shot* p_shot, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 // within 100 units of it.
 // GuideMissileToTarget on the Rust side (src/sim/shots.rs) wraps it, arming the fuse at the rate
 // of a 45 FPS sim.
-void GuideMissileToTargetC(Shot* p_shot, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void GuideMissileToTargetC(Shot* p_shot, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 targetY;
-	MechS32 targetZ;
+	int32_t targetY;
+	int32_t targetZ;
 	Player* player;
-	MechS32 dy;
-	MechS32 dx;
-	MechS32 dz;
+	int32_t dy;
+	int32_t dx;
+	int32_t dz;
 	GameThing* thing;
-	MechS32 distance;
-	MechS32 vx;
-	MechS32 vy;
-	MechS32 vz;
-	MechS32 targetX;
+	int32_t distance;
+	int32_t vx;
+	int32_t vy;
+	int32_t vz;
+	int32_t targetX;
 
 	if (p_shot->m_target < 0) {
 		return;
@@ -474,18 +474,18 @@ void GuideMissileToTargetC(Shot* p_shot, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 // Removes the shot from the world and frees its slot; p_explode spawns the effect its impact
 // calls for at (p_x, p_y, p_z), with the camera looking from (p_camX, p_camY, p_camZ).
 void DetonateShot(
-	MechS32 p_index,
-	MechS32 p_explode,
-	MechS32 p_x,
-	MechS32 p_y,
-	MechS32 p_z,
-	MechS32 p_camX,
-	MechS32 p_camY,
-	MechS32 p_camZ
+	int32_t p_index,
+	int32_t p_explode,
+	int32_t p_x,
+	int32_t p_y,
+	int32_t p_z,
+	int32_t p_camX,
+	int32_t p_camY,
+	int32_t p_camZ
 )
 {
 	Shot* shot;
-	MechS32 impact;
+	int32_t impact;
 
 	shot = &g_shots[p_index];
 	if (shot->m_tracked) {
@@ -502,33 +502,33 @@ void DetonateShot(
 }
 
 void SpawnEffect(
-	MechS32 p_owner,
-	MechS32 p_type,
-	MechS32 p_x,
-	MechS32 p_y,
-	MechS32 p_z,
-	MechS32 p_camX,
-	MechS32 p_camY,
-	MechS32 p_camZ
+	int32_t p_owner,
+	int32_t p_type,
+	int32_t p_x,
+	int32_t p_y,
+	int32_t p_z,
+	int32_t p_camX,
+	int32_t p_camY,
+	int32_t p_camZ
 )
 {
 	SpawnEffectEx(p_owner, p_type, p_x, p_y, p_z, p_camX, p_camY, p_camZ, 0, 0, 0);
 }
 
 void SpawnRotatedEffect(
-	MechS32 p_type,
-	MechS32 p_rotX,
-	MechS32 p_rotY,
-	MechS32 p_rotZ,
-	MechS32 p_x,
-	MechS32 p_y,
-	MechS32 p_z
+	int32_t p_type,
+	int32_t p_rotX,
+	int32_t p_rotY,
+	int32_t p_rotZ,
+	int32_t p_x,
+	int32_t p_y,
+	int32_t p_z
 )
 {
 	SpawnEffectEx(-2, p_type, p_x, p_y, p_z, p_x, p_y, p_z, p_rotX, p_rotY, p_rotZ);
 }
 
-void SpawnLaunchEffect(MechS32 p_type, Player* p_player)
+void SpawnLaunchEffect(int32_t p_type, Player* p_player)
 {
 	g_launchEffectPlayer = p_player;
 	SpawnEffectEx(-2, p_type, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -539,39 +539,39 @@ void SpawnLaunchEffect(MechS32 p_type, Player* p_player)
 // The effect takes a free slot of its type (none if three of them already burn within 500
 // units), and the effect camera may follow it from (p_camX, p_camY, p_camZ).
 void SpawnEffectEx(
-	MechS32 p_owner,
-	MechS32 p_type,
-	MechS32 p_x,
-	MechS32 p_y,
-	MechS32 p_z,
-	MechS32 p_camX,
-	MechS32 p_camY,
-	MechS32 p_camZ,
-	MechS32 p_rotX,
-	MechS32 p_rotY,
-	MechS32 p_rotZ
+	int32_t p_owner,
+	int32_t p_type,
+	int32_t p_x,
+	int32_t p_y,
+	int32_t p_z,
+	int32_t p_camX,
+	int32_t p_camY,
+	int32_t p_camZ,
+	int32_t p_rotX,
+	int32_t p_rotY,
+	int32_t p_rotZ
 )
 {
-	MechS32 pieces;
-	MechS32 distance;
-	MechS32 dy;
-	MechS32 flags;
-	MechS32 dx;
-	MechS32 chainType;
-	MechS32 chain;
-	MechS32 cameraX;
-	MechS32 dz;
-	MechS32 quiet;
-	MechS32 current;
+	int32_t pieces;
+	int32_t distance;
+	int32_t dy;
+	int32_t flags;
+	int32_t dx;
+	int32_t chainType;
+	int32_t chain;
+	int32_t cameraX;
+	int32_t dz;
+	int32_t quiet;
+	int32_t current;
 	EffectInfo* info;
-	MechS32 slot;
-	MechS32 i;
-	MechS32 cameraZ;
+	int32_t slot;
+	int32_t i;
+	int32_t cameraZ;
 	Effect* effect;
-	MechS32 take;
-	MechS32 closer;
-	MechS32 count;
-	MechS32 volume;
+	int32_t take;
+	int32_t closer;
+	int32_t count;
+	int32_t volume;
 
 	effect = NULL;
 	info = NULL;
@@ -806,14 +806,14 @@ void SpawnEffectEx(
 // their time runs out, giving the camera back if one had it.
 void UpdateEffects(void)
 {
-	MechS32 release;
-	MechS32 i;
-	MechS32 restore;
+	int32_t release;
+	int32_t i;
+	int32_t restore;
 	Effect* effect;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 radius;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t radius;
 
 	UpdateNuke();
 	if (g_difficulty->m_heatTracking) {
@@ -881,18 +881,18 @@ void UpdateEffects(void)
 
 // Damages every mech within p_radius (plus its own radius) of (p_x, p_y, p_z) by p_rate per
 // tick in each of its sections, twice as much when its power is off.
-void DamageMechsInRadius(MechS32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_radius, MechS32 p_rate)
+void DamageMechsInRadius(int32_t p_owner, int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_radius, int32_t p_rate)
 {
 	Player* player;
-	MechS32 reach;
+	int32_t reach;
 	Mech* mech;
-	MechS32 i;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 dz;
-	MechS32 damage;
+	int32_t i;
+	int32_t dx;
+	int32_t dy;
+	int32_t dz;
+	int32_t damage;
 
-	MechS32 ticks = IdealFrameTicks();
+	int32_t ticks = IdealFrameTicks();
 	if (!ticks) {
 		return;
 	}
@@ -932,20 +932,20 @@ void DamageMechsInRadius(MechS32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z,
 }
 
 // Damages every game thing whose shape comes within p_radius of (p_x, p_y, p_z).
-void DamageThingsInRadius(MechS32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_radius, MechS32 p_rate)
+void DamageThingsInRadius(int32_t p_owner, int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_radius, int32_t p_rate)
 {
-	MechS32 distance;
+	int32_t distance;
 	GameThing* thing;
-	MechS32 i;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 dz;
+	int32_t i;
+	int32_t dx;
+	int32_t dy;
+	int32_t dz;
 	Shape* shape;
-	MechS32 reach;
-	MechS32 radius;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
+	int32_t reach;
+	int32_t radius;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 
 	i = g_gameThingCount;
 	while (i--) {
@@ -971,7 +971,7 @@ void DamageThingsInRadius(MechS32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z
 	}
 }
 
-MechS32* GetTrackedShotView(void)
+int32_t* GetTrackedShotView(void)
 {
 	if (g_trackedShot != -1 && g_shots[g_trackedShot].m_tracked) {
 		return g_trackedShotView;
@@ -983,7 +983,7 @@ MechS32* GetTrackedShotView(void)
 }
 
 // Starts tracking the local player's last shot, if it is still in flight.
-MechS32 TrackLastShot(void)
+int32_t TrackLastShot(void)
 {
 	if (g_lastLocalMissile > 0 && g_shots[g_lastLocalMissile].m_flags &&
 		g_shots[g_lastLocalMissile].m_shooter == g_localPlayerId) {
@@ -998,7 +998,7 @@ MechS32 TrackLastShot(void)
 
 // Counts the destruction of game thing p_index for the last shooter's side and team, and
 // removes it.
-void KillGameThing(MechU32 p_index)
+void KillGameThing(uint32_t p_index)
 {
 	GameThing* thing;
 
@@ -1046,9 +1046,9 @@ void KillGameThing(MechU32 p_index)
 
 // Takes p_damage off the hit points of the game thing p_shape belongs to; when they run out,
 // blows it up and counts it destroyed.
-void DamageGameThing(MechS32 p_owner, Shape* p_shape, MechS32 p_damage, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void DamageGameThing(int32_t p_owner, Shape* p_shape, int32_t p_damage, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechU32 index;
+	uint32_t index;
 	GameThing* thing;
 
 	if (!p_shape) {
@@ -1081,12 +1081,12 @@ void DamageGameThing(MechS32 p_owner, Shape* p_shape, MechS32 p_damage, MechS32 
 }
 
 // Shows up to p_count free effects of type 0xb (all when 0) at (p_x, p_y, p_z) as debris.
-void ScatterDebris(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_count)
+void ScatterDebris(int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_count)
 {
-	MechS32 shown;
-	MechS32 piece;
+	int32_t shown;
+	int32_t piece;
 	Effect* effect;
-	MechS32 i;
+	int32_t i;
 	SceneObject* object;
 
 	shown = 0;
@@ -1123,20 +1123,20 @@ void SaveCareerRecord(void)
 void HeatMechsNearFires(void)
 {
 	Shape* root;
-	MechS32 heat;
+	int32_t heat;
 	Player* player;
-	MechS32 reach;
-	MechS32 radius;
-	MechS32 distance;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
+	int32_t reach;
+	int32_t radius;
+	int32_t distance;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 	Mech* mech;
-	MechS32 i;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t i;
+	int32_t dx;
+	int32_t dy;
 	Shape* shape;
-	MechS32 dz;
+	int32_t dz;
 
 	root = g_sceneShapes;
 	if (!root) {
@@ -1179,8 +1179,8 @@ void HeatMechsNearFires(void)
 // grows over the next ticks (UpdateNuke).
 void StartNuke(Player* p_player)
 {
-	MechS32 i;
-	MechS32 duration;
+	int32_t i;
+	int32_t duration;
 	Effect* effect;
 	Shape* shape;
 

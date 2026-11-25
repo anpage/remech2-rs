@@ -9,7 +9,7 @@
 extern "C"
 {
 #endif
-	MechS32 FindResourceIdByName(MechS32 p_type, char* p_name);
+	int32_t FindResourceIdByName(int32_t p_type, char* p_name);
 
 #ifdef __cplusplus
 }

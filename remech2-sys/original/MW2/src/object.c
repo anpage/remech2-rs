@@ -19,9 +19,9 @@
 
 // The countdown the next object starts with, stepped through 64 to 191 so that objects
 // renormalize on different frames.
-MechU32 g_nextRenormalizeCountdown = 100;
+uint32_t g_nextRenormalizeCountdown = 100;
 
-SceneObject* CreateObj(SceneObject* p_parent, MechU32 p_flags)
+SceneObject* CreateObj(SceneObject* p_parent, uint32_t p_flags)
 {
 	SceneObject* obj;
 	SceneObject* last;
@@ -126,12 +126,12 @@ Shape* GetObjShape(SceneObject* p_obj)
 	return p_obj->m_shape;
 }
 
-MechChar* GetObjName(SceneObject* p_obj)
+char* GetObjName(SceneObject* p_obj)
 {
 	return p_obj->m_name;
 }
 
-void SetObjName(SceneObject* p_obj, MechChar* p_name)
+void SetObjName(SceneObject* p_obj, char* p_name)
 {
 	p_obj->m_name = strdup(p_name);
 }
@@ -146,21 +146,21 @@ void GetObjAngles(SceneObject* p_obj, undefined4* p_angleX, undefined4* p_angleY
 	GetMatrixAngles(&p_obj->m_local, p_angleX, p_angleY, p_angleZ);
 }
 
-void GetObjPosition(SceneObject* p_obj, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void GetObjPosition(SceneObject* p_obj, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	*p_x = p_obj->m_world.m_rows[3][0];
 	*p_y = p_obj->m_world.m_rows[3][1];
 	*p_z = p_obj->m_world.m_rows[3][2];
 }
 
-void GetObjLocalPosition(SceneObject* p_obj, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void GetObjLocalPosition(SceneObject* p_obj, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	*p_x = p_obj->m_local.m_rows[3][0];
 	*p_y = p_obj->m_local.m_rows[3][1];
 	*p_z = p_obj->m_local.m_rows[3][2];
 }
 
-void SetObjPosition(SceneObject* p_obj, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void SetObjPosition(SceneObject* p_obj, int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	p_obj->m_local.m_rows[3][0] = p_x;
 	p_obj->m_local.m_rows[3][1] = p_y;
@@ -168,7 +168,7 @@ void SetObjPosition(SceneObject* p_obj, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 	p_obj->m_flags |= c_objectDirty;
 }
 
-void MoveObj(SceneObject* p_obj, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void MoveObj(SceneObject* p_obj, int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	p_obj->m_local.m_rows[3][0] += p_x;
 	p_obj->m_local.m_rows[3][1] += p_y;
@@ -223,7 +223,7 @@ void RotateObjMatrix(SceneObject* p_obj, Matrix* p_matrix)
 	}
 }
 
-void SetObjRotation(SceneObject* p_obj, MechS32 p_angleX, MechS32 p_angleY, MechS32 p_angleZ, MechU32 p_flags)
+void SetObjRotation(SceneObject* p_obj, int32_t p_angleX, int32_t p_angleY, int32_t p_angleZ, uint32_t p_flags)
 {
 	Matrix matrix;
 
@@ -231,7 +231,7 @@ void SetObjRotation(SceneObject* p_obj, MechS32 p_angleX, MechS32 p_angleY, Mech
 	SetObjRotationMatrix(p_obj, &matrix);
 }
 
-void RotateObj(SceneObject* p_obj, MechS32 p_angleX, MechS32 p_angleY, MechS32 p_angleZ, MechU32 p_flags)
+void RotateObj(SceneObject* p_obj, int32_t p_angleX, int32_t p_angleY, int32_t p_angleZ, uint32_t p_flags)
 {
 	Matrix matrix;
 
@@ -313,7 +313,7 @@ void DetachObjTreeShapes(SceneObject* p_obj)
 	}
 }
 
-void SetObjTreeKind(SceneObject* p_obj, MechS32 p_kind)
+void SetObjTreeKind(SceneObject* p_obj, int32_t p_kind)
 {
 	SceneObject* child;
 
@@ -326,7 +326,7 @@ void SetObjTreeKind(SceneObject* p_obj, MechS32 p_kind)
 	}
 }
 
-void SetObjTreeOwner(SceneObject* p_obj, MechS32 p_owner)
+void SetObjTreeOwner(SceneObject* p_obj, int32_t p_owner)
 {
 	SceneObject* child;
 
@@ -339,7 +339,7 @@ void SetObjTreeOwner(SceneObject* p_obj, MechS32 p_owner)
 	}
 }
 
-void SetObjTreeCollisionType(SceneObject* p_obj, MechS32 p_collisionType)
+void SetObjTreeCollisionType(SceneObject* p_obj, int32_t p_collisionType)
 {
 	SceneObject* child;
 
@@ -352,12 +352,12 @@ void SetObjTreeCollisionType(SceneObject* p_obj, MechS32 p_collisionType)
 	}
 }
 
-void ClearObjTreeKind(SceneObject* p_obj, MechS32 p_flags)
+void ClearObjTreeKind(SceneObject* p_obj, int32_t p_flags)
 {
 	SceneObject* child;
 
 	if (p_obj->m_shape) {
-		p_obj->m_shape->m_kind &= (MechS16) ~p_flags;
+		p_obj->m_shape->m_kind &= (int16_t) ~p_flags;
 	}
 
 	for (child = p_obj->m_firstChild; child; child = child->m_nextSibling) {
@@ -526,7 +526,7 @@ void DestroyObjTree(SceneObject* p_obj, ShapeCallback p_callback)
 	}
 }
 
-SceneObject* FindObjByName(SceneObject* p_obj, const MechChar* p_name)
+SceneObject* FindObjByName(SceneObject* p_obj, const char* p_name)
 {
 	SceneObject* child;
 
@@ -562,11 +562,11 @@ SceneObject* GetObjLastChild(SceneObject* p_obj)
 }
 
 // Returns child p_index in the order the children were added (they are prepended), or NULL.
-SceneObject* GetObjChild(SceneObject* p_obj, MechS32 p_index)
+SceneObject* GetObjChild(SceneObject* p_obj, int32_t p_index)
 {
 	SceneObject* result;
 	SceneObject* child;
-	MechS32 count;
+	int32_t count;
 
 	result = NULL;
 	count = 0;
@@ -599,10 +599,10 @@ SceneObject* GetObjChild(SceneObject* p_obj, MechS32 p_index)
 	return result;
 }
 
-SceneObject* FindObjByPart(SceneObject* p_obj, MechU32 p_partId)
+SceneObject* FindObjByPart(SceneObject* p_obj, uint32_t p_partId)
 {
 	SceneObject* child;
-	MechU32 id = p_partId;
+	uint32_t id = p_partId;
 
 	if (p_obj->m_shape && p_obj->m_shape->m_partId == id) {
 		return p_obj;
@@ -619,9 +619,9 @@ SceneObject* FindObjByPart(SceneObject* p_obj, MechU32 p_partId)
 }
 
 // Raises the damage level (shape flags 0xf0) of mech part p_partId's shapes to p_level (1 to 15).
-void RaisePartDamageLevel(SceneObject* p_obj, MechS32 p_level, MechU32 p_partId)
+void RaisePartDamageLevel(SceneObject* p_obj, int32_t p_level, uint32_t p_partId)
 {
-	MechS32 current;
+	int32_t current;
 	SceneObject* child;
 	Shape* shape;
 
@@ -645,7 +645,7 @@ void RaisePartDamageLevel(SceneObject* p_obj, MechS32 p_level, MechU32 p_partId)
 }
 
 // Blows mech part p_partId's objects off the tree as debris.
-void BlowOffPart(SceneObject* p_obj, MechU32 p_partId)
+void BlowOffPart(SceneObject* p_obj, uint32_t p_partId)
 {
 	if (p_obj == NULL) {
 		return;
@@ -662,7 +662,7 @@ void BlowOffPart(SceneObject* p_obj, MechU32 p_partId)
 	}
 }
 
-MechS32 GetObjSize(void)
+int32_t GetObjSize(void)
 {
 	return sizeof(SceneObject);
 }

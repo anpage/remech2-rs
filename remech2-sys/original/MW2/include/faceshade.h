@@ -13,15 +13,15 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_brightenDamage;
-	extern MechS32 g_ambientLight;
+	extern int32_t g_brightenDamage;
+	extern int32_t g_ambientLight;
 
-	MechU32 GetFaceColor(struct Face* p_face, struct Vertex* p_vertices, MechU32 p_color, MechS32 p_distance);
-	void ToggleTextureMaps(MechU32 p_flags);
-	MechS32 AreTextureMapsOn(MechU32 p_flags);
-	void EnableTextureMaps(MechU32 p_flags, MechS32 p_enable);
-	MechS32 ArePerspectiveTexturesOn(undefined4 p_unk0x00);
-	void EnablePerspectiveTextures(undefined4 p_unk0x00, MechS32 p_enable);
+	uint32_t GetFaceColor(struct Face* p_face, struct Vertex* p_vertices, uint32_t p_color, int32_t p_distance);
+	void ToggleTextureMaps(uint32_t p_flags);
+	int32_t AreTextureMapsOn(uint32_t p_flags);
+	void EnableTextureMaps(uint32_t p_flags, int32_t p_enable);
+	int32_t ArePerspectiveTexturesOn(undefined4 p_unk0x00);
+	void EnablePerspectiveTextures(undefined4 p_unk0x00, int32_t p_enable);
 
 #ifdef __cplusplus
 }

@@ -26,12 +26,12 @@
 // Parses the command line MECH2.EXE passes: switches start with / or -, anything else names the
 // mission (p_mission, "s.$" by default), which is shown with MonoPrintLine.
 // Returns FALSE without a command line (not launched by MECH2.EXE).
-MechS32 ProcessCmdLineArgs(MechChar* p_cmdLine, MechChar* p_mission)
+int32_t ProcessCmdLineArgs(char* p_cmdLine, char* p_mission)
 {
-	MechS32 result;
-	MechChar* arg;
-	MechChar* value;
-	MechS32 rate;
+	int32_t result;
+	char* arg;
+	char* value;
+	int32_t rate;
 
 	result = TRUE;
 	if (!p_cmdLine) {

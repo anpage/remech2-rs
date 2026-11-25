@@ -96,14 +96,14 @@ ManeuverEntry g_altMechManeuvers[13] = {
 };
 
 // Set once InitializeManeuvers has filled g_maneuverTables.
-MechS32 g_maneuverTablesReady = 0;
+int32_t g_maneuverTablesReady = 0;
 
 // Set from the world stream's planet record when positive: the jump jets' drag divisor, and the
 // ground slope (16.16) past which a mech on it slides.
 
-MechS32 g_jumpJetDrag = 100000;
+int32_t g_jumpJetDrag = 100000;
 
-MechS32 g_slideSlope = 0x2000;
+int32_t g_slideSlope = 0x2000;
 
 // The maneuver table of each player type (m_type, 1 to 8), and in entry 8 the alternative to the
 // first.
@@ -112,9 +112,9 @@ ManeuverTable g_maneuverTables[9];
 // Runs p_player's current maneuver (m_maneuver) against p_target for a tick, and ends it when it
 // is done, when another is asked for (m_nextManeuver: out of ammunition, the mech jumps in or
 // runs at the target, or flees) or when its time is up; with no maneuver, chooses and starts one.
-void RunManeuver(Player* p_player, MechU16 p_target)
+void RunManeuver(Player* p_player, uint16_t p_target)
 {
-	MechS32 done;
+	int32_t done;
 	Mech* mech;
 	Player* leader;
 
@@ -264,7 +264,7 @@ void RunManeuver(Player* p_player, MechU16 p_target)
 // the maneuver tables the first time.
 void InitializeManeuvers(Player* p_player)
 {
-	MechS16 i;
+	int16_t i;
 
 	p_player->m_maneuver = -1;
 	p_player->m_lastManeuver = -1;
@@ -362,12 +362,12 @@ void InitializeManeuvers(Player* p_player)
 // Picks p_player's next maneuver: one an order asked for, an AI player's escape, attack or chase
 // when it applies, or else one its maneuver table lets follow the previous one (any one at
 // first), redrawn until its conditions hold.
-MechS32 ChooseManeuver(Player* p_player)
+int32_t ChooseManeuver(Player* p_player)
 {
 	Mech* mech;
 	ManeuverTable* table;
-	MechS16 choice;
-	MechS16 index;
+	int16_t choice;
+	int16_t index;
 
 	choice = -1;
 	table = &g_maneuverTables[p_player->m_type - 1];
@@ -457,9 +457,9 @@ MechS32 ChooseManeuver(Player* p_player)
 }
 
 // Returns the index of maneuver p_id in p_table, or -1.
-MechS16 FindManeuver(ManeuverTable* p_table, MechS16 p_id)
+int16_t FindManeuver(ManeuverTable* p_table, int16_t p_id)
 {
-	MechS16 i;
+	int16_t i;
 
 	for (i = 0; i < p_table->m_count; i++) {
 		if (p_table->m_entries[i].m_list[0] == p_id) {
@@ -610,12 +610,12 @@ void EndManeuver(Player* p_player)
 }
 
 // Places a nav point for p_player where GetOffsetPoint puts it, and makes it the player's target.
-void PlaceOffsetNav(Player* p_player, MechU32 p_target, MechS16 p_direction, MechS16 p_distance)
+void PlaceOffsetNav(Player* p_player, uint32_t p_target, int16_t p_direction, int16_t p_distance)
 {
-	MechS32 z;
-	MechS32 y;
-	MechS32 x;
-	MechS32 nav;
+	int32_t z;
+	int32_t y;
+	int32_t x;
+	int32_t nav;
 
 	GetOffsetPoint(p_target, p_direction, &x, &z, &y, p_distance);
 	nav = AddNavPoint(p_player->m_index, x, y, z);
@@ -629,13 +629,20 @@ void PlaceOffsetNav(Player* p_player, MechU32 p_target, MechS16 p_direction, Mec
 // Finds the point p_distance units out in direction p_direction (of g_probeDirections's 16) from
 // target p_target, a player (0x200) or a game thing (0x400), in world coordinates; for a player
 // *p_y takes its heading. A game thing without an object is offset from its position.
-void GetOffsetPoint(MechU32 p_target, MechS16 p_direction, MechS32* p_x, MechS32* p_z, MechS32* p_y, MechS16 p_distance)
+void GetOffsetPoint(
+	uint32_t p_target,
+	int16_t p_direction,
+	int32_t* p_x,
+	int32_t* p_z,
+	int32_t* p_y,
+	int16_t p_distance
+)
 {
-	MechU32 index;
-	MechS32 thing;
+	uint32_t index;
+	int32_t thing;
 	Matrix* matrix;
 	struct SceneObject* obj;
-	MechS32 y;
+	int32_t y;
 
 	y = 0;
 	index = p_target & 0xff;
@@ -685,9 +692,9 @@ void GetOffsetPoint(MechU32 p_target, MechS16 p_direction, MechS32* p_x, MechS32
 
 // Whether p_turn (16.16 degrees) is a sharp turn, past 5 degrees either way; a stopped player
 // then creeps forward.
-MechS32 IsSharpTurn(Player* p_player, MechS32 p_turn)
+int32_t IsSharpTurn(Player* p_player, int32_t p_turn)
 {
-	MechS32 sharp;
+	int32_t sharp;
 
 	sharp = 0;
 	if (p_turn > 0x50000 || p_turn < -0x50000) {
@@ -701,10 +708,10 @@ MechS32 IsSharpTurn(Player* p_player, MechS32 p_turn)
 }
 
 // Steers p_player at p_target and closes to 15000, asking for c_maneuverAvoid within 4500.
-void ManeuverStupid(Player* p_player, MechS16 p_target)
+void ManeuverStupid(Player* p_player, int16_t p_target)
 {
-	MechS32 range;
-	MechS32 heading;
+	int32_t range;
+	int32_t heading;
 
 	SetTarget(p_player, p_target);
 	if (!AvoidObstacles(p_player)) {
@@ -727,9 +734,9 @@ void ManeuverStupid(Player* p_player, MechS16 p_target)
 
 // Turns p_player toward its goal and closes on its target; once stopped and turned more than 5
 // degrees away, turns in place (IsSharpTurn) until the target is more than 4500 away.
-void ManeuverBehind(Player* p_player, MechS16 p_target)
+void ManeuverBehind(Player* p_player, int16_t p_target)
 {
-	MechS32 heading;
+	int32_t heading;
 
 	SetTarget(p_player, p_player->m_ai.m_goal);
 	heading = GetTargetBearing(p_player);
@@ -772,11 +779,11 @@ void ManeuverBehind(Player* p_player, MechS16 p_target)
 
 // Closes on p_target. Whether it is within 8000, or more when closing fast (GetClosingRate, per
 // 500000).
-MechS32 ManeuverAchick(Player* p_player, MechS16 p_target)
+int32_t ManeuverAchick(Player* p_player, int16_t p_target)
 {
-	MechDouble scale;
-	MechS32 heading;
-	MechS32 result;
+	double scale;
+	int32_t heading;
+	int32_t result;
 
 	result = FALSE;
 	SetTarget(p_player, p_target);
@@ -804,9 +811,9 @@ MechS32 ManeuverAchick(Player* p_player, MechS16 p_target)
 
 // Runs at p_target, even when the shape AvoidObstacles steers around is the target's own, and
 // self-destructs within 2000 of it. Whether it did.
-MechS32 ManeuverKama(Player* p_player, MechS16 p_target)
+int32_t ManeuverKama(Player* p_player, int16_t p_target)
 {
-	MechS32 result;
+	int32_t result;
 
 	result = FALSE;
 	SetTarget(p_player, p_target);
@@ -824,10 +831,10 @@ MechS32 ManeuverKama(Player* p_player, MechS16 p_target)
 }
 
 // Backs p_player away from p_target at full throttle, facing it. Whether its mech collides.
-MechS32 ManeuverWbackp(Player* p_player, MechS16 p_target)
+int32_t ManeuverWbackp(Player* p_player, int16_t p_target)
 {
-	MechS32 heading;
-	MechS32 result;
+	int32_t heading;
+	int32_t result;
 
 	SetTarget(p_player, p_target);
 	heading = SteerToTarget(p_player);
@@ -839,9 +846,9 @@ MechS32 ManeuverWbackp(Player* p_player, MechS16 p_target)
 }
 
 // Turns p_player toward its goal and closes on its target. Whether it is within 3000.
-MechS32 ManeuverWchick(Player* p_player, MechS16 p_target)
+int32_t ManeuverWchick(Player* p_player, int16_t p_target)
 {
-	MechS32 heading;
+	int32_t heading;
 
 	SetTarget(p_player, p_player->m_ai.m_goal);
 	heading = GetTargetBearing(p_player);
@@ -858,10 +865,10 @@ MechS32 ManeuverWchick(Player* p_player, MechS16 p_target)
 
 // Turns p_player toward p_target and runs an attack in three steps (m_maneuverParam): steer at it
 // while it can fire and has a line to it, then for a second, then BrakeFall. Whether that ended.
-MechS32 ManeuverWpeek(Player* p_player, MechS16 p_target)
+int32_t ManeuverWpeek(Player* p_player, int16_t p_target)
 {
-	MechS32 heading;
-	MechS32 result;
+	int32_t heading;
+	int32_t result;
 
 	result = FALSE;
 	SetTarget(p_player, p_target);
@@ -904,9 +911,9 @@ MechS32 ManeuverWpeek(Player* p_player, MechS16 p_target)
 }
 
 // Turns p_player toward p_target. Whether the player is at least 2000 above it.
-MechS32 ManeuverAjmpin(Player* p_player, MechS16 p_target)
+int32_t ManeuverAjmpin(Player* p_player, int16_t p_target)
 {
-	MechS32 heading;
+	int32_t heading;
 
 	SetTarget(p_player, p_target);
 	heading = GetTargetBearing(p_player);
@@ -920,9 +927,9 @@ MechS32 ManeuverAjmpin(Player* p_player, MechS16 p_target)
 }
 
 // Turns p_player toward p_target.
-MechS32 ManeuverSprint(Player* p_player, MechS16 p_target)
+int32_t ManeuverSprint(Player* p_player, int16_t p_target)
 {
-	MechS32 heading;
+	int32_t heading;
 
 	SetTarget(p_player, p_target);
 	heading = GetTargetBearing(p_player);
@@ -934,12 +941,12 @@ MechS32 ManeuverSprint(Player* p_player, MechS16 p_target)
 // forward or backward by how fast it closes; closer in, it cuts them, counting the ticks it was
 // still jumping (m_maneuverParam; it stops at 2). Whether it is done: on the ground, colliding, or unable to
 // jump on.
-MechS32 ManeuverAdfa(Player* p_player, MechS16 p_target)
+int32_t ManeuverAdfa(Player* p_player, int16_t p_target)
 {
-	MechS32 rate;
-	MechS32 result;
-	MechS32 turn;
-	MechS16 side;
+	int32_t rate;
+	int32_t result;
+	int32_t turn;
+	int16_t side;
 	Mech* mech;
 
 	SetTarget(p_player, p_target);
@@ -994,9 +1001,9 @@ MechS32 ManeuverAdfa(Player* p_player, MechS16 p_target)
 
 // Drives p_player at full throttle (backwards while StartManeuver set m_reverse), steering
 // towards p_target.
-void ManeuverAvoid(Player* p_player, MechS16 p_target)
+void ManeuverAvoid(Player* p_player, int16_t p_target)
 {
-	MechS32 heading;
+	int32_t heading;
 
 	SetTarget(p_player, p_target);
 	if (!p_player->m_steering->m_reverse) {
@@ -1019,10 +1026,10 @@ void ManeuverAvoid(Player* p_player, MechS16 p_target)
 // Turns p_player toward its goal and closes on its target, giving up the goal (ReleaseNavPoints,
 // PlacePatrolNavs) now and then while far from the target, and handing the target to AdvanceNavTarget
 // within 3000.
-MechS32 ManeuverCircle(Player* p_player, MechS16 p_target)
+int32_t ManeuverCircle(Player* p_player, int16_t p_target)
 {
-	MechS32 heading;
-	MechS32 result;
+	int32_t heading;
+	int32_t result;
 
 	result = 0;
 	SetTarget(p_player, p_player->m_ai.m_goal);
@@ -1053,9 +1060,9 @@ MechS32 ManeuverCircle(Player* p_player, MechS16 p_target)
 
 // Whether p_player, targeting a player it has no clear line to, is more than 800 below it, with
 // jump jets (its jump fuel not negative).
-MechS32 IsBelowHiddenTarget(Player* p_player)
+int32_t IsBelowHiddenTarget(Player* p_player)
 {
-	MechS32 below;
+	int32_t below;
 
 	below = 0;
 	switch (p_player->m_targetInfo.m_target & 0xf00) {
@@ -1080,10 +1087,10 @@ MechS32 IsBelowHiddenTarget(Player* p_player)
 // Near the ground, fires the player's jump jets while its mech falls faster than 85% of the fall
 // damage speed and clears it once it is slower than 75%, and logs a fall faster than that speed.
 // Returns whether the player is on the ground.
-MechS32 BrakeFall(Player* p_player)
+int32_t BrakeFall(Player* p_player)
 {
-	MechChar line[80];
-	MechS16 value;
+	char line[80];
+	int16_t value;
 	Mech* mech;
 
 	mech = p_player->m_mech;
@@ -1117,7 +1124,7 @@ MechS32 BrakeFall(Player* p_player)
 }
 
 // Fires (p_value set) or cuts p_player's jump jets.
-void SetJumpJets(Player* p_player, MechS8 p_value)
+void SetJumpJets(Player* p_player, int8_t p_value)
 {
 	p_player->m_steering->m_jumpJetEnabled = p_value;
 }
@@ -1126,15 +1133,15 @@ void SetJumpJets(Player* p_player, MechS8 p_value)
 // the avoiding side m_avoidSide, as long as the mech's speed (m_probeScale), and turns away from what
 // they hit, slowing down if the first one hits. Returns whether it steered. Between checks (every
 // 10 ticks for the local player, 90 or 181 for others) it returns whether it is avoiding a shape.
-MechS32 AvoidObstacles(Player* p_player)
+int32_t AvoidObstacles(Player* p_player)
 {
-	MechS32 length;
+	int32_t length;
 	Shape* hit;
 	Ray ray;
 	Mech* mech;
-	MechS16 i;
-	MechS32 turn;
-	MechS32 throttle;
+	int16_t i;
+	int32_t turn;
+	int32_t throttle;
 
 	turn = 0;
 	mech = p_player->m_mech;
@@ -1184,7 +1191,7 @@ MechS32 AvoidObstacles(Player* p_player)
 				p_player->m_avoidShape = hit;
 			}
 
-			turn += (MechS32) (p_player->m_avoidSide * (0.2 * 0x10000000) / 4);
+			turn += (int32_t) (p_player->m_avoidSide * (0.2 * 0x10000000) / 4);
 		}
 		else {
 			if (i == 0 && abs(GetTargetBearing(p_player)) <= 0x10000) {
@@ -1206,7 +1213,7 @@ MechS32 AvoidObstacles(Player* p_player)
 						break;
 					}
 
-					turn += (MechS32) (p_player->m_avoidSide * (0.1 * 0x10000000));
+					turn += (int32_t) (p_player->m_avoidSide * (0.1 * 0x10000000));
 				}
 			}
 
@@ -1248,7 +1255,7 @@ MechS32 AvoidObstacles(Player* p_player)
 }
 
 // Whether p_shape is solid ground to stand on: a flat enough face or a shape of type 0x50.
-MechS32 IsStandableShape(Shape* p_shape)
+int32_t IsStandableShape(Shape* p_shape)
 {
 	if (HasHeightTest(p_shape) && g_segmentNormalY >= 0xc41b) {
 		return 1;
@@ -1259,15 +1266,15 @@ MechS32 IsStandableShape(Shape* p_shape)
 
 // Builds a probe ray for p_player in p_ray: p_length along direction p_step (mirrored for a
 // negative p_side) in the mech's frame, from its position or, with p_fromEdge, from its side.
-void BuildProbeRay(Player* p_player, Ray* p_ray, MechS32 p_side, MechS16 p_step, MechS32 p_length, MechS32 p_fromEdge)
+void BuildProbeRay(Player* p_player, Ray* p_ray, int32_t p_side, int16_t p_step, int32_t p_length, int32_t p_fromEdge)
 {
 	Matrix* matrix;
-	MechS32 x;
-	MechS32 y;
-	MechS32 dx;
-	MechS32 z;
-	MechS32 dz;
-	MechS32 dy;
+	int32_t x;
+	int32_t y;
+	int32_t dx;
+	int32_t z;
+	int32_t dz;
+	int32_t dy;
 	Mech* mech;
 
 	dy = 0;
@@ -1306,15 +1313,15 @@ void BuildProbeRay(Player* p_player, Ray* p_ray, MechS32 p_side, MechS16 p_step,
 }
 
 // Which side of p_player the point (p_x, p_y, p_z) is, seen from p_shape: 1 or -1.
-MechS16 GetAvoidSide(Player* p_player, Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int16_t GetAvoidSide(Player* p_player, Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 dz;
-	MechS32 unused;
-	MechU32 distance;
-	MechS32 heading;
-	MechS32 length;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t dz;
+	int32_t unused;
+	uint32_t distance;
+	int32_t heading;
+	int32_t length;
+	int32_t dx;
+	int32_t dy;
 
 	dx = p_shape->m_centerX - p_x;
 	dy = p_shape->m_centerY - p_y;
@@ -1332,10 +1339,10 @@ MechS16 GetAvoidSide(Player* p_player, Shape* p_shape, MechS32 p_x, MechS32 p_y,
 }
 
 // The heading from p_player to p_target (16.16 degrees, 0 to 360), keeping its target.
-MechS32 GetHeadingTo(Player* p_player, MechS16 p_target)
+int32_t GetHeadingTo(Player* p_player, int16_t p_target)
 {
-	MechS32 target;
-	MechS32 heading;
+	int32_t target;
+	int32_t heading;
 
 	target = p_player->m_targetInfo.m_target;
 	SetTarget(p_player, p_target);
@@ -1345,7 +1352,7 @@ MechS32 GetHeadingTo(Player* p_player, MechS16 p_target)
 }
 
 // Clamps p_value to +/- p_limit.
-MechS32 ClampMagnitude(MechS32 p_value, MechS32 p_limit)
+int32_t ClampMagnitude(int32_t p_value, int32_t p_limit)
 {
 	if (p_value > p_limit) {
 		p_value = p_limit;
@@ -1358,12 +1365,12 @@ MechS32 ClampMagnitude(MechS32 p_value, MechS32 p_limit)
 }
 
 // Whether the segment from p_player at height p_y to its target is clear, or hits the target.
-MechS32 HasLineToTarget(Player* p_player, MechS32 p_y)
+int32_t HasLineToTarget(Player* p_player, int32_t p_y)
 {
 	Ray ray;
 	Shape* hit;
-	MechU32 target;
-	MechU16 flags;
+	uint32_t target;
+	uint16_t flags;
 
 	hit = NULL;
 	BuildRayFromSegment(
@@ -1394,11 +1401,11 @@ MechS32 HasLineToTarget(Player* p_player, MechS32 p_y)
 }
 
 // Whether p_mech has weapons but none left that can fire: every one is out of ammunition.
-MechS32 IsOutOfAmmo(Mech* p_mech)
+int32_t IsOutOfAmmo(Mech* p_mech)
 {
-	MechS16 i;
+	int16_t i;
 	WeaponSlot* slot;
-	MechS32 found;
+	int32_t found;
 
 	found = FALSE;
 	for (i = 0; i < p_mech->m_weaponCount && !found; i++) {
@@ -1413,7 +1420,7 @@ MechS32 IsOutOfAmmo(Mech* p_mech)
 }
 
 // Fires p_player's jump jets forward (p_value set) or backward.
-void SetJumpDirection(Player* p_player, MechS16 p_value)
+void SetJumpDirection(Player* p_player, int16_t p_value)
 {
 	p_player->m_steering->m_jumpJetFireForward = p_value;
 	if (!p_value) {
@@ -1425,9 +1432,9 @@ void SetJumpDirection(Player* p_player, MechS16 p_value)
 }
 
 // How fast p_player closes on its target since the last call, per tick.
-MechS32 GetClosingRate(Player* p_player)
+int32_t GetClosingRate(Player* p_player)
 {
-	MechS32 rate;
+	int32_t rate;
 
 	if (!g_deltaTime) {
 		return 0;
@@ -1443,7 +1450,7 @@ MechS32 GetClosingRate(Player* p_player)
 // piloting skill for it, and not while avoiding.
 void JumpToTurn(Player* p_player)
 {
-	MechS32 turn;
+	int32_t turn;
 	Mech* mech;
 
 	mech = p_player->m_mech;
@@ -1465,7 +1472,7 @@ void JumpToTurn(Player* p_player)
 
 // Whether p_player's mech can jump: jump fuel left (at least 6), jump jets that lift it and its
 // heat (16.16) under p_limit.
-MechS32 CanJump(Player* p_player, MechS32 p_limit)
+int32_t CanJump(Player* p_player, int32_t p_limit)
 {
 	Mech* mech;
 
@@ -1474,10 +1481,10 @@ MechS32 CanJump(Player* p_player, MechS32 p_limit)
 }
 
 // The shape of the player or game thing an AI target id names, or NULL.
-Shape* GetTargetShape(MechS16 p_target)
+Shape* GetTargetShape(int16_t p_target)
 {
-	MechS16 index;
-	MechS32 id;
+	int16_t index;
+	int32_t id;
 	SceneObject* obj;
 
 	obj = NULL;
@@ -1501,25 +1508,25 @@ Shape* GetTargetShape(MechS16 p_target)
 // (state 4).
 void DodgeShot(WeaponSlot* p_slot, Mech* p_mech)
 {
-	MechS32 maxAngle;
-	MechS32 index;
-	MechS32 pitch;
-	MechS32 kind;
+	int32_t maxAngle;
+	int32_t index;
+	int32_t pitch;
+	int32_t kind;
 	Player* target;
-	MechU32 id;
-	MechS32 bearing;
-	MechS32 x;
-	MechS32 y;
-	MechS32 range;
-	MechS32 sx;
-	MechS32 z;
-	MechS32 sy;
+	uint32_t id;
+	int32_t bearing;
+	int32_t x;
+	int32_t y;
+	int32_t range;
+	int32_t sx;
+	int32_t z;
+	int32_t sy;
 	Shape* hit;
-	MechS32 heading;
+	int32_t heading;
 	Ray ray;
-	MechS16 side;
-	MechS16 j;
-	MechS16 step;
+	int16_t side;
+	int16_t j;
+	int16_t step;
 
 	id = 0;
 	target = NULL;
@@ -1599,12 +1606,12 @@ void DodgeShot(WeaponSlot* p_slot, Mech* p_mech)
 // Picks p_player's place around its goal player (eight places, 45 degrees apart): the one it is
 // nearest, moved off the front and back, or else the first free one on its side. Returns twice
 // the place.
-MechS16 ChooseFlankPlace(Player* p_player)
+int16_t ChooseFlankPlace(Player* p_player)
 {
-	MechS32 angle;
-	MechS32 i;
-	MechS32 place;
-	MechS32 found;
+	int32_t angle;
+	int32_t i;
+	int32_t place;
+	int32_t found;
 	Player* leader;
 
 	leader = g_players[p_player->m_ai.m_goal & 0xff];
@@ -1669,7 +1676,7 @@ MechS16 ChooseFlankPlace(Player* p_player)
 }
 
 // Whether p_mech is stuck: colliding, not reversing, and not in a maneuver that jumps or avoids.
-MechS32 IsStuck(Mech* p_mech)
+int32_t IsStuck(Mech* p_mech)
 {
 	return p_mech->m_collisionTicks && p_mech->m_player->m_steering->m_reverse != 1 &&
 		   !p_mech->m_player->m_controlsJets && p_mech->m_player->m_maneuver != c_maneuverAvoid;

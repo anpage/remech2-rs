@@ -5,25 +5,25 @@
 #include "types.h"
 
 typedef struct Ramp {
-	MechS32 m_time;     // 0x00 — the clock at the last update
-	MechS32 m_target;   // 0x04
-	MechS32 m_value;    // 0x08
-	MechS32 m_duration; // 0x0c — in clock ticks
+	int32_t m_time;     // 0x00 — the clock at the last update
+	int32_t m_target;   // 0x04
+	int32_t m_value;    // 0x08
+	int32_t m_duration; // 0x0c — in clock ticks
 } Ramp;
 
 // A ramp whose value wraps around a period (an angle).
 typedef struct WrappedRamp {
-	MechS32 m_time;     // 0x00
-	MechS32 m_target;   // 0x04
-	MechS32 m_value;    // 0x08
-	MechS32 m_duration; // 0x0c
-	MechS32 m_period;   // 0x10
+	int32_t m_time;     // 0x00
+	int32_t m_target;   // 0x04
+	int32_t m_value;    // 0x08
+	int32_t m_duration; // 0x0c
+	int32_t m_period;   // 0x10
 } WrappedRamp;
 
 typedef struct EasedValue {
-	MechS32 m_value;  // 0x00
-	MechS32 m_target; // 0x04
-	MechS32 m_shift;  // 0x08 — each step closes 1 / 2^m_shift of the distance
+	int32_t m_value;  // 0x00
+	int32_t m_target; // 0x04
+	int32_t m_shift;  // 0x08 — each step closes 1 / 2^m_shift of the distance
 } EasedValue;
 
 // The functions of ramp.c that other units use.
@@ -32,19 +32,19 @@ extern "C"
 {
 #endif
 
-	MechS32 StartRamp(Ramp* p_ramp, MechS32 p_target, MechS32 p_value, MechDouble p_seconds);
-	MechS32 UpdateRamp(Ramp* p_ramp);
-	MechS32 StartWrappedRamp(
+	int32_t StartRamp(Ramp* p_ramp, int32_t p_target, int32_t p_value, double p_seconds);
+	int32_t UpdateRamp(Ramp* p_ramp);
+	int32_t StartWrappedRamp(
 		WrappedRamp* p_ramp,
-		MechS32 p_target,
-		MechS32 p_value,
-		MechDouble p_seconds,
-		MechS32 p_period
+		int32_t p_target,
+		int32_t p_value,
+		double p_seconds,
+		int32_t p_period
 	);
-	MechS32 UpdateWrappedRamp(WrappedRamp* p_ramp);
-	MechS32 SetWrappedRampTarget(WrappedRamp* p_ramp, MechS32 p_target);
+	int32_t UpdateWrappedRamp(WrappedRamp* p_ramp);
+	int32_t SetWrappedRampTarget(WrappedRamp* p_ramp, int32_t p_target);
 	// Implemented on the Rust side (src/sim/timing.rs)
-	MechS32 UpdateEasedValue(EasedValue* p_value);
+	int32_t UpdateEasedValue(EasedValue* p_value);
 
 #ifdef __cplusplus
 }

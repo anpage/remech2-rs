@@ -18,7 +18,7 @@ undefined g_linkColorMap[256] = {0xff, 1};
 
 void InitTextColorMaps()
 {
-	MechS32 i;
+	int32_t i;
 
 	g_linkColorMap[0] = 0xff;
 	for (i = 1; i < 256; i++) {
@@ -48,7 +48,7 @@ void TextGlyph::Draw()
 
 void TextGlyph::DrawAllChars()
 {
-	MechS32 textIndex;
+	int32_t textIndex;
 
 	textIndex = m_textIndex;
 	m_textIndex = -1;
@@ -58,10 +58,10 @@ void TextGlyph::DrawAllChars()
 }
 
 // Draws the next character of the text, or handles the escape sequence starting at it.
-MechU8 TextGlyph::DrawNextChar()
+uint8_t TextGlyph::DrawNextChar()
 {
-	MechS32 i;
-	MechChar number[0x80];
+	int32_t i;
+	char number[0x80];
 
 	if (!m_registered) {
 		m_videoDriver->AddGlyph(this, 1);
@@ -146,7 +146,7 @@ MechU8 TextGlyph::DrawNextChar()
 	return FALSE;
 }
 
-MechU8 TextGlyph::TypeStep()
+uint8_t TextGlyph::TypeStep()
 {
 	if (m_done == 1) {
 		return TRUE;
@@ -159,7 +159,7 @@ MechU8 TextGlyph::TypeStep()
 	return DrawNextChar();
 }
 
-TextGlyph::TextGlyph(MechChar* p_text, MechS32 p_left, MechS32 p_top, undefined* p_colors, Font* p_font)
+TextGlyph::TextGlyph(char* p_text, int32_t p_left, int32_t p_top, undefined* p_colors, Font* p_font)
 {
 	m_font = p_font;
 	m_videoDriver = p_font->m_videoDriver;

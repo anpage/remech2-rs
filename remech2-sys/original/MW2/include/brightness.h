@@ -10,14 +10,14 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_displayBrightness;
-	extern MechS32 g_brightnessSetting;
+	extern int32_t g_displayBrightness;
+	extern int32_t g_brightnessSetting;
 	extern PaletteColor g_paletteColorsPreBrightness[0x100];
-	extern MechU8 g_gammaTable[16][64];
+	extern uint8_t g_gammaTable[16][64];
 
 	void InitGammaTable(void);
 	void SavePreBrightnessPalette(void);
-	void PreviewBrightness(MechS32 p_brightness);
+	void PreviewBrightness(int32_t p_brightness);
 	void CopyPaletteColorWithBrightness(PaletteColor* p_src, PaletteColor* p_dst);
 
 #ifdef __cplusplus

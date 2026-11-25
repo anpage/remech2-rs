@@ -15,9 +15,9 @@ extern "C"
 #endif
 
 	// Widens the satellite view's viewport and pane (cockpit view 4) to the whole frame
-	void MechWidenCockpitLayout(MechS32 p_cockpit, CockpitLayout* p_layout);
+	void MechWidenCockpitLayout(int32_t p_cockpit, CockpitLayout* p_layout);
 	// The world span the map view shows across pane p_slot: the satellite view's widens with it
-	MechS32 MechWidenMapSpan(MechS32 p_slot, MechS32 p_span);
+	int32_t MechWidenMapSpan(int32_t p_slot, int32_t p_span);
 	// Narrows p_pane to the HUD box
 	void MechHudPane(PANE* p_pane);
 	// Centers a message box pane horizontally in the frame

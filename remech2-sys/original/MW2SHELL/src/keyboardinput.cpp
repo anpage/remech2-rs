@@ -24,7 +24,7 @@ enum {
 	c_keyCodeAlt = 0x400
 };
 
-MechChar g_editTextBuffer[0x100];
+char g_editTextBuffer[0x100];
 
 KeyboardInput::KeyboardInput()
 {
@@ -43,7 +43,7 @@ void KeyboardInput::FlushKeys()
 	m_key = 0;
 }
 
-MechS32 KeyboardInput::WaitForKey()
+int32_t KeyboardInput::WaitForKey()
 {
 	while (!PollKey()) {
 	}
@@ -63,7 +63,7 @@ undefined4 KeyboardInput::GetKeyPressed()
 }
 
 // Returns 0 without a key, 3 for Escape and 1 for any other key.
-MechS32 KeyboardInput::PollKey()
+int32_t KeyboardInput::PollKey()
 {
 	m_key = KeyboardPollKeyCode();
 	if (m_key != 0) {
@@ -95,7 +95,7 @@ void KeyboardInput::ResetText(undefined4 p_maxLength)
 	strcpy(m_text, "");
 }
 
-void KeyboardInput::SetText(undefined4 p_maxLength, const MechChar* p_text)
+void KeyboardInput::SetText(undefined4 p_maxLength, const char* p_text)
 {
 	strcpy(m_text, p_text);
 	m_key = 0;
@@ -104,7 +104,7 @@ void KeyboardInput::SetText(undefined4 p_maxLength, const MechChar* p_text)
 }
 
 // Returns 1 after an edit, 2 when Return copies the text out, 3 for Escape and 0 otherwise.
-MechS32 KeyboardInput::EditText(MechChar* p_text, MechU8 p_upperCase)
+int32_t KeyboardInput::EditText(char* p_text, uint8_t p_upperCase)
 {
 	if (PollKey() == 1) {
 		switch (m_key) {
@@ -147,18 +147,18 @@ MechS32 KeyboardInput::EditText(MechChar* p_text, MechU8 p_upperCase)
 
 // Edits p_text with a cursor ('_') drawn after it. Return, a click or the window closing store
 // the text and return 1; Escape stores it and returns 0.
-MechS32 EditTextField(
+int32_t EditTextField(
 	Font* p_font,
-	MechS32 p_left,
-	MechS32 p_top,
-	MechChar* p_text,
+	int32_t p_left,
+	int32_t p_top,
+	char* p_text,
 	undefined* p_colors,
-	MechS32 p_maxLength,
-	MechS32 p_width
+	int32_t p_maxLength,
+	int32_t p_width
 )
 {
-	MechS32 key;
-	MechS32 length;
+	int32_t key;
+	int32_t length;
 	TextGlyph* glyph;
 
 	glyph = NULL;

@@ -34,11 +34,11 @@ void ArchiveFree(void* p_block)
 }
 
 // Writes p_size bytes in chunks of at most 0x4000. Returns p_size, or -1 on a short write.
-MechS32 ArchiveWrite(MechS32 p_fd, MechU8* p_buffer, MechU32 p_size)
+int32_t ArchiveWrite(int32_t p_fd, uint8_t* p_buffer, uint32_t p_size)
 {
-	MechU8* buffer;
-	MechU32 remaining;
-	MechU32 chunk;
+	uint8_t* buffer;
+	uint32_t remaining;
+	uint32_t chunk;
 
 	remaining = p_size;
 	buffer = p_buffer;
@@ -56,11 +56,11 @@ MechS32 ArchiveWrite(MechS32 p_fd, MechU8* p_buffer, MechU32 p_size)
 }
 
 // Reads p_size bytes in chunks of at most 0x4000. Returns p_size, or -1 on a short read.
-MechS32 ArchiveRead(MechS32 p_fd, MechU8* p_buffer, MechU32 p_size)
+int32_t ArchiveRead(int32_t p_fd, uint8_t* p_buffer, uint32_t p_size)
 {
-	MechU8* buffer;
-	MechU32 remaining;
-	MechU32 chunk;
+	uint8_t* buffer;
+	uint32_t remaining;
+	uint32_t chunk;
 
 	remaining = p_size;
 	buffer = p_buffer;
@@ -79,13 +79,13 @@ MechS32 ArchiveRead(MechS32 p_fd, MechU8* p_buffer, MechU32 p_size)
 
 // Opens the project archive p_name in a free slot: p_mode 2 for reading and writing (a project
 // marked 0xfe returns -2), 0 for reading. Loads its header and returns the slot, or -1.
-MechS32 OpenArchive(char* p_name, MechChar p_mode)
+int32_t OpenArchive(char* p_name, char p_mode)
 {
 	ArchiveHeader* header;
-	MechU16 slot;
-	MechU32 size;
-	MechS32 fd;
-	MechU8 tag[12];
+	uint16_t slot;
+	uint32_t size;
+	int32_t fd;
+	uint8_t tag[12];
 
 	for (slot = 0; slot < 1 && g_archiveSlots[slot].m_open; slot++) {
 	}
@@ -128,7 +128,7 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 	}
 
 	MechSeek(fd, 0x10, SEEK_SET);
-	if (ArchiveRead(fd, (MechU8*) &size, 4) != 4) {
+	if (ArchiveRead(fd, (uint8_t*) &size, 4) != 4) {
 		return -1;
 	}
 
@@ -139,7 +139,7 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 	}
 
 	MechSeek(fd, 0xc, SEEK_SET);
-	if (ArchiveRead(fd, (MechU8*) header, size) != size) {
+	if (ArchiveRead(fd, (uint8_t*) header, size) != size) {
 		ArchiveFree(header);
 		return -1;
 	}
@@ -153,9 +153,9 @@ MechS32 OpenArchive(char* p_name, MechChar p_mode)
 }
 
 // Release the header and cached archive entries, then close its file descriptor.
-MechS32 CloseArchive(MechS32 p_handle)
+int32_t CloseArchive(int32_t p_handle)
 {
-	MechU16 index;
+	uint16_t index;
 
 	ArchiveFree(g_archiveSlots[p_handle].m_header);
 	g_archiveSlots[p_handle].m_header = NULL;
@@ -172,11 +172,11 @@ MechS32 CloseArchive(MechS32 p_handle)
 }
 
 // Find an archive entry by its four-byte type tag. Returns 0xffff if absent.
-MechU16 FindArchiveEntry(MechS32 p_handle, MechChar* p_name)
+uint16_t FindArchiveEntry(int32_t p_handle, char* p_name)
 {
-	MechChar found;
-	MechU16 index;
-	MechU16 count;
+	char found;
+	uint16_t index;
+	uint16_t count;
 	ArchiveEntry* entries;
 
 	found = 0;
@@ -201,12 +201,12 @@ MechU16 FindArchiveEntry(MechS32 p_handle, MechChar* p_name)
 }
 
 // Read and cache every archive entry whose on-disk data offset is nonzero.
-MechS32 LoadArchiveEntries(MechS32 p_handle)
+int32_t LoadArchiveEntries(int32_t p_handle)
 {
-	MechU16 count;
+	uint16_t count;
 	ArchiveEntry* entries;
-	MechU16 index;
-	MechU32 size;
+	uint16_t index;
+	uint32_t size;
 	void* data;
 
 	count = g_archiveSlots[p_handle].m_header->m_entryCount;
@@ -220,7 +220,7 @@ MechS32 LoadArchiveEntries(MechS32 p_handle)
 			}
 
 			MechSeek(g_archiveSlots[p_handle].m_fd, entries[index].m_offset, SEEK_SET);
-			if (ArchiveRead(g_archiveSlots[p_handle].m_fd, (MechU8*) data, size) != size) {
+			if (ArchiveRead(g_archiveSlots[p_handle].m_fd, (uint8_t*) data, size) != size) {
 				ArchiveFree(data);
 				return -1;
 			}
@@ -233,13 +233,13 @@ MechS32 LoadArchiveEntries(MechS32 p_handle)
 }
 
 // Compute a cached subresource length, clamping non-positive lengths to zero.
-MechS32 GetArchiveItemSize(MechS32 p_handle, MechChar* p_name, MechU16 p_index)
+int32_t GetArchiveItemSize(int32_t p_handle, char* p_name, uint16_t p_index)
 {
-	MechS16 entry;
-	MechU16 index;
-	MechS32* offsets;
+	int16_t entry;
+	uint16_t index;
+	int32_t* offsets;
 	ArchiveEntry* entries;
-	MechS32 length;
+	int32_t length;
 
 	if (p_index == 0) {
 		return -1;
@@ -252,7 +252,7 @@ MechS32 GetArchiveItemSize(MechS32 p_handle, MechChar* p_name, MechU16 p_index)
 		}
 
 		index = p_index;
-		offsets = (MechS32*) ((MechU8*) g_archiveSlots[p_handle].m_entries[entry].m_data + 0x16);
+		offsets = (int32_t*) ((uint8_t*) g_archiveSlots[p_handle].m_entries[entry].m_data + 0x16);
 		entries = g_archiveSlots[p_handle].m_header->m_entries;
 		length = offsets[index * 2 + 1] - entries[entry].m_baseOffset;
 		return length > 0 ? length : 0;
@@ -263,31 +263,31 @@ MechS32 GetArchiveItemSize(MechS32 p_handle, MechChar* p_name, MechU16 p_index)
 }
 
 // Look up a subresource's byte offset and length in the cached archive entry.
-MechS32 SeekArchiveItem(MechS32 p_handle, MechChar* p_name, MechU32 p_index, void** p_offset, MechS32* p_size)
+int32_t SeekArchiveItem(int32_t p_handle, char* p_name, uint32_t p_index, void** p_offset, int32_t* p_size)
 {
-	MechU16 entry;
+	uint16_t entry;
 	ArchiveEntry* entries;
-	MechU8* offsets;
-	MechS32 offset;
+	uint8_t* offsets;
+	int32_t offset;
 
 	entry = FindArchiveEntry(p_handle, p_name);
 	// FindArchiveEntry's -1 as the 16 bits it's kept in: compared with an int, as the
 	// original's source has it, it never matches
-	if (entry == (MechU16) -1) {
+	if (entry == (uint16_t) -1) {
 		return -1;
 	}
 	if (g_archiveSlots[p_handle].m_entries[entry].m_data == NULL && LoadArchiveEntries(p_handle) == -1) {
 		return -1;
 	}
 
-	offsets = (MechU8*) g_archiveSlots[p_handle].m_entries[entry].m_data + 0x16;
+	offsets = (uint8_t*) g_archiveSlots[p_handle].m_entries[entry].m_data + 0x16;
 	entries = g_archiveSlots[p_handle].m_header->m_entries;
-	offset = entries[entry].m_baseOffset + *(MechU32*) (offsets + (p_index & 0xffff) * 8);
+	offset = entries[entry].m_baseOffset + *(uint32_t*) (offsets + (p_index & 0xffff) * 8);
 	if (p_offset != NULL) {
 		*p_offset = MECH_S32_TO_PTR(offset);
 	}
 	if (p_size != NULL) {
-		*p_size = *(MechS32*) (offsets + (p_index & 0xffff) * 8 + 4) - entries[entry].m_baseOffset;
+		*p_size = *(int32_t*) (offsets + (p_index & 0xffff) * 8 + 4) - entries[entry].m_baseOffset;
 	}
 
 	MechSeek(g_archiveSlots[p_handle].m_fd, offset, SEEK_SET);
@@ -295,22 +295,22 @@ MechS32 SeekArchiveItem(MechS32 p_handle, MechChar* p_name, MechU32 p_index, voi
 }
 
 // Read p_size bytes after selecting the archive descriptor and offset.
-void ReadArchiveAt(void* p_data, MechS32 p_handle, void* p_offset, MechU32 p_size)
+void ReadArchiveAt(void* p_data, int32_t p_handle, void* p_offset, uint32_t p_size)
 {
 	p_handle = g_archiveSlots[p_handle].m_fd;
 	MechSeek(p_handle, MECH_PTR_TO_S32(p_offset), SEEK_SET);
-	ArchiveRead(p_handle, (MechU8*) p_data, p_size);
+	ArchiveRead(p_handle, (uint8_t*) p_data, p_size);
 }
 
 // Read a cached archive subresource into the caller's buffer.
-MechS32 ReadArchiveItem(MechS32 p_handle, MechChar* p_name, MechU16 p_index, void* p_data)
+int32_t ReadArchiveItem(int32_t p_handle, char* p_name, uint16_t p_index, void* p_data)
 {
-	MechS16 entry;
-	MechU16 index;
+	int16_t entry;
+	uint16_t index;
 	ArchiveEntry* entries;
-	MechU8* offsets;
-	MechU32 size;
-	MechS32 offset;
+	uint8_t* offsets;
+	uint32_t size;
+	int32_t offset;
 
 	entry = FindArchiveEntry(p_handle, p_name);
 	if (entry != -1) {
@@ -319,15 +319,15 @@ MechS32 ReadArchiveItem(MechS32 p_handle, MechChar* p_name, MechU16 p_index, voi
 		}
 
 		index = p_index;
-		offsets = (MechU8*) g_archiveSlots[p_handle].m_entries[entry].m_data + 0x16;
+		offsets = (uint8_t*) g_archiveSlots[p_handle].m_entries[entry].m_data + 0x16;
 		entries = g_archiveSlots[p_handle].m_header->m_entries;
-		offset = entries[entry].m_baseOffset + *(MechU32*) (offsets + index * 8);
-		size = *(MechU32*) (offsets + index * 8 + 4) - entries[entry].m_baseOffset;
+		offset = entries[entry].m_baseOffset + *(uint32_t*) (offsets + index * 8);
+		size = *(uint32_t*) (offsets + index * 8 + 4) - entries[entry].m_baseOffset;
 		if (MechSeek(g_archiveSlots[p_handle].m_fd, offset, SEEK_SET) == -1) {
 			return -1;
 		}
 
-		if (ArchiveRead(g_archiveSlots[p_handle].m_fd, (MechU8*) p_data, size) != size) {
+		if (ArchiveRead(g_archiveSlots[p_handle].m_fd, (uint8_t*) p_data, size) != size) {
 			return -1;
 		}
 		else {
@@ -340,13 +340,13 @@ MechS32 ReadArchiveItem(MechS32 p_handle, MechChar* p_name, MechU16 p_index, voi
 }
 
 // Return the archive offset and descriptor of a cached subresource.
-MechS32 GetArchiveItemOffset(MechS32 p_handle, MechChar* p_name, MechU16 p_index, MechS32* p_fd)
+int32_t GetArchiveItemOffset(int32_t p_handle, char* p_name, uint16_t p_index, int32_t* p_fd)
 {
-	MechS16 entry;
-	MechU16 index;
-	MechU8* offsets;
+	int16_t entry;
+	uint16_t index;
+	uint8_t* offsets;
 	ArchiveEntry* entries;
-	MechS32 offset;
+	int32_t offset;
 
 	entry = FindArchiveEntry(p_handle, p_name);
 	if (entry != -1) {
@@ -355,9 +355,9 @@ MechS32 GetArchiveItemOffset(MechS32 p_handle, MechChar* p_name, MechU16 p_index
 		}
 
 		index = p_index;
-		offsets = (MechU8*) g_archiveSlots[p_handle].m_entries[entry].m_data + 0x16;
+		offsets = (uint8_t*) g_archiveSlots[p_handle].m_entries[entry].m_data + 0x16;
 		entries = g_archiveSlots[p_handle].m_header->m_entries;
-		offset = entries[entry].m_baseOffset + *(MechU32*) (offsets + index * 8);
+		offset = entries[entry].m_baseOffset + *(uint32_t*) (offsets + index * 8);
 		*p_fd = g_archiveSlots[p_handle].m_fd;
 		return offset;
 	}

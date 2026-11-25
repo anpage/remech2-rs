@@ -15,17 +15,17 @@
 #include <string.h>
 
 // The flags a new shape starts with (CreateShape).
-MechU32 g_newShapeFlags = 0;
+uint32_t g_newShapeFlags = 0;
 
-MechU32 GetNewShapeFlags(void)
+uint32_t GetNewShapeFlags(void)
 {
 	return g_newShapeFlags;
 }
 
 // Sets the flags new shapes start with; returns the previous ones.
-MechU32 SetNewShapeFlags(MechU32 p_flags)
+uint32_t SetNewShapeFlags(uint32_t p_flags)
 {
-	MechU32 previous;
+	uint32_t previous;
 
 	previous = g_newShapeFlags;
 	g_newShapeFlags = p_flags;
@@ -58,19 +58,19 @@ void SelectNextModel(Shape* p_shape)
 // p_extraData), inserts it into the shape's list by p_key and selects it.
 Model* AddModel(
 	Shape* p_shape,
-	MechS32 p_key,
-	MechS32 p_vertexCount,
-	MechS32 p_faceCount,
-	MechS32 p_extra,
+	int32_t p_key,
+	int32_t p_vertexCount,
+	int32_t p_faceCount,
+	int32_t p_extra,
 	void** p_extraData
 )
 {
 	Model* model;
-	MechS32 vertexBytes;
+	int32_t vertexBytes;
 	Model* cursor;
 	void* memory;
-	MechU32 size;
-	MechS32 faceBytes;
+	uint32_t size;
+	int32_t faceBytes;
 
 	size = 0;
 	faceBytes = 0;
@@ -93,8 +93,8 @@ Model* AddModel(
 	model->m_vertexCount = 0;
 	model->m_faceCount = 0;
 	model->m_transformCount = 0;
-	model->m_faceOffset = (MechU16) (vertexBytes + sizeof(Model));
-	*p_extraData = (Face*) ((MechU8*) model + model->m_faceOffset) + p_faceCount;
+	model->m_faceOffset = (uint16_t) (vertexBytes + sizeof(Model));
+	*p_extraData = (Face*) ((uint8_t*) model + model->m_faceOffset) + p_faceCount;
 	SelectModel(p_shape, model);
 
 	if (!p_shape->m_models) {
@@ -124,7 +124,7 @@ Model* AddModel(
 }
 
 // Selects the first model whose key is at most p_key.
-void SelectModelByKey(Shape* p_shape, MechS32 p_key)
+void SelectModelByKey(Shape* p_shape, int32_t p_key)
 {
 	Model* model;
 
@@ -136,7 +136,7 @@ void SelectModelByKey(Shape* p_shape, MechS32 p_key)
 	}
 }
 
-void SetModelKey(Shape* p_shape, MechS32 p_key)
+void SetModelKey(Shape* p_shape, int32_t p_key)
 {
 	Model* model;
 
@@ -148,7 +148,7 @@ void SetModelKey(Shape* p_shape, MechS32 p_key)
 	model->m_key = p_key;
 }
 
-MechS32 GetModelKey(Shape* p_shape)
+int32_t GetModelKey(Shape* p_shape)
 {
 	Model* model;
 
@@ -161,7 +161,7 @@ MechS32 GetModelKey(Shape* p_shape)
 }
 
 // Allocates a shape with one model (AddModel).
-Shape* CreateShape(MechS32 p_vertexCount, MechS32 p_faceCount, MechS32 p_extra, void** p_extraData)
+Shape* CreateShape(int32_t p_vertexCount, int32_t p_faceCount, int32_t p_extra, void** p_extraData)
 {
 	Shape* shape;
 
@@ -193,7 +193,7 @@ Shape* CreateShape(MechS32 p_vertexCount, MechS32 p_faceCount, MechS32 p_extra, 
 }
 
 // Appends a vertex to the selected model.
-void AddShapeVertex(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z, undefined4 p_u, undefined4 p_v)
+void AddShapeVertex(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z, undefined4 p_u, undefined4 p_v)
 {
 	Model* model;
 	Vertex* vertex;
@@ -213,7 +213,7 @@ void AddShapeVertex(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z, undef
 }
 
 // Appends a face to the selected model, its vertex indices at p_indices.
-Face* AddShapeFace(Shape* p_shape, MechU16 p_color, MechU8* p_indices)
+Face* AddShapeFace(Shape* p_shape, uint16_t p_color, uint8_t* p_indices)
 {
 	Model* model;
 	Face* face;
@@ -223,8 +223,8 @@ Face* AddShapeFace(Shape* p_shape, MechU16 p_color, MechU8* p_indices)
 		return NULL;
 	}
 
-	face = (Face*) ((MechU8*) model + model->m_faceOffset) + model->m_faceCount;
-	face->m_indexOffset = (MechU16) (p_indices - (MechU8*) face);
+	face = (Face*) ((uint8_t*) model + model->m_faceOffset) + model->m_faceCount;
+	face->m_indexOffset = (uint16_t) (p_indices - (uint8_t*) face);
 	face->m_shape = p_shape;
 	face->m_color = p_color;
 	face->m_indexCount = 0;
@@ -233,7 +233,7 @@ Face* AddShapeFace(Shape* p_shape, MechU16 p_color, MechU8* p_indices)
 }
 
 // Appends a vertex index to a face of the selected model.
-void AddShapeFaceIndex(Shape* p_shape, Face* p_face, MechU32 p_index)
+void AddShapeFaceIndex(Shape* p_shape, Face* p_face, uint32_t p_index)
 {
 	Model* model;
 
@@ -242,7 +242,7 @@ void AddShapeFaceIndex(Shape* p_shape, Face* p_face, MechU32 p_index)
 		return;
 	}
 
-	((MechU8*) p_face)[p_face->m_indexOffset + p_face->m_indexCount] = (MechU8) p_index;
+	((uint8_t*) p_face)[p_face->m_indexOffset + p_face->m_indexCount] = (uint8_t) p_index;
 	p_face->m_indexCount++;
 }
 
@@ -303,14 +303,14 @@ void FreeShape(Shape* p_shape)
 	MechHeapFree(g_primaryHeap, p_shape);
 }
 
-void SetShapeState(Shape* p_shape, MechS32 p_flags)
+void SetShapeState(Shape* p_shape, int32_t p_flags)
 {
 	if (p_shape) {
 		p_shape->m_flags = (p_shape->m_flags & ~0x7ef0) | (p_flags & 0x7ef0) | 0x8000;
 	}
 }
 
-MechU32 GetShapeState(Shape* p_shape)
+uint32_t GetShapeState(Shape* p_shape)
 {
 	if (p_shape) {
 		return p_shape->m_flags & 0x7ef0;
@@ -320,39 +320,39 @@ MechU32 GetShapeState(Shape* p_shape)
 	}
 }
 
-void SetShapeKind(Shape* p_shape, MechS32 p_kind)
+void SetShapeKind(Shape* p_shape, int32_t p_kind)
 {
 	if (p_shape) {
 		p_shape->m_kind = p_kind;
 	}
 }
 
-void SetShapePartId(Shape* p_shape, MechU16 p_partId)
+void SetShapePartId(Shape* p_shape, uint16_t p_partId)
 {
 	p_shape->m_partId = p_partId;
 }
 
-void SetShapeOwner(Shape* p_shape, MechU16 p_owner)
+void SetShapeOwner(Shape* p_shape, uint16_t p_owner)
 {
 	p_shape->m_owner = p_owner;
 }
 
-MechU32 GetShapeKind(Shape* p_shape)
+uint32_t GetShapeKind(Shape* p_shape)
 {
 	return p_shape->m_kind;
 }
 
-MechU32 GetShapePartId(Shape* p_shape)
+uint32_t GetShapePartId(Shape* p_shape)
 {
 	return p_shape->m_partId;
 }
 
-MechU32 GetShapeOwner(Shape* p_shape)
+uint32_t GetShapeOwner(Shape* p_shape)
 {
 	return p_shape->m_owner;
 }
 
-MechS32 GetShapeBounds(Shape* p_shape, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+int32_t GetShapeBounds(Shape* p_shape, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	if (p_x) {
 		*p_x = p_shape->m_centerX;
@@ -374,7 +374,7 @@ MechS32 GetShapeBounds(Shape* p_shape, MechS32* p_x, MechS32* p_y, MechS32* p_z)
 void ComputeNormalsAndBounds(Shape* p_shape)
 {
 	Model* model;
-	MechS32 i;
+	int32_t i;
 
 	model = p_shape->m_model;
 	if (!model) {
@@ -383,7 +383,7 @@ void ComputeNormalsAndBounds(Shape* p_shape)
 
 	i = model->m_faceCount;
 	while (i--) {
-		ComputeFaceNormal((Face*) ((MechU8*) model + model->m_faceOffset) + i, (Vertex*) (model + 1));
+		ComputeFaceNormal((Face*) ((uint8_t*) model + model->m_faceOffset) + i, (Vertex*) (model + 1));
 	}
 
 	ComputeShapeBounds(p_shape);
@@ -393,20 +393,20 @@ void ComputeNormalsAndBounds(Shape* p_shape)
 // distance from there to the farthest vertex.
 void ComputeShapeBounds(Shape* p_shape)
 {
-	MechDouble dz;
+	double dz;
 	Model* model;
-	MechDouble max;
-	MechS32 minX;
-	MechS32 i;
-	MechS32 minY;
-	MechS32 minZ;
-	MechDouble d;
-	MechS32 maxX;
-	MechS32 maxY;
-	MechDouble dx;
-	MechS32 maxZ;
+	double max;
+	int32_t minX;
+	int32_t i;
+	int32_t minY;
+	int32_t minZ;
+	double d;
+	int32_t maxX;
+	int32_t maxY;
+	double dx;
+	int32_t maxZ;
 	Vertex* v;
-	MechDouble dy;
+	double dy;
 
 	model = p_shape->m_models;
 	if (!model) {
@@ -457,7 +457,7 @@ void ComputeShapeBounds(Shape* p_shape)
 		}
 	}
 
-	p_shape->m_radius = (MechS32) sqrt(max);
+	p_shape->m_radius = (int32_t) sqrt(max);
 }
 
 // Sets the face's normal (both copies) from its vertices: a triangle's directly, otherwise from
@@ -465,18 +465,18 @@ void ComputeShapeBounds(Shape* p_shape)
 // area over 16. A face of fewer than 3 vertices keeps the default (0x20000000, 0, 0).
 void ComputeFaceNormal(Face* p_face, Vertex* p_vertices)
 {
-	MechS32 length;
-	MechS32 nx;
+	int32_t length;
+	int32_t nx;
 	Vertex* vertex;
-	MechS32 ny;
-	MechS32 nz;
+	int32_t ny;
+	int32_t nz;
 	Vertex* prev;
 	Vertex* a;
-	MechS32 best;
-	MechS32 i;
-	MechS32 area;
+	int32_t best;
+	int32_t i;
+	int32_t area;
 	Vertex* b;
-	MechS32 bestArea;
+	int32_t bestArea;
 	Vertex* v0;
 	Vertex* v1;
 	Vertex* v2;
@@ -491,9 +491,9 @@ void ComputeFaceNormal(Face* p_face, Vertex* p_vertices)
 	}
 
 	if (p_face->m_indexCount == 3) {
-		v0 = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset]];
-		v1 = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset + 1]];
-		v2 = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset + 2]];
+		v0 = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset]];
+		v1 = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset + 1]];
+		v2 = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset + 2]];
 		ComputeTriangleNormal(
 			v0->m_modelX,
 			v0->m_modelY,
@@ -514,9 +514,9 @@ void ComputeFaceNormal(Face* p_face, Vertex* p_vertices)
 		return;
 	}
 
-	prev = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset]];
+	prev = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset]];
 	for (i = p_face->m_indexCount; i--; prev = vertex) {
-		vertex = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset + i]];
+		vertex = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset + i]];
 		length = ApproximateVectorLength(
 			prev->m_modelX - vertex->m_modelX,
 			prev->m_modelY - vertex->m_modelY,
@@ -536,7 +536,7 @@ void ComputeFaceNormal(Face* p_face, Vertex* p_vertices)
 	bestArea = -1;
 	i = p_face->m_indexCount;
 	while (i--) {
-		vertex = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset + i]];
+		vertex = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset + i]];
 		if (vertex != a && vertex != b) {
 			area = ComputeTriangleNormal(
 				a->m_modelX,
@@ -566,7 +566,7 @@ void ComputeFaceNormal(Face* p_face, Vertex* p_vertices)
 }
 
 // Returns the selected model's vertex and face counts.
-void GetModelCounts(Shape* p_shape, MechS32* p_vertexCount, MechS32* p_faceCount)
+void GetModelCounts(Shape* p_shape, int32_t* p_vertexCount, int32_t* p_faceCount)
 {
 	Model* model;
 
@@ -603,7 +603,7 @@ void ForEachShape(Shape* p_shape, void (*p_fn)(Shape*))
 }
 
 // Returns a vertex's transformed position.
-void GetTransformedVertex(Shape* p_shape, MechS32 p_index, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void GetTransformedVertex(Shape* p_shape, int32_t p_index, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	Model* model;
 	Vertex* vertex;
@@ -628,7 +628,7 @@ void GetTransformedVertex(Shape* p_shape, MechS32 p_index, MechS32* p_x, MechS32
 }
 
 // Returns a vertex's position in the model.
-void GetVertexPosition(Shape* p_shape, MechS32 p_index, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void GetVertexPosition(Shape* p_shape, int32_t p_index, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	Model* model;
 	Vertex* vertex;
@@ -655,23 +655,23 @@ void GetVertexPosition(Shape* p_shape, MechS32 p_index, MechS32* p_x, MechS32* p
 // Returns a face of the selected model and up to p_max of its vertex indices.
 void GetShapeFace(
 	Shape* p_shape,
-	MechS32 p_index,
-	MechU32* p_color,
-	MechU32* p_count,
-	MechU32* p_indices,
-	MechS32 p_max
+	int32_t p_index,
+	uint32_t* p_color,
+	uint32_t* p_count,
+	uint32_t* p_indices,
+	int32_t p_max
 )
 {
 	Model* model;
 	Face* face;
-	MechS32 count;
+	int32_t count;
 
 	model = p_shape->m_model;
 	if (!model) {
 		return;
 	}
 
-	face = (Face*) ((MechU8*) model + model->m_faceOffset) + p_index;
+	face = (Face*) ((uint8_t*) model + model->m_faceOffset) + p_index;
 	if (p_color) {
 		*p_color = face->m_color;
 	}
@@ -687,12 +687,12 @@ void GetShapeFace(
 		}
 
 		while (count--) {
-			p_indices[count] = ((MechU8*) face)[face->m_indexOffset + count];
+			p_indices[count] = ((uint8_t*) face)[face->m_indexOffset + count];
 		}
 	}
 }
 
-void SetFaceColor(Shape* p_shape, MechS32 p_index, MechS32 p_color)
+void SetFaceColor(Shape* p_shape, int32_t p_index, int32_t p_color)
 {
 	Model* model;
 
@@ -702,7 +702,7 @@ void SetFaceColor(Shape* p_shape, MechS32 p_index, MechS32 p_color)
 	}
 
 	if (p_index < model->m_faceCount) {
-		((Face*) ((MechU8*) model + model->m_faceOffset) + p_index)->m_color = p_color;
+		((Face*) ((uint8_t*) model + model->m_faceOffset) + p_index)->m_color = p_color;
 	}
 }
 
@@ -716,12 +716,12 @@ void SetShapeObject(Shape* p_shape, struct SceneObject* p_object)
 	p_shape->m_object = p_object;
 }
 
-MechU32 GetShapeLoadFlags(Shape* p_shape)
+uint32_t GetShapeLoadFlags(Shape* p_shape)
 {
 	return p_shape->m_flags & 0x10f;
 }
 
-void SetShapeLoadFlags(Shape* p_shape, MechU32 p_flags)
+void SetShapeLoadFlags(Shape* p_shape, uint32_t p_flags)
 {
 	p_shape->m_flags = (p_shape->m_flags & ~0x10f) | (p_flags & 0x10f) | 0x8000;
 }
@@ -749,12 +749,12 @@ void DestroyObjShape(Shape* p_shape)
 }
 
 // Returns the bytes the shape, its models and its bounding data take.
-MechS32 GetShapeMemorySize(Shape* p_shape)
+int32_t GetShapeMemorySize(Shape* p_shape)
 {
 	Model* model;
 	Vertex* vertex;
-	MechS32 size;
-	MechS32 i;
+	int32_t size;
+	int32_t i;
 	Face* face;
 
 	size = sizeof(Shape);
@@ -769,7 +769,7 @@ MechS32 GetShapeMemorySize(Shape* p_shape)
 			size += sizeof(Vertex);
 		}
 
-		face = (Face*) ((MechU8*) model + model->m_faceOffset);
+		face = (Face*) ((uint8_t*) model + model->m_faceOffset);
 		for (i = model->m_faceCount; i--; face++) {
 			size += face->m_indexCount + sizeof(Face);
 		}

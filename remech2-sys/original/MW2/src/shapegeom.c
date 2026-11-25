@@ -17,31 +17,31 @@
 
 // The 64-bit product of two 32-bit values, as imul leaves it in edx:eax. Sums of products wrap,
 // like the add/adc chains.
-static MechU64 Product(MechS32 p_a, MechS32 p_b)
+static MechU64 Product(int32_t p_a, int32_t p_b)
 {
 	return (MechU64) ((MechS64) p_a * p_b);
 }
 
 // sub: wraps.
-static MechS32 Difference(MechS32 p_a, MechS32 p_b)
+static int32_t Difference(int32_t p_a, int32_t p_b)
 {
-	return PortableS32((MechU32) p_a - (MechU32) p_b);
+	return PortableS32((uint32_t) p_a - (uint32_t) p_b);
 }
 
 // neg: INT_MIN stays INT_MIN.
-static MechS32 Negate(MechS32 p_value)
+static int32_t Negate(int32_t p_value)
 {
-	return PortableS32(0 - (MechU32) p_value);
+	return PortableS32(0 - (uint32_t) p_value);
 }
 
 // Row p_row of p_matrix's 2.29 rotation times (p_x, p_y, p_z), shifted right by 29, rounded and
 // offset by p_offset.
-static MechS32 TransformRow(Matrix* p_matrix, MechS32 p_row, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_offset)
+static int32_t TransformRow(Matrix* p_matrix, int32_t p_row, int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_offset)
 {
-	MechS32* row = p_matrix->m_rows[p_row];
+	int32_t* row = p_matrix->m_rows[p_row];
 	MechU64 sum = Product(row[0], p_x) + Product(row[1], p_y) + Product(row[2], p_z);
 
-	return PortableS32(PortableShrdRound(sum, 29) + (MechU32) p_offset);
+	return PortableS32(PortableShrdRound(sum, 29) + (uint32_t) p_offset);
 }
 
 // Transforms p_model's vertices (their positions into m_worldX-m_worldZ) and face normals by
@@ -49,15 +49,15 @@ static MechS32 TransformRow(Matrix* p_matrix, MechS32 p_row, MechS32 p_x, MechS3
 void TransformModel(Model* p_model, Matrix* p_matrix)
 {
 	Vertex* vertex = (Vertex*) (p_model + 1);
-	Face* face = (Face*) ((MechU8*) p_model + p_model->m_faceOffset);
-	MechU16 count;
+	Face* face = (Face*) ((uint8_t*) p_model + p_model->m_faceOffset);
+	uint16_t count;
 
 	/* The counts are 16-bit: 0 runs 0x10000 times. */
-	count = (MechU16) p_model->m_vertexCount;
+	count = (uint16_t) p_model->m_vertexCount;
 	do {
-		MechS32 x = vertex->m_modelX;
-		MechS32 y = vertex->m_modelY;
-		MechS32 z = vertex->m_modelZ;
+		int32_t x = vertex->m_modelX;
+		int32_t y = vertex->m_modelY;
+		int32_t z = vertex->m_modelZ;
 
 		vertex->m_worldX = TransformRow(p_matrix, 0, x, y, z, p_matrix->m_rows[3][0]);
 		vertex->m_worldY = TransformRow(p_matrix, 1, x, y, z, p_matrix->m_rows[3][1]);
@@ -65,11 +65,11 @@ void TransformModel(Model* p_model, Matrix* p_matrix)
 		vertex++;
 	} while (--count);
 
-	count = (MechU16) p_model->m_faceCount;
+	count = (uint16_t) p_model->m_faceCount;
 	do {
-		MechS32 x = face->m_modelNormalX;
-		MechS32 y = face->m_modelNormalY;
-		MechS32 z = face->m_modelNormalZ;
+		int32_t x = face->m_modelNormalX;
+		int32_t y = face->m_modelNormalY;
+		int32_t z = face->m_modelNormalZ;
 
 		face->m_normal[0] = TransformRow(p_matrix, 0, x, y, z, 0);
 		face->m_normal[1] = TransformRow(p_matrix, 1, x, y, z, 0);
@@ -125,34 +125,34 @@ void TransformShape(struct Shape* p_shape, Matrix* p_matrix)
 
 // Solves the plane p_normalX * x + p_normalY * y + p_normalZ * z + p_distance = 0 for y at
 // (p_dx, p_dz): (p_normalX * p_dx + p_normalZ * p_dz + p_distance) / p_normalY, in 64 bits.
-MechS32 SolvePlaneY(
-	MechS32 p_normalX,
-	MechS32 p_normalY,
-	MechS32 p_normalZ,
-	MechS32 p_distance,
-	MechS32 p_dx,
-	MechS32 p_dz
+int32_t SolvePlaneY(
+	int32_t p_normalX,
+	int32_t p_normalY,
+	int32_t p_normalZ,
+	int32_t p_distance,
+	int32_t p_dx,
+	int32_t p_dz
 )
 {
 	/* p_distance is added unsigned (adc edx, 0), and the sum wraps at 64 bits. */
-	MechU64 sum = Product(p_normalX, p_dx) + Product(p_normalZ, p_dz) + (MechU32) p_distance;
+	MechU64 sum = Product(p_normalX, p_dx) + Product(p_normalZ, p_dz) + (uint32_t) p_distance;
 
 	return PortableIdiv(PortableS64(sum), p_normalY);
 }
 
 // Returns an approximate distance from (p_x, p_y, p_z) to the shape's center, (4 * the largest +
 // the others) / 4 of the offsets, or 0x7fffffff outside its bounding sphere.
-MechS32 ApproximateShapeDistance(struct Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t ApproximateShapeDistance(struct Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 deltaX = Difference(p_shape->m_centerX, p_x);
-	MechS32 deltaY = Difference(p_shape->m_centerY, p_y);
-	MechS32 deltaZ = Difference(p_shape->m_centerZ, p_z);
-	MechS32 radius = p_shape->m_radius;
-	MechS32 low = Negate(radius);
-	MechS32 largest;
-	MechS32 second;
-	MechS32 third;
-	MechS32 swap;
+	int32_t deltaX = Difference(p_shape->m_centerX, p_x);
+	int32_t deltaY = Difference(p_shape->m_centerY, p_y);
+	int32_t deltaZ = Difference(p_shape->m_centerZ, p_z);
+	int32_t radius = p_shape->m_radius;
+	int32_t low = Negate(radius);
+	int32_t largest;
+	int32_t second;
+	int32_t third;
+	int32_t swap;
 
 	if (deltaX > radius || deltaX < low || deltaY > radius || deltaY < low || deltaZ > radius || deltaZ < low) {
 		return 0x7fffffff;
@@ -179,37 +179,37 @@ MechS32 ApproximateShapeDistance(struct Shape* p_shape, MechS32 p_x, MechS32 p_y
 		third = swap;
 	}
 
-	return PortableS32((((MechU32) largest << 2) + (MechU32) second + (MechU32) third) >> 2);
+	return PortableS32((((uint32_t) largest << 2) + (uint32_t) second + (uint32_t) third) >> 2);
 }
 
 // The normal of the triangle (p_x0, p_y0, p_z0), (p_x1, p_y1, p_z1), (p_x2, p_y2, p_z2): the cross
 // product of its edges, scaled to 2.29 fixed point; returns the scale's exponent. A degenerate
 // triangle gets the normal (-1, -1, -1) and 0. The products and the scaling are __asm blocks.
-MechS32 ComputeTriangleNormal(
-	MechS32 p_x0,
-	MechS32 p_y0,
-	MechS32 p_z0,
-	MechS32 p_x1,
-	MechS32 p_y1,
-	MechS32 p_z1,
-	MechS32 p_x2,
-	MechS32 p_y2,
-	MechS32 p_z2,
-	MechS32* p_nx,
-	MechS32* p_ny,
-	MechS32* p_nz
+int32_t ComputeTriangleNormal(
+	int32_t p_x0,
+	int32_t p_y0,
+	int32_t p_z0,
+	int32_t p_x1,
+	int32_t p_y1,
+	int32_t p_z1,
+	int32_t p_x2,
+	int32_t p_y2,
+	int32_t p_z2,
+	int32_t* p_nx,
+	int32_t* p_ny,
+	int32_t* p_nz
 )
 {
 	MechS64 normal[3];
-	MechU32 values[3];
-	MechS32 quotients[3];
-	MechU32 high = 0;
-	MechU32 low = 0;
-	MechU32 squares = 0;
-	MechS32 divisor;
-	MechS32 shift;
-	MechS32 scale;
-	MechS32 i;
+	uint32_t values[3];
+	int32_t quotients[3];
+	uint32_t high = 0;
+	uint32_t low = 0;
+	uint32_t squares = 0;
+	int32_t divisor;
+	int32_t shift;
+	int32_t scale;
+	int32_t i;
 
 	/* The cross product of the edges, each component a 64-bit difference of products (which
 	   can't overflow), and the bits of their magnitudes. */
@@ -222,8 +222,8 @@ MechS32 ComputeTriangleNormal(
 	for (i = 0; i < 3; i++) {
 		MechU64 magnitude = (MechU64) (normal[i] < 0 ? -normal[i] : normal[i]);
 
-		high |= (MechU32) (magnitude >> 32);
-		low |= (MechU32) magnitude;
+		high |= (uint32_t) (magnitude >> 32);
+		low |= (uint32_t) magnitude;
 	}
 
 	/* Scaled to 32 bits with the highest bit at 29 or below: shifted right by the magnitude's
@@ -231,7 +231,7 @@ MechS32 ComputeTriangleNormal(
 	if (high) {
 		scale = PortableBsr(high) + 3;
 		for (i = 0; i < 3; i++) {
-			values[i] = (MechU32) ((MechU64) normal[i] >> (scale & 31));
+			values[i] = (uint32_t) ((MechU64) normal[i] >> (scale & 31));
 		}
 
 		shift = scale + 29;
@@ -241,10 +241,10 @@ MechS32 ComputeTriangleNormal(
 		scale = 29 - shift;
 		for (i = 0; i < 3; i++) {
 			if (scale < 0) {
-				values[i] = (MechU32) ((MechU64) normal[i] >> -scale);
+				values[i] = (uint32_t) ((MechU64) normal[i] >> -scale);
 			}
 			else {
-				values[i] = (MechU32) normal[i] << scale;
+				values[i] = (uint32_t) normal[i] << scale;
 			}
 		}
 	}
@@ -255,12 +255,12 @@ MechS32 ComputeTriangleNormal(
 
 	/* Normalized by the square root of the sum of the high words' squares. */
 	for (i = 0; i < 3; i++) {
-		MechS32 word = PortableS16((MechU16) (values[i] >> 16));
+		int32_t word = PortableS16((uint16_t) (values[i] >> 16));
 
-		squares += (MechU32) (word * word);
+		squares += (uint32_t) (word * word);
 	}
 
-	divisor = (MechU16) g_sqrtTable[squares >> 20];
+	divisor = (uint16_t) g_sqrtTable[squares >> 20];
 	for (i = 0; i < 3; i++) {
 		quotients[i] = PortableIdiv((MechS64) PortableS32(values[i]) * 0x2000, divisor);
 	}
@@ -272,9 +272,9 @@ MechS32 ComputeTriangleNormal(
 }
 
 // Returns p_value / (p_a - p_b) in 15.17 fixed point, or 0 if p_a and p_b are equal.
-MechS32 DivDifference17(MechS32 p_a, MechS32 p_b, MechS32 p_value)
+int32_t DivDifference17(int32_t p_a, int32_t p_b, int32_t p_value)
 {
-	MechS32 divisor = Difference(p_a, p_b);
+	int32_t divisor = Difference(p_a, p_b);
 
 	if (!divisor) {
 		return 0;
@@ -285,16 +285,16 @@ MechS32 DivDifference17(MechS32 p_a, MechS32 p_b, MechS32 p_value)
 
 // Returns how far along p_ray it passes closest to the shape's center, less the radius, or
 // 0x7fffffff when it misses the bounding sphere or ends first; 10 when the ray starts inside it.
-MechS32 RayShapeDistance(struct Shape* p_shape, Ray* p_ray)
+int32_t RayShapeDistance(struct Shape* p_shape, Ray* p_ray)
 {
-	MechS32 radius = p_shape->m_radius;
-	MechS32 deltaX;
-	MechS32 deltaY;
-	MechS32 deltaZ;
+	int32_t radius = p_shape->m_radius;
+	int32_t deltaX;
+	int32_t deltaY;
+	int32_t deltaZ;
 	MechU64 excess;
 	MechU64 partial;
 	MechU64 dot;
-	MechS32 t;
+	int32_t t;
 
 	if (radius <= 0) {
 		return 0x7fffffff;

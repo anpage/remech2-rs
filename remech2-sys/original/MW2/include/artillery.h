@@ -17,7 +17,7 @@ extern "C"
 	void UpdateArtillery(struct Mech* p_mech);
 	void LateUpdateArtillery(struct Mech* p_mech);
 	void ShutdownArtillery(struct Mech* p_mech);
-	MechS32 CreateArtillery(MechS32 p_index, struct Player* p_player);
+	int32_t CreateArtillery(int32_t p_index, struct Player* p_player);
 
 #ifdef __cplusplus
 }

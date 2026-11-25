@@ -19,9 +19,9 @@
 ResourceCacheEntry** g_cacheTable = NULL;
 
 // The number of the next cache log.
-MechS32 g_cacheDumpNumber = 0;
+int32_t g_cacheDumpNumber = 0;
 
-MechS32 g_cacheEntryCount;
+int32_t g_cacheEntryCount;
 
 // The purge list: unlocked items, oldest first.
 ResourceCacheEntry* g_purgeListHead;
@@ -84,7 +84,7 @@ void AllocateCacheTable(void)
 void RebuildPurgeList(void)
 {
 	ResourceCacheEntry* item;
-	MechS32 i;
+	int32_t i;
 
 	g_purgeListHead = NULL;
 	g_purgeListTail = NULL;
@@ -102,7 +102,7 @@ void RebuildPurgeList(void)
 void ShutdownResourceCache(void)
 {
 	ResourceCacheEntry* item;
-	MechS32 i;
+	int32_t i;
 	ResourceCacheEntry* next;
 
 	if (!g_cacheTable) {
@@ -131,10 +131,10 @@ void InitializeResourceCache(void)
 }
 
 // Returns the cached item of an ID and type, or NULL.
-ResourceCacheEntry* FindCacheEntry(MechS32 p_id, const char* p_type)
+ResourceCacheEntry* FindCacheEntry(int32_t p_id, const char* p_type)
 {
 	ResourceCacheEntry* item;
-	MechS32 slot;
+	int32_t slot;
 
 	if (p_id < 0) {
 		return NULL;
@@ -142,7 +142,7 @@ ResourceCacheEntry* FindCacheEntry(MechS32 p_id, const char* p_type)
 
 	slot = (p_type[2] + p_type[3] + p_type[0] + p_type[1] + p_id) % 0x3f1;
 	for (item = g_cacheTable[slot]; item; item = item->m_next) {
-		if (item->m_id == p_id && item->m_type == *(MechS32*) p_type) {
+		if (item->m_id == p_id && item->m_type == *(int32_t*) p_type) {
 			break;
 		}
 	}
@@ -154,9 +154,9 @@ ResourceCacheEntry* FindCacheEntry(MechS32 p_id, const char* p_type)
 void FreeCacheEntry(ResourceCacheEntry* p_item)
 {
 	ResourceCacheEntry* prev = NULL;
-	MechChar type[5];
-	MechS32 slot;
-	MechChar text[100];
+	char type[5];
+	int32_t slot;
+	char text[100];
 
 	if (!p_item) {
 		return;
@@ -165,7 +165,7 @@ void FreeCacheEntry(ResourceCacheEntry* p_item)
 	p_item->m_lock = 0;
 	LockCacheEntry(p_item);
 	type[4] = '\0';
-	*(MechS32*) type = p_item->m_type;
+	*(int32_t*) type = p_item->m_type;
 	slot = (type[2] + type[3] + type[0] + type[1] + p_item->m_id) % 0x3f1;
 	if (g_cacheTable[slot] == p_item) {
 		g_cacheTable[slot] = p_item->m_next;
@@ -202,17 +202,17 @@ void FreeCacheEntry(ResourceCacheEntry* p_item)
 // Writes the cache's hash chains and purge list to the next dbugcch<n>.log.
 void DumpResourceCache(void)
 {
-	MechS32 i;
-	MechChar type[5];
+	int32_t i;
+	char type[5];
 	ResourceCacheEntry* item;
-	MechChar name[100];
+	char name[100];
 
 	snprintf(name, sizeof(name), "dbugcch%d.log", g_cacheDumpNumber++);
 	MechLogDebugf("%s: Cache table", name);
 	type[4] = '\0';
 	for (i = 0; i < 0x3f1; i++) {
 		for (item = g_cacheTable[i]; item; item = item->m_next) {
-			*(MechS32*) type = item->m_type;
+			*(int32_t*) type = item->m_type;
 			MechLogDebugf(
 				"%s: bucket=%d ID=%5d Type=%4s Lock=%d Size=%7d",
 				name,
@@ -220,26 +220,26 @@ void DumpResourceCache(void)
 				item->m_id,
 				type,
 				item->m_lock,
-				(MechS32) MechHeapSize(g_primaryHeap, item)
+				(int32_t) MechHeapSize(g_primaryHeap, item)
 			);
 		}
 	}
 
 	MechLogDebugf("%s: Purge list", name);
 	for (item = g_purgeListHead; item; item = item->m_purgeNext) {
-		*(MechS32*) type = item->m_type;
+		*(int32_t*) type = item->m_type;
 		MechLogDebugf(
 			"%s: purge ID=%5d Type=%4s Lock=%d Size=%7d",
 			name,
 			item->m_id,
 			type,
 			item->m_lock,
-			(MechS32) MechHeapSize(g_primaryHeap, item)
+			(int32_t) MechHeapSize(g_primaryHeap, item)
 		);
 	}
 }
 
-void UnlockCachedResource(MechS32 p_id, const char* p_type)
+void UnlockCachedResource(int32_t p_id, const char* p_type)
 {
 	ResourceCacheEntry* entry;
 
@@ -254,14 +254,14 @@ void UnlockCachedResource(MechS32 p_id, const char* p_type)
 // Returns resource p_id of type p_type from project file p_file, locked in the cache: the cached
 // copy, or one read in, purging unlocked items while the cache is full or memory runs out. A
 // missing resource is logged to symlog.txt and reported. p_unk0x0c goes unused.
-void* LoadCachedResource(MechS32 p_file, MechS32 p_id, const char* p_type, undefined4 p_unk0x0c)
+void* LoadCachedResource(int32_t p_file, int32_t p_id, const char* p_type, undefined4 p_unk0x0c)
 {
 	ResourceCacheEntry* entry;
 	ResourceCacheEntry* item;
-	MechS32 hash;
-	MechS32 size;
-	MechChar message[100];
-	MechChar message2[100];
+	int32_t hash;
+	int32_t size;
+	char message[100];
+	char message2[100];
 
 	if (p_id < 0) {
 		return NULL;
@@ -329,14 +329,14 @@ void* LoadCachedResource(MechS32 p_file, MechS32 p_id, const char* p_type, undef
 	g_cacheTable[hash] = item;
 	item->m_lock = 1;
 	item->m_id = p_id;
-	item->m_type = *(MechS32*) p_type;
+	item->m_type = *(int32_t*) p_type;
 	item->m_purgeNext = NULL;
 	item->m_purgePrev = NULL;
 	g_cacheEntryCount++;
 	return item + 1;
 }
 
-void FreeCachedResource(MechS32 p_id, const char* p_type)
+void FreeCachedResource(int32_t p_id, const char* p_type)
 {
 	ResourceCacheEntry* entry;
 
@@ -348,7 +348,7 @@ void FreeCachedResource(MechS32 p_id, const char* p_type)
 	FreeCacheEntry(entry);
 }
 
-MechS32 PurgeOldestCacheEntry(void)
+int32_t PurgeOldestCacheEntry(void)
 {
 	if (g_purgeListHead) {
 		FreeCacheEntry(g_purgeListHead);
@@ -358,19 +358,19 @@ MechS32 PurgeOldestCacheEntry(void)
 	return 0;
 }
 
-void* MemAlloc(MechU32 p_size)
+void* MemAlloc(uint32_t p_size)
 {
 	return MechHeapAllocZeroed(g_primaryHeap, p_size);
 }
 
-void* MemCopy(void* p_dst, const void* p_src, MechU32 p_size)
+void* MemCopy(void* p_dst, const void* p_src, uint32_t p_size)
 {
 	/* Forwards, a dword at a time and then the remaining bytes, as rep movsd/movsb copy
 	   overlapping blocks. */
-	MechU8* dst = (MechU8*) p_dst;
-	const MechU8* src = (const MechU8*) p_src;
-	MechU8 dword[4];
-	MechU32 count;
+	uint8_t* dst = (uint8_t*) p_dst;
+	const uint8_t* src = (const uint8_t*) p_src;
+	uint8_t dword[4];
+	uint32_t count;
 
 	for (count = p_size >> 2; count; count--) {
 		memcpy(dword, src, 4);
@@ -386,9 +386,9 @@ void* MemCopy(void* p_dst, const void* p_src, MechU32 p_size)
 	return p_dst;
 }
 
-void* MemSet(void* p_dst, MechS32 p_value, MechU32 p_size)
+void* MemSet(void* p_dst, int32_t p_value, uint32_t p_size)
 {
-	memset(p_dst, (MechU8) p_value, p_size);
+	memset(p_dst, (uint8_t) p_value, p_size);
 
 	return p_dst;
 }

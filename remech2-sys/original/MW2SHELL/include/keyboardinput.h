@@ -12,32 +12,32 @@ public:
 	~KeyboardInput();
 
 	void FlushKeys();
-	MechS32 WaitForKey();
+	int32_t WaitForKey();
 	undefined4 GetKeyPressed();
-	MechS32 PollKey();
+	int32_t PollKey();
 	void ResetText(undefined4 p_maxLength);
-	void SetText(undefined4 p_maxLength, const MechChar* p_text);
-	MechS32 EditText(MechChar* p_text, MechU8 p_upperCase);
+	void SetText(undefined4 p_maxLength, const char* p_text);
+	int32_t EditText(char* p_text, uint8_t p_upperCase);
 
-	MechU32 m_key; // 0x00
+	uint32_t m_key; // 0x00
 
 private:
-	MechS32 m_length;        // 0x04
-	MechS32 m_maxLength;     // 0x08
-	MechChar m_text[0x100];  // 0x0c
+	int32_t m_length;        // 0x04
+	int32_t m_maxLength;     // 0x08
+	char m_text[0x100];      // 0x0c
 	undefined4 m_keyPressed; // 0x10c — whether PollKey read a key
 };
 
 // The functions and globals of keyboardinput.cpp that other units use.
-extern MechChar g_editTextBuffer[0x100];
-MechS32 EditTextField(
+extern char g_editTextBuffer[0x100];
+int32_t EditTextField(
 	Font* p_font,
-	MechS32 p_left,
-	MechS32 p_top,
-	MechChar* p_text,
+	int32_t p_left,
+	int32_t p_top,
+	char* p_text,
 	undefined* p_colors,
-	MechS32 p_maxLength,
-	MechS32 p_width
+	int32_t p_maxLength,
+	int32_t p_width
 );
 
 #endif // KEYBOARDINPUT_H

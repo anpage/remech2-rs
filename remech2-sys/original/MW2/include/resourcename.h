@@ -10,14 +10,14 @@ extern "C"
 {
 #endif
 
-	MechS32 FindResourceIdByName(MechS32 p_table, MechChar* p_name);
+	int32_t FindResourceIdByName(int32_t p_table, char* p_name);
 	void* LoadResourceByRef(
 		ResourceRef* p_ref,
 		const char* p_type,
 		const char* p_ext,
-		MechS32 p_table,
-		MechS32* p_size,
-		MechU32* p_poolTag
+		int32_t p_table,
+		int32_t* p_size,
+		uint32_t* p_poolTag
 	);
 
 #ifdef __cplusplus

@@ -21,12 +21,12 @@ enum {
 };
 
 typedef struct Anim2d {
-	MechS32 m_state;      // 0x00
-	MechS32 m_frameCount; // 0x04
-	MechS32 m_frameTime;  // 0x08 — clock ticks per frame
-	MechS32 m_startTime;  // 0x0c — 0: not started
-	MechU32 m_flags;      // 0x10
-	MechS32 m_resourceId; // 0x14 — a SHP resource, relative to g_artResolution
+	int32_t m_state;      // 0x00
+	int32_t m_frameCount; // 0x04
+	int32_t m_frameTime;  // 0x08 — clock ticks per frame
+	int32_t m_startTime;  // 0x0c — 0: not started
+	uint32_t m_flags;     // 0x10
+	int32_t m_resourceId; // 0x14 — a SHP resource, relative to g_artResolution
 	void* m_shape;        // 0x18 — loaded on first draw
 } Anim2d;
 
@@ -36,14 +36,14 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_anim2dCount;
+	extern int32_t g_anim2dCount;
 	extern Anim2d* g_anim2ds[7];
 
-	MechS16 LoadAnim2d(MechU32 p_flags, MechS32 p_frameTime, MechS32 p_type, MechS16* p_resourceId);
-	void FreeAnim2ds(MechS32 p_index);
-	void FreeAnim2d(MechS32 p_index);
-	void DrawAnim2d(PANE* p_target, MechS32 p_index, MechS32 p_x, MechS32 p_y);
-	void RestartAnim2d(MechS32 p_index);
+	int16_t LoadAnim2d(uint32_t p_flags, int32_t p_frameTime, int32_t p_type, int16_t* p_resourceId);
+	void FreeAnim2ds(int32_t p_index);
+	void FreeAnim2d(int32_t p_index);
+	void DrawAnim2d(PANE* p_target, int32_t p_index, int32_t p_x, int32_t p_y);
+	void RestartAnim2d(int32_t p_index);
 
 #ifdef __cplusplus
 }

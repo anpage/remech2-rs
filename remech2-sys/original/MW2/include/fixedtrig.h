@@ -9,11 +9,11 @@ extern "C"
 {
 #endif
 
-	MechS32 FixedSin(MechS32 p_angle);
-	MechS32 FixedCos(MechS32 p_angle);
-	MechS32 FixedAsin(MechS32 p_sine);
-	MechS32 FixedAcos(MechS32 p_cosine);
-	MechS32 FixedAtan2(MechS32 p_x, MechS32 p_z);
+	int32_t FixedSin(int32_t p_angle);
+	int32_t FixedCos(int32_t p_angle);
+	int32_t FixedAsin(int32_t p_sine);
+	int32_t FixedAcos(int32_t p_cosine);
+	int32_t FixedAtan2(int32_t p_x, int32_t p_z);
 
 #ifdef __cplusplus
 }

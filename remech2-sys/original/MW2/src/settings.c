@@ -16,19 +16,19 @@
 #include "targeting.h"
 #include "types.h"
 
-MechChar g_gameCtrlItem[] = "Game Ctrl";
+char g_gameCtrlItem[] = "Game Ctrl";
 
-MechChar g_systemsStatusTitle[] = "SYSTEMS STATUS";
+char g_systemsStatusTitle[] = "SYSTEMS STATUS";
 
-MechChar g_lightAmplificationItem[] = "Light Amplification";
+char g_lightAmplificationItem[] = "Light Amplification";
 
-MechChar g_imageEnhancementItem[] = "Image Emhancement";
+char g_imageEnhancementItem[] = "Image Emhancement";
 
-MechChar g_hudItem[] = "HUD";
+char g_hudItem[] = "HUD";
 
-MechChar g_autoThermOverrideItem[] = "Auto Therm Override";
+char g_autoThermOverrideItem[] = "Auto Therm Override";
 
-MechChar g_autoEjectItem[] = "Auto Eject";
+char g_autoEjectItem[] = "Auto Eject";
 
 MenuControl g_infraredControl = {3, 0, &g_offOnChoices, 166, NULL, GetSystemSetting, NULL, SetSystemSetting, NULL};
 
@@ -92,9 +92,9 @@ MenuPage* g_systemsMenuPageStack[8];
 // and 0xa7 ENHANCED_VISION (image enhancement: outlined polygons).
 
 // Returns the setting p_id, or 0.
-MechS32 GetSystemSetting(MechS32 p_id)
+int32_t GetSystemSetting(int32_t p_id)
 {
-	MechS32 value;
+	int32_t value;
 
 	switch (p_id) {
 	case 0xa6:
@@ -126,7 +126,7 @@ MechS32 GetSystemSetting(MechS32 p_id)
 }
 
 // Changes the setting p_id (see GetSystemSetting) to p_value.
-void SetSystemSetting(MechS32 p_id, MechS32 p_value)
+void SetSystemSetting(int32_t p_id, int32_t p_value)
 {
 	switch (p_id) {
 	case 0xa6:

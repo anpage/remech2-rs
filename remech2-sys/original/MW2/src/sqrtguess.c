@@ -7,10 +7,10 @@
 
 // Estimates the square root of a 16.16 fixed-point value from its highest set bit, for
 // FixedSqrt16 to refine.
-MechU32 FixedSqrtGuess(MechU32 p_value)
+uint32_t FixedSqrtGuess(uint32_t p_value)
 {
 	/* bsr of 0 leaves the shift undefined */
-	MechS32 bit;
+	int32_t bit;
 
 	PORTABLE_ASSERT(p_value != 0);
 	bit = PortableBsr(p_value);

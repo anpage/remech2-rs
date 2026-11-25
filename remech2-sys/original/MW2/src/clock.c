@@ -12,59 +12,59 @@
 
 // The game clock, in the 181 Hz ticks of ticks.h, which FirstClock starts.
 
-MechS32 g_currentClock = 0;
+int32_t g_currentClock = 0;
 
 // Ticks that run on while the game clock is paused; the network times its messages by them.
-MechS32 g_realClock = 0;
+int32_t g_realClock = 0;
 
-MechS32 g_deltaTime = 0;
+int32_t g_deltaTime = 0;
 
 // 0 the game clock runs on its own ticks, 2 a slave's follows the master's, 3 paused.
-MechS32 g_clockMode = 0;
+int32_t g_clockMode = 0;
 
-MechS32 g_clockPaused = 0;
+int32_t g_clockPaused = 0;
 
-MechS32 g_timeCompressionEnabled = 0;
+int32_t g_timeCompressionEnabled = 0;
 
-MechS32 g_timeExpansionEnabled = 0;
+int32_t g_timeExpansionEnabled = 0;
 
-MechS32 g_framerateLimit = 0;
+int32_t g_framerateLimit = 0;
 
-MechS32 g_clockHandle = -1;
+int32_t g_clockHandle = -1;
 
 // The ticks since a slave's last UpdateNetwork: they advance its game clock when the master's
 // clock didn't arrive.
-MechS32 g_syncTicksHandle = -1;
+int32_t g_syncTicksHandle = -1;
 
-MechS32 g_realClockHandle = -1;
+int32_t g_realClockHandle = -1;
 
-MechS32 g_previousClock = 0;
+int32_t g_previousClock = 0;
 
-MechS32 g_clockModeBeforePause = 0;
+int32_t g_clockModeBeforePause = 0;
 
-MechS32 g_ticksTimerInitialized = FALSE;
+int32_t g_ticksTimerInitialized = FALSE;
 
-MechS16* g_sqrtTable;
+int16_t* g_sqrtTable;
 
-MechS32 g_slopeSines[800];
+int32_t g_slopeSines[800];
 
-MechS32 g_slopeCosines[800];
+int32_t g_slopeCosines[800];
 
-MechS32 g_sinTable[0x102];
+int32_t g_sinTable[0x102];
 
-MechS16 g_sqrtTableData[0x400];
+int16_t g_sqrtTableData[0x400];
 
-MechS32 g_atanTable[0x102];
+int32_t g_atanTable[0x102];
 
 // A quarter wave of sines (2.29 fixed point, 1024 steps to the circle) and the arctangents of
 // 0 to 1 in 256 steps (16.16 degrees), each padded with two copies of its last value.
-MechS32 InitSinAtanTables(void)
+int32_t InitSinAtanTables(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x100; i++) {
-		g_sinTable[i] = (MechS32) (sin(i * (3.14159265 / 512)) * 536870912.0);
-		g_atanTable[i] = (MechS32) (atan(i / 256.0) * 3754936.210460003);
+		g_sinTable[i] = (int32_t) (sin(i * (3.14159265 / 512)) * 536870912.0);
+		g_atanTable[i] = (int32_t) (atan(i / 256.0) * 3754936.210460003);
 	}
 
 	g_sinTable[0x100] = g_sinTable[0x101] = 0x20000000;
@@ -73,54 +73,54 @@ MechS32 InitSinAtanTables(void)
 }
 
 // The cosines and sines of the angles whose tangents are 0 to 50 in steps of 1/16 (2.29).
-MechS32 InitSlopeTables(void)
+int32_t InitSlopeTables(void)
 {
-	MechS32 i;
-	MechDouble cosine;
+	int32_t i;
+	double cosine;
 
 	for (i = 0; i < 800; i++) {
-		g_slopeCosines[i] = (MechS32) ((cosine = 1.0 / sqrt(i / 16.0 * (i / 16.0) + 1.0)) * 536870912.0);
-		g_slopeSines[i] = (MechS32) (i / 16.0 * cosine * 536870912.0);
+		g_slopeCosines[i] = (int32_t) ((cosine = 1.0 / sqrt(i / 16.0 * (i / 16.0) + 1.0)) * 536870912.0);
+		g_slopeSines[i] = (int32_t) (i / 16.0 * cosine * 536870912.0);
 	}
 
 	return TRUE;
 }
 
 // The square roots of 0 to 1023 (6.10 fixed point).
-MechS32 InitSqrtTable(void)
+int32_t InitSqrtTable(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	g_sqrtTable = g_sqrtTableData;
 	for (i = 0; i < 0x400; i++) {
-		g_sqrtTable[i] = (MechS16) (sqrt(i) * 1024.0);
+		g_sqrtTable[i] = (int16_t) (sqrt(i) * 1024.0);
 	}
 
 	return TRUE;
 }
 
-MechS32 Hypot2D(MechS32 p_x, MechS32 p_y)
+int32_t Hypot2D(int32_t p_x, int32_t p_y)
 {
-	MechS32 length;
-	MechDouble x;
-	MechDouble y;
+	int32_t length;
+	double x;
+	double y;
 
 	x = p_x;
 	// The original assigned y inside the product, which C leaves unsequenced
 	y = p_y;
-	length = (MechS32) sqrt(y * y + x * x);
+	length = (int32_t) sqrt(y * y + x * x);
 	return length;
 }
 
 // Sets p_matrix to the rotation that points along (p_x, p_y, p_z).
-void BuildMatrixFromDirection(Matrix* p_matrix, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void BuildMatrixFromDirection(Matrix* p_matrix, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechDouble pitch;
-	MechDouble yaw;
+	double pitch;
+	double yaw;
 
 	yaw = atan2(p_x, p_z);
-	pitch = -asin(p_y / sqrt((MechDouble) p_x * p_x + (MechDouble) p_y * p_y + (MechDouble) p_z * p_z));
-	BuildMatrix(p_matrix, (MechS32) (pitch * 3754939.378), (MechS32) (yaw * 3754939.378), 0, 0, 0, 0);
+	pitch = -asin(p_y / sqrt((double) p_x * p_x + (double) p_y * p_y + (double) p_z * p_z));
+	BuildMatrix(p_matrix, (int32_t) (pitch * 3754939.378), (int32_t) (yaw * 3754939.378), 0, 0, 0, 0);
 }
 
 // Normalizes the rows and columns of the rotation (2.29 fixed point).
@@ -135,19 +135,19 @@ void NormalizeRotation(Matrix* p_matrix)
 }
 
 // Scales (*p_x, *p_y, *p_z) to length p_length.
-void ScaleVectorToLength(MechS32 p_length, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void ScaleVectorToLength(int32_t p_length, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
-	MechDouble scale;
-	MechDouble x;
-	MechDouble y;
-	MechDouble z;
+	double scale;
+	double x;
+	double y;
+	double z;
 
 	x = *p_x;
 	y = *p_y;
 	z = *p_z;
-	*p_x = (MechS32) ((scale = p_length / sqrt(x * x + y * y + z * z)) * x);
-	*p_y = (MechS32) (y * scale);
-	*p_z = (MechS32) (z * scale);
+	*p_x = (int32_t) ((scale = p_length / sqrt(x * x + y * y + z * z)) * x);
+	*p_y = (int32_t) (y * scale);
+	*p_z = (int32_t) (z * scale);
 }
 
 void FirstClock(void)
@@ -233,12 +233,12 @@ void StopTimers(void)
 	}
 }
 
-MechS32 GetGameClock(void)
+int32_t GetGameClock(void)
 {
 	return GetTicks(g_clockHandle);
 }
 
-MechS32 GetTicksSinceSync(void)
+int32_t GetTicksSinceSync(void)
 {
 	return GetTicks(g_syncTicksHandle);
 }
@@ -256,7 +256,7 @@ void ResetClocks(void)
 	g_currentClock = g_previousClock = 0;
 }
 
-MechS32 GetRealClock(void)
+int32_t GetRealClock(void)
 {
 	return GetTicks(g_realClockHandle);
 }

@@ -14,16 +14,16 @@ struct MenuPage;
 typedef void (*MenuItemRunFn)(
 	struct MenuDefinition* p_menu,
 	struct MenuControl* p_control,
-	MechS32 p_index,
+	int32_t p_index,
 	Point p_pos,
 	struct MenuPage* p_page
 );
 
 // An item of a menu page.
 typedef struct MenuItem {
-	MechS32 m_type; // 0x00 — 0: opens m_subpage, 2: accepts (and goes back), 3: a heading without a
+	int32_t m_type; // 0x00 — 0: opens m_subpage, 2: accepts (and goes back), 3: a heading without a
 					// number, 5 and 6: close the page (ApplyMenuKey)
-	MechChar* m_text;              // 0x04
+	char* m_text;                  // 0x04
 	MenuItemRunFn m_run;           // 0x08
 	struct MenuControl* m_control; // 0x0c — passed to m_run
 	struct MenuPage* m_subpage;    // 0x10

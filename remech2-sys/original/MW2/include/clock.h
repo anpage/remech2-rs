@@ -10,47 +10,47 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_slopeSines[800];
-	extern MechS32 g_slopeCosines[800];
-	extern MechS32 g_currentClock;
-	extern MechS32 g_framerateLimit;
-	extern MechS32 g_timeExpansionEnabled;
-	extern MechS32 g_timeCompressionEnabled;
-	extern MechS32 g_realClock;
-	extern MechS32 g_clockMode;
-	extern MechS32 g_deltaTime;
-	extern MechS32 g_ticksTimerInitialized;
-	extern MechS16* g_sqrtTable;
-	extern MechS32 g_sinTable[0x102];
-	extern MechS16 g_sqrtTableData[0x400];
-	extern MechS32 g_atanTable[0x102];
-	extern MechS32 g_clockPaused;
-	extern MechS32 g_clockHandle;
-	extern MechS32 g_syncTicksHandle;
-	extern MechS32 g_realClockHandle;
-	extern MechS32 g_previousClock;
-	extern MechS32 g_clockModeBeforePause;
+	extern int32_t g_slopeSines[800];
+	extern int32_t g_slopeCosines[800];
+	extern int32_t g_currentClock;
+	extern int32_t g_framerateLimit;
+	extern int32_t g_timeExpansionEnabled;
+	extern int32_t g_timeCompressionEnabled;
+	extern int32_t g_realClock;
+	extern int32_t g_clockMode;
+	extern int32_t g_deltaTime;
+	extern int32_t g_ticksTimerInitialized;
+	extern int16_t* g_sqrtTable;
+	extern int32_t g_sinTable[0x102];
+	extern int16_t g_sqrtTableData[0x400];
+	extern int32_t g_atanTable[0x102];
+	extern int32_t g_clockPaused;
+	extern int32_t g_clockHandle;
+	extern int32_t g_syncTicksHandle;
+	extern int32_t g_realClockHandle;
+	extern int32_t g_previousClock;
+	extern int32_t g_clockModeBeforePause;
 
-	MechS32 InitSinAtanTables(void);
-	MechS32 InitSlopeTables(void);
-	MechS32 InitSqrtTable(void);
-	MechS32 Hypot2D(MechS32 p_x, MechS32 p_y);
-	void BuildMatrixFromDirection(Matrix* p_matrix, MechS32 p_x, MechS32 p_y, MechS32 p_z);
+	int32_t InitSinAtanTables(void);
+	int32_t InitSlopeTables(void);
+	int32_t InitSqrtTable(void);
+	int32_t Hypot2D(int32_t p_x, int32_t p_y);
+	void BuildMatrixFromDirection(Matrix* p_matrix, int32_t p_x, int32_t p_y, int32_t p_z);
 	void NormalizeRotation(Matrix* p_matrix);
-	void ScaleVectorToLength(MechS32 p_length, MechS32* p_x, MechS32* p_y, MechS32* p_z);
+	void ScaleVectorToLength(int32_t p_length, int32_t* p_x, int32_t* p_y, int32_t* p_z);
 	void FirstClock(void);
 	// Implemented on the Rust side (src/sim/timing.rs), around NextClockC
 	void NextClock(void);
 	void NextClockC(void);
 	// Implemented on the Rust side (src/sim/timing.rs)
-	MechS32 CrossedIdealFrame(void);
-	MechS32 IdealFrameTicks(void);
+	int32_t CrossedIdealFrame(void);
+	int32_t IdealFrameTicks(void);
 	void StopTimers(void);
-	MechS32 GetGameClock(void);
-	MechS32 GetTicksSinceSync(void);
+	int32_t GetGameClock(void);
+	int32_t GetTicksSinceSync(void);
 	void ResetSyncTicks(void);
 	void ResetClocks(void);
-	MechS32 GetRealClock(void);
+	int32_t GetRealClock(void);
 
 #ifdef __cplusplus
 }

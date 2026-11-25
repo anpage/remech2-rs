@@ -8,9 +8,9 @@
 // The texture a polygon maps (VFXREND.H's VFX_TEXTURE): the table of row ("V-baseline") addresses
 // and the tiling limits (DrawTexturedPolygon sets both to the texture's height).
 typedef struct VFX_TEXTURE {
-	MechU8** m_vAddrs; // 0x00
-	MechS32 m_width;   // 0x04
-	MechS32 m_height;  // 0x08
+	uint8_t** m_vAddrs; // 0x00
+	int32_t m_width;    // 0x04
+	int32_t m_height;   // 0x08
 } VFX_TEXTURE;
 
 // VFXREND, Miles Design VFX's polygon renderer, reimplemented in C (common/src/vfxrend.c), which
@@ -25,26 +25,26 @@ extern "C"
 {
 #endif
 
-	void VFX_set_Gouraud_dither_level(MechS32 p_dither1, MechS32 p_dither2);
-	MechS32 GetCodeBlock(undefined4* p_start, undefined4* p_selector);
+	void VFX_set_Gouraud_dither_level(int32_t p_dither1, int32_t p_dither2);
+	int32_t GetCodeBlock(undefined4* p_start, undefined4* p_selector);
 	void VFX_polygon_render(
 		PANE* p_pane,
-		MechU32* p_vlist,
-		MechS32 p_nvertices,
-		MechS32 p_operation,
+		uint32_t* p_vlist,
+		int32_t p_nvertices,
+		int32_t p_operation,
 		undefined4 p_color,
 		VFX_TEXTURE* p_texture,
 		void* p_cueing,
 		void* p_translucency
 	);
-	MechS32 F16_div_to_F30(MechS32 p_dividend, MechS32 p_divisor);
-	MechS32 F30_reciprocal(MechS32 p_value);
-	MechS32 mul_F30(MechS32 p_m1, MechS32 p_m2);
+	int32_t F16_div_to_F30(int32_t p_dividend, int32_t p_divisor);
+	int32_t F30_reciprocal(int32_t p_value);
+	int32_t mul_F30(int32_t p_m1, int32_t p_m2);
 	void VFX_polygon_clip_XY_and_render(
 		PANE* p_pane,
-		MechU32* p_vlist,
-		MechS32 p_nvertices,
-		MechS32 p_operation,
+		uint32_t* p_vlist,
+		int32_t p_nvertices,
+		int32_t p_operation,
 		undefined4 p_color,
 		VFX_TEXTURE* p_texture,
 		void* p_cueing,

@@ -41,43 +41,43 @@
 #include <strings.h>
 
 void SendStateMsg(void);
-void ReceiveChatMsg(NetChatMsg* p_msg, MechS32 p_slot);
-void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot);
+void ReceiveChatMsg(NetChatMsg* p_msg, int32_t p_slot);
+void ReceiveStateMsg(NetStateMsg* p_msg, int32_t p_slot);
 void SendWeaponsMsg(void);
-void ReceiveWeaponsMsg(NetWeaponsMsg* p_msg, MechS32 p_slot);
-void ReceiveCollisionMsg(NetCollisionMsg* p_msg, MechS32 p_slot);
+void ReceiveWeaponsMsg(NetWeaponsMsg* p_msg, int32_t p_slot);
+void ReceiveCollisionMsg(NetCollisionMsg* p_msg, int32_t p_slot);
 void SendGoMsg(void);
-void ReceiveGoMsg(MechChar* p_msg, MechS32 p_slot);
+void ReceiveGoMsg(char* p_msg, int32_t p_slot);
 void SendThingsMsg(void);
-void ReceiveThingsMsg(MechU8* p_msg, MechS32 p_slot);
-void ReceiveSuccessMsg(MechChar* p_msg, MechS32 p_slot);
+void ReceiveThingsMsg(uint8_t* p_msg, int32_t p_slot);
+void ReceiveSuccessMsg(char* p_msg, int32_t p_slot);
 BOOL PASCAL CountPlayersCallback(DPID p_id, LPSTR p_friendlyName, LPSTR p_formalName, DWORD p_flags, LPVOID p_context);
 BOOL PASCAL FindSessionCallback(LPDPSESSIONDESC p_desc, LPVOID p_context, LPDWORD p_timeout, DWORD p_flags);
 BOOL PASCAL FindIpxProviderCallback(LPGUID p_guid, LPSTR p_name, DWORD p_major, DWORD p_minor, LPVOID p_context);
-MechS32 FindSession(LPDPSESSIONDESC p_desc);
+int32_t FindSession(LPDPSESSIONDESC p_desc);
 
-MechS32 g_stateInterval = 36;
+int32_t g_stateInterval = 36;
 
 // The number of players of a network game, or 0.
-MechS32 g_isNetworkGame = 0;
+int32_t g_isNetworkGame = 0;
 
-MechChar* g_sessionName = NULL;
+char* g_sessionName = NULL;
 
 // Set when this tick's messages brought the master's clock.
-MechS16 g_clockSynced = 0;
+int16_t g_clockSynced = 0;
 
 // Set when the shell launched the game with its own DirectPlay session.
-MechS16 g_launchedByShell = 0;
+int16_t g_launchedByShell = 0;
 
-MechS32 g_stateCount = 0;
+int32_t g_stateCount = 0;
 
-MechS32 g_messagesReceived = 0;
+int32_t g_messagesReceived = 0;
 
-MechS32 g_unrecognizedMessages = 0;
+int32_t g_unrecognizedMessages = 0;
 
-MechS32 g_successSent = 0;
+int32_t g_successSent = 0;
 
-MechS16 g_gameStarted = 0;
+int16_t g_gameStarted = 0;
 
 NetLaunchInfo* g_netLaunch = NULL;
 
@@ -89,15 +89,15 @@ NetWeaponsMsg* g_weaponsMsg = NULL;
 
 // SN: the game things destroyed so far. After the tag, the sender's g_stateCount (an older
 // message is ignored) and a bit for each thing, the first in the high bit of the first byte.
-MechU8* g_thingsMsg = NULL;
+uint8_t* g_thingsMsg = NULL;
 
 NetChatMsg* g_chatMsg = NULL;
 
 // 1 while the network runs, 2 once it has stopped.
-MechS32 g_netState = 0;
+int32_t g_netState = 0;
 
 // 0 alone, 1 the master (it keeps the clock), 2 a slave.
-MechS32 g_netRole = 0;
+int32_t g_netRole = 0;
 
 GUID g_sessionGuid = {0x5a237e00, 0xea03, 0x11ce, {0x97, 0xdc, 0x00, 0x20, 0xaf, 0x24, 0xc6, 0x4a}};
 
@@ -110,32 +110,32 @@ DPID g_masterDpid = 0;
 
 LPGUID g_serviceProvider = NULL;
 
-MechS32 g_nextStateTime = 0;
+int32_t g_nextStateTime = 0;
 
-MechChar* g_netRecvBuffer;
+char* g_netRecvBuffer;
 
-MechU32 g_stateMsgSize;
+uint32_t g_stateMsgSize;
 
 // When each player was last heard from.
-MechS32 g_lastHeard[8];
+int32_t g_lastHeard[8];
 
 // The clock of each player's last state message.
-MechS32 g_lastStateClock[8];
+int32_t g_lastStateClock[8];
 
-MechS8 g_playerReady[8];
+int8_t g_playerReady[8];
 
-MechS32 g_playersFound;
+int32_t g_playersFound;
 
-MechU32 g_thingsMsgSize;
+uint32_t g_thingsMsgSize;
 
-MechS8 g_playerDestroyed[8];
+int8_t g_playerDestroyed[8];
 
 // The count of each player's last things message.
-MechS32 g_lastThingsCount[8];
+int32_t g_lastThingsCount[8];
 
-MechS32 GetPlayerSlotFromNetId(DPID p_id)
+int32_t GetPlayerSlotFromNetId(DPID p_id)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (g_netLaunch) {
 		for (i = 0; i < 8; i++) {
@@ -153,7 +153,7 @@ MechS32 GetPlayerSlotFromNetId(DPID p_id)
 
 void FirstNetwork(NetLaunchInfo* p_netLaunch)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (!g_isNetworkGame) {
 		g_goLaunch |= 1;
@@ -196,19 +196,19 @@ void FirstNetwork(NetLaunchInfo* p_netLaunch)
 	}
 }
 
-MechS32 FirstExternalCtrl(void)
+int32_t FirstExternalCtrl(void)
 {
 	return 1;
 }
 
-MechS32 UpdateNetwork(void)
+int32_t UpdateNetwork(void)
 {
-	MechChar text[80];
+	char text[80];
 	Player* player;
 	DPID from;
-	MechS32 i;
-	MechChar tag[3];
-	MechS32 slot;
+	int32_t i;
+	char tag[3];
+	int32_t slot;
 
 	if (g_netState != 1) {
 		return 1;
@@ -257,7 +257,7 @@ MechS32 UpdateNetwork(void)
 			ReceiveGoMsg(g_netRecvBuffer, slot);
 		}
 		else if (strcasecmp(tag, "SN") == 0) {
-			ReceiveThingsMsg((MechU8*) g_netRecvBuffer, slot);
+			ReceiveThingsMsg((uint8_t*) g_netRecvBuffer, slot);
 		}
 		else if (strcasecmp(tag, "SU") == 0) {
 			ReceiveSuccessMsg(g_netRecvBuffer, slot);
@@ -343,9 +343,9 @@ void ShutdownNetwork(void)
 void SendStateMsg(void)
 {
 	Player* player;
-	MechU32 thing;
+	uint32_t thing;
 	Mech* mech;
-	MechS32 i;
+	int32_t i;
 	MechSection* section;
 	PlayerSteering* steering;
 
@@ -428,15 +428,15 @@ void SendStateMsg(void)
 		g_stateMsg->m_internal[i] = section->m_internal;
 	}
 
-	NetSend((MechU8*) g_stateMsg, g_stateMsgSize);
+	NetSend((uint8_t*) g_stateMsg, g_stateMsgSize);
 }
 
 // Sends a chat line to player p_to, or to the players of side 1 (-3), those of side 0 (-2) or
 // everybody (-1). Fails on a line of 80 characters or more.
-MechS32 SendChatMsg(MechS32 p_to, MechChar* p_text)
+int32_t SendChatMsg(int32_t p_to, char* p_text)
 {
-	MechS32 i;
-	MechU32 size;
+	int32_t i;
+	uint32_t size;
 
 	size = strlen(p_text);
 	if (size >= 80) {
@@ -448,7 +448,7 @@ MechS32 SendChatMsg(MechS32 p_to, MechChar* p_text)
 	strcpy(g_chatMsg->m_text, p_text);
 	switch (p_to) {
 	case -1:
-		NetSend((MechU8*) g_chatMsg, size);
+		NetSend((uint8_t*) g_chatMsg, size);
 		break;
 	case -2:
 		for (i = 0; i < 8; i++) {
@@ -472,9 +472,9 @@ MechS32 SendChatMsg(MechS32 p_to, MechChar* p_text)
 	return 1;
 }
 
-void ReceiveChatMsg(NetChatMsg* p_msg, MechS32 p_slot)
+void ReceiveChatMsg(NetChatMsg* p_msg, int32_t p_slot)
 {
-	MechChar text[100];
+	char text[100];
 
 	if (g_players[p_slot] == NULL) {
 		return;
@@ -487,18 +487,18 @@ void ReceiveChatMsg(NetChatMsg* p_msg, MechS32 p_slot)
 }
 
 // Applies a player's state message.
-void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
+void ReceiveStateMsg(NetStateMsg* p_msg, int32_t p_slot)
 {
-	MechChar text2[40];
-	MechChar text[40];
+	char text2[40];
+	char text[40];
 	MechSection* section;
-	MechS32 i;
+	int32_t i;
 	Mech* mech;
-	MechU32 levels;
-	MechU32 thing;
+	uint32_t levels;
+	uint32_t thing;
 	Player* player;
-	MechS32 damage2;
-	MechS32 damage1;
+	int32_t damage2;
+	int32_t damage1;
 	NetStateMsg* msg;
 
 	damage1 = 0;
@@ -609,7 +609,7 @@ void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 			levels = (section->m_flags & 0xf0) >> 4;
 			if (levels) {
 				damage2 = 15 - ((section->m_internal + section->m_armor[1] / g_localArmorPerLevel) * 3) /
-								   (MechS32) (levels << 16);
+								   (int32_t) (levels << 16);
 			}
 			break;
 		case 3:
@@ -617,7 +617,7 @@ void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 			levels = (section->m_flags & 0xf0) >> 4;
 			if (levels) {
 				damage2 = 15 - ((section->m_internal + section->m_armor[1] / g_localArmorPerLevel) * 3) /
-								   (MechS32) (levels << 16);
+								   (int32_t) (levels << 16);
 			}
 			break;
 		case 2:
@@ -625,7 +625,7 @@ void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 			levels = (section->m_flags & 0xf0) >> 4;
 			if (levels) {
 				damage2 = 15 - ((section->m_internal + section->m_armor[1] / g_localArmorPerLevel) * 3) /
-								   (MechS32) (levels << 16);
+								   (int32_t) (levels << 16);
 			}
 			break;
 		default:
@@ -635,7 +635,7 @@ void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 		levels = section->m_flags & 0xf;
 		if (levels) {
 			damage1 = 15 - ((section->m_internal + section->m_armor[0] / g_localArmorPerLevel) * 3) /
-							   (MechS32) (levels << 16);
+							   (int32_t) (levels << 16);
 		}
 
 		RaisePartDamageLevel(mech->m_player->m_obj, damage2 > damage1 ? damage2 : damage1, i + 1);
@@ -681,7 +681,7 @@ void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 void SendWeaponsMsg(void)
 {
 	Player* player;
-	MechS32 i;
+	int32_t i;
 
 	memcpy(g_weaponsMsg->m_tag, "WE", 2);
 	player = g_players[g_localPlayerId];
@@ -695,18 +695,18 @@ void SendWeaponsMsg(void)
 	}
 
 	if (g_weaponsMsg->m_weapons) {
-		NetSend((MechU8*) g_weaponsMsg, sizeof(NetWeaponsMsg));
+		NetSend((uint8_t*) g_weaponsMsg, sizeof(NetWeaponsMsg));
 	}
 }
 
 // Fires the weapons of a player's weapons message.
-void ReceiveWeaponsMsg(NetWeaponsMsg* p_msg, MechS32 p_slot)
+void ReceiveWeaponsMsg(NetWeaponsMsg* p_msg, int32_t p_slot)
 {
 	Player* player;
 	NetWeaponsMsg* msg;
-	MechU32 bit;
+	uint32_t bit;
 	Mech* mech;
-	MechS32 i;
+	int32_t i;
 
 	msg = p_msg;
 	if (msg->m_player == g_localPlayerId) {
@@ -728,7 +728,7 @@ void ReceiveWeaponsMsg(NetWeaponsMsg* p_msg, MechS32 p_slot)
 }
 
 // Sends player p_slot a collision push along the normal (p_x, p_y, p_z).
-void SendCollisionMsg(MechS32 p_slot, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void SendCollisionMsg(int32_t p_slot, int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	Mech* mech;
 	NetCollisionMsg* msg;
@@ -746,9 +746,9 @@ void SendCollisionMsg(MechS32 p_slot, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 }
 
 // Applies a collision push from player p_slot to the local mech.
-void ReceiveCollisionMsg(NetCollisionMsg* p_msg, MechS32 p_slot)
+void ReceiveCollisionMsg(NetCollisionMsg* p_msg, int32_t p_slot)
 {
-	MechS32 volume;
+	int32_t volume;
 	Mech* mech;
 	NetCollisionMsg* msg;
 
@@ -777,18 +777,18 @@ void ReceiveCollisionMsg(NetCollisionMsg* p_msg, MechS32 p_slot)
 // Sends GO: a slave is ready, or the master starts the game.
 void SendGoMsg(void)
 {
-	MechChar msg[] = "GO";
+	char msg[] = "GO";
 
-	NetSend((MechU8*) msg, 2);
+	NetSend((uint8_t*) msg, 2);
 	if (g_netRole == 1) {
 		g_goLaunch |= 1;
 		g_gameStarted = 1;
 	}
 }
 
-void ReceiveGoMsg(MechChar* p_msg, MechS32 p_slot)
+void ReceiveGoMsg(char* p_msg, int32_t p_slot)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (p_slot == g_localPlayerId) {
 		return;
@@ -815,16 +815,16 @@ void ReceiveGoMsg(MechChar* p_msg, MechS32 p_slot)
 // Sends the game things destroyed so far.
 void SendThingsMsg(void)
 {
-	MechU8* out;
-	MechS32 i;
-	MechS32 count;
-	MechU8 bits;
+	uint8_t* out;
+	int32_t i;
+	int32_t count;
+	uint8_t bits;
 
 	count = 0;
 	bits = 0;
 	out = g_thingsMsg + 2;
 	memcpy(g_thingsMsg, "SN", 2);
-	*(MechS32*) out = g_stateCount;
+	*(int32_t*) out = g_stateCount;
 	out += 4;
 	for (i = 0; i < 254; i++) {
 		bits <<= 1;
@@ -845,17 +845,17 @@ void SendThingsMsg(void)
 }
 
 // Destroys the game things a player's things message has destroyed.
-void ReceiveThingsMsg(MechU8* p_msg, MechS32 p_slot)
+void ReceiveThingsMsg(uint8_t* p_msg, int32_t p_slot)
 {
-	MechU8* in;
-	MechS32 msgCount;
-	MechS32 i;
-	MechS32 count;
-	MechU8 bits;
+	uint8_t* in;
+	int32_t msgCount;
+	int32_t i;
+	int32_t count;
+	uint8_t bits;
 
 	count = 0;
 	in = p_msg + 2;
-	msgCount = *(MechS32*) in;
+	msgCount = *(int32_t*) in;
 	in += 4;
 	if (g_lastThingsCount[p_slot] >= msgCount) {
 		return;
@@ -881,17 +881,17 @@ void ReceiveThingsMsg(MechU8* p_msg, MechS32 p_slot)
 // Sends SU once: the local player's objectives succeeded.
 void SendSuccessMsg(void)
 {
-	MechChar msg[] = "SU";
+	char msg[] = "SU";
 
 	if (!g_successSent) {
-		NetSend((MechU8*) msg, 2);
+		NetSend((uint8_t*) msg, 2);
 		g_successSent = 1;
 	}
 }
 
-void ReceiveSuccessMsg(MechChar* p_msg, MechS32 p_slot)
+void ReceiveSuccessMsg(char* p_msg, int32_t p_slot)
 {
-	MechChar text[80];
+	char text[80];
 
 	if (p_slot == g_localPlayerId) {
 		return;
@@ -941,7 +941,7 @@ BOOL PASCAL FindIpxProviderCallback(LPGUID p_guid, LPSTR p_name, DWORD p_major, 
 }
 
 // Looks for the session named g_sessionName, into p_desc.
-MechS32 FindSession(LPDPSESSIONDESC p_desc)
+int32_t FindSession(LPDPSESSIONDESC p_desc)
 {
 	HRESULT result;
 	DPSESSIONDESC desc;
@@ -961,7 +961,7 @@ MechS32 FindSession(LPDPSESSIONDESC p_desc)
 	return 0;
 }
 
-MechS32 StartExternalIO(NetLaunchInfo* p_netLaunch)
+int32_t StartExternalIO(NetLaunchInfo* p_netLaunch)
 {
 	HRESULT result;
 	DPSESSIONDESC desc;
@@ -1062,14 +1062,14 @@ MechS32 StartExternalIO(NetLaunchInfo* p_netLaunch)
 }
 
 // Sends SS and leaves the session, then stops the network.
-MechS32 StopExternalIO(void)
+int32_t StopExternalIO(void)
 {
-	MechChar msg[] = "SS";
+	char msg[] = "SS";
 
 	if (!g_launchedByShell) {
 		if (g_directPlay && g_localDpid) {
 			if (g_netRole) {
-				NetSend((MechU8*) msg, 2);
+				NetSend((uint8_t*) msg, 2);
 			}
 
 			g_directPlay->lpVtbl->DestroyPlayer(g_directPlay, g_localDpid);
@@ -1082,7 +1082,7 @@ MechS32 StopExternalIO(void)
 		}
 	}
 	else if (g_directPlay && g_localDpid && g_netRole) {
-		NetSend((MechU8*) msg, 2);
+		NetSend((uint8_t*) msg, 2);
 	}
 
 	if (g_netState != 1) {

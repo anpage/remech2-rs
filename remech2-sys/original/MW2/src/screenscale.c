@@ -28,13 +28,13 @@ Point g_textMargins = {0x28f, 0x28f};
 
 // DrawPulsingFrame's state: the frame's inset (1 or 2, alternating each call), its color (0xf0
 // to 0xf7 and back), when the color last stepped and its step.
-MechS32 g_pulseInset = 0;
+int32_t g_pulseInset = 0;
 
-MechS32 g_pulseColor = 0xf0;
+int32_t g_pulseColor = 0xf0;
 
-MechS32 g_pulseTime = 0;
+int32_t g_pulseTime = 0;
 
-MechS32 g_pulseStep = 0;
+int32_t g_pulseStep = 0;
 
 // ScaleRectToScreen, ScaleBoundsToScreen, ScalePointToScreen and CenterRectOnScreen are
 // implemented on the Rust side (src/sim/window.rs). In widescreen they place the HUD in a 4:3 box
@@ -43,8 +43,8 @@ MechS32 g_pulseStep = 0;
 // Maps 16.16 fractions of p_frame onto pixels.
 PANE* ScaleRectToFrame(PANE* p_frame, PANE* p_src, PANE* p_dst)
 {
-	MechS32 width;
-	MechS32 height;
+	int32_t width;
+	int32_t height;
 
 	width = p_frame->m_x1 - p_frame->m_x0;
 	height = p_frame->m_y1 - p_frame->m_y0;
@@ -63,8 +63,8 @@ PANE* ScaleRectToFrame(PANE* p_frame, PANE* p_src, PANE* p_dst)
 // ScaleRectToFrame, it doesn't add the frame's origin).
 Rect* ScaleBoundsToFrame(PANE* p_frame, Rect* p_src, Rect* p_dst)
 {
-	MechS32 width;
-	MechS32 height;
+	int32_t width;
+	int32_t height;
 
 	width = p_frame->m_x1 - p_frame->m_x0;
 	height = p_frame->m_y1 - p_frame->m_y0;
@@ -78,8 +78,8 @@ Rect* ScaleBoundsToFrame(PANE* p_frame, Rect* p_src, Rect* p_dst)
 // Maps a point in 16.16 fractions of p_frame's size onto pixels, relative to the frame.
 Point* ScalePointToFrame(PANE* p_frame, Point* p_src, Point* p_dst)
 {
-	MechS32 width;
-	MechS32 height;
+	int32_t width;
+	int32_t height;
 
 	width = p_frame->m_x1 - p_frame->m_x0;
 	height = p_frame->m_y1 - p_frame->m_y0;
@@ -90,9 +90,9 @@ Point* ScalePointToFrame(PANE* p_frame, Point* p_src, Point* p_dst)
 
 // Scales 16.16 fractions to 320x200 (low resolution) coordinates, correcting the height for the aspect ratio
 // p_aspect (16.16, 0xd555 = 5:6 for none).
-PANE* ScaleRectToLowRes(PANE* p_rect, MechS32 p_aspect)
+PANE* ScaleRectToLowRes(PANE* p_rect, int32_t p_aspect)
 {
-	MechS32 scale;
+	int32_t scale;
 
 	scale = FixedDiv16(p_aspect, 0xd555);
 	p_rect->m_x0 = FixedMul16(p_rect->m_x0, 319);
@@ -133,8 +133,8 @@ Point* ScalePointFromLowRes(Point* p_src, Point* p_dst)
 // Scales p_src about its center by p_scale (16.16).
 PANE* ScaleRectAboutCenter(PANE* p_src, PANE* p_dst, Point p_scale)
 {
-	MechS32 centerX;
-	MechS32 centerY;
+	int32_t centerX;
+	int32_t centerY;
 
 	centerX = ((p_src->m_x1 - p_src->m_x0 + 1) >> 1) + p_src->m_x0;
 	centerY = ((p_src->m_y1 - p_src->m_y0 + 1) >> 1) + p_src->m_y0;
@@ -154,9 +154,9 @@ PANE* ScaleRectAboutCenter(PANE* p_src, PANE* p_dst, Point p_scale)
 }
 
 // Scales p_src about its center to the size of a shape frame.
-PANE* FitRectToShape(PANE* p_src, PANE* p_dst, void* p_shape, MechS32 p_frame)
+PANE* FitRectToShape(PANE* p_src, PANE* p_dst, void* p_shape, int32_t p_frame)
 {
-	MechS32 size;
+	int32_t size;
 	Point scale;
 
 	size = VFX_shape_bounds(p_shape, p_frame);
@@ -171,7 +171,7 @@ PANE* FitRectToShape(PANE* p_src, PANE* p_dst, void* p_shape, MechS32 p_frame)
 // Scales p_src about its center to the size of a shape.
 PANE* FitRectToGif(PANE* p_src, PANE* p_dst, void* p_shape)
 {
-	MechS32 size;
+	int32_t size;
 	Point scale;
 
 	size = VFX_GIF_resolution(p_shape);
@@ -184,10 +184,10 @@ PANE* FitRectToGif(PANE* p_src, PANE* p_dst, void* p_shape)
 }
 
 // Outlines a pane.
-void OutlinePane(PANE* p_target, MechS32 p_color)
+void OutlinePane(PANE* p_target, int32_t p_color)
 {
-	MechS32 width;
-	MechS32 height;
+	int32_t width;
+	int32_t height;
 
 	width = p_target->m_x1 - p_target->m_x0;
 	height = p_target->m_y1 - p_target->m_y0;
@@ -198,10 +198,10 @@ void OutlinePane(PANE* p_target, MechS32 p_color)
 }
 
 // Draws a line across the pane under a line of text at p_pos.
-void DrawRuleUnderRow(PANE* p_target, Point p_pos, void* p_font, MechS32 p_color)
+void DrawRuleUnderRow(PANE* p_target, Point p_pos, void* p_font, int32_t p_color)
 {
-	MechS32 height;
-	MechS32 width;
+	int32_t height;
+	int32_t width;
 
 	height = VFX_font_height(p_font);
 	p_pos.m_x = 0;
@@ -211,11 +211,11 @@ void DrawRuleUnderRow(PANE* p_target, Point p_pos, void* p_font, MechS32 p_color
 }
 
 // Underlines text drawn at p_pos.
-void UnderlineText(PANE* p_target, MechChar* p_text, Point p_pos, void* p_font, MechS32 p_color)
+void UnderlineText(PANE* p_target, char* p_text, Point p_pos, void* p_font, int32_t p_color)
 {
-	MechS32 width;
-	MechS32 height;
-	MechU32 i;
+	int32_t width;
+	int32_t height;
+	uint32_t i;
 
 	width = 0;
 	height = VFX_font_height(p_font);
@@ -228,15 +228,15 @@ void UnderlineText(PANE* p_target, MechChar* p_text, Point p_pos, void* p_font, 
 }
 
 // Draws a box around text drawn at p_pos.m_x, p_pos.m_y.
-void BoxText(PANE* p_target, MechChar* p_text, Point p_pos, void* p_font, MechS32 p_color)
+void BoxText(PANE* p_target, char* p_text, Point p_pos, void* p_font, int32_t p_color)
 {
-	MechS32 left;
-	MechS32 top;
-	MechS32 bottom;
-	MechS32 right;
-	MechS32 height;
-	MechS32 width;
-	MechU32 i;
+	int32_t left;
+	int32_t top;
+	int32_t bottom;
+	int32_t right;
+	int32_t height;
+	int32_t width;
+	uint32_t i;
 
 	width = 0;
 	height = VFX_font_height(p_font);
@@ -255,19 +255,19 @@ void BoxText(PANE* p_target, MechChar* p_text, Point p_pos, void* p_font, MechS3
 }
 
 // Draws text word-wrapped into a pane, inside the margins, until it runs out of lines.
-void DrawWrappedText(PANE* p_target, MechChar* p_text, void* p_font)
+void DrawWrappedText(PANE* p_target, char* p_text, void* p_font)
 {
-	MechS32 x;
-	MechChar* line;
+	int32_t x;
+	char* line;
 	Point origin;
-	MechChar* end;
-	MechS32 length;
-	MechChar* breakAt;
-	MechS32 lineHeight;
-	MechChar* buffer;
-	MechChar* p;
-	MechS32 width;
-	MechS32 height;
+	char* end;
+	int32_t length;
+	char* breakAt;
+	int32_t lineHeight;
+	char* buffer;
+	char* p;
+	int32_t width;
+	int32_t height;
 
 	if (p_target == NULL || p_text == NULL || p_font == NULL) {
 		return;
@@ -334,14 +334,14 @@ void DrawWrappedText(PANE* p_target, MechChar* p_text, void* p_font)
 }
 
 // Sizes p_rect to fit a block of text, lines separated by newlines, plus the margins.
-PANE* FitRectToText(MechChar* p_text, void* p_font, PANE* p_rect)
+PANE* FitRectToText(char* p_text, void* p_font, PANE* p_rect)
 {
-	MechS32 lineWidth;
-	MechS32 lineHeight;
-	MechChar* c;
-	MechS32 maxWidth;
-	MechS32 height;
-	MechChar ch;
+	int32_t lineWidth;
+	int32_t lineHeight;
+	char* c;
+	int32_t maxWidth;
+	int32_t height;
+	char ch;
 
 	maxWidth = 0;
 	height = 0;
@@ -378,15 +378,15 @@ PANE* FitRectToText(MechChar* p_text, void* p_font, PANE* p_rect)
 
 // A pane and the colour PlotCenteredPixel draws into it.
 typedef struct CenteredDraw {
-	PANE* m_target; // 0x00
-	MechU8 m_color; // 0x04
+	PANE* m_target;  // 0x00
+	uint8_t m_color; // 0x04
 } CenteredDraw;
 
 // Plots a pixel of p_draw's colour at (p_width / 2, -p_height / 2) from the centre of its target
 // (16.16 fractions of the target), shows the frame, and returns FALSE if Esc was pressed.
-MechS32 PlotCenteredPixel(CenteredDraw* p_draw, MechS32 p_width, MechS32 p_height)
+int32_t PlotCenteredPixel(CenteredDraw* p_draw, int32_t p_width, int32_t p_height)
 {
-	MechS32 result;
+	int32_t result;
 	PANE* target;
 	Point pos;
 
@@ -439,17 +439,17 @@ void DrawPulsingFrame(PANE* p_target)
 }
 
 // Tiles a pane with a shape frame.
-void TilePane(PANE* p_target, void* p_shape, MechS32 p_frame)
+void TilePane(PANE* p_target, void* p_shape, int32_t p_frame)
 {
-	MechS32 size;
-	MechS32 tileWidth;
-	MechS32 tileHeight;
-	MechS32 columns;
-	MechS32 rows;
-	MechS32 row;
-	MechS32 column;
-	MechS32 x;
-	MechS32 y;
+	int32_t size;
+	int32_t tileWidth;
+	int32_t tileHeight;
+	int32_t columns;
+	int32_t rows;
+	int32_t row;
+	int32_t column;
+	int32_t x;
+	int32_t y;
 
 	x = 0;
 	y = 0;
@@ -475,9 +475,9 @@ void TilePane(PANE* p_target, void* p_shape, MechS32 p_frame)
 
 // Returns 1 if the line through (0, 0) and (p_dx, p_dy) is too steep for a 16.16 slope,
 // otherwise 0 with the slope in p_slope.
-MechS32 GetLineSlope(MechS32 p_dx, MechS32 p_dy, MechS32* p_slope)
+int32_t GetLineSlope(int32_t p_dx, int32_t p_dy, int32_t* p_slope)
 {
-	MechS32 steep;
+	int32_t steep;
 
 	if (p_dx == 0 || p_dy / p_dx > 0x7fff || p_dy / p_dx < -0x8000) {
 		steep = 1;
@@ -497,10 +497,10 @@ MechS32 GetLineSlope(MechS32 p_dx, MechS32 p_dy, MechS32* p_slope)
 Point* GetRectNeedleToward(PANE* p_target, Point* p_point, Point* p_out)
 {
 	GaugeQuadrant quadrant;
-	MechS32 slope;
+	int32_t slope;
 	Point half;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t dx;
+	int32_t dy;
 
 	half.m_x = (p_target->m_x1 - p_target->m_x0 + 1) >> 1;
 	half.m_y = (p_target->m_y1 - p_target->m_y0 + 1) >> 1;
@@ -523,13 +523,13 @@ Point* GetRectNeedleToward(PANE* p_target, Point* p_point, Point* p_out)
 
 // Where the needle from the center of a gauge rectangle at the heading p_angle (16.16 degrees)
 // leaves the rectangle.
-Point* GetRectNeedleAt(PANE* p_target, MechS32 p_angle, Point* p_out)
+Point* GetRectNeedleAt(PANE* p_target, int32_t p_angle, Point* p_out)
 {
 	GaugeQuadrant quadrant;
-	MechS32 slope;
+	int32_t slope;
 	Point half;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t dx;
+	int32_t dy;
 
 	p_angle = (p_angle % 0x1680000 + 0x1680000) % 0x1680000;
 	half.m_x = (p_target->m_x1 - p_target->m_x0 + 1) >> 1;
@@ -561,12 +561,12 @@ Point* GetRectNeedleAt(PANE* p_target, MechS32 p_angle, Point* p_out)
 
 // Where a line from the center of a rectangle (p_half: its half size) leaves it, for the
 // slope p_slope and the direction bits of p_quadrant (GetRectNeedleToward).
-Point* GetRectEdgeAtSlope(Point* p_half, GaugeQuadrant p_quadrant, MechS32 p_slope, Point* p_out)
+Point* GetRectEdgeAtSlope(Point* p_half, GaugeQuadrant p_quadrant, int32_t p_slope, Point* p_out)
 {
-	MechS32 height;
-	MechS32 width;
-	MechS32 ratio;
-	MechS32 negRatio;
+	int32_t height;
+	int32_t width;
+	int32_t ratio;
+	int32_t negRatio;
 	Point result;
 
 	width = p_half->m_x * 2;
@@ -639,13 +639,13 @@ Point* GetRectEdgeAtSlope(Point* p_half, GaugeQuadrant p_quadrant, MechS32 p_slo
 }
 
 // Draws the ellipse inscribed in a pane, corrected for the pixel aspect.
-void DrawGaugeEllipse(PANE* p_target, MechS32 p_color)
+void DrawGaugeEllipse(PANE* p_target, int32_t p_color)
 {
-	MechS32 centerX;
-	MechS32 centerY;
-	MechS32 radiusY;
-	MechS32 radius;
-	MechS32 aspect;
+	int32_t centerX;
+	int32_t centerY;
+	int32_t radiusY;
+	int32_t radius;
+	int32_t aspect;
 
 	aspect = g_eyepoint->m_pixelAspect;
 	centerX = (p_target->m_x1 - p_target->m_x0 + 1) >> 1;
@@ -656,14 +656,14 @@ void DrawGaugeEllipse(PANE* p_target, MechS32 p_color)
 }
 
 // Fills the part of the ellipse inscribed in a pane that lies in p_rect.
-void FillGaugeEllipse(PANE* p_target, Rect* p_rect, MechS32 p_color)
+void FillGaugeEllipse(PANE* p_target, Rect* p_rect, int32_t p_color)
 {
 	PANE clip;
-	MechS32 centerX;
-	MechS32 centerY;
-	MechS32 radiusY;
-	MechS32 radius;
-	MechS32 aspect;
+	int32_t centerX;
+	int32_t centerY;
+	int32_t radiusY;
+	int32_t radius;
+	int32_t aspect;
 
 	aspect = g_eyepoint->m_pixelAspect;
 	centerX = (p_target->m_x1 - p_target->m_x0 + 1) >> 1;
@@ -681,15 +681,15 @@ void FillGaugeEllipse(PANE* p_target, Rect* p_rect, MechS32 p_color)
 }
 
 // Tests whether a point lies inside the ellipse inscribed in a pane.
-MechS32 IsInsideGaugeEllipse(PANE* p_target, MechS32 p_x, MechS32 p_y)
+int32_t IsInsideGaugeEllipse(PANE* p_target, int32_t p_x, int32_t p_y)
 {
-	MechS32 centerX;
-	MechS32 centerY;
-	MechS32 radiusSquared;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 distanceSquared;
-	MechS32 aspect;
+	int32_t centerX;
+	int32_t centerY;
+	int32_t radiusSquared;
+	int32_t dx;
+	int32_t dy;
+	int32_t distanceSquared;
+	int32_t aspect;
 
 	aspect = g_eyepoint->m_pixelAspect;
 	centerX = (p_target->m_x1 - p_target->m_x0 + 1) >> 1;
@@ -705,11 +705,11 @@ MechS32 IsInsideGaugeEllipse(PANE* p_target, MechS32 p_x, MechS32 p_y)
 // Where the needle of the gauge ellipse towards p_point ends.
 Point* GetEllipseNeedleToward(PANE* p_target, Point* p_point, Point* p_out)
 {
-	MechS32 angle;
+	int32_t angle;
 	GaugeQuadrant quadrant;
 	Point half;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t dx;
+	int32_t dy;
 
 	half.m_x = (p_target->m_x1 - p_target->m_x0 + 1) >> 1;
 	half.m_y = (p_target->m_y1 - p_target->m_y0 + 1) >> 1;
@@ -739,13 +739,13 @@ Point* GetEllipseNeedleToward(PANE* p_target, Point* p_point, Point* p_out)
 }
 
 // Where the needle of the gauge ellipse at the heading p_angle (16.16 degrees) ends.
-Point* GetEllipseNeedleAt(PANE* p_target, MechS32 p_angle, Point* p_out)
+Point* GetEllipseNeedleAt(PANE* p_target, int32_t p_angle, Point* p_out)
 {
-	MechS32 angle;
+	int32_t angle;
 	GaugeQuadrant quadrant;
 	Point half;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t dx;
+	int32_t dy;
 
 	p_angle = (p_angle % 0x1680000 + 0x1680000) % 0x1680000;
 	half.m_x = (p_target->m_x1 - p_target->m_x0 + 1) >> 1;
@@ -782,10 +782,10 @@ Point* GetEllipseNeedleAt(PANE* p_target, MechS32 p_angle, Point* p_out)
 }
 
 // Where a needle of the gauge ellipse at p_angle ends, from p_center.
-Point* GetEllipseEdgeAtAngle(PANE* p_target, Point* p_center, GaugeQuadrant p_quadrant, MechS32 p_angle, Point* p_out)
+Point* GetEllipseEdgeAtAngle(PANE* p_target, Point* p_center, GaugeQuadrant p_quadrant, int32_t p_angle, Point* p_out)
 {
-	MechS32 radius;
-	MechS32 radiusY;
+	int32_t radius;
+	int32_t radiusY;
 	Point result;
 	Point center;
 

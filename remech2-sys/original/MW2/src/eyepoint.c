@@ -32,78 +32,78 @@
 
 // The track view's distance from the mech; UpdateFreeEyeView also starts the free camera that far
 // back from it.
-MechS32 g_trackDistance = 0;
+int32_t g_trackDistance = 0;
 
 // The track view's distance limits, height and turn around the mech (UpdateTrackView).
 
-MechS32 g_trackMinDistance = 0;
+int32_t g_trackMinDistance = 0;
 
-MechS32 g_trackMaxDistance = 0;
+int32_t g_trackMaxDistance = 0;
 
-MechS32 g_trackHeight = 0;
+int32_t g_trackHeight = 0;
 
-MechS32 g_trackTurn = 0xb40000;
+int32_t g_trackTurn = 0xb40000;
 
-MechS32 g_normalFov = 0x10000;
+int32_t g_normalFov = 0x10000;
 
-MechS32 g_zoomFov = 0x10000;
+int32_t g_zoomFov = 0x10000;
 
 // The view mode the camera was updated in last (c_view...), or -1.
-MechS32 g_viewMode = -1;
+int32_t g_viewMode = -1;
 
 // The view mode to return to from the ordinance view.
-MechS32 g_ordinanceReturnMode = -1;
+int32_t g_ordinanceReturnMode = -1;
 
 // The view mode FirstEyepoint starts the camera in.
-MechS32 g_initialViewMode = 0;
+int32_t g_initialViewMode = 0;
 
 // The view mode SetViewMode asked for; UpdateEyepoint switches to it.
-MechS32 g_requestedViewMode = 0;
+int32_t g_requestedViewMode = 0;
 
 // Set when a mech starts under the autopilot (mechclass.c); nothing reads it.
-MechS32 g_autopilotStart = 1;
+int32_t g_autopilotStart = 1;
 
 // Set while the cockpit view is placed at the eye (GetCockpitEyeView), not shaking: the HUD
 // draws the crosshair only then.
-MechS32 g_cockpitEyeSteady = 0;
+int32_t g_cockpitEyeSteady = 0;
 
 // Set while the camera is in the cockpit view: the cockpit's own shape (g_cockpitObject) is drawn
 // separately, and the 3D sound calls get it.
 undefined4 g_inCockpitView = 0;
 
 // The view mode SetViewMode forces once the local mech is lost (g_localMechLost): the track view.
-MechS32 g_lostViewMode = -1;
+int32_t g_lostViewMode = -1;
 
 // Set while a network game's lost player advances the viewpoint between players; until then the
 // track view circles the mech.
-MechS32 g_spectating = 0;
+int32_t g_spectating = 0;
 
 struct Player* g_localPlayer = NULL;
 
 // The player the camera tracks.
-MechS32 g_trackedPlayer = 0;
+int32_t g_trackedPlayer = 0;
 
 // The local mech's cockpit height and torso twist (InitCockpitPanels): the first raises the eye
 // (GetPlayerEyeView, the aim ray); nothing reads the second.
-MechS32* g_eyeHeightOffset = NULL;
+int32_t* g_eyeHeightOffset = NULL;
 
-MechS32* g_eyeTwist = NULL;
+int32_t* g_eyeTwist = NULL;
 
 // The drop camera (UpdateDropView): its vertical speed, acceleration and start clock.
-MechS32 g_dropSpeed = 0;
+int32_t g_dropSpeed = 0;
 
-MechS32 g_dropAcceleration = 0x3ca0;
+int32_t g_dropAcceleration = 0x3ca0;
 
-MechS32 g_dropStartClock = 0;
+int32_t g_dropStartClock = 0;
 
 // Set while no glance key is held (UpdateCockpitView).
-MechS8 g_glanceReleased = 0;
+int8_t g_glanceReleased = 0;
 
 // The view UpdateOrdinanceView saves when it enters the ordinance view.
-MechS32 g_ordinanceSavedView[7];
+int32_t g_ordinanceSavedView[7];
 
 // The track view's height limits (UpdateTrackView).
-MechS32 g_trackMaxHeight;
+int32_t g_trackMaxHeight;
 
 // The track view's eased offsets from the mech and its eased heading and pitch.
 Ramp g_trackOffsetZ;
@@ -112,7 +112,7 @@ WrappedRamp g_trackPitch;
 
 WrappedRamp g_trackHeading;
 
-MechS32 g_trackMinHeight;
+int32_t g_trackMinHeight;
 
 // The cockpit view's tilt, eased toward g_sinkPilotTilt.
 Ramp g_pilotTilt;
@@ -133,7 +133,7 @@ Ramp g_trackOffsetX;
 // and resets the camera shake and the zoom.
 void FirstEyepoint(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	StartRamp(&g_trackOffsetX, 0, 0, 0.5);
 	StartRamp(&g_trackOffsetZ, 0, 0, 0.5);
@@ -164,13 +164,13 @@ void FirstEyepoint(void)
 // eyepoint and track sinks.
 void UpdateEyepoint(void)
 {
-	MechS32 mode;
-	MechS32 climb;
-	MechS32 strafe;
-	MechS32 turn;
-	MechS32 speed;
-	MechS32 pitch;
-	MechS32 pan;
+	int32_t mode;
+	int32_t climb;
+	int32_t strafe;
+	int32_t turn;
+	int32_t speed;
+	int32_t pitch;
+	int32_t pan;
 
 	g_normalFov = g_sinkZoomFactor;
 	ApplyCameraFov(0);
@@ -239,9 +239,9 @@ void UpdateEyepoint(void)
 	TurnBillboards();
 }
 
-MechS32 GetCameraFloor(Eyepoint* p_eyepoint)
+int32_t GetCameraFloor(Eyepoint* p_eyepoint)
 {
-	MechS32 height;
+	int32_t height;
 
 	height = GetHighestSurface(p_eyepoint->m_x, p_eyepoint->m_y, p_eyepoint->m_z);
 	if (height > 0) {
@@ -254,7 +254,7 @@ MechS32 GetCameraFloor(Eyepoint* p_eyepoint)
 	return height;
 }
 
-void SetViewMode(MechS32 p_zoom)
+void SetViewMode(int32_t p_zoom)
 {
 	if (g_localMechLost) {
 		if (g_lostViewMode == -1) {
@@ -267,7 +267,7 @@ void SetViewMode(MechS32 p_zoom)
 	g_requestedViewMode = p_zoom;
 }
 
-MechS32 GetViewMode(void)
+int32_t GetViewMode(void)
 {
 	return g_requestedViewMode;
 }
@@ -277,7 +277,7 @@ MechS32 GetViewMode(void)
 
 // Saves the eyepoint's position and orientation (0x00-0x14) to p_view, marking it (p_view[6])
 // as set. Returns 0 without both.
-MechS32 SaveView(Eyepoint* p_eyepoint, MechS32* p_view)
+int32_t SaveView(Eyepoint* p_eyepoint, int32_t* p_view)
 {
 	if (p_view == NULL || p_eyepoint == NULL) {
 		return 0;
@@ -295,7 +295,7 @@ MechS32 SaveView(Eyepoint* p_eyepoint, MechS32* p_view)
 
 // Restores the eyepoint's position and orientation from p_view, if SaveView set it. Returns
 // 0 without both, or when the view is not set.
-MechS32 RestoreView(Eyepoint* p_eyepoint, MechS32* p_view)
+int32_t RestoreView(Eyepoint* p_eyepoint, int32_t* p_view)
 {
 	if (p_view == NULL || p_eyepoint == NULL) {
 		return 0;
@@ -316,9 +316,9 @@ MechS32 RestoreView(Eyepoint* p_eyepoint, MechS32* p_view)
 
 // Moves the camera to the next (p_next) or previous player, or back to the local player
 // (p_home), skipping players who left or whose mechs are gone.
-void CycleTrackedPlayer(MechS32 p_next, MechS32 p_home)
+void CycleTrackedPlayer(int32_t p_next, int32_t p_home)
 {
-	MechS32 step;
+	int32_t step;
 
 	step = -1;
 	if (!g_playerCount) {
@@ -351,12 +351,12 @@ void CycleTrackedPlayer(MechS32 p_next, MechS32 p_home)
 
 // Returns the camera player's view: its orientation and, from the cockpit, the position of its
 // eye object (at half the object's height outside the external views).
-void GetPlayerEyeView(MechS32* p_pitch, MechS32* p_heading, MechS32* p_roll, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void GetPlayerEyeView(int32_t* p_pitch, int32_t* p_heading, int32_t* p_roll, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	Player* player;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 
 	*p_pitch = *p_heading = *p_roll = *p_x = *p_y = *p_z = 0;
 	player = g_localPlayer;
@@ -397,7 +397,7 @@ void GetPlayerEyeView(MechS32* p_pitch, MechS32* p_heading, MechS32* p_roll, Mec
 // camera).
 void UpdateOrdinanceView(void)
 {
-	MechS32* camera;
+	int32_t* camera;
 
 	if (g_viewMode != c_viewOrdinance) {
 		g_ordinanceReturnMode = g_viewMode;
@@ -421,29 +421,29 @@ void UpdateOrdinanceView(void)
 // The track view: places the camera behind the tracked player's mech: p_distance and p_height move it out and up,
 // within limits taken from the mech's size the first time, p_turn turns it around the mech and
 // p_tilt tilts it. The first call after another view starts its ramps from the current eyepoint.
-void UpdateTrackView(MechS32 p_distance, MechS32 p_height, MechS32 p_tilt, MechS32 p_turn)
+void UpdateTrackView(int32_t p_distance, int32_t p_height, int32_t p_tilt, int32_t p_turn)
 {
-	MechS32 y;
-	MechS32 dx;
-	MechS32 z;
-	MechS32 dy;
-	MechS32 angle;
-	MechS32 dz;
-	MechS32 turn;
-	MechS32 tilt;
-	MechS32 floor;
-	MechS32 offsetX;
-	MechS32 pitch;
-	MechS32 offsetY;
-	MechS32 sine;
-	MechS32 heading;
-	MechS32 offsetZ;
-	MechS32 roll;
-	MechU32 distance;
-	MechS32 height;
-	MechS32 cosine;
-	MechS32 x;
-	MechS32 unused;
+	int32_t y;
+	int32_t dx;
+	int32_t z;
+	int32_t dy;
+	int32_t angle;
+	int32_t dz;
+	int32_t turn;
+	int32_t tilt;
+	int32_t floor;
+	int32_t offsetX;
+	int32_t pitch;
+	int32_t offsetY;
+	int32_t sine;
+	int32_t heading;
+	int32_t offsetZ;
+	int32_t roll;
+	uint32_t distance;
+	int32_t height;
+	int32_t cosine;
+	int32_t x;
+	int32_t unused;
 	Mech* mech;
 
 	GetPlayerEyeView(&pitch, &heading, &roll, &x, &y, &z);
@@ -588,10 +588,10 @@ void UpdateCockpitView(void)
 }
 
 // GetPlayerEyeView's view, turned from the cockpit by the pilot's pan and tilt.
-void GetCockpitEyeView(MechS32* p_pitch, MechS32* p_heading, MechS32* p_roll, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void GetCockpitEyeView(int32_t* p_pitch, int32_t* p_heading, int32_t* p_roll, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
-	MechS32 pan;
-	MechS32 tilt;
+	int32_t pan;
+	int32_t tilt;
 
 	pan = 0;
 	tilt = 0;
@@ -611,12 +611,12 @@ void GetCockpitEyeView(MechS32* p_pitch, MechS32* p_heading, MechS32* p_roll, Me
 // Switches to the drop view (mode 4): the camera starts level at the mech and falls, turning.
 void UpdateDropView(void)
 {
-	MechS32 unk0x10;
-	MechS32 unk0x0c;
-	MechS32 unk0x14;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
+	int32_t unk0x10;
+	int32_t unk0x0c;
+	int32_t unk0x14;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 
 	GetPlayerEyeView(&unk0x10, &unk0x0c, &unk0x14, &x, &y, &z);
 	if (g_viewMode != c_viewDrop) {
@@ -634,13 +634,13 @@ void UpdateDropView(void)
 
 // Moves the free camera (mode 2): p_climb raises it, p_speed drives it forward (eased),
 // p_strafe moves it sideways, and p_turn and p_pitch turn it. It stays above the ground.
-void UpdateFreeEyeView(MechS32 p_climb, MechS32 p_speed, MechS32 p_strafe, MechS32 p_turn, MechS32 p_pitch)
+void UpdateFreeEyeView(int32_t p_climb, int32_t p_speed, int32_t p_strafe, int32_t p_turn, int32_t p_pitch)
 {
-	MechS32 sinHeading;
-	MechS32 cosHeading;
-	MechS32 floor;
-	MechS32 speed;
-	MechS32 cosPitch;
+	int32_t sinHeading;
+	int32_t cosHeading;
+	int32_t floor;
+	int32_t speed;
+	int32_t cosPitch;
 
 	sinHeading = FixedSin(g_eyepoint->m_heading);
 	cosHeading = FixedCos(g_eyepoint->m_heading);
@@ -688,13 +688,13 @@ void UpdateFreeEyeView(MechS32 p_climb, MechS32 p_speed, MechS32 p_strafe, MechS
 // IsSatelliteView is set.
 void TurnBillboards(void)
 {
-	MechS32 pitch;
+	int32_t pitch;
 	Shape* shape;
 	SceneObject* obj;
-	MechS32 z;
-	MechS32 y;
-	MechS32 x;
-	MechS32 heading;
+	int32_t z;
+	int32_t y;
+	int32_t x;
+	int32_t heading;
 
 	for (shape = g_sceneShapes->m_next; shape; shape = shape->m_next) {
 		if ((shape->m_kind & 0xf0) == 0x10 || (shape->m_kind & 0xf0) == 0x60) {

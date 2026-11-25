@@ -22,9 +22,9 @@
 void DrawWeaponPanel(CockpitPanel* p_panel)
 {
 	Mech* mech;
-	MechS32 color;
+	int32_t color;
 	void* font;
-	MechChar text[64];
+	char text[64];
 	WeaponSlot* weapon;
 
 	if (!p_panel->m_enabled || p_panel->m_weapon < 0) {
@@ -106,7 +106,7 @@ void DrawWeaponPanelStartup(CockpitPanel* p_panel)
 {
 	Mech* mech;
 	WeaponSlot* weapon;
-	MechS32 clock;
+	int32_t clock;
 	void* font;
 
 	if (!p_panel->m_enabled || p_panel->m_weapon < 0) {

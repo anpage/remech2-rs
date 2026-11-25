@@ -31,52 +31,45 @@ public:
 
 	// The area of a link word and its id.
 	struct Link {
-		MechS32 m_left;   // 0x00
-		MechS32 m_top;    // 0x04
-		MechS32 m_right;  // 0x08
-		MechS32 m_bottom; // 0x0c
-		MechS32 m_id;     // 0x10
+		int32_t m_left;   // 0x00
+		int32_t m_top;    // 0x04
+		int32_t m_right;  // 0x08
+		int32_t m_bottom; // 0x0c
+		int32_t m_id;     // 0x10
 	};
 
 	Page(
 		Font* p_font,
 		VideoDriver* p_videoDriver,
 		undefined* p_colors,
-		MechS32 p_left,
-		MechS32 p_top,
-		MechS32 p_width,
-		MechS32 p_height
+		int32_t p_left,
+		int32_t p_top,
+		int32_t p_width,
+		int32_t p_height
 	);
 	~Page();
 
-	MechS32 SkipSpaces(MechChar* p_text, MechS32* p_pos, MechS32 p_end);
-	MechS32 ReadToken(
-		MechChar* p_text,
-		MechChar* p_word,
-		MechS32* p_pos,
-		MechS32 p_end,
-		MechS32* p_link,
-		MechS32* p_kern
-	);
-	MechS32 FlushLine(MechChar* p_line, MechChar* p_word);
-	MechS32 AppendWord(MechChar* p_line, MechChar* p_word, MechS32 p_width);
-	MechChar* Layout(MechChar* p_text);
-	void AddGlyph(MechChar* p_text, MechS32 p_left, MechS32 p_top);
+	int32_t SkipSpaces(char* p_text, int32_t* p_pos, int32_t p_end);
+	int32_t ReadToken(char* p_text, char* p_word, int32_t* p_pos, int32_t p_end, int32_t* p_link, int32_t* p_kern);
+	int32_t FlushLine(char* p_line, char* p_word);
+	int32_t AppendWord(char* p_line, char* p_word, int32_t p_width);
+	char* Layout(char* p_text);
+	void AddGlyph(char* p_text, int32_t p_left, int32_t p_top);
 	void Show();
 	void Restart();
 	void TypeStep();
 	void Hide();
-	void SetBanner(undefined* p_data, MechS32 p_size);
+	void SetBanner(undefined* p_data, int32_t p_size);
 
 private:
 	Collection* m_glyphs;       // 0x00
 	undefined* m_colors;        // 0x04
 	Font* m_font;               // 0x08
-	MechS32 m_left;             // 0x0c
-	MechS32 m_top;              // 0x10
-	MechS32 m_width;            // 0x14
-	MechS32 m_bottom;           // 0x18
-	MechS32 m_lineHeight;       // 0x1c
+	int32_t m_left;             // 0x0c
+	int32_t m_top;              // 0x10
+	int32_t m_width;            // 0x14
+	int32_t m_bottom;           // 0x18
+	int32_t m_lineHeight;       // 0x1c
 	PopupPicture* m_banner;     // 0x20
 	VideoDriver* m_videoDriver; // 0x24
 	AudioSample* m_sample;      // 0x28
@@ -87,11 +80,11 @@ public:
 };
 
 // The globals of page.cpp that other units use.
-extern MechU8 g_pageLinkRead;
-extern MechU8 g_pageBackUpPending;
-extern MechU8 g_pageGoToPending;
-extern MechChar g_pageWord[0x400];
-extern MechChar g_pageLine[0x400];
-extern MechChar g_pageTemp[0x400];
+extern uint8_t g_pageLinkRead;
+extern uint8_t g_pageBackUpPending;
+extern uint8_t g_pageGoToPending;
+extern char g_pageWord[0x400];
+extern char g_pageLine[0x400];
+extern char g_pageTemp[0x400];
 
 #endif // PAGE_H

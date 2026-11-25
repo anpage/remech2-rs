@@ -6,12 +6,12 @@
 #include "types.h"
 
 typedef struct Team {
-	MechS32 m_leader;         // 0x00 — a player index, or -1
-	MechS32 m_memberCount;    // 0x04
+	int32_t m_leader;         // 0x00 — a player index, or -1
+	int32_t m_memberCount;    // 0x04
 	undefined4 m_affiliation; // 0x08
-	MechS32 m_side;           // 0x10
-	MechS32 m_formation;      // 0x14 — the template g_teamFormations copies
-	MechS32 m_members[8];     // 0x18 — player indices
+	int32_t m_side;           // 0x10
+	int32_t m_formation;      // 0x14 — the template g_teamFormations copies
+	int32_t m_members[8];     // 0x18 — player indices
 } Team;
 
 // The functions and globals of team.c that other units use.
@@ -20,27 +20,27 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_localStar;
-	extern MechS32 g_formationTemplateCount;
+	extern int32_t g_localStar;
+	extern int32_t g_formationTemplateCount;
 	extern TeamFormation g_formationTemplates[32];
 	extern Team g_teams[16];
-	extern MechS32 g_starSides[8];
+	extern int32_t g_starSides[8];
 	extern TeamFormation g_teamFormations[16];
 
 	void ResetTeams(void);
-	MechS32 SetTeamFormationByName(MechS32 p_team, const MechChar* p_name);
-	MechS32 GetTeamFormation(MechS32 p_team);
-	void SetTeamFormation(MechS32 p_team, MechS32 p_formation);
-	MechS32 SetPlayerSlot(MechU32 p_player, MechU32 p_slot);
-	MechS32 SetTeamLeader(MechS32 p_team, MechS32 p_player);
-	MechS32 PlaceTeam(MechS32 p_team, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_heading);
-	MechS32 GetTeamSlotPosition(MechU32 p_player, MechS32* p_x, MechS32* p_z, MechS32* p_heading);
-	MechS32 GetTeamLeader(MechS32 p_team);
-	MechS32 AssignTeamSlots(MechS32 p_team, MechS32 p_unk0x04);
-	MechS32 GetPlayerSide(MechS32 p_player);
-	MechS32 GetThingSide(MechS32 p_thing);
-	MechS32 GetNavSide(MechU32 p_nav);
-	MechS32 OnSameSide(MechS32 p_playerA, MechS32 p_playerB);
+	int32_t SetTeamFormationByName(int32_t p_team, const char* p_name);
+	int32_t GetTeamFormation(int32_t p_team);
+	void SetTeamFormation(int32_t p_team, int32_t p_formation);
+	int32_t SetPlayerSlot(uint32_t p_player, uint32_t p_slot);
+	int32_t SetTeamLeader(int32_t p_team, int32_t p_player);
+	int32_t PlaceTeam(int32_t p_team, int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_heading);
+	int32_t GetTeamSlotPosition(uint32_t p_player, int32_t* p_x, int32_t* p_z, int32_t* p_heading);
+	int32_t GetTeamLeader(int32_t p_team);
+	int32_t AssignTeamSlots(int32_t p_team, int32_t p_unk0x04);
+	int32_t GetPlayerSide(int32_t p_player);
+	int32_t GetThingSide(int32_t p_thing);
+	int32_t GetNavSide(uint32_t p_nav);
+	int32_t OnSameSide(int32_t p_playerA, int32_t p_playerB);
 
 #ifdef __cplusplus
 }

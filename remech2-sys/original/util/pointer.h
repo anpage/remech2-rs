@@ -21,10 +21,10 @@ extern "C"
 
 	// Where the cursor is, which can be outside the frame. Returns 0, leaving the position alone,
 	// when that isn't known.
-	int MechMouseGetPosition(MechS32* p_x, MechS32* p_y);
+	int MechMouseGetPosition(int32_t* p_x, int32_t* p_y);
 	// Moves the cursor
-	void MechMouseSetPosition(MechS32 p_x, MechS32 p_y);
-	MechU32 MechMouseButtons(void);
+	void MechMouseSetPosition(int32_t p_x, int32_t p_y);
+	uint32_t MechMouseButtons(void);
 	// Keeps the cursor inside the frame while the window is active, or lets it go again
 	void MechMouseGrab(int p_grab);
 	// Shows or hides the cursor. Returns whether it was shown.

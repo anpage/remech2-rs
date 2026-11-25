@@ -8,7 +8,7 @@
 // position in the view and its depth.
 typedef struct MapPoint {
 	Point m_xy;  // 0x00
-	MechS32 m_z; // 0x08
+	int32_t m_z; // 0x08
 } MapPoint;
 
 #endif // MAPPOINT_H

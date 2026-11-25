@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-	MechS32 IsWithinRadius(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_radius);
+	int32_t IsWithinRadius(int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_radius);
 
 #ifdef __cplusplus
 }

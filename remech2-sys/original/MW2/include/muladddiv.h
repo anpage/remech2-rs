@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-	MechS32 MulAddDiv(MechS32 p_a, MechS32 p_b, MechS32 p_c, MechS32 p_d);
+	int32_t MulAddDiv(int32_t p_a, int32_t p_b, int32_t p_c, int32_t p_d);
 
 #ifdef __cplusplus
 }

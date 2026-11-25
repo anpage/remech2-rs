@@ -17,16 +17,16 @@
 
 // Returns the id of the resource named p_name in TABL resource p_table, or -1. The table's entries
 // are 12 bytes from 0x0c: a name of 10 bytes, each stored as 0x100 minus the character, and the id.
-MechS32 FindResourceIdByName(MechS32 p_table, MechChar* p_name)
+int32_t FindResourceIdByName(int32_t p_table, char* p_name)
 {
-	MechS32 j;
-	MechU8* header;
-	MechS32 result;
-	MechU8* table;
-	MechU8* entry;
-	MechS32 i;
-	MechS32 c;
-	MechChar name[12];
+	int32_t j;
+	uint8_t* header;
+	int32_t result;
+	uint8_t* table;
+	uint8_t* entry;
+	int32_t i;
+	int32_t c;
+	char name[12];
 
 	result = -1;
 	table = LoadCachedResource(g_mw2PrjHandle, p_table, g_resourceTypeTags[c_resTagTable], 1);
@@ -34,24 +34,24 @@ MechS32 FindResourceIdByName(MechS32 p_table, MechChar* p_name)
 		header = table;
 		entry = table + 0xc;
 		for (j = 0; j < 10; j++) {
-			c = (MechS8) entry[j];
+			c = (int8_t) entry[j];
 			c = 0x100 - c;
 			name[j] = c;
 		}
 
 		i = 0;
-		while (i < *(MechS16*) (header + 8) && strcasecmp(name, p_name)) {
+		while (i < *(int16_t*) (header + 8) && strcasecmp(name, p_name)) {
 			entry += 0xc;
 			i++;
 			for (j = 0; j < 10; j++) {
-				c = (MechS8) entry[j];
+				c = (int8_t) entry[j];
 				c = 0x100 - c;
 				name[j] = c;
 			}
 		}
 
 		if (!strcasecmp(name, p_name)) {
-			result = *(MechS16*) (entry + 0xa);
+			result = *(int16_t*) (entry + 0xa);
 		}
 
 		UnlockCachedResource(p_table, g_resourceTypeTags[c_resTagTable]);
@@ -67,17 +67,17 @@ void* LoadResourceByRef(
 	ResourceRef* p_ref,
 	const char* p_type,
 	const char* p_ext,
-	MechS32 p_table,
-	MechS32* p_size,
-	MechU32* p_poolTag
+	int32_t p_table,
+	int32_t* p_size,
+	uint32_t* p_poolTag
 )
 {
 	void* loaded;
-	MechS32 fromResource;
-	MechS32 handle;
-	MechS32 id;
+	int32_t fromResource;
+	int32_t handle;
+	int32_t id;
 	void* data;
-	MechChar name[16];
+	char name[16];
 
 	data = NULL;
 	loaded = NULL;

@@ -7,9 +7,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-MechChar g_debugPrintBuffer[0x100];
+char g_debugPrintBuffer[0x100];
 
-void ShowMessage(const MechChar* p_format, ...)
+void ShowMessage(const char* p_format, ...)
 {
 	va_list args;
 
@@ -20,7 +20,7 @@ void ShowMessage(const MechChar* p_format, ...)
 	MechLogError(g_debugPrintBuffer);
 }
 
-void DebugPrint(const MechChar* p_format, ...)
+void DebugPrint(const char* p_format, ...)
 {
 	va_list args;
 

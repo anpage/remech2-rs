@@ -13,10 +13,10 @@ Point g_bandTexCoords[4] = {{0, 0}, {0x10000, 0}, {0x10000, 0x10000}, {0, 0x1000
 
 // Draws a polygon of p_count points in the mode in p_flags' low four bits, in the color in bits
 // 4-11: modes 0 and 3 draw it filled (DrawBand) when the render settings allow.
-void DrawBandPolygon(MechU32 p_flags, MechS32 p_count, MechU32* p_points, MechS32 p_unk0x0c)
+void DrawBandPolygon(uint32_t p_flags, int32_t p_count, uint32_t* p_points, int32_t p_unk0x0c)
 {
-	MechU32 color;
-	MechU32 mode;
+	uint32_t color;
+	uint32_t mode;
 
 	mode = p_flags & 0xf;
 	color = (p_flags & 0xff0) >> 4;
@@ -24,7 +24,7 @@ void DrawBandPolygon(MechU32 p_flags, MechS32 p_count, MechU32* p_points, MechS3
 	case 0:
 	case 3:
 		if (g_renderSettings.m_flags & 1) {
-			DrawBand(color, p_count, (MechS32*) p_points, p_unk0x0c, 0);
+			DrawBand(color, p_count, (int32_t*) p_points, p_unk0x0c, 0);
 		}
 		break;
 	case 1:
@@ -37,20 +37,20 @@ void DrawBandPolygon(MechU32 p_flags, MechS32 p_count, MechU32* p_points, MechS3
 // Draws a band as a textured quad (DrawAnimatedPolygon) from the first three points of a polygon: the
 // two whose m_unk0x0c/m_unk0x10 mark its ends (mode 0), or a square about the second one (mode
 // 1). A negative mark flips the texture. Returns half the band's width, or 0 without both ends.
-MechS32 DrawBand(MechU32 p_color, MechS32 p_count, MechS32* p_points, MechS32 p_luma, MechS32 p_mode)
+int32_t DrawBand(uint32_t p_color, int32_t p_count, int32_t* p_points, int32_t p_luma, int32_t p_mode)
 {
-	MechS32 x0;
-	MechS32 y0;
-	MechS32 x1;
-	MechS32 step;
-	MechS32 flip;
-	MechS32 i;
-	MechS32 y1;
-	MechS32 haveStart;
-	MechS32 dy;
-	MechS32 dx;
-	MechS32 haveEnd;
-	MechU32 quad[4][6];
+	int32_t x0;
+	int32_t y0;
+	int32_t x1;
+	int32_t step;
+	int32_t flip;
+	int32_t i;
+	int32_t y1;
+	int32_t haveStart;
+	int32_t dy;
+	int32_t dx;
+	int32_t haveEnd;
+	uint32_t quad[4][6];
 
 	haveStart = FALSE;
 	haveEnd = FALSE;
@@ -139,11 +139,11 @@ MechS32 DrawBand(MechU32 p_color, MechS32 p_count, MechS32* p_points, MechS32 p_
 	return dx;
 }
 
-MechS32 DrawBandWithFlash(undefined4 p_unk0x00, MechS32 p_unk0x04, undefined4* p_unk0x08)
+int32_t DrawBandWithFlash(undefined4 p_unk0x00, int32_t p_unk0x04, undefined4* p_unk0x08)
 {
-	MechS32 result;
+	int32_t result;
 
-	result = DrawBand(p_unk0x00, p_unk0x04, (MechS32*) p_unk0x08, 15, 0);
+	result = DrawBand(p_unk0x00, p_unk0x04, (int32_t*) p_unk0x08, 15, 0);
 	if (result > 60) {
 		StartPaletteFade(17, 181, 1);
 	}

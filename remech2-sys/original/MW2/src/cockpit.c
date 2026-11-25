@@ -50,7 +50,7 @@
 #include <stdio.h>
 
 // The satellite view's display option, 0 or 1 (DrawSatelliteStatic).
-MechS32 g_satelliteStaticState = 0;
+int32_t g_satelliteStaticState = 0;
 
 // The frame callback the satellite view replaces (SwitchCockpitView).
 void (*g_savedFrameDrawCallback)(void) = DrawScene;
@@ -58,21 +58,21 @@ void (*g_savedFrameDrawCallback)(void) = DrawScene;
 // The overlay settings the satellite view keeps while a cockpit view shows (SwitchCockpitView):
 // g_showCrosshair's, g_showHud's and g_showTargetMarker's, and whether they are held.
 
-MechS32 g_savedShowCrosshair = 1;
+int32_t g_savedShowCrosshair = 1;
 
 undefined4 g_savedShowHud = 1;
 
-MechS32 g_savedShowTargetMarker = 1;
+int32_t g_savedShowTargetMarker = 1;
 
-MechS32 g_hudSettingsSaved = 0;
+int32_t g_hudSettingsSaved = 0;
 
 // The height the map view's shading starts at (GetMapHeightShade).
-MechS32 g_mapShadeBase = 0;
+int32_t g_mapShadeBase = 0;
 
-MechS32 g_mapShadeTop = 0x1900;
+int32_t g_mapShadeTop = 0x1900;
 
 // The height range the map view's shading spans (GetMapHeightShade).
-MechS32 g_mapShadeRange = 0x1900;
+int32_t g_mapShadeRange = 0x1900;
 
 // The gauge functions of the cockpit layouts, by index.
 CockpitGaugeFn g_cockpitGauges[10] = {
@@ -97,41 +97,41 @@ PANE g_cockpitGaugePanes[5] = {
 };
 
 // Whether cockpit view 1 and 2's map animation shows this frame (DrawDamagedMapView).
-MechS32 g_mapDamageAnimShown = 0;
+int32_t g_mapDamageAnimShown = 0;
 
 // The clock times the satellite view's static starts and stops at (DrawSatelliteStatic).
 
-MechS32 g_staticCleanUntil;
+int32_t g_staticCleanUntil;
 
-MechS32 g_staticNoiseUntil;
+int32_t g_staticNoiseUntil;
 
 // The cockpit view before the current one (SwitchCockpitView).
-MechS32 g_previousCockpitView;
+int32_t g_previousCockpitView;
 
 // The map view's power mode, and the one before: 1 sliding in while the mech starts up
 // (PowerUpMapView), 3 sliding out while it shuts down (PowerDownMapView), 4 running (RunMapView),
 // 0 reset (ResetMapView). The readouts draw only while it runs.
-MechS32 g_previousMapViewMode;
+int32_t g_previousMapViewMode;
 
-MechS32 g_cockpitLayoutIndex;
+int32_t g_cockpitLayoutIndex;
 
-MechS32 g_mapViewMode;
+int32_t g_mapViewMode;
 
 // The view g_cockpitLayoutIndex switches to; 3 and 5 enter and leave the satellite view (4).
-MechS32 g_requestedCockpitView;
+int32_t g_requestedCockpitView;
 
 // Set while the map views follow the free eyepoint instead of the player (the free-eye cheat).
-MechS32 g_mapFollowsFreeEye;
+int32_t g_mapFollowsFreeEye;
 
 // Set to draw the satellite view without its static once (DrawSatelliteStatic).
-MechS32 g_satelliteClean;
+int32_t g_satelliteClean;
 
 // Places the cockpit view p_cockpit on the screen: its viewport (kept in the render-target table,
 // and for the normal cockpit also in g_cockpitPanelPanes), its points and extra rectangles, and its
 // gauge functions.
-void LoadCockpitLayout(MechS32 p_cockpit, CockpitLayout* p_layout)
+void LoadCockpitLayout(int32_t p_cockpit, CockpitLayout* p_layout)
 {
-	MechS32 index;
+	int32_t index;
 	PANE* rect;
 	RectTransition* transition;
 	PANE* viewport;
@@ -194,7 +194,7 @@ void LoadCockpitLayout(MechS32 p_cockpit, CockpitLayout* p_layout)
 // readout and the map view's shading range.
 void InitCockpitViews(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 6; i++) {
 		LoadCockpitLayout(i, g_cockpitLayouts[i]);
@@ -226,11 +226,11 @@ void RunMapView(void)
 // (4) with its own frame callback, and 5 back out to the view it was entered from. Keeps the
 // overlay settings the satellite view changes while a cockpit view shows, and leaves it when the
 // player dies. Returns whether the view changed.
-MechS32 SwitchCockpitView(void)
+int32_t SwitchCockpitView(void)
 {
-	MechS32 changed;
+	int32_t changed;
 	CockpitLayout* layout;
-	MechS32 sound;
+	int32_t sound;
 
 	changed = FALSE;
 	if (g_cockpitLayoutIndex <= 2 && g_previousCockpitView == 4 && g_hudSettingsSaved) {
@@ -323,21 +323,21 @@ void DrawCockpitView(void)
 // The pose has a seventh element nothing uses.
 void DrawMapView(void)
 {
-	MechS32 farPlane;
-	MechS32 heading;
-	MechS32 angle;
+	int32_t farPlane;
+	int32_t heading;
+	int32_t angle;
 	struct SceneObject* obj;
-	MechS32 zoom;
-	MechS32 pose[7];
+	int32_t zoom;
+	int32_t pose[7];
 	PANE* viewport;
 	CockpitLayout* layout;
-	MechS32 range;
-	MechS32 z;
-	MechS32 y;
-	MechS32 x;
-	MechS32 slot;
+	int32_t range;
+	int32_t z;
+	int32_t y;
+	int32_t x;
+	int32_t slot;
 	Player* player;
-	MechU32 flags;
+	uint32_t flags;
 
 	if (g_cockpitLayoutIndex == 0) {
 		return;
@@ -428,10 +428,10 @@ void DrawMapView(void)
 // things, and the target.
 void DrawMapContents(CockpitLayout* p_layout)
 {
-	MechS32 id;
+	int32_t id;
 	PANE* viewport;
-	MechS32 y;
-	MechS32 x;
+	int32_t y;
+	int32_t x;
 	void* shape;
 
 	viewport = p_layout->m_viewport;
@@ -452,11 +452,11 @@ void DrawMapContents(CockpitLayout* p_layout)
 }
 
 // Draws icon p_icon at the world position p_pos, if the map view shows it.
-void DrawMapIcon(CockpitLayout* p_layout, MapPoint p_pos, MechS32 p_icon)
+void DrawMapIcon(CockpitLayout* p_layout, MapPoint p_pos, int32_t p_icon)
 {
 	PANE* viewport;
 	void* shape;
-	MechS32 visible;
+	int32_t visible;
 
 	viewport = p_layout->m_viewport;
 	visible = ProjectMapPoint(&p_pos);
@@ -477,9 +477,9 @@ void DrawMapIcon(CockpitLayout* p_layout, MapPoint p_pos, MechS32 p_icon)
 void DrawMapUnits(CockpitLayout* p_layout)
 {
 	Player* player;
-	MechS32 icon;
+	int32_t icon;
 	GameThing* thing;
-	MechS32 i;
+	int32_t i;
 	MapPoint pos;
 
 	for (i = 0; i < g_playerCount; i++) {
@@ -508,7 +508,7 @@ void DrawMapUnits(CockpitLayout* p_layout)
 
 // Returns whether team p_team has reached the nav point. The team test is an | where an & was
 // meant: any reached nav counts.
-MechS32 IsNavReached(NavPoint* p_nav, MechS32 p_team)
+int32_t IsNavReached(NavPoint* p_nav, int32_t p_team)
 {
 	return (p_nav->m_flags & 0x20) && (p_nav->m_teamsReached | (1 << p_team));
 }
@@ -516,16 +516,16 @@ MechS32 IsNavReached(NavPoint* p_nav, MechS32 p_team)
 // Draws the local player's target: in the view, or clamped to its edge when outside it.
 void DrawMapTarget(CockpitLayout* p_layout)
 {
-	MechS32 index;
+	int32_t index;
 	Player* player;
-	MechS32 visible;
-	MechS32 icon;
-	MechS32 side;
-	MechS32 kind;
+	int32_t visible;
+	int32_t icon;
+	int32_t side;
+	int32_t kind;
 	PANE* viewport;
 	MapPoint pos;
-	MechS32 row;
-	MechU32 target;
+	int32_t row;
+	uint32_t target;
 	void* shape;
 
 	viewport = p_layout->m_viewport;
@@ -612,10 +612,10 @@ void DrawMapTarget(CockpitLayout* p_layout)
 void DrawMapNavPoints(CockpitLayout* p_layout)
 {
 	MapPoint pos;
-	MechS32 i;
+	int32_t i;
 	PANE* viewport;
-	MechS32 icon;
-	MechS32 visible;
+	int32_t icon;
+	int32_t visible;
 	NavPoint* nav;
 	void* shape;
 
@@ -659,14 +659,14 @@ void DrawMapNavPoints(CockpitLayout* p_layout)
 }
 
 // Draws the two lines of the view's field of view from the center, around heading p_heading.
-void DrawMapFieldOfView(CockpitLayout* p_layout, MechS32 p_heading)
+void DrawMapFieldOfView(CockpitLayout* p_layout, int32_t p_heading)
 {
-	MechS32 halfFov;
+	int32_t halfFov;
 	PANE* viewport;
 	Point end;
-	MechS32 y;
-	MechS32 x;
-	MechS32* colors;
+	int32_t y;
+	int32_t x;
+	int32_t* colors;
 
 	viewport = p_layout->m_viewport;
 	colors = p_layout->m_colors;
@@ -687,14 +687,14 @@ void DrawMapFieldOfView(CockpitLayout* p_layout, MechS32 p_heading)
 // again only when they change.
 void DrawMapViewText(CockpitLayout* p_layout)
 {
-	MechDouble value;
-	MechChar* units;
-	MechS32 range;
+	double value;
+	char* units;
+	int32_t range;
 	void* font;
 	PANE* viewport;
-	MechS32 heading;
+	int32_t heading;
 	Player* player;
-	MechDouble degrees;
+	double degrees;
 	PANE saved;
 
 	viewport = p_layout->m_viewport;
@@ -765,7 +765,7 @@ void CycleCockpitView(void)
 	}
 }
 
-MechS32 IsSatelliteView(void)
+int32_t IsSatelliteView(void)
 {
 	return g_cockpitLayoutIndex == 4;
 }
@@ -790,7 +790,7 @@ void ToggleSatelliteView(void)
 
 // Zooms the current view's map: p_zoom 0 resets the range, 1 halves it (wrapping to the longest
 // below the shortest) and 2 doubles it (wrapping to the shortest).
-void ZoomMapView(MechS32 p_zoom)
+void ZoomMapView(int32_t p_zoom)
 {
 	CockpitLayout* layout;
 
@@ -822,12 +822,12 @@ void ZoomMapView(MechS32 p_zoom)
 
 // The map view's shape filter (RenderSettings::m_shapeFilter): skips dead players' shapes and
 // shapes of types 0x30 and 0x70, then culls through CullMapViewShape.
-MechS32 MapShapeFilter(Shape* p_shape)
+int32_t MapShapeFilter(Shape* p_shape)
 {
-	MechS32 type;
-	MechS32 flags;
-	MechS32 skip;
-	MechS32 kind;
+	int32_t type;
+	int32_t flags;
+	int32_t skip;
+	int32_t kind;
 
 	skip = FALSE;
 	kind = p_shape->m_kind & 0xf00;
@@ -862,16 +862,16 @@ MechS32 MapShapeFilter(Shape* p_shape)
 // The satellite view's face hook (RenderSettings::m_drawFace): the color a face of p_face's shape
 // draws in, from the view's colors by the shape's kind and side, or the face's own (p_flags).
 // Faces of a textured kind (0x3000) draw in the view's color 10.
-MechU32 SatelliteFaceColor(Face* p_face, Vertex* p_vertices, MechU32 p_flags, MechS32 p_distance)
+uint32_t SatelliteFaceColor(Face* p_face, Vertex* p_vertices, uint32_t p_flags, int32_t p_distance)
 {
-	MechU32 color;
-	MechU32 type;
-	MechU32 result;
-	MechU32 index;
+	uint32_t color;
+	uint32_t type;
+	uint32_t result;
+	uint32_t index;
 	CockpitLayout* layout;
 	Shape* shape;
-	MechS32 kind;
-	MechS32* colors;
+	int32_t kind;
+	int32_t* colors;
 
 	result = 0;
 	layout = g_cockpitLayouts[g_cockpitLayoutIndex];
@@ -945,14 +945,14 @@ MechU32 SatelliteFaceColor(Face* p_face, Vertex* p_vertices, MechU32 p_flags, Me
 // The satellite view's polygon hook (RenderSettings::m_drawPolygon): terrain faces (0x4000) are
 // shaded by height, textured ones (0x3000) drawn as bands, and the rest as usual; plain faces
 // (0) twice, the second time outlined (0x2000).
-void SatelliteDrawPolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
+void SatelliteDrawPolygon(int32_t p_count, uint32_t* p_points, uint32_t p_flags)
 {
-	MechU32 shade;
-	MechU32 kind;
-	MechS32 i;
-	MechU32* point;
+	uint32_t shade;
+	uint32_t kind;
+	int32_t i;
+	uint32_t* point;
 	CockpitLayout* layout;
-	MechU32 color;
+	uint32_t color;
 
 	layout = g_cockpitLayouts[g_cockpitLayoutIndex];
 	if (!layout) {
@@ -979,7 +979,7 @@ void SatelliteDrawPolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
 		break;
 	case 0x3000:
 		color = (p_flags & 0xff0) >> 4;
-		DrawBand(color, p_count, (MechS32*) p_points, -1, 1);
+		DrawBand(color, p_count, (int32_t*) p_points, -1, 1);
 		break;
 	case 0:
 		DrawScenePolygon(p_count, p_points, 0);
@@ -992,11 +992,11 @@ void SatelliteDrawPolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
 }
 
 // Returns the shade (0-15) of a height p_height in the map view.
-MechS32 GetMapHeightShade(CockpitLayout* p_layout, MechS32 p_height)
+int32_t GetMapHeightShade(CockpitLayout* p_layout, int32_t p_height)
 {
-	MechS32 shade;
-	MechS32 height;
-	MechS32 fraction;
+	int32_t shade;
+	int32_t height;
+	int32_t fraction;
 
 	height = p_layout->m_range - (p_height >> 2);
 	height -= g_mapShadeBase;
@@ -1015,9 +1015,9 @@ MechS32 GetMapHeightShade(CockpitLayout* p_layout, MechS32 p_height)
 // Draws the layout's view into the rectangle p_transition has reached, restoring the viewport
 // afterwards. Returns FALSE once the transition is over; then, with p_final, it draws into the
 // transition's final rectangle and has it stretched to the screen.
-MechS32 DrawMapViewTransition(MechS32 p_reverse, CockpitLayout* p_layout, RectTransition* p_transition, MechS32 p_final)
+int32_t DrawMapViewTransition(int32_t p_reverse, CockpitLayout* p_layout, RectTransition* p_transition, int32_t p_final)
 {
-	MechS32 result;
+	int32_t result;
 	PANE* rect;
 	PANE* viewport;
 
@@ -1137,10 +1137,10 @@ void DrawSatelliteStatic(void)
 // at 2.
 void DrawDamagedMapView(void)
 {
-	MechS32 threshold;
+	int32_t threshold;
 	PANE* viewport;
 	CockpitLayout* layout;
-	MechS32 anim;
+	int32_t anim;
 
 	layout = g_cockpitLayouts[g_cockpitLayoutIndex];
 	if (!layout) {

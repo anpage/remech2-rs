@@ -9,11 +9,17 @@ extern "C"
 {
 #endif
 
-	extern MechU8 g_soundUpsampleBuffer[0x400];
-	extern MechU8 g_soundFrame[0x401];
-	extern MechU8 g_soundDeltas[0x43];
+	extern uint8_t g_soundUpsampleBuffer[0x400];
+	extern uint8_t g_soundFrame[0x401];
+	extern uint8_t g_soundDeltas[0x43];
 
-	MechU8* DecodeSoundFrames(MechU8* p_src, MechU8* p_dst, MechU32 p_count, MechU32 p_frameSize, MechS32* p_state);
+	uint8_t* DecodeSoundFrames(
+		uint8_t* p_src,
+		uint8_t* p_dst,
+		uint32_t p_count,
+		uint32_t p_frameSize,
+		int32_t* p_state
+	);
 
 #ifdef __cplusplus
 }

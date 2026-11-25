@@ -19,17 +19,17 @@
 
 // Set by a command-line switch: OpenBwdStream reads every stream from a file, even one with a
 // resource id.
-MechS32 g_streamsFromFiles = 0;
+int32_t g_streamsFromFiles = 0;
 
 // Set by a command-line switch: OpenBwdStream logs each stream it opens
-MechS32 g_logStreams = 0;
+int32_t g_logStreams = 0;
 
 // Copies a BWD file from the buffer passed in from the shell
-static void* CopyLaunchBwd(const MechChar* p_name, MechS32* p_size)
+static void* CopyLaunchBwd(const char* p_name, int32_t* p_size)
 {
 	const BwdBuffer* bwd;
 	void* data;
-	MechU32 i;
+	uint32_t i;
 
 	if (g_missionLaunch == NULL) {
 		return NULL;
@@ -55,13 +55,13 @@ static void* CopyLaunchBwd(const MechChar* p_name, MechS32* p_size)
 // when there is no such file, from the resource file. Returns p_stream, or NULL.
 BwdStream* OpenBwdStream(BwdStreamKey* p_key, BwdStream* p_stream)
 {
-	MechChar line[256];
-	MechS32 size;
+	char line[256];
+	int32_t size;
 	BwdStream* result;
-	MechS32 file;
-	MechChar* dot;
+	int32_t file;
+	char* dot;
 	BwdHeader* header;
-	MechS32 id;
+	int32_t id;
 	void* data;
 
 	result = NULL;
@@ -143,7 +143,7 @@ BwdStream* OpenBwdStream(BwdStreamKey* p_key, BwdStream* p_stream)
 BwdNode* GetNextNode(BwdStream* p_stream)
 {
 	BwdNode* next;
-	MechS32 size;
+	int32_t size;
 	BwdNode* result;
 
 	result = NULL;
@@ -154,8 +154,8 @@ BwdNode* GetNextNode(BwdStream* p_stream)
 		size = p_stream->m_current->m_size;
 	}
 
-	next = (BwdNode*) ((MechU8*) p_stream->m_current + size);
-	if ((MechU8*) next - (MechU8*) p_stream->m_data < p_stream->m_size) {
+	next = (BwdNode*) ((uint8_t*) p_stream->m_current + size);
+	if ((uint8_t*) next - (uint8_t*) p_stream->m_data < p_stream->m_size) {
 		if (next->m_size <= p_stream->m_maxNodeSize && next->m_size >= sizeof(BwdNode)) {
 			p_stream->m_current = next;
 			result = next;
@@ -182,9 +182,9 @@ void UnloadResource(BwdStream* p_stream)
 }
 
 // Returns the name of the keyword with tag p_code, or "unknown".
-MechChar* GetKeywordName(MechU32 p_code)
+char* GetKeywordName(uint32_t p_code)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x48; i++) {
 		if (g_bwdTypeCodes[i] == p_code) {
@@ -201,7 +201,7 @@ MechChar* GetKeywordName(MechU32 p_code)
 }
 
 // Appends a line to mw2debug.txt and shows it on screen.
-void LogDebugLine(MechChar* p_text)
+void LogDebugLine(char* p_text)
 {
 	// We send it to the Rust side to log with tracing instead
 	MechLogDebugf("mw2debug.txt: %s", p_text);
@@ -210,10 +210,10 @@ void LogDebugLine(MechChar* p_text)
 }
 
 // Logs a keyword's name with LogDebugLine.
-void LogKeywordName(MechU32 p_code)
+void LogKeywordName(uint32_t p_code)
 {
-	MechChar line[256];
-	MechChar* name;
+	char line[256];
+	char* name;
 
 	name = GetKeywordName(p_code);
 	sprintf(line, "%s, ", name);

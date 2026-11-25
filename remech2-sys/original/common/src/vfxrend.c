@@ -81,17 +81,17 @@ enum OperationFlag {
 };
 
 // The operations RENDOPTS.INC builds, in its order.
-static const MechU16 g_primitives[] = {
+static const uint16_t g_primitives[] = {
 	0x691, 0x611, 0x491, 0x411, 0x6a0, 0x680, 0x697, 0x689, 0x6b1, 0x690, 0x600, 0x610, 0x650,
 	0x497, 0x490, 0x400, 0x410, 0x408, 0x450, 0x080, 0x280, 0x040, 0x300, 0x2c0, 0x240,
 };
 
 // VFX_set_Gouraud_dither_level's levels (dfactor_1, dfactor_2), which each Gouraud pass adds to
 // the shades of a scan line's even and odd pixels, swapping them every line.
-static MechU32 g_ditherLevels[2] = {0x8000, 0};
+static uint32_t g_ditherLevels[2] = {0x8000, 0};
 
 // The clipper's working vertices (work_pts).
-static MechU32 g_workPoints[MAX_WORK_VERTICES * VERTEX_WORDS];
+static uint32_t g_workPoints[MAX_WORK_VERTICES * VERTEX_WORDS];
 
 // The passes MAKE_POLY assembles for a scan line, in order.
 enum Pass {
@@ -107,56 +107,56 @@ enum Pass {
 
 // One side of the polygon: an edge, and where the walk along it has got to.
 typedef struct RenderEdge {
-	const MechU32* m_next;          // the vertex at the edge's end
-	MechU32 m_count;                // the scan lines left on the edge
-	MechU32 m_values[VERTEX_WORDS]; // by vertex word (x in 16.16, with a half)
-	MechU32 m_steps[VERTEX_WORDS];  // per scan line
+	const uint32_t* m_next;          // the vertex at the edge's end
+	uint32_t m_count;                // the scan lines left on the edge
+	uint32_t m_values[VERTEX_WORDS]; // by vertex word (x in 16.16, with a half)
+	uint32_t m_steps[VERTEX_WORDS];  // per scan line
 } RenderEdge;
 
 typedef struct Render {
-	MechU8* m_buffer;
-	MechU32 m_pitch;
-	MechU32 m_row; // the scan line's offset in m_buffer
-	const MechU32* m_vertices;
-	const MechU32* m_verticesEnd;
-	MechS32 m_operation;
-	MechU32 m_color;
+	uint8_t* m_buffer;
+	uint32_t m_pitch;
+	uint32_t m_row; // the scan line's offset in m_buffer
+	const uint32_t* m_vertices;
+	const uint32_t* m_verticesEnd;
+	int32_t m_operation;
+	uint32_t m_color;
 	const VFX_TEXTURE* m_texture;
-	const MechU8* m_cueing;
-	const MechU8* m_translucency;
-	MechU32 m_dither[2];
-	MechS32 m_passes[3];
-	MechS32 m_words[4]; // the vertex words the edges interpolate besides x
-	MechS32 m_wordCount;
+	const uint8_t* m_cueing;
+	const uint8_t* m_translucency;
+	uint32_t m_dither[2];
+	int32_t m_passes[3];
+	int32_t m_words[4]; // the vertex words the edges interpolate besides x
+	int32_t m_wordCount;
 	RenderEdge m_left;  // walks the vertices backwards
 	RenderEdge m_right; // forwards
 } Render;
 
 // `sar 16`: a 16.16 value's integer part.
-static MechS32 Integer(MechU32 p_value)
+static int32_t Integer(uint32_t p_value)
 {
 	return PortableSar32(PortableS32(p_value), 16);
 }
 
 // FIXDIV and FPDIV: a 16.16 value over a count, as p_delta shifted into a 64-bit dividend over
 // p_count shifted into a 32-bit divisor (which a count of 0x10000 makes 0).
-static MechU32 Slope(MechU32 p_delta, MechU32 p_count)
+static uint32_t Slope(uint32_t p_delta, uint32_t p_count)
 {
-	return (MechU32) PortableIdiv((MechS64) PortableS32(p_delta) * 0x10000, PortableS32(p_count << 16));
+	return (uint32_t) PortableIdiv((MechS64) PortableS32(p_delta) * 0x10000, PortableS32(p_count << 16));
 }
 
 // FPDIVONE: a perspective coordinate (16.16, times w) over w (2.30).
-static MechU32 DivideOne(MechU32 p_value, MechU32 p_w)
+static uint32_t DivideOne(uint32_t p_value, uint32_t p_w)
 {
-	return (MechU32) PortableIdiv((MechS64) PortableS32(p_value) * 0x40000000, PortableS32(p_w));
+	return (uint32_t) PortableIdiv((MechS64) PortableS32(p_value) * 0x40000000, PortableS32(p_w));
 }
 
 // The quotient of two magnitudes, in 32 bits, rounded half up: the remainder carries when it is
 // at least half the divisor (rounded up).
-static MechU32 DivideRounded(MechU64 p_dividend, MechU32 p_divisor)
+static uint32_t DivideRounded(MechU64 p_dividend, uint32_t p_divisor)
 {
-	MechU32 quotient = PortableDiv(p_dividend, p_divisor);
-	MechU32 remainder = (MechU32) (p_dividend - (MechU64) quotient * p_divisor);
+	uint32_t quotient = PortableDiv(p_dividend, p_divisor);
+	uint32_t remainder = (uint32_t) (p_dividend - (MechU64) quotient * p_divisor);
 
 	if ((p_divisor >> 1) + (p_divisor & 1) - 1 < remainder) {
 		quotient++;
@@ -165,7 +165,7 @@ static MechU32 DivideRounded(MechU64 p_dividend, MechU32 p_divisor)
 	return quotient;
 }
 
-static MechU32 Magnitude(MechU32 p_value, MechS32* p_negative, MechS32 p_sign)
+static uint32_t Magnitude(uint32_t p_value, int32_t* p_negative, int32_t p_sign)
 {
 	if (PortableS32(p_value) < 0) {
 		*p_negative += p_sign;
@@ -177,70 +177,70 @@ static MechU32 Magnitude(MechU32 p_value, MechS32* p_negative, MechS32 p_sign)
 
 // F16_div_to_F30: the magnitudes' quotient with the dividend shifted up by 30 (`sar 2` into the
 // high word, so a dividend of 0x80000000 faults), negated if the signs differ.
-static MechU32 DivideToF30(MechU32 p_dividend, MechU32 p_divisor)
+static uint32_t DivideToF30(uint32_t p_dividend, uint32_t p_divisor)
 {
-	MechS32 negative = 0;
-	MechU32 dividend = Magnitude(p_dividend, &negative, 1);
-	MechU32 divisor = Magnitude(p_divisor, &negative, -1);
-	MechU64 wide = (MechU64) (MechU32) PortableSar32(PortableS32(dividend), 2) << 32 | (MechU32) (dividend << 30);
-	MechU32 quotient = DivideRounded(wide, divisor);
+	int32_t negative = 0;
+	uint32_t dividend = Magnitude(p_dividend, &negative, 1);
+	uint32_t divisor = Magnitude(p_divisor, &negative, -1);
+	MechU64 wide = (MechU64) (uint32_t) PortableSar32(PortableS32(dividend), 2) << 32 | (uint32_t) (dividend << 30);
+	uint32_t quotient = DivideRounded(wide, divisor);
 
 	return negative ? 0 - quotient : quotient;
 }
 
 // MMUL_F30: the product of p_value and the 2.30 p_factor, rounded, shifted down by 30.
-static MechU32 MultiplyF30(MechU32 p_value, MechU32 p_factor)
+static uint32_t MultiplyF30(uint32_t p_value, uint32_t p_factor)
 {
 	MechU64 product = (MechU64) ((MechS64) PortableS32(p_value) * PortableS32(p_factor));
 
-	return (MechU32) ((product + 0x20000000) >> 30);
+	return (uint32_t) ((product + 0x20000000) >> 30);
 }
 
 // --- The entry points ---
 
-void VFX_set_Gouraud_dither_level(MechS32 p_dither1, MechS32 p_dither2)
+void VFX_set_Gouraud_dither_level(int32_t p_dither1, int32_t p_dither2)
 {
-	g_ditherLevels[0] = (MechU32) p_dither1;
-	g_ditherLevels[1] = (MechU32) p_dither2;
+	g_ditherLevels[0] = (uint32_t) p_dither1;
+	g_ditherLevels[1] = (uint32_t) p_dither2;
 }
 
 // The assembly returns its code segment's selector, and the range of its primitives and its size;
 // the C patches no code, and returns its working vertices instead, which the caller can make
 // writable all the same. The start is a 32-bit address, as the game's caller takes it.
-MechS32 GetCodeBlock(undefined4* p_start, undefined4* p_selector)
+int32_t GetCodeBlock(undefined4* p_start, undefined4* p_selector)
 {
 	*p_selector = 0;
 	*p_start = (undefined4) (size_t) g_workPoints;
-	return (MechS32) sizeof(g_workPoints);
+	return (int32_t) sizeof(g_workPoints);
 }
 
-MechS32 F16_div_to_F30(MechS32 p_dividend, MechS32 p_divisor)
+int32_t F16_div_to_F30(int32_t p_dividend, int32_t p_divisor)
 {
-	return PortableS32(DivideToF30((MechU32) p_dividend, (MechU32) p_divisor));
+	return PortableS32(DivideToF30((uint32_t) p_dividend, (uint32_t) p_divisor));
 }
 
 // 1.0 (16.16) over p_value: 0x4000 in the dividend's high word.
-MechS32 F30_reciprocal(MechS32 p_value)
+int32_t F30_reciprocal(int32_t p_value)
 {
-	MechS32 negative = 0;
-	MechU32 divisor = Magnitude((MechU32) p_value, &negative, -1);
-	MechU32 quotient = DivideRounded((MechU64) 0x4000 << 32, divisor);
+	int32_t negative = 0;
+	uint32_t divisor = Magnitude((uint32_t) p_value, &negative, -1);
+	uint32_t quotient = DivideRounded((MechU64) 0x4000 << 32, divisor);
 
 	return PortableS32(negative ? 0 - quotient : quotient);
 }
 
-MechS32 mul_F30(MechS32 p_m1, MechS32 p_m2)
+int32_t mul_F30(int32_t p_m1, int32_t p_m2)
 {
-	return PortableS32(MultiplyF30((MechU32) p_m1, (MechU32) p_m2));
+	return PortableS32(MultiplyF30((uint32_t) p_m1, (uint32_t) p_m2));
 }
 
 // --- Scan conversion ---
 
-static MechS32 IsBuilt(MechS32 p_operation)
+static int32_t IsBuilt(int32_t p_operation)
 {
-	MechS32 i;
+	int32_t i;
 
-	for (i = 0; i < (MechS32) (sizeof(g_primitives) / sizeof(g_primitives[0])); i++) {
+	for (i = 0; i < (int32_t) (sizeof(g_primitives) / sizeof(g_primitives[0])); i++) {
 		if (g_primitives[i] == p_operation) {
 			return 1;
 		}
@@ -249,7 +249,7 @@ static MechS32 IsBuilt(MechS32 p_operation)
 	return 0;
 }
 
-static void AddWord(Render* p_render, MechS32 p_word)
+static void AddWord(Render* p_render, int32_t p_word)
 {
 	p_render->m_words[p_render->m_wordCount++] = p_word;
 }
@@ -257,10 +257,10 @@ static void AddWord(Render* p_render, MechS32 p_word)
 // The passes and the edges' words of an operation, as MAKE_POLY selects them.
 static void SelectPasses(Render* p_render)
 {
-	MechS32 map = p_render->m_operation & c_mapMask;
-	MechS32 shade = p_render->m_operation & c_shadeMask;
-	MechS32 transparency = p_render->m_operation & c_transparentMask;
-	MechS32 useColor = 0;
+	int32_t map = p_render->m_operation & c_mapMask;
+	int32_t shade = p_render->m_operation & c_shadeMask;
+	int32_t transparency = p_render->m_operation & c_transparentMask;
+	int32_t useColor = 0;
 
 	p_render->m_passes[0] = c_passNone;
 	p_render->m_passes[1] = c_passNone;
@@ -314,7 +314,7 @@ static void SelectPasses(Render* p_render)
 	}
 }
 
-static const MechU32* PreviousVertex(const Render* p_render, const MechU32* p_vertex)
+static const uint32_t* PreviousVertex(const Render* p_render, const uint32_t* p_vertex)
 {
 	if (p_vertex == p_render->m_vertices) {
 		p_vertex = p_render->m_verticesEnd;
@@ -323,7 +323,7 @@ static const MechU32* PreviousVertex(const Render* p_render, const MechU32* p_ve
 	return p_vertex - VERTEX_WORDS;
 }
 
-static const MechU32* NextVertex(const Render* p_render, const MechU32* p_vertex)
+static const uint32_t* NextVertex(const Render* p_render, const uint32_t* p_vertex)
 {
 	p_vertex += VERTEX_WORDS;
 	if (p_vertex == p_render->m_verticesEnd) {
@@ -334,16 +334,16 @@ static const MechU32* NextVertex(const Render* p_render, const MechU32* p_vertex
 }
 
 // LEFT_DELTAS and RIGHT_DELTAS: starts an edge at its top vertex, towards m_next.
-static void StartEdge(const Render* p_render, RenderEdge* p_edge, const MechU32* p_start, MechU32 p_count)
+static void StartEdge(const Render* p_render, RenderEdge* p_edge, const uint32_t* p_start, uint32_t p_count)
 {
-	const MechU32* end = p_edge->m_next;
-	MechS32 i;
+	const uint32_t* end = p_edge->m_next;
+	int32_t i;
 
 	p_edge->m_count = p_count;
 	p_edge->m_steps[c_vertexX] = Slope((end[c_vertexX] - p_start[c_vertexX]) << 16, p_count);
 	p_edge->m_values[c_vertexX] = (p_start[c_vertexX] << 16) + 0x8000;
 	for (i = 0; i < p_render->m_wordCount; i++) {
-		MechS32 word = p_render->m_words[i];
+		int32_t word = p_render->m_words[i];
 
 		p_edge->m_steps[word] = Slope(end[word] - p_start[word], p_count);
 		p_edge->m_values[word] = p_start[word];
@@ -351,9 +351,9 @@ static void StartEdge(const Render* p_render, RenderEdge* p_edge, const MechU32*
 }
 
 // Moves an edge to the one after it along its walk; returns its top vertex.
-static const MechU32* AdvanceEdge(const Render* p_render, RenderEdge* p_edge)
+static const uint32_t* AdvanceEdge(const Render* p_render, RenderEdge* p_edge)
 {
-	const MechU32* start = p_edge->m_next;
+	const uint32_t* start = p_edge->m_next;
 
 	if (p_edge == &p_render->m_left) {
 		p_edge->m_next = PreviousVertex(p_render, start);
@@ -368,8 +368,8 @@ static const MechU32* AdvanceEdge(const Render* p_render, RenderEdge* p_edge)
 // The first edge on a side that isn't horizontal.
 static void StartFirstEdge(const Render* p_render, RenderEdge* p_edge)
 {
-	const MechU32* start;
-	MechU32 count;
+	const uint32_t* start;
+	uint32_t count;
 
 	do {
 		start = AdvanceEdge(p_render, p_edge);
@@ -382,8 +382,8 @@ static void StartFirstEdge(const Render* p_render, RenderEdge* p_edge)
 // The next edge, when the scan lines reach the end of one: a horizontal one for a line.
 static void StartNextEdge(const Render* p_render, RenderEdge* p_edge)
 {
-	const MechU32* start = AdvanceEdge(p_render, p_edge);
-	MechU32 count = p_edge->m_next[c_vertexY] - start[c_vertexY];
+	const uint32_t* start = AdvanceEdge(p_render, p_edge);
+	uint32_t count = p_edge->m_next[c_vertexY] - start[c_vertexY];
 
 	StartEdge(p_render, p_edge, start, count ? count : 1);
 }
@@ -391,11 +391,11 @@ static void StartNextEdge(const Render* p_render, RenderEdge* p_edge)
 // LEFT_TRACE and RIGHT_TRACE.
 static void StepEdge(const Render* p_render, RenderEdge* p_edge)
 {
-	MechS32 i;
+	int32_t i;
 
 	p_edge->m_values[c_vertexX] += p_edge->m_steps[c_vertexX];
 	for (i = 0; i < p_render->m_wordCount; i++) {
-		MechS32 word = p_render->m_words[i];
+		int32_t word = p_render->m_words[i];
 
 		p_edge->m_values[word] += p_edge->m_steps[word];
 	}
@@ -408,8 +408,8 @@ static void StepEdge(const Render* p_render, RenderEdge* p_edge)
 typedef struct RenderSpan {
 	const RenderEdge* m_low;
 	const RenderEdge* m_high;
-	MechS32 m_left;   // the integer x of the ends
-	MechU32 m_length; // the pixels after the first
+	int32_t m_left;    // the integer x of the ends
+	uint32_t m_length; // the pixels after the first
 } RenderSpan;
 
 static void StartSpan(const Render* p_render, RenderSpan* p_span)
@@ -424,12 +424,12 @@ static void StartSpan(const Render* p_render, RenderSpan* p_span)
 	}
 
 	p_span->m_left = Integer(p_span->m_low->m_values[c_vertexX]);
-	p_span->m_length = (MechU32) Integer(p_span->m_high->m_values[c_vertexX]) - (MechU32) p_span->m_left;
+	p_span->m_length = (uint32_t) Integer(p_span->m_high->m_values[c_vertexX]) - (uint32_t) p_span->m_left;
 }
 
-static MechU8* SpanPixels(const Render* p_render, const RenderSpan* p_span)
+static uint8_t* SpanPixels(const Render* p_render, const RenderSpan* p_span)
 {
-	return p_render->m_buffer + PortableS32(p_render->m_row + (MechU32) p_span->m_left);
+	return p_render->m_buffer + PortableS32(p_render->m_row + (uint32_t) p_span->m_left);
 }
 
 // A span's Gouraud shades: the low end's color plus one dither level on its even pixels and plus
@@ -437,18 +437,18 @@ static MechU8* SpanPixels(const Render* p_render, const RenderSpan* p_span)
 // half the span's length, at least 1). The assembly writes them in pairs, starting with a single
 // pixel at an odd address for some passes, which puts the same shades on the same pixels.
 typedef struct Shades {
-	MechU32 m_even;
-	MechU32 m_odd;
-	MechU32 m_step;
+	uint32_t m_even;
+	uint32_t m_odd;
+	uint32_t m_step;
 } Shades;
 
 static void StartShades(const Render* p_render, const RenderSpan* p_span, Shades* p_shades)
 {
-	MechU32 color = p_span->m_low->m_values[c_vertexColor];
+	uint32_t color = p_span->m_low->m_values[c_vertexColor];
 
 	p_shades->m_step = 0;
 	if (p_span->m_length) {
-		MechU32 halves = p_span->m_length >> 1;
+		uint32_t halves = p_span->m_length >> 1;
 
 		p_shades->m_step = Slope(p_span->m_high->m_values[c_vertexColor] - color, halves ? halves : 1);
 	}
@@ -457,16 +457,16 @@ static void StartShades(const Render* p_render, const RenderSpan* p_span, Shades
 	p_shades->m_odd = color + p_render->m_dither[1];
 }
 
-static MechU8 Shade(const Shades* p_shades, MechU32 p_pixel)
+static uint8_t Shade(const Shades* p_shades, uint32_t p_pixel)
 {
-	MechU32 shade = (p_pixel & 1 ? p_shades->m_odd : p_shades->m_even) + (p_pixel >> 1) * p_shades->m_step;
+	uint32_t shade = (p_pixel & 1 ? p_shades->m_odd : p_shades->m_even) + (p_pixel >> 1) * p_shades->m_step;
 
-	return (MechU8) (shade >> 16);
+	return (uint8_t) (shade >> 16);
 }
 
 static void SwapDither(Render* p_render)
 {
-	MechU32 level = p_render->m_dither[0];
+	uint32_t level = p_render->m_dither[0];
 
 	p_render->m_dither[0] = p_render->m_dither[1];
 	p_render->m_dither[1] = level;
@@ -475,12 +475,12 @@ static void SwapDither(Render* p_render)
 // The Gouraud passes: a fill of the shades (R_GOURAUD_SOLID), of the translucency table's entries
 // for them (I_GOURAUD_SOLID), of p_cueing's for the polygon's color (M_GOURAUD_SOLID), or the
 // pixels there translated through p_cueing's row for each shade (GOURAUD_CUE).
-static void DrawShades(Render* p_render, MechS32 p_pass)
+static void DrawShades(Render* p_render, int32_t p_pass)
 {
 	RenderSpan span;
 	Shades shades;
-	MechU8* pixels;
-	MechU32 i;
+	uint8_t* pixels;
+	uint32_t i;
 
 	StartSpan(p_render, &span);
 	StartShades(p_render, &span, &shades);
@@ -490,7 +490,7 @@ static void DrawShades(Render* p_render, MechS32 p_pass)
 	}
 
 	for (i = 0; i <= span.m_length; i++) {
-		MechU8 shade = Shade(&shades, i);
+		uint8_t shade = Shade(&shades, i);
 
 		switch (p_pass) {
 		case c_passRangeFill:
@@ -500,10 +500,10 @@ static void DrawShades(Render* p_render, MechS32 p_pass)
 			pixels[i] = p_render->m_translucency[shade];
 			break;
 		case c_passCueFill:
-			pixels[i] = p_render->m_cueing[(p_render->m_color & ~(MechU32) 0xff00) | (MechU32) shade << 8];
+			pixels[i] = p_render->m_cueing[(p_render->m_color & ~(uint32_t) 0xff00) | (uint32_t) shade << 8];
 			break;
 		default:
-			pixels[i] = p_render->m_cueing[(MechU32) shade << 8 | pixels[i]];
+			pixels[i] = p_render->m_cueing[(uint32_t) shade << 8 | pixels[i]];
 			break;
 		}
 	}
@@ -517,15 +517,15 @@ static void DrawSolid(const Render* p_render)
 	RenderSpan span;
 
 	StartSpan(p_render, &span);
-	memset(SpanPixels(p_render, &span), (MechU8) (p_render->m_color >> 16), span.m_length + 1);
+	memset(SpanPixels(p_render, &span), (uint8_t) (p_render->m_color >> 16), span.m_length + 1);
 }
 
 // FLAT_CUE: the pixels there through p_cueing.
 static void DrawFlatCue(const Render* p_render)
 {
 	RenderSpan span;
-	MechU8* pixels;
-	MechU32 i;
+	uint8_t* pixels;
+	uint32_t i;
 
 	StartSpan(p_render, &span);
 	pixels = SpanPixels(p_render, &span);
@@ -545,7 +545,7 @@ typedef struct TextureWalk {
 } TextureWalk;
 
 // A walk from 16.16 coordinates and steps.
-static void StartWalk(TextureWalk* p_walk, MechU32 p_u, MechU32 p_uStep, MechU32 p_v, MechU32 p_vStep)
+static void StartWalk(TextureWalk* p_walk, uint32_t p_u, uint32_t p_uStep, uint32_t p_v, uint32_t p_vStep)
 {
 	p_walk->m_u = (MechU64) p_u << 16;
 	p_walk->m_v = (MechU64) p_v << 16;
@@ -555,20 +555,20 @@ static void StartWalk(TextureWalk* p_walk, MechU32 p_u, MechU32 p_uStep, MechU32
 
 // TEXTURE_INDEX and TEXTURE_XP: the texel at the walk's position, through the flat lookaside
 // table if the operation shades. Returns 0 for a transparent one.
-static MechS32 FetchTexel(const Render* p_render, const TextureWalk* p_walk, MechU8* p_texel)
+static int32_t FetchTexel(const Render* p_render, const TextureWalk* p_walk, uint8_t* p_texel)
 {
 	const VFX_TEXTURE* texture = p_render->m_texture;
-	MechU32 u = (MechU32) (p_walk->m_u >> 32);
-	MechU32 v = (MechU32) (p_walk->m_v >> 32);
-	MechU8 texel;
+	uint32_t u = (uint32_t) (p_walk->m_u >> 32);
+	uint32_t v = (uint32_t) (p_walk->m_v >> 32);
+	uint8_t texel;
 
 	switch (p_render->m_operation & c_tileMask) {
 	case c_tileLog:
-		texel = texture->m_vAddrs[v & ((MechU32) texture->m_height - 1)][u & ((MechU32) texture->m_width - 1)];
+		texel = texture->m_vAddrs[v & ((uint32_t) texture->m_height - 1)][u & ((uint32_t) texture->m_width - 1)];
 		break;
 	case c_tileLinear:
 		PORTABLE_ASSERT(texture->m_width && texture->m_height);
-		texel = texture->m_vAddrs[v % (MechU32) texture->m_height][u % (MechU32) texture->m_width];
+		texel = texture->m_vAddrs[v % (uint32_t) texture->m_height][u % (uint32_t) texture->m_width];
 		break;
 	default:
 		texel = texture->m_vAddrs[PortableS32(v)][PortableS32(u)];
@@ -592,16 +592,16 @@ static MechS32 FetchTexel(const Render* p_render, const TextureWalk* p_walk, Mec
 
 // The texels of p_count pixels. Subsampled, each texel takes two pixels, with steps twice as long,
 // while 8 pixels or more are left; the rest take one each.
-static void DrawTexels(const Render* p_render, MechU8* p_pixels, MechU32 p_count, TextureWalk* p_walk)
+static void DrawTexels(const Render* p_render, uint8_t* p_pixels, uint32_t p_count, TextureWalk* p_walk)
 {
-	MechU8 texel;
+	uint8_t texel;
 
 	if (p_render->m_operation & c_sampleCoarse) {
 		MechU64 uStep = p_walk->m_uStep * 2;
 		MechU64 vStep = p_walk->m_vStep * 2;
 
 		while (p_count >= 8) {
-			MechS32 i;
+			int32_t i;
 
 			for (i = 0; i < 4; i++) {
 				if (FetchTexel(p_render, p_walk, &texel)) {
@@ -635,9 +635,9 @@ static void DrawAffine(const Render* p_render)
 {
 	RenderSpan span;
 	TextureWalk walk;
-	MechU32 count;
-	MechU32 u;
-	MechU32 v;
+	uint32_t count;
+	uint32_t u;
+	uint32_t v;
 
 	StartSpan(p_render, &span);
 	count = span.m_length + 1;
@@ -657,20 +657,20 @@ static void DrawAffine(const Render* p_render)
 // the coordinates to the segment's end.
 static void DrawSegment(
 	const Render* p_render,
-	MechU8* p_pixels,
-	MechU32 p_count,
-	MechU32* p_u,
-	MechU32 p_uStep,
-	MechU32* p_v,
-	MechU32 p_vStep
+	uint8_t* p_pixels,
+	uint32_t p_count,
+	uint32_t* p_u,
+	uint32_t p_uStep,
+	uint32_t* p_v,
+	uint32_t p_vStep
 )
 {
 	TextureWalk walk;
 
 	StartWalk(&walk, *p_u, p_uStep, *p_v, p_vStep);
 	DrawTexels(p_render, p_pixels, p_count, &walk);
-	*p_u = (MechU32) (walk.m_u >> 16);
-	*p_v = (MechU32) (walk.m_v >> 16);
+	*p_u = (uint32_t) (walk.m_u >> 16);
+	*p_v = (uint32_t) (walk.m_v >> 16);
 }
 
 // PERSPECTIVE_MAP: u, v and w linear across the span, and the texture coordinates u / w and
@@ -680,18 +680,18 @@ static void DrawSegment(
 static void DrawPerspective(const Render* p_render)
 {
 	RenderSpan span;
-	MechU32 u;
-	MechU32 v;
-	MechU32 w;
-	MechU32 uStep;
-	MechU32 vStep;
-	MechU32 wStep;
-	MechU32 uTexel;
-	MechU32 vTexel;
-	MechU32 count;
-	MechU32 rest;
-	MechU32 segments;
-	MechU8* pixels;
+	uint32_t u;
+	uint32_t v;
+	uint32_t w;
+	uint32_t uStep;
+	uint32_t vStep;
+	uint32_t wStep;
+	uint32_t uTexel;
+	uint32_t vTexel;
+	uint32_t count;
+	uint32_t rest;
+	uint32_t segments;
+	uint8_t* pixels;
 
 	StartSpan(p_render, &span);
 	count = span.m_length + 1;
@@ -706,8 +706,8 @@ static void DrawPerspective(const Render* p_render)
 	pixels = SpanPixels(p_render, &span);
 
 	for (segments = count >> SEGMENT_SHIFT; segments; segments--) {
-		MechU32 vEnd;
-		MechU32 uEnd;
+		uint32_t vEnd;
+		uint32_t uEnd;
 
 		u += uStep;
 		v += vStep;
@@ -719,9 +719,9 @@ static void DrawPerspective(const Render* p_render)
 			pixels,
 			SEGMENT_PIXELS,
 			&uTexel,
-			(MechU32) PortableSar32(PortableS32(uEnd - uTexel), SEGMENT_SHIFT),
+			(uint32_t) PortableSar32(PortableS32(uEnd - uTexel), SEGMENT_SHIFT),
 			&vTexel,
-			(MechU32) PortableSar32(PortableS32(vEnd - vTexel), SEGMENT_SHIFT)
+			(uint32_t) PortableSar32(PortableS32(vEnd - vTexel), SEGMENT_SHIFT)
 		);
 		pixels += SEGMENT_PIXELS;
 	}
@@ -729,8 +729,8 @@ static void DrawPerspective(const Render* p_render)
 	rest = count & (SEGMENT_PIXELS - 1);
 	if (rest) {
 		const RenderEdge* high = span.m_high;
-		MechU32 uEnd = DivideOne(high->m_values[c_vertexU], high->m_values[c_vertexW]) + 0x8000;
-		MechU32 vEnd = DivideOne(high->m_values[c_vertexV], high->m_values[c_vertexW]) + 0x8000;
+		uint32_t uEnd = DivideOne(high->m_values[c_vertexU], high->m_values[c_vertexW]) + 0x8000;
+		uint32_t vEnd = DivideOne(high->m_values[c_vertexV], high->m_values[c_vertexW]) + 0x8000;
 
 		DrawSegment(p_render, pixels, rest, &uTexel, Slope(uEnd - uTexel, rest), &vTexel, Slope(vEnd - vTexel, rest));
 	}
@@ -740,7 +740,7 @@ static void DrawPerspective(const Render* p_render)
 
 static void DrawLine(Render* p_render)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 3; i++) {
 		switch (p_render->m_passes[i]) {
@@ -773,14 +773,14 @@ static void DrawLine(Render* p_render)
 // SCAN_CONVERT: the polygon from its top vertex (the last of the least y) down to its greatest y.
 static void ScanConvert(Render* p_render)
 {
-	const MechU32* vertex;
-	const MechU32* top = NULL;
-	MechS32 topY = 0x7fffffff;
-	MechS32 bottomY = -0x7fffffff - 1;
-	MechU32 lines;
+	const uint32_t* vertex;
+	const uint32_t* top = NULL;
+	int32_t topY = 0x7fffffff;
+	int32_t bottomY = -0x7fffffff - 1;
+	uint32_t lines;
 
 	for (vertex = p_render->m_vertices; vertex != p_render->m_verticesEnd; vertex += VERTEX_WORDS) {
-		MechS32 y = PortableS32(vertex[c_vertexY]);
+		int32_t y = PortableS32(vertex[c_vertexY]);
 
 		if (y <= topY) {
 			topY = y;
@@ -792,7 +792,7 @@ static void ScanConvert(Render* p_render)
 		}
 	}
 
-	lines = (MechU32) bottomY - (MechU32) topY;
+	lines = (uint32_t) bottomY - (uint32_t) topY;
 	if (!lines) {
 		return;
 	}
@@ -801,7 +801,7 @@ static void ScanConvert(Render* p_render)
 	p_render->m_right.m_next = top;
 	StartFirstEdge(p_render, &p_render->m_left);
 	StartFirstEdge(p_render, &p_render->m_right);
-	p_render->m_row = (MechU32) topY * p_render->m_pitch;
+	p_render->m_row = (uint32_t) topY * p_render->m_pitch;
 
 	for (;;) {
 		DrawLine(p_render);
@@ -836,9 +836,9 @@ static void ScanConvert(Render* p_render)
 
 static void RenderPolygon(
 	const PANE* p_pane,
-	const MechU32* p_vlist,
-	MechS32 p_nvertices,
-	MechS32 p_operation,
+	const uint32_t* p_vlist,
+	int32_t p_nvertices,
+	int32_t p_operation,
 	undefined4 p_color,
 	VFX_TEXTURE* p_texture,
 	void* p_cueing,
@@ -854,14 +854,14 @@ static void RenderPolygon(
 
 	PORTABLE_ASSERT(p_nvertices > 0);
 	render.m_buffer = p_pane->m_window->m_buffer;
-	render.m_pitch = (MechU32) p_pane->m_window->m_xMax + 1;
+	render.m_pitch = (uint32_t) p_pane->m_window->m_xMax + 1;
 	render.m_vertices = p_vlist;
 	render.m_verticesEnd = p_vlist + p_nvertices * VERTEX_WORDS;
 	render.m_operation = p_operation;
 	render.m_color = p_color;
 	render.m_texture = p_texture;
-	render.m_cueing = (const MechU8*) p_cueing;
-	render.m_translucency = (const MechU8*) p_translucency;
+	render.m_cueing = (const uint8_t*) p_cueing;
+	render.m_translucency = (const uint8_t*) p_translucency;
 	render.m_dither[0] = g_ditherLevels[0];
 	render.m_dither[1] = g_ditherLevels[1];
 	SelectPasses(&render);
@@ -870,9 +870,9 @@ static void RenderPolygon(
 
 void VFX_polygon_render(
 	PANE* p_pane,
-	MechU32* p_vlist,
-	MechS32 p_nvertices,
-	MechS32 p_operation,
+	uint32_t* p_vlist,
+	int32_t p_nvertices,
+	int32_t p_operation,
 	undefined4 p_color,
 	VFX_TEXTURE* p_texture,
 	void* p_cueing,
@@ -892,19 +892,19 @@ enum ClipSide {
 	c_clipTop
 };
 
-static const MechU32 g_clipBits[] = {8, 1, 4, 2};
+static const uint32_t g_clipBits[] = {8, 1, 4, 2};
 
 // The words a clipped vertex interpolates besides x and y, by operation (UV_clip, W_clip,
 // C_clip).
 typedef struct ClipWords {
-	MechS32 m_words[4];
-	MechS32 m_count;
+	int32_t m_words[4];
+	int32_t m_count;
 } ClipWords;
 
-static void SelectClipWords(ClipWords* p_words, MechS32 p_operation)
+static void SelectClipWords(ClipWords* p_words, int32_t p_operation)
 {
-	MechS32 shade = p_operation & c_shadeMask;
-	MechS32 transparency = p_operation & c_transparentMask;
+	int32_t shade = p_operation & c_shadeMask;
+	int32_t transparency = p_operation & c_transparentMask;
 
 	p_words->m_count = 0;
 	if (p_operation & c_mapAffine) {
@@ -922,7 +922,7 @@ static void SelectClipWords(ClipWords* p_words, MechS32 p_operation)
 	}
 }
 
-static MechS32 IsInside(MechS32 p_side, MechS32 p_value, MechS32 p_clip)
+static int32_t IsInside(int32_t p_side, int32_t p_value, int32_t p_clip)
 {
 	return p_side == c_clipRight || p_side == c_clipTop ? p_value <= p_clip : p_value >= p_clip;
 }
@@ -930,23 +930,23 @@ static MechS32 IsInside(MechS32 p_side, MechS32 p_value, MechS32 p_clip)
 // CLIP_X_LINE and CLIP_Y_LINE: the point of the edge from p_second to p_first on the side, as
 // p_second plus the edge times the fraction of it inside. Writes x, y and p_words only.
 static void ClipEdge(
-	const MechU32* p_first,
-	const MechU32* p_second,
-	MechU32* p_out,
-	MechS32 p_side,
-	MechS32 p_clip,
+	const uint32_t* p_first,
+	const uint32_t* p_second,
+	uint32_t* p_out,
+	int32_t p_side,
+	int32_t p_clip,
 	const ClipWords* p_words
 )
 {
-	MechS32 across = p_side == c_clipRight || p_side == c_clipLeft ? c_vertexX : c_vertexY;
-	MechS32 along = across == c_vertexX ? c_vertexY : c_vertexX;
-	MechU32 fraction = DivideToF30((MechU32) p_clip - p_second[across], p_first[across] - p_second[across]);
-	MechS32 i;
+	int32_t across = p_side == c_clipRight || p_side == c_clipLeft ? c_vertexX : c_vertexY;
+	int32_t along = across == c_vertexX ? c_vertexY : c_vertexX;
+	uint32_t fraction = DivideToF30((uint32_t) p_clip - p_second[across], p_first[across] - p_second[across]);
+	int32_t i;
 
-	p_out[across] = (MechU32) p_clip;
+	p_out[across] = (uint32_t) p_clip;
 	p_out[along] = p_second[along] + MultiplyF30(p_first[along] - p_second[along], fraction);
 	for (i = 0; i < p_words->m_count; i++) {
-		MechS32 word = p_words->m_words[i];
+		int32_t word = p_words->m_words[i];
 
 		p_out[word] = p_second[word] + MultiplyF30(p_first[word] - p_second[word], fraction);
 	}
@@ -954,28 +954,28 @@ static void ClipEdge(
 
 // One side: each edge from p_first to p_second copies p_first if it's inside, and adds the edge's
 // crossing if one end is outside. Returns the vertices written.
-static MechU32 ClipSide(
-	const MechU32* p_source,
-	MechU32 p_count,
-	MechU32* p_destination,
-	MechS32 p_side,
-	MechS32 p_clip,
+static uint32_t ClipSide(
+	const uint32_t* p_source,
+	uint32_t p_count,
+	uint32_t* p_destination,
+	int32_t p_side,
+	int32_t p_clip,
 	const ClipWords* p_words
 )
 {
-	MechS32 across = p_side == c_clipRight || p_side == c_clipLeft ? c_vertexX : c_vertexY;
-	const MechU32* first = p_source + (p_count - 1) * VERTEX_WORDS;
-	const MechU32* second = p_source;
-	MechU32 out = 0;
-	MechU32 i;
+	int32_t across = p_side == c_clipRight || p_side == c_clipLeft ? c_vertexX : c_vertexY;
+	const uint32_t* first = p_source + (p_count - 1) * VERTEX_WORDS;
+	const uint32_t* second = p_source;
+	uint32_t out = 0;
+	uint32_t i;
 
 	for (i = 0; i < p_count; i++) {
-		MechS32 firstInside = IsInside(p_side, PortableS32(first[across]), p_clip);
-		MechS32 secondInside = IsInside(p_side, PortableS32(second[across]), p_clip);
+		int32_t firstInside = IsInside(p_side, PortableS32(first[across]), p_clip);
+		int32_t secondInside = IsInside(p_side, PortableS32(second[across]), p_clip);
 
 		if (firstInside) {
 			PORTABLE_ASSERT(p_destination != g_workPoints || out < MAX_WORK_VERTICES);
-			memcpy(p_destination + out * VERTEX_WORDS, first, VERTEX_WORDS * sizeof(MechU32));
+			memcpy(p_destination + out * VERTEX_WORDS, first, VERTEX_WORDS * sizeof(uint32_t));
 			out++;
 		}
 
@@ -994,21 +994,21 @@ static MechU32 ClipSide(
 
 void VFX_polygon_clip_XY_and_render(
 	PANE* p_pane,
-	MechU32* p_vlist,
-	MechS32 p_nvertices,
-	MechS32 p_operation,
+	uint32_t* p_vlist,
+	int32_t p_nvertices,
+	int32_t p_operation,
 	undefined4 p_color,
 	VFX_TEXTURE* p_texture,
 	void* p_cueing,
 	void* p_translucency
 )
 {
-	MechS32 clips[4];
-	MechU32 needed = 0;
-	MechU32 count = (MechU32) p_nvertices;
-	MechU32* source = p_vlist;
-	MechU32* destination = g_workPoints;
-	MechU32 i;
+	int32_t clips[4];
+	uint32_t needed = 0;
+	uint32_t count = (uint32_t) p_nvertices;
+	uint32_t* source = p_vlist;
+	uint32_t* destination = g_workPoints;
+	uint32_t i;
 
 	clips[c_clipRight] = p_pane->m_x1;
 	clips[c_clipBottom] = p_pane->m_y0;
@@ -1018,23 +1018,23 @@ void VFX_polygon_clip_XY_and_render(
 	// The outcodes: the signs of each vertex's distances inside the sides
 	PORTABLE_ASSERT(p_nvertices > 0);
 	for (i = 0; i < count; i++) {
-		const MechU32* vertex = p_vlist + i * VERTEX_WORDS;
-		MechU32 x = vertex[c_vertexX];
-		MechU32 y = vertex[c_vertexY];
+		const uint32_t* vertex = p_vlist + i * VERTEX_WORDS;
+		uint32_t x = vertex[c_vertexX];
+		uint32_t y = vertex[c_vertexY];
 
-		needed |= ((MechU32) clips[c_clipRight] - x) >> 31 << 3;
-		needed |= (x - (MechU32) clips[c_clipLeft]) >> 31 << 2;
-		needed |= ((MechU32) clips[c_clipTop] - y) >> 31 << 1;
-		needed |= (y - (MechU32) clips[c_clipBottom]) >> 31;
+		needed |= ((uint32_t) clips[c_clipRight] - x) >> 31 << 3;
+		needed |= (x - (uint32_t) clips[c_clipLeft]) >> 31 << 2;
+		needed |= ((uint32_t) clips[c_clipTop] - y) >> 31 << 1;
+		needed |= (y - (uint32_t) clips[c_clipBottom]) >> 31;
 	}
 
 	if (needed) {
 		ClipWords words;
-		MechS32 side;
+		int32_t side;
 
 		SelectClipWords(&words, p_operation);
 		for (side = c_clipRight; side <= c_clipTop; side++) {
-			MechU32* swap;
+			uint32_t* swap;
 
 			if (!(needed & g_clipBits[side])) {
 				continue;
@@ -1055,5 +1055,5 @@ void VFX_polygon_clip_XY_and_render(
 		return;
 	}
 
-	RenderPolygon(p_pane, source, (MechS32) count, p_operation, p_color, p_texture, p_cueing, p_translucency);
+	RenderPolygon(p_pane, source, (int32_t) count, p_operation, p_color, p_texture, p_cueing, p_translucency);
 }

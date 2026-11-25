@@ -11,18 +11,18 @@ extern "C"
 {
 #endif
 
-	extern MechChar* g_supAnimBackdropName;
-	extern MechChar* g_supAnimShapeName;
+	extern char* g_supAnimBackdropName;
+	extern char* g_supAnimShapeName;
 	extern void* g_supAnimBackdrop;
 	extern void* g_supAnimShape;
-	extern MechS32 g_supAnimFrameCount;
+	extern int32_t g_supAnimFrameCount;
 	extern PaletteColor g_supAnimPalette[16];
-	extern MechS32 g_supAnimY;
-	extern MechS32 g_supAnimX;
+	extern int32_t g_supAnimY;
+	extern int32_t g_supAnimX;
 	extern PANE g_supAnimTarget;
 	extern WINDOW g_supAnimBuffer;
 
-	void StartSupAnim(MechS32 p_slowFade);
+	void StartSupAnim(int32_t p_slowFade);
 	void StopSupAnim(void);
 
 #ifdef __cplusplus

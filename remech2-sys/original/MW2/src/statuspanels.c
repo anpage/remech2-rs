@@ -31,24 +31,24 @@
 
 // Who the chat message goes to: 0 nobody (no message is being typed), -1 everybody, or a
 // player.
-MechS32 g_chatRecipient = 0;
+int32_t g_chatRecipient = 0;
 
 // Whether the objectives panel shows.
-MechS32 g_showObjectives = 0;
+int32_t g_showObjectives = 0;
 
-MechChar g_ticksText[16];
+char g_ticksText[16];
 
-MechChar g_secondsText[16];
+char g_secondsText[16];
 
 // The chat message being typed. HandleChatKey edits it.
-MechChar g_chatMessage[0x30];
+char g_chatMessage[0x30];
 
 // Formats a tick count (181 per second) as hours:minutes:seconds.
-MechChar* FormatTicks(MechS32 p_ticks)
+char* FormatTicks(int32_t p_ticks)
 {
-	MechDouble seconds;
-	MechS32 hours;
-	MechS32 minutes;
+	double seconds;
+	int32_t hours;
+	int32_t minutes;
 
 	hours = p_ticks / (181 * 3600);
 	minutes = (p_ticks - hours * (181 * 3600)) / (181 * 60);
@@ -58,11 +58,11 @@ MechChar* FormatTicks(MechS32 p_ticks)
 }
 
 // Formats a count of seconds as hours:minutes:seconds.
-MechChar* FormatSeconds(MechS32 p_seconds)
+char* FormatSeconds(int32_t p_seconds)
 {
-	MechS32 seconds;
-	MechS32 hours;
-	MechS32 minutes;
+	int32_t seconds;
+	int32_t hours;
+	int32_t minutes;
 
 	hours = p_seconds / 3600;
 	minutes = (p_seconds - hours * 3600) / 60;
@@ -72,10 +72,10 @@ MechChar* FormatSeconds(MechS32 p_seconds)
 }
 
 // Returns the width of p_text in p_font.
-MechS32 GetTextWidth(const MechChar* p_text, void* p_font)
+int32_t GetTextWidth(const char* p_text, void* p_font)
 {
-	MechS32 width;
-	const MechChar* c;
+	int32_t width;
+	const char* c;
 
 	width = 0;
 	for (c = p_text; *c; c++) {
@@ -88,21 +88,21 @@ MechS32 GetTextWidth(const MechChar* p_text, void* p_font)
 // Lists the objectives of priority p_priority the local player's star can see, from p_pos, each
 // with its state at the right edge of the panel. A name longer than 31 characters takes two
 // lines. In a network game whose only listed objective is a secondary one, it counts as primary.
-void DrawObjectiveList(CockpitPanel* p_panel, Point* p_pos, void* p_font, MechU8 p_priority)
+void DrawObjectiveList(CockpitPanel* p_panel, Point* p_pos, void* p_font, uint8_t p_priority)
 {
 	PANE* target;
 	StarMission* mission;
-	MechS32 height;
-	MechS32 primary;
-	MechS32 count;
-	MechS32 secondary;
-	MechS32 i;
+	int32_t height;
+	int32_t primary;
+	int32_t count;
+	int32_t secondary;
+	int32_t i;
 	MissionObjective* objective;
-	MechChar* label;
-	MechS32 twoLines;
-	MechS32 x;
-	MechS32 y;
-	MechChar text[256];
+	char* label;
+	int32_t twoLines;
+	int32_t x;
+	int32_t y;
+	char text[256];
 
 	target = p_panel->m_target;
 	mission = &g_objectiveTable[g_localStar];
@@ -224,10 +224,10 @@ void DrawObjectivesPanel(CockpitPanel* p_panel)
 	void* font;
 	Point pos;
 	Point* cursor = &pos;
-	MechS32 ticks;
-	MechS32 height;
-	MechChar text[256];
-	MechS32 gap;
+	int32_t ticks;
+	int32_t height;
+	char text[256];
+	int32_t gap;
 
 	if (!p_panel->m_enabled || !g_showObjectives) {
 		return;
@@ -290,14 +290,14 @@ void DrawObjectivesPanel(CockpitPanel* p_panel)
 // a cursor.
 void DrawNetworkPanel(CockpitPanel* p_panel)
 {
-	MechChar* state;
+	char* state;
 	Point pos;
 	Point* cursor = &pos;
-	MechS32 color;
-	MechS32 height;
-	MechS32 player;
-	MechS32 gap;
-	MechChar text[40];
+	int32_t color;
+	int32_t height;
+	int32_t player;
+	int32_t gap;
+	char text[40];
 	void* font;
 
 	color = 0xe;
@@ -476,7 +476,7 @@ void DrawNetworkPanel(CockpitPanel* p_panel)
 void DrawKillsPanel(CockpitPanel* p_panel)
 {
 	void* font;
-	MechChar text[40];
+	char text[40];
 
 	if (!p_panel->m_enabled) {
 		return;
@@ -505,7 +505,7 @@ void DrawKillsPanel(CockpitPanel* p_panel)
 // Shows the autopilot's state.
 void DrawAutopilotPanel(CockpitPanel* p_panel)
 {
-	MechChar* text;
+	char* text;
 	Mech* mech;
 	void* font;
 
@@ -548,9 +548,9 @@ void DrawAutopilotPanel(CockpitPanel* p_panel)
 // Shows the local mech's speed in kph, in a different color while it backs up, and its throttle bar.
 void DrawSpeedPanel(CockpitPanel* p_panel)
 {
-	MechS32 speed;
+	int32_t speed;
 	Mech* mech;
-	MechChar text[64];
+	char text[64];
 	void* font;
 
 	if (!p_panel->m_enabled) {

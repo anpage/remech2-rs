@@ -26,25 +26,25 @@ public:
 	~TMPackDataBase();
 
 	void DumpEntries();
-	MechS32 GetEntryCount();
-	TMPackDBEntry* GetEntry(MechS32 p_id);
-	MechS32 GetDBItem(MechS32 p_id, void** p_data, MechS32* p_size);
-	MechS32 GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size);
-	MechS32 ReadDBItemData(MechS32 p_id, MechS32 p_offset, void* p_buffer, size_t p_size);
-	MechS32 ReadDBItemLine(MechS32 p_id, MechS32 p_offset, MechChar* p_buffer);
-	MechS32 ReadDBItemString(MechS32 p_id, MechS32 p_offset, MechChar* p_buffer);
+	int32_t GetEntryCount();
+	TMPackDBEntry* GetEntry(int32_t p_id);
+	int32_t GetDBItem(int32_t p_id, void** p_data, int32_t* p_size);
+	int32_t GetDBItemLZ(int32_t p_id, void** p_data, int32_t* p_size);
+	int32_t ReadDBItemData(int32_t p_id, int32_t p_offset, void* p_buffer, size_t p_size);
+	int32_t ReadDBItemLine(int32_t p_id, int32_t p_offset, char* p_buffer);
+	int32_t ReadDBItemString(int32_t p_id, int32_t p_offset, char* p_buffer);
 
 private:
-	MechS32 ByteAt(MechS32 p_offset);
+	int32_t ByteAt(int32_t p_offset);
 
-	MechChar m_name[0x80];
-	MechU8* m_data;
-	MechS32 m_size;
-	MechS32 m_numEntries;
+	char m_name[0x80];
+	uint8_t* m_data;
+	int32_t m_size;
+	int32_t m_numEntries;
 	Collection* m_entries;
 };
 
 // The globals of tmpackdatabase.cpp that other units use.
-extern MechU8 g_lzWindow[c_lzWindowSize];
+extern uint8_t g_lzWindow[c_lzWindowSize];
 
 #endif // TMPACKDATABASE_H

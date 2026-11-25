@@ -9,8 +9,8 @@ extern "C"
 {
 #endif
 
-	MechU32 FixedSqrt16(MechU32 p_value);
-	void NormalizeVectorGuarded(MechS32* p_x, MechS32* p_y, MechS32* p_z);
+	uint32_t FixedSqrt16(uint32_t p_value);
+	void NormalizeVectorGuarded(int32_t* p_x, int32_t* p_y, int32_t* p_z);
 
 #ifdef __cplusplus
 }

@@ -14,20 +14,20 @@ public:
 	MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_cursorShape);
 	~MouseState();
 
-	void MoveCursorTo(MechS32 p_x, MechS32 p_y);
+	void MoveCursorTo(int32_t p_x, int32_t p_y);
 	undefined GetDoubleClicked();
 	undefined4 GetLeftPressed();
 	undefined4 GetRightPressed();
 	undefined4 GetMiddlePressed();
 	void DrawCursorPosition();
-	void PressButton(MechS32 p_button);
+	void PressButton(int32_t p_button);
 	void ReadMouseState();
 
 private:
 	void* m_cursorShape;         // 0x00 — g_cursorShape, never read
 	VideoDriver* m_videoDriver;  // 0x04
 	Font* m_font;                // 0x08
-	MechS32 m_positionTextWidth; // 0x0c — DrawCursorPosition's, restored before the next
+	int32_t m_positionTextWidth; // 0x0c — DrawCursorPosition's, restored before the next
 	undefined4 m_leftPressed;    // 0x10
 	undefined4 m_rightPressed;   // 0x14
 	undefined4 m_middlePressed;  // 0x18
@@ -37,8 +37,8 @@ private:
 public:
 	// The screens read the cursor position, and the cockpit controls screen's scroll arrows
 	// repeat while a button is held.
-	MechS32 m_x;            // 0x2b
-	MechS32 m_y;            // 0x2f
+	int32_t m_x;            // 0x2b
+	int32_t m_y;            // 0x2f
 	undefined4 m_leftDown;  // 0x33
 	undefined4 m_rightDown; // 0x37
 
@@ -50,6 +50,6 @@ private:
 #pragma pack()
 
 // The globals of mousestate.cpp that other units use.
-extern MechChar g_cursorPositionText[0x20];
+extern char g_cursorPositionText[0x20];
 
 #endif // MOUSESTATE_H

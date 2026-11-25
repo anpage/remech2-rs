@@ -14,15 +14,15 @@ typedef void (*ObjectCallback)(SceneObject* p_obj);
 /* A node of the scene tree: its transform relative to the parent, the world transform
    UpdateObjWorld derives from it, and an optional shape. CreateObj allocates it. */
 struct SceneObject {
-	SceneObject* m_parent;          // 0x00
-	SceneObject* m_firstChild;      // 0x04
-	SceneObject* m_nextSibling;     // 0x08
-	Matrix m_local;                 // 0x0c
-	Matrix m_world;                 // 0x3c
-	Shape* m_shape;                 // 0x6c
-	MechChar* m_name;               // 0x70
-	MechU32 m_flags;                // 0x74
-	MechU32 m_renormalizeCountdown; // 0x78 — rotations left before NormalizeRotation (64 to 191, staggered)
+	SceneObject* m_parent;           // 0x00
+	SceneObject* m_firstChild;       // 0x04
+	SceneObject* m_nextSibling;      // 0x08
+	Matrix m_local;                  // 0x0c
+	Matrix m_world;                  // 0x3c
+	Shape* m_shape;                  // 0x6c
+	char* m_name;                    // 0x70
+	uint32_t m_flags;                // 0x74
+	uint32_t m_renormalizeCountdown; // 0x78 — rotations left before NormalizeRotation (64 to 191, staggered)
 };
 
 enum {
@@ -37,36 +37,36 @@ extern "C"
 {
 #endif
 
-	extern MechU32 g_nextRenormalizeCountdown;
+	extern uint32_t g_nextRenormalizeCountdown;
 
-	SceneObject* CreateObj(SceneObject* p_parent, MechU32 p_flags);
+	SceneObject* CreateObj(SceneObject* p_parent, uint32_t p_flags);
 	SceneObject* InitObj(SceneObject* p_parent, void* p_memory);
 	void SetObjShape(SceneObject* p_obj, Shape* p_shape);
 	Shape* GetObjShape(SceneObject* p_obj);
-	MechChar* GetObjName(SceneObject* p_obj);
-	void SetObjName(SceneObject* p_obj, MechChar* p_name);
+	char* GetObjName(SceneObject* p_obj);
+	void SetObjName(SceneObject* p_obj, char* p_name);
 	void GetObjWorldAngles(SceneObject* p_obj, undefined4* p_angleX, undefined4* p_angleY, undefined4* p_angleZ);
 	void GetObjAngles(SceneObject* p_obj, undefined4* p_angleX, undefined4* p_angleY, undefined4* p_angleZ);
-	void GetObjPosition(SceneObject* p_obj, MechS32* p_x, MechS32* p_y, MechS32* p_z);
-	void GetObjLocalPosition(SceneObject* p_obj, MechS32* p_x, MechS32* p_y, MechS32* p_z);
-	void SetObjPosition(SceneObject* p_obj, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	void MoveObj(SceneObject* p_obj, MechS32 p_x, MechS32 p_y, MechS32 p_z);
+	void GetObjPosition(SceneObject* p_obj, int32_t* p_x, int32_t* p_y, int32_t* p_z);
+	void GetObjLocalPosition(SceneObject* p_obj, int32_t* p_x, int32_t* p_y, int32_t* p_z);
+	void SetObjPosition(SceneObject* p_obj, int32_t p_x, int32_t p_y, int32_t p_z);
+	void MoveObj(SceneObject* p_obj, int32_t p_x, int32_t p_y, int32_t p_z);
 	void SetObjTransform(SceneObject* p_obj, Matrix* p_matrix);
 	void TransformObj(SceneObject* p_obj, Matrix* p_matrix);
 	void SetObjRotationMatrix(SceneObject* p_obj, Matrix* p_matrix);
 	void RotateObjMatrix(SceneObject* p_obj, Matrix* p_matrix);
-	void SetObjRotation(SceneObject* p_obj, MechS32 p_angleX, MechS32 p_angleY, MechS32 p_angleZ, MechU32 p_flags);
-	void RotateObj(SceneObject* p_obj, MechS32 p_angleX, MechS32 p_angleY, MechS32 p_angleZ, MechU32 p_flags);
+	void SetObjRotation(SceneObject* p_obj, int32_t p_angleX, int32_t p_angleY, int32_t p_angleZ, uint32_t p_flags);
+	void RotateObj(SceneObject* p_obj, int32_t p_angleX, int32_t p_angleY, int32_t p_angleZ, uint32_t p_flags);
 	void TransformShapeModel(Shape* p_shape);
 	void HideObjTree(SceneObject* p_obj);
 	void ShowObjTree(SceneObject* p_obj);
 	void DisableObjTreeCollision(SceneObject* p_obj);
 	void EnableObjTreeCollision(SceneObject* p_obj);
 	void DetachObjTreeShapes(SceneObject* p_obj);
-	void SetObjTreeKind(SceneObject* p_obj, MechS32 p_kind);
-	void SetObjTreeOwner(SceneObject* p_obj, MechS32 p_owner);
-	void SetObjTreeCollisionType(SceneObject* p_obj, MechS32 p_collisionType);
-	void ClearObjTreeKind(SceneObject* p_obj, MechS32 p_flags);
+	void SetObjTreeKind(SceneObject* p_obj, int32_t p_kind);
+	void SetObjTreeOwner(SceneObject* p_obj, int32_t p_owner);
+	void SetObjTreeCollisionType(SceneObject* p_obj, int32_t p_collisionType);
+	void ClearObjTreeKind(SceneObject* p_obj, int32_t p_flags);
 	void UpdateObjWorld(SceneObject* p_obj);
 	void UpdateObj(SceneObject* p_obj);
 	SceneObject* GetObjRoot(SceneObject* p_obj);
@@ -80,13 +80,13 @@ extern "C"
 	void DetachObj(SceneObject* p_obj);
 	void AttachObj(SceneObject* p_obj, SceneObject* p_parent);
 	void DestroyObjTree(SceneObject* p_obj, ShapeCallback p_callback);
-	SceneObject* FindObjByName(SceneObject* p_obj, const MechChar* p_name);
+	SceneObject* FindObjByName(SceneObject* p_obj, const char* p_name);
 	SceneObject* GetObjLastChild(SceneObject* p_obj);
-	SceneObject* GetObjChild(SceneObject* p_obj, MechS32 p_index);
-	SceneObject* FindObjByPart(SceneObject* p_obj, MechU32 p_partId);
-	void RaisePartDamageLevel(SceneObject* p_obj, MechS32 p_level, MechU32 p_partId);
-	void BlowOffPart(SceneObject* p_obj, MechU32 p_partId);
-	MechS32 GetObjSize(void);
+	SceneObject* GetObjChild(SceneObject* p_obj, int32_t p_index);
+	SceneObject* FindObjByPart(SceneObject* p_obj, uint32_t p_partId);
+	void RaisePartDamageLevel(SceneObject* p_obj, int32_t p_level, uint32_t p_partId);
+	void BlowOffPart(SceneObject* p_obj, uint32_t p_partId);
+	int32_t GetObjSize(void);
 
 #ifdef __cplusplus
 }

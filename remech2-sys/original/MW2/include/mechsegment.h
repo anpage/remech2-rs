@@ -13,7 +13,7 @@ typedef struct MechSegment {
 	struct MechSegment* m_nextSibling; // 0x04
 	struct SceneObject* m_obj;         // 0x08
 	struct SceneObject* m_parent;      // 0x0c
-	MechS32 m_position[3];             // 0x10
+	int32_t m_position[3];             // 0x10
 	undefined4 m_rotation[3];          // 0x1c
 } MechSegment;
 

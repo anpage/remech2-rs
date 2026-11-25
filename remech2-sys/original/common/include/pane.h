@@ -11,10 +11,10 @@ typedef struct WINDOW WINDOW;
 // take. Coordinates are relative to the WINDOW; VFX clips the pane to it.
 struct PANE {
 	WINDOW* m_window; // 0x00
-	MechS32 m_x0;     // 0x04
-	MechS32 m_y0;     // 0x08
-	MechS32 m_x1;     // 0x0c
-	MechS32 m_y1;     // 0x10
+	int32_t m_x0;     // 0x04
+	int32_t m_y0;     // 0x08
+	int32_t m_x1;     // 0x0c
+	int32_t m_y1;     // 0x10
 };
 typedef struct PANE PANE;
 #pragma pack()

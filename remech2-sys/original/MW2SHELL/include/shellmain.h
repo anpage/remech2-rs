@@ -28,8 +28,8 @@ enum ShellMessage {
 	c_msgPilotRoster = 0x412,
 	c_msgStarConfig = 0x413,
 	c_msgCadetTraining = 0x414,
-	c_msgLandingVideo = 0x415,     // a clan's landing video, before its clan hall
-	c_msgEndingVideo = 0x416       // the campaign's ending video
+	c_msgLandingVideo = 0x415, // a clan's landing video, before its clan hall
+	c_msgEndingVideo = 0x416   // the campaign's ending video
 };
 
 // The shell menu's commands (menu 104)
@@ -39,37 +39,37 @@ enum ShellMenuCommand {
 	c_menuFleeToWindows = 40003,
 	c_menuCockpitControls = 40011,
 	c_menuHelpContents = 40012, // "Codes and Procedures"
-	c_menuKeshik = 40082, // the credits
+	c_menuKeshik = 40082,       // the credits
 	c_menuCombatVariables = 40084,
 	c_menuTechnicalHelp = 40085
 };
 
 // The functions and globals of shellmain.cpp that other units use.
-extern void (*g_screenFunction)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32);
+extern void (*g_screenFunction)(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t);
 extern char* g_scenario;
-extern MechS32 g_selectedCampaign;
-extern MechU8 g_pilotChosen;
-extern void (*g_menuFunction)(MechS32 p_active);
+extern int32_t g_selectedCampaign;
+extern uint8_t g_pilotChosen;
+extern void (*g_menuFunction)(int32_t p_active);
 extern MidiSequence* g_midiBackgroundMusic;
-extern MechS32 g_cursorHidden;
-extern MechU8 g_midiSongBaseSet;
-extern MechS32 g_midiSongBase;
-extern MechS32 g_midiSongPlaying;
-extern MechU8 g_menuCommandEnabled[5];
+extern int32_t g_cursorHidden;
+extern uint8_t g_midiSongBaseSet;
+extern int32_t g_midiSongBase;
+extern int32_t g_midiSongPlaying;
+extern uint8_t g_menuCommandEnabled[5];
 
 extern "C" int ShellMain(char* p_cmdLine);
 // Implemented on the Rust side (src/shell/screens/debug.rs), around ShellHandleMessageC
-extern "C" MECH_INTPTR ShellHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
-MECH_INTPTR ShellHandleMessageC(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+extern "C" MECH_INTPTR ShellHandleMessage(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
 void CloseMenuFunction();
-MechS32 PumpMessage();
-extern "C" MechS32 IsShellMenuCommandEnabled(MechS32 p_command);
-void EnableShellMenuCommand(MechS32 p_command, MechS32 p_enabled);
+int32_t PumpMessage();
+extern "C" int32_t IsShellMenuCommandEnabled(int32_t p_command);
+void EnableShellMenuCommand(int32_t p_command, int32_t p_enabled);
 void EnableShellMenu();
 void DisableShellMenu();
-void RegisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32));
-void UnregisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32));
-void RegisterMenuFunction(void (*p_callback)(MechS32 p_active));
-void UnregisterMenuFunction(void (*p_callback)(MechS32 p_active));
+void RegisterScreenFunction(void (*p_callback)(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t));
+void UnregisterScreenFunction(void (*p_callback)(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t));
+void RegisterMenuFunction(void (*p_callback)(int32_t p_active));
+void UnregisterMenuFunction(void (*p_callback)(int32_t p_active));
 
 #endif // SHELLMAIN_H

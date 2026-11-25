@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-	MechU32 FixedSqrtGuess(MechU32 p_value);
+	uint32_t FixedSqrtGuess(uint32_t p_value);
 
 #ifdef __cplusplus
 }

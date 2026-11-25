@@ -11,11 +11,11 @@
 
 // Reads up to 100 more tokens from the file. Returns c_tokenEndOfFile when the file is already
 // at its end.
-MechS32 ReadTokens(TokenStream* p_stream)
+int32_t ReadTokens(TokenStream* p_stream)
 {
-	MechChar token[500];
-	MechS32 count;
-	MechS32 result;
+	char token[500];
+	int32_t count;
+	int32_t result;
 
 	if (feof(p_stream->m_file)) {
 		return c_tokenEndOfFile;
@@ -37,7 +37,7 @@ MechS32 ReadTokens(TokenStream* p_stream)
 TokenStream* CreateTokenStream(FILE* p_file)
 {
 	TokenStream* stream;
-	MechChar** tokens;
+	char** tokens;
 
 	stream = (TokenStream*) MechHeapAlloc(g_primaryHeap, sizeof(TokenStream));
 	if (stream == NULL) {
@@ -51,7 +51,7 @@ TokenStream* CreateTokenStream(FILE* p_file)
 	stream->m_capacity = 100;
 	stream->m_file = p_file;
 
-	tokens = (MechChar**) MechHeapAlloc(g_primaryHeap, stream->m_capacity * sizeof(MechChar*));
+	tokens = (char**) MechHeapAlloc(g_primaryHeap, stream->m_capacity * sizeof(char*));
 	if (tokens == NULL) {
 		fprintf(stderr, "Could not allocate Token entry array\n");
 		fflush(stderr);
@@ -66,7 +66,7 @@ TokenStream* CreateTokenStream(FILE* p_file)
 
 void SkipBlanks(FILE* p_file)
 {
-	MechChar c;
+	char c;
 
 	c = fgetc(p_file);
 	while (!feof(p_file) && (c == ' ' || c == '\t')) {
@@ -78,13 +78,13 @@ void SkipBlanks(FILE* p_file)
 	}
 }
 
-MechS32 ReadFileToken(FILE* p_file, MechChar* p_token)
+int32_t ReadFileToken(FILE* p_file, char* p_token)
 {
-	MechS32 last;
-	MechChar buffer[500];
-	MechChar c;
-	MechU8 trimmed;
-	MechS32 length;
+	int32_t last;
+	char buffer[500];
+	char c;
+	uint8_t trimmed;
+	int32_t length;
 
 	strcpy(p_token, "");
 	strcpy(buffer, "");
@@ -134,9 +134,9 @@ MechS32 ReadFileToken(FILE* p_file, MechChar* p_token)
 }
 
 // Refills the stream once every token has been handed out.
-MechS32 RefillTokens(TokenStream* p_stream)
+int32_t RefillTokens(TokenStream* p_stream)
 {
-	MechS32 result;
+	int32_t result;
 
 	if (p_stream->m_count <= p_stream->m_index) {
 		if (feof(p_stream->m_file)) {
@@ -155,7 +155,7 @@ MechS32 RefillTokens(TokenStream* p_stream)
 // Takes the next token if it starts with p_key (any token for an empty key), copying it to
 // p_value. Line ends are skipped unless p_key is one. A mismatch leaves the token in place, still
 // copied, and returns c_tokenMismatch.
-MechS32 TakeToken(TokenStream* p_stream, MechChar* p_key, MechChar* p_value)
+int32_t TakeToken(TokenStream* p_stream, char* p_key, char* p_value)
 {
 	if (RefillTokens(p_stream) == c_tokenEndOfFile) {
 		return c_tokenEndOfFile;
@@ -198,14 +198,14 @@ MechS32 TakeToken(TokenStream* p_stream, MechChar* p_key, MechChar* p_value)
 	return c_tokenMismatch;
 }
 
-void AddToken(TokenStream* p_stream, MechChar* p_token)
+void AddToken(TokenStream* p_stream, char* p_token)
 {
-	MechChar** tokens;
-	MechChar* copy;
+	char** tokens;
+	char* copy;
 
 	if (p_stream->m_capacity - 1 < p_stream->m_count) {
 		p_stream->m_capacity += 100;
-		tokens = (MechChar**) realloc(p_stream->m_tokens, p_stream->m_capacity * sizeof(MechChar*));
+		tokens = (char**) realloc(p_stream->m_tokens, p_stream->m_capacity * sizeof(char*));
 		if (tokens == NULL) {
 			fprintf(stderr, "Failed to reallocate token array\n");
 			fflush(stderr);
@@ -224,8 +224,8 @@ void AddToken(TokenStream* p_stream, MechChar* p_token)
 // Skips the tokens up to the next line end.
 void SkipLine(TokenStream* p_stream)
 {
-	MechChar value[512];
-	MechS32 result;
+	char value[512];
+	int32_t result;
 
 	result = c_tokenOk;
 	while (result == c_tokenOk) {
@@ -240,10 +240,10 @@ void SkipLine(TokenStream* p_stream)
 }
 
 // Joins the tokens up to the next line end into p_line, each followed by a space.
-void ReadLine(TokenStream* p_stream, MechChar* p_line)
+void ReadLine(TokenStream* p_stream, char* p_line)
 {
-	MechChar value[512];
-	MechS32 result;
+	char value[512];
+	int32_t result;
 
 	strcpy(p_line, "");
 	result = c_tokenOk;

@@ -11,7 +11,7 @@ extern "C"
 {
 #endif
 
-	void DebugPrintInternal(MechChar* p_message, ...);
+	void DebugPrintInternal(char* p_message, ...);
 
 #ifdef __cplusplus
 }

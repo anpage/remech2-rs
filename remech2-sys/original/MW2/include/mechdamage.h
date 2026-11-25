@@ -12,30 +12,30 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_autoEject;
-	extern MechS32 g_otherArmorPerLevel;
-	extern MechS32 g_localArmorPerLevel;
-	extern MechS32 g_killCount;
-	extern MechS32 g_localMechHidden;
-	extern MechS32 g_criticalHeatWarned;
-	extern MechS32 g_criticalHeatWarningTime;
+	extern int32_t g_autoEject;
+	extern int32_t g_otherArmorPerLevel;
+	extern int32_t g_localArmorPerLevel;
+	extern int32_t g_killCount;
+	extern int32_t g_localMechHidden;
+	extern int32_t g_criticalHeatWarned;
+	extern int32_t g_criticalHeatWarningTime;
 
 	void RunAutopilot(struct Mech* p_mech);
 	void PunchInAutoHeading(struct Mech* p_mech);
 	void CalculateHeat(struct Mech* p_mech);
-	void DestroyMech(MechS32 p_killer, struct Mech* p_mech);
-	void KillMech(MechS32 p_killer, struct Mech* p_mech);
-	void DestroySectionSlots(MechS32 p_attacker, struct Mech* p_mech, MechU32 p_section);
-	void DestroySection(MechS32 p_attacker, struct Mech* p_mech, MechU32 p_section);
+	void DestroyMech(int32_t p_killer, struct Mech* p_mech);
+	void KillMech(int32_t p_killer, struct Mech* p_mech);
+	void DestroySectionSlots(int32_t p_attacker, struct Mech* p_mech, uint32_t p_section);
+	void DestroySection(int32_t p_attacker, struct Mech* p_mech, uint32_t p_section);
 	void DestroyCriticalSlot(
-		MechS32 p_attacker,
+		int32_t p_attacker,
 		struct Mech* p_mech,
-		MechU32 p_section,
-		MechS32 p_slot,
-		MechS32 p_recursing
+		uint32_t p_section,
+		int32_t p_slot,
+		int32_t p_recursing
 	);
-	void ApplyDamageToMech(MechS32 p_attacker, struct Mech* p_mech, MechS32 p_damage, MechS32 p_section);
-	void EjectPlayer(struct Mech* p_mech, MechS32 p_eject);
+	void ApplyDamageToMech(int32_t p_attacker, struct Mech* p_mech, int32_t p_damage, int32_t p_section);
+	void EjectPlayer(struct Mech* p_mech, int32_t p_eject);
 	void ToggleLocalMechVisible(void);
 
 #ifdef __cplusplus

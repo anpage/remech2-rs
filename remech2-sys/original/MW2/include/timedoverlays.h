@@ -14,15 +14,15 @@ extern "C"
 
 	extern PANE g_topMessagePane;
 	extern PANE g_bottomMessagePane;
-	extern MechChar g_bottomMessageText[0x100];
-	extern MechChar g_topMessageText[0x100];
+	extern char g_bottomMessageText[0x100];
+	extern char g_topMessageText[0x100];
 	extern TimedOverlay g_timedOverlays[2];
 
 	void LayoutMessageBoxes(void);
-	MechS32 ShowInGameMessage(MechChar* p_text, MechS32 p_font, MechS32 p_duration, MechS32 p_priority);
+	int32_t ShowInGameMessage(char* p_text, int32_t p_font, int32_t p_duration, int32_t p_priority);
 	void DrawTimedOverlays(void);
-	void DrawTextBox(MechS32 p_background, MechS32 p_font, MechChar* p_text, MechS32 p_x, MechS32 p_y);
-	void DrawTextResourceBox(MechS32 p_background, MechS32 p_font, MechS32 p_id, MechS32 p_x, MechS32 p_y);
+	void DrawTextBox(int32_t p_background, int32_t p_font, char* p_text, int32_t p_x, int32_t p_y);
+	void DrawTextResourceBox(int32_t p_background, int32_t p_font, int32_t p_id, int32_t p_x, int32_t p_y);
 
 #ifdef __cplusplus
 }

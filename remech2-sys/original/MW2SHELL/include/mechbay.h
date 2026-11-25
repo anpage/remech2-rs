@@ -14,64 +14,64 @@
 // An engine: its rating, its weight (in 1/100 t) and its maker. Ids from 10000 up are XL
 // engines at half the weight.
 struct EngineType {
-	MechS32 m_rating; // 0x00
-	MechS32 m_weight; // 0x04
-	MechChar* m_name; // 0x08
+	int32_t m_rating; // 0x00
+	int32_t m_weight; // 0x04
+	char* m_name;     // 0x08
 };
 
 // A weapon: the stats the weapon info fields show. Masses are in 1/100 t. The table holds
 // negative values in the fields up to 0x14, so those are signed.
 struct Weapon {
-	MechS32 m_heat;         // 0x00
-	MechS32 m_damage;       // 0x04 — negative: per missile
-	MechS32 m_minimumRange; // 0x08 — -1 for none
-	MechS32 m_shortRange;   // 0x0c — -1 for none
-	MechS32 m_mediumRange;  // 0x10 — -1 for none
-	MechS32 m_range;        // 0x14 — -1 for none
-	MechS32 m_mass;         // 0x18
+	int32_t m_heat;         // 0x00
+	int32_t m_damage;       // 0x04 — negative: per missile
+	int32_t m_minimumRange; // 0x08 — -1 for none
+	int32_t m_shortRange;   // 0x0c — -1 for none
+	int32_t m_mediumRange;  // 0x10 — -1 for none
+	int32_t m_range;        // 0x14 — -1 for none
+	int32_t m_mass;         // 0x18
 	undefined4 m_criticals; // 0x1c — critical slots it takes
-	MechS32 m_ammoPerTon;   // 0x20 — rounds per ton of ammo, 0 for weapons without ammo
-	MechChar* m_name;       // 0x24
+	int32_t m_ammoPerTon;   // 0x20 — rounds per ton of ammo, 0 for weapons without ammo
+	char* m_name;           // 0x24
 };
 
 // The internal structure of a weight class (20 to 110 tons in steps of 5) per location.
 struct InternalStructure {
-	MechS32 m_centerTorso; // 0x00
-	MechS32 m_sideTorso;   // 0x04
-	MechS32 m_arm;         // 0x08
-	MechS32 m_leg;         // 0x0c
+	int32_t m_centerTorso; // 0x00
+	int32_t m_sideTorso;   // 0x04
+	int32_t m_arm;         // 0x08
+	int32_t m_leg;         // 0x0c
 };
 
 // A piece of equipment other than a weapon: ids come in steps of 50 from 5000.
 struct Equipment {
-	MechS32 m_id;     // 0x00
-	MechChar* m_name; // 0x04
+	int32_t m_id; // 0x00
+	char* m_name; // 0x04
 };
 
 // One location in the image of a .mek file: its armor and its critical slots.
 struct MekLocation {
-	MechS32 m_front;      // 0x00
-	MechS32 m_rear;       // 0x04
-	MechS32 m_internal;   // 0x08
-	MechU16 m_items[12];  // 0x0c — item ids, ammunition as g_mekAmmo ids
-	MechS16 m_slotCount;  // 0x24 — 12, or 6 for the head and legs
+	int32_t m_front;      // 0x00
+	int32_t m_rear;       // 0x04
+	int32_t m_internal;   // 0x08
+	uint16_t m_items[12]; // 0x0c — item ids, ammunition as g_mekAmmo ids
+	int16_t m_slotCount;  // 0x24 — 12, or 6 for the head and legs
 	undefined2 m_unk0x26; // 0x26 — always 1 in a saved .mek file, never read
 };
 
 // The header of a .mek file.
 struct MekHeader {
-	MechS32 m_tonnage;      // 0x00
-	MechS32 m_walkingSpeed; // 0x04
-	MechS32 m_jumpJets;     // 0x08
-	MechS32 m_heatSinks;    // 0x0c — the count, doubled for double heat sinks
-	MechS32 m_weaponCount;  // 0x10
-	MechS32 m_ammoCount;    // 0x14
+	int32_t m_tonnage;      // 0x00
+	int32_t m_walkingSpeed; // 0x04
+	int32_t m_jumpJets;     // 0x08
+	int32_t m_heatSinks;    // 0x0c — the count, doubled for double heat sinks
+	int32_t m_weaponCount;  // 0x10
+	int32_t m_ammoCount;    // 0x14
 };
 
 // A weapon or an ammunition entry of a .mek file.
 struct MekItem {
-	MechS32 m_id;     // 0x00 — the weapon id; for ammunition, 10000 + weapon type * 100 + n
-	MechS32 m_weapon; // 0x04 — the weapon id the ammunition feeds, -1 for a weapon
+	int32_t m_id;     // 0x00 — the weapon id; for ammunition, 10000 + weapon type * 100 + n
+	int32_t m_weapon; // 0x04 — the weapon id the ammunition feeds, -1 for a weapon
 };
 
 // The variant being edited.
@@ -82,113 +82,113 @@ struct MekItem {
 struct MekVariant {
 	// An item waiting for critical slots.
 	struct Item {
-		MechS32 m_id;        // 0x00 — -1 when free
-		MechS32 m_criticals; // 0x04 — slots it takes
+		int32_t m_id;        // 0x00 — -1 when free
+		int32_t m_criticals; // 0x04 — slots it takes
 	};
 
 	// One location's armor. The tab callbacks index the array through its base at 0x710.
 	struct Armor {
-		MechS32 m_internal; // 0x00 — internal structure
-		MechS32 m_maxArmor; // 0x04 — twice the internal structure, 9 for the head
-		MechS32 m_front;    // 0x08
-		MechS32 m_rear;     // 0x0c — negative when the location has none
+		int32_t m_internal; // 0x00 — internal structure
+		int32_t m_maxArmor; // 0x04 — twice the internal structure, 9 for the head
+		int32_t m_front;    // 0x08
+		int32_t m_rear;     // 0x0c — negative when the location has none
 	};
 
-	MechChar m_title[0x100];             // 0x00 — '~' and the mech's name
-	MechChar m_variantName[0x40];        // 0x100
-	MechS32 m_maxMass;                   // 0x200
-	MechS32 m_usedMass;                  // 0x204
-	MechS32 m_freeMass;                  // 0x208
-	MechS32 m_engine;                    // 0x20c — index into g_engines, + 10000 for an XL engine
-	MechS32 m_engineRating;              // 0x210
-	MechS32 m_engineMass;                // 0x214
-	MechS32 m_gyroMass;                  // 0x220
-	MechS32 m_cockpitMass;               // 0x224
-	MechS32 m_heatSinkType;              // 0x228 — 1 single, 2 double
-	MechS32 m_heatSinkMass;              // 0x22c — ten heat sinks come free
-	MechS32 m_externalHeatSinks;         // 0x230 — heat sinks the engine can't hold, which take slots
-	MechS32 m_jumpJetUnitMass;           // 0x234 — mass of one jump jet
-	MechS32 m_jumpJetMass;               // 0x238
-	MechS32 m_endoSteel;                 // 0x240
-	MechS32 m_internalMass;              // 0x244
-	MechS32 m_ferroFibrous;              // 0x24c
-	MechS32 m_armorMass;                 // 0x250
-	MechS32 m_armorFactor;               // 0x258 — armor points m_armorMass buys
-	MechS32 m_armorAllocated;            // 0x25c
-	MechS32 m_weaponMass;                // 0x260
-	MechS32 m_ammoMass;                  // 0x268
-	MechS32 m_equipmentMass;             // 0x270
-	MechS32 m_walkingSpeed;              // 0x278 — shown as 10.8 kph per point
-	MechS32 m_runningSpeed;              // 0x27c
-	MechS32 m_jumpJets;                  // 0x280
-	MechS32 m_ammo[25];                  // 0x284 — ammunition ids, -1 past the last
-	MechS32 m_weapons[10];               // 0x2e8 — weapon ids, -1 past the last
-	MechS32 m_selectedWeapon;            // 0x310 — a weapon id, or a weapon type * 100; -1 for none
-	MechS32 m_selectedLocation;          // 0x314 — index into g_locationNames
-	MechS32 m_criticals[8][12];          // 0x318 — item ids per location and slot, 0 when free
-	MechS32 m_unassignedCount;           // 0x49c
-	Item m_unassigned[78];               // 0x4a0
-	Armor m_armor[8];                    // 0x710
-	MechS32 m_masc;                      // 0x790
-	MechS32 m_rightLowerArm;             // 0x794 — the actuator is fitted
-	MechS32 m_rightHand;                 // 0x798
-	MechS32 m_leftLowerArm;              // 0x79c
-	MechS32 m_leftHand;                  // 0x7a0
-	MechS32 m_mascCriticals;             // 0x7a4 — MASC's slots (items 5001 and up) and tons
+	char m_title[0x100];         // 0x00 — '~' and the mech's name
+	char m_variantName[0x40];    // 0x100
+	int32_t m_maxMass;           // 0x200
+	int32_t m_usedMass;          // 0x204
+	int32_t m_freeMass;          // 0x208
+	int32_t m_engine;            // 0x20c — index into g_engines, + 10000 for an XL engine
+	int32_t m_engineRating;      // 0x210
+	int32_t m_engineMass;        // 0x214
+	int32_t m_gyroMass;          // 0x220
+	int32_t m_cockpitMass;       // 0x224
+	int32_t m_heatSinkType;      // 0x228 — 1 single, 2 double
+	int32_t m_heatSinkMass;      // 0x22c — ten heat sinks come free
+	int32_t m_externalHeatSinks; // 0x230 — heat sinks the engine can't hold, which take slots
+	int32_t m_jumpJetUnitMass;   // 0x234 — mass of one jump jet
+	int32_t m_jumpJetMass;       // 0x238
+	int32_t m_endoSteel;         // 0x240
+	int32_t m_internalMass;      // 0x244
+	int32_t m_ferroFibrous;      // 0x24c
+	int32_t m_armorMass;         // 0x250
+	int32_t m_armorFactor;       // 0x258 — armor points m_armorMass buys
+	int32_t m_armorAllocated;    // 0x25c
+	int32_t m_weaponMass;        // 0x260
+	int32_t m_ammoMass;          // 0x268
+	int32_t m_equipmentMass;     // 0x270
+	int32_t m_walkingSpeed;      // 0x278 — shown as 10.8 kph per point
+	int32_t m_runningSpeed;      // 0x27c
+	int32_t m_jumpJets;          // 0x280
+	int32_t m_ammo[25];          // 0x284 — ammunition ids, -1 past the last
+	int32_t m_weapons[10];       // 0x2e8 — weapon ids, -1 past the last
+	int32_t m_selectedWeapon;    // 0x310 — a weapon id, or a weapon type * 100; -1 for none
+	int32_t m_selectedLocation;  // 0x314 — index into g_locationNames
+	int32_t m_criticals[8][12];  // 0x318 — item ids per location and slot, 0 when free
+	int32_t m_unassignedCount;   // 0x49c
+	Item m_unassigned[78];       // 0x4a0
+	Armor m_armor[8];            // 0x710
+	int32_t m_masc;              // 0x790
+	int32_t m_rightLowerArm;     // 0x794 — the actuator is fitted
+	int32_t m_rightHand;         // 0x798
+	int32_t m_leftLowerArm;      // 0x79c
+	int32_t m_leftHand;          // 0x7a0
+	int32_t m_mascCriticals;     // 0x7a4 — MASC's slots (items 5001 and up) and tons
 };
 
 // The functions and globals of mechbay.cpp that other units use.
 extern MechChassis g_mechChassis[19];
-extern MechS32 g_pickStarMech;
+extern int32_t g_pickStarMech;
 extern MekVariant g_variant;
 extern ScreenField* g_componentFields;
 extern ScreenField* g_screenFields;
 extern AudioSample* g_locationSound;
-extern MechS32 g_selectedChassis;
+extern int32_t g_selectedChassis;
 extern AudioSample* g_chassisNameSound;
 extern ButtonMenu* g_mechBayMenu;
 extern AudioSample* g_mechBayAmbience;
-extern MechS32 g_mechBayWParam;
-extern MechS32 g_pickingStarMech;
+extern int32_t g_mechBayWParam;
+extern int32_t g_pickingStarMech;
 extern AudioSample* g_acceptSound;
 extern AudioSample* g_variantSound;
-extern MechChar g_variantFiles[200][13];
-extern MechS32 g_selectedVariant;
+extern char g_variantFiles[200][13];
+extern int32_t g_selectedVariant;
 extern ScreenField g_engineFields[16];
 extern ScreenField g_customizeFields[38];
 extern ScreenField g_mechBayFields[48];
 extern Equipment g_equipment[23];
-extern MechChar* g_locationNames[8];
+extern char* g_locationNames[8];
 extern InternalStructure g_internalStructure[19];
 extern MekVariant g_previousVariant;
 extern EngineType g_engines[80];
 extern Weapon g_weapons[31];
-extern MechS32 g_armorTrimLocation;
-extern MechS32 g_locationMapLefts[8];
-extern MechS32 g_locationMapTops[8];
-extern MechS32 g_chassisCount;
-extern MechChar g_wolfChassisVideo[8];
-extern MechChar g_jadeFalconChassisVideo[8];
-extern MechChar g_trialChassisVideo[8];
-extern MechChar* g_chassisVideoFormat;
+extern int32_t g_armorTrimLocation;
+extern int32_t g_locationMapLefts[8];
+extern int32_t g_locationMapTops[8];
+extern int32_t g_chassisCount;
+extern char g_wolfChassisVideo[8];
+extern char g_jadeFalconChassisVideo[8];
+extern char g_trialChassisVideo[8];
+extern char* g_chassisVideoFormat;
 extern undefined4 g_chassisVideoLeft;
 extern undefined4 g_chassisVideoTop;
-extern MechChar g_userMekName[0x20];
-extern MechChar g_callsignLine[0x80];
-extern MechChar g_tempBuffer[0x100];
+extern char g_userMekName[0x20];
+extern char g_callsignLine[0x80];
+extern char g_tempBuffer[0x100];
 extern MekItem g_mekAmmo[25];
 extern MekHeader g_mekHeader;
-extern MechChar g_chassisVideoName[0x10];
-extern MechChar g_mekVariantName[0x32];
+extern char g_chassisVideoName[0x10];
+extern char g_mekVariantName[0x32];
 extern MekItem g_mekWeapons[10];
-extern MechS32 g_mechBayMessage;
-extern MechChar g_variantFileName[0x20];
+extern int32_t g_mechBayMessage;
+extern char g_variantFileName[0x20];
 extern undefined g_mekFileBuffer[0x800];
 extern MekLocation g_mekLocations[8];
 extern undefined g_warningColors[0x100];
 extern undefined g_activeColors[0x100];
 extern undefined g_textColors[0x100];
-extern MechChar g_mekPath[0x20];
+extern char g_mekPath[0x20];
 extern ScreenField g_heatSinkFields[10];
 extern ScreenField g_jumpJetFields[8];
 extern ScreenField g_internalFields[22];
@@ -200,21 +200,21 @@ extern ScreenField g_criticalFields[59];
 void ShowFields(ScreenField* p_tabs);
 void RedrawFields(ScreenField* p_tabs);
 void HideFields(ScreenField* p_tabs);
-ScreenField* FindFieldAt(ScreenField* p_tabs, MechS32 p_x, MechS32 p_y);
+ScreenField* FindFieldAt(ScreenField* p_tabs, int32_t p_x, int32_t p_y);
 void LoadChassis();
 void NextChassis();
 void PreviousChassis();
 void NextVariant();
 void PreviousVariant();
-MechS32 SaveUserVariant();
-void DrawMechBay(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam);
+int32_t SaveUserVariant();
+void DrawMechBay(TMPackDataBase* p_database, int32_t p_campaign, size_t p_wParam);
 // The mech bay's frame, implemented on the Rust side (src/shell/screens/mechlab.rs)
 extern "C" void MechBayCallback(
 	TMPackDataBase* p_database,
-	MechS32* p_campaign,
-	MechU8* p_pilotChosen,
+	int32_t* p_campaign,
+	uint8_t* p_pilotChosen,
 	char** p_scenario,
-	MechS32 p_msg
+	int32_t p_msg
 );
 
 #endif // MECHBAY_H

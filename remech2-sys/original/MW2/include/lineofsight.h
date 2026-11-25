@@ -12,9 +12,9 @@ extern "C"
 {
 #endif
 
-	MechS32 CanSeeTarget(struct Player* p_player, MechS32 p_ahead);
-	MechS32 IsGroundLevelToward(struct Player* p_player, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 GetTargetRangeBand(struct Player* p_player, struct WeaponDef* p_weapon);
+	int32_t CanSeeTarget(struct Player* p_player, int32_t p_ahead);
+	int32_t IsGroundLevelToward(struct Player* p_player, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t GetTargetRangeBand(struct Player* p_player, struct WeaponDef* p_weapon);
 
 #ifdef __cplusplus
 }

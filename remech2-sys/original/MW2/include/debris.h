@@ -12,26 +12,26 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_debrisCount;
+	extern int32_t g_debrisCount;
 	extern DebrisChunk g_emptyDebrisChunk;
 	extern DebrisPiece g_debrisPieces[0x80];
 	extern DebrisChunk g_debrisChunks[0x80];
 
-	MechS32 IsDebrisFull(void);
-	MechS32 AddDebrisPiece(SceneObject* p_obj);
-	void ThrowDebrisPiece(MechS32 p_index);
-	void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x16);
-	void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x16);
+	int32_t IsDebrisFull(void);
+	int32_t AddDebrisPiece(SceneObject* p_obj);
+	void ThrowDebrisPiece(int32_t p_index);
+	void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0x16);
+	void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0x16);
 	void DisposeDebris(SceneObject* p_obj, ObjectCallback p_callback);
 	void UpdateDebris(void);
-	void ExplodeChunk(MechS32 p_index);
-	void DamageChunk(MechS32 p_index, MechS32 p_damage);
-	void UpdateDebrisPiece(MechS32 p_index);
-	void PushDebrisPiece(MechS32 p_index, MechS32 p_x, MechS32 p_y, MechS32 p_z);
+	void ExplodeChunk(int32_t p_index);
+	void DamageChunk(int32_t p_index, int32_t p_damage);
+	void UpdateDebrisPiece(int32_t p_index);
+	void PushDebrisPiece(int32_t p_index, int32_t p_x, int32_t p_y, int32_t p_z);
 	void ZeroChunx(void);
-	void ResetDebrisPiece(MechS32 p_index);
-	MechS32 FindDebrisPiece(SceneObject* p_obj);
-	void DamageChunksInRadius(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_radius, MechS32 p_damage);
+	void ResetDebrisPiece(int32_t p_index);
+	int32_t FindDebrisPiece(SceneObject* p_obj);
+	void DamageChunksInRadius(int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_radius, int32_t p_damage);
 	void RemoveChunk(SceneObject* p_obj, ObjectCallback p_callback);
 	void HideDebrisObj(SceneObject* p_obj);
 

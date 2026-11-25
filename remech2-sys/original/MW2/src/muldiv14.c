@@ -7,7 +7,7 @@
 
 // Returns p_scale * p_radius / p_depth / 2^14, the product kept in 64 bits and shifted by 8 before the division
 // and the quotient by 6 after it.
-MechS32 ProjectRadius(MechS32 p_scale, MechS32 p_radius, MechS32 p_depth)
+int32_t ProjectRadius(int32_t p_scale, int32_t p_radius, int32_t p_depth)
 {
 	MechS64 scaled = PortableSar64((MechS64) p_scale * p_radius, 8);
 

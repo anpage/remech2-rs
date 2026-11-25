@@ -39,9 +39,9 @@
 // mission list.
 
 // DrawPilotRoster's p_campaign.
-MechS32 g_rosterCampaign;
+int32_t g_rosterCampaign;
 
-MechChar g_rosterFieldText[0x100];
+char g_rosterFieldText[0x100];
 
 // The campaign's ten slots of g_pilotRoster.
 PilotRecord* g_rosterPilots[10];
@@ -49,8 +49,8 @@ PilotRecord* g_rosterPilots[10];
 void ShowPilotCallsigns()
 {
 	PilotRecord* pilot;
-	MechS32 top;
-	MechS32 i;
+	int32_t top;
+	int32_t i;
 
 	top = 0x5c;
 	for (i = 0; i < 10; i++, top += 0x23) {
@@ -69,7 +69,7 @@ void ShowPilotCallsigns()
 void HidePilotCallsigns()
 {
 	PilotRecord* pilot;
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 10; i++) {
 		pilot = g_rosterPilots[i];
@@ -92,7 +92,7 @@ void ClearPilot(PilotRecord* p_pilot)
 
 void SetActivePilot(PilotRecord* p_pilot)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 10; i++) {
 		g_rosterPilots[i]->m_active = 0;
@@ -103,7 +103,7 @@ void SetActivePilot(PilotRecord* p_pilot)
 // Draws the tab's data, a string, in the button font.
 TextGlyph* DrawRosterLabel(ScreenField* p_tab)
 {
-	MechChar* text = (MechChar*) p_tab->m_data;
+	char* text = (char*) p_tab->m_data;
 
 	return g_buttonFont->AddText(p_tab->m_left, p_tab->m_top, text, NULL);
 }
@@ -152,7 +152,7 @@ void ClickMissionListEntry(ScreenField* p_tab)
 }
 
 // Negative m_top: rows (times the previous tab's height) and an offset below the previous tab.
-#define TAB_BELOW(rows, offset) ((MechS32) (0x80000000 | ((rows) << 4) | (offset)))
+#define TAB_BELOW(rows, offset) ((int32_t) (0x80000000 | ((rows) << 4) | (offset)))
 #define ROSTER_TAB(x, y, width, draw, click, data) {x, y, width, -1, NULL, NULL, draw, click, (void*) (data), NULL}
 #define ROSTER_END {-1, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL}
 
@@ -199,18 +199,18 @@ ScreenField g_missionListFields[] = {
 AudioSample* g_rosterSound = NULL;
 
 // Set while the mission list shows instead of the pilot's record.
-MechS32 g_missionListShown = 0;
+int32_t g_missionListShown = 0;
 
 ButtonMenu* g_rosterMenu;
 
 // Opens the pilot roster of the campaign's clan hall: the ten pilot slots, the active pilot's
 // record, and the menu.
-void DrawPilotRoster(TMPackDataBase* p_database, MechS32 p_campaign, MechU8* p_pilotChosen, char**)
+void DrawPilotRoster(TMPackDataBase* p_database, int32_t p_campaign, uint8_t* p_pilotChosen, char**)
 {
 	void* data = NULL;
-	MechS32 slot;
-	MechS32 i;
-	MechS32 size;
+	int32_t slot;
+	int32_t i;
+	int32_t size;
 
 	g_rosterCampaign = p_campaign;
 	// The original seeded with clock(), milliseconds since the program started

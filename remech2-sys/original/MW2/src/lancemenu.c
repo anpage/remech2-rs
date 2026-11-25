@@ -12,19 +12,19 @@
 
 // The order each AI slot was given last, an index into g_orderChoices (7: none); slot 0 is the
 // whole star's.
-MechS32 g_lanceOrders[8] = {7, 7, 7, 7, 7, 0, 0, 0};
+int32_t g_lanceOrders[8] = {7, 7, 7, 7, 7, 0, 0, 0};
 
 // Fills the page with an item per AI slot (from template 5) and a last one (template 6), marking
 // the slots whose player is in AI state 12. With no slot, or every slot marked, the page has only
 // templates 7 and 6.
-MechS32 PrepareCommandComputerPage(MenuDefinition* p_menu, MenuPage* p_page)
+int32_t PrepareCommandComputerPage(MenuDefinition* p_menu, MenuPage* p_page)
 {
-	MechS32 marked;
-	MechS32 slot;
-	MechS32 count;
-	MechS32 i;
-	MechS32 index;
-	MechS32 src;
+	int32_t marked;
+	int32_t slot;
+	int32_t count;
+	int32_t i;
+	int32_t index;
+	int32_t src;
 
 	marked = 0;
 	if (!p_page) {
@@ -60,14 +60,14 @@ MechS32 PrepareCommandComputerPage(MenuDefinition* p_menu, MenuPage* p_page)
 
 // Unless the page's AI slot holds a player outside AI state 12, keeps only the page's last two
 // items.
-MechS32 PrepareCommandPointPage(MenuDefinition* p_menu, MenuPage* p_page)
+int32_t PrepareCommandPointPage(MenuDefinition* p_menu, MenuPage* p_page)
 {
-	MechS32 count;
-	MechS32 slot;
-	MechS32 index;
-	MechS32 src;
-	MechU32 unk0x08;
-	MechS32 valid;
+	int32_t count;
+	int32_t slot;
+	int32_t index;
+	int32_t src;
+	uint32_t unk0x08;
+	int32_t valid;
 
 	if (!p_page) {
 		return FALSE;
@@ -94,9 +94,9 @@ MechS32 PrepareCommandPointPage(MenuDefinition* p_menu, MenuPage* p_page)
 	return TRUE;
 }
 
-MechS32 GetLanceOrder(MechS32 p_index)
+int32_t GetLanceOrder(int32_t p_index)
 {
-	MechS32 state;
+	int32_t state;
 
 	state = 7;
 	if (p_index < 8) {
@@ -106,12 +106,12 @@ MechS32 GetLanceOrder(MechS32 p_index)
 	return state;
 }
 
-MechS32 GetFormation(MechS32 p_arg)
+int32_t GetFormation(int32_t p_arg)
 {
 	return GetTeamFormation(g_localStar);
 }
 
-void SelectFormation(MechS32 p_formation, MechS32 p_value)
+void SelectFormation(int32_t p_formation, int32_t p_value)
 {
 	g_lanceOrders[0] = 0;
 	SetTeamFormation(g_localStar, p_formation);
@@ -119,12 +119,12 @@ void SelectFormation(MechS32 p_formation, MechS32 p_value)
 }
 
 // Returns the AI state of the player in AI slot p_index, plus one (0: none).
-MechS32 GetSlotAiState(MechS32 p_index)
+int32_t GetSlotAiState(int32_t p_index)
 {
 	Player* player;
 	PlayerAi* ai;
-	MechS32 index;
-	MechS32 state;
+	int32_t index;
+	int32_t state;
 
 	state = -1;
 	if (p_index < 8) {
@@ -178,7 +178,7 @@ void InstallGoalSuffix(MenuPage* p_page, MenuControl* p_control)
 
 // The orders' actions: each records the order for the menu and gives it to the slot's player
 // (OrderStarSlot).
-void OrderAttack(MechS32 p_index, MechS32 p_value)
+void OrderAttack(int32_t p_index, int32_t p_value)
 {
 	if (p_index < 8) {
 		g_lanceOrders[p_index] = 2;
@@ -188,7 +188,7 @@ void OrderAttack(MechS32 p_index, MechS32 p_value)
 	RequestMenuClose(1);
 }
 
-void OrderEngageAtWill(MechS32 p_index, MechS32 p_value)
+void OrderEngageAtWill(int32_t p_index, int32_t p_value)
 {
 	if (p_index < 8) {
 		g_lanceOrders[p_index] = 1;
@@ -198,7 +198,7 @@ void OrderEngageAtWill(MechS32 p_index, MechS32 p_value)
 	RequestMenuClose(1);
 }
 
-void OrderJoinFormation(MechS32 p_index, MechS32 p_value)
+void OrderJoinFormation(int32_t p_index, int32_t p_value)
 {
 	if (p_index < 8) {
 		g_lanceOrders[p_index] = 3;
@@ -208,7 +208,7 @@ void OrderJoinFormation(MechS32 p_index, MechS32 p_value)
 	RequestMenuClose(1);
 }
 
-void OrderDefend(MechS32 p_index, MechS32 p_value)
+void OrderDefend(int32_t p_index, int32_t p_value)
 {
 	if (p_index < 8) {
 		g_lanceOrders[p_index] = 4;
@@ -218,7 +218,7 @@ void OrderDefend(MechS32 p_index, MechS32 p_value)
 	RequestMenuClose(1);
 }
 
-void OrderDisengage(MechS32 p_index, MechS32 p_value)
+void OrderDisengage(int32_t p_index, int32_t p_value)
 {
 	if (p_index < 8) {
 		g_lanceOrders[p_index] = 5;
@@ -228,7 +228,7 @@ void OrderDisengage(MechS32 p_index, MechS32 p_value)
 	RequestMenuClose(1);
 }
 
-void OrderShutdown(MechS32 p_index, MechS32 p_value)
+void OrderShutdown(int32_t p_index, int32_t p_value)
 {
 	if (p_index < 8) {
 		g_lanceOrders[p_index] = 6;
@@ -239,18 +239,12 @@ void OrderShutdown(MechS32 p_index, MechS32 p_value)
 }
 
 // Returns the name of the goal of the control's AI player: a nav, a player or a game thing.
-MechChar* GetSlotGoalName(
-	MenuDefinition* p_menu,
-	MenuControl* p_control,
-	MechS32 p_index,
-	Point p_pos,
-	MenuPage* p_page
-)
+char* GetSlotGoalName(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_index, Point p_pos, MenuPage* p_page)
 {
-	MechS16 target;
+	int16_t target;
 	Player* player;
-	MechS32 index;
-	MechS16 goal;
+	int32_t index;
+	int16_t goal;
 
 	index = FindStarSlotPlayer(p_control->m_arg);
 	if (index >= g_playerCount) {

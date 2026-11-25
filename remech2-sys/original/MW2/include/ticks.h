@@ -17,13 +17,13 @@ extern "C"
 	void StopTicks(void);
 
 	// p_flags picks the counter: 0x80 the first, 0x100 the second. Returns -1 when out of handles.
-	MechS16 AllocTicks(MechU32 p_flags);
-	MechS32 GetTicks(MechU32 p_handle);
-	void ResetTicks(MechU32 p_handle);
-	void SetTicks(MechU32 p_handle, MechS32 p_ticks);
-	void FreeTicks(MechU32 p_handle);
+	int16_t AllocTicks(uint32_t p_flags);
+	int32_t GetTicks(uint32_t p_handle);
+	void ResetTicks(uint32_t p_handle);
+	void SetTicks(uint32_t p_handle, int32_t p_ticks);
+	void FreeTicks(uint32_t p_handle);
 	// Pauses or resumes the counters p_flags picks, as for AllocTicks
-	void PauseTimer(MechS32 p_flags, MechS32 p_paused);
+	void PauseTimer(int32_t p_flags, int32_t p_paused);
 
 #ifdef __cplusplus
 }

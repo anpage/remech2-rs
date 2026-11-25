@@ -13,16 +13,16 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_chatRecipient;
-	extern MechS32 g_showObjectives;
-	extern MechChar g_chatMessage[0x30];
-	extern MechChar g_ticksText[16];
-	extern MechChar g_secondsText[16];
+	extern int32_t g_chatRecipient;
+	extern int32_t g_showObjectives;
+	extern char g_chatMessage[0x30];
+	extern char g_ticksText[16];
+	extern char g_secondsText[16];
 
-	MechChar* FormatTicks(MechS32 p_ticks);
-	MechChar* FormatSeconds(MechS32 p_seconds);
-	MechS32 GetTextWidth(const MechChar* p_text, void* p_font);
-	void DrawObjectiveList(struct CockpitPanel* p_panel, struct Point* p_pos, void* p_font, MechU8 p_priority);
+	char* FormatTicks(int32_t p_ticks);
+	char* FormatSeconds(int32_t p_seconds);
+	int32_t GetTextWidth(const char* p_text, void* p_font);
+	void DrawObjectiveList(struct CockpitPanel* p_panel, struct Point* p_pos, void* p_font, uint8_t p_priority);
 	void DrawObjectivesPanel(struct CockpitPanel* p_panel);
 	void DrawNetworkPanel(struct CockpitPanel* p_panel);
 	void DrawKillsPanel(struct CockpitPanel* p_panel);

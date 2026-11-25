@@ -34,17 +34,17 @@
 // A star in a mission's BWD file (node type 0x46). Its mechs' variant names follow, one per
 // mech of the star's size.
 struct BwdStar {
-	MechS32 m_difficulty;         // 0x00 — the enemy star's, see g_enemyStarDifficulty
-	MechS32 m_tonnage;            // 0x04
-	MechS32 m_count;              // 0x08
-	MechS32 m_size;               // 0x0c
-	MechChar m_variants[1][0x10]; // 0x10
+	int32_t m_difficulty;     // 0x00 — the enemy star's, see g_enemyStarDifficulty
+	int32_t m_tonnage;        // 0x04
+	int32_t m_count;          // 0x08
+	int32_t m_size;           // 0x0c
+	char m_variants[1][0x10]; // 0x10
 };
 
-void MissionBriefingCallback(TMPackDataBase*, MechS32*, MechU8*, MechChar**, MechS32);
+void MissionBriefingCallback(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t);
 
 // The briefing videos of the missions, each with its looping continuation.
-MechChar* g_briefingVideos[12][2] = {
+char* g_briefingVideos[12][2] = {
 	{"aplan01", "aplan01c"},
 	{"aplan02", "aplan02c"},
 	{"aplan03", "aplan03c"},
@@ -60,7 +60,7 @@ MechChar* g_briefingVideos[12][2] = {
 };
 
 // The missions of the Trials of Grievance, in order; the list ends at the first NULL.
-MechChar* g_briefingScenarios[12] = {
+char* g_briefingScenarios[12] = {
 	"jackscn1",
 	"chedscn1",
 	"edamscn1",
@@ -74,7 +74,7 @@ MechChar* g_briefingScenarios[12] = {
 };
 
 // The clans' videos, by the index into g_clanNames.
-MechChar* g_clanVideos[6] = {"wiawolf", "wiajf", "wiaghost", "wiasmoke", "wianova", "wiasteel"};
+char* g_clanVideos[6] = {"wiawolf", "wiajf", "wiaghost", "wiasmoke", "wianova", "wiasteel"};
 
 // The names of the mechs of the player's star...
 MechNameTag g_playerMechTags[3] = {0};
@@ -82,10 +82,10 @@ MechNameTag g_playerMechTags[3] = {0};
 // ...and of the enemy's.
 MechNameTag g_enemyMechTags[3] = {0};
 
-MechS32 g_briefingChassisCount = 0xf;
+int32_t g_briefingChassisCount = 0xf;
 
 // The briefing video, an index into g_briefingVideos.
-MechS32 g_briefingVideo = 0;
+int32_t g_briefingVideo = 0;
 
 // The formation names of the enemy's star...
 TextGlyph* g_enemyFormationName = NULL;
@@ -102,35 +102,35 @@ AudioSample* g_launchSound = NULL;
 AudioSample* g_trialSound = NULL;
 
 // The text colors: each color maps to itself, but 0 is transparent and 1 is drawn in 0x22.
-MechU8 g_briefingTextColors[0x100];
+uint8_t g_briefingTextColors[0x100];
 
 // The player's clan and the rival clan, indices into g_clanNames and g_clanVideos. They are
 // never the same.
-MechS32 g_briefingClan;
+int32_t g_briefingClan;
 
 // The three lines of briefing text.
 TextGlyph* g_briefingLines[3];
 
 // The formations of the player's star and the enemy's, indices into g_formations.
-MechS32 g_playerFormation;
+int32_t g_playerFormation;
 
-MechS32 g_briefingRival;
+int32_t g_briefingRival;
 
 // DrawMissionBriefing's p_wParam: WM_USER + 0xe for a trial.
 size_t g_briefingMessage;
 
-MechS32 g_enemyFormation;
+int32_t g_enemyFormation;
 
 // The briefing text line being built.
-MechChar g_briefingLine[0x100];
+char g_briefingLine[0x100];
 
 // The mission, an index into g_briefingScenarios.
-MechS32 g_briefingMission;
+int32_t g_briefingMission;
 
 // Sets up a star from a BWD star node, and registers its mechs' variants.
-void LoadStar(MechS32 p_star, BwdStar* p_data)
+void LoadStar(int32_t p_star, BwdStar* p_data)
 {
-	MechS32 i;
+	int32_t i;
 
 	SelectStar(p_star, 0, p_data->m_size, p_data->m_count, p_data->m_tonnage);
 	for (i = 0; i < p_data->m_size; i++) {
@@ -141,29 +141,29 @@ void LoadStar(MechS32 p_star, BwdStar* p_data)
 
 // Reads the mission's BWD file (the scenario's first four letters + "brf2"): its briefing
 // name, optionally its two stars (p_stars) and its briefing video and text (p_video).
-void ShellApplyMissionUiInfo(MechChar* p_scenario, MechS32 p_stars, MechS32 p_video)
+void ShellApplyMissionUiInfo(char* p_scenario, int32_t p_stars, int32_t p_video)
 {
-	MechS32* briefing;
-	MechChar name[16];
-	MechS32* star;
-	MechS32* file;
-	MechS32 i;
-	MechS32 pos;
-	MechS32 j;
-	MechS32* title;
+	int32_t* briefing;
+	char name[16];
+	int32_t* star;
+	int32_t* file;
+	int32_t i;
+	int32_t pos;
+	int32_t j;
+	int32_t* title;
 
 	strcpy(name, p_scenario);
 	name[4] = '\0';
 	strcat(name, "brf2");
 
-	file = (MechS32*) g_projectArchive->GetResourceByName(name, 0xe, "BWD");
+	file = (int32_t*) g_projectArchive->GetResourceByName(name, 0xe, "BWD");
 	if (!file) {
 		return;
 	}
 
 	title = g_projectArchive->FindNextBwdNode(file, 0x47, NULL);
 	if (title) {
-		strcpy(g_missionName, (MechChar*) (title + 2));
+		strcpy(g_missionName, (char*) (title + 2));
 	}
 
 	if (p_stars) {
@@ -194,8 +194,8 @@ void ShellApplyMissionUiInfo(MechChar* p_scenario, MechS32 p_stars, MechS32 p_vi
 
 			pos = 0;
 			for (i = 0; i < 3; i++, pos++) {
-				for (j = 0; pos < briefing[1] - 0xc && ((MechChar*) briefing)[pos + 0xc] >= ' '; pos++, j++) {
-					g_briefingLine[j] = ((MechChar*) briefing)[pos + 0xc];
+				for (j = 0; pos < briefing[1] - 0xc && ((char*) briefing)[pos + 0xc] >= ' '; pos++, j++) {
+					g_briefingLine[j] = ((char*) briefing)[pos + 0xc];
 				}
 				g_briefingLine[j] = '\0';
 
@@ -211,9 +211,9 @@ void ShellApplyMissionUiInfo(MechChar* p_scenario, MechS32 p_stars, MechS32 p_vi
 }
 
 // Shows the name of mech type p_type at (p_left, p_top), replacing the tag's previous glyph.
-void ShowMechName(MechNameTag* p_tag, MechS32 p_type, MechS32 p_left, MechS32 p_top)
+void ShowMechName(MechNameTag* p_tag, int32_t p_type, int32_t p_left, int32_t p_top)
 {
-	MechChar* text;
+	char* text;
 
 	p_tag->m_type = p_type;
 	if (p_tag->m_glyph) {
@@ -254,7 +254,7 @@ void ShowFormationNames()
 
 // Picks a value by the pilot of the player's first mech: 0x12 for Enzo, 0x11 for Hobbes, 0x10
 // for Calvin and 0xf for anyone else.
-MechS32 GetChassisCount()
+int32_t GetChassisCount()
 {
 	CustomStar* star;
 
@@ -273,12 +273,12 @@ MechS32 GetChassisCount()
 }
 
 // Sets up the mission briefing screen. p_wParam is WM_USER + 0xe for a trial.
-void DrawMissionBriefing(TMPackDataBase* p_database, MechChar** p_scenario, size_t p_wParam)
+void DrawMissionBriefing(TMPackDataBase* p_database, char** p_scenario, size_t p_wParam)
 {
 	MechPoint* pos;
 	void* audioData = NULL;
-	MechS32 i;
-	MechS32 audioSize;
+	int32_t i;
+	int32_t audioSize;
 
 	g_briefingMessage = p_wParam;
 	g_briefingChassisCount = GetChassisCount();
@@ -346,12 +346,12 @@ void DrawMissionBriefing(TMPackDataBase* p_database, MechChar** p_scenario, size
 
 // The mission briefing's frame: LAUNCH, EXIT, the next mission, both clans' videos, the mechs
 // and formations of both stars (next and previous), and the two stars' accept and config.
-void MissionBriefingCallback(TMPackDataBase*, MechS32*, MechU8*, MechChar** p_scenario, MechS32 p_msg)
+void MissionBriefingCallback(TMPackDataBase*, int32_t*, uint8_t*, char** p_scenario, int32_t p_msg)
 {
 	MechPoint* pos;
-	MechChar* variant;
-	MechS32 i;
-	MechS32 button;
+	char* variant;
+	int32_t i;
+	int32_t button;
 
 	// The original skips the frame's work with a goto, like StarConfigCallback.
 	if (p_msg != c_msgScreenFrame) {

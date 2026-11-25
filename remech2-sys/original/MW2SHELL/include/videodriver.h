@@ -17,56 +17,56 @@ public:
 	VideoDriver();
 	~VideoDriver();
 
-	void ExpandRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom);
-	void ExpandRectBySize(MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height);
-	MechS32 IntersectsRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom);
-	MechS32 IntersectsRectBySize(MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height);
+	void ExpandRect(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom);
+	void ExpandRectBySize(int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
+	int32_t IntersectsRect(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom);
+	int32_t IntersectsRectBySize(int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
 	void UpdatePalette();
 	void DrawShell();
 	void DrawFmv();
 	void GetPalette(PaletteColor* p_palette);
 	void SetPalette(PaletteColor* p_palette, undefined4 p_allColors);
-	void ReadPictureSize(MechS32* p_maxX, MechS32* p_maxY, undefined* p_data, MechS32 p_size, MechS32 p_type);
-	void LoadBackground(TMPackDataBase* p_database, MechS32 p_id);
-	void DrawPicture(undefined* p_data, MechS32 p_type, PANE* p_view);
-	void DrawLine(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom, MechS32 p_color);
-	void DrawPixels(undefined* p_pixels, MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height);
-	void DrawPixelsClipped(undefined* p_pixels, MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height);
-	void ReadPixels(undefined* p_pixels, MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height);
-	void RestoreBackground(MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height);
+	void ReadPictureSize(int32_t* p_maxX, int32_t* p_maxY, undefined* p_data, int32_t p_size, int32_t p_type);
+	void LoadBackground(TMPackDataBase* p_database, int32_t p_id);
+	void DrawPicture(undefined* p_data, int32_t p_type, PANE* p_view);
+	void DrawLine(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom, int32_t p_color);
+	void DrawPixels(undefined* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
+	void DrawPixelsClipped(undefined* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
+	void ReadPixels(undefined* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
+	void RestoreBackground(int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height);
 	void CopyScreenToBackground();
 	void CopyBackgroundToScreen();
-	void LoadPalette(MechS32 p_id);
+	void LoadPalette(int32_t p_id);
 	void DrawShpFrame(
 		void* p_shp,
 		undefined4 p_frame,
-		MechS32 p_left,
-		MechS32 p_top,
-		MechS32 p_width,
-		MechS32 p_height
+		int32_t p_left,
+		int32_t p_top,
+		int32_t p_width,
+		int32_t p_height
 	);
 	void DrawShpFrameClipped(
 		void* p_shp,
 		undefined4 p_frame,
-		MechS32 p_left,
-		MechS32 p_top,
-		MechS32 p_width,
-		MechS32 p_height
+		int32_t p_left,
+		int32_t p_top,
+		int32_t p_width,
+		int32_t p_height
 	);
-	MechS32 DrawString(MechS32 p_left, MechS32 p_top, void* p_font, MechChar* p_text, undefined* p_colorMap);
-	MechS32 DrawChar(MechS32 p_left, MechS32 p_top, void* p_font, MechChar p_char, undefined* p_colorMap);
-	void AddGlyph(TextGlyph* p_item, MechS32 p_overlay);
+	int32_t DrawString(int32_t p_left, int32_t p_top, void* p_font, char* p_text, undefined* p_colorMap);
+	int32_t DrawChar(int32_t p_left, int32_t p_top, void* p_font, char p_char, undefined* p_colorMap);
+	void AddGlyph(TextGlyph* p_item, int32_t p_overlay);
 	void RemoveGlyph(TextGlyph* p_item);
-	void RedrawGlyphs(MechS32 p_overlay);
-	void ClearGlyphs(MechU8 p_delete);
+	void RedrawGlyphs(int32_t p_overlay);
+	void ClearGlyphs(uint8_t p_delete);
 	void ActivateFramebuffer();
 
 private:
-	MechS32 m_pictureSize;            // 0x00 — the last picture's, see VFX_PCX_resolution
-	TextGlyphList* m_overlayGlyphs;   // 0x16 — redrawn after the videos' frames
-	TextGlyphList* m_glyphs;          // 0x1a — redrawn before them
-	undefined4 m_paletteChanged;      // 0x1e — the next draw loads m_palette
-	undefined4 m_allColors;           // 0x22 — for m_setPalette
+	int32_t m_pictureSize;          // 0x00 — the last picture's, see VFX_PCX_resolution
+	TextGlyphList* m_overlayGlyphs; // 0x16 — redrawn after the videos' frames
+	TextGlyphList* m_glyphs;        // 0x1a — redrawn before them
+	undefined4 m_paletteChanged;    // 0x1e — the next draw loads m_palette
+	undefined4 m_allColors;         // 0x22 — for m_setPalette
 
 public:
 	// LoopingMovie decodes into m_screenBuffer.m_pixels directly.
@@ -83,13 +83,13 @@ public:
 private:
 	PANE m_dirtyView;              // 0x7e
 	PaletteColor m_palette[0x100]; // 0x92
-	MechS32 m_width;               // 0x392
-	MechS32 m_height;              // 0x396
+	int32_t m_width;               // 0x392
+	int32_t m_height;              // 0x396
 
 public:
 	// The color RestoreBackground fills with instead of copying the background, -1 to copy.
 	// The options, leaderboard, credits and cockpit controls screens set it to 0 directly.
-	MechS32 m_restoreColor; // 0x3a6
+	int32_t m_restoreColor; // 0x3a6
 
 	// Set by the full-screen video player on its first frame: the next draw keeps the frame as
 	// the background before loading the palette.
@@ -98,9 +98,9 @@ public:
 #pragma pack()
 
 // The globals of videodriver.cpp that other units use.
-extern MechS32 g_redrawingGlyphs;
-extern MechS32 g_clearPaletteOnDraw;
+extern int32_t g_redrawingGlyphs;
+extern int32_t g_clearPaletteOnDraw;
 extern PaletteColor g_tempPalette[0x100];
-extern MechU8 g_defaultColorMap[0x100];
+extern uint8_t g_defaultColorMap[0x100];
 
 #endif // VIDEODRIVER_H

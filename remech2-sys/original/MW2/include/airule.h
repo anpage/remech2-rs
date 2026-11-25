@@ -9,13 +9,13 @@
 // state with a new target. The target fields hold AI target ids, or '@' (the current goal),
 // '%' (the target the message matched) or '*' (the current target).
 typedef struct AiRule {
-	MechS16 m_message;   // 0x00
-	MechU16 m_target;    // 0x02
-	MechS16 m_arg;       // 0x04
-	MechU8 m_transition; // 0x06
-	MechS16 m_newState;  // 0x07
-	MechS16 m_newTarget; // 0x09
-	MechU8 m_unk0x0b;    // 0x0b
+	int16_t m_message;    // 0x00
+	uint16_t m_target;    // 0x02
+	int16_t m_arg;        // 0x04
+	uint8_t m_transition; // 0x06
+	int16_t m_newState;   // 0x07
+	int16_t m_newTarget;  // 0x09
+	uint8_t m_unk0x0b;    // 0x0b
 } AiRule;
 
 #pragma pack(pop)

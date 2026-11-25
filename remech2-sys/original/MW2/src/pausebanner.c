@@ -31,14 +31,14 @@
 
 // The debug keys' selections (HandleDebugKey): a number, and a mech section.
 
-MechS32 g_debugSlot = -1;
+int32_t g_debugSlot = -1;
 
-MechS32 g_debugSection = -1;
+int32_t g_debugSection = -1;
 
 // The banner's rectangle, in 16.16 fractions of the screen until the first draw scales it.
 PANE g_pausedBannerRect = {NULL, 0, 0x3333, 0x10000, 0x6666};
 
-MechS32 g_pausedBannerUnscaled = 1;
+int32_t g_pausedBannerUnscaled = 1;
 
 void DrawPausedBanner(void)
 {
@@ -88,9 +88,9 @@ void ResumeGame(void)
 // The debug keys, which RunGameKey passes on while the mission timer is stopped: views, the
 // debug render flags and overlays, the difficulty switches, the objective state of the selected
 // star (g_debugStar) and objective (g_debugObjective), and a number and mech section selection.
-void HandleDebugKey(MechU16 p_key)
+void HandleDebugKey(uint16_t p_key)
 {
-	MechChar text[40];
+	char text[40];
 
 	switch (p_key) {
 	case 0xa:

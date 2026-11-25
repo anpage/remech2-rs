@@ -36,34 +36,34 @@
 #include <stdio.h>
 #include <string.h>
 
-MechS32 g_targetPanelMode = 1;
+int32_t g_targetPanelMode = 1;
 
 // Set to announce the target's side with the next name the target panel shows.
-MechS32 g_announceTargetSide = 0;
+int32_t g_announceTargetSide = 0;
 
 // When the target panel goes from the target's short name to its name.
-MechS32 g_targetFullNameTime = 0;
+int32_t g_targetFullNameTime = 0;
 
 // The target the panel showed last.
-MechS32 g_lastPanelTarget = 0;
+int32_t g_lastPanelTarget = 0;
 
 // The target panel flickers to static while set.
-MechS32 g_targetPanelStatic = 0;
+int32_t g_targetPanelStatic = 0;
 
 // The name the target panel shows for an unknown installation.
-MechChar g_anonymousInstallationName[8];
+char g_anonymousInstallationName[8];
 
 // Writes the target panel's text: the locked target's name (its short name when it changes, its
 // name after a while), coloured by its side, and its distance.
 void DrawTargetPanelText(CockpitPanel* p_panel)
 {
-	MechS32 index;
-	MechFloat km;
-	MechS32 color;
-	MechS32 kind;
-	MechS32 meters;
+	int32_t index;
+	float km;
+	int32_t color;
+	int32_t kind;
+	int32_t meters;
 	Mech* mech;
-	MechChar text[64];
+	char text[64];
 	void* font;
 
 	color = 0xe;
@@ -256,27 +256,27 @@ void DrawTargetPanelText(CockpitPanel* p_panel)
 // static while the panel is damaged (m_damage).
 void DrawTargetPanel(CockpitPanel* p_panel)
 {
-	MechS32 index;
-	MechS32 dz;
+	int32_t index;
+	int32_t dz;
 	RenderSettings saved;
 	Player* targetPlayer;
-	MechS32 view[7];
+	int32_t view[7];
 	SceneObject* object;
-	MechS32 kind;
+	int32_t kind;
 	Mech* mech;
-	MechS32 centerX;
+	int32_t centerX;
 	Player* player;
-	MechS32 centerY;
-	MechS32 distance;
-	MechS32 heading;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 dx;
-	MechS32 icon;
+	int32_t centerY;
+	int32_t distance;
+	int32_t heading;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t dx;
+	int32_t icon;
 	void* noTarget;
 	void* noObject;
-	MechS32 targetIndex;
+	int32_t targetIndex;
 
 	if (!p_panel->m_enabled || !g_targetPanelMode) {
 		return;

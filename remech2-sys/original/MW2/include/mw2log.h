@@ -11,9 +11,9 @@ extern "C"
 {
 #endif
 
-	MechS32 OpenMw2Log(void);
-	MechS32 CloseMw2Log(void);
-	MechS32 WriteToMw2Log(MechChar* p_text);
+	int32_t OpenMw2Log(void);
+	int32_t CloseMw2Log(void);
+	int32_t WriteToMw2Log(char* p_text);
 
 #ifdef __cplusplus
 }

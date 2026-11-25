@@ -45,12 +45,12 @@ void SetCockpitPanelLightUpTime(CockpitPanel* p_panel, undefined4 p_lightUpTime)
 	p_panel->m_lightUpTime = p_lightUpTime;
 }
 
-void SetCockpitPanelWeapon(CockpitPanel* p_panel, MechS32 p_weapon)
+void SetCockpitPanelWeapon(CockpitPanel* p_panel, int32_t p_weapon)
 {
 	p_panel->m_weapon = p_weapon;
 }
 
-void SetCockpitPanelName(CockpitPanel* p_panel, const MechChar* p_name)
+void SetCockpitPanelName(CockpitPanel* p_panel, const char* p_name)
 {
 	strncpy(p_panel->m_name, p_name, sizeof(p_panel->m_name));
 	p_panel->m_name[sizeof(p_panel->m_name) - 1] = '\0';
@@ -75,7 +75,7 @@ void SetCockpitPanelTransition(CockpitPanel* p_panel, RectTransition* p_transiti
 	p_panel->m_transition = p_transition;
 }
 
-void SetCockpitPanelRect(CockpitPanel* p_panel, MechS32 p_x, MechS32 p_y, MechS32 p_width, MechS32 p_height)
+void SetCockpitPanelRect(CockpitPanel* p_panel, int32_t p_x, int32_t p_y, int32_t p_width, int32_t p_height)
 {
 	p_panel->m_x = p_x;
 	p_panel->m_y = p_y;
@@ -83,7 +83,7 @@ void SetCockpitPanelRect(CockpitPanel* p_panel, MechS32 p_x, MechS32 p_y, MechS3
 	p_panel->m_height = p_height;
 }
 
-void SetCockpitPanelDamage(CockpitPanel* p_panel, MechS32 p_damage)
+void SetCockpitPanelDamage(CockpitPanel* p_panel, int32_t p_damage)
 {
 	p_panel->m_damage = p_damage;
 }

@@ -67,35 +67,35 @@
 // planet: the gravity, the time of day and climate, and render switches.
 typedef struct BwdPlanetRecord {
 	BwdRecord m_header;       // 0x00
-	MechS32 m_gravity;        // 0x08 — in g
+	int32_t m_gravity;        // 0x08 — in g
 	undefined4 m_unk0x0c;     // 0x0c
-	MechS32 m_daysPerYear;    // 0x10
-	MechS32 m_secondsPerDay;  // 0x14
+	int32_t m_daysPerYear;    // 0x10
+	int32_t m_secondsPerDay;  // 0x14
 	undefined4 m_unk0x18[3];  // 0x18
-	MechS32 m_temperature;    // 0x24
-	MechS32 m_jumpJetDrag;    // 0x28
-	MechS32 m_mapShadeTop;    // 0x2c
-	MechS32 m_mapShadeBase;   // 0x30
-	MechS32 m_slideSlope;     // 0x34
-	MechS32 m_breathable;     // 0x38
-	MechS32 m_brightenDamage; // 0x3c
-	MechS32 m_noEffectCamera; // 0x40
-	MechS32 m_noSky;          // 0x44
-	MechS32 m_noGround;       // 0x48
-	MechS32 m_noHorizonBand;  // 0x4c
+	int32_t m_temperature;    // 0x24
+	int32_t m_jumpJetDrag;    // 0x28
+	int32_t m_mapShadeTop;    // 0x2c
+	int32_t m_mapShadeBase;   // 0x30
+	int32_t m_slideSlope;     // 0x34
+	int32_t m_breathable;     // 0x38
+	int32_t m_brightenDamage; // 0x3c
+	int32_t m_noEffectCamera; // 0x40
+	int32_t m_noSky;          // 0x44
+	int32_t m_noGround;       // 0x48
+	int32_t m_noHorizonBand;  // 0x4c
 } BwdPlanetRecord;
 
 // hiddentext.
 typedef struct BwdTextRecord {
 	BwdRecord m_header; // 0x00
-	MechChar m_text[1]; // 0x08
+	char m_text[1];     // 0x08
 } BwdTextRecord;
 
 // A record of two values.
 typedef struct BwdPairRecord {
 	BwdRecord m_header; // 0x00
-	MechS32 m_a;        // 0x08
-	MechS32 m_b;        // 0x0c
+	int32_t m_a;        // 0x08
+	int32_t m_b;        // 0x0c
 } BwdPairRecord;
 
 // A record of a resource: luma, music, animsound, bitmap prj and id list, the cockpit files.
@@ -108,35 +108,35 @@ typedef struct BwdResourceRecord {
 typedef struct BwdNowRecord {
 	BwdRecord m_header;      // 0x00
 	undefined4 m_unk0x08[2]; // 0x08
-	MechS32 m_timeOfDay;     // 0x10
-	MechS16 m_dayOfYear;     // 0x14
+	int32_t m_timeOfDay;     // 0x10
+	int16_t m_dayOfYear;     // 0x14
 } BwdNowRecord;
 
 // palettegroup: the palettes of the 20 slots.
 typedef struct BwdPaletteGroupRecord {
 	BwdRecord m_header; // 0x00
-	MechS16 m_ids[20];  // 0x08
+	int16_t m_ids[20];  // 0x08
 } BwdPaletteGroupRecord;
 
 // light: the eyepoint's light.
 typedef struct BwdLightRecord {
 	BwdRecord m_header;      // 0x00
 	undefined4 m_unk0x08[2]; // 0x08
-	MechS32 m_x;             // 0x10
-	MechS32 m_y;             // 0x14
-	MechS32 m_z;             // 0x18
-	MechS16 m_ambient;       // 0x1c
-	MechS16 m_directional;   // 0x1e
-	MechS32 m_fadeDistance;  // 0x20
+	int32_t m_x;             // 0x10
+	int32_t m_y;             // 0x14
+	int32_t m_z;             // 0x18
+	int16_t m_ambient;       // 0x1c
+	int16_t m_directional;   // 0x1e
+	int32_t m_fadeDistance;  // 0x20
 } BwdLightRecord;
 
 // A window record's rectangle for one of g_panes.
 typedef struct BwdWindowEntry {
-	MechS32 m_index;         // 0x00
-	MechS32 m_x;             // 0x04
-	MechS32 m_y;             // 0x08
-	MechS32 m_width;         // 0x0c
-	MechS32 m_height;        // 0x10
+	int32_t m_index;         // 0x00
+	int32_t m_x;             // 0x04
+	int32_t m_y;             // 0x08
+	int32_t m_width;         // 0x0c
+	int32_t m_height;        // 0x10
 	undefined4 m_unk0x14[3]; // 0x14
 } BwdWindowEntry;
 
@@ -149,22 +149,22 @@ typedef struct BwdWindowRecord {
 // start: the eyepoint's view.
 typedef struct BwdStartRecord {
 	BwdRecord m_header;  // 0x00
-	MechS32 m_values[7]; // 0x08 — Eyepoint 0x00-0x18
+	int32_t m_values[7]; // 0x08 — Eyepoint 0x00-0x18
 } BwdStartRecord;
 
 // A record of two resource numbers: bitmapsection, bitmapenable.
 typedef struct BwdIdPairRecord {
 	BwdRecord m_header; // 0x00
-	MechS16 m_a;        // 0x08
-	MechS16 m_b;        // 0x0a
+	int16_t m_a;        // 0x08
+	int16_t m_b;        // 0x0a
 } BwdIdPairRecord;
 
 // polyoffset: the shape offset.
 typedef struct BwdOffsetRecord {
 	BwdRecord m_header; // 0x00
-	MechS32 m_x;        // 0x08
-	MechS32 m_y;        // 0x0c
-	MechS32 m_z;        // 0x10
+	int32_t m_x;        // 0x08
+	int32_t m_y;        // 0x0c
+	int32_t m_z;        // 0x10
 } BwdOffsetRecord;
 
 // blockxform.
@@ -177,68 +177,68 @@ typedef struct BwdXformRecord {
 // objloc, booyowthing, xplode, lightobj. Only xplode records carry m_effectType.
 typedef struct BwdIdRecord {
 	BwdRecord m_header;   // 0x00
-	MechS16 m_id;         // 0x08
-	MechS16 m_value;      // 0x0a
-	MechS16 m_effectType; // 0x0c
+	int16_t m_id;         // 0x08
+	int16_t m_value;      // 0x0a
+	int16_t m_effectType; // 0x0c
 } BwdIdRecord;
 
 // gamething: an object (and its replacement) that counts for the mission.
 typedef struct BwdGameThingRecord {
-	BwdRecord m_header;         // 0x00
-	MechS16 m_objects[4][2];    // 0x08 — the object and its replacement
-	MechS16 m_hitPoints;        // 0x18
-	MechU16 m_events;           // 0x1a
-	MechS32 m_flags;            // 0x1c
-	MechChar m_name[0x16];      // 0x20
-	MechChar m_shortName[0x16]; // 0x36
+	BwdRecord m_header;      // 0x00
+	int16_t m_objects[4][2]; // 0x08 — the object and its replacement
+	int16_t m_hitPoints;     // 0x18
+	uint16_t m_events;       // 0x1a
+	int32_t m_flags;         // 0x1c
+	char m_name[0x16];       // 0x20
+	char m_shortName[0x16];  // 0x36
 } BwdGameThingRecord;
 
 // navpoint.
 typedef struct BwdNavPointRecord {
-	BwdRecord m_header;    // 0x00
-	Vector3 m_position;    // 0x08
-	MechS32 m_heading;     // 0x14
-	MechS16 m_used;        // 0x18
-	MechS16 m_flags;       // 0x1a
-	MechS16 m_owner;       // 0x1c
-	MechS16 m_team;        // 0x1e
-	MechU16 m_radius;      // 0x20 — in hundreds
-	MechU16 m_events;      // 0x22
-	MechChar m_name[0x16]; // 0x24
+	BwdRecord m_header; // 0x00
+	Vector3 m_position; // 0x08
+	int32_t m_heading;  // 0x14
+	int16_t m_used;     // 0x18
+	int16_t m_flags;    // 0x1a
+	int16_t m_owner;    // 0x1c
+	int16_t m_team;     // 0x1e
+	uint16_t m_radius;  // 0x20 — in hundreds
+	uint16_t m_events;  // 0x22
+	char m_name[0x16];  // 0x24
 } BwdNavPointRecord;
 
 // navobject: a nav point on an object.
 typedef struct BwdNavObjectRecord {
 	BwdRecord m_header; // 0x00
-	MechS16 m_unk0x08;  // 0x08
-	MechS16 m_id;       // 0x0a
-	MechS16 m_radius;   // 0x0c
-	MechU16 m_events;   // 0x0e
+	int16_t m_unk0x08;  // 0x08
+	int16_t m_id;       // 0x0a
+	int16_t m_radius;   // 0x0c
+	uint16_t m_events;  // 0x0e
 } BwdNavObjectRecord;
 
 // task: a timed callback, on an object or detached.
 typedef struct BwdTaskRecord {
 	BwdRecord m_header; // 0x00
-	MechS16 m_kind;     // 0x08 — an index into g_taskFns
-	MechS32 m_period;   // 0x0a
-	MechChar m_data[1]; // 0x0e — "object;..."
+	int16_t m_kind;     // 0x08 — an index into g_taskFns
+	int32_t m_period;   // 0x0a
+	char m_data[1];     // 0x0e — "object;..."
 } BwdTaskRecord;
 
 // position and rotate: an object class's instance, placed.
 typedef struct BwdPlaceRecord {
 	BwdRecord m_header; // 0x00
-	MechS16 m_id;       // 0x08
-	MechS32 m_x;        // 0x0a
-	MechS32 m_y;        // 0x0e
-	MechS32 m_z;        // 0x12
+	int16_t m_id;       // 0x08
+	int32_t m_x;        // 0x0a
+	int32_t m_y;        // 0x0e
+	int32_t m_z;        // 0x12
 } BwdPlaceRecord;
 
 // anim2d's parameters (LoadAnim2d).
 typedef struct BwdAnim2dSpec {
-	MechS16 m_flags;      // 0x00
-	MechS16 m_frameTime;  // 0x02
-	MechS16 m_type;       // 0x04
-	MechS16 m_resourceId; // 0x06
+	int16_t m_flags;      // 0x00
+	int16_t m_frameTime;  // 0x02
+	int16_t m_type;       // 0x04
+	int16_t m_resourceId; // 0x06
 } BwdAnim2dSpec;
 
 // anim2d.
@@ -250,22 +250,22 @@ typedef struct BwdAnim2dRecord {
 #pragma pack(pop)
 
 // Set by the local player's gpspec record: its hudfile record loads the HUD once.
-MechS32 g_loadHudFile = 0;
+int32_t g_loadHudFile = 0;
 
 // The next g_shots slot a booyowthing record fills.
-MechS32 g_nextShotRecord = 0;
+int32_t g_nextShotRecord = 0;
 
 // The next g_effects slot an xplode record fills.
-MechS32 g_nextEffectRecord = 0;
+int32_t g_nextEffectRecord = 0;
 
 // The name of the mission's music (the world stream's music record).
-MechChar g_musicName[12];
+char g_musicName[12];
 
 // The mission's "MUS" resource.
-MechS32 g_musicResource;
+int32_t g_musicResource;
 
 // Widens p_flags: any of the bits 0x730 sets them all, as does either of the bits 3.
-MechU32 WidenEventFlags(MechU32 p_flags)
+uint32_t WidenEventFlags(uint32_t p_flags)
 {
 	if (p_flags & 0x730) {
 		p_flags |= 0x730;
@@ -282,15 +282,15 @@ MechU32 WidenEventFlags(MechU32 p_flags)
 // gamepiece and cockpit file records execute their own streams. Events of the things and nav
 // points it creates are posted to the stream's event list (the mission table's, once one is
 // read). Returns whether every stream it executed loaded.
-MechS32 BwdExecuteStream(BwdStream* p_stream)
+int32_t BwdExecuteStream(BwdStream* p_stream)
 {
-	MechS32 result;
+	int32_t result;
 	BwdNode* node;
-	MechU32 eventList;
-	MechU32 type;
-	MechChar* eventName;
+	uint32_t eventList;
+	uint32_t type;
+	char* eventName;
 	undefined4 unk0x18;
-	MechS32 affiliation;
+	int32_t affiliation;
 
 	result = TRUE;
 	eventList = 0;
@@ -354,7 +354,7 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			g_mainEyepoint.m_farPlane = view->m_b;
 		}
 		else if (type == g_bwdTypeCodes[c_bwdLuma]) {
-			MechS32 id;
+			int32_t id;
 			BwdResourceRecord* luma = (BwdResourceRecord*) node;
 
 			id = luma->m_ref.m_id;
@@ -406,10 +406,10 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			g_dayOfYear = now->m_dayOfYear;
 		}
 		else if (type == g_bwdTypeCodes[c_bwdPaletteGroup]) {
-			MechS32 slot;
-			MechS32 i;
+			int32_t slot;
+			int32_t i;
 			BwdPaletteGroupRecord* group = (BwdPaletteGroupRecord*) node;
-			MechS16* ids;
+			int16_t* ids;
 
 			slot = 0;
 			ids = group->m_ids;
@@ -450,10 +450,10 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			LoadMapBitmap((BwdRecord*) node, &g_skyColor, NULL, NULL);
 		}
 		else if (type == g_bwdTypeCodes[c_bwdWindow]) {
-			MechS32 count;
+			int32_t count;
 			BwdWindowEntry* entry;
-			MechS32 i;
-			MechS32 index;
+			int32_t i;
+			int32_t index;
 			BwdWindowRecord* window = (BwdWindowRecord*) node;
 
 			entry = window->m_entries;
@@ -508,7 +508,7 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		}
 		else if (type == g_bwdTypeCodes[c_bwdBitmapPrj]) {
 			BwdResourceRecord* prj = (BwdResourceRecord*) node;
-			MechS32 id;
+			int32_t id;
 
 			id = prj->m_ref.m_id;
 			if (id == -1) {
@@ -524,15 +524,15 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		}
 		else if (type == g_bwdTypeCodes[c_bwdBitmapIdList]) {
 			BwdResourceRecord* list = (BwdResourceRecord*) node;
-			MechS32 id;
+			int32_t id;
 
 			id = list->m_ref.m_id;
 			StartAnimation(id, -1);
 		}
 		else if (type == g_bwdTypeCodes[c_bwdBitmapSection]) {
 			BwdIdPairRecord* section = (BwdIdPairRecord*) node;
-			MechS16 delay;
-			MechS16 index;
+			int16_t delay;
+			int16_t index;
 
 			index = section->m_a;
 			delay = section->m_b;
@@ -541,8 +541,8 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		}
 		else if (type == g_bwdTypeCodes[c_bwdBitmapEnable]) {
 			BwdIdPairRecord* enable = (BwdIdPairRecord*) node;
-			MechS16 mode;
-			MechS16 index;
+			int16_t mode;
+			int16_t index;
 
 			index = enable->m_a;
 			mode = enable->m_b;
@@ -552,9 +552,9 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			// Unused
 		}
 		else if (type == g_bwdTypeCodes[c_bwdPolyOffset]) {
-			MechS32 x;
-			MechS32 y;
-			MechS32 z;
+			int32_t x;
+			int32_t y;
+			int32_t z;
 			BwdOffsetRecord* offset = (BwdOffsetRecord*) node;
 
 			x = offset->m_x;
@@ -568,7 +568,7 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			ApplyBlockXform(xform->m_xform);
 		}
 		else if (type == g_bwdTypeCodes[c_bwdRep]) {
-			MechS32 i;
+			int32_t i;
 
 			if (!g_inRepeat) {
 				g_inRepeat = 1;
@@ -609,7 +609,7 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		else if (type == g_bwdTypeCodes[c_bwdScrounge]) {
 			SceneObject* obj;
 			Shape* shape;
-			MechS32 id;
+			int32_t id;
 			BwdIdRecord* scrounge = (BwdIdRecord*) node;
 
 			id = scrounge->m_id;
@@ -623,8 +623,8 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdThing]) {
-			MechS32 index;
-			MechS32 id;
+			int32_t index;
+			int32_t id;
 			BwdIdRecord* thing = (BwdIdRecord*) node;
 
 			id = thing->m_id;
@@ -641,15 +641,15 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdGamepiece]) {
-			MechS32 kind;
+			int32_t kind;
 			Player* player;
 			PlayerType* playerType;
-			MechS32 typeIndex;
-			MechS32 i;
+			int32_t typeIndex;
+			int32_t i;
 			BwdIdRecord* gamepiece = (BwdIdRecord*) node;
 			SceneObject* obj;
 			Shape* shape;
-			MechS32 id;
+			int32_t id;
 
 			typeIndex = -1;
 			obj = NULL;
@@ -789,19 +789,13 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			ref = &mgd->m_ref;
 			if (g_lastPlayer) {
 				mech = g_lastPlayer->m_mech;
-				LoadMgdFile(
-					ref,
-					&mech->m_height,
-					&mech->m_cockpitHeight,
-					&mech->m_maxTorsoTwist,
-					&mech->m_radius
-				);
+				LoadMgdFile(ref, &mech->m_height, &mech->m_cockpitHeight, &mech->m_maxTorsoTwist, &mech->m_radius);
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdEyeObj]) {
 			SceneObject* obj;
-			MechS32 index;
-			MechS32 id;
+			int32_t index;
+			int32_t id;
 			BwdIdRecord* eye = (BwdIdRecord*) node;
 
 			if (g_lastPlayer) {
@@ -820,8 +814,8 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			Mech* mech;
 			BwdIdRecord* pof = (BwdIdRecord*) node;
 			SceneObject* obj;
-			MechS32 index;
-			MechS32 id;
+			int32_t index;
+			int32_t id;
 
 			if (g_lastPlayer) {
 				id = pof->m_id;
@@ -837,17 +831,17 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdGameThing]) {
-			MechS32 i;
-			MechU32 events;
+			int32_t i;
+			uint32_t events;
 			GameThing* thing;
-			MechS32 index;
-			MechS32 replacementIndex;
-			MechS32 objectIndex;
+			int32_t index;
+			int32_t replacementIndex;
+			int32_t objectIndex;
 			BwdGameThingRecord* gameThing = (BwdGameThingRecord*) node;
-			MechS32 hitPoints;
-			MechS32 object;
-			MechU16 target;
-			MechS32 replacement;
+			int32_t hitPoints;
+			int32_t object;
+			uint16_t target;
+			int32_t replacement;
 
 			i = 0;
 			thing = NULL;
@@ -890,15 +884,15 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 
 				thing->m_staticObject = objectIndex;
 				if (eventList) {
-					target = (MechU8) index | 0x400;
+					target = (uint8_t) index | 0x400;
 					PostEventToList(eventName, events, target);
 				}
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdObjLoc]) {
-			MechS32 index;
-			MechS32 value;
-			MechS32 id;
+			int32_t index;
+			int32_t value;
+			int32_t id;
 			BwdIdRecord* objLoc = (BwdIdRecord*) node;
 
 			id = objLoc->m_id;
@@ -912,11 +906,11 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdBooyowThing]) {
-			MechS32 shotType;
+			int32_t shotType;
 			BwdIdRecord* booyow = (BwdIdRecord*) node;
 			SceneObject* obj;
 			Shape* shape;
-			MechS32 id;
+			int32_t id;
 
 			id = booyow->m_id;
 			shotType = booyow->m_value;
@@ -942,11 +936,11 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		else if (type == g_bwdTypeCodes[c_bwdXplode]) {
 			Effect* effect;
 			BwdIdRecord* xplode = (BwdIdRecord*) node;
-			MechS32 effectType;
-			MechS32 animation;
+			int32_t effectType;
+			int32_t animation;
 			SceneObject* obj;
 			Shape* shape;
-			MechS32 id;
+			int32_t id;
 
 			id = xplode->m_id;
 			animation = xplode->m_value;
@@ -988,9 +982,9 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		}
 		else if (type == g_bwdTypeCodes[c_bwdNavPoint]) {
 			BwdNavPointRecord* navPoint = (BwdNavPointRecord*) node;
-			MechU32 events;
+			uint32_t events;
 			Vector3 position;
-			MechU16 target;
+			uint16_t target;
 			NavPoint* nav;
 
 			if (g_navCount < 0x80 && g_navCount != -1) {
@@ -1010,7 +1004,7 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 				strncpy(nav->m_name, navPoint->m_name, 0x15);
 				nav->m_name[0x15] = '\0';
 				events = WidenEventFlags(navPoint->m_events);
-				target = (MechU8) g_navCount | 0x100;
+				target = (uint8_t) g_navCount | 0x100;
 				g_navCount++;
 				if (eventList) {
 					PostEventToList(eventName, events, target);
@@ -1020,15 +1014,15 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		else if (type == g_bwdTypeCodes[c_bwdNavObject]) {
 			BwdNavObjectRecord* navObject = (BwdNavObjectRecord*) node;
 			SceneObject* obj;
-			MechS32 index;
-			MechU32 events;
-			MechS32 x;
-			MechS32 found;
-			MechS32 y;
-			MechS32 z;
+			int32_t index;
+			uint32_t events;
+			int32_t x;
+			int32_t found;
+			int32_t y;
+			int32_t z;
 			Shape* shape;
-			MechS32 id;
-			MechU16 target;
+			int32_t id;
+			uint16_t target;
 
 			found = FALSE;
 			if (g_navCount < 0x80 && g_navCount != -1) {
@@ -1061,7 +1055,7 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 					g_navTable[g_navCount].m_flags = 0;
 					g_navTable[g_navCount].m_owner = 0;
 					events = WidenEventFlags(navObject->m_events);
-					target = (MechU8) g_navCount | 0x100;
+					target = (uint8_t) g_navCount | 0x100;
 					g_navCount++;
 					if (eventList) {
 						PostEventToList(eventName, events, target);
@@ -1070,9 +1064,9 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdLightObj]) {
-			MechS32 index;
+			int32_t index;
 			BwdIdRecord* lightObj = (BwdIdRecord*) node;
-			MechS32 id;
+			int32_t id;
 
 			id = lightObj->m_id;
 			if (id != -1) {
@@ -1086,12 +1080,12 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 			}
 		}
 		else if (type == g_bwdTypeCodes[c_bwdTask]) {
-			MechS32 period;
-			MechChar* semicolon;
-			MechChar* data;
-			MechS32 index;
-			MechS32 kind;
-			MechS32 objectId;
+			int32_t period;
+			char* semicolon;
+			char* data;
+			int32_t index;
+			int32_t kind;
+			int32_t objectId;
 			BwdTaskRecord* task = (BwdTaskRecord*) node;
 
 			objectId = -1;
@@ -1122,11 +1116,11 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		else if (type == g_bwdTypeCodes[c_bwdPosition]) {
 			SceneObject* obj;
 			BwdPlaceRecord* position = (BwdPlaceRecord*) node;
-			MechS32 x;
-			MechS32 y;
-			MechS32 z;
+			int32_t x;
+			int32_t y;
+			int32_t z;
 			Shape* shape;
-			MechS32 id;
+			int32_t id;
 
 			id = position->m_id;
 			x = position->m_x;
@@ -1144,12 +1138,12 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		}
 		else if (type == g_bwdTypeCodes[c_bwdRotate]) {
 			SceneObject* obj;
-			MechS32 x;
-			MechS32 y;
-			MechS32 z;
+			int32_t x;
+			int32_t y;
+			int32_t z;
 			Shape* shape;
 			BwdPlaceRecord* rotate = (BwdPlaceRecord*) node;
-			MechS32 id;
+			int32_t id;
 
 			id = rotate->m_id;
 			x = rotate->m_x;
@@ -1162,9 +1156,9 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 				if (obj) {
 					SetObjRotation(
 						obj,
-						(MechS32) (x * 65536.0 + 0.5),
-						(MechS32) (y * 65536.0 + 0.5),
-						(MechS32) (z * 65536.0 + 0.5),
+						(int32_t) (x * 65536.0 + 0.5),
+						(int32_t) (y * 65536.0 + 0.5),
+						(int32_t) (z * 65536.0 + 0.5),
 						0
 					);
 					UpdateObj(obj);
@@ -1179,17 +1173,17 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 		}
 		else if (type == g_bwdTypeCodes[c_bwdGpSpec]) {
 			Mech* mech;
-			MechS32 leader;
-			MechChar name[9];
-			MechU32 events;
-			MechS32 i;
-			MechS32 index;
+			int32_t leader;
+			char name[9];
+			uint32_t events;
+			int32_t i;
+			int32_t index;
 			IncludeRecord2* gpSpec = (IncludeRecord2*) node;
-			MechChar config[9];
-			MechS32 mekId;
-			MechU16 team;
-			MechU16 target;
-			MechS32 ai;
+			char config[9];
+			int32_t mekId;
+			uint16_t team;
+			uint16_t target;
+			int32_t ai;
 
 			index = 0;
 			mekId = gpSpec->m_mekId;
@@ -1224,7 +1218,7 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 					strncpy(g_lastPlayer->m_shortName, gpSpec->m_playerShortName, 0x16);
 					g_lastPlayer->m_shortName[0x15] = '\0';
 					if (eventList) {
-						target = (MechU8) index | 0x200;
+						target = (uint8_t) index | 0x200;
 						PostEventToList(eventName, events, target);
 					}
 
@@ -1279,12 +1273,12 @@ MechS32 BwdExecuteStream(BwdStream* p_stream)
 
 // Loads the mission world p_name (a resource number or a file name): resets the teams, the
 // thing table and the shape offset, then executes its BWD stream. Returns whether it loaded.
-MechS32 LoadWorld(MechChar* p_name)
+int32_t LoadWorld(char* p_name)
 {
 	BwdStream* stream;
 	BwdStreamKey* key;
-	MechS32 result;
-	MechS32 i;
+	int32_t result;
+	int32_t i;
 	BwdStreamKey keyData;
 	BwdStream streamData;
 
@@ -1333,7 +1327,7 @@ MechS32 LoadWorld(MechChar* p_name)
 void AfterWorldLoader(void)
 {
 	SceneObject* obj;
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < g_playerCount; i++) {
 		if (g_isNetworkGame) {

@@ -7,8 +7,8 @@ struct BwdStream;
 
 // One entry of a mission's static memory table: a pool tag and its size.
 typedef struct StaticPoolSize {
-	MechU32 m_tag;  // 0x00
-	MechU32 m_size; // 0x04
+	uint32_t m_tag;  // 0x00
+	uint32_t m_size; // 0x04
 } StaticPoolSize;
 
 // The functions and globals of poolsizes.c that other units use.
@@ -17,18 +17,18 @@ extern "C"
 {
 #endif
 
-	extern MechU32 g_staticPoolTags[10];
-	extern MechS16 g_missionPlayers;
-	extern MechS16 g_missionObjects;
-	extern MechS16 g_missionClassEntries;
-	extern MechS16 g_missionAnims;
-	extern MechS16 g_missionAnimTracks;
-	extern MechS32 g_missionAnimFrameBytes;
+	extern uint32_t g_staticPoolTags[10];
+	extern int16_t g_missionPlayers;
+	extern int16_t g_missionObjects;
+	extern int16_t g_missionClassEntries;
+	extern int16_t g_missionAnims;
+	extern int16_t g_missionAnimTracks;
+	extern int32_t g_missionAnimFrameBytes;
 	extern StaticPoolSize g_staticPoolSizes[10];
 
-	MechU32 GetStaticPoolSize(MechS32 p_index);
+	uint32_t GetStaticPoolSize(int32_t p_index);
 	StaticPoolSize* ReadStaticMemoryTable(char* p_mission);
-	MechS32 CountMissionStream(struct BwdStream* p_stream);
+	int32_t CountMissionStream(struct BwdStream* p_stream);
 	StaticPoolSize* BuildStaticMemoryTable(void);
 
 #ifdef __cplusplus

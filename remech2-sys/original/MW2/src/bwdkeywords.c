@@ -5,10 +5,10 @@
 #include "types.h"
 
 // The BWD version this build reads: a mission stream's REV record must be at least this.
-MechChar g_bwdVersion[] = "1.22";
+char g_bwdVersion[] = "1.22";
 
 // The name of each keyword in g_bwdTypeCodes.
-MechChar* g_bwdKeywordNames[0x48] = {
+char* g_bwdKeywordNames[0x48] = {
 	"bwd",           "rev",
 	"dtbl",          "planet",
 	"palette_grp",   "terrain",
@@ -48,10 +48,10 @@ MechChar* g_bwdKeywordNames[0x48] = {
 };
 
 // The extension OpenBwdStream gives a file name without one.
-MechChar g_bwdExtension[8] = "BWD";
+char g_bwdExtension[8] = "BWD";
 
 // The node tags, four characters each. The first is a stream's header node (BwdHeader).
-MechU32 g_bwdTypeCodes[0x48] = {
+uint32_t g_bwdTypeCodes[0x48] = {
 	0x00445742, // BWD
 	0x00564552, // REV
 	0x4c425444, // DTBL

@@ -17,21 +17,21 @@
 // places each member (by its slot) relative to the leader. Formations are copied from a
 // table of named templates.
 
-MechS32 g_localStar = -1;
+int32_t g_localStar = -1;
 
-MechS32 g_formationTemplateCount = 0;
+int32_t g_formationTemplateCount = 0;
 
 TeamFormation g_formationTemplates[32];
 
 Team g_teams[16];
 
-MechS32 g_starSides[8];
+int32_t g_starSides[8];
 
 TeamFormation g_teamFormations[16];
 
 void ResetTeams(void)
 {
-	MechU32 i;
+	uint32_t i;
 
 	for (i = 0; i < 16; i++) {
 		g_teams[i].m_leader = 0;
@@ -40,10 +40,10 @@ void ResetTeams(void)
 	}
 }
 
-MechS32 SetTeamFormationByName(MechS32 p_team, const MechChar* p_name)
+int32_t SetTeamFormationByName(int32_t p_team, const char* p_name)
 {
-	MechS32 result = FALSE;
-	MechS32 i;
+	int32_t result = FALSE;
+	int32_t i;
 
 	if (p_team >= 16) {
 		return FALSE;
@@ -61,7 +61,7 @@ MechS32 SetTeamFormationByName(MechS32 p_team, const MechChar* p_name)
 	return result;
 }
 
-MechS32 GetTeamFormation(MechS32 p_team)
+int32_t GetTeamFormation(int32_t p_team)
 {
 	if (p_team >= 16) {
 		return 0;
@@ -70,7 +70,7 @@ MechS32 GetTeamFormation(MechS32 p_team)
 	return g_teams[p_team].m_formation;
 }
 
-void SetTeamFormation(MechS32 p_team, MechS32 p_formation)
+void SetTeamFormation(int32_t p_team, int32_t p_formation)
 {
 	if (p_team >= 16 || p_formation >= 32) {
 		return;
@@ -84,9 +84,9 @@ void SetTeamFormation(MechS32 p_team, MechS32 p_formation)
 	g_teamFormations[p_team] = g_formationTemplates[p_formation];
 }
 
-MechS32 SetPlayerSlot(MechU32 p_player, MechU32 p_slot)
+int32_t SetPlayerSlot(uint32_t p_player, uint32_t p_slot)
 {
-	MechS32 result = FALSE;
+	int32_t result = FALSE;
 
 	if (p_player < g_playerCount && p_slot < 8) {
 		g_players[p_player]->m_slot = p_slot;
@@ -97,13 +97,13 @@ MechS32 SetPlayerSlot(MechU32 p_player, MechU32 p_slot)
 }
 
 // Makes a player the team's leader and moves the formation's origin to the leader's slot.
-MechS32 SetTeamLeader(MechS32 p_team, MechS32 p_player)
+int32_t SetTeamLeader(int32_t p_team, int32_t p_player)
 {
-	MechS32 result;
-	MechU16 i;
-	MechS32 dz;
+	int32_t result;
+	uint16_t i;
+	int32_t dz;
 	Player* player;
-	MechS32 dx;
+	int32_t dx;
 
 	result = FALSE;
 	if (p_player == -1) {
@@ -127,15 +127,15 @@ MechS32 SetTeamLeader(MechS32 p_team, MechS32 p_player)
 }
 
 // Places the team's leader, then every member at its formation slot around the leader.
-MechS32 PlaceTeam(MechS32 p_team, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_heading)
+int32_t PlaceTeam(int32_t p_team, int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_heading)
 {
-	MechS32 result;
-	MechS32 z;
-	MechU32 leader;
+	int32_t result;
+	int32_t z;
+	uint32_t leader;
 	Player* player;
-	MechS32 heading;
-	MechS32 x;
-	MechU32 i;
+	int32_t heading;
+	int32_t x;
+	uint32_t i;
 
 	result = FALSE;
 	if (p_team < 16 && (leader = g_teams[p_team].m_leader) < g_playerCount) {
@@ -167,14 +167,14 @@ MechS32 PlaceTeam(MechS32 p_team, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32
 
 // Returns where a player's formation slot puts it: the leader's own position, or the slot's
 // offset transformed by the leader's orientation.
-MechS32 GetTeamSlotPosition(MechU32 p_player, MechS32* p_x, MechS32* p_z, MechS32* p_heading)
+int32_t GetTeamSlotPosition(uint32_t p_player, int32_t* p_x, int32_t* p_z, int32_t* p_heading)
 {
-	MechS32 slot;
-	MechU32 leader;
+	int32_t slot;
+	uint32_t leader;
 	Matrix* matrix;
 	SceneObject* obj;
-	MechS32 y;
-	MechS32 team;
+	int32_t y;
+	int32_t team;
 
 	y = 0;
 	if (p_player >= g_playerCount) {
@@ -201,9 +201,9 @@ MechS32 GetTeamSlotPosition(MechU32 p_player, MechS32* p_x, MechS32* p_z, MechS3
 	return TRUE;
 }
 
-MechS32 GetTeamLeader(MechS32 p_team)
+int32_t GetTeamLeader(int32_t p_team)
 {
-	MechS32 result = 0;
+	int32_t result = 0;
 
 	if (p_team < 16) {
 		result = g_teams[p_team].m_leader;
@@ -213,13 +213,13 @@ MechS32 GetTeamLeader(MechS32 p_team)
 }
 
 // Numbers the team's active members' formation slots from 1, the leader taking slot 0.
-MechS32 AssignTeamSlots(MechS32 p_team, MechS32 p_unk0x04)
+int32_t AssignTeamSlots(int32_t p_team, int32_t p_unk0x04)
 {
 	Team* team;
 	Player* player;
-	MechS16 i;
-	MechS16 slot;
-	MechS16 leader;
+	int16_t i;
+	int16_t slot;
+	int16_t leader;
 
 	team = &g_teams[p_team];
 	leader = GetTeamLeader(p_team);
@@ -246,14 +246,14 @@ MechS32 AssignTeamSlots(MechS32 p_team, MechS32 p_unk0x04)
 	return TRUE;
 }
 
-MechS32 GetPlayerSide(MechS32 p_player)
+int32_t GetPlayerSide(int32_t p_player)
 {
 	return g_teams[g_players[p_player]->m_team].m_side;
 }
 
-MechS32 GetThingSide(MechS32 p_thing)
+int32_t GetThingSide(int32_t p_thing)
 {
-	MechS32 index;
+	int32_t index;
 
 	index = g_gameThings[p_thing].m_affiliation;
 	if (index < 0) {
@@ -265,9 +265,9 @@ MechS32 GetThingSide(MechS32 p_thing)
 }
 
 // The side of the team that owns nav p_nav; 2 past the first 16 navs.
-MechS32 GetNavSide(MechU32 p_nav)
+int32_t GetNavSide(uint32_t p_nav)
 {
-	MechS32 side;
+	int32_t side;
 
 	side = 2;
 	if (p_nav < 16) {
@@ -277,7 +277,7 @@ MechS32 GetNavSide(MechU32 p_nav)
 	return side;
 }
 
-MechS32 OnSameSide(MechS32 p_playerA, MechS32 p_playerB)
+int32_t OnSameSide(int32_t p_playerA, int32_t p_playerB)
 {
 	return GetPlayerSide(p_playerB) == GetPlayerSide(p_playerA);
 }

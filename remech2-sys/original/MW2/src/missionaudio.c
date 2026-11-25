@@ -13,21 +13,21 @@
 #include <string.h>
 #include <strings.h>
 
-MechS32 g_soundFileCount = 0;
+int32_t g_soundFileCount = 0;
 
 ProjectFileEntry g_soundFileEntries[200];
 
 ProjectFileEntry* g_soundFileTable[0x65];
 
 // The directory of the mission's sound files.
-MechChar g_soundFileDir[0x100];
+char g_soundFileDir[0x100];
 
 // Returns the entry named p_name, or adds it if p_add; NULL when it is missing.
-ProjectFileEntry* FindSoundFile(MechChar* p_name, MechS32 p_add)
+ProjectFileEntry* FindSoundFile(char* p_name, int32_t p_add)
 {
 	ProjectFileEntry* entry;
 	ProjectFileEntry* added;
-	MechU32 slot;
+	uint32_t slot;
 
 	slot = HashName(p_name) % 0x65;
 	for (entry = g_soundFileTable[slot]; entry; entry = entry->m_next) {
@@ -73,7 +73,7 @@ void CollectMissionAudio(void)
 		// The original listed the files' short (8.3) names, which always fit an entry
 		name = MechFileListName(files, i);
 		if (strlen(name) < sizeof(g_soundFileEntries[0].m_name)) {
-			FindSoundFile((MechChar*) name, 1);
+			FindSoundFile((char*) name, 1);
 		}
 	}
 
@@ -83,10 +83,10 @@ void CollectMissionAudio(void)
 
 // Reads the sound file p_name (".sfl" appended) from the mission's directory, if the project
 // file lists it. Returns the data, or NULL.
-void* ReadSoundFile(MechChar* p_name)
+void* ReadSoundFile(char* p_name)
 {
-	MechChar path[0x100];
-	MechChar name[0x100];
+	char path[0x100];
+	char name[0x100];
 
 	// The original returned NULL here for a null g_soundFileDir, which as an array never is
 

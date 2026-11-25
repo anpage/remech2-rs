@@ -20,11 +20,11 @@
 // of the heading p_heading (always against the local player, else one time in three) it aims at
 // its goal and may fire (DecideAIFire). Then turns and pitches the torso. Returns whether it
 // fired.
-MechS32 RunAIWeapons(Player* p_player, MechS32 p_heading)
+int32_t RunAIWeapons(Player* p_player, int32_t p_heading)
 {
-	MechS32 fired;
-	MechS32 roll;
-	MechS32 delta;
+	int32_t fired;
+	int32_t roll;
+	int32_t delta;
 
 	fired = FALSE;
 	if (p_player->m_nextFireTime <= g_currentClock) {
@@ -58,12 +58,12 @@ MechS32 RunAIWeapons(Player* p_player, MechS32 p_heading)
 // Decides whether p_player's AI fires its selected weapon: in range of its target, cool enough, the
 // weapon ready and loaded, and by chance per recycle time; otherwise it selects the next weapon.
 // Firing weapon types 0 and 4 also steers; a guided weapon's volley may lock on.
-MechS32 DecideAIFire(Player* p_player)
+int32_t DecideAIFire(Player* p_player)
 {
-	MechS32 fire;
-	MechS32 type;
+	int32_t fire;
+	int32_t type;
 	Mech* mech;
-	MechS32 i;
+	int32_t i;
 	WeaponSlot* slot;
 	WeaponDef* def;
 

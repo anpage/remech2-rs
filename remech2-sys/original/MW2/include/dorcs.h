@@ -17,40 +17,40 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_fledToWindows;
+	extern int32_t g_fledToWindows;
 	extern void (*g_dorcsPreviousDrawCallback)(void);
 	extern MenuDefinition g_dorcsMenu;
 	extern MenuPage* g_dorcsMenuPageStack[8];
-	extern MechChar g_dorcsPageTitle[26];
-	extern MechChar g_dorcsAboutItem[12];
-	extern MechChar g_dorcsClarkeName[15];
-	extern MechChar g_dorcsDouglasName[19];
-	extern MechChar g_dorcsEthertonName[18];
-	extern MechChar g_dorcsHusebyName[17];
-	extern MechChar g_dorcsKaminsName[11];
-	extern MechChar g_dorcsKeatingName[13];
-	extern MechChar g_dorcsMilesName[11];
-	extern MechChar g_dorcsMortenName[11];
-	extern MechChar g_dorcsMortensenName[14];
-	extern MechChar g_dorcsPetersonName[14];
-	extern MechChar g_dorcsStanfillName[13];
-	extern MechChar g_dorcsWhiteName[12];
-	extern MechChar g_dorcsZobelName[11];
-	extern MechChar g_dorcsAboutText[569];
-	extern MechChar g_dorcsClarkeText[669];
-	extern MechChar g_dorcsDouglasText[643];
-	extern MechChar g_dorcsEthertonText[49];
-	extern MechChar g_dorcsHusebyText[286];
-	extern MechChar g_dorcsKaminsText[251];
-	extern MechChar g_dorcsKeatingText[509];
-	extern MechChar g_dorcsMilesText[367];
-	extern MechChar g_dorcsMortenText[300];
-	extern MechChar g_dorcsMortensenText[383];
-	extern MechChar g_dorcsPetersonText[400];
-	extern MechChar g_dorcsStanfillText[327];
-	extern MechChar g_dorcsWhiteText[49];
-	extern MechChar g_dorcsZobelText[85];
-	extern MechChar g_dorcsExitItem[16];
+	extern char g_dorcsPageTitle[26];
+	extern char g_dorcsAboutItem[12];
+	extern char g_dorcsClarkeName[15];
+	extern char g_dorcsDouglasName[19];
+	extern char g_dorcsEthertonName[18];
+	extern char g_dorcsHusebyName[17];
+	extern char g_dorcsKaminsName[11];
+	extern char g_dorcsKeatingName[13];
+	extern char g_dorcsMilesName[11];
+	extern char g_dorcsMortenName[11];
+	extern char g_dorcsMortensenName[14];
+	extern char g_dorcsPetersonName[14];
+	extern char g_dorcsStanfillName[13];
+	extern char g_dorcsWhiteName[12];
+	extern char g_dorcsZobelName[11];
+	extern char g_dorcsAboutText[569];
+	extern char g_dorcsClarkeText[669];
+	extern char g_dorcsDouglasText[643];
+	extern char g_dorcsEthertonText[49];
+	extern char g_dorcsHusebyText[286];
+	extern char g_dorcsKaminsText[251];
+	extern char g_dorcsKeatingText[509];
+	extern char g_dorcsMilesText[367];
+	extern char g_dorcsMortenText[300];
+	extern char g_dorcsMortensenText[383];
+	extern char g_dorcsPetersonText[400];
+	extern char g_dorcsStanfillText[327];
+	extern char g_dorcsWhiteText[49];
+	extern char g_dorcsZobelText[85];
+	extern char g_dorcsExitItem[16];
 	extern PANE g_dorcsTextRect;
 	extern MenuTextBox g_dorcsAboutTextBox;
 	extern MenuTextBox g_dorcsClarkeTextBox;
@@ -106,11 +106,11 @@ extern "C"
 	extern RectTransition g_dorcsTransition;
 	extern void* g_dorcsGif;
 	extern PaletteColor* g_dorcsPalette;
-	extern MechU8* g_dorcsGifState;
-	extern MechS32 g_dorcsGifLoaded;
-	extern MechS32 g_dorcsTime;
-	extern MechS32 g_dorcsReverse;
-	extern MechS32 g_dorcsState;
+	extern uint8_t* g_dorcsGifState;
+	extern int32_t g_dorcsGifLoaded;
+	extern int32_t g_dorcsTime;
+	extern int32_t g_dorcsReverse;
+	extern int32_t g_dorcsState;
 	extern PANE g_dorcsSavedTarget;
 	extern PANE g_dorcsGifTarget;
 	extern PaletteColor g_dorcsBlack;
@@ -118,18 +118,18 @@ extern "C"
 	void AbortMissionAction(
 		MenuDefinition* p_menu,
 		MenuControl* p_control,
-		MechS32 p_index,
+		int32_t p_index,
 		Point p_pos,
 		MenuPage* p_page
 	);
 	void FleeToWindowsAction(
 		MenuDefinition* p_menu,
 		MenuControl* p_control,
-		MechS32 p_index,
+		int32_t p_index,
 		Point p_pos,
 		MenuPage* p_page
 	);
-	void* ReadVfxBin(MechChar* p_name);
+	void* ReadVfxBin(char* p_name);
 	void CloseInGameMenus(void);
 	void UpdateDorcs(void);
 	void ShowDorcs(void);

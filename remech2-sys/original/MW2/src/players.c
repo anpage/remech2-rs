@@ -29,9 +29,9 @@ PlayerType g_playerTypes[9] = {
 	{8, CreateMech, FirstMech, UpdateMech, LateUpdateMech, UpdateLocalMech, DrawMechCockpit, ShutdownMech},
 };
 
-MechS32 g_playerCount = 0;
+int32_t g_playerCount = 0;
 
-MechS32 g_gameThingCount = 0;
+int32_t g_gameThingCount = 0;
 
 // The world loader stops at 0x3c players (BwdExecuteStream), which fill the original's room
 // before g_gameThings.
@@ -41,7 +41,7 @@ GameThing g_gameThings[254];
 
 void FirstClassFunctions(void)
 {
-	MechS32 i;
+	int32_t i;
 	void (*first)(Player* p_player);
 
 	for (i = 0; i < g_playerCount; i++) {
@@ -56,7 +56,7 @@ void UpdateAllPlayers(void)
 {
 	PlayerMechFn update;
 	Mech* mech;
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < g_playerCount; i++) {
 		update = g_players[i]->m_updateFn;
@@ -69,7 +69,7 @@ void UpdateAllPlayers(void)
 
 void LateUpdateAllPlayers(void)
 {
-	MechS32 i;
+	int32_t i;
 	PlayerMechFn update;
 
 	for (i = 0; i < g_playerCount; i++) {
@@ -111,7 +111,7 @@ void DrawLocalPlayer(void)
 void ShutdownAllPlayers(void)
 {
 	PlayerMechFn shutdown;
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < g_playerCount; i++) {
 		if (g_players[i]->m_shutdownFn != NULL) {
@@ -121,7 +121,7 @@ void ShutdownAllPlayers(void)
 	}
 }
 
-void ZeroGameThing(MechS32 p_index)
+void ZeroGameThing(int32_t p_index)
 {
 	GameThing* thing;
 
@@ -136,7 +136,7 @@ void ZeroGameThing(MechS32 p_index)
 
 void ZeroGamethings(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 254; i++) {
 		ZeroGameThing(i);
@@ -145,7 +145,7 @@ void ZeroGamethings(void)
 
 // Creates player p_player: allocates it, sets it up, gives it its steering (the input sinks for
 // the local player, the room after it otherwise), and passes it to p_fn if given.
-void CreateSimPlayer(MechS32 p_player, PlayerCreatedFn p_fn)
+void CreateSimPlayer(int32_t p_player, PlayerCreatedFn p_fn)
 {
 	PlayerCreatedFn fn;
 	Player* player;
@@ -175,10 +175,10 @@ void CreateSimPlayer(MechS32 p_player, PlayerCreatedFn p_fn)
 }
 
 // Allocates player p_player: a remote player gets room for its steering after it.
-MechS32 AllocPlayer(MechS32 p_player)
+int32_t AllocPlayer(int32_t p_player)
 {
 	Player* player;
-	MechU32 size;
+	uint32_t size;
 
 	size = sizeof(Player);
 	if (p_player != g_localPlayerId) {

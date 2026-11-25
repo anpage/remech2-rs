@@ -11,29 +11,29 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_rayBoxEntryBehind;
+	extern int32_t g_rayBoxEntryBehind;
 
-	MechS32 TestPointInBox(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 GetBoxTop(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32* p_top);
+	int32_t TestPointInBox(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t GetBoxTop(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z, int32_t* p_top);
 	void ClassifyPointInBox(
 		Shape* p_shape,
-		MechS32 p_x,
-		MechS32 p_y,
-		MechS32 p_z,
-		MechS32* p_inside,
-		MechS32* p_inColumn,
-		MechS32* p_top
+		int32_t p_x,
+		int32_t p_y,
+		int32_t p_z,
+		int32_t* p_inside,
+		int32_t* p_inColumn,
+		int32_t* p_top
 	);
-	MechS32 TestRayBox(Shape* p_shape, Ray* p_ray);
-	MechS32 TestPointInBoxColumn(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 TestPointNever(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 TestRayNever(Shape* p_shape, Ray* p_ray);
-	MechS32 TestPointUnderFloor(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 TestPointTerrain(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 TestRayTerrain(Shape* p_shape, Ray* p_ray);
-	MechS32 GetTerrainShapeTop(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32* p_top);
-	MechS32 TestPointAboveFaces(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 TestRayFaces(Shape* p_shape, Ray* p_ray);
+	int32_t TestRayBox(Shape* p_shape, Ray* p_ray);
+	int32_t TestPointInBoxColumn(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t TestPointNever(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t TestRayNever(Shape* p_shape, Ray* p_ray);
+	int32_t TestPointUnderFloor(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t TestPointTerrain(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t TestRayTerrain(Shape* p_shape, Ray* p_ray);
+	int32_t GetTerrainShapeTop(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z, int32_t* p_top);
+	int32_t TestPointAboveFaces(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t TestRayFaces(Shape* p_shape, Ray* p_ray);
 
 #ifdef __cplusplus
 }

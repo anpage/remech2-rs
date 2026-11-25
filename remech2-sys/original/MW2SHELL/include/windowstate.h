@@ -11,10 +11,10 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_windowHeight;
-	extern MechS32 g_windowWidth;
-	extern MechS32 g_paused;
-	extern MechS32 g_menuDialogOpen;
+	extern int32_t g_windowHeight;
+	extern int32_t g_windowWidth;
+	extern int32_t g_paused;
+	extern int32_t g_menuDialogOpen;
 	extern MechHeap* g_primaryHeap;
 
 #ifdef __cplusplus

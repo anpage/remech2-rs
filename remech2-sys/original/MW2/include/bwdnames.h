@@ -14,8 +14,8 @@ extern "C"
 	extern struct BwdNameNode* g_bwdNames;
 	extern struct BwdNameNode* g_bwdNamesTail;
 
-	MechS32 AddBwdName(BwdName* p_name);
-	MechS16* FindBwdName(BwdName* p_name);
+	int32_t AddBwdName(BwdName* p_name);
+	int16_t* FindBwdName(BwdName* p_name);
 	void FreeBwdNames(void);
 
 #ifdef __cplusplus

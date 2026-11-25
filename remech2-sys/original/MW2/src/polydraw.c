@@ -25,27 +25,27 @@ Eyepoint* g_eyepoint = &g_mainEyepoint;
 
 RenderSettings g_renderSettings = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0x186a0, 0, 0, NULL, NULL, NULL, 0, NULL};
 
-MechS32 g_horizonBandHeight = 0x24;
+int32_t g_horizonBandHeight = 0x24;
 
 // Polygon drawing: a polygon is p_count points of 6 dwords each (x, y, a shade, two texture
 // coordinates and a depth), and the mode in bits 12 to 14 of p_flags picks how it is drawn.
 
 // The end of the last line DrawLineTo drew.
-MechS32 g_lineEndX;
+int32_t g_lineEndX;
 
-MechS32 g_lineEndY;
+int32_t g_lineEndY;
 
-void DrawScenePolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
+void DrawScenePolygon(int32_t p_count, uint32_t* p_points, uint32_t p_flags)
 {
-	MechS32 luma;
-	MechS32 saved;
-	MechU32 mode;
-	MechS32 i;
-	MechU32* point;
-	MechS32 index;
-	MechS32 scale;
-	MechS32 shade;
-	MechS32 fraction;
+	int32_t luma;
+	int32_t saved;
+	uint32_t mode;
+	int32_t i;
+	uint32_t* point;
+	int32_t index;
+	int32_t scale;
+	int32_t shade;
+	int32_t fraction;
 
 	mode = p_flags & 0x7000;
 	point = p_points;
@@ -73,7 +73,7 @@ void DrawScenePolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
 	case 0x4000:
 		p_flags &= 0xff;
 		for (i = 0; i < p_count; i++) {
-			if ((MechS32) point[3] < 0x300000) {
+			if ((int32_t) point[3] < 0x300000) {
 				point[2] = point[3];
 			}
 			else {
@@ -148,21 +148,21 @@ void DrawScenePolygon(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
 // horizon blends the sky into the ground.
 void DrawSkyAndGround(Eyepoint* p_eyepoint)
 {
-	MechS32 y1;
-	MechS32 x1;
-	MechS32 yLeft;
-	MechS32 corners;
-	MechS32 y0;
-	MechS32 dx;
+	int32_t y1;
+	int32_t x1;
+	int32_t yLeft;
+	int32_t corners;
+	int32_t y0;
+	int32_t dx;
 	PANE rect;
-	MechU32 band[4 * 6];
-	MechS32 dy;
-	MechS32 dz;
-	MechS32 xBottom;
-	MechS32 yRight;
-	MechS32 xTop;
-	MechS32 gradient;
-	MechS32 x0;
+	uint32_t band[4 * 6];
+	int32_t dy;
+	int32_t dz;
+	int32_t xBottom;
+	int32_t yRight;
+	int32_t xTop;
+	int32_t gradient;
+	int32_t x0;
 	Matrix roll;
 
 	x0 = p_eyepoint->m_viewLeft;
@@ -501,20 +501,20 @@ void DrawSkyAndGround(Eyepoint* p_eyepoint)
 
 // Draws a closed polygon of five points.
 void DrawPentagon(
-	MechS32 p_x0,
-	MechS32 p_y0,
-	MechS32 p_x1,
-	MechS32 p_y1,
-	MechS32 p_x2,
-	MechS32 p_y2,
-	MechS32 p_x3,
-	MechS32 p_y3,
-	MechS32 p_x4,
-	MechS32 p_y4,
-	MechU32 p_flags
+	int32_t p_x0,
+	int32_t p_y0,
+	int32_t p_x1,
+	int32_t p_y1,
+	int32_t p_x2,
+	int32_t p_y2,
+	int32_t p_x3,
+	int32_t p_y3,
+	int32_t p_x4,
+	int32_t p_y4,
+	uint32_t p_flags
 )
 {
-	MechU32 points[5 * 6];
+	uint32_t points[5 * 6];
 
 	points[0] = points[3] = p_x0;
 	points[1] = points[4] = p_y0;
@@ -530,18 +530,18 @@ void DrawPentagon(
 }
 
 void DrawQuad(
-	MechS32 p_x0,
-	MechS32 p_y0,
-	MechS32 p_x1,
-	MechS32 p_y1,
-	MechS32 p_x2,
-	MechS32 p_y2,
-	MechS32 p_x3,
-	MechS32 p_y3,
-	MechU32 p_flags
+	int32_t p_x0,
+	int32_t p_y0,
+	int32_t p_x1,
+	int32_t p_y1,
+	int32_t p_x2,
+	int32_t p_y2,
+	int32_t p_x3,
+	int32_t p_y3,
+	uint32_t p_flags
 )
 {
-	MechU32 points[4 * 6];
+	uint32_t points[4 * 6];
 
 	points[0] = points[3] = p_x0;
 	points[1] = points[4] = p_y0;
@@ -554,9 +554,9 @@ void DrawQuad(
 	g_renderSettings.m_drawPolygon(4, points, p_flags);
 }
 
-void DrawTriangle(MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, MechS32 p_y1, MechS32 p_x2, MechS32 p_y2, MechU32 p_flags)
+void DrawTriangle(int32_t p_x0, int32_t p_y0, int32_t p_x1, int32_t p_y1, int32_t p_x2, int32_t p_y2, uint32_t p_flags)
 {
-	MechU32 points[3 * 6];
+	uint32_t points[3 * 6];
 
 	points[0] = points[3] = p_x0;
 	points[1] = points[4] = p_y0;
@@ -568,7 +568,7 @@ void DrawTriangle(MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, MechS32 p_y1, MechS3
 }
 
 // Draws a line from the end of the last one to (p_x, p_y).
-void DrawLineTo(MechS32 p_x, MechS32 p_y, MechU32 p_color)
+void DrawLineTo(int32_t p_x, int32_t p_y, uint32_t p_color)
 {
 	VFX_line_draw(&g_currentPane, p_x, p_y, g_lineEndX, g_lineEndY, 0, p_color);
 	g_lineEndX = p_x;
@@ -577,7 +577,7 @@ void DrawLineTo(MechS32 p_x, MechS32 p_y, MechU32 p_color)
 
 // Draws a polygon: a point or a line with the pane's own routines where the settings
 // allow, else through g_renderSettings's polygon callback, filled, outlined or both.
-void DrawPolygonOrLine(MechS32 p_count, MechU32* p_points, MechU32 p_flags)
+void DrawPolygonOrLine(int32_t p_count, uint32_t* p_points, uint32_t p_flags)
 {
 	if (p_count == 1 && g_renderSettings.m_drawPixels) {
 		if (p_flags == 0x1000) {

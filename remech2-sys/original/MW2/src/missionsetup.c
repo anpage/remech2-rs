@@ -17,10 +17,10 @@
 // and each objective's, with its conditions.
 void SetUpStarMission(MissionTable* p_table)
 {
-	MechS32 i;
-	MechS32 count;
-	MechS32 j;
-	MechS32 kind;
+	int32_t i;
+	int32_t count;
+	int32_t j;
+	int32_t kind;
 
 	count = (p_table->m_header.m_size - 0x26) / sizeof(MissionEntry);
 	if (p_table->m_entries[0].m_type != 0x10) {
@@ -107,12 +107,12 @@ void SetUpStarMission(MissionTable* p_table)
 
 // Returns the objectives that wait (state 0, 1 or 7) on the event list p_name, marking them as
 // waiting (7): bit j for objective j, bit 16 + i for mission table i.
-MechU32 FindEventList(MechChar* p_name)
+uint32_t FindEventList(char* p_name)
 {
-	MechS32 j;
-	MechU8 state;
-	MechS32 i;
-	MechU32 lists;
+	int32_t j;
+	uint8_t state;
+	int32_t i;
+	uint32_t lists;
 
 	lists = 0;
 	if (!*p_name) {
@@ -139,12 +139,12 @@ MechU32 FindEventList(MechChar* p_name)
 
 // Adds the target p_target to the waiting objectives on the event list p_name whose type is in
 // p_types.
-void PostEventToList(MechChar* p_name, MechS32 p_types, MechU16 p_target)
+void PostEventToList(char* p_name, int32_t p_types, uint16_t p_target)
 {
-	MechS32 count;
-	MechS32 j;
-	MechU8 state;
-	MechS32 i;
+	int32_t count;
+	int32_t j;
+	uint8_t state;
+	int32_t i;
 
 	for (i = 0; i < g_objectiveCount; i++) {
 		if (g_missionTables[i]) {

@@ -27,7 +27,7 @@
 // section's front and rear armor.
 
 // The section each of the outline's sixteen parts shows, plus one (0: none).
-MechS32 g_outlinePartSections[16] = {1, 3, 3, 2, 2, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 0};
+int32_t g_outlinePartSections[16] = {1, 3, 3, 2, 2, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 0};
 
 // The places of the armor bars' four labels, in 16.16 fractions of the panel until InitDamagePanel
 // scales them.
@@ -41,7 +41,7 @@ Point g_htalLabelAPosition = {0x9697, 0x199a};
 Point g_htalLabelLPosition = {0xd2d3, 0x199a};
 
 // The largest armor value of the local mech's sections.
-MechS32 g_maxSectionArmor = 0;
+int32_t g_maxSectionArmor = 0;
 
 // The outline's rectangle, centered in the panel.
 PANE g_outlineRect = {NULL, 0, 0, 0, 0};
@@ -54,17 +54,17 @@ PANE g_outlinePartRects[16] = {0};
 Point g_outlinePartOffsets[16] = {0};
 
 // Frames the outline's parts (OutlinePane) when set.
-MechS32 g_frameOutlineParts = 0;
+int32_t g_frameOutlineParts = 0;
 
 // The armor bars' labels.
 
-MechChar g_htalLabelH[4] = "H";
+char g_htalLabelH[4] = "H";
 
-MechChar g_htalLabelT[4] = "T";
+char g_htalLabelT[4] = "T";
 
-MechChar g_htalLabelA[4] = "A";
+char g_htalLabelA[4] = "A";
 
-MechChar g_htalLabelL[4] = "L";
+char g_htalLabelL[4] = "L";
 
 // The armor bars' places, one per section (m_x the bar's left, m_y its bottom).
 Point g_armorBarPositions[8];
@@ -73,7 +73,7 @@ Point g_armorBarPositions[8];
 Point g_fullSectionArmor[8];
 
 // The remap table that colors an outline part (entry 6) by its damage.
-MechU8 g_outlineRemap[0x100];
+uint8_t g_outlineRemap[0x100];
 
 // The armor bars' width and full height.
 Point g_armorBarSize;
@@ -83,14 +83,14 @@ Point g_armorBarSize;
 void InitDamagePanel(void)
 {
 	CockpitPanel* panel;
-	MechS32 color;
-	MechS32 height2;
-	MechS32 width2;
-	MechS32 height1;
-	MechS32 width1;
+	int32_t color;
+	int32_t height2;
+	int32_t width2;
+	int32_t height1;
+	int32_t width1;
 	void* shape;
 	Mech* mech;
-	MechS32 i;
+	int32_t i;
 	Point max;
 	Point min;
 	MechSection* section;
@@ -128,10 +128,10 @@ void InitDamagePanel(void)
 		i = 16;
 		while (i--) {
 			g_outlinePartRects[i].m_window = &g_mainPixelBuffer;
-			min.m_x = (MechDouble) g_outlinePartRects[i].m_x0 / width1 * 65536.0 + 0.5;
-			min.m_y = (MechDouble) g_outlinePartRects[i].m_y0 / height1 * 65536.0 + 0.5;
-			max.m_x = (MechDouble) g_outlinePartRects[i].m_x1 / width1 * 65536.0 + 0.5;
-			max.m_y = (MechDouble) g_outlinePartRects[i].m_y1 / height1 * 65536.0 + 0.5;
+			min.m_x = (double) g_outlinePartRects[i].m_x0 / width1 * 65536.0 + 0.5;
+			min.m_y = (double) g_outlinePartRects[i].m_y0 / height1 * 65536.0 + 0.5;
+			max.m_x = (double) g_outlinePartRects[i].m_x1 / width1 * 65536.0 + 0.5;
+			max.m_y = (double) g_outlinePartRects[i].m_y1 / height1 * 65536.0 + 0.5;
 			max.m_x += min.m_x - 1;
 			max.m_y += min.m_y - 1;
 			ScalePointToFrame(&g_outlineRect, &min, &min);
@@ -186,15 +186,15 @@ void InitDamagePanel(void)
 // as its armor goes, black once the section is destroyed.
 void DrawDamageOutline(Mech* p_mech, PANE* p_target)
 {
-	MechS32 rear;
-	MechS32 color;
-	MechS32 front;
-	MechS32 remap;
+	int32_t rear;
+	int32_t color;
+	int32_t front;
+	int32_t remap;
 	void* shape;
-	MechS32 scale;
-	MechS32 level;
-	MechS32 index;
-	MechS32 i;
+	int32_t scale;
+	int32_t level;
+	int32_t index;
+	int32_t i;
 	MechSection* section;
 
 	rear = 0;
@@ -275,12 +275,12 @@ void DrawDamageOutline(Mech* p_mech, PANE* p_target)
 // torso sections (1 to 3) beside it, full height for the section's full armor.
 void DrawArmorBars(Mech* p_mech, PANE* p_target)
 {
-	MechS32 full;
-	MechS32 i;
-	MechS32 color;
+	int32_t full;
+	int32_t i;
+	int32_t color;
 	void* font;
-	MechS32 armor;
-	MechS32 width;
+	int32_t armor;
+	int32_t width;
 	MechSection* section;
 
 	g_textColors[0xe] = 6;

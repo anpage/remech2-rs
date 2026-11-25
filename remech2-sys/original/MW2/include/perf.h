@@ -13,16 +13,16 @@ extern "C"
 {
 #endif
 
-	extern MechChar g_combatVariablesItem[17];
+	extern char g_combatVariablesItem[17];
 	extern MenuPage g_combatVariablesPage;
-	extern MechChar g_combatVariablesTitle[17];
-	extern MechChar g_objectTextmapsItem[16];
-	extern MechChar g_terrainTextmapsItem[17];
-	extern MechChar g_displayDetailItem[15];
-	extern MechChar g_objectDensityItem[15];
-	extern MechChar g_explosionChunksItem[17];
-	extern MechChar g_affineText[7];
-	extern MechChar g_perspectiveText[12];
+	extern char g_combatVariablesTitle[17];
+	extern char g_objectTextmapsItem[16];
+	extern char g_terrainTextmapsItem[17];
+	extern char g_displayDetailItem[15];
+	extern char g_objectDensityItem[15];
+	extern char g_explosionChunksItem[17];
+	extern char g_affineText[7];
+	extern char g_perspectiveText[12];
 	extern MenuChoices g_affinePerspectiveChoices;
 	extern MenuControl g_objectTextmapsControl;
 	extern MenuControl g_terrainTextmapsControl;

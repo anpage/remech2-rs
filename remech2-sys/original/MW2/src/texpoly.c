@@ -9,21 +9,21 @@
 // bitmap p_pixels, through the code block's routines.
 void DrawTexturedPolygon(
 	PANE* p_target,
-	MechU8* p_pixels,
-	MechS16 p_width,
-	MechS16 p_height,
-	MechS32 p_count,
-	MechU32* p_points,
-	MechS32 p_useLuma,
-	MechU16* p_luma
+	uint8_t* p_pixels,
+	int16_t p_width,
+	int16_t p_height,
+	int32_t p_count,
+	uint32_t* p_points,
+	int32_t p_useLuma,
+	uint16_t* p_luma
 )
 {
 	VFX_TEXTURE texture;
-	MechS32 mode;
-	MechU8* rows[128];
-	MechS32 i;
-	MechU32* points;
-	MechU32 unk0x08;
+	int32_t mode;
+	uint8_t* rows[128];
+	int32_t i;
+	uint32_t* points;
+	uint32_t unk0x08;
 
 	mode = 0x11;
 	p_useLuma = TRUE;

@@ -10,13 +10,13 @@
 // channel, carrying the remainders in m_accum, and frees the block after the last step.
 #pragma pack(push, 1)
 typedef struct PaletteFade {
-	MechU8* m_palette; // 0x00
-	MechS8* m_delta;   // 0x04
-	MechS16* m_accum;  // 0x08
-	MechS32 m_steps;   // 0x0c
-	MechS32 m_step;    // 0x10
-	MechU8 m_first;    // 0x14
-	MechS32 m_count;   // 0x15
+	uint8_t* m_palette; // 0x00
+	int8_t* m_delta;    // 0x04
+	int16_t* m_accum;   // 0x08
+	int32_t m_steps;    // 0x0c
+	int32_t m_step;     // 0x10
+	uint8_t m_first;    // 0x14
+	int32_t m_count;    // 0x15
 } PaletteFade;
 #pragma pack(pop)
 
@@ -26,18 +26,18 @@ extern "C"
 {
 #endif
 
-	MechS32 InitPaletteCycle(PaletteCycle* p_cycle, MechU8* p_palette, MechU8 p_first, MechS32 p_count);
+	int32_t InitPaletteCycle(PaletteCycle* p_cycle, uint8_t* p_palette, uint8_t p_first, int32_t p_count);
 	void RotatePaletteCycle(PaletteCycle* p_cycle);
 	void FreePaletteCycle(PaletteCycle* p_cycle);
-	MechS32 InitPaletteFade(
+	int32_t InitPaletteFade(
 		PaletteFade* p_fade,
-		MechU8* p_from,
-		MechU8* p_to,
-		MechS32 p_first,
-		MechS32 p_count,
-		MechS32 p_steps
+		uint8_t* p_from,
+		uint8_t* p_to,
+		int32_t p_first,
+		int32_t p_count,
+		int32_t p_steps
 	);
-	void StepPaletteFade(PaletteFade* p_fade, MechS32 p_count);
+	void StepPaletteFade(PaletteFade* p_fade, int32_t p_count);
 
 #ifdef __cplusplus
 }

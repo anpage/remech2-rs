@@ -12,8 +12,8 @@ extern "C"
 {
 #endif
 
-	MechS32 RunAIWeapons(struct Player* p_player, MechS32 p_heading);
-	MechS32 DecideAIFire(struct Player* p_player);
+	int32_t RunAIWeapons(struct Player* p_player, int32_t p_heading);
+	int32_t DecideAIFire(struct Player* p_player);
 
 #ifdef __cplusplus
 }

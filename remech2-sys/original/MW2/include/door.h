@@ -17,7 +17,7 @@ extern "C"
 	void UpdateDoor(struct Mech* p_mech);
 	void LateUpdateDoor(struct Mech* p_mech);
 	void ShutdownDoor(struct Mech* p_mech);
-	MechS32 CreateDoor(MechS32 p_index, struct Player* p_player);
+	int32_t CreateDoor(int32_t p_index, struct Player* p_player);
 
 #ifdef __cplusplus
 }

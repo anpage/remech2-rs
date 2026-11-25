@@ -21,24 +21,24 @@
 // A slider from 0 to 0x10000 (MenuControl::m_data holds its shapes: the left cap, the bar, the
 // right cap and the knob): while selected, Space or Right (0xc8) raises it by a tenth and Left
 // (0xc9) lowers it, and its number key raises it too.
-void RunMenuSlider(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_index, Point p_pos, MenuPage* p_page)
+void RunMenuSlider(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_index, Point p_pos, MenuPage* p_page)
 {
-	MechS32 pressed;
-	MechS32 step;
-	MechS32* shapes;
-	MechS32 selected;
-	MechU32 state;
-	MechS32 height;
-	MechS32 knobX;
-	MechS32 size;
-	MechS32 x;
+	int32_t pressed;
+	int32_t step;
+	int32_t* shapes;
+	int32_t selected;
+	uint32_t state;
+	int32_t height;
+	int32_t knobX;
+	int32_t size;
+	int32_t x;
 	void* font;
 	PANE* target;
-	MechS32 apply;
-	MechS32 width;
+	int32_t apply;
+	int32_t width;
 	void* knob;
 	void* bar;
-	MechS32 value;
+	int32_t value;
 	void* right;
 	void* left;
 
@@ -195,18 +195,18 @@ void RunMenuSlider(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_ind
 
 // A list of choices shown with a suffix from MenuChoices::m_suffix; it changes only through its
 // callbacks.
-void RunMenuStatus(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_index, Point p_pos, MenuPage* p_page)
+void RunMenuStatus(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_index, Point p_pos, MenuPage* p_page)
 {
-	MechS32 pressed;
-	MechS32 value;
-	MechChar* suffix;
-	MechS32 selected;
-	MechU32 state;
-	MechS32 room;
-	MechS32 step;
+	int32_t pressed;
+	int32_t value;
+	char* suffix;
+	int32_t selected;
+	uint32_t state;
+	int32_t room;
+	int32_t step;
 	PANE* target;
-	MechS32 apply;
-	MechChar text[128];
+	int32_t apply;
+	char text[128];
 
 	step = 0;
 	apply = TRUE;
@@ -324,15 +324,15 @@ void RunMenuStatus(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_ind
 
 // A list of choices (MenuChoices): while selected, Space or Right (0xc8) picks the next and Left
 // (0xc9) the previous, wrapping, and its number key the next.
-void RunMenuChoice(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_index, Point p_pos, MenuPage* p_page)
+void RunMenuChoice(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_index, Point p_pos, MenuPage* p_page)
 {
-	MechS32 pressed;
-	MechS32 value;
-	MechS32 selected;
-	MechU32 state;
-	MechS32 step;
+	int32_t pressed;
+	int32_t value;
+	int32_t selected;
+	uint32_t state;
+	int32_t step;
 	PANE* target;
-	MechS32 apply;
+	int32_t apply;
 
 	step = 0;
 	apply = TRUE;
@@ -461,11 +461,11 @@ void RunMenuChoice(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_ind
 
 // A text box (MenuTextBox) in the menu's font; its rectangle is placed in the menu's target the
 // first time. Reports 0 through m_preview unless the menu is being accepted or cancelled.
-void RunMenuTextBox(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_index, Point p_pos, MenuPage* p_page)
+void RunMenuTextBox(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_index, Point p_pos, MenuPage* p_page)
 {
 	MenuTextBox* box;
-	MechU32 state;
-	MechChar* text;
+	uint32_t state;
+	char* text;
 	void* font;
 	PANE* rect;
 	PANE* target;

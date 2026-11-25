@@ -21,20 +21,20 @@ enum {
 };
 
 // The colors of the pages LoadTextPages lays out.
-MechU8 g_textPageColors[0x100];
+uint8_t g_textPageColors[0x100];
 
 // The text with its escapes expanded: \\Q the quote, \\R0 to \\R2 the pilot's rank and the next
 // two, \\H the pilot's honor.
-MechChar g_expandedText[0x2000];
+char g_expandedText[0x2000];
 
 // Expands the escapes of p_text into g_expandedText and returns a copy of the result.
-MechChar* ExpandTextEscapes(MechChar* p_text, MechChar* p_quote)
+char* ExpandTextEscapes(char* p_text, char* p_quote)
 {
-	MechS32 i;
-	MechS32 length;
-	MechChar number[0x80];
-	MechS32 textLength;
-	MechS32 rank;
+	int32_t i;
+	int32_t length;
+	char number[0x80];
+	int32_t textLength;
+	int32_t rank;
 
 	textLength = strlen(p_text);
 	i = 0;
@@ -114,20 +114,20 @@ MechChar* ExpandTextEscapes(MechChar* p_text, MechChar* p_quote)
 // Lays out p_text (p_size bytes, the last of which becomes its terminator) on as many pages as
 // it takes, adding them to p_pages. With p_quote, the text's escapes are expanded first.
 void LayoutTextPages(
-	MechChar* p_text,
-	MechS32 p_size,
+	char* p_text,
+	int32_t p_size,
 	Collection* p_pages,
 	Font* p_font,
 	undefined* p_colors,
-	MechS32 p_left,
-	MechS32 p_top,
-	MechS32 p_width,
-	MechS32 p_height,
-	MechChar* p_quote
+	int32_t p_left,
+	int32_t p_top,
+	int32_t p_width,
+	int32_t p_height,
+	char* p_quote
 )
 {
 	Page* page;
-	MechChar* text;
+	char* text;
 
 	p_text[p_size - 1] = '\0';
 	if (p_quote) {
@@ -150,17 +150,17 @@ void LayoutTextPages(
 // transparent and everything else in color 1.
 void LoadTextPages(
 	Collection* p_pages,
-	MechS32 p_left,
-	MechS32 p_top,
-	MechS32 p_width,
-	MechS32 p_height,
-	MechChar* p_name,
+	int32_t p_left,
+	int32_t p_top,
+	int32_t p_width,
+	int32_t p_height,
+	char* p_name,
 	Font* p_font,
-	MechChar* p_quote
+	char* p_quote
 )
 {
-	MechS32* node = NULL;
-	MechS32 i;
+	int32_t* node = NULL;
+	int32_t i;
 
 	g_textPageColors[0] = 0xff;
 	g_textPageColors[1] = 1;
@@ -172,10 +172,10 @@ void LoadTextPages(
 		// The original does nothing about a missing file.
 	}
 
-	node = g_projectArchive->FindBwdNode(*(MechS32*) g_bwdTags[c_tagHtxt]);
+	node = g_projectArchive->FindBwdNode(*(int32_t*) g_bwdTags[c_tagHtxt]);
 	if (node) {
 		LayoutTextPages(
-			(MechChar*) (node + 2),
+			(char*) (node + 2),
 			node[1] - 8,
 			p_pages,
 			p_font,

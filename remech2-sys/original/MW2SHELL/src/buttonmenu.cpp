@@ -14,35 +14,35 @@
 // The menu's collection owns 0x2a-byte entries with a hit rectangle and two text glyphs.
 #pragma pack(1)
 struct MenuEntry {
-	MechChar* m_text;    // 0x00
+	char* m_text;        // 0x00
 	MechPoint m_textPos; // 0x04
-	MechS32 m_bottom;    // 0x0c
+	int32_t m_bottom;    // 0x0c
 	Font* m_font;        // 0x10
 	undefined* m_colors; // 0x14
 	HitRect* m_rect;     // 0x18
 	TextGlyph* m_hover;  // 0x1c
 	TextGlyph* m_label;  // 0x20
-	MechS32 m_id;        // 0x24
-	MechU8 m_drawRect;   // 0x28
-	MechU8 m_enabled;    // 0x29
+	int32_t m_id;        // 0x24
+	uint8_t m_drawRect;  // 0x28
+	uint8_t m_enabled;   // 0x29
 
 	MenuEntry(
-		MechS32 p_left,
-		MechS32 p_top,
-		MechS32 p_right,
-		MechS32 p_bottom,
-		MechS32 p_id,
-		MechU8 p_drawRect,
+		int32_t p_left,
+		int32_t p_top,
+		int32_t p_right,
+		int32_t p_bottom,
+		int32_t p_id,
+		uint8_t p_drawRect,
 		VideoDriver* p_videoDriver,
 		Font* p_font,
-		MechChar* p_text,
+		char* p_text,
 		MechPoint p_textPos,
 		undefined* p_colors,
-		MechU8 p_enabled
+		uint8_t p_enabled
 	);
 	~MenuEntry();
 	void DrawRect(VideoDriver* p_videoDriver);
-	MechU8 HitTest(MechS32 p_x, MechS32 p_y);
+	uint8_t HitTest(int32_t p_x, int32_t p_y);
 };
 #pragma pack()
 
@@ -51,14 +51,14 @@ struct MenuEntry {
 ButtonMenu::ButtonMenu(
 	VideoDriver* p_videoDriver,
 	Font* p_font,
-	MechU8 p_drawRect,
+	uint8_t p_drawRect,
 	MainMenuButton* p_buttons,
-	MechS32 p_count
+	int32_t p_count
 )
 {
 	TextGlyph* label = NULL;
-	MechS32 i;
-	MechChar* text;
+	int32_t i;
+	char* text;
 	MenuEntry* item;
 
 	p_font = g_buttonFont;
@@ -104,7 +104,7 @@ ButtonMenu::ButtonMenu(
 
 ButtonMenu::~ButtonMenu()
 {
-	MechS32 i;
+	int32_t i;
 	MenuEntry* item;
 
 	for (i = 0; i < m_items->m_count; i++) {
@@ -116,10 +116,10 @@ ButtonMenu::~ButtonMenu()
 	MechHeapFree(g_primaryHeap, m_items);
 }
 
-void ButtonMenu::RemoveButtonsFrom(MechS32 p_id)
+void ButtonMenu::RemoveButtonsFrom(int32_t p_id)
 {
 	Collection* retained;
-	MechS32 i;
+	int32_t i;
 	MenuEntry* item;
 
 	CreateCollection(&retained, 10, NULL, 4, NULL);
@@ -139,10 +139,10 @@ void ButtonMenu::RemoveButtonsFrom(MechS32 p_id)
 	DestroyCollection(retained);
 }
 
-MechS32 ButtonMenu::HitTest(MechS32 p_x, MechS32 p_y)
+int32_t ButtonMenu::HitTest(int32_t p_x, int32_t p_y)
 {
-	MechS32 id;
-	MechS32 i;
+	int32_t id;
+	int32_t i;
 	MenuEntry* item;
 
 	id = -1;
@@ -158,7 +158,7 @@ MechS32 ButtonMenu::HitTest(MechS32 p_x, MechS32 p_y)
 
 void ButtonMenu::DrawRects()
 {
-	MechS32 i;
+	int32_t i;
 	MenuEntry* item;
 
 	for (i = 0; i < m_items->m_count; i++) {
@@ -169,9 +169,9 @@ void ButtonMenu::DrawRects()
 	}
 }
 
-void ButtonMenu::RemoveButton(MechS32 p_id)
+void ButtonMenu::RemoveButton(int32_t p_id)
 {
-	MechS32 i;
+	int32_t i;
 	MenuEntry* item;
 
 	for (i = 0; i < m_items->m_count; i++) {
@@ -184,10 +184,10 @@ void ButtonMenu::RemoveButton(MechS32 p_id)
 }
 
 // Adds one button.
-void ButtonMenu::AddButton(MainMenuButton p_button, MechS32 p_id, MechU8 p_drawRect)
+void ButtonMenu::AddButton(MainMenuButton p_button, int32_t p_id, uint8_t p_drawRect)
 {
 	TextGlyph* label = NULL;
-	MechChar* text = p_button.m_text;
+	char* text = p_button.m_text;
 	MenuEntry* item;
 
 	if (text != NULL && *text == '<') {
@@ -213,9 +213,9 @@ void ButtonMenu::AddButton(MainMenuButton p_button, MechS32 p_id, MechU8 p_drawR
 	ExpandCollection(m_items, item);
 }
 
-void ButtonMenu::EnableButton(MechS32 p_id)
+void ButtonMenu::EnableButton(int32_t p_id)
 {
-	MechS32 i;
+	int32_t i;
 	MenuEntry* item;
 
 	for (i = 0; i < m_items->m_count; i++) {
@@ -230,9 +230,9 @@ void ButtonMenu::EnableButton(MechS32 p_id)
 	}
 }
 
-void ButtonMenu::DisableButton(MechS32 p_id)
+void ButtonMenu::DisableButton(int32_t p_id)
 {
-	MechS32 i;
+	int32_t i;
 	MenuEntry* item;
 
 	for (i = 0; i < m_items->m_count; i++) {
@@ -251,18 +251,18 @@ void ButtonMenu::DisableButton(MechS32 p_id)
 }
 
 MenuEntry::MenuEntry(
-	MechS32 p_left,
-	MechS32 p_top,
-	MechS32 p_right,
-	MechS32 p_bottom,
-	MechS32 p_id,
-	MechU8 p_drawRect,
+	int32_t p_left,
+	int32_t p_top,
+	int32_t p_right,
+	int32_t p_bottom,
+	int32_t p_id,
+	uint8_t p_drawRect,
 	VideoDriver* p_videoDriver,
 	Font* p_font,
-	MechChar* p_text,
+	char* p_text,
 	MechPoint p_textPos,
 	undefined* p_colors,
-	MechU8 p_enabled
+	uint8_t p_enabled
 )
 {
 	m_id = p_id;
@@ -295,7 +295,7 @@ void MenuEntry::DrawRect(VideoDriver* p_videoDriver)
 	m_rect->Draw(p_videoDriver);
 }
 
-MechU8 MenuEntry::HitTest(MechS32 p_x, MechS32 p_y)
+uint8_t MenuEntry::HitTest(int32_t p_x, int32_t p_y)
 {
 	if (m_enabled && m_rect->Contains(p_x, p_y)) {
 		if (m_hover == NULL && m_text != NULL && strlen(m_text) != 0) {
@@ -332,7 +332,7 @@ void HitRect::Draw(VideoDriver* p_videoDriver)
 	p_videoDriver->DrawLine(m_left, m_bottom, m_left, m_top, 1);
 }
 
-MechU8 HitRect::Contains(MechS32 p_x, MechS32 p_y)
+uint8_t HitRect::Contains(int32_t p_x, int32_t p_y)
 {
 	if (m_bottom >= p_y && m_top <= p_y && m_right >= p_x && m_left <= p_x) {
 		return TRUE;

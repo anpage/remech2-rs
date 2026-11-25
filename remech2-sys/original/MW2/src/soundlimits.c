@@ -39,9 +39,9 @@ SoundTableEntry g_soundTable[0x8c] = {
 // Fills g_soundInfo from the sound table.
 void InitSoundInfo(void)
 {
-	MechU32 i;
+	uint32_t i;
 	SoundTableEntry* entry;
-	MechS32 id;
+	int32_t id;
 
 	memset(g_soundInfo, 0xff, sizeof(g_soundInfo));
 	for (i = 0, entry = g_soundTable; i < 0x8c; i++, entry++) {

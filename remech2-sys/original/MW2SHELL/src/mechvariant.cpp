@@ -34,13 +34,13 @@
 
 // The two stars of a custom battle: the player's and the enemy's.
 
-MechS32 PlayVideo(
-	MechS32 p_index,
+int32_t PlayVideo(
+	int32_t p_index,
 	const char* p_name,
 	undefined4 p_unk0x08,
 	undefined4 p_unk0x0c,
-	MechU32 p_unk0x10,
-	MechU32 p_unk0x14
+	uint32_t p_unk0x10,
+	uint32_t p_unk0x14
 );
 
 // The formations of the Wolf and Inner Sphere stars (Jade Falcon's differ): six formations of
@@ -63,11 +63,11 @@ FormationPositions g_jadeFalconFormationLayouts[6] = {
 	{{{2, 297, 329, 0}, {1, 425, 345, 2}, {0, 258, 385, 1}}},
 };
 
-MechChar g_wolfStarVideo[] = "awosc%s";
+char g_wolfStarVideo[] = "awosc%s";
 
-MechChar g_jadeFalconStarVideo[] = "ajfsc%s";
+char g_jadeFalconStarVideo[] = "ajfsc%s";
 
-MechChar g_trialStarVideo[] = "aiasc%s";
+char g_trialStarVideo[] = "aiasc%s";
 
 CustomStar g_playerStar =
 	{0, 0, 3, 3, 100, {{12, "tbr00std", "MechWarrior"}, {0, "drw00std", "Friend 1"}, {1, "frm00std", "Friend 2"}}};
@@ -88,13 +88,13 @@ FormationOption g_formationOptions[6] = {
 
 // Where the name labels go, by position: left edges and tops, for the Wolf and Inner Sphere
 // screens and for the Jade Falcon one.
-MechS32 g_starLabelLefts[4] = {81, 313, 508, 0};
+int32_t g_starLabelLefts[4] = {81, 313, 508, 0};
 
-MechS32 g_starLabelTops[4] = {166, 133, 189, 0};
+int32_t g_starLabelTops[4] = {166, 133, 189, 0};
 
-MechS32 g_jadeFalconLabelLefts[4] = {47, 280, 495, 0};
+int32_t g_jadeFalconLabelLefts[4] = {47, 280, 495, 0};
 
-MechS32 g_jadeFalconLabelTops[3] = {172, 127, 217};
+int32_t g_jadeFalconLabelTops[3] = {172, 127, 217};
 
 // The formation, mission, star size, tonnage limit and star mass lines.
 TextGlyph* g_formationLine = NULL;
@@ -111,25 +111,25 @@ TextGlyph* g_starMassLine = NULL;
 TextGlyph* g_positionGlyphs[3][3];
 
 // The mass of each mech of the star.
-MechS32 g_mechMasses[3];
+int32_t g_mechMasses[3];
 
 FormationPositions* g_formationLayout;
 
 AudioSample* g_mechLabSound;
 
-MechChar g_starInfoText[0x100];
+char g_starInfoText[0x100];
 
-MechS32* g_labelTops;
+int32_t* g_labelTops;
 
-MechS32* g_labelLefts;
+int32_t* g_labelLefts;
 
 AudioSample* g_starSound;
 
 ButtonMenu* g_starMenu;
 
-MechChar g_fitTextBuffer[0x100];
+char g_fitTextBuffer[0x100];
 
-MechChar* g_starVideoFormat;
+char* g_starVideoFormat;
 
 // Saves both stars and which one is selected in the mw2prm.cfg record, for RestoreStars to
 // restore.
@@ -161,9 +161,9 @@ void RestoreStars()
 
 // Sets a mech of the selected star: its pilot name and its variant file. A three-letter variant
 // name is the mech's standard variant. Returns 0 when the mech is too heavy for the star.
-MechS32 SetStarMech(MechS32 p_index, MechChar* p_variant, MechChar* p_name)
+int32_t SetStarMech(int32_t p_index, char* p_variant, char* p_name)
 {
-	MechS32 type;
+	int32_t type;
 
 	if (p_index < 0) {
 		p_index = g_selectedStar->m_selected;
@@ -215,7 +215,7 @@ MechS32 SetStarMech(MechS32 p_index, MechChar* p_variant, MechChar* p_name)
 	return -1;
 }
 
-MechChar* GetStarMechVariant(MechS32 p_index)
+char* GetStarMechVariant(int32_t p_index)
 {
 	if (p_index < 0) {
 		p_index = g_selectedStar->m_selected;
@@ -229,7 +229,7 @@ MechChar* GetStarMechVariant(MechS32 p_index)
 	}
 }
 
-MechS32 GetStarMechChassis(MechS32 p_index)
+int32_t GetStarMechChassis(int32_t p_index)
 {
 	if (p_index < 0) {
 		p_index = g_selectedStar->m_selected;
@@ -245,7 +245,7 @@ MechS32 GetStarMechChassis(MechS32 p_index)
 
 // Returns a star's formation: the selected star's for a negative p_star, else the player's (0) or
 // the enemy's.
-MechS32 GetStarFormation(MechS32 p_star)
+int32_t GetStarFormation(int32_t p_star)
 {
 	if (p_star < 0) {
 		return g_selectedStar->m_formation;
@@ -258,7 +258,7 @@ MechS32 GetStarFormation(MechS32 p_star)
 	}
 }
 
-CustomStar* GetStar(MechS32 p_star)
+CustomStar* GetStar(int32_t p_star)
 {
 	if (p_star < 0) {
 		return g_selectedStar;
@@ -273,7 +273,7 @@ CustomStar* GetStar(MechS32 p_star)
 
 // Selects a star (negative arguments leave the setting alone) and sets its formation, its size,
 // its mech count and its tonnage limit.
-void SelectStar(MechS32 p_star, MechS32 p_formation, MechS32 p_size, MechS32 p_count, MechS32 p_tonnage)
+void SelectStar(int32_t p_star, int32_t p_formation, int32_t p_size, int32_t p_count, int32_t p_tonnage)
 {
 	if (p_star >= 0) {
 		if (p_star == 0) {
@@ -317,14 +317,14 @@ void WriteStarFiles()
 #define STAR_LAYOUT(formation, i) g_formationLayout[formation].m_posts[i]
 
 // Returns the mech whose video is under a point, or -1.
-MechS32 FindMechAt(MechS32 p_x, MechS32 p_y)
+int32_t FindMechAt(int32_t p_x, int32_t p_y)
 {
-	MechS32 mech;
-	MechS32 left;
-	MechS32 right;
-	MechS32 i;
-	MechS32 top;
-	MechS32 bottom;
+	int32_t mech;
+	int32_t left;
+	int32_t right;
+	int32_t i;
+	int32_t top;
+	int32_t bottom;
 
 	for (i = 2; i >= 0; i--) {
 		left = STAR_LAYOUT(g_selectedStar->m_formation, i).m_left - 0x32;
@@ -343,10 +343,10 @@ MechS32 FindMechAt(MechS32 p_x, MechS32 p_y)
 }
 
 // Returns as much of p_text as fits in p_width pixels of p_font.
-MechChar* FitText(MechChar* p_text, Font* p_font, MechS32 p_width)
+char* FitText(char* p_text, Font* p_font, int32_t p_width)
 {
-	MechChar* out = g_fitTextBuffer;
-	MechS32 width = 0;
+	char* out = g_fitTextBuffer;
+	int32_t width = 0;
 
 	if (p_text == NULL) {
 		return p_text;
@@ -365,13 +365,13 @@ MechChar* FitText(MechChar* p_text, Font* p_font, MechS32 p_width)
 }
 
 // A click on a pilot name edits it.
-void EditPilotName(MechS32 p_x, MechS32 p_y, MechS32 p_campaign)
+void EditPilotName(int32_t p_x, int32_t p_y, int32_t p_campaign)
 {
-	MechS32 i;
-	MechS32 mech;
-	MechS32 label;
-	MechS32 left;
-	MechS32 top;
+	int32_t i;
+	int32_t mech;
+	int32_t label;
+	int32_t left;
+	int32_t top;
 
 	for (i = 0; i < 3; i++) {
 		mech = STAR_LAYOUT(g_selectedStar->m_formation, i).m_mech;
@@ -399,14 +399,14 @@ void EditPilotName(MechS32 p_x, MechS32 p_y, MechS32 p_campaign)
 
 // Shows the mech at a formation position: its video, pilot name, type and mass, or hides the
 // position when the star has fewer mechs.
-void ShowFormationMech(MechS32 p_formation, MechS32 p_position, ButtonMenu* p_menu)
+void ShowFormationMech(int32_t p_formation, int32_t p_position, ButtonMenu* p_menu)
 {
-	MechS32 label;
-	MechS32 type;
-	MechS32 left;
-	MechChar name[0x10];
-	MechS32 top;
-	MechS32 mech;
+	int32_t label;
+	int32_t type;
+	int32_t left;
+	char name[0x10];
+	int32_t top;
+	int32_t mech;
 
 	if (g_positionGlyphs[p_position][0]) {
 		delete g_positionGlyphs[p_position][0];
@@ -452,10 +452,10 @@ void ShowFormationMech(MechS32 p_formation, MechS32 p_position, ButtonMenu* p_me
 }
 
 // Redraws the formation, mission, star size, tonnage limit and star mass lines.
-void DrawStarInfo(MechS32 p_campaign)
+void DrawStarInfo(int32_t p_campaign)
 {
-	MechS32 i;
-	MechS32 mass;
+	int32_t i;
+	int32_t mass;
 
 	if (g_formationLine) {
 		delete g_formationLine;
@@ -496,14 +496,14 @@ void DrawStarInfo(MechS32 p_campaign)
 	g_starMassLine = g_textFont->AddText(0x140, 0x50, g_starInfoText, NULL);
 }
 
-void StarConfigCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, char**, MechS32 p_msg);
+void StarConfigCallback(TMPackDataBase*, int32_t* p_campaign, uint8_t*, char**, int32_t p_msg);
 
 // Opens the star screen of a campaign (2: a trial of grievance).
-void DrawStarConfig(TMPackDataBase* p_database, MechS32 p_campaign)
+void DrawStarConfig(TMPackDataBase* p_database, int32_t p_campaign)
 {
 	void* audioData;
-	MechS32 i;
-	MechS32 audioSize;
+	int32_t i;
+	int32_t audioSize;
 
 	g_videoDriver->LoadBackground(p_database, g_starConfigScreens[p_campaign].m_picture);
 	g_starMenu = new ButtonMenu(g_videoDriver, g_defaultFont, 0, g_starConfigScreens[p_campaign].m_buttons, 9);
@@ -586,11 +586,11 @@ void DrawStarConfig(TMPackDataBase* p_database, MechS32 p_campaign)
 // The star screen's buttons: 0 exits, 1 opens the mech lab, 2 and 3 cycle the formation, 4 and 5
 // add and remove a mech, 6 to 8 change the mech at a label position. A double click on a mech
 // changes it too.
-void StarConfigCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, char**, MechS32 p_msg)
+void StarConfigCallback(TMPackDataBase*, int32_t* p_campaign, uint8_t*, char**, int32_t p_msg)
 {
-	MechS32 i;
-	MechS32 button;
-	MechS32 mech;
+	int32_t i;
+	int32_t button;
+	int32_t mech;
 
 	// The original skips the frame's work with a goto: the jump it compiles to leaves a stub
 	// after the function's end.

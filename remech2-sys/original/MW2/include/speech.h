@@ -21,22 +21,22 @@ extern "C"
 	extern SpeechLine g_damageSpeech[39];
 	extern SpeechEntry* g_speechQueue;
 	extern HSAMPLE g_speechSample;
-	extern MechS32 g_speechLocked;
+	extern int32_t g_speechLocked;
 	extern SpeechEntry g_speechEntries[8];
 
-	MechS32 QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, MechS32 p_priority);
+	int32_t QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, int32_t p_priority);
 	void AdvanceSpeechQueue(void);
-	MechS32 StartSpeech(SpeechEntry* p_entry);
+	int32_t StartSpeech(SpeechEntry* p_entry);
 	void PlayVoiceVolumeTest(void);
-	void FlushSpeechQueue(MechS32 p_keep);
+	void FlushSpeechQueue(int32_t p_keep);
 	SpeechEntry* FreeSpeechEntry(SpeechEntry* p_entry);
 	void StopSpeech(void);
 	void ResumeSpeech(void);
-	void SayLancemateReport(MechS32 p_message, MechS32 p_slot);
-	void SayFormation(MechS32 p_formation);
-	void PlayCockpitSound(MechS32 p_message, MechS32 p_engage);
-	void SayCriticalHit(MechS32 p_part);
-	MechS32 QueueSpeechLine(SpeechLine* p_line);
+	void SayLancemateReport(int32_t p_message, int32_t p_slot);
+	void SayFormation(int32_t p_formation);
+	void PlayCockpitSound(int32_t p_message, int32_t p_engage);
+	void SayCriticalHit(int32_t p_part);
+	int32_t QueueSpeechLine(SpeechLine* p_line);
 
 #ifdef __cplusplus
 }

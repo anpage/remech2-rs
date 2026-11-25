@@ -38,16 +38,16 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_hudLayoutValues[3];
-	extern MechS32 g_torsoTwistDegrees;
-	extern MechS32 g_headingDegrees;
+	extern int32_t g_hudLayoutValues[3];
+	extern int32_t g_torsoTwistDegrees;
+	extern int32_t g_headingDegrees;
 	extern CockpitPanel* g_cockpitPanels[c_panelCount];
-	extern MechS32 g_cockpitPanelEnabled[c_panelCount];
-	extern MechS32 g_cockpitPowerState;
+	extern int32_t g_cockpitPanelEnabled[c_panelCount];
+	extern int32_t g_cockpitPowerState;
 	extern struct PANE g_cockpitPanelPanes[c_panelCount];
-	extern MechS32 g_punchInAutoHeadingRequested;
-	extern MechChar g_gameDir[256];
-	extern MechS32 g_hitFadePending;
+	extern int32_t g_punchInAutoHeadingRequested;
+	extern char g_gameDir[256];
+	extern int32_t g_hitFadePending;
 	extern Point g_cockpitPanelTextOrigins[c_panelCount];
 	extern RectTransitionState g_targetTransitionState;
 	extern RectTransitionState g_mechViewTransitionState;
@@ -63,36 +63,36 @@ extern "C"
 	extern RectTransition g_mechViewTransition;
 	extern RectTransition* g_cockpitPanelTransitions[c_panelCount];
 	extern undefined4 g_cockpitPanelLightUpTimes[c_panelCount];
-	extern MechS32 g_lastWarningPowerState;
-	extern MechS32 g_lockedTonePlayed;
-	extern MechS32 g_lockingTonePlayed;
-	extern MechS32 g_hitFadeCount;
-	extern MechChar g_gamePath[0x50];
+	extern int32_t g_lastWarningPowerState;
+	extern int32_t g_lockedTonePlayed;
+	extern int32_t g_lockingTonePlayed;
+	extern int32_t g_hitFadeCount;
+	extern char g_gamePath[0x50];
 
-	MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_poolTag);
-	MechS32 LoadDifficultyCfg(MechChar* p_name, DifficultyCfg** p_cfg);
+	int32_t LoadFile(char* p_path, int32_t* p_size, void** p_data, uint32_t* p_poolTag);
+	int32_t LoadDifficultyCfg(char* p_name, DifficultyCfg** p_cfg);
 	void LoadSndCfg(SoundConfig* p_cfg);
 	void SaveSndCfg(const SoundConfig* p_cfg);
-	MechChar* BuildGamePath(MechChar* p_name);
+	char* BuildGamePath(char* p_name);
 	void LayoutWeaponPanels(struct Mech* p_mech);
 	void ScaleCockpitLayout(void);
 	void InitCockpitPanels(void);
 	void ResetCockpitPanels(void);
 	void UpdateCockpit(struct Mech* p_mech);
 	void ShutdownCockpitPanels(void);
-	void DamageCockpitPanels(struct Mech* p_mech, MechS32 p_heavy);
+	void DamageCockpitPanels(struct Mech* p_mech, int32_t p_heavy);
 	void PlayCockpitWarnings(struct Mech* p_mech);
-	void DrawPanelAnim(struct PANE* p_target, MechS32 p_index, MechS32 p_x, MechS32 p_y);
-	MechS32 LoadMgdFile(
+	void DrawPanelAnim(struct PANE* p_target, int32_t p_index, int32_t p_x, int32_t p_y);
+	int32_t LoadMgdFile(
 		struct ResourceRef* p_ref,
-		MechS32* p_height,
-		MechS32* p_cockpitHeight,
-		MechS32* p_maxTorsoTwist,
-		MechS32* p_radius
+		int32_t* p_height,
+		int32_t* p_cockpitHeight,
+		int32_t* p_maxTorsoTwist,
+		int32_t* p_radius
 	);
-	MechS32 LoadReels(struct ResourceRef* p_ref);
-	MechS32 LoadHudFile(struct ResourceRef* p_ref);
-	MechS32 LoadCptFile(struct ResourceRef* p_ref, struct PANE* p_gauges, struct PANE* p_panels);
+	int32_t LoadReels(struct ResourceRef* p_ref);
+	int32_t LoadHudFile(struct ResourceRef* p_ref);
+	int32_t LoadCptFile(struct ResourceRef* p_ref, struct PANE* p_gauges, struct PANE* p_panels);
 	void PreloadCockpitSounds(void);
 
 #ifdef __cplusplus

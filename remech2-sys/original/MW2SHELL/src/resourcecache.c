@@ -14,10 +14,10 @@ void FreeCacheEntry(ResourceCacheEntry* p_entry);
 ResourceCacheEntry** g_cacheTable = NULL;
 
 // The number of the next dump DumpResourceCache writes.
-MechS32 g_cacheDumpNumber = 0;
+int32_t g_cacheDumpNumber = 0;
 
 // The number of entries.
-MechS32 g_cacheEntryCount;
+int32_t g_cacheEntryCount;
 
 ResourceCacheEntry* g_purgeListHead;
 
@@ -71,7 +71,7 @@ void AllocateCacheTable(void)
 
 void RebuildPurgeList(void)
 {
-	MechS32 i;
+	int32_t i;
 	ResourceCacheEntry* entry;
 
 	g_purgeListHead = NULL;
@@ -88,7 +88,7 @@ void RebuildPurgeList(void)
 
 void ShutdownResourceCache(void)
 {
-	MechS32 i;
+	int32_t i;
 	ResourceCacheEntry* entry;
 	ResourceCacheEntry* next;
 
@@ -116,16 +116,16 @@ void InitializeResourceCache(void)
 	AllocateCacheTable();
 }
 
-ResourceCacheEntry* FindCacheEntry(MechS32 p_id, char* p_type)
+ResourceCacheEntry* FindCacheEntry(int32_t p_id, char* p_type)
 {
-	MechS32 bucket;
+	int32_t bucket;
 	ResourceCacheEntry* entry;
 
 	if (p_id < 0) {
 		return NULL;
 	}
 
-	bucket = ((MechS8) p_type[3] + (MechS8) p_type[2] + (MechS8) p_type[0] + (MechS8) p_type[1] + p_id) % 0x3f1;
+	bucket = ((int8_t) p_type[3] + (int8_t) p_type[2] + (int8_t) p_type[0] + (int8_t) p_type[1] + p_id) % 0x3f1;
 	for (entry = g_cacheTable[bucket]; entry != NULL; entry = entry->m_next) {
 		if (entry->m_id == p_id && entry->m_type == *(undefined4*) p_type) {
 			break;
@@ -137,9 +137,9 @@ ResourceCacheEntry* FindCacheEntry(MechS32 p_id, char* p_type)
 
 void FreeCacheEntry(ResourceCacheEntry* p_entry)
 {
-	MechS32 bucket;
+	int32_t bucket;
 	ResourceCacheEntry* entry;
-	MechChar type[5];
+	char type[5];
 
 	entry = NULL;
 	if (p_entry == NULL) {
@@ -150,7 +150,7 @@ void FreeCacheEntry(ResourceCacheEntry* p_entry)
 	LockCacheEntry(p_entry);
 	type[4] = '\0';
 	*(undefined4*) type = p_entry->m_type;
-	bucket = ((MechS8) type[2] + (MechS8) type[3] + (MechS8) type[0] + (MechS8) type[1] + p_entry->m_id) % 0x3f1;
+	bucket = ((int8_t) type[2] + (int8_t) type[3] + (int8_t) type[0] + (int8_t) type[1] + p_entry->m_id) % 0x3f1;
 	if (g_cacheTable[bucket] == p_entry) {
 		g_cacheTable[bucket] = p_entry->m_next;
 	}
@@ -176,29 +176,29 @@ void FreeCacheEntry(ResourceCacheEntry* p_entry)
 // printed each entry's block size (_msize).
 void DumpResourceCache(void)
 {
-	MechChar name[100];
+	char name[100];
 	ResourceCacheEntry* entry;
-	MechChar type[5];
-	MechS32 i;
+	char type[5];
+	int32_t i;
 
 	snprintf(name, sizeof(name), "dbugcch%d.log", g_cacheDumpNumber++);
 	MechLogDebugf("%s: Cache table", name);
 	type[4] = '\0';
 	for (i = 0; i < 0x3f1; i++) {
 		for (entry = g_cacheTable[i]; entry; entry = entry->m_next) {
-			*(MechS32*) type = entry->m_type;
+			*(int32_t*) type = entry->m_type;
 			MechLogDebugf("%s: bucket=%d ID=%5d Type=%4s Lock=%d", name, i, entry->m_id, type, entry->m_lock);
 		}
 	}
 
 	MechLogDebugf("%s: Purge list", name);
 	for (entry = g_purgeListHead; entry; entry = entry->m_purgeNext) {
-		*(MechS32*) type = entry->m_type;
+		*(int32_t*) type = entry->m_type;
 		MechLogDebugf("%s: purge ID=%5d Type=%4s Lock=%d", name, entry->m_id, type, entry->m_lock);
 	}
 }
 
-void UnlockCachedResource(MechS32 p_id, char* p_type)
+void UnlockCachedResource(int32_t p_id, char* p_type)
 {
 	ResourceCacheEntry* entry = FindCacheEntry(p_id, p_type);
 	if (entry == NULL) {
@@ -211,12 +211,12 @@ void UnlockCachedResource(MechS32 p_id, char* p_type)
 // Returns the data of p_type item p_id of p_handle, loading it into the cache when needed and
 // purging the least recently used entries to make room. p_unk0x0c is ignored (the name tables
 // pass 1), so nothing gives it a name.
-void* LoadCachedResource(MechS32 p_handle, MechS32 p_id, char* p_type, MechS32 p_unk0x0c)
+void* LoadCachedResource(int32_t p_handle, int32_t p_id, char* p_type, int32_t p_unk0x0c)
 {
 	ResourceCacheEntry* entry;
 	ResourceCacheEntry* block;
-	MechS32 bucket;
-	MechS32 size;
+	int32_t bucket;
+	int32_t size;
 
 	if (p_id < 0) {
 		return NULL;
@@ -257,7 +257,7 @@ void* LoadCachedResource(MechS32 p_handle, MechS32 p_id, char* p_type, MechS32 p
 		return NULL;
 	}
 
-	bucket = ((MechS8) p_type[2] + (MechS8) p_type[3] + (MechS8) p_type[0] + (MechS8) p_type[1] + p_id) % 0x3f1;
+	bucket = ((int8_t) p_type[2] + (int8_t) p_type[3] + (int8_t) p_type[0] + (int8_t) p_type[1] + p_id) % 0x3f1;
 	block->m_next = g_cacheTable[bucket];
 	g_cacheTable[bucket] = block;
 	block->m_lock = 1;
@@ -269,7 +269,7 @@ void* LoadCachedResource(MechS32 p_handle, MechS32 p_id, char* p_type, MechS32 p
 	return block + 1;
 }
 
-void FreeCachedResource(MechS32 p_id, char* p_type)
+void FreeCachedResource(int32_t p_id, char* p_type)
 {
 	ResourceCacheEntry* entry = FindCacheEntry(p_id, p_type);
 	if (entry == NULL) {
@@ -279,7 +279,7 @@ void FreeCachedResource(MechS32 p_id, char* p_type)
 	FreeCacheEntry(entry);
 }
 
-MechS32 PurgeOldestCacheEntry(void)
+int32_t PurgeOldestCacheEntry(void)
 {
 	if (g_purgeListHead != NULL) {
 		FreeCacheEntry(g_purgeListHead);

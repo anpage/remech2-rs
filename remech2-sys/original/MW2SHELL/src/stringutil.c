@@ -10,15 +10,15 @@
 #include <string.h>
 
 // Returns a copy of the string on the primary heap, or NULL for an empty string.
-MechChar* AllocateString(MechChar* p_string)
+char* AllocateString(char* p_string)
 {
-	MechChar* copy;
+	char* copy;
 
 	if (strlen(p_string) == 0) {
 		return NULL;
 	}
 
-	copy = (MechChar*) MechHeapAlloc(g_primaryHeap, strlen(p_string) + 1);
+	copy = (char*) MechHeapAlloc(g_primaryHeap, strlen(p_string) + 1);
 	if (copy == NULL) {
 		fprintf(stderr, "Out of memory in allocate string\n");
 		fflush(stderr);
@@ -30,9 +30,9 @@ MechChar* AllocateString(MechChar* p_string)
 }
 
 // Uppercases a string in place and returns the same pointer.
-MechChar* UppercaseString(MechChar* p_string)
+char* UppercaseString(char* p_string)
 {
-	MechU32 i;
+	uint32_t i;
 
 	for (i = 0; i < strlen(p_string); i++) {
 		p_string[i] = toupper(p_string[i]);

@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-	MechS32 CrossDiv(MechS32 p_a, MechS32 p_b, MechS32 p_c, MechS32 p_d, MechS32 p_divisor);
+	int32_t CrossDiv(int32_t p_a, int32_t p_b, int32_t p_c, int32_t p_d, int32_t p_divisor);
 
 #ifdef __cplusplus
 }

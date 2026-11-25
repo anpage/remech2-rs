@@ -14,57 +14,57 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_temperature;
-	extern MechS32 g_hostileAtmosphere;
-	extern MechS32 g_sampleRates[10];
+	extern int32_t g_temperature;
+	extern int32_t g_hostileAtmosphere;
+	extern int32_t g_sampleRates[10];
 	extern AudioEngine* g_audioEngine;
 	extern SoundInfo g_soundInfo[1200];
-	extern MechChar g_sampleTag[5];
+	extern char g_sampleTag[5];
 
-	MechS32 InitializeDigitalAudio(MechU32 p_numSamples);
+	int32_t InitializeDigitalAudio(uint32_t p_numSamples);
 	void ShutdownDigitalAudio(void);
 	void ServeSamples(void);
-	MechS32 PlaySample(
-		MechS32 p_delay,
-		MechS32 p_bearing,
-		MechS32 p_id,
+	int32_t PlaySample(
+		int32_t p_delay,
+		int32_t p_bearing,
+		int32_t p_id,
 		void* p_data,
-		MechU32 p_volume,
-		MechS32 p_volumeScale,
-		MechS32 p_pan,
-		MechS32 p_rate,
-		MechS32* p_userData,
-		MechU16 p_flags
+		uint32_t p_volume,
+		int32_t p_volumeScale,
+		int32_t p_pan,
+		int32_t p_rate,
+		int32_t* p_userData,
+		uint16_t p_flags
 	);
-	MechS32 StartSample(MechS32 p_id, void* p_data, MechU16 p_flags, MechS16 p_slot, MechS32* p_userData);
+	int32_t StartSample(int32_t p_id, void* p_data, uint16_t p_flags, int16_t p_slot, int32_t* p_userData);
 	void AILCALLBACK SampleEosCallback(HSAMPLE p_sample);
 	void PlayEffectsVolumeTest(void);
-	MechS32 PlaySoundOnce(MechS32 p_id, MechU32 p_volume, MechS32 p_pan, MechS32 p_rate);
-	MechS32 PlaySoundRandomRate(
-		MechS32 p_delay,
-		MechS32 p_bearing,
-		MechS32 p_id,
-		MechU32 p_volume,
-		MechS32 p_pan,
-		MechU16 p_flags
+	int32_t PlaySoundOnce(int32_t p_id, uint32_t p_volume, int32_t p_pan, int32_t p_rate);
+	int32_t PlaySoundRandomRate(
+		int32_t p_delay,
+		int32_t p_bearing,
+		int32_t p_id,
+		uint32_t p_volume,
+		int32_t p_pan,
+		uint16_t p_flags
 	);
-	MechS32 PlayPositionalSound(MechS32 p_dx, MechS32 p_dy, MechS32 p_dz, MechS32 p_sound, MechS32 p_half);
-	MechS32 PlaySoundEffect(MechS32 p_id, MechU32 p_volume, MechS32 p_pan, MechS32 p_rate, MechU16 p_flags);
-	MechS32 PlayDelayedSound(
-		MechS32 p_delay,
-		MechS32 p_bearing,
-		MechS32 p_id,
-		MechU32 p_volume,
-		MechS32 p_pan,
-		MechU16 p_flags
+	int32_t PlayPositionalSound(int32_t p_dx, int32_t p_dy, int32_t p_dz, int32_t p_sound, int32_t p_half);
+	int32_t PlaySoundEffect(int32_t p_id, uint32_t p_volume, int32_t p_pan, int32_t p_rate, uint16_t p_flags);
+	int32_t PlayDelayedSound(
+		int32_t p_delay,
+		int32_t p_bearing,
+		int32_t p_id,
+		uint32_t p_volume,
+		int32_t p_pan,
+		uint16_t p_flags
 	);
-	MechS32 PlaySoundAt(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_sound, MechS32 p_half);
-	MechS32 CalculateSamplePan(MechS32 p_bearing);
-	MechS32 RandomSampleRate(void);
-	void StopSamples(MechS32 p_all);
+	int32_t PlaySoundAt(int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_sound, int32_t p_half);
+	int32_t CalculateSamplePan(int32_t p_bearing);
+	int32_t RandomSampleRate(void);
+	void StopSamples(int32_t p_all);
 	void UpdateAmbientSound(AmbientSound* p_sound);
 	void StopAmbientSound(AmbientSound* p_sound);
-	MechS32 GetDistanceVolume(MechS32 p_distance);
+	int32_t GetDistanceVolume(int32_t p_distance);
 
 #ifdef __cplusplus
 }

@@ -15,10 +15,10 @@ class PopupPicture {
 public:
 	PopupPicture(
 		undefined* p_data,
-		MechS32 p_size,
+		int32_t p_size,
 		VideoDriver* p_videoDriver,
-		MechS32 p_left,
-		MechS32 p_top,
+		int32_t p_left,
+		int32_t p_top,
 		AudioSample* p_sample
 	);
 	~PopupPicture();
@@ -27,17 +27,17 @@ public:
 	void Hide();
 
 private:
-	undefined* m_data;                 // 0x00
-	MechS32 m_size;                    // 0x04
-	VideoDriver* m_videoDriver;        // 0x08
-	MechS32 m_left;                    // 0x0c
-	MechS32 m_top;                     // 0x10
-	MechS32 m_width;                   // 0x14
-	MechS32 m_height;                  // 0x18
-	PANE m_savedView;                  // 0x1c
-	PANE m_screenView;                 // 0x30
-	WINDOW m_saved;                    // 0x44
-	AudioSample* m_sample;             // 0x358
+	undefined* m_data;          // 0x00
+	int32_t m_size;             // 0x04
+	VideoDriver* m_videoDriver; // 0x08
+	int32_t m_left;             // 0x0c
+	int32_t m_top;              // 0x10
+	int32_t m_width;            // 0x14
+	int32_t m_height;           // 0x18
+	PANE m_savedView;           // 0x1c
+	PANE m_screenView;          // 0x30
+	WINDOW m_saved;             // 0x44
+	AudioSample* m_sample;      // 0x358
 };
 
 #endif // POPUPPICTURE_H

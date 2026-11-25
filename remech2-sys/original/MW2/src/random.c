@@ -9,25 +9,25 @@
 // distributed around 0 (the sum of 30 rand() calls, scaled to +-sqrt(90) * 1024). rand is
 // MechRand, with Visual C++'s 15-bit range: glibc's 31-bit numbers overflowed the sum.
 
-MechS32 g_normalRandomIndex = 0;
+int32_t g_normalRandomIndex = 0;
 
 // A second pair of indices, so a second stream of callers doesn't disturb the first.
 
-MechS32 g_randomIndex2 = 0;
+int32_t g_randomIndex2 = 0;
 
-MechS32 g_normalRandomIndex2 = 0;
+int32_t g_normalRandomIndex2 = 0;
 
-MechS32 g_normalRandomInts[127];
+int32_t g_normalRandomInts[127];
 
-MechS32 g_randomInts[127];
+int32_t g_randomInts[127];
 
-void InitRandom(MechU32 p_seed)
+void InitRandom(uint32_t p_seed)
 {
-	MechS32 sum;
-	MechDouble scale;
-	MechS32 i;
-	MechS32 j;
-	MechDouble range;
+	int32_t sum;
+	double scale;
+	int32_t i;
+	int32_t j;
+	double range;
 
 	MechSRand(p_seed);
 	for (i = 0; i < 127; i++) {
@@ -41,7 +41,7 @@ void InitRandom(MechU32 p_seed)
 			sum += MechRand();
 		}
 
-		g_normalRandomInts[i] = (MechS32) ((sum * scale - range) * 1024.0);
+		g_normalRandomInts[i] = (int32_t) ((sum * scale - range) * 1024.0);
 	}
 }
 
@@ -49,9 +49,9 @@ void InitRandom(MechU32 p_seed)
 // through g_randomIndex, which at some framerates never gave a number below 3 when taken modulo a
 // fixed delta time.
 
-MechS32 RandomNormal(void)
+int32_t RandomNormal(void)
 {
-	MechS32 value;
+	int32_t value;
 
 	value = g_normalRandomInts[g_normalRandomIndex];
 	g_normalRandomIndex++;
@@ -59,9 +59,9 @@ MechS32 RandomNormal(void)
 	return value;
 }
 
-MechS32 RandomIntBelow2(MechS32 p_max)
+int32_t RandomIntBelow2(int32_t p_max)
 {
-	MechS32 value;
+	int32_t value;
 
 	value = g_randomInts[g_randomIndex2] % p_max;
 	g_randomIndex2++;
@@ -69,9 +69,9 @@ MechS32 RandomIntBelow2(MechS32 p_max)
 	return value;
 }
 
-MechS32 RandomNormal2(void)
+int32_t RandomNormal2(void)
 {
-	MechS32 value;
+	int32_t value;
 
 	value = g_normalRandomInts[g_normalRandomIndex2];
 	g_normalRandomIndex2++;
@@ -79,12 +79,12 @@ MechS32 RandomNormal2(void)
 	return value;
 }
 
-MechS32 RandomNormalMean(void)
+int32_t RandomNormalMean(void)
 {
 	return 0;
 }
 
-MechS32 RandomNormalDeviation(void)
+int32_t RandomNormalDeviation(void)
 {
 	return 0x400;
 }

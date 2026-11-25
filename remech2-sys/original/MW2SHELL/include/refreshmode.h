@@ -11,15 +11,15 @@
 // A refresh mode (the original's debug strings name them): how the framebuffer reaches the
 // screen through a display back end. The original had six, several to a back end.
 struct RefreshMode {
-	MechS32 m_index;                                                         // 0x00
-	MechS32 m_backend;                                                       // 0x04 — DisplayBackendId
-	MechS32 m_available;                                                     // 0x08 — cleared when m_begin fails
-	MechU32 m_profileTime;                                                   // 0x0c
-	MechS32 (*m_begin)(WINDOW* p_buffer, MechS32 p_width, MechS32 p_height); // 0x10
-	MechS32 (*m_end)(void);                                                  // 0x14
-	MechS32 (*m_flip)(void);                                                 // 0x18
-	MechS32 (*m_blitRect)(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom);    // 0x1c
-	MechS32 (*m_stretchBlit)(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom); // 0x20
+	int32_t m_index;                                                         // 0x00
+	int32_t m_backend;                                                       // 0x04 — DisplayBackendId
+	int32_t m_available;                                                     // 0x08 — cleared when m_begin fails
+	uint32_t m_profileTime;                                                  // 0x0c
+	int32_t (*m_begin)(WINDOW* p_buffer, int32_t p_width, int32_t p_height); // 0x10
+	int32_t (*m_end)(void);                                                  // 0x14
+	int32_t (*m_flip)(void);                                                 // 0x18
+	int32_t (*m_blitRect)(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom);    // 0x1c
+	int32_t (*m_stretchBlit)(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom); // 0x20
 };
 typedef struct RefreshMode RefreshMode;
 #pragma pack()
@@ -34,22 +34,22 @@ extern "C"
 	extern RefreshMode* g_currentRefreshMode;
 	extern WINDOW* g_refreshModeBuffer;
 	extern PaletteColor g_paletteColors[0x100];
-	extern MechS32 g_windowMode;
-	extern MechS32 g_refreshModePixelCount;
-	extern MechS32 g_refreshModeWidth;
-	extern MechS32 g_refreshModeHeight;
+	extern int32_t g_windowMode;
+	extern int32_t g_refreshModePixelCount;
+	extern int32_t g_refreshModeWidth;
+	extern int32_t g_refreshModeHeight;
 	extern DisplayBackend g_displayBackend;
 	extern RefreshMode g_refreshMode;
-	extern MechU8* g_frame;
+	extern uint8_t* g_frame;
 
-	MechS32 GetPaletteColors(MechS32 p_first, MechS32 p_count, PaletteColor* p_palette);
-	MechS32 InitRefreshMode(
-		MechS32 p_mode,
-		MechS32 p_allowFallback,
+	int32_t GetPaletteColors(int32_t p_first, int32_t p_count, PaletteColor* p_palette);
+	int32_t InitRefreshMode(
+		int32_t p_mode,
+		int32_t p_allowFallback,
 		WINDOW* p_buffer,
-		MechS32 p_width,
-		MechS32 p_height,
-		MechS32 p_menu
+		int32_t p_width,
+		int32_t p_height,
+		int32_t p_menu
 	);
 	void ShutdownRefreshMode(void);
 

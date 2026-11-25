@@ -8,17 +8,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-MechS32 CreateCollection(
+int32_t CreateCollection(
 	Collection** p_collection,
-	MechS32 p_growBy,
+	int32_t p_growBy,
 	void (*p_destroyItem)(void*),
-	MechU8 p_flags,
+	uint8_t p_flags,
 	int (*p_compare)(const void*, const void*)
 )
 {
 	Collection* collection;
 	void** items;
-	MechS32 i;
+	int32_t i;
 
 	collection = (Collection*) MechHeapAlloc(g_primaryHeap, sizeof(Collection));
 	if (collection == NULL) {
@@ -51,9 +51,9 @@ MechS32 CreateCollection(
 	return 0;
 }
 
-MechS32 DestroyCollection(Collection* p_collection)
+int32_t DestroyCollection(Collection* p_collection)
 {
-	MechS32 i;
+	int32_t i;
 	void* item;
 
 	for (i = 0; i < p_collection->m_capacity; i++) {
@@ -70,10 +70,10 @@ MechS32 DestroyCollection(Collection* p_collection)
 	return 0;
 }
 
-MechS32 ExpandCollection(Collection* p_collection, void* p_item)
+int32_t ExpandCollection(Collection* p_collection, void* p_item)
 {
 	void** items;
-	MechS32 i;
+	int32_t i;
 
 	if (p_collection->m_count > p_collection->m_capacity - 1) {
 		items = p_collection->m_items;
@@ -106,10 +106,10 @@ MechS32 ExpandCollection(Collection* p_collection, void* p_item)
 	return 0;
 }
 
-void CollectionRemove(Collection* p_collection, void* p_item, MechU8 p_destroy)
+void CollectionRemove(Collection* p_collection, void* p_item, uint8_t p_destroy)
 {
-	MechS32 index;
-	MechS32 i;
+	int32_t index;
+	int32_t i;
 	void* item;
 
 	index = CollectionFind(p_collection, p_item);
@@ -129,12 +129,12 @@ void CollectionRemove(Collection* p_collection, void* p_item, MechU8 p_destroy)
 	}
 }
 
-MechS32 CollectionFind(Collection* p_collection, void* p_item)
+int32_t CollectionFind(Collection* p_collection, void* p_item)
 {
 	void** found;
 	void* item;
 	void* key;
-	MechS32 i;
+	int32_t i;
 
 	if (p_collection->m_flags & c_collectionSorted) {
 		EnsureCollectionSorted(p_collection);
@@ -179,7 +179,7 @@ void EnsureCollectionSorted(Collection* p_collection)
 	}
 }
 
-void* CollectionGet(Collection* p_collection, MechS32 p_index)
+void* CollectionGet(Collection* p_collection, int32_t p_index)
 {
 	EnsureCollectionSorted(p_collection);
 
@@ -192,7 +192,7 @@ void* CollectionGet(Collection* p_collection, MechS32 p_index)
 
 void MoveCollectionItems(Collection* p_collection, Collection* p_source)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < p_source->m_count; i++) {
 		ExpandCollection(p_collection, p_source->m_items[i]);
@@ -204,7 +204,7 @@ void MoveCollectionItems(Collection* p_collection, Collection* p_source)
 
 void ClearCollection(Collection* p_collection)
 {
-	MechS32 i;
+	int32_t i;
 	void** items;
 	void* item;
 

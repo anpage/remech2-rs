@@ -89,17 +89,17 @@ void AttachShapeBoundBox(Shape* p_shape)
 // Computes the bounding box of the shape's first model, transforming it first if it is out of date.
 void ComputeModelBounds(
 	Shape* p_shape,
-	MechS32* p_minX,
-	MechS32* p_maxX,
-	MechS32* p_minY,
-	MechS32* p_maxY,
-	MechS32* p_minZ,
-	MechS32* p_maxZ
+	int32_t* p_minX,
+	int32_t* p_maxX,
+	int32_t* p_minY,
+	int32_t* p_maxY,
+	int32_t* p_minZ,
+	int32_t* p_maxZ
 )
 {
 	Model* model;
 	Vertex* vertex;
-	MechS32 count;
+	int32_t count;
 	Model* selected;
 
 	model = p_shape->m_models;
@@ -172,9 +172,9 @@ void FreeBoundBox(Shape* p_shape)
 }
 
 // Returns the bytes the shape's bounding data take.
-MechS32 GetBoundBoxSize(Shape* p_shape)
+int32_t GetBoundBoxSize(Shape* p_shape)
 {
-	MechS32 size;
+	int32_t size;
 	void* data;
 
 	if (!p_shape) {

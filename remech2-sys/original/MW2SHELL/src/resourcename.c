@@ -13,25 +13,25 @@
 
 typedef struct ResourceEntry {
 	char m_name[10]; // 0x00
-	MechS16 m_id;    // 0x0a
+	int16_t m_id;    // 0x0a
 } ResourceEntry;
 
 typedef struct ResourceTable {
 	undefined m_unk0x00[0x08];  // 0x00 — never accessed
-	MechS16 m_count;            // 0x08
+	int16_t m_count;            // 0x08
 	undefined2 m_unk0x0a;       // 0x0a — never accessed
 	ResourceEntry m_entries[1]; // 0x0c
 } ResourceTable;
 
-MechS32 FindResourceIdByName(MechS32 p_type, char* p_name)
+int32_t FindResourceIdByName(int32_t p_type, char* p_name)
 {
-	MechS32 j;
+	int32_t j;
 	ResourceTable* table;
-	MechS32 id;
+	int32_t id;
 	ResourceTable* data;
 	ResourceEntry* entry;
-	MechS32 i;
-	MechS32 c;
+	int32_t i;
+	int32_t c;
 	char name[12];
 
 	id = -1;
@@ -66,15 +66,15 @@ MechS32 FindResourceIdByName(MechS32 p_type, char* p_name)
 	return id;
 }
 
-char* FindResourceNameById(MechS32 p_type, MechS32 p_id, char* p_buffer)
+char* FindResourceNameById(int32_t p_type, int32_t p_id, char* p_buffer)
 {
-	MechS32 j;
+	int32_t j;
 	ResourceTable* table;
 	ResourceTable* data;
 	ResourceEntry* entry;
 	char* result;
-	MechS32 i;
-	MechS32 c;
+	int32_t i;
+	int32_t c;
 
 	result = NULL;
 	if (p_buffer != NULL) {

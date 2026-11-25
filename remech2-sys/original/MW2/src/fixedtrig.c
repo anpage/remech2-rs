@@ -10,25 +10,25 @@
 // Returns the sine of p_angle (16.16 degrees) from the table, as 16.16: the angle is scaled
 // to 1024 steps to the circle (0x5b05b05b is 2^37 / 360), and the table's quarter wave is
 // interpolated, mirrored and negated by quadrant.
-MechS32 FixedSin(MechS32 p_angle)
+int32_t FixedSin(int32_t p_angle)
 {
-	MechS32 result;
+	int32_t result;
 
 	/* The angle in 1024ths of the circle (8.16 per quadrant): bit 24 selects the falling half
 	   of a half wave, bit 25 the negative half wave. */
-	MechU32 steps = PortableShrdRound((MechU64) ((MechS64) p_angle * 0x5b05b05b), 29);
-	MechU32 index = (steps >> 16) & 0xff;
-	MechU32 fraction = steps;
-	MechU32 low;
-	MechU32 sine;
+	uint32_t steps = PortableShrdRound((MechU64) ((MechS64) p_angle * 0x5b05b05b), 29);
+	uint32_t index = (steps >> 16) & 0xff;
+	uint32_t fraction = steps;
+	uint32_t low;
+	uint32_t sine;
 
 	if (steps & 0x1000000) {
 		fraction = ~steps;
 		index ^= 0xff;
 	}
 
-	low = (MechU32) g_sinTable[index];
-	sine = low + PortableShrdRound((MechU64) ((MechU32) g_sinTable[index + 1] - low) * (fraction & 0xffff), 16);
+	low = (uint32_t) g_sinTable[index];
+	sine = low + PortableShrdRound((MechU64) ((uint32_t) g_sinTable[index + 1] - low) * (fraction & 0xffff), 16);
 	if (steps & 0x2000000) {
 		sine = 0 - sine;
 	}
@@ -39,26 +39,26 @@ MechS32 FixedSin(MechS32 p_angle)
 }
 
 // Returns the cosine of p_angle (16.16 degrees): the sine 90 degrees on.
-MechS32 FixedCos(MechS32 p_angle)
+int32_t FixedCos(int32_t p_angle)
 {
 	/* The add wraps (BuildMatrixEx's portable C calls this with any angle). */
-	return FixedSin(PortableS32((MechU32) p_angle + 0x5a0000));
+	return FixedSin(PortableS32((uint32_t) p_angle + 0x5a0000));
 }
 
 // Returns the arcsine of p_sine (2.29 fixed point, as the table holds it) in 16.16 degrees: a
 // binary search of the table's quarter wave, interpolated between the two entries found.
-MechS32 FixedAsin(MechS32 p_sine)
+int32_t FixedAsin(int32_t p_sine)
 {
 	/* The magnitude wraps like the C's negation (INT_MIN stays negative), and the search
 	   compares unsigned. */
-	MechU32 sine = (MechU32) p_sine;
-	MechS32 negative = 0;
-	MechS32 result;
-	MechU32 index;
-	MechU32 step;
-	MechU32 position;
-	MechU32 offset;
-	MechU32 span;
+	uint32_t sine = (uint32_t) p_sine;
+	int32_t negative = 0;
+	int32_t result;
+	uint32_t index;
+	uint32_t step;
+	uint32_t position;
+	uint32_t offset;
+	uint32_t span;
 
 	if (p_sine == 0) {
 		return 0;
@@ -75,7 +75,7 @@ MechS32 FixedAsin(MechS32 p_sine)
 	else {
 		index = 0;
 		for (step = 0x80; step; step >>= 1) {
-			if (sine >= (MechU32) g_sinTable[index + step]) {
+			if (sine >= (uint32_t) g_sinTable[index + step]) {
 				index += step;
 			}
 		}
@@ -83,44 +83,44 @@ MechS32 FixedAsin(MechS32 p_sine)
 		/* The entry in 8.16 steps, plus the fraction between it and the next one (the idiv faults
 		   on two equal entries, which the game's table doesn't have). */
 		position = index << 16;
-		offset = sine - (MechU32) g_sinTable[index];
+		offset = sine - (uint32_t) g_sinTable[index];
 		if (offset) {
-			span = (MechU32) g_sinTable[index + 1] - (MechU32) g_sinTable[index];
+			span = (uint32_t) g_sinTable[index + 1] - (uint32_t) g_sinTable[index];
 			if (span && offset >= span) {
 				position += 0x10000;
 			}
 			else {
 				position =
 					(position & 0xffff0000) |
-					((MechU32) PortableIdiv((MechS64) PortableS32(offset) * 0x10000, PortableS32(span)) & 0xffff);
+					((uint32_t) PortableIdiv((MechS64) PortableS32(offset) * 0x10000, PortableS32(span)) & 0xffff);
 			}
 		}
 
-		result = (MechS32) (((MechS64) 0x5a000000 * PortableS32(position)) >> 32);
+		result = (int32_t) (((MechS64) 0x5a000000 * PortableS32(position)) >> 32);
 	}
 
 	return negative ? -result : result;
 }
 
-MechS32 FixedAcos(MechS32 p_cosine)
+int32_t FixedAcos(int32_t p_cosine)
 {
 	return 0x5a0000 - FixedAsin(p_cosine);
 }
 
 // Returns the bearing of (p_x, p_z) in 16.16 degrees: the arctangent of the smaller over the
 // larger component from the table, folded into its octant. The result is also left in dx:ax.
-MechS32 FixedAtan2(MechS32 p_x, MechS32 p_z)
+int32_t FixedAtan2(int32_t p_x, int32_t p_z)
 {
 	/* The magnitudes wrap like neg (INT_MIN stays negative) and compare signed; the quotient,
 	   interpolation and folding are unsigned. */
-	MechS32 smaller = p_x < 0 ? PortableS32(0 - (MechU32) p_x) : p_x;
-	MechS32 larger = p_z < 0 ? PortableS32(0 - (MechU32) p_z) : p_z;
-	MechU32 octant = (p_x < 0 ? 1 : 0) | (p_z < 0 ? 2 : 0);
-	MechU32 angle;
-	MechU32 ratio;
-	MechU32 index;
-	MechU32 product;
-	MechS32 swap;
+	int32_t smaller = p_x < 0 ? PortableS32(0 - (uint32_t) p_x) : p_x;
+	int32_t larger = p_z < 0 ? PortableS32(0 - (uint32_t) p_z) : p_z;
+	uint32_t octant = (p_x < 0 ? 1 : 0) | (p_z < 0 ? 2 : 0);
+	uint32_t angle;
+	uint32_t ratio;
+	uint32_t index;
+	uint32_t product;
+	int32_t swap;
 
 	if (smaller == larger) {
 		angle = 0x2d0000;
@@ -138,10 +138,10 @@ MechS32 FixedAtan2(MechS32 p_x, MechS32 p_z)
 		}
 		else {
 			/* The ratio in 8.24 fixed point */
-			ratio = PortableDiv((MechU64) (MechU32) smaller << 24, (MechU32) larger);
+			ratio = PortableDiv((MechU64) (uint32_t) smaller << 24, (uint32_t) larger);
 			index = (ratio >> 16) & 0xff;
-			product = (ratio & 0xffff) * ((MechU32) g_atanTable[index + 1] - (MechU32) g_atanTable[index]);
-			angle = (product >> 16) + (MechU32) g_atanTable[index] + ((product >> 15) & 1);
+			product = (ratio & 0xffff) * ((uint32_t) g_atanTable[index + 1] - (uint32_t) g_atanTable[index]);
+			angle = (product >> 16) + (uint32_t) g_atanTable[index] + ((product >> 15) & 1);
 		}
 	}
 

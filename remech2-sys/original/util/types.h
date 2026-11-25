@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <stdint.h>
+
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -13,26 +15,9 @@
 #define NULL 0
 #endif
 
-/* Project type vocabulary, with the width and signedness explicit. */
-
-typedef signed char MechS8;
-typedef unsigned char MechU8;
-typedef short MechS16;
-typedef unsigned short MechU16;
-typedef int MechS32;
-typedef unsigned int MechU32;
-typedef float MechFloat;
-typedef double MechDouble;
-typedef char MechChar;
-
-/* The integers the original keeps in pointers (a screen field's item index, a file offset) and
-   the pointers it keeps in 32-bit integers (a Miles sample's user data) go through a
-   pointer-sized integer, so that the conversions are defined where pointers are wider than 32
-   bits. */
-#include <stdint.h>
 #define MECH_INTPTR intptr_t
 
-#define MECH_PTR_TO_S32(p_pointer) ((MechS32) (MECH_INTPTR) (p_pointer))
+#define MECH_PTR_TO_S32(p_pointer) ((int32_t) (MECH_INTPTR) (p_pointer))
 #define MECH_S32_TO_PTR(p_value) ((void*) (MECH_INTPTR) (p_value))
 
 /* windows.h's max */
@@ -40,11 +25,8 @@ typedef char MechChar;
 
 /* A position in pixels, laid out as Windows' POINT */
 typedef struct MechPoint {
-	MechS32 x;
-	MechS32 y;
+	int32_t x;
+	int32_t y;
 } MechPoint;
-
-/* Boolean typedefs (MechBool / MechBool8 ...) are added when a match proves
-   the width and signedness. */
 
 #endif /* TYPES_H */

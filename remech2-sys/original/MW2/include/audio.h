@@ -11,23 +11,23 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_cdTrack;
+	extern int32_t g_cdTrack;
 	extern SoundConfig g_soundConfig;
 	extern SoundConfig* g_mw2SndCfgData;
-	extern MechS32 g_audioPaused;
-	extern MechS32 g_musicStarted;
-	extern MechS32 g_nextEngageCheck;
+	extern int32_t g_audioPaused;
+	extern int32_t g_musicStarted;
+	extern int32_t g_nextEngageCheck;
 
-	MechS32 GetSoundSetting(MechS32 p_setting);
-	void PreviewSoundSetting(MechS32 p_setting, MechS32 p_value);
-	void SetSoundSetting(MechS32 p_setting, MechS32 p_value);
-	void RestoreSoundSetting(MechS32 p_setting);
+	int32_t GetSoundSetting(int32_t p_setting);
+	void PreviewSoundSetting(int32_t p_setting, int32_t p_value);
+	void SetSoundSetting(int32_t p_setting, int32_t p_value);
+	void RestoreSoundSetting(int32_t p_setting);
 	void StartMissionMusic(void);
 	void PauseMusic(void);
 	void ResumeMusic(void);
 	void StopMusic(void);
 	void LoopCdMusic(void);
-	MechS32 FirstAudio(void);
+	int32_t FirstAudio(void);
 	void DoAudio(void);
 	void ShutdownAudio(void);
 	void PauseAudio(void);

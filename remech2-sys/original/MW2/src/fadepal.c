@@ -30,7 +30,7 @@
 #include "view.h"
 
 // The launch sound of the local player's weapon, in the cockpit (p_shotType is unused).
-void PlayWeaponLaunchSound(undefined4 p_shotType, MechS32 p_sound, undefined4 p_pan)
+void PlayWeaponLaunchSound(undefined4 p_shotType, int32_t p_sound, undefined4 p_pan)
 {
 	if (p_sound > 0) {
 		PlayDelayedSound(0, 0, p_sound, 0x32, p_pan, 0x32);
@@ -40,11 +40,11 @@ void PlayWeaponLaunchSound(undefined4 p_shotType, MechS32 p_sound, undefined4 p_
 // Renders the scene into pane p_target from the camera p_view with a field of view of
 // p_fovX (only the objects under p_object, if set), then restores the eyepoint, its field of view
 // and the pending palette.
-void RenderViewToPane(MechU32 p_target, MechS32 p_fovX, MechS32* p_view, struct SceneObject* p_object)
+void RenderViewToPane(uint32_t p_target, int32_t p_fovX, int32_t* p_view, struct SceneObject* p_object)
 {
-	MechS32 fovX;
-	MechS32 palette;
-	MechS32 view[7];
+	int32_t fovX;
+	int32_t palette;
+	int32_t view[7];
 
 	fovX = g_eyepoint->m_fovX;
 	palette = g_palettePending;
@@ -85,9 +85,9 @@ void FlashZappedPalette(void)
 }
 
 // Flashes palette slot 0x11 (ZAPPED) over p_level (0-15) fifteenths of two seconds.
-void FlashZappedPaletteLevel(MechU32 p_level)
+void FlashZappedPaletteLevel(uint32_t p_level)
 {
-	MechS32 duration;
+	int32_t duration;
 
 	if (p_level > 15) {
 		p_level = 0x10000;
@@ -102,9 +102,9 @@ void FlashZappedPaletteLevel(MechU32 p_level)
 
 // Fades (blocking, over 60 steps) to palette slot 0x10, or 0x11 if p_alternate is set, then applies
 // that slot.
-void FadeToEndPalette(MechS32 p_alternate)
+void FadeToEndPalette(int32_t p_alternate)
 {
-	MechS32 slot;
+	int32_t slot;
 	PaletteColor* palette;
 
 	if (p_alternate) {
@@ -125,9 +125,9 @@ void FadeToEndPalette(MechS32 p_alternate)
 // Sets off the smoke of a wrecked mech, or now and then a spark while m_stateTime is set.
 void EmitWreckSmoke(Mech* p_mech)
 {
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 
 	x = p_mech->m_player->m_position.m_x;
 	y = p_mech->m_player->m_position.m_y;
@@ -153,9 +153,9 @@ void BreakUpMech(Mech* p_mech)
 	SceneObject* obj;
 	SceneObject* upper;
 	SceneObject* lower;
-	MechS32 upperIndex;
-	MechS32 lowerIndex;
-	MechS32 objIndex;
+	int32_t upperIndex;
+	int32_t lowerIndex;
+	int32_t objIndex;
 
 	ShowObjTree(p_mech->m_player->m_obj);
 	obj = p_mech->m_player->m_obj;
@@ -172,12 +172,12 @@ void BreakUpMech(Mech* p_mech)
 // Sets off the flames of the jump jets and plays their sound.
 void FireJumpJetEffects(Mech* p_mech)
 {
-	MechS32 z;
-	MechS32 y;
-	MechS32 x;
+	int32_t z;
+	int32_t y;
+	int32_t x;
 	Player* player;
-	MechS32 jet;
-	MechS32 fired;
+	int32_t jet;
+	int32_t fired;
 
 	fired = FALSE;
 	player = p_mech->m_player;
@@ -216,9 +216,9 @@ void FireJumpJetEffects(Mech* p_mech)
 }
 
 // Plays a mech's landing: the thud, and the camera shake for the local player.
-void PlayMechLanding(Mech* p_mech, MechS32 p_speed)
+void PlayMechLanding(Mech* p_mech, int32_t p_speed)
 {
-	MechS32 sound;
+	int32_t sound;
 
 	if (p_mech->m_player->m_index == g_localPlayerId) {
 		PlayPlayerHitFeedback(0, -p_speed, 0);
@@ -241,11 +241,11 @@ void PlayMechLanding(Mech* p_mech, MechS32 p_speed)
 }
 
 // Shakes the camera away from a hit's direction, unless a shake is already playing.
-void PlayPlayerHitFeedback(MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void PlayPlayerHitFeedback(int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 off10;
-	MechS32 off0c;
-	MechS32 off14;
+	int32_t off10;
+	int32_t off0c;
+	int32_t off14;
 
 	if (IsCameraShaking()) {
 		return;

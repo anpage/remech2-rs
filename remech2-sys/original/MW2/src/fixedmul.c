@@ -5,7 +5,7 @@
 #include "portable.h"
 #include "types.h"
 
-MechS32 FixedMul16(MechS32 p_a, MechS32 p_b)
+int32_t FixedMul16(int32_t p_a, int32_t p_b)
 {
 	return PortableS32(PortableShrdRound((MechU64) ((MechS64) p_a * p_b), 16));
 }

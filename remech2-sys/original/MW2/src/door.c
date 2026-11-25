@@ -80,7 +80,7 @@ void FirstDoor(Player* p_player)
 // player's heading.
 void UpdateDoor(Mech* p_mech)
 {
-	MechS32 heading;
+	int32_t heading;
 	Mech* mech;
 
 	if (!p_mech) {
@@ -121,19 +121,19 @@ void UpdateDoor(Mech* p_mech)
 void LateUpdateDoor(Mech* p_mech)
 {
 	Mech* mech;
-	MechS32 team;
+	int32_t team;
 	MissionObjective* objective;
-	MechS32 dz;
-	MechS32 nav;
-	MechS32 x;
-	MechS32 navX;
-	MechS32 step;
-	MechS32 y;
-	MechS32 navY;
-	MechS32 z;
-	MechS32 navZ;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t dz;
+	int32_t nav;
+	int32_t x;
+	int32_t navX;
+	int32_t step;
+	int32_t y;
+	int32_t navY;
+	int32_t z;
+	int32_t navZ;
+	int32_t dx;
+	int32_t dy;
 
 	mech = p_mech;
 	UpdateAI(mech->m_player);
@@ -143,7 +143,7 @@ void LateUpdateDoor(Mech* p_mech)
 		mech->m_player->m_targetInfo.m_target = 0;
 		mech->m_player->m_steering->m_autopilot = 0;
 		if (objective->m_type == 0x100 && objective->m_targetCount > 0 && (objective->m_targets[0] & 0xff00) == 0x100) {
-			nav = (MechU8) objective->m_targets[0];
+			nav = (uint8_t) objective->m_targets[0];
 			GetObjPosition(mech->m_player->m_obj, &x, &y, &z);
 			navX = g_navTable[nav].m_position[0];
 			navY = g_navTable[nav].m_position[1];
@@ -207,7 +207,7 @@ void ShutdownDoor(Mech* p_mech)
 }
 
 // Allocates p_player's mech, its weapons and sections, and sets them up.
-MechS32 CreateDoor(MechS32 p_index, Player* p_player)
+int32_t CreateDoor(int32_t p_index, Player* p_player)
 {
 	void* buffer = NULL;
 	MechSection* sections = NULL;
@@ -215,8 +215,8 @@ MechS32 CreateDoor(MechS32 p_index, Player* p_player)
 	void* extra = NULL;
 	Mech* mech = NULL;
 	WeaponSlot* slot;
-	MechS32 i;
-	MechS32 size;
+	int32_t i;
+	int32_t size;
 
 	p_player->m_mech = NULL;
 	size = GetMechAllocSize();

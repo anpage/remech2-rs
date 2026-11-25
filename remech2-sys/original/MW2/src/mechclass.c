@@ -53,37 +53,37 @@
 #include <stdio.h>
 
 // The "mightymouse" cheat: infinite jump jet fuel.
-MechS32 g_infiniteJumpFuel = 0;
+int32_t g_infiniteJumpFuel = 0;
 
 // Set by a game key: run JettisonAmmo on the local mech next tick.
-MechS32 g_jettisonAmmoRequested = 0;
+int32_t g_jettisonAmmoRequested = 0;
 
 // Set by the MASC game key: toggle the local mech's MASC next tick.
-MechS32 g_toggleMascRequested = 0;
+int32_t g_toggleMascRequested = 0;
 
-MechS32 g_mascEngaged = 0;
+int32_t g_mascEngaged = 0;
 
-MechS32 g_manualWeaponCycle = 0;
+int32_t g_manualWeaponCycle = 0;
 
-MechS32 g_localMechLost = 0;
+int32_t g_localMechLost = 0;
 
 // A power request for the local mech: 1 powers it up, -1 shuts it down.
-MechS32 g_powerRequest = 0;
+int32_t g_powerRequest = 0;
 
 // The local player's heading at the last tick, while the torso recenters (LateUpdateMech).
-MechS32 g_recenterLastHeading = 0;
+int32_t g_recenterLastHeading = 0;
 
-MechS32 g_mechPoweredUp = 0;
+int32_t g_mechPoweredUp = 0;
 
 // The clock at the last MASC malfunction roll (LateUpdateMech).
-MechS32 g_lastMascRoll = 0;
+int32_t g_lastMascRoll = 0;
 
-MechS32 g_localMechDestroyed = 0;
+int32_t g_localMechDestroyed = 0;
 
-MechS32 g_ejectStarted = 0;
+int32_t g_ejectStarted = 0;
 
 // Set once the local mech's collision sound played; cleared when it moves freely (UpdateMech).
-MechS32 g_collisionSoundPlayed;
+int32_t g_collisionSoundPlayed;
 
 // Puts p_player's mech back in its starting state: fresh parts for a new mech (and, for the local
 // player, its cockpit), the ramps, weapon and motion state, its object back on the ground and the
@@ -177,55 +177,55 @@ void FirstMech(struct Player* p_player)
 // it down slopes, then poses its objects. Every player type's update (PlayerType::m_updateFn).
 void UpdateMech(Mech* p_mech)
 {
-	MechS32 height;
-	MechS32 accelY;
-	MechS32 velZ;
-	MechS32 posZ;
-	MechS32 dy;
-	MechS32 isLocal;
+	int32_t height;
+	int32_t accelY;
+	int32_t velZ;
+	int32_t posZ;
+	int32_t dy;
+	int32_t isLocal;
 	Player* hitPlayer;
-	MechS32 speed;
-	MechS32 length;
-	MechS32 dragX;
-	MechS32 accelZ;
-	MechS32 dz;
+	int32_t speed;
+	int32_t length;
+	int32_t dragX;
+	int32_t accelZ;
+	int32_t dz;
 	struct Shape* hitShape;
-	MechS32 dragZ;
-	MechS32 targetX;
-	MechS32 topSpeed;
-	MechS32 drag;
+	int32_t dragZ;
+	int32_t targetX;
+	int32_t topSpeed;
+	int32_t drag;
 	Mech* mech;
-	MechS32 heading;
-	MechS32 targetZ;
-	MechS32 pitch;
-	MechS32 impact;
-	MechS32 velX;
-	MechS32 posX;
-	MechS32 accelX;
-	MechS32 velY;
-	MechS32 posY;
-	MechS32 dx;
-	MechS32 a;
-	MechS32 b;
-	MechS32 c;
-	MechS32 topSpeed2;
-	MechS32 posX2;
-	MechS32 posY2;
-	MechS32 posZ2;
+	int32_t heading;
+	int32_t targetZ;
+	int32_t pitch;
+	int32_t impact;
+	int32_t velX;
+	int32_t posX;
+	int32_t accelX;
+	int32_t velY;
+	int32_t posY;
+	int32_t dx;
+	int32_t a;
+	int32_t b;
+	int32_t c;
+	int32_t topSpeed2;
+	int32_t posX2;
+	int32_t posY2;
+	int32_t posZ2;
 	struct Shape* hitShape2;
-	MechS32 savedUnk0xa4;
-	MechS32 sound;
-	MechS32 volume;
-	MechS32 sound2;
-	MechS32 volume2;
-	MechS32 damage;
-	MechS32 slope;
-	MechS32 objY;
-	MechS32 angle;
-	MechS32 objZ;
-	MechS32 rayLength;
+	int32_t savedUnk0xa4;
+	int32_t sound;
+	int32_t volume;
+	int32_t sound2;
+	int32_t volume2;
+	int32_t damage;
+	int32_t slope;
+	int32_t objY;
+	int32_t angle;
+	int32_t objZ;
+	int32_t rayLength;
 	Ray ray;
-	MechS32 objX;
+	int32_t objX;
 
 	height = 0;
 	hitShape = NULL;
@@ -609,26 +609,26 @@ void UpdateMech(Mech* p_mech)
 // recharge at the same rate whatever the framerate.
 void LateUpdateMechC(Mech* p_mech)
 {
-	MechS32 throttle;
-	MechS32 isLocal;
-	MechS32 cosine;
-	MechS32 jumping;
-	MechS32 turn;
-	MechS32 speed;
-	MechS32 dx;
+	int32_t throttle;
+	int32_t isLocal;
+	int32_t cosine;
+	int32_t jumping;
+	int32_t turn;
+	int32_t speed;
+	int32_t dx;
 	Mech* mech;
-	MechS32 dy;
-	MechS32 dz;
-	MechS32 turnRate;
-	MechS32 active;
-	MechS32 previousDegrees;
-	MechS32 degrees;
-	MechS32 heading;
-	MechS32 delta;
-	MechChar text[40];
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
+	int32_t dy;
+	int32_t dz;
+	int32_t turnRate;
+	int32_t active;
+	int32_t previousDegrees;
+	int32_t degrees;
+	int32_t heading;
+	int32_t delta;
+	char text[40];
+	int32_t x;
+	int32_t y;
+	int32_t z;
 
 	jumping = 0;
 	speed = 0;
@@ -1079,11 +1079,11 @@ void LateUpdateMechC(Mech* p_mech)
 // mech down, or powers up a shut-down mech that isn't overheating.
 void UpdateLocalMech(Mech* p_mech)
 {
-	MechS32 dx;
+	int32_t dx;
 	Mech* mech;
-	MechS32 dy;
-	MechS32 dz;
-	MechChar text[40];
+	int32_t dy;
+	int32_t dz;
+	char text[40];
 
 	if (p_mech) {
 		mech = p_mech;
@@ -1214,11 +1214,11 @@ void ShutdownMech(Mech* p_mech)
 }
 
 // Allocates p_player's mech and sets it up.
-MechS32 CreateMech(MechS32 p_index, Player* p_player)
+int32_t CreateMech(int32_t p_index, Player* p_player)
 {
 	void* buffer = NULL;
-	MechS32 i;
-	MechS32 size;
+	int32_t i;
+	int32_t size;
 	Mech* mech = NULL;
 
 	p_player->m_mech = NULL;
@@ -1247,7 +1247,7 @@ void InitMechArrays(struct Mech* p_mech)
 	AmmoBin* bin;
 	WeaponSlot* slot;
 	AmmoBin* bins = NULL;
-	MechS32 i;
+	int32_t i;
 	WeaponSlot* weapons = NULL;
 	MechSection* sections = NULL;
 
@@ -1290,9 +1290,9 @@ void InitMechArrays(struct Mech* p_mech)
 
 // Returns the size of a mech's allocation: the mech, its ten weapons and eight sections, and 500
 // bytes more.
-MechS32 GetMechAllocSize(void)
+int32_t GetMechAllocSize(void)
 {
-	MechS32 size;
+	int32_t size;
 
 	size = sizeof(Mech);
 	size += 10 * sizeof(WeaponSlot);
@@ -1302,7 +1302,7 @@ MechS32 GetMechAllocSize(void)
 }
 
 // Nothing calls it.
-MechS32 GetLastSelectedWeapon(Player* p_player)
+int32_t GetLastSelectedWeapon(Player* p_player)
 {
 	Mech* mech;
 
@@ -1311,7 +1311,7 @@ MechS32 GetLastSelectedWeapon(Player* p_player)
 }
 
 // Selects weapon p_weapon of p_player's mech.
-void SetSelectedWeapon(Player* p_player, MechS32 p_weapon)
+void SetSelectedWeapon(Player* p_player, int32_t p_weapon)
 {
 	Mech* mech;
 
@@ -1320,7 +1320,7 @@ void SetSelectedWeapon(Player* p_player, MechS32 p_weapon)
 }
 
 // Nothing calls it.
-MechS32 GetMechHeight(Player* p_player)
+int32_t GetMechHeight(Player* p_player)
 {
 	Mech* mech;
 

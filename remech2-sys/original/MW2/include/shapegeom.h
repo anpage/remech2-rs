@@ -18,30 +18,30 @@ extern "C"
 	void TransformModel(Model* p_model, Matrix* p_matrix);
 	void TransformShapeCenter(struct Shape* p_shape, Matrix* p_matrix);
 	void TransformShape(struct Shape* p_shape, Matrix* p_matrix);
-	MechS32 SolvePlaneY(
-		MechS32 p_normalX,
-		MechS32 p_normalY,
-		MechS32 p_normalZ,
-		MechS32 p_distance,
-		MechS32 p_dx,
-		MechS32 p_dz
+	int32_t SolvePlaneY(
+		int32_t p_normalX,
+		int32_t p_normalY,
+		int32_t p_normalZ,
+		int32_t p_distance,
+		int32_t p_dx,
+		int32_t p_dz
 	);
-	MechS32 ApproximateShapeDistance(struct Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 ComputeTriangleNormal(
-		MechS32 p_x0,
-		MechS32 p_y0,
-		MechS32 p_z0,
-		MechS32 p_x1,
-		MechS32 p_y1,
-		MechS32 p_z1,
-		MechS32 p_x2,
-		MechS32 p_y2,
-		MechS32 p_z2,
-		MechS32* p_nx,
-		MechS32* p_ny,
-		MechS32* p_nz
+	int32_t ApproximateShapeDistance(struct Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t ComputeTriangleNormal(
+		int32_t p_x0,
+		int32_t p_y0,
+		int32_t p_z0,
+		int32_t p_x1,
+		int32_t p_y1,
+		int32_t p_z1,
+		int32_t p_x2,
+		int32_t p_y2,
+		int32_t p_z2,
+		int32_t* p_nx,
+		int32_t* p_ny,
+		int32_t* p_nz
 	);
-	MechS32 RayShapeDistance(struct Shape* p_shape, struct Ray* p_ray);
+	int32_t RayShapeDistance(struct Shape* p_shape, struct Ray* p_ray);
 
 #ifdef __cplusplus
 }

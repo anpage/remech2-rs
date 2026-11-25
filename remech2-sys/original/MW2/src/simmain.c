@@ -74,50 +74,50 @@
 #include <string.h>
 #include <strings.h>
 
-MechS32 g_shouldQuit = 0;
+int32_t g_shouldQuit = 0;
 
-MechS32 g_quitStage = 0;
+int32_t g_quitStage = 0;
 
 TimedCallback* g_detachedTasks = NULL;
 
 DifficultyCfg* g_difficulty = NULL;
 
-MechS32 g_localPlayerId = 0;
+int32_t g_localPlayerId = 0;
 
-MechS32 g_remoteWaitTime = 0;
+int32_t g_remoteWaitTime = 0;
 
 // Set when the local player starts on the autopilot (FirstMech).
-MechS32 g_startOnAutopilot = 0;
+int32_t g_startOnAutopilot = 0;
 
 MechHeap* g_primaryHeap = NULL;
 
-MechS32 g_gameWindowWidth = 0;
+int32_t g_gameWindowWidth = 0;
 
-MechS32 g_gameWindowHeight = 0;
+int32_t g_gameWindowHeight = 0;
 
-MechS32 g_drawModeReady = 0;
+int32_t g_drawModeReady = 0;
 
-MechS32 g_simPaused = 0;
+int32_t g_simPaused = 0;
 
-MechS32 g_pauseRequested = 0;
+int32_t g_pauseRequested = 0;
 
-MechS32 g_mouseOutsideClientWindow = 0;
+int32_t g_mouseOutsideClientWindow = 0;
 
-MechS32 g_goLaunch = 0;
+int32_t g_goLaunch = 0;
 
 const MissionLaunch* g_missionLaunch = NULL;
 MissionReport* g_missionReport = NULL;
 
-static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+static MECH_INTPTR SimHandleMessage(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
 
 int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_netLaunch, MissionReport* p_report)
 {
 	MechMessage msg;
 	int result;
-	MechS32 i;
+	int32_t i;
 	char missionName[64];
-	MechS32 seed;
-	MechS32 quitLatched;
+	int32_t seed;
+	int32_t quitLatched;
 
 	// The original was loaded fresh for each mission.
 	ResetSimGlobals();
@@ -419,7 +419,7 @@ int SimMain(char* p_cmdLine, const MissionLaunch* p_launch, NetLaunchInfo* p_net
 }
 
 // The simulator's message handler, originally its window procedure (SimWindowProc).
-static MECH_INTPTR SimHandleMessage(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
+static MECH_INTPTR SimHandleMessage(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
 	if (p_msg >= c_mechMsgKeyFirst && p_msg <= c_mechMsgKeyLast) {
 		HandleKeyboardMessages(p_msg, p_wParam, p_lParam);

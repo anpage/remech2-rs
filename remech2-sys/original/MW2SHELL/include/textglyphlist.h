@@ -14,7 +14,7 @@ public:
 
 	void Add(TextGlyph* p_item);
 	void Remove(TextGlyph* p_item);
-	void Clear(MechU8 p_delete);
+	void Clear(uint8_t p_delete);
 	void DrawAll();
 
 private:

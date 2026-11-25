@@ -12,17 +12,17 @@
 
 #include <stddef.h>
 
-MechChar g_audioItem[] = "Audio Ctrl";
+char g_audioItem[] = "Audio Ctrl";
 
-MechChar g_audioTitle[] = "SET AUDIO VOLUME";
+char g_audioTitle[] = "SET AUDIO VOLUME";
 
-MechChar g_bettyMessageItem[] = "Betty Message";
+char g_bettyMessageItem[] = "Betty Message";
 
-MechChar g_soundEffectsItem[] = "Sound Effects";
+char g_soundEffectsItem[] = "Sound Effects";
 
-MechChar g_voiceItem[] = "Voice";
+char g_voiceItem[] = "Voice";
 
-MechChar g_musicItem[] = "Music";
+char g_musicItem[] = "Music";
 
 MenuControl g_soundEffectsControl =
 	{2, 0, g_sliderShapes, 0, NULL, GetSoundSetting, PreviewSoundSetting, SetSoundSetting, RestoreSoundSetting};

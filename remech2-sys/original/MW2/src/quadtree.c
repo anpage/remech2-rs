@@ -13,7 +13,7 @@
 
 #include <string.h>
 
-MechS32 g_quadtreesDisabled = 0;
+int32_t g_quadtreesDisabled = 0;
 
 // Builds p_shape's quadtree (m_collisionData) over its model's bounds, unless g_quadtreesDisabled is set.
 void BuildShapeQuadtree(Shape* p_shape)
@@ -21,8 +21,8 @@ void BuildShapeQuadtree(Shape* p_shape)
 	Model* model;
 	QuadtreeNode* root;
 	Vertex* vertex;
-	MechS32 i;
-	MechS32 j;
+	int32_t i;
+	int32_t j;
 
 	if (g_quadtreesDisabled) {
 		return;
@@ -80,23 +80,23 @@ void BuildShapeQuadtree(Shape* p_shape)
 
 // Builds the quadtree child p_quadrant of p_node from p_model's faces. A leaf takes at most 25
 // faces; with more, the child is split again.
-QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, MechS32 p_quadrant, Model* p_model)
+QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, int32_t p_quadrant, Model* p_model)
 {
-	MechS32 j;
-	MechS32 i;
+	int32_t j;
+	int32_t i;
 	Face* entries[25];
 	QuadtreeNode* node;
-	MechS32 faceLow;
-	MechS32 minX;
-	MechS32 lowY;
-	MechS32 minZ;
-	MechS32 count;
+	int32_t faceLow;
+	int32_t minX;
+	int32_t lowY;
+	int32_t minZ;
+	int32_t count;
 	QuadtreeNode* child;
 	Face* face;
-	MechS32 faceHigh;
-	MechS32 maxX;
-	MechS32 highY;
-	MechS32 maxZ;
+	int32_t faceHigh;
+	int32_t maxX;
+	int32_t highY;
+	int32_t maxZ;
 	Face** faces;
 
 	if (p_quadrant & 1) {
@@ -125,7 +125,7 @@ QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, MechS32 p_quadrant, Model
 	lowY = 0x7fffffff;
 	highY = -0x7fffffff;
 	for (i = 0; i < p_model->m_faceCount; i++) {
-		face = (Face*) ((MechU8*) p_model + p_model->m_faceOffset) + i;
+		face = (Face*) ((uint8_t*) p_model + p_model->m_faceOffset) + i;
 		if (FaceOverlapsBox(face, p_model, minX, maxX, minZ, maxZ, &faceLow, &faceHigh)) {
 			count++;
 			if (count > 25) {
@@ -196,12 +196,12 @@ QuadtreeNode* AllocQuadtreeNode(
 	undefined4 p_maxY,
 	undefined4 p_minZ,
 	undefined4 p_maxZ,
-	MechS32 p_faceCount
+	int32_t p_faceCount
 )
 {
 	Face** entries;
 	QuadtreeNode* node;
-	MechS32 i;
+	int32_t i;
 
 	node = MechHeapAlloc(g_primaryHeap, p_faceCount * sizeof(Face*) + sizeof(QuadtreeNode));
 	if (node) {
@@ -232,7 +232,7 @@ QuadtreeNode* AllocQuadtreeNode(
 // Frees a quadtree.
 void FreeQuadtree(QuadtreeNode* p_node)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (!p_node) {
 		return;
@@ -249,37 +249,37 @@ void FreeQuadtree(QuadtreeNode* p_node)
 
 // Returns whether face p_face of p_model overlaps the box from (p_minX, p_minZ) to
 // (p_maxX, p_maxZ), seen from above; if it does, stores the face's height range.
-MechS32 FaceOverlapsBox(
+int32_t FaceOverlapsBox(
 	Face* p_face,
 	Model* p_model,
-	MechS32 p_minX,
-	MechS32 p_maxX,
-	MechS32 p_minZ,
-	MechS32 p_maxZ,
-	MechS32* p_minY,
-	MechS32* p_maxY
+	int32_t p_minX,
+	int32_t p_maxX,
+	int32_t p_minZ,
+	int32_t p_maxZ,
+	int32_t* p_minY,
+	int32_t* p_maxY
 )
 {
-	MechS32 count;
-	MechS32 maxY;
-	MechS32 maxZ;
-	MechS32 minX;
+	int32_t count;
+	int32_t maxY;
+	int32_t maxZ;
+	int32_t minX;
 	Vertex* vertices;
 	Vertex* vertex;
-	MechS32 x;
-	MechS32 y;
-	MechS32 i;
-	MechS32 z;
-	MechS32 minY;
-	MechS32 minZ;
-	MechS32 maxX;
+	int32_t x;
+	int32_t y;
+	int32_t i;
+	int32_t z;
+	int32_t minY;
+	int32_t minZ;
+	int32_t maxX;
 
 	count = p_face->m_indexCount;
 	vertices = (Vertex*) (p_model + 1);
 	minX = minY = minZ = 0x7fffffff;
 	maxX = maxY = maxZ = -0x7fffffff;
 	for (i = 0; i < count; i++) {
-		vertex = &vertices[((MechU8*) p_face)[p_face->m_indexOffset + i]];
+		vertex = &vertices[((uint8_t*) p_face)[p_face->m_indexOffset + i]];
 		x = vertex->m_worldX;
 		y = vertex->m_worldY;
 		z = vertex->m_worldZ;
@@ -319,14 +319,14 @@ MechS32 FaceOverlapsBox(
 
 // Classifies the point (p_x, p_y, p_z) against the quadtree's faces: 0 outside the tree's
 // ground area, 2 above the faces under it, 3 below one of them.
-MechS32 ClassifyQuadtreePoint(QuadtreeNode* p_node, Model* p_model, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t ClassifyQuadtreePoint(QuadtreeNode* p_node, Model* p_model, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 result;
+	int32_t result;
 	Vertex* vertices;
 	Face** faces;
-	MechS32 i;
+	int32_t i;
 	Face* face;
-	MechS32 height;
+	int32_t height;
 
 	if (!p_node) {
 		return 0;
@@ -386,15 +386,15 @@ MechS32 ClassifyQuadtreePoint(QuadtreeNode* p_node, Model* p_model, MechS32 p_x,
 }
 
 // Returns whether p_ray hits one of the quadtree's faces, shortening it to the hit.
-MechS32 TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
+int32_t TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 {
-	MechS32 tMin;
+	int32_t tMin;
 	Vertex* vertices;
-	MechS32 t0;
+	int32_t t0;
 	Face** faces;
-	MechS32 i;
-	MechS32 t1;
-	MechS32 tMax;
+	int32_t i;
+	int32_t t1;
+	int32_t tMax;
 	Face* face;
 
 	if (!p_node) {
@@ -468,13 +468,13 @@ MechS32 TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 
 // Finds the nearest hit of p_ray among p_node's children and shortens p_ray to it. Whether any
 // child was hit.
-MechS32 TestQuadtreeChildrenRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
+int32_t TestQuadtreeChildrenRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray)
 {
-	MechS32 length;
-	MechS32 i;
+	int32_t length;
+	int32_t i;
 	Ray best;
 	Ray ray;
-	MechS32 nearest;
+	int32_t nearest;
 
 	nearest = 0x7fffffff;
 	CopyRay(&ray, p_ray);
@@ -500,11 +500,11 @@ MechS32 TestQuadtreeChildrenRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray
 
 // Finds the upward face of the quadtree under (p_x, p_z) and stores its height at the point in
 // p_top, or 0 if there is none. Returns FALSE outside the tree's ground area.
-MechS32 GetQuadtreeTop(QuadtreeNode* p_node, Model* p_model, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32* p_top)
+int32_t GetQuadtreeTop(QuadtreeNode* p_node, Model* p_model, int32_t p_x, int32_t p_y, int32_t p_z, int32_t* p_top)
 {
 	Vertex* vertices;
 	Face** faces;
-	MechS32 i;
+	int32_t i;
 	Face* face;
 
 	if (!p_node) {
@@ -556,10 +556,10 @@ void DisableQuadtrees(void)
 }
 
 // Returns the bytes a quadtree takes.
-MechS32 GetQuadtreeSize(QuadtreeNode* p_node)
+int32_t GetQuadtreeSize(QuadtreeNode* p_node)
 {
-	MechS32 i;
-	MechS32 size;
+	int32_t i;
+	int32_t size;
 
 	if (!p_node) {
 		return 0;

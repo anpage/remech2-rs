@@ -31,37 +31,37 @@
 
 #include <stdio.h>
 
-MechChar g_dorcsPageTitle[] = "MW2 Programmer Dorcs Page";
+char g_dorcsPageTitle[] = "MW2 Programmer Dorcs Page";
 
-MechChar g_dorcsAboutItem[] = "About Dorcs";
+char g_dorcsAboutItem[] = "About Dorcs";
 
-MechChar g_dorcsClarkeName[] = "John A. Clarke";
+char g_dorcsClarkeName[] = "John A. Clarke";
 
-MechChar g_dorcsDouglasName[] = "Michael H. Douglas";
+char g_dorcsDouglasName[] = "Michael H. Douglas";
 
-MechChar g_dorcsEthertonName[] = "Scott T. Etherton";
+char g_dorcsEthertonName[] = "Scott T. Etherton";
 
-MechChar g_dorcsHusebyName[] = "Sverre H. Huseby";
+char g_dorcsHusebyName[] = "Sverre H. Huseby";
 
-MechChar g_dorcsKaminsName[] = "Dan Kamins";
+char g_dorcsKaminsName[] = "Dan Kamins";
 
-MechChar g_dorcsKeatingName[] = "John Keating";
+char g_dorcsKeatingName[] = "John Keating";
 
-MechChar g_dorcsMilesName[] = "John Miles";
+char g_dorcsMilesName[] = "John Miles";
 
-MechChar g_dorcsMortenName[] = "Tim Morten";
+char g_dorcsMortenName[] = "Tim Morten";
 
-MechChar g_dorcsMortensenName[] = "Bob Mortensen";
+char g_dorcsMortensenName[] = "Bob Mortensen";
 
-MechChar g_dorcsPetersonName[] = "Eric Peterson";
+char g_dorcsPetersonName[] = "Eric Peterson";
 
-MechChar g_dorcsStanfillName[] = "Dan Stanfill";
+char g_dorcsStanfillName[] = "Dan Stanfill";
 
-MechChar g_dorcsWhiteName[] = "David White";
+char g_dorcsWhiteName[] = "David White";
 
-MechChar g_dorcsZobelName[] = "Dave Zobel";
+char g_dorcsZobelName[] = "Dave Zobel";
 
-MechChar g_dorcsAboutText[] =
+char g_dorcsAboutText[] =
 	"Hi MW2 Fans,\n"
 	"\n"
 	"Welcome to the MW2 Sim Programmer Dorcs Web page.  We hope you'll spend a few minutes here to learn a bit about "
@@ -74,7 +74,7 @@ MechChar g_dorcsAboutText[] =
 	"\n"
 	"MW2 Programmers";
 
-MechChar g_dorcsClarkeText[] =
+char g_dorcsClarkeText[] =
 	"Hi MW2 fans,\n"
 	"\n"
 	"I can't believe it finally over.  My tour of duty has been 18 months long.  I am looking forward to spending lots "
@@ -87,7 +87,7 @@ MechChar g_dorcsClarkeText[] =
 	"\n"
 	"ATTENTION ALL PROGRAMMERS! ALL CLEAR FOR DORCS CO! GET GIDDI TOO!";
 
-MechChar g_dorcsDouglasText[] =
+char g_dorcsDouglasText[] =
 	"    If I had known six months ago how crazy working on MWII was going to be, I'm not sure I would have done it. "
 	"But, after countless late nights and thousands of ornery bugs, we've finally got a killer game.\n"
 	"    I'd like to thank John Spinale and Josh Resnick for bringing me on. They've put together the best development "
@@ -100,14 +100,14 @@ MechChar g_dorcsDouglasText[] =
 	"\n"
 	"P.S. - No, I'm not THAT Michael Douglas.";
 
-MechChar g_dorcsEthertonText[] = "I just love to code.  That's all there is to it.";
+char g_dorcsEthertonText[] = "I just love to code.  That's all there is to it.";
 
-MechChar g_dorcsHusebyText[] =
+char g_dorcsHusebyText[] =
 	"We don't know much about this guy except that he lives in Norway and probably has a thick Norwegian accent.  He "
 	"wrote some handy freeware called GifSave and was kind enough to post it on the net.  You can thank him personally "
 	"at sverrehu@ifi.uio.no for the cool high res screen shots.\n";
 
-MechChar g_dorcsKaminsText[] =
+char g_dorcsKaminsText[] =
 	"  Thanks to all!\n"
 	"  I'd take better advantage of my DORCSOpportunity (TM) here, except for the fact that I have 34 bugs to fix.\n"
 	"  By the way, I wrote the NetDemo network shell.\n"
@@ -115,21 +115,21 @@ MechChar g_dorcsKaminsText[] =
 	"--\n"
 	"dkamins@husc.harvard.edu\n";
 
-MechChar g_dorcsKeatingText[] =
+char g_dorcsKeatingText[] =
 	"John drew on his experience defending his turf and scrapping in the gutters as a kid in San Antonio's roughest "
 	"neighborhood, \"Alamo Heights\", to create the battle AI for MechWarrior.  A Mac guy living in a hostile PC "
 	"world, he is naturally short tempered and combative.  For the part of drill instructor John was influenced "
 	"heavily by his big sister, Paula, as well as huge doses of MSG.  He welcomes your criticisms, offers of sympathy, "
 	"or any reply from those lacking a \"Y\" chromosome at Marshall1@aol.com.";
 
-MechChar g_dorcsMilesText[] =
+char g_dorcsMilesText[] =
 	"This guy wrote all the graphics and sound packages (along with John Lemberger) We could dorcs co his API with "
 	"confidence because we knew we were getting high quality, efficient and reliable code.  Once we converted to the "
 	"world of PANES, high res was easy.  The DLL loader just made us giddi.  We even used it for these menus.\n"
 	"\n"
 	"Thanks to to John for all the support.";
 
-MechChar g_dorcsMortenText[] =
+char g_dorcsMortenText[] =
 	"Tim's Liner Notes\n"
 	"\n"
 	"Is it done?  Can I leave my cube?  Where is everybody?\n"
@@ -141,7 +141,7 @@ MechChar g_dorcsMortenText[] =
 	"\n"
 	"Tim Morten";
 
-MechChar g_dorcsMortensenText[] =
+char g_dorcsMortensenText[] =
 	"I'm so HONORED!  Only three months on the project and I'm an official DORCS.\n"
 	"\n"
 	"Of course I'll have to thank my wife and kids, that is if I can ever remember their names....  Hmmmm, oh yeah.... "
@@ -151,14 +151,14 @@ MechChar g_dorcsMortensenText[] =
 	"Later,\n"
 	"BobM";
 
-MechChar g_dorcsPetersonText[] =
+char g_dorcsPetersonText[] =
 	"Eric no longer works here but he is really the grand-pappy of the Sim engine.  The original concept was his and "
 	"he single-handedly wrote the first real mode version (including all tools and much of the art).  Without Eric's "
 	"dedication to Warthink, we would'nt have a snowball's chance in heck of completing this game.\n"
 	"\n"
 	"By the way, if anyone sees Eric, would they mind asking him what \"booyow\" means?";
 
-MechChar g_dorcsStanfillText[] =
+char g_dorcsStanfillText[] =
 	"We made it!\n"
 	"\n"
 	"I want to thank John Spinale, Josh Resnick, and Howard Marks for putting together such a stellar team for this "
@@ -167,11 +167,11 @@ MechChar g_dorcsStanfillText[] =
 	"But more than anything I want to thank my wife Kyung Ah and son D.J. for supporting me during the past seven "
 	"months and for tolerating my constant absence while we built the coolest game ever!";
 
-MechChar g_dorcsWhiteText[] = "I just love to code.  That's all there is to it.";
+char g_dorcsWhiteText[] = "I just love to code.  That's all there is to it.";
 
-MechChar g_dorcsZobelText[] = "Dave Zobel was last seen plunging into the darkness beyond the Wall of Testosterone.";
+char g_dorcsZobelText[] = "Dave Zobel was last seen plunging into the darkness beyond the Wall of Testosterone.";
 
-MechChar g_dorcsExitItem[] = "This is boring!";
+char g_dorcsExitItem[] = "This is boring!";
 
 PANE g_dorcsTextRect = {NULL, 0, 0x2666, 0x10000, 0x10000};
 
@@ -424,7 +424,7 @@ MenuDefinition g_dorcsMenu = {
 	&g_dorcsPage
 };
 
-MechS32 g_fledToWindows = 0;
+int32_t g_fledToWindows = 0;
 
 // The frame draw callback ShowDorcs replaces.
 void (*g_dorcsPreviousDrawCallback)(void) = DrawScene;
@@ -452,20 +452,20 @@ void* g_dorcsGif = NULL;
 
 PaletteColor* g_dorcsPalette = NULL;
 
-MechU8* g_dorcsGifState = NULL;
+uint8_t* g_dorcsGifState = NULL;
 
-MechS32 g_dorcsGifLoaded = 0;
+int32_t g_dorcsGifLoaded = 0;
 
-MechS32 g_dorcsTime = 0;
+int32_t g_dorcsTime = 0;
 
-MechS32 g_dorcsReverse = 1;
+int32_t g_dorcsReverse = 1;
 
 // A menu item's action: ejects the local player (game key 0x3b) without its sound.
-void AbortMissionAction(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_index, Point p_pos, MenuPage* p_page)
+void AbortMissionAction(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_index, Point p_pos, MenuPage* p_page)
 {
-	MechS32 saved;
-	MechS32 digit;
-	MechS32 selected;
+	int32_t saved;
+	int32_t digit;
+	int32_t selected;
 
 	if (!p_page) {
 		return;
@@ -484,10 +484,10 @@ void AbortMissionAction(MenuDefinition* p_menu, MenuControl* p_control, MechS32 
 }
 
 // A menu item's action: ejects the local player's mech.
-void FleeToWindowsAction(MenuDefinition* p_menu, MenuControl* p_control, MechS32 p_index, Point p_pos, MenuPage* p_page)
+void FleeToWindowsAction(MenuDefinition* p_menu, MenuControl* p_control, int32_t p_index, Point p_pos, MenuPage* p_page)
 {
-	MechS32 digit;
-	MechS32 selected;
+	int32_t digit;
+	int32_t selected;
 	Player* player;
 
 	if (!p_page) {
@@ -506,10 +506,10 @@ void FleeToWindowsAction(MenuDefinition* p_menu, MenuControl* p_control, MechS32
 }
 
 // Reads vfx/<p_name>.bin whole.
-void* ReadVfxBin(MechChar* p_name)
+void* ReadVfxBin(char* p_name)
 {
 	void* data;
-	MechChar path[256];
+	char path[256];
 
 	sprintf(path, "%s/%s.%s", "vfx", p_name, "bin");
 	data = MechReadFile(g_primaryHeap, path);
@@ -527,7 +527,7 @@ void CloseInGameMenus(void)
 }
 
 // The dorcs sequence's state.
-MechS32 g_dorcsState;
+int32_t g_dorcsState;
 
 PANE g_dorcsSavedTarget;
 
@@ -539,10 +539,10 @@ PaletteColor g_dorcsBlack;
 void UpdateDorcs(void)
 {
 	PANE* rect;
-	MechS32 index;
+	int32_t index;
 	PANE saved;
 	PANE* target;
-	MechS32 i;
+	int32_t i;
 
 	switch (g_dorcsState) {
 	case 0:
@@ -653,7 +653,7 @@ void UpdateDorcs(void)
 					VFX_GIF_draw(&g_dorcsGifTarget, g_dorcsGif, g_dorcsGifState);
 					g_currentRefreshMode->m_flip();
 
-					VFX_GIF_palette(g_dorcsGif, (MechU8*) g_dorcsPalette);
+					VFX_GIF_palette(g_dorcsGif, (uint8_t*) g_dorcsPalette);
 					g_currentDisplayBackend->m_blendPalettes(g_dorcsPalette, 0xb5);
 					g_dorcsGifLoaded = 1;
 				}
@@ -688,7 +688,7 @@ void UpdateDorcs(void)
 				VFX_GIF_draw(&g_dorcsGifTarget, g_dorcsGif, g_dorcsGifState);
 				g_currentRefreshMode->m_flip();
 
-				VFX_GIF_palette(g_dorcsGif, (MechU8*) g_dorcsPalette);
+				VFX_GIF_palette(g_dorcsGif, (uint8_t*) g_dorcsPalette);
 				g_currentDisplayBackend->m_blendPalettes(g_dorcsPalette, 0xb5);
 			}
 			else {

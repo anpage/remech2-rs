@@ -14,16 +14,16 @@ extern "C"
 {
 #endif
 
-	void PlayWeaponLaunchSound(undefined4 p_shotType, MechS32 p_sound, undefined4 p_pan);
-	void RenderViewToPane(MechU32 p_target, MechS32 p_fovX, MechS32* p_view, struct SceneObject* p_object);
+	void PlayWeaponLaunchSound(undefined4 p_shotType, int32_t p_sound, undefined4 p_pan);
+	void RenderViewToPane(uint32_t p_target, int32_t p_fovX, int32_t* p_view, struct SceneObject* p_object);
 	void FlashZappedPalette(void);
-	void FlashZappedPaletteLevel(MechU32 p_level);
-	void FadeToEndPalette(MechS32 p_alternate);
+	void FlashZappedPaletteLevel(uint32_t p_level);
+	void FadeToEndPalette(int32_t p_alternate);
 	void EmitWreckSmoke(struct Mech* p_mech);
 	void BreakUpMech(struct Mech* p_mech);
 	void FireJumpJetEffects(struct Mech* p_mech);
-	void PlayMechLanding(struct Mech* p_mech, MechS32 p_speed);
-	void PlayPlayerHitFeedback(MechS32 p_x, MechS32 p_y, MechS32 p_z);
+	void PlayMechLanding(struct Mech* p_mech, int32_t p_speed);
+	void PlayPlayerHitFeedback(int32_t p_x, int32_t p_y, int32_t p_z);
 
 #ifdef __cplusplus
 }

@@ -34,46 +34,46 @@ public:
 
 	// A link to another entry.
 	struct Topic {
-		MechS32 m_id;    // 0x00
-		MechS16 m_entry; // 0x04
+		int32_t m_id;    // 0x00
+		int16_t m_entry; // 0x04
 	};
 
 	ArchiveReader(
-		MechChar* p_name,
+		char* p_name,
 		Font* p_font,
-		MechS32 p_entry,
-		MechU8 p_ownsDatabase,
+		int32_t p_entry,
+		uint8_t p_ownsDatabase,
 		TMPackDataBase* p_database,
 		Collection* p_pages,
 		MainMenuButton* p_buttons,
-		MechS32 p_count
+		int32_t p_count
 	);
 	~ArchiveReader();
 
-	void AddTopic(MechS16 p_entry, MechS32 p_index);
+	void AddTopic(int16_t p_entry, int32_t p_index);
 	void ClearGlyphs();
 	void FirstPage();
 	void PrevPage();
 	void NextPage();
-	void OpenTopic(MechS32 p_id);
-	MechS32 Run();
-	void Load(MechS32 p_entry);
+	void OpenTopic(int32_t p_id);
+	int32_t Run();
+	void Load(int32_t p_entry);
 
 private:
-	ButtonMenu* m_menu;               // 0x00
-	TMPackDataBase* m_database;       // 0x04
-	Font* m_font;                     // 0x0c
-	ArchiveReader* m_child;           // 0x10
-	TextGlyph* m_titleGlyph;          // 0x1c
-	Collection* m_topics;             // 0x20
-	undefined m_colors[0x100];        // 0x24
-	MechU8 m_ownsDatabase;            // 0x124
-	MainMenuButton* m_buttons;        // 0x125
-	MechS32 m_count;                  // 0x129
-	Collection* m_pages;              // 0x12d
-	MechS32 m_page;                   // 0x131
-	Page* m_currentPage;              // 0x135
-	MechChar m_title[0x80];           // 0x139
+	ButtonMenu* m_menu;         // 0x00
+	TMPackDataBase* m_database; // 0x04
+	Font* m_font;               // 0x0c
+	ArchiveReader* m_child;     // 0x10
+	TextGlyph* m_titleGlyph;    // 0x1c
+	Collection* m_topics;       // 0x20
+	undefined m_colors[0x100];  // 0x24
+	uint8_t m_ownsDatabase;     // 0x124
+	MainMenuButton* m_buttons;  // 0x125
+	int32_t m_count;            // 0x129
+	Collection* m_pages;        // 0x12d
+	int32_t m_page;             // 0x131
+	Page* m_currentPage;        // 0x135
+	char m_title[0x80];         // 0x139
 };
 
 #pragma pack()
@@ -82,12 +82,12 @@ private:
 extern ArchiveReader* g_archiveReader;
 extern size_t g_archiveReturnMessage;
 extern AudioSample* g_archiveSound;
-extern MechChar g_archiveText[0x10000];
-extern MechChar g_archiveTitle[0x200];
-extern MechChar g_archiveTopicName[0x200];
+extern char g_archiveText[0x10000];
+extern char g_archiveTitle[0x200];
+extern char g_archiveTopicName[0x200];
 extern MainMenuButton g_prevPageLinkButton;
 extern MainMenuButton g_nextPageLinkButton;
-extern MechChar g_archiveLine[0x400];
-void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam);
+extern char g_archiveLine[0x400];
+void DrawArchive(TMPackDataBase* p_database, int32_t p_campaign, size_t p_wParam);
 
 #endif // ARCHIVEREADER_H

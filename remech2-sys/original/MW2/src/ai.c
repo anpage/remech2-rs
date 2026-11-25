@@ -37,15 +37,15 @@
 // the star's current mission objective (LeadStar). tools/dump_ait.py prints the scripts from
 // MW2.PRJ.
 
-MechS32 g_debugStar = -1;
+int32_t g_debugStar = -1;
 
-MechS32 g_debugObjective = 0;
+int32_t g_debugObjective = 0;
 
-MechS32 g_debugLastLine = -1;
+int32_t g_debugLastLine = -1;
 
-MechS32 g_debugFirstLine = -1;
+int32_t g_debugFirstLine = -1;
 
-MechS32 g_debugListedStar = -1;
+int32_t g_debugListedStar = -1;
 
 AiName g_aiMessageNames[8] = {
 	{"NO_MESSAGE", c_aiMessageNone},
@@ -187,7 +187,7 @@ AiName g_aiBehaviorNames[14] = {
 	{"circle", 12},
 };
 
-MechS16 g_invalidTargetLogCount = 0;
+int16_t g_invalidTargetLogCount = 0;
 
 AiScriptTable g_mechScripts = {
 	{1, 1},
@@ -284,7 +284,7 @@ AiScriptTable g_tankScripts = {
 	{0, 0},
 };
 
-MechS16 g_helicopterScripts[15][2] = {
+int16_t g_helicopterScripts[15][2] = {
 	{1, 1},
 	{7, 3},
 	{7, 3},
@@ -302,11 +302,11 @@ MechS16 g_helicopterScripts[15][2] = {
 	{8, 4},
 };
 
-MechS32 g_lairdoCheat = 0;
+int32_t g_lairdoCheat = 0;
 
-MechS32 g_aiSpreadTargets = 1;
+int32_t g_aiSpreadTargets = 1;
 
-MechS32 g_localStarAssigned = 0;
+int32_t g_localStarAssigned = 0;
 
 AiStateFn g_aiStateFns[14] = {
 	AiStateIdle,
@@ -346,11 +346,11 @@ AiTransitionFn g_aiTransitionFns[5] = {
 
 void* g_aiScripts[10];
 
-MechS16 g_hiddenTargetCount;
+int16_t g_hiddenTargetCount;
 
 AiRule* g_aiRules[60][6];
 
-MechS32 g_aiStateTime;
+int32_t g_aiStateTime;
 
 // Runs p_player's AI for a tick: the star leader leads its star (LeadStar); an AI player runs
 // its rules and, unless one changed its state, its state's function; a player the AI doesn't
@@ -395,14 +395,14 @@ void UpdateAI(Player* p_player)
 // Matches p_player's rules against the posted message and their own messages; the first that
 // fires makes its transition and, unless that says otherwise, enters its new state. Whether one
 // did.
-MechS32 RunAIRules(Player* p_player)
+int32_t RunAIRules(Player* p_player)
 {
 	AiRule* rule;
-	MechS16 target;
-	MechS16 arg;
-	MechS16 i;
-	MechS32 posted;
-	MechS32 valid;
+	int16_t target;
+	int16_t arg;
+	int16_t i;
+	int32_t posted;
+	int32_t valid;
 
 	i = 0;
 	posted = FALSE;
@@ -439,15 +439,15 @@ MechS32 RunAIRules(Player* p_player)
 // script's first; a rule for the same message and target as one collected is skipped.
 void CollectAIRules(Player* p_player)
 {
-	MechU16 count;
-	MechU32 found;
-	MechS16 j;
-	MechS16 pos;
-	MechS16 i;
-	MechS16 skip;
-	MechU16* script;
+	uint16_t count;
+	uint32_t found;
+	int16_t j;
+	int16_t pos;
+	int16_t i;
+	int16_t skip;
+	uint16_t* script;
 	AiRule* rule;
-	MechS16 ruleCount;
+	int16_t ruleCount;
 
 	p_player->m_rules[0] = NULL;
 
@@ -479,7 +479,7 @@ void CollectAIRules(Player* p_player)
 
 		pos = *script * 4 + 2;
 		pos = pos + skip * 12;
-		rule = (AiRule*) ((MechU8*) script + pos);
+		rule = (AiRule*) ((uint8_t*) script + pos);
 
 		for (pos = 0; pos < ruleCount; pos++, rule++) {
 			if (!rule->m_message) {
@@ -507,7 +507,7 @@ void CollectAIRules(Player* p_player)
 
 void FirstAI(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < g_objectiveCount; i++) {
 		AssignTeamSlots(i, 0);
@@ -572,7 +572,7 @@ void InitializeAI(Player* p_player)
 // Clears p_player's AI state, target, goal, scripts, stack and posted message.
 void ResetAI(Player* p_player)
 {
-	MechS32 i;
+	int32_t i;
 
 	LeaveAIState(p_player);
 	p_player->m_ai.m_target = 0;
@@ -602,10 +602,10 @@ void ResetAI(Player* p_player)
 // it is busy with that player already, calling off the teammate on it (FindNearestTarget).
 void TargetAttacker(Player* p_player)
 {
-	MechS16 target;
-	MechS16 nearest;
+	int16_t target;
+	int16_t nearest;
 	Player* other;
-	MechS16 best;
+	int16_t best;
 
 	if (p_player->m_ai.m_flags & 1) {
 		return;
@@ -632,9 +632,9 @@ void TargetAttacker(Player* p_player)
 }
 
 // Returns the name of p_value in p_names, or NULL.
-const MechChar* FindAIName(MechS16 p_value, AiName* p_names, MechS16 p_count)
+const char* FindAIName(int16_t p_value, AiName* p_names, int16_t p_count)
 {
-	MechS16 i;
+	int16_t i;
 
 	for (i = 0; i < p_count; i++) {
 		if (p_names[i].m_value == p_value) {
@@ -647,18 +647,18 @@ const MechChar* FindAIName(MechS16 p_value, AiName* p_names, MechS16 p_count)
 
 void LogPlayerStatusLines(void)
 {
-	const MechChar* behavior;
-	const MechChar* sensor;
-	MechChar invalidLine[80];
+	const char* behavior;
+	const char* sensor;
+	char invalidLine[80];
 	PlayerSteering* steering;
-	MechS8 input;
-	MechS32 secondsLeft;
-	MechS32 i;
+	int8_t input;
+	int32_t secondsLeft;
+	int32_t i;
 	MissionObjective* objective;
-	MechChar line[100];
+	char line[100];
 	Player* player;
 	Player saved;
-	MechS16 target;
+	int16_t target;
 
 	for (i = 0; i < g_playerCount; i++) {
 		input = ' ';
@@ -766,24 +766,24 @@ void LogPlayerStatusLines(void)
 }
 
 // Returns the distance between the points p_a and p_b.
-MechU32 GetPointDistance(MechS32* p_a, MechS32* p_b)
+uint32_t GetPointDistance(int32_t* p_a, int32_t* p_b)
 {
-	MechS32 unused;
-	MechU32 distance;
+	int32_t unused;
+	uint32_t distance;
 
 	GetBearingAndRange(p_a[0] - p_b[0], p_a[1] - p_b[1], p_a[2] - p_b[2], &unused, &unused, &distance, &unused);
 	return distance;
 }
 
 // Makes the first able member of star p_team other than its leader the leader. Returns it, or -1.
-MechS32 ChooseTeamLeader(MechS32 p_team)
+int32_t ChooseTeamLeader(int32_t p_team)
 {
 	Player* member;
-	MechS32 newLeader;
-	MechS32 count;
+	int32_t newLeader;
+	int32_t count;
 	Player* members[8];
-	MechS32 i;
-	MechS32 leader;
+	int32_t i;
+	int32_t leader;
 
 	leader = GetTeamLeader(p_team);
 	newLeader = -1;
@@ -810,9 +810,9 @@ MechS32 ChooseTeamLeader(MechS32 p_team)
 
 // Points the goal of every member of star p_team that has player p_index as its goal at
 // player p_target instead.
-void RetargetGoals(MechS32 p_team, MechS32 p_index, MechS32 p_target)
+void RetargetGoals(int32_t p_team, int32_t p_index, int32_t p_target)
 {
-	MechS32 i;
+	int32_t i;
 	Player* player;
 
 	for (i = 0; i < g_playerCount; i++) {
@@ -825,10 +825,10 @@ void RetargetGoals(MechS32 p_team, MechS32 p_index, MechS32 p_target)
 }
 
 // Resolves the symbolic target p_target for p_player (FindNearestTarget).
-MechS16 ResolveTarget(Player* p_player, MechS16 p_target)
+int16_t ResolveTarget(Player* p_player, int16_t p_target)
 {
-	MechS16 nearest;
-	MechS16 best;
+	int16_t nearest;
+	int16_t best;
 
 	if (!(p_target & 0xf000)) {
 		return p_target;
@@ -853,22 +853,22 @@ MechS16 ResolveTarget(Player* p_player, MechS16 p_target)
 // The rule message functions (g_aiMessageFns): each returns the target the message matches
 // for p_player, or 0. M_TRUE always matches. The original declared some of them with fewer
 // parameters (or an unsigned target) and cast them into the table.
-MechS16 AiMessageTrue(Player* p_player, MechS16 p_target, MechS16 p_arg)
+int16_t AiMessageTrue(Player* p_player, int16_t p_target, int16_t p_arg)
 {
 	return p_target;
 }
 
 // M_FALSE never matches.
-MechS16 AiMessageFalse(Player* p_player, MechS16 p_target, MechS16 p_arg)
+int16_t AiMessageFalse(Player* p_player, int16_t p_target, int16_t p_arg)
 {
 	return 0;
 }
 
 // M_REACH: whether p_player is within its range of p_target (p_arg hundreds, or the target's
 // range); reaching its anchor nav releases it, and a patrol moves on to the next nav.
-MechS16 AiMessageReach(Player* p_player, MechS16 p_target, MechS16 p_arg)
+int16_t AiMessageReach(Player* p_player, int16_t p_target, int16_t p_arg)
 {
-	MechS16 result;
+	int16_t result;
 
 	if (p_arg == 0) {
 		result = AiMessageProx(p_player, p_target, GetTargetRange(p_target) / 100);
@@ -897,13 +897,13 @@ MechS16 AiMessageReach(Player* p_player, MechS16 p_target, MechS16 p_arg)
 }
 
 // M_PROX: the nearest of p_target's targets closer than p_arg hundreds.
-MechS16 AiMessageProx(Player* p_player, MechS16 p_target, MechS16 p_arg)
+int16_t AiMessageProx(Player* p_player, int16_t p_target, int16_t p_arg)
 {
-	MechS16 nearestTarget;
-	MechS16 result;
-	MechS32 limit;
-	MechS32 nearest;
-	MechS16 target;
+	int16_t nearestTarget;
+	int16_t result;
+	int32_t limit;
+	int32_t nearest;
+	int16_t target;
 
 	result = 0;
 	nearestTarget = -1;
@@ -933,8 +933,8 @@ MechS16 AiMessageProx(Player* p_player, MechS16 p_target, MechS16 p_arg)
 
 void LogPlayerSkillLines(void)
 {
-	MechS32 i;
-	MechChar line[100];
+	int32_t i;
+	char line[100];
 	Player* player;
 
 	for (i = 0; i < g_playerCount; i++) {
@@ -954,13 +954,13 @@ void LogPlayerSkillLines(void)
 
 // M_DIST: the farthest of p_target's targets farther than p_arg hundreds (-4: p_player's leash
 // range, -2: its alert range).
-MechS16 AiMessageDist(Player* p_player, MechS16 p_target, MechS16 p_arg)
+int16_t AiMessageDist(Player* p_player, int16_t p_target, int16_t p_arg)
 {
-	MechS16 farthestTarget;
-	MechS16 result;
-	MechS32 limit;
-	MechS32 farthest;
-	MechS16 target;
+	int16_t farthestTarget;
+	int16_t result;
+	int32_t limit;
+	int32_t farthest;
+	int16_t target;
 
 	result = 0;
 	farthestTarget = -1;
@@ -997,18 +997,18 @@ MechS16 AiMessageDist(Player* p_player, MechS16 p_target, MechS16 p_arg)
 	return result;
 }
 
-void LogStarMissionLines(MechS32 p_team)
+void LogStarMissionLines(int32_t p_team)
 {
-	const MechChar* activity;
+	const char* activity;
 	StarMission* mission;
-	MechChar prefix[256];
-	MechS32 i;
-	const MechChar* typeName;
-	MechS32 secondsLeft;
-	MechChar line[256];
-	const MechChar* marker;
+	char prefix[256];
+	int32_t i;
+	const char* typeName;
+	int32_t secondsLeft;
+	char line[256];
+	const char* marker;
 	MissionObjective* objective;
-	const MechChar* priority;
+	const char* priority;
 
 	mission = &g_objectiveTable[p_team];
 	switch (mission->m_status) {
@@ -1141,10 +1141,10 @@ void LogStarMissionLines(MechS32 p_team)
 // Whether p_player can detect player p_target: a powered-down target (flag 0x10) within
 // p_distance it has no line of sight to is hidden, checked with p_check at most every 0x21f ticks
 // (m_nextDetectCheck). Nothing calls it.
-MechS32 IsTargetDetectable(Player* p_player, MechS16 p_target, MechS16 p_distance, MechS32 p_check)
+int32_t IsTargetDetectable(Player* p_player, int16_t p_target, int16_t p_distance, int32_t p_check)
 {
-	MechS32 dead;
-	MechS32 result;
+	int32_t dead;
+	int32_t result;
 
 	dead = g_players[p_target & 0xff]->m_flags & 0x10;
 	result = TRUE;
@@ -1166,19 +1166,19 @@ MechS32 IsTargetDetectable(Player* p_player, MechS16 p_target, MechS16 p_distanc
 
 // Finds the nearest of p_target's targets for p_player (*p_best) and the nearest that no
 // teammate already attacks (*p_nearest), both within p_arg. Returns the teammate that does.
-Player* FindNearestTarget(Player* p_player, MechS16 p_target, MechS16 p_arg, MechS16* p_nearest, MechS16* p_best)
+Player* FindNearestTarget(Player* p_player, int16_t p_target, int16_t p_arg, int16_t* p_nearest, int16_t* p_best)
 {
-	MechS32 closer;
-	MechS32 count;
+	int32_t closer;
+	int32_t count;
 	Player* members[8];
-	MechS32 objective;
-	MechS32 nearest;
+	int32_t objective;
+	int32_t nearest;
 	Player* blocker;
-	MechS16 i;
+	int16_t i;
 	Player* member;
-	MechU16 type;
+	uint16_t type;
 	StarMission* mission;
-	MechS16 target;
+	int16_t target;
 
 	blocker = NULL;
 	nearest = 100000000;
@@ -1276,10 +1276,10 @@ void LogAIStatus(void)
 
 // M_TGTABLE: the nearest of p_target's targets within p_arg hundreds (-2: p_player's alert range,
 // -1: its resting one).
-MechS16 AiMessageTargetable(Player* p_player, MechS16 p_target, MechS16 p_arg)
+int16_t AiMessageTargetable(Player* p_player, int16_t p_target, int16_t p_arg)
 {
-	MechS16 nearest;
-	MechS16 best;
+	int16_t nearest;
+	int16_t best;
 
 	if (p_player->m_ai.m_flags & 3) {
 		return 0;
@@ -1305,7 +1305,7 @@ MechS16 AiMessageTargetable(Player* p_player, MechS16 p_target, MechS16 p_arg)
 }
 
 // M_DESTROY: p_target when it is destroyed, reporting it when the local player leads the star.
-MechS16 AiMessageDestroy(Player* p_player, MechS16 p_target, MechS16 p_arg)
+int16_t AiMessageDestroy(Player* p_player, int16_t p_target, int16_t p_arg)
 {
 	if (!IsTargetDone(p_target, 2)) {
 		p_target = 0;
@@ -1319,16 +1319,16 @@ MechS16 AiMessageDestroy(Player* p_player, MechS16 p_target, MechS16 p_arg)
 
 // The state functions (g_aiStateFns), run each tick with the player's target, which idling
 // ignores. The original declared it without one and cast it into the table.
-void AiStateIdle(Player* p_player, MechU16 p_target)
+void AiStateIdle(Player* p_player, uint16_t p_target)
 {
 	p_player->m_targetInfo.m_distance = 0;
 }
 
 // Drives p_player towards p_target, or away from it when fleeing.
-void AiStateMove(Player* p_player, MechU16 p_target)
+void AiStateMove(Player* p_player, uint16_t p_target)
 {
-	MechS32 heading;
-	MechS32 range;
+	int32_t heading;
+	int32_t range;
 
 	SetTarget(p_player, p_target);
 	BrakeFall(p_player);
@@ -1387,25 +1387,25 @@ void AiStateMove(Player* p_player, MechU16 p_target)
 }
 
 // Runs p_player's maneuvers against p_target (RunManeuver).
-void AiStateAttack(Player* p_player, MechU16 p_target)
+void AiStateAttack(Player* p_player, uint16_t p_target)
 {
 	p_player->m_steering->m_weaponFire = 0;
 	RunManeuver(p_player, p_target);
 }
 
 // The rule transitions (g_aiTransitionFns): whether the rule's new state is to be entered.
-MechS32 AiTransitionNull(Player* p_player, AiRule* p_rule)
+int32_t AiTransitionNull(Player* p_player, AiRule* p_rule)
 {
 	return TRUE;
 }
 
-MechS32 AiTransitionClearStack(Player* p_player, AiRule* p_rule)
+int32_t AiTransitionClearStack(Player* p_player, AiRule* p_rule)
 {
 	p_player->m_stackCount = 0;
 	return TRUE;
 }
 
-MechS32 AiTransitionPush(Player* p_player, AiRule* p_rule)
+int32_t AiTransitionPush(Player* p_player, AiRule* p_rule)
 {
 	AiStackEntry entry;
 
@@ -1422,7 +1422,7 @@ MechS32 AiTransitionPush(Player* p_player, AiRule* p_rule)
 	return TRUE;
 }
 
-MechS32 AiTransitionPop(Player* p_player, AiRule* p_rule)
+int32_t AiTransitionPop(Player* p_player, AiRule* p_rule)
 {
 	AiStackEntry entry;
 
@@ -1436,11 +1436,11 @@ MechS32 AiTransitionPop(Player* p_player, AiRule* p_rule)
 	return FALSE;
 }
 
-MechU16 FindAttacker(Player* p_player)
+uint16_t FindAttacker(Player* p_player)
 {
 	Player** players;
-	MechS16 i;
-	MechS16 index;
+	int16_t i;
+	int16_t index;
 
 	index = p_player->m_index;
 	for (i = 0, players = g_players; i < g_playerCount; i++, players++) {
@@ -1454,9 +1454,9 @@ MechU16 FindAttacker(Player* p_player)
 }
 
 // Resolves a rule's target field: '@' the goal, '%' the target found, '*' the current target.
-MechS16 ResolveRuleTarget(MechU16 p_value, MechS16 p_goal, MechS16 p_found, MechS16 p_target)
+int16_t ResolveRuleTarget(uint16_t p_value, int16_t p_goal, int16_t p_found, int16_t p_target)
 {
-	MechS16 result;
+	int16_t result;
 
 	result = p_value;
 	if (p_value == '@') {
@@ -1474,16 +1474,16 @@ MechS16 ResolveRuleTarget(MechU16 p_value, MechS16 p_goal, MechS16 p_found, Mech
 
 // Makes p_target p_player's target and works out the distance and bearing to it (UpdateTarget).
 // Whether the target is valid.
-MechS32 SetTarget(Player* p_player, MechS16 p_target)
+int32_t SetTarget(Player* p_player, int16_t p_target)
 {
 	p_player->m_targetInfo.m_target = p_target;
 	return UpdateTarget(p_player) > 0;
 }
 
 // The range within which p_target counts as reached.
-MechS32 GetTargetRange(MechS16 p_target)
+int32_t GetTargetRange(int16_t p_target)
 {
-	MechS32 range;
+	int32_t range;
 
 	switch (p_target & 0xf00) {
 	case c_aiTargetNav:
@@ -1508,9 +1508,9 @@ MechS32 GetTargetRange(MechS16 p_target)
 
 // The throttle for p_player to close to p_range of its target: full beyond twice the range,
 // stopped inside it, slower while turning hard or running hot.
-MechS32 GetApproachThrottle(Player* p_player, MechS32 p_range)
+int32_t GetApproachThrottle(Player* p_player, int32_t p_range)
 {
-	MechS32 throttle;
+	int32_t throttle;
 
 	throttle = p_player->m_steering->m_throttle;
 	if (p_range * 2 < p_player->m_targetInfo.m_distance) {
@@ -1524,7 +1524,7 @@ MechS32 GetApproachThrottle(Player* p_player, MechS32 p_range)
 	}
 
 	if (throttle && (abs(p_player->m_steering->m_turn) >> 16) > 45) {
-		throttle = (0x4000000 - (MechS32) (abs(p_player->m_steering->m_turn) / 1.5)) >> 16;
+		throttle = (0x4000000 - (int32_t) (abs(p_player->m_steering->m_turn) / 1.5)) >> 16;
 		if (throttle < 0x66) {
 			throttle = 0x66;
 		}
@@ -1542,29 +1542,29 @@ MechS32 GetApproachThrottle(Player* p_player, MechS32 p_range)
 }
 
 // The torso pan towards p_angle, off by p_delta (AddClamped).
-MechS32 AimTorsoPan(Player* p_player, MechS32 p_angle, MechS32 p_delta)
+int32_t AimTorsoPan(Player* p_player, int32_t p_angle, int32_t p_delta)
 {
-	MechS32 value;
+	int32_t value;
 
 	value = p_angle / 0x2d00;
 	return AddClamped(value, p_delta * 2, TRUE);
 }
 
 // The torso tilt towards the target, off by p_delta (AddClamped).
-MechS32 AimTorsoTilt(Player* p_player, MechS32 p_delta)
+int32_t AimTorsoTilt(Player* p_player, int32_t p_delta)
 {
-	MechS32 value;
+	int32_t value;
 
 	value = p_player->m_targetInfo.m_pitch / 0xf00;
 	return AddClamped(value, p_delta * 2, TRUE);
 }
 
 // Turns p_player towards its target. Returns the bearing to it.
-MechS32 SteerToTarget(Player* p_player)
+int32_t SteerToTarget(Player* p_player)
 {
-	MechS32 delta;
-	MechS32 scaled;
-	MechS32 degrees;
+	int32_t delta;
+	int32_t scaled;
+	int32_t degrees;
 
 	delta = GetTargetBearing(p_player);
 	degrees = (delta >> 16) % 360;
@@ -1588,7 +1588,7 @@ MechS32 SteerToTarget(Player* p_player)
 // order.
 void LeaveAIState(Player* p_player)
 {
-	MechS16 flags;
+	int16_t flags;
 
 	flags = 0;
 	p_player->m_steering->m_weaponFire = 0;
@@ -1628,9 +1628,9 @@ void LeaveAIState(Player* p_player)
 }
 
 // Enters AI state p_state for p_player, and logs it.
-void EnterAIState(Player* p_player, MechU16 p_state)
+void EnterAIState(Player* p_player, uint16_t p_state)
 {
-	MechU32 nav;
+	uint32_t nav;
 
 	if (p_player->m_flags & 0x10) {
 		p_player->m_flags &= ~0x10;
@@ -1690,14 +1690,14 @@ void EnterAIState(Player* p_player, MechU16 p_state)
 	p_player->m_ai.m_state = p_state;
 
 	{
-		const MechChar* targetType;
-		const MechChar* goalType;
-		MechChar mech[] = "mech";
+		const char* targetType;
+		const char* goalType;
+		char mech[] = "mech";
 		Mech* logged;
-		MechChar gt[] = "gt";
-		MechChar goalName[20];
-		MechChar line[80];
-		MechChar navName[] = "nav";
+		char gt[] = "gt";
+		char goalName[20];
+		char line[80];
+		char navName[] = "nav";
 
 		logged = p_player->m_mech;
 
@@ -1750,11 +1750,11 @@ void EnterAIState(Player* p_player, MechU16 p_state)
 
 // The target after p_previous (-1 for the first) of p_target for p_player: a plain target
 // once, or each player a symbolic target names. Returns -1 after the last.
-MechS16 NextTarget(Player* p_player, MechS16 p_target, MechS16 p_previous)
+int16_t NextTarget(Player* p_player, int16_t p_target, int16_t p_previous)
 {
-	MechS16 result;
-	MechS32 index;
-	MechS16 home;
+	int16_t result;
+	int32_t index;
+	int16_t home;
 
 	result = -1;
 	index = p_player->m_index;
@@ -1841,9 +1841,9 @@ MechS16 NextTarget(Player* p_player, MechS16 p_target, MechS16 p_previous)
 }
 
 // The bearing to p_player's target, 16.16 degrees either way.
-MechS32 GetTargetBearing(Player* p_player)
+int32_t GetTargetBearing(Player* p_player)
 {
-	MechS32 delta;
+	int32_t delta;
 
 	delta = p_player->m_targetInfo.m_heading - p_player->m_heading;
 	if (delta > 0xb40000) {
@@ -1858,13 +1858,13 @@ MechS32 GetTargetBearing(Player* p_player)
 
 // Whether p_target is done for an objective of type p_check: its flag 4 (destroyed) or 0x20
 // (inspected) is set.
-MechS32 IsTargetDone(MechU16 p_target, MechS32 p_check)
+int32_t IsTargetDone(uint16_t p_target, int32_t p_check)
 {
-	MechU32 index;
-	MechS16 mask;
-	MechS32 result;
-	MechU32 type;
-	MechS16* flags;
+	uint32_t index;
+	int16_t mask;
+	int32_t result;
+	uint32_t type;
+	int16_t* flags;
 
 	flags = NULL;
 	result = TRUE;
@@ -1931,7 +1931,7 @@ MechS32 IsTargetDone(MechU16 p_target, MechS32 p_check)
 }
 
 // Enters p_state for p_player now, or after its pushed state when it has one.
-void QueueAIState(Player* p_player, MechS16 p_state, MechU16 p_target)
+void QueueAIState(Player* p_player, int16_t p_state, uint16_t p_target)
 {
 	AiStackEntry entry;
 
@@ -1946,11 +1946,11 @@ void QueueAIState(Player* p_player, MechS16 p_state, MechU16 p_target)
 }
 
 // Whether one of p_player's scripts has rules for p_state.
-MechS32 HasAIState(Player* p_player, MechS16 p_state)
+int32_t HasAIState(Player* p_player, int16_t p_state)
 {
-	MechS32 i;
-	MechU16* script;
-	MechS32 j;
+	int32_t i;
+	uint16_t* script;
+	int32_t j;
 
 	for (i = 0; i <= 2; i++) {
 		script = p_player->m_ruleSets[i];
@@ -1970,7 +1970,7 @@ MechS32 HasAIState(Player* p_player, MechS16 p_state)
 
 // Makes p_player enter p_state with p_target, pushing the current state with p_push, if its
 // scripts have the state.
-void SetAIState(Player* p_player, MechS16 p_state, MechS16 p_target, MechS32 p_push)
+void SetAIState(Player* p_player, int16_t p_state, int16_t p_target, int32_t p_push)
 {
 	if (p_state != -1 && HasAIState(p_player, p_state)) {
 		if (p_push) {
@@ -1998,10 +1998,10 @@ void SetAIState(Player* p_player, MechS16 p_state, MechS16 p_target, MechS32 p_p
 // Releases the nav points p_player placed, except its anchor.
 void ReleaseNavPoints(Player* p_player)
 {
-	MechU32 i;
+	uint32_t i;
 
 	if (g_navCount != -1) {
-		for (i = 0; (MechS32) i < g_navCount; i++) {
+		for (i = 0; (int32_t) i < g_navCount; i++) {
 			if ((g_navTable[i].m_flags & 1) && g_navTable[i].m_owner == (p_player->m_index | c_aiTargetPlayer)) {
 				if (!(p_player->m_nav & 0x1000)) {
 					if ((p_player->m_nav & 0xff) != i) {
@@ -2019,13 +2019,13 @@ void ReleaseNavPoints(Player* p_player)
 // Places four nav points around p_player's target and targets them.
 void PlacePatrolNavs(Player* p_player)
 {
-	MechU32 index;
-	MechS32 range;
-	MechS32 x;
-	MechU32 owner;
-	MechS32 y;
-	MechS32 z;
-	MechS32 found;
+	uint32_t index;
+	int32_t range;
+	int32_t x;
+	uint32_t owner;
+	int32_t y;
+	int32_t z;
+	int32_t found;
 	Player* player;
 	NavPoint* nav;
 
@@ -2070,7 +2070,7 @@ void PlacePatrolNavs(Player* p_player)
 
 // Targets p_target and steps p_player's target on to the next of its own nav points, past its
 // anchor nav, and makes that its AI target.
-void AdvanceNavTarget(Player* p_player, MechS16 p_target)
+void AdvanceNavTarget(Player* p_player, int16_t p_target)
 {
 	p_player->m_targetInfo.m_target = p_target;
 	CycleNavTarget(p_player, 1, 1);
@@ -2084,10 +2084,10 @@ void AdvanceNavTarget(Player* p_player, MechS16 p_target)
 // Places a nav point at p_player's place in its star's formation and targets it.
 void PlaceFormationNav(Player* p_player)
 {
-	MechS32 z;
-	MechS32 heading;
-	MechS32 x;
-	MechS32 nav;
+	int32_t z;
+	int32_t heading;
+	int32_t x;
+	int32_t nav;
 
 	ReleaseNavPoints(p_player);
 	if (GetTeamSlotPosition(p_player->m_index, &x, &z, &heading)) {
@@ -2102,9 +2102,9 @@ void PlaceFormationNav(Player* p_player)
 
 // Makes player p_index attack player p_target (logging the first time), when it is the local
 // player or on a network game.
-void RecordAttack(MechS32 p_index, MechU32 p_target)
+void RecordAttack(int32_t p_index, uint32_t p_target)
 {
-	MechChar line[80];
+	char line[80];
 	Player* player;
 
 	if (p_index == g_localPlayerId || g_netRole) {
@@ -2127,9 +2127,9 @@ void RecordAttack(MechS32 p_index, MechU32 p_target)
 }
 
 // Loads the nine AIT scripts.
-MechS32 LoadAIScripts(void)
+int32_t LoadAIScripts(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	g_aiScripts[0] = NULL;
 	for (i = 0; i < 9; i++) {
@@ -2139,9 +2139,9 @@ MechS32 LoadAIScripts(void)
 	return TRUE;
 }
 
-MechS32 AiTransitionNotify(Player* p_player, AiRule* p_rule)
+int32_t AiTransitionNotify(Player* p_player, AiRule* p_rule)
 {
-	MechS16 leader;
+	int16_t leader;
 
 	leader = GetTeamLeader(p_player->m_team);
 	if (leader != -1) {
@@ -2152,11 +2152,11 @@ MechS32 AiTransitionNotify(Player* p_player, AiRule* p_rule)
 }
 
 // The local player's teammate in formation slot p_slot, or -1.
-MechS32 FindStarSlotPlayer(MechS32 p_slot)
+int32_t FindStarSlotPlayer(int32_t p_slot)
 {
-	MechS32 team;
+	int32_t team;
 	Player* player;
-	MechS32 i;
+	int32_t i;
 
 	team = g_players[g_localPlayerId]->m_team;
 	for (i = 0; i < g_playerCount; i++) {
@@ -2170,7 +2170,7 @@ MechS32 FindStarSlotPlayer(MechS32 p_slot)
 }
 
 // Posts a message to p_player unless one is waiting.
-void PostAIMessage(Player* p_player, MechS16 p_message, MechU16 p_target, MechS16 p_arg)
+void PostAIMessage(Player* p_player, int16_t p_message, uint16_t p_target, int16_t p_arg)
 {
 	AiMessage* message;
 
@@ -2183,11 +2183,11 @@ void PostAIMessage(Player* p_player, MechS16 p_message, MechU16 p_target, MechS1
 
 // Orders the players of p_targets into p_state with p_target (the local player's orders to its
 // star). Returns how many it skipped.
-MechS16 OrderPlayers(Player* p_player, MechS16 p_targets, MechS16 p_state, MechS16 p_target)
+int16_t OrderPlayers(Player* p_player, int16_t p_targets, int16_t p_state, int16_t p_target)
 {
-	MechS16 skipped;
+	int16_t skipped;
 	Player* player;
-	MechS16 target;
+	int16_t target;
 
 	target = -1;
 	skipped = 0;
@@ -2245,11 +2245,11 @@ MechS16 OrderPlayers(Player* p_player, MechS16 p_targets, MechS16 p_state, MechS
 
 // Carries out the local player's command p_command to formation slot p_slot (or the star), and
 // says it.
-MechS32 OrderStarSlot(MechS32 p_slot, MechS16 p_command)
+int32_t OrderStarSlot(int32_t p_slot, int16_t p_command)
 {
-	MechS16 target;
-	MechS32 index;
-	MechS16 speech;
+	int16_t target;
+	int32_t index;
+	int16_t speech;
 	Player* local;
 
 	speech = -1;
@@ -2322,7 +2322,7 @@ MechS32 OrderStarSlot(MechS32 p_slot, MechS16 p_command)
 }
 
 // Adds p_delta to p_value (with p_value's sign with p_sameSign), clamped to +/-0x400.
-MechS32 AddClamped(MechS32 p_value, MechS32 p_delta, MechS32 p_sameSign)
+int32_t AddClamped(int32_t p_value, int32_t p_delta, int32_t p_sameSign)
 {
 	if (p_sameSign && (p_value < 0 ? -1 : 1) != (p_delta < 0 ? -1 : 1)) {
 		p_delta = -p_delta;
@@ -2340,26 +2340,26 @@ MechS32 AddClamped(MechS32 p_value, MechS32 p_delta, MechS32 p_sameSign)
 }
 
 // Gives star p_team its orders for the current objective.
-void ResetStarOrders(MechS32 p_team)
+void ResetStarOrders(int32_t p_team)
 {
 	HandleStarOrder(p_team, NULL);
 }
 
 // Gives star p_team's AI players the script and state of its current objective: rest, shut down
 // or follow the leader.
-void AssignStarObjective(MechS32 p_team)
+void AssignStarObjective(int32_t p_team)
 {
-	MechS16 leader;
-	MechS32 count;
+	int16_t leader;
+	int32_t count;
 	Player* members[8];
-	MechS32 objective;
-	MechS32 bit;
-	MechS32 i;
-	MechS32 state;
-	MechU16 type;
+	int32_t objective;
+	int32_t bit;
+	int32_t i;
+	int32_t state;
+	uint16_t type;
 	StarMission* mission;
 	Player* member;
-	MechS16 flags;
+	int16_t flags;
 
 	leader = GetTeamLeader(p_team);
 	if (leader == -1) {
@@ -2427,7 +2427,7 @@ void AssignStarObjective(MechS32 p_team)
 	}
 }
 
-MechS16 GetEngagementAIFlags(MechS32 p_value)
+int16_t GetEngagementAIFlags(int32_t p_value)
 {
 	if (p_value == 1) {
 		return 2;
@@ -2442,9 +2442,9 @@ MechS16 GetEngagementAIFlags(MechS32 p_value)
 
 // Sets p_player's script slot p_slot to script p_script of its player type, as its star's
 // leader or a follower; -1 clears the slot.
-void SetAIScript(Player* p_player, MechS16 p_slot, MechS16 p_script, MechS16 p_leader)
+void SetAIScript(Player* p_player, int16_t p_slot, int16_t p_script, int16_t p_leader)
 {
-	MechU16 follower;
+	uint16_t follower;
 
 	if (p_script == -1) {
 		p_player->m_ruleSets[p_slot] = NULL;
@@ -2460,25 +2460,25 @@ void SetAIScript(Player* p_player, MechS16 p_slot, MechS16 p_script, MechS16 p_l
 
 	switch (p_player->m_type) {
 	case c_playerTypeMech:
-		p_player->m_ruleSets[p_slot] = (MechU16*) g_aiScripts[g_mechScripts[p_script][(MechS16) follower]];
+		p_player->m_ruleSets[p_slot] = (uint16_t*) g_aiScripts[g_mechScripts[p_script][(int16_t) follower]];
 		break;
 	case c_playerTypeArtillery:
-		p_player->m_ruleSets[p_slot] = (MechU16*) g_aiScripts[g_artilleryScripts[p_script][(MechS16) follower]];
+		p_player->m_ruleSets[p_slot] = (uint16_t*) g_aiScripts[g_artilleryScripts[p_script][(int16_t) follower]];
 		break;
 	case c_playerTypeWanderer:
-		p_player->m_ruleSets[p_slot] = (MechU16*) g_aiScripts[g_wandererScripts[p_script][(MechS16) follower]];
+		p_player->m_ruleSets[p_slot] = (uint16_t*) g_aiScripts[g_wandererScripts[p_script][(int16_t) follower]];
 		break;
 	case c_playerTypeTruck:
-		p_player->m_ruleSets[p_slot] = (MechU16*) g_aiScripts[g_truckScripts[p_script][(MechS16) follower]];
+		p_player->m_ruleSets[p_slot] = (uint16_t*) g_aiScripts[g_truckScripts[p_script][(int16_t) follower]];
 		break;
 	case c_playerTypeTank:
-		p_player->m_ruleSets[p_slot] = (MechU16*) g_aiScripts[g_tankScripts[p_script][(MechS16) follower]];
+		p_player->m_ruleSets[p_slot] = (uint16_t*) g_aiScripts[g_tankScripts[p_script][(int16_t) follower]];
 		break;
 	case c_playerTypeHelicopter:
-		p_player->m_ruleSets[p_slot] = (MechU16*) g_aiScripts[g_helicopterScripts[p_script][(MechS16) follower]];
+		p_player->m_ruleSets[p_slot] = (uint16_t*) g_aiScripts[g_helicopterScripts[p_script][(int16_t) follower]];
 		break;
 	case 8:
-		p_player->m_ruleSets[p_slot] = (MechU16*) g_aiScripts[g_helicopterScripts[p_script][(MechS16) follower]];
+		p_player->m_ruleSets[p_slot] = (uint16_t*) g_aiScripts[g_helicopterScripts[p_script][(int16_t) follower]];
 		break;
 	case c_playerTypeDoor:
 		break;
@@ -2486,7 +2486,7 @@ void SetAIScript(Player* p_player, MechS16 p_slot, MechS16 p_script, MechS16 p_l
 }
 
 // Target p_index of star p_team's current objective.
-MechU16 GetObjectiveTarget(MechS32 p_team, MechS16 p_objective, MechS32 p_index)
+uint16_t GetObjectiveTarget(int32_t p_team, int16_t p_objective, int32_t p_index)
 {
 	StarMission* mission;
 
@@ -2497,11 +2497,11 @@ MechU16 GetObjectiveTarget(MechS32 p_team, MechS16 p_objective, MechS32 p_index)
 
 // Fills p_members with star p_team's members that are in play (alive, with p_aliveOnly).
 // Returns how many.
-MechS32 GetTeamMembers(MechS32 p_team, Player** p_members, MechS32 p_aliveOnly)
+int32_t GetTeamMembers(int32_t p_team, Player** p_members, int32_t p_aliveOnly)
 {
-	MechS32 mask;
-	MechS32 count;
-	MechS32 i;
+	int32_t mask;
+	int32_t count;
+	int32_t i;
 	Player* player;
 	Team* team;
 
@@ -2524,7 +2524,7 @@ MechS32 GetTeamMembers(MechS32 p_team, Player** p_members, MechS32 p_aliveOnly)
 
 // Handles an order posted to star p_team's leader (M_TGTABLE: attack its target), or with none
 // gives the star its objective's orders.
-void HandleStarOrder(MechS32 p_team, AiMessage* p_order)
+void HandleStarOrder(int32_t p_team, AiMessage* p_order)
 {
 	if (p_order && p_order->m_message) {
 		switch (p_order->m_message) {
@@ -2542,21 +2542,21 @@ void HandleStarOrder(MechS32 p_team, AiMessage* p_order)
 
 // Sends members of star p_team after p_target: every free one on objective 4, else the free one
 // nearest the target's value (or the leader). Whether one went.
-MechS32 AssignStarTarget(MechS32 p_team, MechU16 p_target)
+int32_t AssignStarTarget(int32_t p_team, uint16_t p_target)
 {
-	MechS32 required;
+	int32_t required;
 	StarMission* mission;
 	MissionObjective* objective;
-	MechS32 result;
-	MechS32 nearest;
-	MechS32 leader;
-	MechS32 count;
-	MechS32 diff;
+	int32_t result;
+	int32_t nearest;
+	int32_t leader;
+	int32_t count;
+	int32_t diff;
 	Player* members[8];
-	MechS32 i;
-	MechU32 slot;
+	int32_t i;
+	uint32_t slot;
 	Player* member;
-	MechS32 chosen;
+	int32_t chosen;
 
 	slot = 0;
 	if (p_target & 0xf000) {
@@ -2638,23 +2638,23 @@ MechS32 AssignStarTarget(MechS32 p_team, MechU16 p_target)
 
 // Run by star p_team's leader: hands its posted order on and sends an idle member after the
 // first target of the star's objective that isn't covered yet.
-void LeadStar(MechS32 p_team)
+void LeadStar(int32_t p_team)
 {
-	MechU16* targets;
-	MechS32 leader;
-	MechS32 count;
+	uint16_t* targets;
+	int32_t leader;
+	int32_t count;
 	Player* members[8];
-	MechS32 objectiveIndex;
-	MechS32 remaining;
-	MechS32 j;
-	MechS32 i;
-	MechU16 target;
-	MechS32 type;
-	MechS16 state;
+	int32_t objectiveIndex;
+	int32_t remaining;
+	int32_t j;
+	int32_t i;
+	uint16_t target;
+	int32_t type;
+	int16_t state;
 	StarMission* mission;
 	Player* player;
 	MissionObjective* objective;
-	MechS16 flags;
+	int16_t flags;
 
 	leader = GetTeamLeader(p_team);
 	if (leader == -1) {
@@ -2830,13 +2830,13 @@ void ReleaseAnchorNav(Player* p_player)
 }
 
 // The number of players in the local player's star.
-MechS32 GetLocalStarSize(void)
+int32_t GetLocalStarSize(void)
 {
 	return g_teams[g_players[g_localPlayerId]->m_team].m_memberCount;
 }
 
 // Carries out the local player's star command: a formation (-1) or an order to slot p_slot.
-void RunStarCommand(MechS32 p_command, MechS32 p_slot)
+void RunStarCommand(int32_t p_command, int32_t p_slot)
 {
 	if (p_command == -1) {
 		SetTeamFormationByName(g_localStar, g_formationTemplates[p_slot].m_name);
@@ -2851,7 +2851,7 @@ void RunStarCommand(MechS32 p_command, MechS32 p_slot)
 // turning back past 45.
 void SweepTorso(Player* p_player)
 {
-	MechS32 period;
+	int32_t period;
 
 	if (p_player->m_steering->m_throttle == 0) {
 		period = 0x40;

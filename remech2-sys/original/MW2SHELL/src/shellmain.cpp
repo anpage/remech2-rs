@@ -45,44 +45,44 @@
 // with c_msgScreenFrame, and a menu command or leaving the shell with the message to move on to.
 void (*g_screenFunction)(
 	TMPackDataBase* p_database,
-	MechS32* p_campaign,
-	MechU8* p_pilotChosen,
+	int32_t* p_campaign,
+	uint8_t* p_pilotChosen,
 	char** p_scenario,
-	MechS32 p_msg
+	int32_t p_msg
 ) = NULL;
 
 // The screen a menu command opened over the current one (RegisterMenuFunction), called instead of
 // g_screenFunction while set: every frame with p_active TRUE, and with FALSE to close it
 // (CloseMenuFunction).
-void (*g_menuFunction)(MechS32 p_active) = NULL;
+void (*g_menuFunction)(int32_t p_active) = NULL;
 
 MidiSequence* g_midiBackgroundMusic = NULL;
 
-MechS32 g_cursorHidden = 0;
+int32_t g_cursorHidden = 0;
 
 // PlayMidiSong's state: whether the base song id is set, the base, and the song playing.
-MechU8 g_midiSongBaseSet = 0;
+uint8_t g_midiSongBaseSet = 0;
 
-MechS32 g_midiSongBase = 0;
+int32_t g_midiSongBase = 0;
 
-MechS32 g_midiSongPlaying = 0;
+int32_t g_midiSongPlaying = 0;
 
 char* g_scenario;
 
-MechS32 g_selectedCampaign;
+int32_t g_selectedCampaign;
 
-MechU8 g_pilotChosen;
+uint8_t g_pilotChosen;
 
-void PlayMidiSong(MechU32 p_msg, MechS32 p_campaign);
+void PlayMidiSong(uint32_t p_msg, int32_t p_campaign);
 void RunScreenFrame();
 void CloseMenuFunction();
 
 // The shell's message handler, originally its window procedure (ShellWindowProc).
 // ShellHandleMessage on the Rust side (src/shell/screens/debug.rs) wraps it, for the debug menu's
 // jumps between screens and to hold back the landing and ending videos while a prompt is up.
-MECH_INTPTR ShellHandleMessageC(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
+MECH_INTPTR ShellHandleMessageC(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
-	MechU32 msg;
+	uint32_t msg;
 
 	if (p_msg >= c_mechMsgKeyFirst && p_msg <= c_mechMsgKeyLast) {
 		HandleKeyboardMessages(p_msg, p_wParam, p_lParam);
@@ -308,9 +308,9 @@ MECH_INTPTR ShellHandleMessageC(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lP
 extern "C" int ShellMain(char* p_cmdLine)
 {
 	void* itemData = NULL;
-	MechS32 itemSize;
+	int32_t itemSize;
 	MechMessage msg;
-	MechS32 fromSim = FALSE;
+	int32_t fromSim = FALSE;
 
 	// The original was loaded fresh each time.
 	ResetShellGlobals();
@@ -449,7 +449,7 @@ extern "C" int ShellMain(char* p_cmdLine)
 }
 
 // Handles one pending message. Returns 0 on c_mechMsgQuit (posting it again), 1 otherwise.
-MechS32 PumpMessage()
+int32_t PumpMessage()
 {
 	MechMessage msg;
 
@@ -469,12 +469,12 @@ MechS32 PumpMessage()
 }
 
 // Starts the song of the shell message p_msg for the campaign, unless it is already playing.
-void PlayMidiSong(MechU32 p_msg, MechS32 p_campaign)
+void PlayMidiSong(uint32_t p_msg, int32_t p_campaign)
 {
-	MechS32 size;
+	int32_t size;
 	void* data;
-	MechS32 result;
-	MechS32 song;
+	int32_t result;
+	int32_t song;
 
 	switch (p_campaign) {
 	case 0:
@@ -534,7 +534,7 @@ void PlayMidiSong(MechU32 p_msg, MechS32 p_campaign)
 // The commands EnableShellMenu and DisableShellMenu switch, and whether each is enabled. The
 // original kept this in the window's menu, where the shell grayed the items; the Rust side draws
 // its menu bar from it.
-static const MechS32 g_menuCommands[] = {
+static const int32_t g_menuCommands[] = {
 	c_menuNewAllegiance,
 	c_menuHallOfHonor,
 	c_menuCombatVariables,
@@ -542,12 +542,12 @@ static const MechS32 g_menuCommands[] = {
 	c_menuKeshik,
 };
 
-MechU8 g_menuCommandEnabled[sizeof(g_menuCommands) / sizeof(g_menuCommands[0])] = {1, 1, 1, 1, 1};
+uint8_t g_menuCommandEnabled[sizeof(g_menuCommands) / sizeof(g_menuCommands[0])] = {1, 1, 1, 1, 1};
 
 // Whether a menu command can be chosen. The commands that are never grayed always can.
-extern "C" MechS32 IsShellMenuCommandEnabled(MechS32 p_command)
+extern "C" int32_t IsShellMenuCommandEnabled(int32_t p_command)
 {
-	MechU32 i;
+	uint32_t i;
 
 	for (i = 0; i < sizeof(g_menuCommands) / sizeof(g_menuCommands[0]); i++) {
 		if (g_menuCommands[i] == p_command) {
@@ -559,9 +559,9 @@ extern "C" MechS32 IsShellMenuCommandEnabled(MechS32 p_command)
 }
 
 // Originally EnableMenuItem on the window's menu.
-void EnableShellMenuCommand(MechS32 p_command, MechS32 p_enabled)
+void EnableShellMenuCommand(int32_t p_command, int32_t p_enabled)
 {
-	MechU32 i;
+	uint32_t i;
 
 	for (i = 0; i < sizeof(g_menuCommands) / sizeof(g_menuCommands[0]); i++) {
 		if (g_menuCommands[i] == p_command) {
@@ -581,12 +581,12 @@ void DisableShellMenu()
 	memset(g_menuCommandEnabled, 0, sizeof(g_menuCommandEnabled));
 }
 
-void RegisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32))
+void RegisterScreenFunction(void (*p_callback)(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t))
 {
 	g_screenFunction = p_callback;
 }
 
-void UnregisterScreenFunction(void (*p_callback)(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32))
+void UnregisterScreenFunction(void (*p_callback)(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t))
 {
 	g_screenFunction = p_callback;
 	if (g_screenFunction != NULL) {
@@ -610,12 +610,12 @@ void RunScreenFrame()
 	}
 }
 
-void RegisterMenuFunction(void (*p_callback)(MechS32 p_active))
+void RegisterMenuFunction(void (*p_callback)(int32_t p_active))
 {
 	g_menuFunction = p_callback;
 }
 
-void UnregisterMenuFunction(void (*p_callback)(MechS32 p_active))
+void UnregisterMenuFunction(void (*p_callback)(int32_t p_active))
 {
 	g_menuFunction = p_callback;
 	if (g_menuFunction != NULL) {

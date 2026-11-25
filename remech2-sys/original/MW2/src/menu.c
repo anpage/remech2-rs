@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-MechS32 g_menuRepeatTimer = -1;
+int32_t g_menuRepeatTimer = -1;
 
 // The in-mission menus by ID (RegisterMenu): 4 the main menu, 5 the systems status, 1 the lance
 // command computer, 7 and 8 command points 2 and 3, 3 the programmers' page.
@@ -47,30 +47,30 @@ MenuDefinition* g_menuDefinitions[11] = {
 
 undefined g_textColors[0x100];
 
-MechS32 g_openMenuCount;
+int32_t g_openMenuCount;
 
 MenuSlot* g_menuSlotsTail;
 
 MenuSlot* g_menuSlots;
 
 // The key the open menu acts on this frame (0: none).
-MechS32 g_menuKey;
+int32_t g_menuKey;
 
-MechS32 ActivateMenu(MenuSlot* p_slot);
+int32_t ActivateMenu(MenuSlot* p_slot);
 void DeactivateMenu(MenuSlot* p_slot);
-MechS32 DrawAndRunMenu(MenuDefinition* p_menu);
+int32_t DrawAndRunMenu(MenuDefinition* p_menu);
 void RunMenuItems(MenuDefinition* p_menu);
-MenuSlot* FindMenuSlot(MechS32 p_id);
+MenuSlot* FindMenuSlot(int32_t p_id);
 MenuPage* PeekMenuPage(MenuDefinition* p_menu);
-MechS32 PushMenuPage(MenuDefinition* p_menu, MenuPage* p_page);
+int32_t PushMenuPage(MenuDefinition* p_menu, MenuPage* p_page);
 MenuPage* PopMenuPage(MenuDefinition* p_menu);
 void ClearMenuPages(MenuDefinition* p_menu);
-MechS32 IsMenuPageStackEmpty(MenuDefinition* p_menu);
+int32_t IsMenuPageStackEmpty(MenuDefinition* p_menu);
 
 // Adds a slot for a menu ID at the end of g_menuSlots. Returns whether it could.
-MechS32 RegisterMenu(MechS32 p_id)
+int32_t RegisterMenu(int32_t p_id)
 {
-	MechS32 result;
+	int32_t result;
 	MenuSlot* slot;
 
 	result = 0;
@@ -95,10 +95,10 @@ MechS32 RegisterMenu(MechS32 p_id)
 
 // Asks for an in-mission menu to open (4 is the mission menu), if no menu is open already.
 // Returns whether it will.
-MechS32 RequestMenu(MechS32 p_id)
+int32_t RequestMenu(int32_t p_id)
 {
 	MenuSlot* slot;
-	MechS32 result;
+	int32_t result;
 
 	result = 0;
 	if (g_openMenuCount == 0) {
@@ -113,9 +113,9 @@ MechS32 RequestMenu(MechS32 p_id)
 }
 
 // Asks for a closed menu to open or an open one to close. Returns whether it asked to open it.
-MechS32 ToggleMenu(MechS32 p_id)
+int32_t ToggleMenu(int32_t p_id)
 {
-	MechS32 result;
+	int32_t result;
 
 	result = 0;
 	switch (GetMenuSlotState(p_id)) {
@@ -157,8 +157,8 @@ void LayoutMenu(MenuDefinition* p_menu)
 {
 	Point scale;
 	void* shape;
-	MechS32 dx;
-	MechS32 size;
+	int32_t dx;
+	int32_t size;
 	PANE* target;
 	Point origin;
 	PANE* background;
@@ -255,9 +255,9 @@ void LoadMenuResources(MenuDefinition* p_menu)
 // Opens a menu on its root page. Menus with flag 1 take the controls, so this calls
 // DisableGameplayInput; DeactivateMenu calls EnableGameplayInput again. Returns whether the menu
 // has a definition (the original reads the definition uninitialized for a menu ID outside 1-10).
-MechS32 ActivateMenu(MenuSlot* p_slot)
+int32_t ActivateMenu(MenuSlot* p_slot)
 {
-	MechS32 result;
+	int32_t result;
 	MenuDefinition* menu;
 
 	result = 0;
@@ -318,7 +318,7 @@ void DeactivateMenu(MenuSlot* p_slot)
 }
 
 // Asks for a menu to close.
-void RequestMenuClose(MechS32 p_id)
+void RequestMenuClose(int32_t p_id)
 {
 	MenuSlot* slot;
 
@@ -332,12 +332,12 @@ void RequestMenuClose(MechS32 p_id)
 // the definitions whose root page or its subpages fail their init callbacks.
 void FirstMenu(void)
 {
-	MechS32 ok;
+	int32_t ok;
 	MenuDefinition* menu;
 	MenuPage* subpage;
-	MechS32 i;
-	MechS32 j;
-	MechS32 count;
+	int32_t i;
+	int32_t j;
+	int32_t count;
 	MenuPage* page;
 
 	for (i = 0; i <= 10; i++) {
@@ -378,8 +378,8 @@ void FirstMenu(void)
 void UpdateMenuKey(void)
 {
 	MenuDefinition* menu;
-	MechU32 flags;
-	MechS16 bound;
+	uint32_t flags;
+	int16_t bound;
 
 	g_menuKey = 0;
 	bound = TakeBoundMenuKey();
@@ -455,10 +455,10 @@ void UpdateMenuKey(void)
 // (g_openMenuCount) when that frame's game keys run.
 void UpdateMenus(void)
 {
-	MechS32 requested;
-	MechS32 state;
+	int32_t requested;
+	int32_t state;
 	MenuSlot* slot;
-	MechS32 done;
+	int32_t done;
 
 	slot = g_menuSlots;
 	done = 0;
@@ -493,9 +493,9 @@ void UpdateMenus(void)
 }
 
 // Draws the open in-mission menu and acts on g_menuKey. Returns FALSE when the menu should close.
-MechS32 DrawAndRunMenu(MenuDefinition* p_menu)
+int32_t DrawAndRunMenu(MenuDefinition* p_menu)
 {
-	MechS32 result;
+	int32_t result;
 	PANE* target;
 	PANE* backgroundTarget;
 
@@ -537,7 +537,7 @@ MechS32 DrawAndRunMenu(MenuDefinition* p_menu)
 // Acts on a menu key for the selected item: Enter depends on the item's type (0 opens a submenu,
 // action 3; 2 goes back, action 4; 5 and 6 close, action 5); Escape closes (action 5); Down (0xc7)
 // and Tab move the selection +1 through *p_move; Up (0xc6) and Shift+Tab (0x209) move it -1.
-void ApplyMenuKey(MechS32 p_key, MechS32 p_itemType, MechS32* p_action, MechS32* p_move)
+void ApplyMenuKey(int32_t p_key, int32_t p_itemType, int32_t* p_action, int32_t* p_move)
 {
 	switch (p_key) {
 	case 0x09:
@@ -578,24 +578,24 @@ void ApplyMenuKey(MechS32 p_key, MechS32 p_itemType, MechS32* p_action, MechS32*
 // Finally opens the selected item's subpage (state 3) or closes the page (states 4 and 5).
 void RunMenuItems(MenuDefinition* p_menu)
 {
-	MechS32 back;
-	MechChar number[40];
+	int32_t back;
+	char number[40];
 	Point cursor;
-	MechS32 numberWidth;
+	int32_t numberWidth;
 	MenuPage* page;
-	MechS32 selected;
+	int32_t selected;
 	Point textPos;
-	MechS32 offset;
-	MechS32 i;
+	int32_t offset;
+	int32_t i;
 	PANE* target;
 	void* font;
-	MechS32 move;
-	MechS32 key;
-	MechS32 hasHeading;
-	MechS32 height;
+	int32_t move;
+	int32_t key;
+	int32_t hasHeading;
+	int32_t height;
 	MenuItem* item;
-	MechS32 heading;
-	MechS32 n;
+	int32_t heading;
+	int32_t n;
 	Point controlPos;
 
 	heading = 0x10;
@@ -789,7 +789,7 @@ void RunMenuItems(MenuDefinition* p_menu)
 }
 
 // Finds the g_menuSlots entry for a menu ID, or NULL.
-MenuSlot* FindMenuSlot(MechS32 p_id)
+MenuSlot* FindMenuSlot(int32_t p_id)
 {
 	MenuSlot* slot;
 
@@ -805,7 +805,7 @@ MenuSlot* FindMenuSlot(MechS32 p_id)
 }
 
 // Returns the definition of an open menu, or NULL.
-MenuDefinition* FindMenuDefinition(MechS32 p_id)
+MenuDefinition* FindMenuDefinition(int32_t p_id)
 {
 	MenuSlot* slot;
 	MenuDefinition* result;
@@ -851,9 +851,9 @@ MenuPage* PeekMenuPage(MenuDefinition* p_menu)
 	return page;
 }
 
-MechS32 PushMenuPage(MenuDefinition* p_menu, MenuPage* p_page)
+int32_t PushMenuPage(MenuDefinition* p_menu, MenuPage* p_page)
 {
-	MechS32 result;
+	int32_t result;
 
 	result = 0;
 	if (p_menu->m_pageDepth < 8) {
@@ -870,7 +870,7 @@ void ClearMenuPages(MenuDefinition* p_menu)
 	p_menu->m_pageDepth = 0;
 }
 
-MechS32 IsMenuPageStackEmpty(MenuDefinition* p_menu)
+int32_t IsMenuPageStackEmpty(MenuDefinition* p_menu)
 {
 	return p_menu->m_pageDepth == 0;
 }
@@ -895,10 +895,10 @@ MenuDefinition* GetOpenMenu(void)
 }
 
 // Returns a menu's state (1: open), or 0 if it isn't registered.
-MechS32 GetMenuSlotState(MechS32 p_id)
+int32_t GetMenuSlotState(int32_t p_id)
 {
 	MenuSlot* slot;
-	MechS32 result;
+	int32_t result;
 
 	result = 0;
 	slot = FindMenuSlot(p_id);

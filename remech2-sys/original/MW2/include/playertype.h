@@ -7,7 +7,7 @@
 // A kind of player a world stream's gamepiece record creates (g_playerTypes): its callbacks,
 // copied into the Player.
 typedef struct PlayerType {
-	MechS32 m_type;                           // 0x00 — Player::m_type
+	int32_t m_type;                           // 0x00 — Player::m_type
 	PlayerCreatedFn m_create;                 // 0x04 — CreateSimPlayer's
 	void (*m_firstClassFn)(Player* p_player); // 0x08
 	PlayerMechFn m_updateFn;                  // 0x0c

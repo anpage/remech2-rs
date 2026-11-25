@@ -10,9 +10,9 @@ struct Vertex;
 
 // A shape type's collision tests: a point, a ray, and the height of the surface under a point.
 typedef struct ShapeCollisionFns {
-	MechS32 (*m_testPoint)(Shape*, MechS32, MechS32, MechS32);           // 0x00
-	MechS32 (*m_testRay)(Shape*, Ray*);                                  // 0x04
-	MechS32 (*m_getHeight)(Shape*, MechS32, MechS32, MechS32, MechS32*); // 0x08
+	int32_t (*m_testPoint)(Shape*, int32_t, int32_t, int32_t);           // 0x00
+	int32_t (*m_testRay)(Shape*, Ray*);                                  // 0x04
+	int32_t (*m_getHeight)(Shape*, int32_t, int32_t, int32_t, int32_t*); // 0x08
 } ShapeCollisionFns;
 
 // The functions and globals of collision.c that other units use.
@@ -21,45 +21,45 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_groundColor;
-	extern MechS32 g_horizonMapColor;
+	extern int32_t g_groundColor;
+	extern int32_t g_horizonMapColor;
 	extern ShapeCollisionFns g_shapeCollisionFns[8];
-	extern MechS32 g_hitNormalX;
-	extern MechS32 g_hitNormalY;
-	extern MechS32 g_hitNormalZ;
-	extern MechS32 g_groundNormalX;
-	extern MechS32 g_groundNormalY;
-	extern MechS32 g_groundNormalZ;
-	extern MechS32 g_segmentNormalX;
-	extern MechS32 g_segmentNormalY;
-	extern MechS32 g_segmentNormalZ;
-	extern MechS32 g_backgroundColor;
-	extern MechS32 g_skyColor;
+	extern int32_t g_hitNormalX;
+	extern int32_t g_hitNormalY;
+	extern int32_t g_hitNormalZ;
+	extern int32_t g_groundNormalX;
+	extern int32_t g_groundNormalY;
+	extern int32_t g_groundNormalZ;
+	extern int32_t g_segmentNormalX;
+	extern int32_t g_segmentNormalY;
+	extern int32_t g_segmentNormalZ;
+	extern int32_t g_backgroundColor;
+	extern int32_t g_skyColor;
 
-	void SetShapeCollisionType(Shape* p_shape, MechS32 p_collisionType);
-	MechS32 IsBelowFacePlane(
+	void SetShapeCollisionType(Shape* p_shape, int32_t p_collisionType);
+	int32_t IsBelowFacePlane(
 		struct Face* p_face,
 		struct Vertex* p_vertices,
-		MechS32 p_x,
-		MechS32 p_y,
-		MechS32 p_z,
-		MechS32* p_height
+		int32_t p_x,
+		int32_t p_y,
+		int32_t p_z,
+		int32_t* p_height
 	);
-	MechS32 GetTerrainHeight(MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 GetHighestSurface(MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 HasHeightTest(Shape* p_shape);
-	MechS32 TestPointCollision(MechS32 p_x, MechS32 p_y, MechS32 p_z, Shape** p_hit);
-	Shape* FindNearestShape(Shape* p_root, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 TestShapePoint(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 TestSegmentCollision(Ray* p_ray, Shape** p_hit, MechS32 p_exclude);
-	MechS32 TestSceneryCollision(Ray* p_ray, Shape** p_hit);
-	MechS32 TestShapeRay(Shape* p_shape, Ray* p_ray, MechS32 p_distance);
-	void EndRayAtShape(Shape* p_shape, Ray* p_ray, MechS32 p_distance);
-	MechS32 IntersectRayFace(struct Face* p_face, struct Vertex* p_vertices, Ray* p_ray);
-	MechS32 IsPointInFace(struct Face* p_face, struct Vertex* p_vertices, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 IsPointInFaceXZ(struct Face* p_face, struct Vertex* p_vertices, MechS32 p_x, MechS32 p_z);
-	MechS32 IsPointInFaceXY(struct Face* p_face, struct Vertex* p_vertices, MechS32 p_x, MechS32 p_y);
-	MechS32 IsPointInFaceYZ(struct Face* p_face, struct Vertex* p_vertices, MechS32 p_y, MechS32 p_z);
+	int32_t GetTerrainHeight(int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t GetHighestSurface(int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t HasHeightTest(Shape* p_shape);
+	int32_t TestPointCollision(int32_t p_x, int32_t p_y, int32_t p_z, Shape** p_hit);
+	Shape* FindNearestShape(Shape* p_root, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t TestShapePoint(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t TestSegmentCollision(Ray* p_ray, Shape** p_hit, int32_t p_exclude);
+	int32_t TestSceneryCollision(Ray* p_ray, Shape** p_hit);
+	int32_t TestShapeRay(Shape* p_shape, Ray* p_ray, int32_t p_distance);
+	void EndRayAtShape(Shape* p_shape, Ray* p_ray, int32_t p_distance);
+	int32_t IntersectRayFace(struct Face* p_face, struct Vertex* p_vertices, Ray* p_ray);
+	int32_t IsPointInFace(struct Face* p_face, struct Vertex* p_vertices, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t IsPointInFaceXZ(struct Face* p_face, struct Vertex* p_vertices, int32_t p_x, int32_t p_z);
+	int32_t IsPointInFaceXY(struct Face* p_face, struct Vertex* p_vertices, int32_t p_x, int32_t p_y);
+	int32_t IsPointInFaceYZ(struct Face* p_face, struct Vertex* p_vertices, int32_t p_y, int32_t p_z);
 
 #ifdef __cplusplus
 }

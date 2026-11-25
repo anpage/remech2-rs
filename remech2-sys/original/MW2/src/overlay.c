@@ -28,18 +28,18 @@
 // the release build only formats for: the drawing is compiled out.
 
 // The spaces the Hide functions blank a readout with.
-MechChar g_blankText[] = "                                 ";
+char g_blankText[] = "                                 ";
 
-MechS32 g_showPalette = 0;
+int32_t g_showPalette = 0;
 
 // The row MonoPrint last wrote to; MonoClear resets it and its neighbours to the top row.
-MechS32 g_monoLastRow = 3;
+int32_t g_monoLastRow = 3;
 
-MechS32 g_frameRateShown = 0;
+int32_t g_frameRateShown = 0;
 
-MechS32 g_showFrameRate = 0;
+int32_t g_showFrameRate = 0;
 
-MechS32 g_showFrameRateMain = 0;
+int32_t g_showFrameRateMain = 0;
 
 // Where the _MAIN readouts are drawn, in 16.16 fractions of the screen until
 // ScaleOverlayPositions scales them to pixels.
@@ -49,50 +49,50 @@ Point g_memInfoOrigin = {0x51f, 0x2148};
 
 Point g_eyePositionOrigin = {0xccd, 0xb333};
 
-MechS32 g_showSceneInfo = 0;
+int32_t g_showSceneInfo = 0;
 
-MechS32 g_showSceneInfoMain = 0;
+int32_t g_showSceneInfoMain = 0;
 
-MechS32 g_sceneInfoShown = 0;
+int32_t g_sceneInfoShown = 0;
 
-MechS32 g_showEyePosition = 0;
+int32_t g_showEyePosition = 0;
 
-MechS32 g_showEyePositionMain = 0;
+int32_t g_showEyePositionMain = 0;
 
-MechS32 g_eyePositionShown = 0;
+int32_t g_eyePositionShown = 0;
 
-MechS32 g_showMemInfo = 1;
+int32_t g_showMemInfo = 1;
 
-MechS32 g_showMemInfoMain = 0;
+int32_t g_showMemInfoMain = 0;
 
-MechS32 g_memInfoShown = 0;
+int32_t g_memInfoShown = 0;
 
-MechS32 g_showCacheInfo = 0;
+int32_t g_showCacheInfo = 0;
 
-MechS32 g_cacheInfoShown = 0;
+int32_t g_cacheInfoShown = 0;
 
-MechS32 g_showSpinner = 1;
+int32_t g_showSpinner = 1;
 
 // The spinner StepSpinner steps through: the CP437 arrows up, left, down and right.
-MechChar g_spinnerArrows[4] = {0x1e, 0x11, 0x1f, 0x10};
+char g_spinnerArrows[4] = {0x1e, 0x11, 0x1f, 0x10};
 
 // The frame rate, in whole frames per second and tenths, over the last ten frames.
-MechS32 g_frameRate = 0;
+int32_t g_frameRate = 0;
 
-MechS32 g_frameRateTenths = 0;
+int32_t g_frameRateTenths = 0;
 
-MechS32 g_frameRateTime = 0;
+int32_t g_frameRateTime = 0;
 
-MechS32 g_frameRateFrames = 0;
+int32_t g_frameRateFrames = 0;
 
-MechS32 g_spinnerDelay = 4;
+int32_t g_spinnerDelay = 4;
 
-MechS32 g_spinnerArrow = 3;
+int32_t g_spinnerArrow = 3;
 
 // The cursor of MonoPrint.
-MechS32 g_monoRow = 3;
+int32_t g_monoRow = 3;
 
-MechS32 g_monoColumn = 0;
+int32_t g_monoColumn = 0;
 
 // The debug build drew each text it formatted while g_monoEnabled was set; the release
 // build keeps only the test.
@@ -103,22 +103,22 @@ MechS32 g_monoColumn = 0;
 	} while (0)
 
 // The totals CountSceneShape adds up for ShowSceneInfo.
-MechS32 g_sceneVertexCount;
+int32_t g_sceneVertexCount;
 
-MechS32 g_sceneMemory;
+int32_t g_sceneMemory;
 
-MechS32 g_sceneShapeCount;
+int32_t g_sceneShapeCount;
 
-MechS32 g_sceneFaceCount;
+int32_t g_sceneFaceCount;
 
 // Set when the monochrome debug screen is in use; the AI logs its state to it too. Only the
 // /M switch's InitializeMono could have set it, in a branch compiled out.
-MechS32 g_monoEnabled;
+int32_t g_monoEnabled;
 
 // A line of spaces, with its terminator.
-MechChar g_monoBlankLine[0x50];
+char g_monoBlankLine[0x50];
 
-MechChar g_monoBlankLineEnd;
+char g_monoBlankLineEnd;
 
 // Draws each debug overlay that is on, or blanks it once it goes off; called every frame.
 void DrawDebugOverlays(void)
@@ -169,10 +169,10 @@ void DrawDebugOverlays(void)
 // Draws the 256 palette colours as a grid of 16 swatches per row.
 void DrawPaletteGrid(void)
 {
-	MechS32 x;
-	MechS32 y;
-	MechS32 color;
-	MechS32 i;
+	int32_t x;
+	int32_t y;
+	int32_t color;
+	int32_t i;
 
 	x = 10;
 	y = 10;
@@ -195,7 +195,7 @@ void DrawPaletteGrid(void)
 // stopped the mission timer here).
 void InitializeMono(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (FALSE) {
 		g_monoEnabled = TRUE;
@@ -210,8 +210,8 @@ void InitializeMono(void)
 
 void ShowFrameRate(void)
 {
-	MechChar text[64];
-	MechS32 rate;
+	char text[64];
+	int32_t rate;
 
 	if (!g_monoEnabled && !g_showFrameRateMain) {
 		return;
@@ -242,8 +242,8 @@ void ShowFrameRate(void)
 
 void HideFrameRate(void)
 {
-	MechChar text[16];
-	MechChar format[16];
+	char text[16];
+	char format[16];
 
 	sprintf(format, "%%%d.%ds", 0xe, 0xe);
 	sprintf(text, format, g_blankText);
@@ -253,7 +253,7 @@ void HideFrameRate(void)
 
 void ShowSceneInfo(void)
 {
-	MechChar text[80];
+	char text[80];
 
 	if (!g_monoEnabled && !g_showSceneInfoMain) {
 		return;
@@ -301,8 +301,8 @@ void ShowSceneInfo(void)
 
 void HideSceneInfo(void)
 {
-	MechChar text[32];
-	MechChar format[32];
+	char text[32];
+	char format[32];
 
 	sprintf(format, "%%%d.%ds", 0x1e, 0x1e);
 	sprintf(text, format, g_blankText);
@@ -314,8 +314,8 @@ void HideSceneInfo(void)
 // Adds a shape's counts to the totals ShowSceneInfo shows.
 void CountSceneShape(Shape* p_shape)
 {
-	MechS32 vertexCount;
-	MechS32 faceCount;
+	int32_t vertexCount;
+	int32_t faceCount;
 
 	vertexCount = 0;
 	faceCount = 0;
@@ -329,7 +329,7 @@ void CountSceneShape(Shape* p_shape)
 
 void ShowEyePosition(Eyepoint* p_eyepoint)
 {
-	MechChar text[132];
+	char text[132];
 
 	if (!g_showEyePositionMain && !g_monoEnabled) {
 		return;
@@ -365,8 +365,8 @@ void ShowEyePosition(Eyepoint* p_eyepoint)
 
 void HideEyePosition(void)
 {
-	MechChar text[28];
-	MechChar format[28];
+	char text[28];
+	char format[28];
 
 	sprintf(format, "%%%d.%ds", 0x18, 0x18);
 	sprintf(text, format, g_blankText);
@@ -377,7 +377,7 @@ void HideEyePosition(void)
 
 void ShowCacheInfo(void)
 {
-	MechChar text[28];
+	char text[28];
 
 	sprintf(text, "Items in cache: %i     ", g_cacheEntryCount);
 	DRAW_DEBUG_TEXT();
@@ -386,7 +386,7 @@ void ShowCacheInfo(void)
 
 void HideCacheInfo(void)
 {
-	MechChar text[28];
+	char text[28];
 
 	// The original also passed 0x19 twice, which the format doesn't use
 	sprintf(text, "                           ");
@@ -396,8 +396,8 @@ void HideCacheInfo(void)
 
 void ShowMemInfo(void)
 {
-	MechChar text[40];
-	MechS32 value;
+	char text[40];
+	int32_t value;
 
 	value = 0;
 	if (!g_memInfoShown) {
@@ -414,8 +414,8 @@ void ShowMemInfo(void)
 
 void HideMemInfo(void)
 {
-	MechChar text[16];
-	MechChar format[16];
+	char text[16];
+	char format[16];
 
 	sprintf(format, "%%%d.%ds", 0xc, 0xc);
 	sprintf(text, format, g_blankText);
@@ -426,7 +426,7 @@ void HideMemInfo(void)
 // Steps the activity spinner.
 void StepSpinner(void)
 {
-	MechChar text[2];
+	char text[2];
 
 	if (--g_spinnerDelay == 0) {
 		g_spinnerDelay = 4;
@@ -441,11 +441,11 @@ void StepSpinner(void)
 }
 
 // Formats a line for the debug console: a leading space, padded with spaces to 79 characters.
-void MonoPrintLine(MechChar* p_text)
+void MonoPrintLine(char* p_text)
 {
-	MechS32 i;
-	MechChar text[80];
-	MechChar* dst;
+	int32_t i;
+	char text[80];
+	char* dst;
 
 	for (i = 0; i < 80; i++) {
 		text[i] = '\0';
@@ -466,7 +466,7 @@ void MonoPrintLine(MechChar* p_text)
 // Clears the debug console's rows 3 to 23.
 void MonoClear(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 3; i <= 0x17; i++) {
 		DRAW_DEBUG_TEXT();
@@ -476,12 +476,12 @@ void MonoClear(void)
 }
 
 // Writes text to the debug console, 80 columns and rows 3 to 23, clearing it when it fills.
-void MonoPrint(MechChar* p_text)
+void MonoPrint(char* p_text)
 {
-	MechS32 newline;
-	MechChar ch[2];
-	MechS32 i;
-	MechS32 length;
+	int32_t newline;
+	char ch[2];
+	int32_t i;
+	int32_t length;
 
 	newline = FALSE;
 	length = strlen(p_text);
@@ -519,9 +519,9 @@ void ScaleOverlayPositions(void)
 	ScalePointToScreen(&g_mainPixelBuffer, &g_memInfoOrigin, &g_memInfoOrigin);
 }
 
-void SimEntranceDbug(MechChar* p_mission, MechS32 p_memory)
+void SimEntranceDbug(char* p_mission, int32_t p_memory)
 {
-	MechChar text[80];
+	char text[80];
 
 	sprintf(
 		text,

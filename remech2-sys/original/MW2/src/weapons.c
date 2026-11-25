@@ -46,19 +46,19 @@
 Shape* g_aimedShape = NULL;
 
 // The fire button fires only the selected weapon; cleared, it fires them all.
-MechS32 g_singleWeaponFire = 1;
+int32_t g_singleWeaponFire = 1;
 
 // The weapons each remote player's weapons message fired, and those the local player fired since
 // the last one (network.c).
 
-MechS32 g_remoteWeaponsFired[10];
+int32_t g_remoteWeaponsFired[10];
 
-MechS32 g_localWeaponsFired[10];
+int32_t g_localWeaponsFired[10];
 
 void ReleaseWeaponTriggers(Mech* p_mech)
 {
 	WeaponSlot* slot;
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 10; i++) {
 		slot = &p_mech->m_weapons[i];
@@ -75,16 +75,16 @@ void ReleaseWeaponTriggers(Mech* p_mech)
 
 void UpdateWeaponFireState(Mech* p_mech)
 {
-	MechS32 dy;
-	MechS32 first;
-	MechS32 dx;
-	MechS32 dz;
+	int32_t dy;
+	int32_t first;
+	int32_t dx;
+	int32_t dz;
 	WeaponSlot* slot;
-	MechS32 time;
+	int32_t time;
 	WeaponDef* def;
-	MechS32 i;
-	MechS32 pan;
-	MechS32 fired;
+	int32_t i;
+	int32_t pan;
+	int32_t fired;
 
 	first = FALSE;
 	if (p_mech->m_powerState != 2) {
@@ -285,17 +285,17 @@ void UpdateWeaponFireState(Mech* p_mech)
 
 // Launches one shot of p_slot's weapon from the player's current hardpoint. Returns 0 when the
 // weapon can't fire again: no hardpoint, or out of ammunition.
-MechS32 SpawnShot(Player* p_player, WeaponSlot* p_slot)
+int32_t SpawnShot(Player* p_player, WeaponSlot* p_slot)
 {
-	MechS32 result;
+	int32_t result;
 	Shot* shot;
 	WeaponDef* def;
-	MechS32 found;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 dz;
-	MechS32 i;
-	MechS32 speed;
+	int32_t found;
+	int32_t dx;
+	int32_t dy;
+	int32_t dz;
+	int32_t i;
+	int32_t speed;
 
 	def = &g_weaponDefs[p_slot->m_type];
 	result = 1;
@@ -389,14 +389,14 @@ MechS32 SpawnShot(Player* p_player, WeaponSlot* p_slot)
 
 // Selects the next weapon of the selected one's group; p_wrap moves on to the next group when
 // there is none.
-void SelectNextWeaponInGroup(Mech* p_mech, MechS32 p_wrap)
+void SelectNextWeaponInGroup(Mech* p_mech, int32_t p_wrap)
 {
-	MechS32 index;
-	MechS32 group;
+	int32_t index;
+	int32_t group;
 	WeaponSlot* slot;
-	MechS32 found;
-	MechS32 i;
-	MechS32 selected;
+	int32_t found;
+	int32_t i;
+	int32_t selected;
 
 	found = FALSE;
 	if (p_mech->m_weaponCount <= 0) {
@@ -429,8 +429,8 @@ void SelectNextWeaponInGroup(Mech* p_mech, MechS32 p_wrap)
 // Selects the next weapon that still has ammunition.
 void SelectNextWeapon(Mech* p_mech)
 {
-	MechS32 done;
-	MechS32 tries;
+	int32_t done;
+	int32_t tries;
 
 	done = FALSE;
 	tries = 0;
@@ -462,11 +462,11 @@ void SelectNextWeapon(Mech* p_mech)
 // Selects the first weapon of the next group that has one.
 void SelectNextWeaponGroup(Mech* p_mech)
 {
-	MechS32 group;
-	MechS32 i;
-	MechS32 found;
-	MechS32 selected;
-	MechS32 current;
+	int32_t group;
+	int32_t i;
+	int32_t found;
+	int32_t selected;
+	int32_t current;
 
 	i = 0;
 	found = FALSE;
@@ -498,12 +498,12 @@ void SelectNextWeaponGroup(Mech* p_mech)
 }
 
 // Selects the first weapon of p_group. Returns 1 if the group has one.
-MechS32 SelectWeaponGroup(Mech* p_mech, MechS32 p_group)
+int32_t SelectWeaponGroup(Mech* p_mech, int32_t p_group)
 {
-	MechS32 i;
-	MechS32 found;
-	MechS32 selected;
-	MechS32 current;
+	int32_t i;
+	int32_t found;
+	int32_t selected;
+	int32_t current;
 
 	i = 0;
 	found = FALSE;
@@ -537,9 +537,9 @@ MechS32 SelectWeaponGroup(Mech* p_mech, MechS32 p_group)
 }
 
 // Returns 1 if the selected weapon is ready, 0 if not, -1 without one.
-MechS32 IsSelectedWeaponReady(Mech* p_mech)
+int32_t IsSelectedWeaponReady(Mech* p_mech)
 {
-	MechS32 result;
+	int32_t result;
 
 	result = -1;
 	if (p_mech->m_selectedWeapon != -1) {
@@ -555,9 +555,9 @@ MechS32 IsSelectedWeaponReady(Mech* p_mech)
 }
 
 // Dumps the selected weapon's ammunition.
-MechS32 JettisonAmmo(Mech* p_mech)
+int32_t JettisonAmmo(Mech* p_mech)
 {
-	MechChar text[40];
+	char text[40];
 	WeaponSlot* slot;
 
 	if (p_mech->m_selectedWeapon == -1) {
@@ -581,7 +581,7 @@ MechS32 JettisonAmmo(Mech* p_mech)
 // Loads the launch sounds of the weapons and the sounds of the effects.
 void LoadWeaponSounds(void)
 {
-	MechS32 i;
+	int32_t i;
 	WeaponDef* def;
 
 	for (i = 0; i < 30; i++) {
@@ -598,7 +598,7 @@ void LoadWeaponSounds(void)
 	}
 }
 
-void SetWeaponGroup(Mech* p_mech, MechS32 p_index, MechS32 p_group)
+void SetWeaponGroup(Mech* p_mech, int32_t p_index, int32_t p_group)
 {
 	WeaponSlot* slot;
 
@@ -609,7 +609,7 @@ void SetWeaponGroup(Mech* p_mech, MechS32 p_index, MechS32 p_group)
 }
 
 // Moves the local player's selected weapon to p_group.
-void SetSelectedWeaponGroup(MechS32 p_group)
+void SetSelectedWeaponGroup(int32_t p_group)
 {
 	Mech* mech;
 	WeaponSlot* slot;
@@ -632,7 +632,7 @@ void FireRemoteWeapons(Mech* p_mech)
 {
 	WeaponSlot* slot;
 	WeaponDef* def;
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 10; i++) {
 		if (g_remoteWeaponsFired[i]) {
@@ -659,8 +659,8 @@ void FireRemoteWeapons(Mech* p_mech)
 void FireWeaponGroup(void)
 {
 	Mech* mech;
-	MechS32 selected;
-	MechS32 first;
+	int32_t selected;
+	int32_t first;
 	WeaponDef* def;
 	WeaponSlot* slot;
 
@@ -694,8 +694,8 @@ void FireWeaponGroup(void)
 // Moves the next weapon into the selected one's group.
 void AddNextWeaponToGroup(Mech* p_mech)
 {
-	MechS32 group;
-	MechS32 next;
+	int32_t group;
+	int32_t next;
 
 	p_mech->m_flags ^= 0x4000;
 	next = p_mech->m_selectedWeapon;
@@ -712,16 +712,16 @@ void AddNextWeaponToGroup(Mech* p_mech)
 // within 16 degrees of the aim, it locks on after 0x16a ticks.
 void UpdateWeaponLock(Mech* p_mech)
 {
-	MechS32 dz;
-	MechS32 twist;
-	MechS32 pitch;
-	MechS32 yaw;
-	MechS32 bearing;
-	MechS32 inRange;
-	MechS32 dx;
+	int32_t dz;
+	int32_t twist;
+	int32_t pitch;
+	int32_t yaw;
+	int32_t bearing;
+	int32_t inRange;
+	int32_t dx;
 	WeaponDef* def;
-	MechS32 dy;
-	MechS32 heading;
+	int32_t dy;
+	int32_t heading;
 
 	p_mech->m_flags &= ~0x80;
 	def = &g_weaponDefs[p_mech->m_weapons[p_mech->m_selectedWeapon].m_type];
@@ -795,10 +795,10 @@ void UpdateWeaponLock(Mech* p_mech)
 Shape* UpdateAimDistance(Player* p_player)
 {
 	Ray ray;
-	MechS32 length;
+	int32_t length;
 	Shape* hit;
-	MechU16 flags;
-	MechS32 collided;
+	uint16_t flags;
+	int32_t collided;
 
 	hit = NULL;
 	UpdateRamp(&p_player->m_aimDistance);
@@ -821,17 +821,17 @@ Shape* UpdateAimDistance(Player* p_player)
 	return hit;
 }
 
-MechS32 GetAimRange(Player* p_player)
+int32_t GetAimRange(Player* p_player)
 {
 	return p_player->m_aimRange.m_value;
 }
 
-void GetMechAimDirection(Player* p_player, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void GetMechAimDirection(Player* p_player, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	Ray ray;
-	MechS32 z;
-	MechS32 y;
-	MechS32 x;
+	int32_t z;
+	int32_t y;
+	int32_t x;
 
 	BuildAimRay(p_player, &ray);
 	SetRayLength(&ray, GetAimRange(p_player));
@@ -844,12 +844,12 @@ void GetMechAimDirection(Player* p_player, MechS32* p_x, MechS32* p_y, MechS32* 
 // Builds the player's aim ray, 150000 long.
 void BuildAimRay(Player* p_player, Ray* p_ray)
 {
-	MechS32 z;
-	MechS32 y;
-	MechS32 x;
-	MechS32 dz;
-	MechS32 dy;
-	MechS32 dx;
+	int32_t z;
+	int32_t y;
+	int32_t x;
+	int32_t dz;
+	int32_t dy;
+	int32_t dx;
 
 	GetEyeAimDirection(p_player, &dx, &dy, &dz);
 	GetObjPosition(p_player->m_eyeObj, &x, &y, &z);
@@ -861,7 +861,7 @@ void BuildAimRay(Player* p_player, Ray* p_ray)
 }
 
 // The direction the player aims in.
-void GetEyeAimDirection(Player* p_player, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void GetEyeAimDirection(Player* p_player, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	Matrix matrix;
 	undefined4 z;
@@ -878,7 +878,7 @@ void GetEyeAimDirection(Player* p_player, MechS32* p_x, MechS32* p_y, MechS32* p
 	RotatePoint(&matrix, p_x, p_y, p_z);
 }
 
-void GetFiringPosition(Player* p_player, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void GetFiringPosition(Player* p_player, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	GetObjPosition(p_player->m_firingObj, p_x, p_y, p_z);
 }
@@ -886,9 +886,9 @@ void GetFiringPosition(Player* p_player, MechS32* p_x, MechS32* p_y, MechS32* p_
 // Places p_obj at the player's current hardpoint.
 void PlaceAtFiringObj(Player* p_player, SceneObject* p_obj)
 {
-	MechS32 z;
-	MechS32 y;
-	MechS32 x;
+	int32_t z;
+	int32_t y;
+	int32_t x;
 
 	GetFiringPosition(p_player, &x, &y, &z);
 	SetObjRotationMatrix(p_obj, GetObjWorldMatrix(p_player->m_firingObj));
@@ -897,21 +897,21 @@ void PlaceAtFiringObj(Player* p_player, SceneObject* p_obj)
 
 // Places a launched shot's object at the player's hardpoint, pointing along the launch
 // direction, and sets it moving. p_spread moves it up to 100 units off the line.
-void SpawnLaunchFx(Player* p_player, SceneObject* p_obj, MechS32 p_dx, MechS32 p_dy, MechS32 p_dz, MechS32 p_spread)
+void SpawnLaunchFx(Player* p_player, SceneObject* p_obj, int32_t p_dx, int32_t p_dy, int32_t p_dz, int32_t p_spread)
 {
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 pitch;
-	MechS32 yaw;
-	MechS32 speed;
-	MechS32 sideZ;
-	MechS32 offset;
-	MechS32 upX;
-	MechS32 upY;
-	MechS32 upZ;
-	MechS32 sideX;
-	MechS32 sideY;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t pitch;
+	int32_t yaw;
+	int32_t speed;
+	int32_t sideZ;
+	int32_t offset;
+	int32_t upX;
+	int32_t upY;
+	int32_t upZ;
+	int32_t sideX;
+	int32_t sideY;
 
 	yaw = FixedAtan2(p_dx, p_dz);
 	pitch = FixedAsin(p_dy << 13);

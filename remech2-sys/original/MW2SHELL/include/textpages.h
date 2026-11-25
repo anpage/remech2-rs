@@ -7,17 +7,17 @@
 #include "types.h"
 
 // The functions and globals of textpages.cpp that other units use.
-extern MechU8 g_textPageColors[0x100];
-extern MechChar g_expandedText[0x2000];
+extern uint8_t g_textPageColors[0x100];
+extern char g_expandedText[0x2000];
 void LoadTextPages(
 	Collection* p_pages,
-	MechS32 p_left,
-	MechS32 p_top,
-	MechS32 p_width,
-	MechS32 p_height,
-	MechChar* p_name,
+	int32_t p_left,
+	int32_t p_top,
+	int32_t p_width,
+	int32_t p_height,
+	char* p_name,
 	Font* p_font,
-	MechChar* p_quote
+	char* p_quote
 );
 
 #endif // TEXTPAGES_H

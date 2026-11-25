@@ -13,6 +13,6 @@ extern ButtonMenu* g_briefingMenu;
 extern Page* g_briefingPage;
 extern Collection* g_briefingPages;
 extern ArchiveReader* g_situationReader;
-void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, MechS32 p_campaign);
+void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, int32_t p_campaign);
 
 #endif // BRIEFING_H

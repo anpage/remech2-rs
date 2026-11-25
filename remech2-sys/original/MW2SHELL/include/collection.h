@@ -16,31 +16,31 @@ extern "C"
 #pragma pack(1)
 	// A growable array of item pointers, optionally kept sorted by m_compare.
 	typedef struct Collection {
-		MechS32 m_capacity;                         // 0x00
-		MechS32 m_count;                            // 0x04
-		MechS32 m_growBy;                           // 0x08
-		MechU8 m_flags;                             // 0x0c
-		MechS32 m_unsorted;                         // 0x0d
+		int32_t m_capacity;                         // 0x00
+		int32_t m_count;                            // 0x04
+		int32_t m_growBy;                           // 0x08
+		uint8_t m_flags;                            // 0x0c
+		int32_t m_unsorted;                         // 0x0d
 		void** m_items;                             // 0x11
 		void (*m_destroyItem)(void*);               // 0x15
 		int (*m_compare)(const void*, const void*); // 0x19
 	} Collection;
 #pragma pack()
 
-	MechS32 CreateCollection(
+	int32_t CreateCollection(
 		Collection** p_collection,
-		MechS32 p_growBy,
+		int32_t p_growBy,
 		void (*p_destroyItem)(void*),
-		MechU8 p_flags,
+		uint8_t p_flags,
 		int (*p_compare)(const void*, const void*)
 	);
-	MechS32 DestroyCollection(Collection* p_collection);
-	MechS32 ExpandCollection(Collection* p_collection, void* p_item);
-	void CollectionRemove(Collection* p_collection, void* p_item, MechU8 p_destroy);
-	MechS32 CollectionFind(Collection* p_collection, void* p_item);
+	int32_t DestroyCollection(Collection* p_collection);
+	int32_t ExpandCollection(Collection* p_collection, void* p_item);
+	void CollectionRemove(Collection* p_collection, void* p_item, uint8_t p_destroy);
+	int32_t CollectionFind(Collection* p_collection, void* p_item);
 	void SortCollection(Collection* p_collection);
 	void EnsureCollectionSorted(Collection* p_collection);
-	void* CollectionGet(Collection* p_collection, MechS32 p_index);
+	void* CollectionGet(Collection* p_collection, int32_t p_index);
 	void MoveCollectionItems(Collection* p_collection, Collection* p_source);
 	void ClearCollection(Collection* p_collection);
 

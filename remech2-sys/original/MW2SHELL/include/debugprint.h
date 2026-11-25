@@ -9,10 +9,10 @@ extern "C"
 {
 #endif
 
-	extern MechChar g_debugPrintBuffer[0x100];
+	extern char g_debugPrintBuffer[0x100];
 
-	void ShowMessage(const MechChar* p_format, ...);
-	void DebugPrint(const MechChar* p_format, ...);
+	void ShowMessage(const char* p_format, ...);
+	void DebugPrint(const char* p_format, ...);
 
 #ifdef __cplusplus
 }

@@ -7,13 +7,13 @@
 
 // Approximates the length of (p_x, p_y, p_z) as (max * 4 + the other two) / 4 of the absolute
 // values.
-MechS32 ApproximateVectorLength(MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t ApproximateVectorLength(int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	/* neg leaves INT_MIN negative, and the comparisons are signed; the sum wraps. */
-	MechS32 x = p_x < 0 ? PortableS32(0 - (MechU32) p_x) : p_x;
-	MechS32 y = p_y < 0 ? PortableS32(0 - (MechU32) p_y) : p_y;
-	MechS32 z = p_z < 0 ? PortableS32(0 - (MechU32) p_z) : p_z;
-	MechS32 swap;
+	int32_t x = p_x < 0 ? PortableS32(0 - (uint32_t) p_x) : p_x;
+	int32_t y = p_y < 0 ? PortableS32(0 - (uint32_t) p_y) : p_y;
+	int32_t z = p_z < 0 ? PortableS32(0 - (uint32_t) p_z) : p_z;
+	int32_t swap;
 
 	if (x < y) {
 		swap = x;
@@ -27,5 +27,5 @@ MechS32 ApproximateVectorLength(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 		z = swap;
 	}
 
-	return PortableSar32(PortableS32(((MechU32) x << 2) + (MechU32) y + (MechU32) z), 2);
+	return PortableSar32(PortableS32(((uint32_t) x << 2) + (uint32_t) y + (uint32_t) z), 2);
 }

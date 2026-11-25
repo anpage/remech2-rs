@@ -14,429 +14,429 @@
 // follow in the order of the button tables: Wolf's, Jade Falcon's, the main menu's and the
 // mission briefing's.
 
-extern MechS32 g_echelonLeftPositions[6];
-extern MechS32 g_echelonRightPositions[6];
-extern MechS32 g_lineAbreastPositions[6];
-extern MechS32 g_lineAsternPositions[6];
-extern MechS32 g_vFormPositions[6];
-extern MechS32 g_wedgePositions[6];
+extern int32_t g_echelonLeftPositions[6];
+extern int32_t g_echelonRightPositions[6];
+extern int32_t g_lineAbreastPositions[6];
+extern int32_t g_lineAsternPositions[6];
+extern int32_t g_vFormPositions[6];
+extern int32_t g_wedgePositions[6];
 
-MechChar g_wolfClanHallCadetTrainingLabel[0x10] = "CADET TRAINING";
+char g_wolfClanHallCadetTrainingLabel[0x10] = "CADET TRAINING";
 
-MechChar g_wolfClanHallArchiveLabel[0x18] = "ARCHIVE HOLOPROJECTOR";
+char g_wolfClanHallArchiveLabel[0x18] = "ARCHIVE HOLOPROJECTOR";
 
-MechChar g_wolfClanHallReadyRoomLabel[0x0c] = "READY ROOM";
+char g_wolfClanHallReadyRoomLabel[0x0c] = "READY ROOM";
 
-MechChar g_wolfClanHallRegisterLabel[0x0c] = "REGISTER";
+char g_wolfClanHallRegisterLabel[0x0c] = "REGISTER";
 
-MechChar g_wolfClanHallExitLabel[0x08] = "~EXIT";
+char g_wolfClanHallExitLabel[0x08] = "~EXIT";
 
-MechChar g_wolfRosterNewAllegianceLabel[0x14] = "<~NEW ALLEGIANCE";
+char g_wolfRosterNewAllegianceLabel[0x14] = "<~NEW ALLEGIANCE";
 
 // The ten pilot slots, which show the callsigns instead.
-MechChar g_wolfRosterSlot0Label[0x04] = "";
+char g_wolfRosterSlot0Label[0x04] = "";
 
-MechChar g_wolfRosterSlot1Label[0x04] = "";
+char g_wolfRosterSlot1Label[0x04] = "";
 
-MechChar g_wolfRosterSlot2Label[0x04] = "";
+char g_wolfRosterSlot2Label[0x04] = "";
 
-MechChar g_wolfRosterSlot3Label[0x04] = "";
+char g_wolfRosterSlot3Label[0x04] = "";
 
-MechChar g_wolfRosterSlot4Label[0x04] = "";
+char g_wolfRosterSlot4Label[0x04] = "";
 
-MechChar g_wolfRosterSlot5Label[0x04] = "";
+char g_wolfRosterSlot5Label[0x04] = "";
 
-MechChar g_wolfRosterSlot6Label[0x04] = "";
+char g_wolfRosterSlot6Label[0x04] = "";
 
-MechChar g_wolfRosterSlot7Label[0x04] = "";
+char g_wolfRosterSlot7Label[0x04] = "";
 
-MechChar g_wolfRosterSlot8Label[0x04] = "";
+char g_wolfRosterSlot8Label[0x04] = "";
 
-MechChar g_wolfRosterSlot9Label[0x04] = "";
+char g_wolfRosterSlot9Label[0x04] = "";
 
-MechChar g_wolfRosterAcceptLabel[0x0c] = "<~ACCEPT";
+char g_wolfRosterAcceptLabel[0x0c] = "<~ACCEPT";
 
-MechChar g_wolfRosterDeleteMechwarriorLabel[0x18] = "<~DELETE MECHWARRIOR";
+char g_wolfRosterDeleteMechwarriorLabel[0x18] = "<~DELETE MECHWARRIOR";
 
-MechChar g_wolfRosterLaunchOldMissionLabel[0x18] = "<~LAUNCH OLD MISSION";
+char g_wolfRosterLaunchOldMissionLabel[0x18] = "<~LAUNCH OLD MISSION";
 
-MechChar g_wolfRosterPilotInfoLabel[0x10] = "<~PILOT INFO";
+char g_wolfRosterPilotInfoLabel[0x10] = "<~PILOT INFO";
 
-MechChar g_wolfArchiveExitLabel[0x08] = "~EXIT";
+char g_wolfArchiveExitLabel[0x08] = "~EXIT";
 
-MechChar g_wolfArchivePrevPageLabel[0x0c] = "~PREV PAGE";
+char g_wolfArchivePrevPageLabel[0x0c] = "~PREV PAGE";
 
-MechChar g_wolfArchiveNextPageLabel[0x0c] = "~NEXT PAGE";
+char g_wolfArchiveNextPageLabel[0x0c] = "~NEXT PAGE";
 
-MechChar g_wolfArchiveBackLabel[0x08] = "~BACK";
+char g_wolfArchiveBackLabel[0x08] = "~BACK";
 
-MechChar g_wolfCadetTrainingClanHallLabel[0x0c] = "CLAN HALL";
+char g_wolfCadetTrainingClanHallLabel[0x0c] = "CLAN HALL";
 
-MechChar g_wolfCadetTrainingNavComputerLabel[0x10] = "<~NAV COMPUTER";
+char g_wolfCadetTrainingNavComputerLabel[0x10] = "<~NAV COMPUTER";
 
-MechChar g_wolfCadetTrainingMechHandlingLabel[0x10] = "<~MECH HANDLING";
+char g_wolfCadetTrainingMechHandlingLabel[0x10] = "<~MECH HANDLING";
 
-MechChar g_wolfCadetTrainingWeaponsUsageLabel[0x10] = "<~WEAPONS USAGE";
+char g_wolfCadetTrainingWeaponsUsageLabel[0x10] = "<~WEAPONS USAGE";
 
-MechChar g_wolfCadetTrainingHuntingLabel[0x0c] = "<~HUNTING";
+char g_wolfCadetTrainingHuntingLabel[0x0c] = "<~HUNTING";
 
-MechChar g_wolfCadetTrainingInspectionLabel[0x10] = "<~INSPECTION";
+char g_wolfCadetTrainingInspectionLabel[0x10] = "<~INSPECTION";
 
-MechChar g_wolfCadetTrainingTrialLabel[0x08] = "<~TRIAL";
+char g_wolfCadetTrainingTrialLabel[0x08] = "<~TRIAL";
 
-MechChar g_wolfReadyRoomClanHallLabel[0x0c] = "CLAN HALL";
+char g_wolfReadyRoomClanHallLabel[0x0c] = "CLAN HALL";
 
-MechChar g_wolfReadyRoomMechLabLabel[0x0c] = "~MECH LAB";
+char g_wolfReadyRoomMechLabLabel[0x0c] = "~MECH LAB";
 
-MechChar g_wolfReadyRoomStarConfigLabel[0x10] = "~STAR CONFIG";
+char g_wolfReadyRoomStarConfigLabel[0x10] = "~STAR CONFIG";
 
-MechChar g_wolfReadyRoomMissionBriefingLabel[0x14] = "~MISSION BRIEFING";
+char g_wolfReadyRoomMissionBriefingLabel[0x14] = "~MISSION BRIEFING";
 
 // The campaign's missions, in g_wolfMissions' order, by their scenario names.
-MechChar g_wolfReadyRoomYellowLabel[0x0c] = "<~YELLOW";
+char g_wolfReadyRoomYellowLabel[0x0c] = "<~YELLOW";
 
-MechChar g_wolfReadyRoomOrangeLabel[0x0c] = "<~ORANGE";
+char g_wolfReadyRoomOrangeLabel[0x0c] = "<~ORANGE";
 
-MechChar g_wolfReadyRoomTealLabel[0x08] = "<~TEAL";
+char g_wolfReadyRoomTealLabel[0x08] = "<~TEAL";
 
-MechChar g_wolfReadyRoomTaupeLabel[0x08] = "<~TAUPE";
+char g_wolfReadyRoomTaupeLabel[0x08] = "<~TAUPE";
 
-MechChar g_wolfReadyRoomJennyLabel[0x08] = "<~JENNY";
+char g_wolfReadyRoomJennyLabel[0x08] = "<~JENNY";
 
-MechChar g_wolfReadyRoomSableLabel[0x08] = "<~SABLE";
+char g_wolfReadyRoomSableLabel[0x08] = "<~SABLE";
 
-MechChar g_wolfReadyRoomGreyLabel[0x08] = "<~GREY";
+char g_wolfReadyRoomGreyLabel[0x08] = "<~GREY";
 
-MechChar g_wolfReadyRoomBrownLabel[0x08] = "<~BROWN";
+char g_wolfReadyRoomBrownLabel[0x08] = "<~BROWN";
 
-MechChar g_wolfReadyRoomAmyLabel[0x08] = "<~AMY";
+char g_wolfReadyRoomAmyLabel[0x08] = "<~AMY";
 
-MechChar g_wolfReadyRoomSilverLabel[0x0c] = "<~SILVER";
+char g_wolfReadyRoomSilverLabel[0x0c] = "<~SILVER";
 
-MechChar g_wolfReadyRoomAquaLabel[0x08] = "<~AQUA";
+char g_wolfReadyRoomAquaLabel[0x08] = "<~AQUA";
 
-MechChar g_wolfReadyRoomKimLabel[0x08] = "<~KIM";
+char g_wolfReadyRoomKimLabel[0x08] = "<~KIM";
 
-MechChar g_wolfReadyRoomCyanLabel[0x08] = "<~CYAN";
+char g_wolfReadyRoomCyanLabel[0x08] = "<~CYAN";
 
-MechChar g_wolfReadyRoomMaroonLabel[0x0c] = "<~MAROON";
+char g_wolfReadyRoomMaroonLabel[0x0c] = "<~MAROON";
 
-MechChar g_wolfReadyRoomGoldLabel[0x08] = "<~GOLD";
+char g_wolfReadyRoomGoldLabel[0x08] = "<~GOLD";
 
-MechChar g_wolfReadyRoomIreneLabel[0x08] = "<~IRENE";
+char g_wolfReadyRoomIreneLabel[0x08] = "<~IRENE";
 
-MechChar g_wolfBriefingAbortLabel[0x08] = "<~ABORT";
+char g_wolfBriefingAbortLabel[0x08] = "<~ABORT";
 
-MechChar g_wolfBriefingSituationLabel[0x0c] = "<~SITUATION";
+char g_wolfBriefingSituationLabel[0x0c] = "<~SITUATION";
 
-MechChar g_wolfBriefingLaunchLabel[0x0c] = "<~LAUNCH";
+char g_wolfBriefingLaunchLabel[0x0c] = "<~LAUNCH";
 
-MechChar g_wolfBriefingSkipLabel[0x08] = "<~SKIP";
+char g_wolfBriefingSkipLabel[0x08] = "<~SKIP";
 
-MechChar g_wolfSituationExitLabel[0x08] = "<~EXIT";
+char g_wolfSituationExitLabel[0x08] = "<~EXIT";
 
-MechChar g_wolfSituationPrevPageLabel[0x0c] = "<~PREV PAGE";
+char g_wolfSituationPrevPageLabel[0x0c] = "<~PREV PAGE";
 
-MechChar g_wolfSituationNextPageLabel[0x0c] = "<~NEXT PAGE";
+char g_wolfSituationNextPageLabel[0x0c] = "<~NEXT PAGE";
 
 // ArchiveReader's BACK button, placed off screen.
-MechChar g_wolfSituationBackLabel[0x04] = "";
+char g_wolfSituationBackLabel[0x04] = "";
 
-MechChar g_wolfDebriefExitLabel[0x08] = "<~EXIT";
+char g_wolfDebriefExitLabel[0x08] = "<~EXIT";
 
-MechChar g_wolfDebriefAftermathLabel[0x0c] = "<~AFTERMATH";
+char g_wolfDebriefAftermathLabel[0x0c] = "<~AFTERMATH";
 
-MechChar g_wolfDebriefReplayLabel[0x0c] = "<~REPLAY";
+char g_wolfDebriefReplayLabel[0x0c] = "<~REPLAY";
 
-MechChar g_wolfAftermathExitLabel[0x08] = "<~EXIT";
+char g_wolfAftermathExitLabel[0x08] = "<~EXIT";
 
-MechChar g_wolfAftermathPrevPageLabel[0x0c] = "<~PREV PAGE";
+char g_wolfAftermathPrevPageLabel[0x0c] = "<~PREV PAGE";
 
-MechChar g_wolfAftermathNextPageLabel[0x0c] = "<~NEXT PAGE";
+char g_wolfAftermathNextPageLabel[0x0c] = "<~NEXT PAGE";
 
-MechChar g_wolfAftermathBackLabel[0x04] = "";
+char g_wolfAftermathBackLabel[0x04] = "";
 
-MechChar g_wolfStarConfigExitConfigLabel[0x10] = "<~EXIT CONFIG";
+char g_wolfStarConfigExitConfigLabel[0x10] = "<~EXIT CONFIG";
 
-MechChar g_wolfStarConfigMechLabLabel[0x0c] = "~MECH LAB";
+char g_wolfStarConfigMechLabLabel[0x0c] = "~MECH LAB";
 
-MechChar g_wolfStarConfigNextFormationLabel[0x10] = "NEXT FORMATION";
+char g_wolfStarConfigNextFormationLabel[0x10] = "NEXT FORMATION";
 
-MechChar g_wolfStarConfigPrevFormationLabel[0x10] = "PREV FORMATION";
+char g_wolfStarConfigPrevFormationLabel[0x10] = "PREV FORMATION";
 
-MechChar g_wolfStarConfigAddStarmateLabel[0x10] = "ADD STARMATE";
+char g_wolfStarConfigAddStarmateLabel[0x10] = "ADD STARMATE";
 
-MechChar g_wolfStarConfigDeleteStarmateLabel[0x10] = "DELETE STARMATE";
+char g_wolfStarConfigDeleteStarmateLabel[0x10] = "DELETE STARMATE";
 
-MechChar g_wolfStarConfigChangeMech0Label[0x0c] = "CHANGE MECH";
+char g_wolfStarConfigChangeMech0Label[0x0c] = "CHANGE MECH";
 
-MechChar g_wolfStarConfigChangeMech1Label[0x0c] = "CHANGE MECH";
+char g_wolfStarConfigChangeMech1Label[0x0c] = "CHANGE MECH";
 
-MechChar g_wolfStarConfigChangeMech2Label[0x0c] = "CHANGE MECH";
+char g_wolfStarConfigChangeMech2Label[0x0c] = "CHANGE MECH";
 
-MechChar g_wolfMechBayExitLabLabel[0x0c] = "<~EXIT LAB";
+char g_wolfMechBayExitLabLabel[0x0c] = "<~EXIT LAB";
 
-MechChar g_wolfMechBayStarConfigLabel[0x10] = "~STAR CONFIG";
+char g_wolfMechBayStarConfigLabel[0x10] = "~STAR CONFIG";
 
-MechChar g_wolfMechBayNextChassisLabel[0x10] = "NEXT CHASSIS";
+char g_wolfMechBayNextChassisLabel[0x10] = "NEXT CHASSIS";
 
-MechChar g_wolfMechBayPrevChassisLabel[0x10] = "PREV CHASSIS";
+char g_wolfMechBayPrevChassisLabel[0x10] = "PREV CHASSIS";
 
-MechChar g_wolfMechBayNextVariantLabel[0x10] = "NEXT VARIANT";
+char g_wolfMechBayNextVariantLabel[0x10] = "NEXT VARIANT";
 
-MechChar g_wolfMechBayPrevVariantLabel[0x10] = "PREV VARIANT";
+char g_wolfMechBayPrevVariantLabel[0x10] = "PREV VARIANT";
 
-MechChar g_wolfMechBayCustomizeLabel[0x0c] = "<~CUSTOMIZE";
+char g_wolfMechBayCustomizeLabel[0x0c] = "<~CUSTOMIZE";
 
-MechChar g_wolfMechBayAcceptMechLabel[0x10] = "<~ACCEPT MECH";
+char g_wolfMechBayAcceptMechLabel[0x10] = "<~ACCEPT MECH";
 
-MechChar g_wolfMechBaySaveLabel[0x08] = "<~SAVE";
+char g_wolfMechBaySaveLabel[0x08] = "<~SAVE";
 
-MechChar g_wolfMechBayAbortLabel[0x08] = "<~ABORT";
+char g_wolfMechBayAbortLabel[0x08] = "<~ABORT";
 
-MechChar g_wolfMechBayDeleteLabel[0x0c] = "<~DELETE";
+char g_wolfMechBayDeleteLabel[0x0c] = "<~DELETE";
 
-MechChar g_jadeFalconClanHallCadetTrainingLabel[0x10] = "CADET TRAINING";
+char g_jadeFalconClanHallCadetTrainingLabel[0x10] = "CADET TRAINING";
 
-MechChar g_jadeFalconClanHallArchiveLabel[0x18] = "ARCHIVE HOLOPROJECTOR";
+char g_jadeFalconClanHallArchiveLabel[0x18] = "ARCHIVE HOLOPROJECTOR";
 
-MechChar g_jadeFalconClanHallReadyRoomLabel[0x0c] = "READY ROOM";
+char g_jadeFalconClanHallReadyRoomLabel[0x0c] = "READY ROOM";
 
-MechChar g_jadeFalconClanHallRegisterLabel[0x0c] = "REGISTER";
+char g_jadeFalconClanHallRegisterLabel[0x0c] = "REGISTER";
 
-MechChar g_jadeFalconClanHallExitLabel[0x08] = "~EXIT";
+char g_jadeFalconClanHallExitLabel[0x08] = "~EXIT";
 
-MechChar g_jadeFalconRosterNewAllegianceLabel[0x14] = "<~NEW ALLEGIANCE";
+char g_jadeFalconRosterNewAllegianceLabel[0x14] = "<~NEW ALLEGIANCE";
 
-MechChar g_jadeFalconRosterSlot0Label[0x04] = "";
+char g_jadeFalconRosterSlot0Label[0x04] = "";
 
-MechChar g_jadeFalconRosterSlot1Label[0x04] = "";
+char g_jadeFalconRosterSlot1Label[0x04] = "";
 
-MechChar g_jadeFalconRosterSlot2Label[0x04] = "";
+char g_jadeFalconRosterSlot2Label[0x04] = "";
 
-MechChar g_jadeFalconRosterSlot3Label[0x04] = "";
+char g_jadeFalconRosterSlot3Label[0x04] = "";
 
-MechChar g_jadeFalconRosterSlot4Label[0x04] = "";
+char g_jadeFalconRosterSlot4Label[0x04] = "";
 
-MechChar g_jadeFalconRosterSlot5Label[0x04] = "";
+char g_jadeFalconRosterSlot5Label[0x04] = "";
 
-MechChar g_jadeFalconRosterSlot6Label[0x04] = "";
+char g_jadeFalconRosterSlot6Label[0x04] = "";
 
-MechChar g_jadeFalconRosterSlot7Label[0x04] = "";
+char g_jadeFalconRosterSlot7Label[0x04] = "";
 
-MechChar g_jadeFalconRosterSlot8Label[0x04] = "";
+char g_jadeFalconRosterSlot8Label[0x04] = "";
 
-MechChar g_jadeFalconRosterSlot9Label[0x04] = "";
+char g_jadeFalconRosterSlot9Label[0x04] = "";
 
-MechChar g_jadeFalconRosterAcceptLabel[0x0c] = "<~ACCEPT";
+char g_jadeFalconRosterAcceptLabel[0x0c] = "<~ACCEPT";
 
-MechChar g_jadeFalconRosterDeleteMechwarriorLabel[0x18] = "<~DELETE MECHWARRIOR";
+char g_jadeFalconRosterDeleteMechwarriorLabel[0x18] = "<~DELETE MECHWARRIOR";
 
-MechChar g_jadeFalconRosterLaunchOldMissionLabel[0x18] = "<~LAUNCH OLD MISSION";
+char g_jadeFalconRosterLaunchOldMissionLabel[0x18] = "<~LAUNCH OLD MISSION";
 
-MechChar g_jadeFalconRosterPilotInfoLabel[0x10] = "<~PILOT INFO";
+char g_jadeFalconRosterPilotInfoLabel[0x10] = "<~PILOT INFO";
 
-MechChar g_jadeFalconArchiveExitLabel[0x08] = "~EXIT";
+char g_jadeFalconArchiveExitLabel[0x08] = "~EXIT";
 
-MechChar g_jadeFalconArchivePrevPageLabel[0x0c] = "~PREV PAGE";
+char g_jadeFalconArchivePrevPageLabel[0x0c] = "~PREV PAGE";
 
-MechChar g_jadeFalconArchiveNextPageLabel[0x0c] = "~NEXT PAGE";
+char g_jadeFalconArchiveNextPageLabel[0x0c] = "~NEXT PAGE";
 
-MechChar g_jadeFalconArchiveBackLabel[0x08] = "~BACK";
+char g_jadeFalconArchiveBackLabel[0x08] = "~BACK";
 
-MechChar g_jadeFalconCadetTrainingClanHallLabel[0x0c] = "CLAN HALL";
+char g_jadeFalconCadetTrainingClanHallLabel[0x0c] = "CLAN HALL";
 
-MechChar g_jadeFalconCadetTrainingNavComputerLabel[0x10] = "<~NAV COMPUTER";
+char g_jadeFalconCadetTrainingNavComputerLabel[0x10] = "<~NAV COMPUTER";
 
-MechChar g_jadeFalconCadetTrainingMechHandlingLabel[0x10] = "<~MECH HANDLING";
+char g_jadeFalconCadetTrainingMechHandlingLabel[0x10] = "<~MECH HANDLING";
 
-MechChar g_jadeFalconCadetTrainingWeaponsUsageLabel[0x10] = "<~WEAPONS USAGE";
+char g_jadeFalconCadetTrainingWeaponsUsageLabel[0x10] = "<~WEAPONS USAGE";
 
-MechChar g_jadeFalconCadetTrainingHuntingLabel[0x0c] = "<~HUNTING";
+char g_jadeFalconCadetTrainingHuntingLabel[0x0c] = "<~HUNTING";
 
-MechChar g_jadeFalconCadetTrainingInspectionLabel[0x10] = "<~INSPECTION";
+char g_jadeFalconCadetTrainingInspectionLabel[0x10] = "<~INSPECTION";
 
-MechChar g_jadeFalconCadetTrainingTrialLabel[0x08] = "<~TRIAL";
+char g_jadeFalconCadetTrainingTrialLabel[0x08] = "<~TRIAL";
 
-MechChar g_jadeFalconReadyRoomClanHallLabel[0x0c] = "CLAN HALL";
+char g_jadeFalconReadyRoomClanHallLabel[0x0c] = "CLAN HALL";
 
-MechChar g_jadeFalconReadyRoomMechLabLabel[0x0c] = "~MECH LAB";
+char g_jadeFalconReadyRoomMechLabLabel[0x0c] = "~MECH LAB";
 
-MechChar g_jadeFalconReadyRoomStarConfigLabel[0x10] = "~STAR CONFIG";
+char g_jadeFalconReadyRoomStarConfigLabel[0x10] = "~STAR CONFIG";
 
-MechChar g_jadeFalconReadyRoomMissionBriefingLabel[0x14] = "~MISSION BRIEFING";
+char g_jadeFalconReadyRoomMissionBriefingLabel[0x14] = "~MISSION BRIEFING";
 
-MechChar g_jadeFalconReadyRoomPinkLabel[0x08] = "<~PINK";
+char g_jadeFalconReadyRoomPinkLabel[0x08] = "<~PINK";
 
-MechChar g_jadeFalconReadyRoomGreenLabel[0x08] = "<~GREEN";
+char g_jadeFalconReadyRoomGreenLabel[0x08] = "<~GREEN";
 
-MechChar g_jadeFalconReadyRoomRedLabel[0x08] = "<~RED";
+char g_jadeFalconReadyRoomRedLabel[0x08] = "<~RED";
 
-MechChar g_jadeFalconReadyRoomFuchsiaLabel[0x0c] = "<~FUCHSIA";
+char g_jadeFalconReadyRoomFuchsiaLabel[0x0c] = "<~FUCHSIA";
 
-MechChar g_jadeFalconReadyRoomCindyLabel[0x08] = "<~CINDY";
+char g_jadeFalconReadyRoomCindyLabel[0x08] = "<~CINDY";
 
-MechChar g_jadeFalconReadyRoomRustLabel[0x08] = "<~RUST";
+char g_jadeFalconReadyRoomRustLabel[0x08] = "<~RUST";
 
-MechChar g_jadeFalconReadyRoomUmberLabel[0x08] = "<~UMBER";
+char g_jadeFalconReadyRoomUmberLabel[0x08] = "<~UMBER";
 
-MechChar g_jadeFalconReadyRoomTanLabel[0x08] = "<~TAN";
+char g_jadeFalconReadyRoomTanLabel[0x08] = "<~TAN";
 
-MechChar g_jadeFalconReadyRoomHeidiLabel[0x08] = "<~HEIDI";
+char g_jadeFalconReadyRoomHeidiLabel[0x08] = "<~HEIDI";
 
-MechChar g_jadeFalconReadyRoomPlumLabel[0x08] = "<~PLUM";
+char g_jadeFalconReadyRoomPlumLabel[0x08] = "<~PLUM";
 
-MechChar g_jadeFalconReadyRoomWhiteLabel[0x08] = "<~WHITE";
+char g_jadeFalconReadyRoomWhiteLabel[0x08] = "<~WHITE";
 
-MechChar g_jadeFalconReadyRoomJillLabel[0x08] = "<~JILL";
+char g_jadeFalconReadyRoomJillLabel[0x08] = "<~JILL";
 
-MechChar g_jadeFalconReadyRoomPuceLabel[0x08] = "<~PUCE";
+char g_jadeFalconReadyRoomPuceLabel[0x08] = "<~PUCE";
 
-MechChar g_jadeFalconReadyRoomBlondeLabel[0x0c] = "<~BLONDE";
+char g_jadeFalconReadyRoomBlondeLabel[0x0c] = "<~BLONDE";
 
-MechChar g_jadeFalconReadyRoomBronzeLabel[0x0c] = "<~BRONZE";
+char g_jadeFalconReadyRoomBronzeLabel[0x0c] = "<~BRONZE";
 
-MechChar g_jadeFalconReadyRoomMaryLabel[0x08] = "<~MARY";
+char g_jadeFalconReadyRoomMaryLabel[0x08] = "<~MARY";
 
-MechChar g_jadeFalconBriefingAbortLabel[0x08] = "<~ABORT";
+char g_jadeFalconBriefingAbortLabel[0x08] = "<~ABORT";
 
-MechChar g_jadeFalconBriefingSituationLabel[0x0c] = "<~SITUATION";
+char g_jadeFalconBriefingSituationLabel[0x0c] = "<~SITUATION";
 
-MechChar g_jadeFalconBriefingLaunchLabel[0x0c] = "<~LAUNCH";
+char g_jadeFalconBriefingLaunchLabel[0x0c] = "<~LAUNCH";
 
-MechChar g_jadeFalconBriefingSkipLabel[0x08] = "<~SKIP";
+char g_jadeFalconBriefingSkipLabel[0x08] = "<~SKIP";
 
-MechChar g_jadeFalconSituationExitLabel[0x08] = "<~EXIT";
+char g_jadeFalconSituationExitLabel[0x08] = "<~EXIT";
 
-MechChar g_jadeFalconSituationPrevPageLabel[0x0c] = "<~PREV PAGE";
+char g_jadeFalconSituationPrevPageLabel[0x0c] = "<~PREV PAGE";
 
-MechChar g_jadeFalconSituationNextPageLabel[0x0c] = "<~NEXT PAGE";
+char g_jadeFalconSituationNextPageLabel[0x0c] = "<~NEXT PAGE";
 
-MechChar g_jadeFalconSituationBackLabel[0x04] = "";
+char g_jadeFalconSituationBackLabel[0x04] = "";
 
-MechChar g_jadeFalconDebriefExitLabel[0x08] = "<~EXIT";
+char g_jadeFalconDebriefExitLabel[0x08] = "<~EXIT";
 
-MechChar g_jadeFalconDebriefAftermathLabel[0x0c] = "<~AFTERMATH";
+char g_jadeFalconDebriefAftermathLabel[0x0c] = "<~AFTERMATH";
 
-MechChar g_jadeFalconDebriefReplayLabel[0x0c] = "<~REPLAY";
+char g_jadeFalconDebriefReplayLabel[0x0c] = "<~REPLAY";
 
-MechChar g_jadeFalconAftermathExitLabel[0x08] = "<~EXIT";
+char g_jadeFalconAftermathExitLabel[0x08] = "<~EXIT";
 
-MechChar g_jadeFalconAftermathPrevPageLabel[0x0c] = "<~PREV PAGE";
+char g_jadeFalconAftermathPrevPageLabel[0x0c] = "<~PREV PAGE";
 
-MechChar g_jadeFalconAftermathNextPageLabel[0x0c] = "<~NEXT PAGE";
+char g_jadeFalconAftermathNextPageLabel[0x0c] = "<~NEXT PAGE";
 
-MechChar g_jadeFalconAftermathBackLabel[0x04] = "";
+char g_jadeFalconAftermathBackLabel[0x04] = "";
 
-MechChar g_jadeFalconStarConfigExitConfigLabel[0x10] = "<~EXIT CONFIG";
+char g_jadeFalconStarConfigExitConfigLabel[0x10] = "<~EXIT CONFIG";
 
-MechChar g_jadeFalconStarConfigMechLabLabel[0x0c] = "~MECH LAB";
+char g_jadeFalconStarConfigMechLabLabel[0x0c] = "~MECH LAB";
 
-MechChar g_jadeFalconStarConfigNextFormationLabel[0x10] = "NEXT FORMATION";
+char g_jadeFalconStarConfigNextFormationLabel[0x10] = "NEXT FORMATION";
 
-MechChar g_jadeFalconStarConfigPrevFormationLabel[0x10] = "PREV FORMATION";
+char g_jadeFalconStarConfigPrevFormationLabel[0x10] = "PREV FORMATION";
 
-MechChar g_jadeFalconStarConfigAddStarmateLabel[0x10] = "ADD STARMATE";
+char g_jadeFalconStarConfigAddStarmateLabel[0x10] = "ADD STARMATE";
 
-MechChar g_jadeFalconStarConfigDeleteStarmateLabel[0x10] = "DELETE STARMATE";
+char g_jadeFalconStarConfigDeleteStarmateLabel[0x10] = "DELETE STARMATE";
 
-MechChar g_jadeFalconStarConfigChangeMech0Label[0x0c] = "CHANGE MECH";
+char g_jadeFalconStarConfigChangeMech0Label[0x0c] = "CHANGE MECH";
 
-MechChar g_jadeFalconStarConfigChangeMech1Label[0x0c] = "CHANGE MECH";
+char g_jadeFalconStarConfigChangeMech1Label[0x0c] = "CHANGE MECH";
 
-MechChar g_jadeFalconStarConfigChangeMech2Label[0x0c] = "CHANGE MECH";
+char g_jadeFalconStarConfigChangeMech2Label[0x0c] = "CHANGE MECH";
 
-MechChar g_jadeFalconMechBayExitLabLabel[0x0c] = "<~EXIT LAB";
+char g_jadeFalconMechBayExitLabLabel[0x0c] = "<~EXIT LAB";
 
-MechChar g_jadeFalconMechBayStarConfigLabel[0x10] = "~STAR CONFIG";
+char g_jadeFalconMechBayStarConfigLabel[0x10] = "~STAR CONFIG";
 
-MechChar g_jadeFalconMechBayNextChassisLabel[0x10] = "NEXT CHASSIS";
+char g_jadeFalconMechBayNextChassisLabel[0x10] = "NEXT CHASSIS";
 
-MechChar g_jadeFalconMechBayPrevChassisLabel[0x10] = "PREV CHASSIS";
+char g_jadeFalconMechBayPrevChassisLabel[0x10] = "PREV CHASSIS";
 
-MechChar g_jadeFalconMechBayNextVariantLabel[0x10] = "NEXT VARIANT";
+char g_jadeFalconMechBayNextVariantLabel[0x10] = "NEXT VARIANT";
 
-MechChar g_jadeFalconMechBayPrevVariantLabel[0x10] = "PREV VARIANT";
+char g_jadeFalconMechBayPrevVariantLabel[0x10] = "PREV VARIANT";
 
-MechChar g_jadeFalconMechBayCustomizeLabel[0x0c] = "<~CUSTOMIZE";
+char g_jadeFalconMechBayCustomizeLabel[0x0c] = "<~CUSTOMIZE";
 
-MechChar g_jadeFalconMechBayAcceptMechLabel[0x10] = "<~ACCEPT MECH";
+char g_jadeFalconMechBayAcceptMechLabel[0x10] = "<~ACCEPT MECH";
 
-MechChar g_jadeFalconMechBaySaveLabel[0x08] = "<~SAVE";
+char g_jadeFalconMechBaySaveLabel[0x08] = "<~SAVE";
 
-MechChar g_jadeFalconMechBayAbortLabel[0x08] = "<~ABORT";
+char g_jadeFalconMechBayAbortLabel[0x08] = "<~ABORT";
 
-MechChar g_jadeFalconMechBayDeleteLabel[0x0c] = "<~DELETE";
+char g_jadeFalconMechBayDeleteLabel[0x0c] = "<~DELETE";
 
-MechChar g_mainMenuTrialsOfGrievanceLabel[0x18] = "~TRIALS OF GRIEVANCE";
+char g_mainMenuTrialsOfGrievanceLabel[0x18] = "~TRIALS OF GRIEVANCE";
 
-MechChar g_mainMenuWolfClanHallLabel[0x10] = "~WOLF CLAN HALL";
+char g_mainMenuWolfClanHallLabel[0x10] = "~WOLF CLAN HALL";
 
-MechChar g_mainMenuJadeFalconClanHallLabel[0x18] = "~JADE FALCON CLAN HALL";
+char g_mainMenuJadeFalconClanHallLabel[0x18] = "~JADE FALCON CLAN HALL";
 
-MechChar g_mainMenuExitLabel[0x08] = "~EXIT";
+char g_mainMenuExitLabel[0x08] = "~EXIT";
 
 // The Trials of Grievance's ready room (missionui.cpp) labels only EXIT. Each ...Next/...Prev pair
 // steps a mech's chassis or the star's formation, and ...Clan steps the star's clan.
-MechChar g_missionBriefingLaunchLabel[0x04] = "";
+char g_missionBriefingLaunchLabel[0x04] = "";
 
-MechChar g_missionBriefingExitLabel[0x08] = "<~EXIT";
+char g_missionBriefingExitLabel[0x08] = "<~EXIT";
 
-MechChar g_missionBriefingMissionLabel[0x04] = "";
+char g_missionBriefingMissionLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerMech0NextLabel[0x04] = "";
+char g_missionBriefingPlayerMech0NextLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerMech1NextLabel[0x04] = "";
+char g_missionBriefingPlayerMech1NextLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerMech2NextLabel[0x04] = "";
+char g_missionBriefingPlayerMech2NextLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerFormationNextLabel[0x04] = "";
+char g_missionBriefingPlayerFormationNextLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerMech0PrevLabel[0x04] = "";
+char g_missionBriefingPlayerMech0PrevLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerMech1PrevLabel[0x04] = "";
+char g_missionBriefingPlayerMech1PrevLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerMech2PrevLabel[0x04] = "";
+char g_missionBriefingPlayerMech2PrevLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerFormationPrevLabel[0x04] = "";
+char g_missionBriefingPlayerFormationPrevLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerClanLabel[0x04] = "";
+char g_missionBriefingPlayerClanLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerMechLabLabel[0x04] = "";
+char g_missionBriefingPlayerMechLabLabel[0x04] = "";
 
-MechChar g_missionBriefingPlayerStarConfigLabel[0x04] = "";
+char g_missionBriefingPlayerStarConfigLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyMech0NextLabel[0x04] = "";
+char g_missionBriefingEnemyMech0NextLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyMech1NextLabel[0x04] = "";
+char g_missionBriefingEnemyMech1NextLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyMech2NextLabel[0x04] = "";
+char g_missionBriefingEnemyMech2NextLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyFormationNextLabel[0x04] = "";
+char g_missionBriefingEnemyFormationNextLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyMech0PrevLabel[0x04] = "";
+char g_missionBriefingEnemyMech0PrevLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyMech1PrevLabel[0x04] = "";
+char g_missionBriefingEnemyMech1PrevLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyMech2PrevLabel[0x04] = "";
+char g_missionBriefingEnemyMech2PrevLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyFormationPrevLabel[0x04] = "";
+char g_missionBriefingEnemyFormationPrevLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyClanLabel[0x04] = "";
+char g_missionBriefingEnemyClanLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyMechLabLabel[0x04] = "";
+char g_missionBriefingEnemyMechLabLabel[0x04] = "";
 
-MechChar g_missionBriefingEnemyStarConfigLabel[0x04] = "";
+char g_missionBriefingEnemyStarConfigLabel[0x04] = "";
 
 // Tab stops for the "\T" text escape, in pixels from the left edge.
-MechS32 g_textTabStops[19] =
+int32_t g_textTabStops[19] =
 	{0, 36, 72, 108, 144, 180, 216, 252, 288, 324, 360, 396, 432, 468, 504, 540, 576, 612, 640};
 
 // The shell's database, for TMPackDataBase.
 char* g_databaseName = "DATABASE.MW2";
 
 // The clan hall archives, by campaign.
-MechChar* g_archiveNames[2] = {"ARCHWO.MW2", "ARCHJF.MW2"};
+char* g_archiveNames[2] = {"ARCHWO.MW2", "ARCHJF.MW2"};
 
 // The star formations, as the mission briefing screen names them.
 Formation g_formations[6] = {
@@ -450,17 +450,17 @@ Formation g_formations[6] = {
 
 // Where each formation puts its three mechs: x, y pairs in screen pixels. Nothing reads them;
 // the star screens use the layouts in mechvariant.cpp.
-MechS32 g_echelonLeftPositions[6] = {285, 176, 344, 222, 450, 320};
+int32_t g_echelonLeftPositions[6] = {285, 176, 344, 222, 450, 320};
 
-MechS32 g_echelonRightPositions[6] = {520, 212, 342, 225, 143, 253};
+int32_t g_echelonRightPositions[6] = {520, 212, 342, 225, 143, 253};
 
-MechS32 g_lineAbreastPositions[6] = {222, 199, 341, 216, 498, 242};
+int32_t g_lineAbreastPositions[6] = {222, 199, 341, 216, 498, 242};
 
-MechS32 g_lineAsternPositions[6] = {385, 184, 343, 221, 264, 290};
+int32_t g_lineAsternPositions[6] = {385, 184, 343, 221, 264, 290};
 
-MechS32 g_vFormPositions[6] = {269, 176, 506, 205, 269, 283};
+int32_t g_vFormPositions[6] = {269, 176, 506, 205, 269, 283};
 
-MechS32 g_wedgePositions[6] = {376, 186, 139, 254, 452, 325};
+int32_t g_wedgePositions[6] = {376, 186, 139, 254, 452, 325};
 
 // The buttons of each screen, Wolf's first. The Trials of Grievance use Wolf's.
 MainMenuButton g_wolfClanHallButtons[5] = {
@@ -781,11 +781,11 @@ CampaignMission g_jadeFalconMissions[17] = {
 CampaignMission* g_campaignMissions[2] = {g_wolfMissions, g_jadeFalconMissions};
 
 // The training missions of each campaign, one per button from the second.
-MechChar* g_wolfTrainingScenarios[6] = {"tnw1SCN1", "tnw2SCN1", "tnw3SCN1", "tnw4SCN1", "tnw5SCN1", "tnw6SCN1"};
+char* g_wolfTrainingScenarios[6] = {"tnw1SCN1", "tnw2SCN1", "tnw3SCN1", "tnw4SCN1", "tnw5SCN1", "tnw6SCN1"};
 
-MechChar* g_jadeFalconTrainingScenarios[6] = {"tnj1SCN1", "tnj2SCN1", "tnj3SCN1", "tnj4SCN1", "tnj5SCN1", "tnj6SCN1"};
+char* g_jadeFalconTrainingScenarios[6] = {"tnj1SCN1", "tnj2SCN1", "tnj3SCN1", "tnj4SCN1", "tnj5SCN1", "tnj6SCN1"};
 
-MechChar** g_trainingScenarios[2] = {g_wolfTrainingScenarios, g_jadeFalconTrainingScenarios};
+char** g_trainingScenarios[2] = {g_wolfTrainingScenarios, g_jadeFalconTrainingScenarios};
 
 // The screens' MenuScreen tables, by campaign.
 MenuScreen g_clanHallScreens[3] = {

@@ -11,14 +11,14 @@ extern "C"
 {
 #endif
 
-	extern MechChar g_musicName[12];
-	extern MechS32 g_musicResource;
-	extern MechS32 g_loadHudFile;
-	extern MechS32 g_nextShotRecord;
-	extern MechS32 g_nextEffectRecord;
-	MechU32 WidenEventFlags(MechU32 p_flags);
-	MechS32 BwdExecuteStream(struct BwdStream* p_stream);
-	MechS32 LoadWorld(MechChar* p_name);
+	extern char g_musicName[12];
+	extern int32_t g_musicResource;
+	extern int32_t g_loadHudFile;
+	extern int32_t g_nextShotRecord;
+	extern int32_t g_nextEffectRecord;
+	uint32_t WidenEventFlags(uint32_t p_flags);
+	int32_t BwdExecuteStream(struct BwdStream* p_stream);
+	int32_t LoadWorld(char* p_name);
 	void AfterWorldLoader(void);
 
 #ifdef __cplusplus

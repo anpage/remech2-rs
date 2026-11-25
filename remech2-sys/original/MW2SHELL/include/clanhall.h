@@ -13,9 +13,9 @@ class ButtonMenu;
 extern ButtonMenu* g_clanHallMenu;
 extern AudioSample* g_clanHallAmbience;
 extern AudioSample* g_welcomeSound;
-extern MechS32 g_welcomePending;
-extern MechS32 g_clanHallExitVideo;
-extern MechS32 g_clanHallExitMessage;
-void DrawClanHall(TMPackDataBase* p_database, MechS32 p_campaign, MechU8, size_t p_wParam);
+extern int32_t g_welcomePending;
+extern int32_t g_clanHallExitVideo;
+extern int32_t g_clanHallExitMessage;
+void DrawClanHall(TMPackDataBase* p_database, int32_t p_campaign, uint8_t, size_t p_wParam);
 
 #endif // CLANHALL_H

@@ -1468,13 +1468,13 @@ static const struct {
 };
 
 // What the globals held before the first mission
-static MechU8* g_resetInitial = NULL;
+static uint8_t* g_resetInitial = NULL;
 
 void ResetSimGlobals(void)
 {
 	size_t i;
 	size_t size;
-	MechU8* initial;
+	uint8_t* initial;
 
 	if (g_resetInitial == NULL) {
 		size = 0;

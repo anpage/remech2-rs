@@ -11,19 +11,19 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_gridObjectShown;
+	extern int32_t g_gridObjectShown;
 	extern SceneObject* g_gridObject;
-	extern MechS32 g_gridCellSize;
-	extern MechS32 g_gridObjectSet;
-	extern MechS32 g_gridObjectPlaced;
-	extern MechS32 g_gridObjectSnaps;
+	extern int32_t g_gridCellSize;
+	extern int32_t g_gridObjectSet;
+	extern int32_t g_gridObjectPlaced;
+	extern int32_t g_gridObjectSnaps;
 	extern Vector3 g_gridCell;
 	extern Vector3 g_gridAnchor;
-	extern MechS32 g_gridSnapDistance;
+	extern int32_t g_gridSnapDistance;
 
 	void SetGridObject(SceneObject* p_obj);
 	void UpdateGridObject(void);
-	void ShowGridObject(MechS32 p_enable);
+	void ShowGridObject(int32_t p_enable);
 
 #ifdef __cplusplus
 }

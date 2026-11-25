@@ -39,22 +39,22 @@ extern "C"
 	};
 
 	typedef struct MechMessage {
-		MechU32 m_message;
+		uint32_t m_message;
 		size_t m_wParam;
 		MECH_INTPTR m_lParam;
 	} MechMessage;
 
-	typedef MECH_INTPTR (*MechMessageHandler)(MechU32 p_message, size_t p_wParam, MECH_INTPTR p_lParam);
+	typedef MECH_INTPTR (*MechMessageHandler)(uint32_t p_message, size_t p_wParam, MECH_INTPTR p_lParam);
 
 	// Sets what handles sent messages, NULL for nothing. Returns the handler it replaces.
 	MechMessageHandler MechSetMessageHandler(MechMessageHandler p_handler);
 	// Adds a message to the back of the queue
-	void MechPostMessage(MechU32 p_message, size_t p_wParam, MECH_INTPTR p_lParam);
+	void MechPostMessage(uint32_t p_message, size_t p_wParam, MECH_INTPTR p_lParam);
 	// Calls the handler now and returns its result, 0 if there is no handler
-	MECH_INTPTR MechSendMessage(MechU32 p_message, size_t p_wParam, MECH_INTPTR p_lParam);
+	MECH_INTPTR MechSendMessage(uint32_t p_message, size_t p_wParam, MECH_INTPTR p_lParam);
 	// Copies the oldest queued message numbered from p_first to p_last, or the oldest of all when
 	// both are 0, to p_message, and takes it off the queue if p_remove. Returns 0 if there is none.
-	int MechPeekMessage(MechMessage* p_message, MechU32 p_first, MechU32 p_last, int p_remove);
+	int MechPeekMessage(MechMessage* p_message, uint32_t p_first, uint32_t p_last, int p_remove);
 
 #ifdef __cplusplus
 }

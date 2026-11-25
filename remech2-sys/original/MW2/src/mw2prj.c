@@ -22,13 +22,13 @@ char* g_resourceTypeExtensions[25] = {".sfl", ".xel", ".xyc", ".shp", ".fnt", ".
 									  ".tbl", ".wtb", ".xxt", ".3di", ".mgi", ".hdi", ".cpi", ".vpi", ".pit",
 									  ".bwd", ".ait", ".mek", ".lum", ".mus", ".gif", ".txt"};
 
-MechS32 g_mw2PrjHandle = -1;
+int32_t g_mw2PrjHandle = -1;
 
 char* g_mw2PrjPath = NULL;
 
-MechS32 FirstResource(void)
+int32_t FirstResource(void)
 {
-	MechS32 result;
+	int32_t result;
 
 	result = TRUE;
 	SetPrjAllocator(Mw2PrjAlloc, Mw2PrjFree);
@@ -61,9 +61,9 @@ void CachePreloads(void)
 	LoadAIScripts();
 }
 
-MechS32 PreloadResource(MechS32 p_id, const char* p_type)
+int32_t PreloadResource(int32_t p_id, const char* p_type)
 {
-	MechS32 result;
+	int32_t result;
 	void* data;
 
 	data = LoadCachedResource(g_mw2PrjHandle, p_id, p_type, 0);
@@ -78,7 +78,7 @@ MechS32 PreloadResource(MechS32 p_id, const char* p_type)
 	return result;
 }
 
-void* Mw2PrjAlloc(MechU32 p_size)
+void* Mw2PrjAlloc(uint32_t p_size)
 {
 	return MemAlloc(p_size);
 }

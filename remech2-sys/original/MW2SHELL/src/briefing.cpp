@@ -35,19 +35,19 @@ Collection* g_briefingPages = NULL;
 // The situation reader, while it is open.
 ArchiveReader* g_situationReader = NULL;
 
-void BriefingCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, MechS32 p_msg);
+void BriefingCallback(TMPackDataBase*, int32_t* p_campaign, uint8_t*, char**, int32_t p_msg);
 
 // Opens the briefing screen: lays the scenario's briefing text (its first four letters, padded
 // with '_', plus "BRF1") out on pages under the menu. A campaign's last mission briefs from
 // KTWOBRF1/KTJFBRF1 once the pilot's rank is high enough.
-void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, MechS32 p_campaign)
+void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, int32_t p_campaign)
 {
-	MechS32 left;
-	MechS32 top;
-	MechS32 width;
-	MechS32 height;
-	MechS32 i;
-	MechChar name[0x80];
+	int32_t left;
+	int32_t top;
+	int32_t width;
+	int32_t height;
+	int32_t i;
+	char name[0x80];
 
 	CreateCollection(&g_briefingPages, 10, NULL, 4, NULL);
 	switch (p_campaign) {
@@ -96,7 +96,7 @@ void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, MechS32 p_campai
 	}
 
 	UppercaseString(name);
-	LoadTextPages(g_briefingPages, left, top, width, height, name, g_bodyFont, (MechChar*) "");
+	LoadTextPages(g_briefingPages, left, top, width, height, name, g_bodyFont, (char*) "");
 
 	g_briefingPage = (Page*) CollectionGet(g_briefingPages, 0);
 	if (!g_briefingPage) {
@@ -127,10 +127,10 @@ void DrawBriefing(TMPackDataBase* p_database, char* p_scenario, MechS32 p_campai
 }
 
 // The briefing screen's frame: ABORT, SITUATION (the text in a reader), LAUNCH and SKIP.
-void BriefingCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, MechS32 p_msg)
+void BriefingCallback(TMPackDataBase*, int32_t* p_campaign, uint8_t*, char**, int32_t p_msg)
 {
-	MechS32 result;
-	MechS32 button;
+	int32_t result;
+	int32_t button;
 
 	// The original skips the frame's work with a goto, like StarConfigCallback.
 	if (p_msg != c_msgScreenFrame) {

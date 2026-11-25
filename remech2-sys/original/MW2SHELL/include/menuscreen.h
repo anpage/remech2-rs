@@ -11,9 +11,9 @@
 // goes by the message and nothing reads m_song.
 struct MenuScreen {
 	MainMenuButton* m_buttons; // 0x00
-	MechS32 m_count;           // 0x04
-	MechS32 m_picture;         // 0x08 — for VideoDriver::LoadBackground
-	MechS32 m_song;            // 0x0c
+	int32_t m_count;           // 0x04
+	int32_t m_picture;         // 0x08 — for VideoDriver::LoadBackground
+	int32_t m_song;            // 0x0c
 };
 
 #endif // MENUSCREEN_H

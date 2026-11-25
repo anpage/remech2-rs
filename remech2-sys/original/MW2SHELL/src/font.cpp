@@ -19,9 +19,9 @@ Font::~Font()
 	MechHeapFree(g_primaryHeap, m_data);
 }
 
-MechS32 Font::GetTextWidth(MechChar* p_text)
+int32_t Font::GetTextWidth(char* p_text)
 {
-	MechS32 width;
+	int32_t width;
 
 	if (p_text == NULL) {
 		return 0;
@@ -35,13 +35,13 @@ MechS32 Font::GetTextWidth(MechChar* p_text)
 	return width;
 }
 
-MechS32 Font::GetCharacterWidth(MechS32 p_char)
+int32_t Font::GetCharacterWidth(int32_t p_char)
 {
 	return VFX_character_width(m_data, p_char);
 }
 
 // Draws p_text and keeps its glyph among the glyphs drawn under the videos.
-TextGlyph* Font::AddText(MechS32 p_left, MechS32 p_top, MechChar* p_text, undefined* p_colors)
+TextGlyph* Font::AddText(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors)
 {
 	TextGlyph* glyph;
 
@@ -56,7 +56,7 @@ TextGlyph* Font::AddText(MechS32 p_left, MechS32 p_top, MechChar* p_text, undefi
 }
 
 // Draws p_text and keeps its glyph among the glyphs drawn over the videos.
-TextGlyph* Font::AddOverlayText(MechS32 p_left, MechS32 p_top, MechChar* p_text, undefined* p_colors)
+TextGlyph* Font::AddOverlayText(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors)
 {
 	TextGlyph* glyph;
 
@@ -71,7 +71,7 @@ TextGlyph* Font::AddOverlayText(MechS32 p_left, MechS32 p_top, MechChar* p_text,
 }
 
 // Like AddText, but starts typing the text out (TextGlyph::TypeStep) instead of drawing it whole.
-TextGlyph* Font::AddTypedText(MechS32 p_left, MechS32 p_top, MechChar* p_text, undefined* p_colors)
+TextGlyph* Font::AddTypedText(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors)
 {
 	TextGlyph* glyph;
 
@@ -81,22 +81,22 @@ TextGlyph* Font::AddTypedText(MechS32 p_left, MechS32 p_top, MechChar* p_text, u
 	return glyph;
 }
 
-MechS32 Font::DrawString(MechS32 p_left, MechS32 p_top, MechChar* p_text, undefined* p_colors)
+int32_t Font::DrawString(int32_t p_left, int32_t p_top, char* p_text, undefined* p_colors)
 {
 	return m_videoDriver->DrawString(p_left, p_top, m_data, p_text, p_colors);
 }
 
-MechS32 Font::DrawChar(MechS32 p_left, MechS32 p_top, MechS32 p_char, undefined* p_colors)
+int32_t Font::DrawChar(int32_t p_left, int32_t p_top, int32_t p_char, undefined* p_colors)
 {
 	return m_videoDriver->DrawChar(p_left, p_top, m_data, p_char, p_colors);
 }
 
 // Text entry: m_typedRight holds the right edge of each typed character, m_typedCount their count.
-void Font::TypeKey(MechS32 p_left, MechS32 p_top, MechS32 p_key, undefined* p_colors)
+void Font::TypeKey(int32_t p_left, int32_t p_top, int32_t p_key, undefined* p_colors)
 {
-	MechS32 width;
-	MechS32 x;
-	MechS32 end;
+	int32_t width;
+	int32_t x;
+	int32_t end;
 
 	switch (p_key) {
 	case '\b':
@@ -151,7 +151,7 @@ void Font::TypeKey(MechS32 p_left, MechS32 p_top, MechS32 p_key, undefined* p_co
 
 void Font::ResetTyping()
 {
-	MechS32 i;
+	int32_t i;
 
 	m_typedCount = 0;
 	for (i = 0; i < 0x100; i++) {

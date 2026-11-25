@@ -6,13 +6,13 @@
 
 // An offset of the eyepoint's first six fields (its position and orientation).
 typedef struct CameraShakeKey {
-	MechS32 m_x;        // 0x00
-	MechS32 m_y;        // 0x04
-	MechS32 m_z;        // 0x08
-	MechS32 m_heading;  // 0x0c
-	MechS32 m_pitch;    // 0x10
-	MechS32 m_roll;     // 0x14
-	MechS32 m_duration; // 0x18 — in clock ticks
+	int32_t m_x;        // 0x00
+	int32_t m_y;        // 0x04
+	int32_t m_z;        // 0x08
+	int32_t m_heading;  // 0x0c
+	int32_t m_pitch;    // 0x10
+	int32_t m_roll;     // 0x14
+	int32_t m_duration; // 0x18 — in clock ticks
 } CameraShakeKey;
 
 // The functions and globals of camerashake.c that other units use.
@@ -21,33 +21,33 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_cameraShakeKeyCount;
-	extern MechS32 g_cameraShakeActive;
+	extern int32_t g_cameraShakeKeyCount;
+	extern int32_t g_cameraShakeActive;
 	extern CameraShakeKey g_cameraShakeKeys[10];
 	extern Ramp g_cameraShakeHeading;
-	extern MechS32 g_cameraShakeKey;
+	extern int32_t g_cameraShakeKey;
 	extern Ramp g_cameraShakeZ;
-	extern MechS32 g_cameraShakeKeyTime;
+	extern int32_t g_cameraShakeKeyTime;
 	extern Ramp g_cameraShakeRoll;
 	extern Ramp g_cameraShakeX;
 	extern Ramp g_cameraShakePitch;
 	extern Ramp g_cameraShakeY;
 
 	void ResetCameraShake(void);
-	MechS32 UpdateCameraShake(void);
+	int32_t UpdateCameraShake(void);
 	void StartCameraShake(void);
-	void StartCameraShakeKey(MechS32 p_key);
+	void StartCameraShakeKey(int32_t p_key);
 	void ClearCameraShakeKeys(void);
 	void AddCameraShakeKey(
-		MechS32 p_x,
-		MechS32 p_y,
-		MechS32 p_z,
-		MechS32 p_pitch,
-		MechS32 p_heading,
-		MechS32 p_roll,
-		MechDouble p_seconds
+		int32_t p_x,
+		int32_t p_y,
+		int32_t p_z,
+		int32_t p_pitch,
+		int32_t p_heading,
+		int32_t p_roll,
+		double p_seconds
 	);
-	MechS32 IsCameraShaking(void);
+	int32_t IsCameraShaking(void);
 
 #ifdef __cplusplus
 }

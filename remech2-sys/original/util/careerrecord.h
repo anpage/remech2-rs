@@ -9,75 +9,75 @@
 // count every destroyed mech; "vehicles" are the mechs of players that aren't c_playerTypeMech.
 typedef struct CareerRecord {
 	// players' mechs of side 1 the local player destroyed
-	MechU16 m_directMechKills;
+	uint16_t m_directMechKills;
 	// side 2
-	MechU16 m_directNeutralMechKills;
+	uint16_t m_directNeutralMechKills;
 	// side 0
-	MechU16 m_directFriendlyMechKills;
+	uint16_t m_directFriendlyMechKills;
 	// things of side 1 the local player destroyed
-	MechU16 m_directThingKills;
+	uint16_t m_directThingKills;
 	// side 2
-	MechU16 m_directNeutralThingKills;
+	uint16_t m_directNeutralThingKills;
 	// side 0
-	MechU16 m_directFriendlyThingKills;
+	uint16_t m_directFriendlyThingKills;
 	// shots fired by the local player
-	MechU16 m_shotsFired;
+	uint16_t m_shotsFired;
 	// hits by the local player on side 1
-	MechU16 m_hits;
+	uint16_t m_hits;
 	// side 2
-	MechU16 m_neutralHits;
+	uint16_t m_neutralHits;
 	// side 0
-	MechU16 m_friendlyHits;
+	uint16_t m_friendlyHits;
 	// hits taken by the local player
-	MechU16 m_hitsTaken;
+	uint16_t m_hitsTaken;
 	// how the local player's mech went down (2, 4)
-	MechU8 m_outcome;
+	uint8_t m_outcome;
 	// players' mechs of side 1 with flag 0x1400 destroyed
-	MechU16 m_mechKills;
+	uint16_t m_mechKills;
 	// side 2
-	MechU16 m_neutralMechKills;
+	uint16_t m_neutralMechKills;
 	// side 0
-	MechU16 m_friendlyMechKills;
+	uint16_t m_friendlyMechKills;
 	// things of side 1 the local team destroyed
-	MechU16 m_teamThingKills;
+	uint16_t m_teamThingKills;
 	// side 2
-	MechU16 m_teamNeutralThingKills;
+	uint16_t m_teamNeutralThingKills;
 	// side 0
-	MechU16 m_teamFriendlyThingKills;
+	uint16_t m_teamFriendlyThingKills;
 	// shots fired by the local team
-	MechU16 m_teamShotsFired;
+	uint16_t m_teamShotsFired;
 	// hits by the local team on side 0
-	MechU16 m_teamFriendlyHits;
+	uint16_t m_teamFriendlyHits;
 	// side 2
-	MechU16 m_teamNeutralHits;
+	uint16_t m_teamNeutralHits;
 	// side 1
-	MechU16 m_teamHits;
+	uint16_t m_teamHits;
 	// hits taken by the local team
-	MechU16 m_teamHitsTaken;
+	uint16_t m_teamHitsTaken;
 	// mechs of the local team destroyed
-	MechU16 m_wingmenLost;
+	uint16_t m_wingmenLost;
 	// of those, the ones in power state 5 (Mech::m_powerState)
-	MechU16 m_wingmenEjected;
+	uint16_t m_wingmenEjected;
 	// players (0-2) and game things (3-5) of sides 0, 2 and 1
-	MechS16 m_sideCounts[6];
+	int16_t m_sideCounts[6];
 	// other mechs of side 1 the local player destroyed
-	MechU16 m_directVehicleKills;
+	uint16_t m_directVehicleKills;
 	// side 2
-	MechU16 m_directNeutralVehicleKills;
+	uint16_t m_directNeutralVehicleKills;
 	// side 0
-	MechU16 m_directFriendlyVehicleKills;
+	uint16_t m_directFriendlyVehicleKills;
 	// other mechs of side 1 with flag 0x1400 destroyed
-	MechU16 m_vehicleKills;
+	uint16_t m_vehicleKills;
 	// side 2
-	MechU16 m_neutralVehicleKills;
+	uint16_t m_neutralVehicleKills;
 	// side 0
-	MechU16 m_friendlyVehicleKills;
+	uint16_t m_friendlyVehicleKills;
 	// the players of a network game
-	MechU16 m_playerCount;
+	uint16_t m_playerCount;
 	// kills, by killer and victim player
-	MechU16 m_kills[8][8];
+	uint16_t m_kills[8][8];
 	// the winner: the last player whose SU message arrived, or -1
-	MechS32 m_winner;
+	int32_t m_winner;
 } CareerRecord;
 
 #endif // CAREERRECORD_H

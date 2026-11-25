@@ -145,9 +145,9 @@ RectTransition* g_cockpitPanelTransitions[c_panelCount] = {
 };
 
 // Set when UpdateCockpit should run PunchInAutoHeading on its next frame.
-MechS32 g_punchInAutoHeadingRequested = 0;
+int32_t g_punchInAutoHeadingRequested = 0;
 
-MechS32 g_hitFadePending = 0;
+int32_t g_hitFadePending = 0;
 
 // The clock times the panels light up at on startup (CockpitPanel::m_lightUpTime): the weapon panels in turn.
 undefined4 g_cockpitPanelLightUpTimes[c_panelCount] = {0x16a, 0xb5,  0xb5,  0x21f, 0x23d, 0x25b, 0x279, 0x297, 0x32e,
@@ -155,42 +155,42 @@ undefined4 g_cockpitPanelLightUpTimes[c_panelCount] = {0x16a, 0xb5,  0xb5,  0x21
 													   0xb5,  0xb5,  0xb5,  0xb5,  0xb5,  0x0,   0x0,   0x0};
 
 // The local mech's state (Mech::m_powerState) when PlayCockpitWarnings last ran.
-MechS32 g_lastWarningPowerState = 0;
+int32_t g_lastWarningPowerState = 0;
 
-MechS32 g_lockedTonePlayed = 0;
+int32_t g_lockedTonePlayed = 0;
 
-MechS32 g_lockingTonePlayed = 0;
+int32_t g_lockingTonePlayed = 0;
 
-MechS32 g_hitFadeCount = 0;
+int32_t g_hitFadeCount = 0;
 
 // The game directory (the MECHWARRIOR environment variable).
-MechChar g_gameDir[256] = {0};
+char g_gameDir[256] = {0};
 
 // The path BuildGamePath returns.
-MechChar g_gamePath[0x50];
+char g_gamePath[0x50];
 
 // The local player's heading and torso twist, in whole degrees (UpdateCockpit).
 
-MechS32 g_torsoTwistDegrees;
+int32_t g_torsoTwistDegrees;
 
-MechS32 g_headingDegrees;
+int32_t g_headingDegrees;
 
 // The 26 cockpit panels InitCockpitPanels allocates.
 CockpitPanel* g_cockpitPanels[c_panelCount];
 
 // Which of the panels are enabled when they are set up.
-MechS32 g_cockpitPanelEnabled[c_panelCount];
+int32_t g_cockpitPanelEnabled[c_panelCount];
 
-MechS32 g_cockpitPowerState;
+int32_t g_cockpitPowerState;
 
 // The three values of the HUD layout (LoadHudFile).
-MechS32 g_hudLayoutValues[3];
+int32_t g_hudLayoutValues[3];
 
 // Loads eight sounds ahead of their use.
 void PreloadCockpitSounds(void)
 {
-	MechS32 ids[8];
-	MechU32 i;
+	int32_t ids[8];
+	uint32_t i;
 
 	ids[0] = 0xbd;
 	ids[1] = 0xf7;
@@ -211,18 +211,18 @@ void PreloadCockpitSounds(void)
 // at odd ones, renumbering their bins, and clears the slots left empty.
 void LayoutWeaponPanels(Mech* p_mech)
 {
-	MechS32 rightStart;
+	int32_t rightStart;
 	WeaponSlot* slot;
-	MechS32 panel;
-	MechS32 i;
+	int32_t panel;
+	int32_t i;
 	WeaponSlot* dst;
 	WeaponSlot* weapons;
-	MechS32 left;
-	MechS32 j;
-	MechS32 index;
-	MechS32 alternate;
+	int32_t left;
+	int32_t j;
+	int32_t index;
+	int32_t alternate;
 	AmmoBin* bin;
-	MechS32 right;
+	int32_t right;
 
 	alternate = TRUE;
 	for (i = 0; i < 10; i++) {
@@ -388,7 +388,7 @@ void ScaleCockpitLayout(void)
 {
 	PANE* rect;
 	RectTransition* transition;
-	MechS32 i;
+	int32_t i;
 	PANE* target;
 
 	for (i = 0; i < c_panelCount; i++) {
@@ -416,7 +416,7 @@ void ScaleCockpitLayout(void)
 void InitCockpitPanels(void)
 {
 	Mech* mech;
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < c_panelCount; i++) {
 		g_cockpitPanelEnabled[i] = TRUE;
@@ -476,7 +476,7 @@ void InitCockpitPanels(void)
 void ResetCockpitPanels(void)
 {
 	Mech* mech;
-	MechS32 i;
+	int32_t i;
 
 	mech = g_players[g_localPlayerId]->m_mech;
 	LayoutWeaponPanels(mech);
@@ -495,11 +495,11 @@ void ResetCockpitPanels(void)
 // panels' handlers for the view mode (Mech::m_powerState: 1, 2 or the rest).
 void UpdateCockpit(Mech* p_mech)
 {
-	MechS32 pitch;
-	MechS32 twistBearing;
-	MechS32 i;
-	MechS32 distance;
-	MechS32 bearing;
+	int32_t pitch;
+	int32_t twistBearing;
+	int32_t i;
+	int32_t distance;
+	int32_t bearing;
 
 	if (p_mech->m_player->m_index != g_localPlayerId) {
 		return;
@@ -615,7 +615,7 @@ void UpdateCockpit(Mech* p_mech)
 // each panel's m_shutdown hook, then every 2D animation.
 void ShutdownCockpitPanels(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (g_difficulty->m_radar) {
 		ResetMapView();
@@ -632,10 +632,10 @@ void ShutdownCockpitPanels(void)
 
 // Knocks the cockpit panels about when the local player's mech is hit: each panel has a two
 // (p_heavy: five) in ten chance of stepping its damage.
-void DamageCockpitPanels(Mech* p_mech, MechS32 p_heavy)
+void DamageCockpitPanels(Mech* p_mech, int32_t p_heavy)
 {
-	MechS32 chance;
-	MechS32 i;
+	int32_t chance;
+	int32_t i;
 
 	if (p_mech->m_player->m_index != g_localPlayerId) {
 		return;
@@ -703,23 +703,23 @@ void PlayCockpitWarnings(Mech* p_mech)
 	g_lastWarningPowerState = p_mech->m_powerState;
 }
 
-void DrawPanelAnim(PANE* p_target, MechS32 p_index, MechS32 p_x, MechS32 p_y)
+void DrawPanelAnim(PANE* p_target, int32_t p_index, int32_t p_x, int32_t p_y)
 {
 	DrawAnim2d(p_target, p_index, p_x, p_y);
 }
 
 // Loads the mech geometry resource p_ref: seven values, of which the third to fifth are unused.
-MechS32 LoadMgdFile(
+int32_t LoadMgdFile(
 	ResourceRef* p_ref,
-	MechS32* p_height,
-	MechS32* p_cockpitHeight,
-	MechS32* p_maxTorsoTwist,
-	MechS32* p_radius
+	int32_t* p_height,
+	int32_t* p_cockpitHeight,
+	int32_t* p_maxTorsoTwist,
+	int32_t* p_radius
 )
 {
-	MechS32 size;
-	MechS32* data;
-	MechS32* cursor;
+	int32_t size;
+	int32_t* data;
+	int32_t* cursor;
 
 	data = LoadResourceByRef(
 		p_ref,
@@ -754,24 +754,24 @@ MechS32 LoadMgdFile(
 
 // Loads the animation file p_ref: up to 32 animations, numbered from the current base
 // (GetAnimBase), into g_reels.
-MechS32 LoadReels(ResourceRef* p_ref)
+int32_t LoadReels(ResourceRef* p_ref)
 {
-	MechS32 ids[32];
-	MechS32 size;
-	MechS32 unk0x08;
-	MechU8* frames;
-	MechS32 base;
-	MechS32 offset;
-	MechS32 count;
-	MechS32 frameCount;
-	MechS32 i;
-	MechU8* data;
-	MechS32 stride;
-	MechU8* end;
-	MechS32 index;
+	int32_t ids[32];
+	int32_t size;
+	int32_t unk0x08;
+	uint8_t* frames;
+	int32_t base;
+	int32_t offset;
+	int32_t count;
+	int32_t frameCount;
+	int32_t i;
+	uint8_t* data;
+	int32_t stride;
+	uint8_t* end;
+	int32_t index;
 
 	offset = 0;
-	stride = sizeof(MechS32);
+	stride = sizeof(int32_t);
 	data = LoadResourceByRef(
 		p_ref,
 		g_resourceTypeTags[c_resTagAnim],
@@ -785,14 +785,14 @@ MechS32 LoadReels(ResourceRef* p_ref)
 		return FALSE;
 	}
 
-	count = *(MechS32*) data;
-	frameCount = *(MechS32*) (data + 4);
+	count = *(int32_t*) data;
+	frameCount = *(int32_t*) (data + 4);
 	offset = stride * 2;
 	base = GetAnimBase();
 	for (i = 0; i < count; i++) {
-		index = *(MechS32*) (data + offset);
+		index = *(int32_t*) (data + offset);
 		offset += stride;
-		unk0x08 = *(MechS32*) (data + offset);
+		unk0x08 = *(int32_t*) (data + offset);
 		offset += stride;
 		if (index >= 0x20) {
 			return FALSE;
@@ -804,13 +804,13 @@ MechS32 LoadReels(ResourceRef* p_ref)
 		}
 
 		frames = data + offset;
-		offset += frameCount * sizeof(MechS32);
+		offset += frameCount * sizeof(int32_t);
 		g_reels[index] = StaticPoolAlloc(sizeof(Reel), g_staticPoolTags[5]);
 		if (!g_reels[index]) {
 			return FALSE;
 		}
 
-		g_reels[index]->m_amounts = (MechS32*) frames;
+		g_reels[index]->m_amounts = (int32_t*) frames;
 		g_reels[index]->m_kind = unk0x08;
 		g_reels[index]->m_frameCount = frameCount;
 		if (p_ref->m_id == -1) {
@@ -834,17 +834,17 @@ MechS32 LoadReels(ResourceRef* p_ref)
 // Loads the cockpit layout resource p_ref: the gauge positions (g_hudGaugePositions), three values
 // (g_hudLayoutValues) and fifteen rectangles in percent of the screen (g_outlinePartRects), any of
 // them out of range cleared.
-MechS32 LoadHudFile(ResourceRef* p_ref)
+int32_t LoadHudFile(ResourceRef* p_ref)
 {
-	MechS32 size;
-	MechS32 value;
-	MechS32 i;
-	MechS32* data;
-	MechS32* cursor;
-	MechS32 right;
-	MechS32 bottom;
-	MechS32 left;
-	MechS32 top;
+	int32_t size;
+	int32_t value;
+	int32_t i;
+	int32_t* data;
+	int32_t* cursor;
+	int32_t right;
+	int32_t bottom;
+	int32_t left;
+	int32_t top;
 
 	data = LoadResourceByRef(
 		p_ref,
@@ -903,11 +903,11 @@ MechS32 LoadHudFile(ResourceRef* p_ref)
 }
 
 // Loads the cockpit layout resource p_ref: five rectangles into p_gauges and fifteen into p_panels
-MechS32 LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels)
+int32_t LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels)
 {
-	MechS32 size;
+	int32_t size;
 	PANE* target;
-	MechS32 i;
+	int32_t i;
 	CockpitFrame* frame;
 	void* data;
 
@@ -961,10 +961,10 @@ MechS32 LoadCptFile(ResourceRef* p_ref, PANE* p_gauges, PANE* p_panels)
 
 // Writes the screen as a picture: a 0x20-byte header from TABL resource 15, the palette, then
 // the main pixel buffer. Returns whether it could.
-MechS32 WriteScreenPicture(MechChar* p_path, void* p_palette)
+int32_t WriteScreenPicture(char* p_path, void* p_palette)
 {
 	void* header;
-	MechS32 file;
+	int32_t file;
 	undefined* pixels;
 
 	header = NULL;
@@ -990,9 +990,9 @@ MechS32 WriteScreenPicture(MechChar* p_path, void* p_palette)
 
 // Reads a whole file into memory from the heap, or from a static pool when p_poolTag is given.
 // Returns the open file, or -1 (logging the path to symlog.txt when it can't be opened).
-MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_poolTag)
+int32_t LoadFile(char* p_path, int32_t* p_size, void** p_data, uint32_t* p_poolTag)
 {
-	MechS32 file;
+	int32_t file;
 
 	file = MechOpen(p_path, c_mechOpenRead);
 	if (file == -1) {
@@ -1025,10 +1025,10 @@ MechS32 LoadFile(MechChar* p_path, MechS32* p_size, void** p_data, MechU32* p_po
 }
 
 // Reads a game file into memory. Returns the file (closed), or -1.
-MechS32 ReadGameFile(MechChar* p_name, void** p_data)
+int32_t ReadGameFile(char* p_name, void** p_data)
 {
-	MechS32 size;
-	MechS32 file;
+	int32_t size;
+	int32_t file;
 	void* data;
 
 	*p_data = NULL;
@@ -1043,10 +1043,10 @@ MechS32 ReadGameFile(MechChar* p_name, void** p_data)
 
 // Builds the difficulty settings from the player’s (p_name NULL) or from file p_name, then overrides some of them in
 // network games. Returns 1 or -1 if there is no block.
-MechS32 LoadDifficultyCfg(MechChar* p_name, DifficultyCfg** p_cfg)
+int32_t LoadDifficultyCfg(char* p_name, DifficultyCfg** p_cfg)
 {
-	MechS32 size;
-	MechS32 file;
+	int32_t size;
+	int32_t file;
 	void* data;
 
 	*p_cfg = MechHeapAllocZeroed(g_primaryHeap, sizeof(DifficultyCfg));
@@ -1145,9 +1145,9 @@ void SaveSndCfg(const SoundConfig* p_cfg)
 }
 
 // Returns the path of a game file: in g_gameDir unless the name has a directory already.
-MechChar* BuildGamePath(MechChar* p_name)
+char* BuildGamePath(char* p_name)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x50; i++) {
 		g_gamePath[i] = 0;
@@ -1164,9 +1164,9 @@ MechChar* BuildGamePath(MechChar* p_name)
 }
 
 // Returns the path of a file in g_gameDir.
-MechChar* BuildGameDirPath(MechChar* p_name)
+char* BuildGameDirPath(char* p_name)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x50; i++) {
 		g_gamePath[i] = 0;

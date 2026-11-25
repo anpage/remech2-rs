@@ -22,22 +22,22 @@ extern "C"
 	// Whitespace-separated tokens read ahead from a text file, up to 100 at a time. Line ends and
 	// '=' are tokens of their own, and trailing commas are dropped.
 	typedef struct TokenStream {
-		MechS32 m_capacity;  // 0x00
-		MechS32 m_count;     // 0x04
-		MechS32 m_index;     // 0x08 — next token to hand out
-		FILE* m_file;        // 0x0c
-		MechChar** m_tokens; // 0x10
+		int32_t m_capacity; // 0x00
+		int32_t m_count;    // 0x04
+		int32_t m_index;    // 0x08 — next token to hand out
+		FILE* m_file;       // 0x0c
+		char** m_tokens;    // 0x10
 	} TokenStream;
 
-	MechS32 ReadTokens(TokenStream* p_stream);
+	int32_t ReadTokens(TokenStream* p_stream);
 	TokenStream* CreateTokenStream(FILE* p_file);
 	void SkipBlanks(FILE* p_file);
-	MechS32 ReadFileToken(FILE* p_file, MechChar* p_token);
-	MechS32 RefillTokens(TokenStream* p_stream);
-	MechS32 TakeToken(TokenStream* p_stream, MechChar* p_key, MechChar* p_value);
-	void AddToken(TokenStream* p_stream, MechChar* p_token);
+	int32_t ReadFileToken(FILE* p_file, char* p_token);
+	int32_t RefillTokens(TokenStream* p_stream);
+	int32_t TakeToken(TokenStream* p_stream, char* p_key, char* p_value);
+	void AddToken(TokenStream* p_stream, char* p_token);
 	void SkipLine(TokenStream* p_stream);
-	void ReadLine(TokenStream* p_stream, MechChar* p_line);
+	void ReadLine(TokenStream* p_stream, char* p_line);
 
 #ifdef __cplusplus
 }

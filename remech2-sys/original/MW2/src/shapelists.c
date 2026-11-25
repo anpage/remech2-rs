@@ -242,7 +242,7 @@ void LinkShape(Shape* p_shape, Shape* p_list)
 
 // Shows the shapes of kind 0xc0 (the object density setting) with their collisions, or hides
 // them without.
-void ShowDensityShapes(MechS32 p_enable)
+void ShowDensityShapes(int32_t p_enable)
 {
 	Shape* shape;
 	Shape* next;

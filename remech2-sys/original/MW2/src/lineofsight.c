@@ -14,13 +14,13 @@
 // Tests whether the player can see its target: nothing but the target itself lies on the line
 // to it. With p_ahead, a target behind the player (between 90 and 270 degrees off the view)
 // is never seen.
-MechS32 CanSeeTarget(Player* p_player, MechS32 p_ahead)
+int32_t CanSeeTarget(Player* p_player, int32_t p_ahead)
 {
 	Ray ray;
 	Shape* hit;
-	MechS32 bearing;
-	MechU32 target;
-	MechU16 surface;
+	int32_t bearing;
+	uint32_t target;
+	uint16_t surface;
 
 	bearing = (p_player->m_heading + p_player->m_torsoTwist - p_player->m_targetInfo.m_heading + 0x1680000) % 0x1680000;
 	if (p_ahead && bearing < 0x10e0000 && bearing > 0x5a0000) {
@@ -57,19 +57,19 @@ MechS32 CanSeeTarget(Player* p_player, MechS32 p_ahead)
 
 // Walks the ground from (p_x, p_y, p_z) toward the player in steps of 1000 units, and tests
 // that the terrain stays within 1000 units of height 0 all the way.
-MechS32 IsGroundLevelToward(Player* p_player, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t IsGroundLevelToward(Player* p_player, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 steps;
-	MechS32 level;
-	MechS32 pitch;
-	MechU32 distance;
-	MechS32 unk0x10;
-	MechS32 height;
-	MechS32 i;
-	MechS32 yaw;
-	MechS32 stepX;
-	MechS32 stepY;
-	MechS32 stepZ;
+	int32_t steps;
+	int32_t level;
+	int32_t pitch;
+	uint32_t distance;
+	int32_t unk0x10;
+	int32_t height;
+	int32_t i;
+	int32_t yaw;
+	int32_t stepX;
+	int32_t stepY;
+	int32_t stepZ;
 
 	level = 0;
 	GetBearingAndRange(
@@ -81,7 +81,7 @@ MechS32 IsGroundLevelToward(Player* p_player, MechS32 p_x, MechS32 p_y, MechS32 
 		&distance,
 		&pitch
 	);
-	steps = (MechS32) distance / 1000;
+	steps = (int32_t) distance / 1000;
 	stepX = FixedMul16(FixedCos(yaw) * 1000, FixedCos(pitch));
 	stepZ = FixedMul16(FixedSin(yaw) * 1000, FixedCos(pitch));
 	stepY = FixedSin(pitch) * 1000;
@@ -100,7 +100,7 @@ MechS32 IsGroundLevelToward(Player* p_player, MechS32 p_x, MechS32 p_y, MechS32 
 
 // Returns which of the weapon's range bands the player's target is in: 3 within the short
 // range, 2 within the long one, 1 right at it and 0 beyond it.
-MechS32 GetTargetRangeBand(Player* p_player, WeaponDef* p_weapon)
+int32_t GetTargetRangeBand(Player* p_player, WeaponDef* p_weapon)
 {
 	if (p_player->m_targetInfo.m_distance < p_weapon->m_shortRange) {
 		return 3;

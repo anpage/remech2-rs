@@ -24,9 +24,9 @@ void StopRectTransition(RectTransition* p_transition)
 
 // Moves p_out's edges to the fraction p_t (16.16) of the way from p_from to p_to: the horizontal
 // ones unless p_axis is 2, the vertical ones unless it is 1.
-PANE* LerpPaneRect(PANE* p_from, PANE* p_to, PANE* p_out, MechS32 p_t, MechS32 p_axis)
+PANE* LerpPaneRect(PANE* p_from, PANE* p_to, PANE* p_out, int32_t p_t, int32_t p_axis)
 {
-	MechS32 delta;
+	int32_t delta;
 
 	if (p_axis != c_rectAxisVertical) {
 		delta = p_to->m_x0 - p_from->m_x0;
@@ -47,11 +47,11 @@ PANE* LerpPaneRect(PANE* p_from, PANE* p_to, PANE* p_out, MechS32 p_t, MechS32 p
 
 // Advances the transition, forward or (p_reverse) backward, and returns its rectangle, or NULL
 // when it isn't running.
-PANE* UpdateRectTransition(MechS32 p_reverse, RectTransition* p_transition)
+PANE* UpdateRectTransition(int32_t p_reverse, RectTransition* p_transition)
 {
-	MechS32 t;
+	int32_t t;
 	RectTransitionDef* def;
-	MechS32 active;
+	int32_t active;
 	PANE* from;
 	RectTransitionState* state;
 	PANE* out;
@@ -97,14 +97,14 @@ PANE* UpdateRectTransition(MechS32 p_reverse, RectTransition* p_transition)
 
 // As UpdateRectTransition, but the horizontal edges move in the first half and the vertical ones
 // in the second (the other way around in reverse).
-PANE* UpdateRectTransitionByAxis(MechS32 p_reverse, RectTransition* p_transition)
+PANE* UpdateRectTransitionByAxis(int32_t p_reverse, RectTransition* p_transition)
 {
-	MechS32 t;
+	int32_t t;
 	RectTransitionDef* def;
-	MechS32 active;
+	int32_t active;
 	PANE* from;
-	MechS32 firstAxis;
-	MechS32 secondAxis;
+	int32_t firstAxis;
+	int32_t secondAxis;
 	RectTransitionState* state;
 	PANE* out;
 	PANE* to;

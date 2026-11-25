@@ -42,37 +42,37 @@
 // A bitmap record: its size and palette-sized data.
 typedef struct BitmapRecord {
 	BwdRecord m_header; // 0x00
-	MechS32 m_width;    // 0x08
-	MechS32 m_height;   // 0x0c
-	MechS32 m_data[1];  // 0x10 — up to the record's end
+	int32_t m_width;    // 0x08
+	int32_t m_height;   // 0x0c
+	int32_t m_data[1];  // 0x10 — up to the record's end
 } BitmapRecord;
 
 // A path record: the path's name and its waypoints.
 typedef struct PathRecord {
 	BwdRecord m_header;    // 0x00
-	MechChar m_name[0x40]; // 0x08
+	char m_name[0x40];     // 0x08
 	PathPoint m_points[1]; // 0x48 — up to the record's end
 } PathRecord;
 
 // A formation record's slot: its offset from the leader and its heading.
 typedef struct FormationSlot {
-	MechS32 m_x;       // 0x00
-	MechS32 m_z;       // 0x04
-	MechS32 m_heading; // 0x08
+	int32_t m_x;       // 0x00
+	int32_t m_z;       // 0x04
+	int32_t m_heading; // 0x08
 } FormationSlot;
 
 // A formation record: the formation's name and its slots.
 typedef struct FormationRecord {
 	BwdRecord m_header;       // 0x00
-	MechChar m_name[0x10];    // 0x08
+	char m_name[0x10];        // 0x08
 	FormationSlot m_slots[1]; // 0x18 — up to the record's end
 } FormationRecord;
 
 // A star record's entry: a team's two values and its formation's name.
 typedef struct StarEntry {
-	MechS32 m_affiliation; // 0x00
-	MechS32 m_side;        // 0x04
-	MechChar m_name[0x10]; // 0x08
+	int32_t m_affiliation; // 0x00
+	int32_t m_side;        // 0x04
+	char m_name[0x10];     // 0x08
 } StarEntry;
 
 typedef struct StarTable {
@@ -82,30 +82,30 @@ typedef struct StarTable {
 
 // A formation-name record: the sixteen teams' formations.
 typedef struct FormationNames {
-	BwdRecord m_header;         // 0x00
-	MechChar m_names[16][0x11]; // 0x08
+	BwdRecord m_header;     // 0x00
+	char m_names[16][0x11]; // 0x08
 } FormationNames;
 
 ScenarioTable* g_scenarios = NULL;
 
 // The next name of g_scenarios ExecuteInclude substitutes.
-MechS32 g_nextScenario = 0;
+int32_t g_nextScenario = 0;
 
 // The number of entries in g_thingRecordIndices, and the next one NextThingRecordObject returns.
-MechS32 g_thingRecordCount = 0;
+int32_t g_thingRecordCount = 0;
 
-MechS32 g_nextThingRecord = 0;
+int32_t g_nextThingRecord = 0;
 
-MechS32 g_mangleBase = 0;
+int32_t g_mangleBase = 0;
 
 // The mangle base of the world stream's next mangle_on section (BwdExecuteStream).
-MechS32 g_nextMangleBase = 0;
+int32_t g_nextMangleBase = 0;
 
 // The formation LoadStarTable gives the player's team, or NULL to use the record's.
-MechChar* g_playerTeamFormation = NULL;
+char* g_playerTeamFormation = NULL;
 
 // The formation LoadStarTable gives the other teams, or NULL to use the record's.
-MechChar* g_otherTeamFormation = NULL;
+char* g_otherTeamFormation = NULL;
 
 // The player the world stream (BwdExecuteStream) created last, for ReelMotionTask.
 struct Player* g_lastPlayer = NULL;
@@ -118,19 +118,19 @@ TimedCallbackFn g_taskFns[6] = {SpinTask, ColorCycleTask, OrbitTask, ReelMotionT
 MissionTable* g_missionTables[16];
 
 // The number of entries of each of g_missionTables.
-MechS32 g_missionTableCounts[16];
+int32_t g_missionTableCounts[16];
 
-MechS32 g_thingRecordIndices[0x96];
+int32_t g_thingRecordIndices[0x96];
 
 // The number of names in g_scenarios.
-MechS32 g_scenarioCount;
+int32_t g_scenarioCount;
 
 // Copies a bitmap record's size to p_width and p_height and its data to p_data, each if not NULL.
-void LoadMapBitmap(BwdRecord* p_record, MechS32* p_width, MechS32* p_height, MechS32* p_data)
+void LoadMapBitmap(BwdRecord* p_record, int32_t* p_width, int32_t* p_height, int32_t* p_data)
 {
 	BitmapRecord* record;
-	MechS32 count;
-	MechS32 i;
+	int32_t count;
+	int32_t i;
 
 	record = (BitmapRecord*) p_record;
 	if (p_width) {
@@ -150,9 +150,9 @@ void LoadMapBitmap(BwdRecord* p_record, MechS32* p_width, MechS32* p_height, Mec
 }
 
 // Replaces the scenario table with a copy of p_table.
-MechS32 LoadScenarioTable(ScenarioTable* p_table)
+int32_t LoadScenarioTable(ScenarioTable* p_table)
 {
-	MechS32 result;
+	int32_t result;
 
 	result = FALSE;
 	if (g_scenarios) {
@@ -176,10 +176,10 @@ MechS32 LoadScenarioTable(ScenarioTable* p_table)
 }
 
 // Replaces the mission table in p_table's slot with a copy of it.
-MechS32 LoadMissionTable(MissionTable* p_table)
+int32_t LoadMissionTable(MissionTable* p_table)
 {
-	MechS32 result;
-	MechS32 slot;
+	int32_t result;
+	int32_t slot;
 
 	result = FALSE;
 	slot = p_table->m_star;
@@ -205,12 +205,12 @@ MechS32 LoadMissionTable(MissionTable* p_table)
 }
 
 // Adds a path to g_paths, or returns FALSE if the table or the path is full.
-MechS32 LoadPathTable(PathRecord* p_record)
+int32_t LoadPathTable(PathRecord* p_record)
 {
-	MechS32 count;
-	MechS32 result;
-	MechS32 index;
-	MechS32 i;
+	int32_t count;
+	int32_t result;
+	int32_t index;
+	int32_t i;
 	PathRecord* record;
 
 	result = FALSE;
@@ -238,12 +238,12 @@ MechS32 LoadPathTable(PathRecord* p_record)
 
 // Adds a formation to g_formationTemplates, or returns FALSE if the table or the formation is
 // full.
-MechS32 LoadFormationTable(FormationRecord* p_record)
+int32_t LoadFormationTable(FormationRecord* p_record)
 {
-	MechS32 count;
-	MechS32 result;
-	MechS32 index;
-	MechS32 i;
+	int32_t count;
+	int32_t result;
+	int32_t index;
+	int32_t i;
 	FormationRecord* record;
 
 	result = FALSE;
@@ -266,15 +266,15 @@ MechS32 LoadFormationTable(FormationRecord* p_record)
 
 // Runs p_fn on the stream an include record names. A name of "^" with id -1 or -2 takes the
 // scenario table's next name.
-MechS32 ExecuteInclude(IncludeRecord* p_record, BwdStreamFn p_fn)
+int32_t ExecuteInclude(IncludeRecord* p_record, BwdStreamFn p_fn)
 {
 	BwdStream streamData;
 	BwdStreamKey keyData;
 	IncludeRecord* record;
-	MechS32 ok;
+	int32_t ok;
 	BwdStreamKey* key;
 	BwdStream* stream;
-	MechS32 result;
+	int32_t result;
 
 	record = p_record;
 	key = &keyData;
@@ -317,9 +317,9 @@ MechS32 ExecuteInclude(IncludeRecord* p_record, BwdStreamFn p_fn)
 // Sets up the teams from a star record: each team's values, and its formation.
 void LoadStarTable(StarTable* p_table)
 {
-	MechS32 count;
+	int32_t count;
 	StarTable* table;
-	MechS32 i;
+	int32_t i;
 
 	table = p_table;
 	count = (table->m_header.m_size - 8) / sizeof(StarEntry);
@@ -343,7 +343,7 @@ void LoadStarTable(StarTable* p_table)
 void SetTeamFormations(FormationNames* p_record)
 {
 	FormationNames* record;
-	MechS32 i;
+	int32_t i;
 
 	record = p_record;
 	for (i = 0; i < 16; i++) {
@@ -352,15 +352,15 @@ void SetTeamFormations(FormationNames* p_record)
 }
 
 // Runs p_fn on the stream a record names.
-MechS32 RunIncludedStream(IncludeRecord2* p_record, BwdStreamFn p_fn)
+int32_t RunIncludedStream(IncludeRecord2* p_record, BwdStreamFn p_fn)
 {
 	BwdStream streamData;
 	BwdStreamKey keyData;
-	MechS32 id;
+	int32_t id;
 	IncludeRecord2* record;
 	BwdStreamKey* key;
 	BwdStream* stream;
-	MechS32 result;
+	int32_t result;
 
 	record = p_record;
 	key = &keyData;
@@ -385,7 +385,7 @@ MechS32 RunIncludedStream(IncludeRecord2* p_record, BwdStreamFn p_fn)
 // Frees the mission tables' blocks.
 void FreeMissionTables(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (g_scenarios) {
 		MechHeapFree(g_primaryHeap, g_scenarios);
@@ -403,9 +403,9 @@ void FreeMissionTables(void)
 
 // Scales the vector (p_a, p_b, p_c) to integers whose absolute values add up to 2^29. A vector
 // that small is left alone.
-void ScaleNormal(MechFloat p_a, MechFloat p_b, MechFloat p_c, undefined4* p_x, undefined4* p_y, undefined4* p_z)
+void ScaleNormal(float p_a, float p_b, float p_c, undefined4* p_x, undefined4* p_y, undefined4* p_z)
 {
-	MechFloat scale;
+	float scale;
 
 	scale = fabs(p_a);
 	scale += fabs(p_b);
@@ -419,17 +419,17 @@ void ScaleNormal(MechFloat p_a, MechFloat p_b, MechFloat p_c, undefined4* p_x, u
 
 // Scales the plane (p_a, p_b, p_c, p_d) like ScaleNormal.
 void ScalePlane(
-	MechFloat p_a,
-	MechFloat p_b,
-	MechFloat p_c,
-	MechFloat p_d,
+	float p_a,
+	float p_b,
+	float p_c,
+	float p_d,
 	undefined4* p_x,
 	undefined4* p_y,
 	undefined4* p_z,
 	undefined4* p_w
 )
 {
-	MechFloat scale;
+	float scale;
 
 	scale = fabs(p_a);
 	scale += fabs(p_b);
@@ -446,29 +446,29 @@ void ScalePlane(
 // The normal of the triangle (p_x1, p_y1, p_z1), (p_x2, p_y2, p_z2), (p_x3, p_y3, p_z3), scaled
 // by ScaleNormal.
 void GetTriangleNormal(
-	MechFloat p_x1,
-	MechFloat p_y1,
-	MechFloat p_z1,
-	MechFloat p_x2,
-	MechFloat p_y2,
-	MechFloat p_z2,
-	MechFloat p_x3,
-	MechFloat p_y3,
-	MechFloat p_z3,
+	float p_x1,
+	float p_y1,
+	float p_z1,
+	float p_x2,
+	float p_y2,
+	float p_z2,
+	float p_x3,
+	float p_y3,
+	float p_z3,
 	undefined4* p_x,
 	undefined4* p_y,
 	undefined4* p_z
 )
 {
-	MechFloat a;
-	MechFloat b;
-	MechFloat c;
-	MechFloat ux;
-	MechFloat uy;
-	MechFloat uz;
-	MechFloat vx;
-	MechFloat vy;
-	MechFloat vz;
+	float a;
+	float b;
+	float c;
+	float ux;
+	float uy;
+	float uz;
+	float vx;
+	float vy;
+	float vz;
 
 	ux = p_x2 - p_x1;
 	uy = p_y2 - p_y1;
@@ -484,31 +484,31 @@ void GetTriangleNormal(
 
 // The plane of the triangle, scaled by ScalePlane.
 void GetTrianglePlane(
-	MechFloat p_x1,
-	MechFloat p_y1,
-	MechFloat p_z1,
-	MechFloat p_x2,
-	MechFloat p_y2,
-	MechFloat p_z2,
-	MechFloat p_x3,
-	MechFloat p_y3,
-	MechFloat p_z3,
+	float p_x1,
+	float p_y1,
+	float p_z1,
+	float p_x2,
+	float p_y2,
+	float p_z2,
+	float p_x3,
+	float p_y3,
+	float p_z3,
 	undefined4* p_x,
 	undefined4* p_y,
 	undefined4* p_z,
 	undefined4* p_w
 )
 {
-	MechFloat a;
-	MechFloat b;
-	MechFloat c;
-	MechFloat d;
-	MechFloat ux;
-	MechFloat uy;
-	MechFloat uz;
-	MechFloat vx;
-	MechFloat vy;
-	MechFloat vz;
+	float a;
+	float b;
+	float c;
+	float d;
+	float ux;
+	float uy;
+	float uz;
+	float vx;
+	float vy;
+	float vz;
 
 	ux = p_x2 - p_x1;
 	uy = p_y2 - p_y1;
@@ -523,22 +523,22 @@ void GetTrianglePlane(
 }
 
 void GetPointNormalPlane(
-	MechFloat p_x,
-	MechFloat p_y,
-	MechFloat p_z,
-	MechFloat p_nx,
-	MechFloat p_ny,
-	MechFloat p_nz,
+	float p_x,
+	float p_y,
+	float p_z,
+	float p_nx,
+	float p_ny,
+	float p_nz,
 	undefined4* p_planeX,
 	undefined4* p_planeY,
 	undefined4* p_planeZ,
 	undefined4* p_planeW
 )
 {
-	MechFloat a;
-	MechFloat b;
-	MechFloat c;
-	MechFloat d;
+	float a;
+	float b;
+	float c;
+	float d;
 
 	a = p_nx;
 	b = -p_ny;
@@ -547,12 +547,12 @@ void GetPointNormalPlane(
 	ScalePlane(a, b, c, d, p_planeX, p_planeY, p_planeZ, p_planeW);
 }
 
-MechS32 MapResourceId(MechS32 p_id)
+int32_t MapResourceId(int32_t p_id)
 {
 	return g_mangleBase + p_id;
 }
 
-void SetMangleBase(MechS32 p_base)
+void SetMangleBase(int32_t p_base)
 {
 	g_mangleBase = p_base;
 }
@@ -563,32 +563,32 @@ void SetMangleBase(MechS32 p_base)
 void CreateObjectNode(
 	BwdObjectRecord* p_record,
 	undefined4 p_unk0x04,
-	MechS32 p_unk0x08,
-	MechS32 p_static,
-	MechS32 p_class,
-	MechS32 p_level
+	int32_t p_unk0x08,
+	int32_t p_static,
+	int32_t p_class,
+	int32_t p_level
 )
 {
-	MechS32 offset;
-	MechS32 unk0x34;
+	int32_t offset;
+	int32_t unk0x34;
 	Xform xform;
-	MechS32 parent;
-	MechS32 fromResource;
-	MechS32 parentIndex;
-	MechU8* data;
-	MechS32 flags;
-	MechS32 kind;
-	MechChar name[13];
+	int32_t parent;
+	int32_t fromResource;
+	int32_t parentIndex;
+	uint8_t* data;
+	int32_t flags;
+	int32_t kind;
+	char name[13];
 	BwdObjectRecord* record;
-	MechS32 mapped;
+	int32_t mapped;
 	Shape* shape;
-	MechS32 thing;
+	int32_t thing;
 	Matrix matrix;
-	MechS32 resource;
-	MechS32 first;
-	MechS32 id;
-	MechS32 size;
-	MechS32 handle;
+	int32_t resource;
+	int32_t first;
+	int32_t id;
+	int32_t size;
+	int32_t handle;
 	SceneObject* parentObj;
 	SceneObject* obj;
 	Shape* classShape;
@@ -729,7 +729,7 @@ void CreateObjectNode(
 // Returns the object of the next entry of g_thingRecordIndices, or NULL after the last.
 struct SceneObject* NextThingRecordObject(void)
 {
-	MechS32 id;
+	int32_t id;
 	struct SceneObject* obj;
 
 	if (g_nextThingRecord < g_thingRecordCount) {
@@ -745,9 +745,9 @@ struct SceneObject* NextThingRecordObject(void)
 }
 
 // Returns the next free game thing index, or -1 when all 254 are taken.
-MechS32 FindFreeGameThing(void)
+int32_t FindFreeGameThing(void)
 {
-	MechS32 index;
+	int32_t index;
 
 	index = -1;
 	if (g_gameThingCount < 0xfe) {

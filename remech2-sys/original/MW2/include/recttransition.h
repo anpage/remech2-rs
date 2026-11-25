@@ -12,13 +12,13 @@ enum {
 };
 
 typedef struct RectTransitionState {
-	MechS32 m_active;    // 0x00
-	MechS32 m_wasActive; // 0x04 — m_active at the previous update
-	MechS32 m_elapsed;   // 0x08 — in clock ticks
+	int32_t m_active;    // 0x00
+	int32_t m_wasActive; // 0x04 — m_active at the previous update
+	int32_t m_elapsed;   // 0x08 — in clock ticks
 } RectTransitionState;
 
 typedef struct RectTransitionDef {
-	MechS32 m_duration; // 0x00 — in clock ticks
+	int32_t m_duration; // 0x00 — in clock ticks
 	PANE* m_first;      // 0x04
 	PANE* m_second;     // 0x08
 	PANE* m_out;        // 0x0c — the rectangle the transition moves
@@ -37,9 +37,9 @@ extern "C"
 
 	void StartRectTransition(RectTransition* p_transition);
 	void StopRectTransition(RectTransition* p_transition);
-	PANE* LerpPaneRect(PANE* p_from, PANE* p_to, PANE* p_out, MechS32 p_t, MechS32 p_axis);
-	PANE* UpdateRectTransition(MechS32 p_reverse, RectTransition* p_transition);
-	PANE* UpdateRectTransitionByAxis(MechS32 p_reverse, RectTransition* p_transition);
+	PANE* LerpPaneRect(PANE* p_from, PANE* p_to, PANE* p_out, int32_t p_t, int32_t p_axis);
+	PANE* UpdateRectTransition(int32_t p_reverse, RectTransition* p_transition);
+	PANE* UpdateRectTransitionByAxis(int32_t p_reverse, RectTransition* p_transition);
 
 #ifdef __cplusplus
 }

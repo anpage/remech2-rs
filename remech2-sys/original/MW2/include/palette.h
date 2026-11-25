@@ -14,39 +14,39 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_palettePending;
-	extern MechS32 g_paletteResourceIds[20];
-	extern MechS32 g_paneIndex;
-	extern MechS32 g_currentPalette;
+	extern int32_t g_palettePending;
+	extern int32_t g_paletteResourceIds[20];
+	extern int32_t g_paneIndex;
+	extern int32_t g_currentPalette;
 	// SelectPane copies one of the eleven into the current one (g_currentPane) and sizes the
 	// eyepoint's view to it.
 	extern PANE g_panes[11];
-	extern MechS32 g_basePalette;
-	extern MechS32 g_settledPalette;
-	extern MechS32 g_paletteFadeTarget;
-	extern MechS32 g_paletteFadeBack;
-	extern MechS32 g_paletteFadeBackSteps;
-	extern MechS32 g_paletteFadeSteps;
-	extern MechS32 g_paletteCycling;
-	extern MechS32 g_paletteCycleResource;
+	extern int32_t g_basePalette;
+	extern int32_t g_settledPalette;
+	extern int32_t g_paletteFadeTarget;
+	extern int32_t g_paletteFadeBack;
+	extern int32_t g_paletteFadeBackSteps;
+	extern int32_t g_paletteFadeSteps;
+	extern int32_t g_paletteCycling;
+	extern int32_t g_paletteCycleResource;
 	extern PaletteFade g_paletteFade;
 	extern PaletteCycle g_paletteCycle;
 
 	void InitPanes(PANE* p_target);
-	void SelectPane(MechS32 p_index);
-	void GetViewCenter(Eyepoint* p_eyepoint, MechS32* p_x, MechS32* p_y);
+	void SelectPane(int32_t p_index);
+	void GetViewCenter(Eyepoint* p_eyepoint, int32_t* p_x, int32_t* p_y);
 	void ApplyPendingPalette(void);
-	void ApplyPaletteResource(MechS32 p_slot);
+	void ApplyPaletteResource(int32_t p_slot);
 	void UpdatePaletteFade(void);
-	MechS32 StartPaletteFade(MechS32 p_palette, MechS32 p_duration, MechS32 p_mode);
-	MechS32 StartPaletteFlash(MechS32 p_offset, MechS32 p_duration, MechS32 p_mode);
-	void StartPaletteCycle(MechU8 p_first, MechS32 p_count);
+	int32_t StartPaletteFade(int32_t p_palette, int32_t p_duration, int32_t p_mode);
+	int32_t StartPaletteFlash(int32_t p_offset, int32_t p_duration, int32_t p_mode);
+	void StartPaletteCycle(uint8_t p_first, int32_t p_count);
 	void StopPaletteCycle(void);
-	MechS32 SetPaletteResourceId(MechS32 p_id, MechS32 p_slot);
-	void FadeToBasePalette(MechS32 p_palette, MechS32 p_duration);
-	void SetBasePalette(MechS32 p_palette);
-	void StartPalettes(MechS32 p_dissolve);
-	MechS32 GetPaletteFadeSteps(void);
+	int32_t SetPaletteResourceId(int32_t p_id, int32_t p_slot);
+	void FadeToBasePalette(int32_t p_palette, int32_t p_duration);
+	void SetBasePalette(int32_t p_palette);
+	void StartPalettes(int32_t p_dissolve);
+	int32_t GetPaletteFadeSteps(void);
 
 #ifdef __cplusplus
 }

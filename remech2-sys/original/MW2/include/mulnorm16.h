@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-	void MulNormalize16(MechS32* p_low, MechS32* p_scaled, MechS16* p_shift, MechU32 p_a, MechU32 p_b);
+	void MulNormalize16(int32_t* p_low, int32_t* p_scaled, int16_t* p_shift, uint32_t p_a, uint32_t p_b);
 
 #ifdef __cplusplus
 }

@@ -11,15 +11,15 @@
 
 // Returns the square root of a 16.16 fixed-point value: a binary search between half and twice
 // FixedSqrtGuess's estimate, for at most 100 steps.
-MechU32 FixedSqrt16(MechU32 p_value)
+uint32_t FixedSqrt16(uint32_t p_value)
 {
-	MechU32 square;
-	MechU32 high;
-	MechS32 steps = 100;
-	MechU32 previous;
-	MechU32 root;
-	MechS32 n;
-	MechU32 low;
+	uint32_t square;
+	uint32_t high;
+	int32_t steps = 100;
+	uint32_t previous;
+	uint32_t root;
+	int32_t n;
+	uint32_t low;
 
 	root = FixedSqrtGuess(p_value);
 	previous = p_value;
@@ -49,9 +49,9 @@ MechU32 FixedSqrt16(MechU32 p_value)
 }
 
 // Scales the vector to length 1.0 (16.16); a zero vector stays as it is.
-void NormalizeVectorGuarded(MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void NormalizeVectorGuarded(int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
-	MechS32 length;
+	int32_t length;
 
 	length = ApproximateVectorLength(*p_x, *p_y, *p_z);
 	if (length > 0) {
@@ -61,12 +61,12 @@ void NormalizeVectorGuarded(MechS32* p_x, MechS32* p_y, MechS32* p_z)
 	}
 }
 
-MechS32 FloatVectorLength(MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t FloatVectorLength(int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechDouble x = p_x;
-	MechDouble y = p_y;
-	MechDouble z = p_z;
+	double x = p_x;
+	double y = p_y;
+	double z = p_z;
 
 	/* Only this grouping of the sum matches. */
-	return (MechS32) (sqrt(z * z + (x * x + y * y)) + 0.5);
+	return (int32_t) (sqrt(z * z + (x * x + y * y)) + 0.5);
 }

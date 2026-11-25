@@ -11,31 +11,31 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_missionTime;
-	extern MechS32 g_currentObjective[16];
-	extern MechS32 g_objectiveAnnounced[48];
+	extern int32_t g_missionTime;
+	extern int32_t g_currentObjective[16];
+	extern int32_t g_objectiveAnnounced[48];
 	extern StarMission g_objectiveTable[16];
-	extern MechS32 g_objectiveCount;
-	void CollapseWhitespace(MechChar* p_text);
-	extern MechS32 g_forceMissionSuccess;
-	extern MechS32 g_missionResultAnnounced;
-	extern MechU32 g_missionResultTag;
+	extern int32_t g_objectiveCount;
+	void CollapseWhitespace(char* p_text);
+	extern int32_t g_forceMissionSuccess;
+	extern int32_t g_missionResultAnnounced;
+	extern uint32_t g_missionResultTag;
 
-	MechS32 DoFirstObjtv(StarMission* p_mission, MechS32 p_team);
-	MechS32 GetObjectiveTargetState(MechU8* p_target);
-	MechS32 HasTeamReachedTarget(MechU8* p_target, MechS32 p_team);
-	MechS32 IsTeamNearTarget(MechU8* p_target, MechS32 p_team);
-	MechS32 AnnounceObjective(MechS32 p_star, MechS32 p_objective, MechS32 p_state);
+	int32_t DoFirstObjtv(StarMission* p_mission, int32_t p_team);
+	int32_t GetObjectiveTargetState(uint8_t* p_target);
+	int32_t HasTeamReachedTarget(uint8_t* p_target, int32_t p_team);
+	int32_t IsTeamNearTarget(uint8_t* p_target, int32_t p_team);
+	int32_t AnnounceObjective(int32_t p_star, int32_t p_objective, int32_t p_state);
 	void ChooseNetworkWinner(void);
-	MechS32 AnnounceMissionResult(MechS32 p_star, MechS32 p_status);
-	MechS32 TestObjectiveCondition(MechS32 p_star, MechS32 p_objective, MechS32 p_condition);
-	MechS32 ObjectiveConditionsHold(MechS32 p_star, MechS32 p_objective);
-	void UpdateObjective(MechS32 p_star, MechS32 p_objective);
+	int32_t AnnounceMissionResult(int32_t p_star, int32_t p_status);
+	int32_t TestObjectiveCondition(int32_t p_star, int32_t p_objective, int32_t p_condition);
+	int32_t ObjectiveConditionsHold(int32_t p_star, int32_t p_objective);
+	void UpdateObjective(int32_t p_star, int32_t p_objective);
 	void UpdateObjectives(void);
 	void EndTheMission1(void);
-	MechS32 EndTheMission2(void);
-	void RestartStarMission(MechS32 p_star);
-	MechU16 GetTeamHomeTarget(MechS32 p_team);
+	int32_t EndTheMission2(void);
+	void RestartStarMission(int32_t p_star);
+	uint16_t GetTeamHomeTarget(int32_t p_team);
 
 #ifdef __cplusplus
 }

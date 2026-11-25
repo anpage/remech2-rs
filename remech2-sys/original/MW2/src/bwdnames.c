@@ -16,9 +16,9 @@ BwdNameNode* g_bwdNames = NULL;
 BwdNameNode* g_bwdNamesTail;
 
 // Appends a copy of a BWD name to the list.
-MechS32 AddBwdName(BwdName* p_name)
+int32_t AddBwdName(BwdName* p_name)
 {
-	MechS32 result;
+	int32_t result;
 	BwdNameNode* node;
 
 	result = 0;
@@ -47,10 +47,10 @@ MechS32 AddBwdName(BwdName* p_name)
 }
 
 // Finds a BWD name in the list: by name for a named entry (-1 or -2), by number otherwise.
-MechS16* FindBwdName(BwdName* p_name)
+int16_t* FindBwdName(BwdName* p_name)
 {
 	BwdNameNode* node;
-	MechS16* found;
+	int16_t* found;
 
 	node = g_bwdNames;
 	found = NULL;

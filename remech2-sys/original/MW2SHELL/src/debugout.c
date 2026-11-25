@@ -6,9 +6,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-void DebugPrintInternal(MechChar* p_message, ...)
+void DebugPrintInternal(char* p_message, ...)
 {
-	MechChar message[0x100];
+	char message[0x100];
 	va_list args;
 
 	va_start(args, p_message);

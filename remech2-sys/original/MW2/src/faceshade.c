@@ -15,28 +15,28 @@
 
 // Set by the world stream (BwdExecuteStream): GetFaceColor brightens damaged shapes instead of
 // dimming them.
-MechS32 g_brightenDamage = 0;
+int32_t g_brightenDamage = 0;
 
 // The eyepoint's ambient light (SelectEyepoint): ComputeShade's base shade, out of 0x80.
-MechS32 g_ambientLight;
+int32_t g_ambientLight;
 
-MechS32 ComputeShade(MechS32 p_light, MechS32 p_value, MechS32 p_distance);
+int32_t ComputeShade(int32_t p_light, int32_t p_value, int32_t p_distance);
 
 // Returns the color word of face p_face for the draw mode in bits 12-14 of p_color: its shade
 // (ComputeShade, from the face's light and p_distance) with the color bits of p_color, or in the
 // wireframe views (m_wireframe) a fixed color by the shape's type. Textured faces of the kinds in
 // m_untexturedKinds are drawn in a flat color instead.
-MechU32 GetFaceColor(Face* p_face, Vertex* p_vertices, MechU32 p_color, MechS32 p_distance)
+uint32_t GetFaceColor(Face* p_face, Vertex* p_vertices, uint32_t p_color, int32_t p_distance)
 {
-	MechS32 shade;
-	MechU32 kind;
-	MechU32 high;
-	MechU32 low;
-	MechS32 mode;
-	MechS32 value;
-	MechU32 result;
-	MechS32 level;
-	MechS32 detail;
+	int32_t shade;
+	uint32_t kind;
+	uint32_t high;
+	uint32_t low;
+	int32_t mode;
+	int32_t value;
+	uint32_t result;
+	int32_t level;
+	int32_t detail;
 
 	low = 0;
 	shade = -1;
@@ -203,9 +203,9 @@ MechU32 GetFaceColor(Face* p_face, Vertex* p_vertices, MechU32 p_color, MechS32 
 
 // Returns a shade from 0 to 15 for a light level p_light (out of 0x80) and a brightness
 // p_value, dimmed with the distance p_distance.
-MechS32 ComputeShade(MechS32 p_light, MechS32 p_value, MechS32 p_distance)
+int32_t ComputeShade(int32_t p_light, int32_t p_value, int32_t p_distance)
 {
-	MechS32 shade;
+	int32_t shade;
 
 	shade = (((0x80 - g_ambientLight) * p_light >> 7) + g_ambientLight) * (p_value >> 1) / 0x440;
 	if (g_renderSettings.m_fadeDistance) {
@@ -224,17 +224,17 @@ MechS32 ComputeShade(MechS32 p_light, MechS32 p_value, MechS32 p_distance)
 
 // Switches the texture maps of the shape kinds in p_flags on or off (the TOGGLE_..._TEXT_MAPS
 // keys).
-void ToggleTextureMaps(MechU32 p_flags)
+void ToggleTextureMaps(uint32_t p_flags)
 {
 	g_renderSettings.m_untexturedKinds ^= p_flags;
 }
 
-MechS32 AreTextureMapsOn(MechU32 p_flags)
+int32_t AreTextureMapsOn(uint32_t p_flags)
 {
 	return !(p_flags & g_renderSettings.m_untexturedKinds);
 }
 
-void EnableTextureMaps(MechU32 p_flags, MechS32 p_enable)
+void EnableTextureMaps(uint32_t p_flags, int32_t p_enable)
 {
 	if (p_enable) {
 		g_renderSettings.m_untexturedKinds &= ~p_flags;
@@ -245,12 +245,12 @@ void EnableTextureMaps(MechU32 p_flags, MechS32 p_enable)
 }
 
 // The display detail setting: textures with perspective correction.
-MechS32 ArePerspectiveTexturesOn(undefined4 p_unk0x00)
+int32_t ArePerspectiveTexturesOn(undefined4 p_unk0x00)
 {
 	return !g_renderSettings.m_affineTextures;
 }
 
-void EnablePerspectiveTextures(undefined4 p_unk0x00, MechS32 p_enable)
+void EnablePerspectiveTextures(undefined4 p_unk0x00, int32_t p_enable)
 {
 	if (!p_enable) {
 		g_renderSettings.m_affineTextures = TRUE;

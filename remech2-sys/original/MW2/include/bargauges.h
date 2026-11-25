@@ -17,12 +17,12 @@ extern "C"
 	extern EasedValue g_heatRateBarLevel;
 	extern EasedValue g_jumpFuelBarLevel;
 	extern Point g_throttleGaugeSize;
-	extern MechS32 g_throttleFrameLeft;
-	extern MechS32 g_throttleFrameTop;
-	extern MechS32 g_throttleFrameRight;
-	extern MechS32 g_throttleFrameBottom;
-	extern MechS32 g_throttleBarLeft;
-	extern MechS32 g_throttleZeroY;
+	extern int32_t g_throttleFrameLeft;
+	extern int32_t g_throttleFrameTop;
+	extern int32_t g_throttleFrameRight;
+	extern int32_t g_throttleFrameBottom;
+	extern int32_t g_throttleBarLeft;
+	extern int32_t g_throttleZeroY;
 	extern Point g_heatBarPosition;
 	extern Point g_heatBarSize;
 	extern Point g_heatRateBarPosition;
@@ -35,14 +35,14 @@ extern "C"
 	void DrawHeatRateBar(PANE* p_target);
 	void DrawThrottleGauge(PANE* p_target);
 	void DrawJumpFuelBar(PANE* p_target);
-	void DrawVerticalBar(PANE* p_target, MechS32 p_x, MechS32 p_y, MechS32 p_width, MechS32 p_height, MechS32 p_color);
+	void DrawVerticalBar(PANE* p_target, int32_t p_x, int32_t p_y, int32_t p_width, int32_t p_height, int32_t p_color);
 	void DrawHorizontalBar(
 		PANE* p_target,
-		MechS32 p_x,
-		MechS32 p_y,
-		MechS32 p_width,
-		MechS32 p_height,
-		MechS32 p_color
+		int32_t p_x,
+		int32_t p_y,
+		int32_t p_width,
+		int32_t p_height,
+		int32_t p_color
 	);
 
 #ifdef __cplusplus

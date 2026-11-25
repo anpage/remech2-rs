@@ -21,7 +21,7 @@ void TextGlyphList::Add(TextGlyph* p_item)
 
 void TextGlyphList::Remove(TextGlyph* p_item)
 {
-	MechS32 index;
+	int32_t index;
 
 	index = CollectionFind(m_items, p_item);
 	if (index >= 0) {
@@ -29,7 +29,7 @@ void TextGlyphList::Remove(TextGlyph* p_item)
 	}
 }
 
-void TextGlyphList::Clear(MechU8 p_delete)
+void TextGlyphList::Clear(uint8_t p_delete)
 {
 	TextGlyph* item;
 
@@ -48,7 +48,7 @@ void TextGlyphList::Clear(MechU8 p_delete)
 
 void TextGlyphList::DrawAll()
 {
-	MechS32 i;
+	int32_t i;
 	TextGlyph* item;
 
 	for (i = 0; i < m_items->m_count; i++) {

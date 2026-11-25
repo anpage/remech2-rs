@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-	void IntegrateMidpoint(MechS32* p_position, MechS32* p_velocity, MechS32 p_acceleration, MechS32 p_time);
+	void IntegrateMidpoint(int32_t* p_position, int32_t* p_velocity, int32_t p_acceleration, int32_t p_time);
 
 #ifdef __cplusplus
 }

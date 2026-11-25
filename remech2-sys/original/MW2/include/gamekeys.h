@@ -9,27 +9,27 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_missionTimerStopped;
-	extern MechS32 g_feetToTorso;
-	extern MechS32 g_timeCompressionCheat;
-	extern MechS32 g_statusMessage;
-	extern MechS32 g_mechViewMode;
-	extern MechS32 g_missionEnded;
-	extern MechS32 g_chatLength;
-	extern MechS32 g_missionResolved;
-	extern MechS32 g_frontViewForRear;
-	extern MechS32 g_missionEndTime;
-	extern MechS32 g_speechFlushTime;
-	extern MechS32 g_overrideShutdown;
-	extern MechChar g_typedKeys[0xf];
+	extern int32_t g_missionTimerStopped;
+	extern int32_t g_feetToTorso;
+	extern int32_t g_timeCompressionCheat;
+	extern int32_t g_statusMessage;
+	extern int32_t g_mechViewMode;
+	extern int32_t g_missionEnded;
+	extern int32_t g_chatLength;
+	extern int32_t g_missionResolved;
+	extern int32_t g_frontViewForRear;
+	extern int32_t g_missionEndTime;
+	extern int32_t g_speechFlushTime;
+	extern int32_t g_overrideShutdown;
+	extern char g_typedKeys[0xf];
 
-	MechS32 AppendTypedKey(MechS16 p_key);
-	MechS32 TypedCodeMatches(MechChar* p_code);
-	void HandleCheatInput(MechS16 p_key);
-	void ShiftCharacter(MechChar* p_char);
-	MechS32 HandleChatKey(MechU32 p_keyCode);
-	void HandleGameKeys(MechS32 p_unk0x00, MechS32 p_unk0x04, MechU16 p_key);
-	void RunGameKey(MechS32 p_key);
+	int32_t AppendTypedKey(int16_t p_key);
+	int32_t TypedCodeMatches(char* p_code);
+	void HandleCheatInput(int16_t p_key);
+	void ShiftCharacter(char* p_char);
+	int32_t HandleChatKey(uint32_t p_keyCode);
+	void HandleGameKeys(int32_t p_unk0x00, int32_t p_unk0x04, uint16_t p_key);
+	void RunGameKey(int32_t p_key);
 
 #ifdef __cplusplus
 }

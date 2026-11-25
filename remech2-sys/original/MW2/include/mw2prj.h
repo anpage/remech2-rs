@@ -70,14 +70,14 @@ extern "C"
 
 	extern char* g_resourceTypeTags[26];
 	extern char* g_resourceTypeExtensions[25];
-	extern MechS32 g_mw2PrjHandle;
+	extern int32_t g_mw2PrjHandle;
 	extern char* g_mw2PrjPath;
 
-	MechS32 FirstResource(void);
+	int32_t FirstResource(void);
 	void ShutdownMw2Prj(void);
 	void CachePreloads(void);
-	MechS32 PreloadResource(MechS32 p_id, const char* p_type);
-	void* Mw2PrjAlloc(MechU32 p_size);
+	int32_t PreloadResource(int32_t p_id, const char* p_type);
+	void* Mw2PrjAlloc(uint32_t p_size);
 	void Mw2PrjFree(void* p_block);
 
 #ifdef __cplusplus

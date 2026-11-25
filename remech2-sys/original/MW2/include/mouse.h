@@ -11,10 +11,10 @@ extern "C"
 #endif
 
 	extern undefined4 g_reclipCursor;
-	extern MechS32 g_cursorClipped;
+	extern int32_t g_cursorClipped;
 
 	void MouseRelease(void);
-	MechS32 MousePoll(void* p_data, MechS32* p_position, MechU32* p_buttons);
+	int32_t MousePoll(void* p_data, int32_t* p_position, uint32_t* p_buttons);
 
 #ifdef __cplusplus
 }

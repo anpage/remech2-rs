@@ -13,13 +13,13 @@ extern "C"
 {
 #endif
 
-	void VFX_flat_polygon(PANE* p_pane, MechS32 p_vcnt, MechU32* p_vlist);
-	void VFX_Gouraud_polygon(PANE* p_pane, MechS32 p_vcnt, MechU32* p_vlist);
-	void VFX_dithered_Gouraud_polygon(PANE* p_pane, MechS32 p_ditherAmount, MechS32 p_vcnt, MechU32* p_vlist);
-	void VFX_illuminate_polygon(PANE* p_pane, MechS32 p_ditherAmount, MechS32 p_vcnt, MechU32* p_vlist);
-	void VFX_translate_polygon(PANE* p_pane, MechS32 p_vcnt, MechU32* p_vlist, MechU8* p_lookaside);
-	void VFX_map_lookaside(MechU16* p_table);
-	void VFX_map_polygon(PANE* p_pane, MechS32 p_vcnt, MechU32* p_vlist, WINDOW* p_texture, MechS32 p_flags);
+	void VFX_flat_polygon(PANE* p_pane, int32_t p_vcnt, uint32_t* p_vlist);
+	void VFX_Gouraud_polygon(PANE* p_pane, int32_t p_vcnt, uint32_t* p_vlist);
+	void VFX_dithered_Gouraud_polygon(PANE* p_pane, int32_t p_ditherAmount, int32_t p_vcnt, uint32_t* p_vlist);
+	void VFX_illuminate_polygon(PANE* p_pane, int32_t p_ditherAmount, int32_t p_vcnt, uint32_t* p_vlist);
+	void VFX_translate_polygon(PANE* p_pane, int32_t p_vcnt, uint32_t* p_vlist, uint8_t* p_lookaside);
+	void VFX_map_lookaside(uint16_t* p_table);
+	void VFX_map_polygon(PANE* p_pane, int32_t p_vcnt, uint32_t* p_vlist, WINDOW* p_texture, int32_t p_flags);
 
 #ifdef __cplusplus
 }

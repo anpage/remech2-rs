@@ -32,21 +32,21 @@ AudioSample* g_clanHallAmbience = NULL;
 AudioSample* g_welcomeSound = NULL;
 
 // The Jade Falcon hall holds the welcome back until its door videos (2 and 3) are done.
-MechS32 g_welcomePending = 0;
+int32_t g_welcomePending = 0;
 
 // The video playing before the screen moves on, -1 for none, and the message it moves on with.
-MechS32 g_clanHallExitVideo = -1;
+int32_t g_clanHallExitVideo = -1;
 
-MechS32 g_clanHallExitMessage = c_msgScreenFrame;
+int32_t g_clanHallExitMessage = c_msgScreenFrame;
 
-void ClanHallCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, MechS32 p_msg);
+void ClanHallCallback(TMPackDataBase*, int32_t* p_campaign, uint8_t*, char**, int32_t p_msg);
 
 // Opens the clan hall. Coming back from registering a pilot (c_msgPilotRoster) sets up the new
 // pilot's star first.
-void DrawClanHall(TMPackDataBase* p_database, MechS32 p_campaign, MechU8, size_t p_wParam)
+void DrawClanHall(TMPackDataBase* p_database, int32_t p_campaign, uint8_t, size_t p_wParam)
 {
 	void* data = NULL;
-	MechS32 size;
+	int32_t size;
 
 	if (p_wParam == c_msgPilotRoster) {
 		SelectStar(0, 0, 3, 1, 100);
@@ -108,11 +108,11 @@ void DrawClanHall(TMPackDataBase* p_database, MechS32 p_campaign, MechU8, size_t
 
 // The clan hall's frame: CADET TRAINING, ARCHIVE HOLOPROJECTOR, READY ROOM, REGISTER and EXIT.
 // The Jade Falcon hall plays a door video before moving on.
-void ClanHallCallback(TMPackDataBase*, MechS32* p_campaign, MechU8*, MechChar**, MechS32 p_msg)
+void ClanHallCallback(TMPackDataBase*, int32_t* p_campaign, uint8_t*, char**, int32_t p_msg)
 {
 	void* data = NULL;
-	MechS32 button;
-	MechS32 size;
+	int32_t button;
+	int32_t size;
 
 	// The original skips the frame's work with a goto, like StarConfigCallback.
 	if (p_msg != c_msgScreenFrame) {

@@ -30,30 +30,30 @@
 #include <string.h>
 
 // Set to end the mission as successful (a cheat).
-MechS32 g_forceMissionSuccess = 0;
+int32_t g_forceMissionSuccess = 0;
 
 // Set once the local team's mission result has been announced (AnnounceMissionResult).
-MechS32 g_missionResultAnnounced = 0;
+int32_t g_missionResultAnnounced = 0;
 
 // The tag of the mission result EndTheMission2 writes.
-MechU32 g_missionResultTag = 0x4d32574d;
+uint32_t g_missionResultTag = 0x4d32574d;
 
-MechS32 g_missionTime;
+int32_t g_missionTime;
 
-MechS32 g_currentObjective[16]; // by team
+int32_t g_currentObjective[16]; // by team
 
 // Whether each objective of the local team has been announced (AnnounceObjective).
-MechS32 g_objectiveAnnounced[48];
+int32_t g_objectiveAnnounced[48];
 
-MechS32 g_objectiveCount;
+int32_t g_objectiveCount;
 
 StarMission g_objectiveTable[16];
 
 // Collapses each run of whitespace after a character of p_text into one space.
-void CollapseWhitespace(MechChar* p_text)
+void CollapseWhitespace(char* p_text)
 {
-	MechChar* src;
-	MechChar* dst;
+	char* src;
+	char* dst;
 
 	src = p_text;
 	dst = p_text;
@@ -75,14 +75,14 @@ void CollapseWhitespace(MechChar* p_text)
 
 // Starts a star's mission: stamps its start time and places the team at the nav of its first
 // objective, when that is a nav (or at the origin). Returns whether it was.
-MechS32 DoFirstObjtv(StarMission* p_mission, MechS32 p_team)
+int32_t DoFirstObjtv(StarMission* p_mission, int32_t p_team)
 {
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechU16 nav;
-	MechS32 heading;
-	MechS32 found;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	uint16_t nav;
+	int32_t heading;
+	int32_t found;
 
 	x = 0;
 	y = 0;
@@ -91,7 +91,7 @@ MechS32 DoFirstObjtv(StarMission* p_mission, MechS32 p_team)
 	found = FALSE;
 	g_missionTime = g_currentClock / 181;
 	if (p_mission->m_objectives[0].m_targetCount > 0 && (p_mission->m_objectives[0].m_targets[0] & 0xff00) == 0x100) {
-		nav = (MechU8) p_mission->m_objectives[0].m_targets[0];
+		nav = (uint8_t) p_mission->m_objectives[0].m_targets[0];
 		if (nav < g_navCount) {
 			x = g_navTable[nav].m_position[0];
 			y = g_navTable[nav].m_position[1];
@@ -109,10 +109,10 @@ MechS32 DoFirstObjtv(StarMission* p_mission, MechS32 p_team)
 
 // Returns the state bits (0xe) of an objective target: a player's or a game thing's flags. A target
 // is an AI target id stored as two bytes, the index and the type.
-MechS32 GetObjectiveTargetState(MechU8* p_target)
+int32_t GetObjectiveTargetState(uint8_t* p_target)
 {
-	MechU16 index;
-	MechU16 kind;
+	uint16_t index;
+	uint16_t kind;
 	Player* player;
 	GameThing* thing;
 
@@ -133,11 +133,11 @@ MechS32 GetObjectiveTargetState(MechU8* p_target)
 }
 
 // Returns whether team p_team has reached an objective target.
-MechS32 HasTeamReachedTarget(MechU8* p_target, MechS32 p_team)
+int32_t HasTeamReachedTarget(uint8_t* p_target, int32_t p_team)
 {
-	MechU16 index;
-	MechU16 kind;
-	MechS32 reached;
+	uint16_t index;
+	uint16_t kind;
+	int32_t reached;
 	Player* player;
 	GameThing* thing;
 	NavPoint* nav;
@@ -171,17 +171,17 @@ MechS32 HasTeamReachedTarget(MechU8* p_target, MechS32 p_team)
 
 // Returns whether a live member of team p_team is near an objective target (within 20000, or a
 // nav's radius). The local player reaching a nav marks it reached and plays sound 0xe7.
-MechS32 IsTeamNearTarget(MechU8* p_target, MechS32 p_team)
+int32_t IsTeamNearTarget(uint8_t* p_target, int32_t p_team)
 {
-	MechU16 index;
-	MechU16 kind;
-	MechS32 i;
+	uint16_t index;
+	uint16_t kind;
+	int32_t i;
 	Player* target;
 	GameThing* thing;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 radius;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t radius;
 	NavPoint* nav;
 
 	index = p_target[0];
@@ -249,9 +249,9 @@ MechS32 IsTeamNearTarget(MechU8* p_target, MechS32 p_team)
 }
 
 // Announces the local team's objective p_objective as successful (p_state 5) or failed (6), once.
-MechS32 AnnounceObjective(MechS32 p_star, MechS32 p_objective, MechS32 p_state)
+int32_t AnnounceObjective(int32_t p_star, int32_t p_objective, int32_t p_state)
 {
-	MechChar text[100];
+	char text[100];
 	SpeechLine line;
 	MissionObjective* objective;
 
@@ -290,16 +290,16 @@ MechS32 AnnounceObjective(MechS32 p_star, MechS32 p_objective, MechS32 p_state)
 void ChooseNetworkWinner(void)
 {
 	MissionObjective* objective;
-	MechS32 best;
-	MechS32 winner;
-	MechS32 i;
-	MechS32 player;
+	int32_t best;
+	int32_t winner;
+	int32_t i;
+	int32_t player;
 	StarMission* mission;
-	MechS32 victim;
-	MechS32 score;
-	MechS32 deathmatch;
-	MechS32 secondary;
-	MechS32 listed;
+	int32_t victim;
+	int32_t score;
+	int32_t deathmatch;
+	int32_t secondary;
+	int32_t listed;
 
 	best = -0x7fff;
 	deathmatch = FALSE;
@@ -348,9 +348,9 @@ void ChooseNetworkWinner(void)
 
 // Announces the local team's mission result: successful (2), failed (3) or out of time (4). In a
 // network game, only the first result; a successful one names the local player the winner.
-MechS32 AnnounceMissionResult(MechS32 p_star, MechS32 p_status)
+int32_t AnnounceMissionResult(int32_t p_star, int32_t p_status)
 {
-	MechChar text[100];
+	char text[100];
 	SpeechLine line;
 
 	if (p_star != g_localStar) {
@@ -390,13 +390,13 @@ MechS32 AnnounceMissionResult(MechS32 p_star, MechS32 p_status)
 }
 
 // Returns whether condition p_condition of star p_star's objective p_objective holds.
-MechS32 TestObjectiveCondition(MechS32 p_star, MechS32 p_objective, MechS32 p_condition)
+int32_t TestObjectiveCondition(int32_t p_star, int32_t p_objective, int32_t p_condition)
 {
 	MissionObjective* objective;
-	MechS32 other;
-	MechS32 star;
-	MechS32 state;
-	MechS32 kind;
+	int32_t other;
+	int32_t star;
+	int32_t state;
+	int32_t kind;
 
 	objective = &g_objectiveTable[p_star].m_objectives[p_objective];
 	kind = objective->m_conditions[p_condition].m_kind;
@@ -409,13 +409,13 @@ MechS32 TestObjectiveCondition(MechS32 p_star, MechS32 p_objective, MechS32 p_co
 
 // Returns whether the conditions of star p_star's objective p_objective hold: one of them, or
 // every one. A finished objective's don't; a type 0x10 objective's always do.
-MechS32 ObjectiveConditionsHold(MechS32 p_star, MechS32 p_objective)
+int32_t ObjectiveConditionsHold(int32_t p_star, int32_t p_objective)
 {
-	MechS32 all;
+	int32_t all;
 	MissionObjective* objective;
-	MechU32 result;
-	MechS32 i;
-	MechU32 holds;
+	uint32_t result;
+	int32_t i;
+	uint32_t holds;
 
 	objective = &g_objectiveTable[p_star].m_objectives[p_objective];
 	all = objective->m_allConditions;
@@ -459,21 +459,21 @@ MechS32 ObjectiveConditionsHold(MechS32 p_star, MechS32 p_objective)
 // done (by its type: destroyed, reached, ...), whether its time is up, and what it does when done
 // (types 0x10000 and up end or reset other objectives and missions). Sets its state: 5 successful,
 // 6 failed, 8 failed for another star, 3 still going.
-void UpdateObjective(MechS32 p_star, MechS32 p_objective)
+void UpdateObjective(int32_t p_star, int32_t p_objective)
 {
-	MechS32 done;
+	int32_t done;
 	MissionObjective* objective;
-	MechS32 expired;
-	MechS32 i;
-	MechS32 untouched;
-	MechU8 state;
-	MechS32 alive;
+	int32_t expired;
+	int32_t i;
+	int32_t untouched;
+	uint8_t state;
+	int32_t alive;
 	StarMission* won;
 	StarMission* lost;
 	MissionObjective* failTarget;
 	MissionObjective* reset;
 	StarMission* restarted;
-	MechS32 j;
+	int32_t j;
 	MissionObjective* restartTarget;
 	MissionObjective* succeedTarget;
 
@@ -483,7 +483,7 @@ void UpdateObjective(MechS32 p_star, MechS32 p_objective)
 	objective = &g_objectiveTable[p_star].m_objectives[p_objective];
 	if (g_isNetworkGame && objective->m_state == 5 && objective->m_type == 2) {
 		for (i = 0; i < objective->m_targetCount; i++) {
-			if (done && GetObjectiveTargetState((MechU8*) &objective->m_targets[i])) {
+			if (done && GetObjectiveTargetState((uint8_t*) &objective->m_targets[i])) {
 				done = TRUE;
 			}
 			else {
@@ -512,7 +512,7 @@ void UpdateObjective(MechS32 p_star, MechS32 p_objective)
 	case 1:
 	case 2:
 		for (i = 0; i < objective->m_targetCount; i++) {
-			if (done && GetObjectiveTargetState((MechU8*) &objective->m_targets[i])) {
+			if (done && GetObjectiveTargetState((uint8_t*) &objective->m_targets[i])) {
 				done = TRUE;
 			}
 			else {
@@ -522,7 +522,7 @@ void UpdateObjective(MechS32 p_star, MechS32 p_objective)
 		break;
 	case 4:
 		for (i = 0; i < objective->m_targetCount; i++) {
-			alive = GetObjectiveTargetState((MechU8*) &objective->m_targets[i]);
+			alive = GetObjectiveTargetState((uint8_t*) &objective->m_targets[i]);
 			if (done && !alive) {
 				done = TRUE;
 			}
@@ -540,7 +540,7 @@ void UpdateObjective(MechS32 p_star, MechS32 p_objective)
 		break;
 	case 8:
 		for (i = 0; i < objective->m_targetCount; i++) {
-			if (done && HasTeamReachedTarget((MechU8*) &objective->m_targets[i], p_star)) {
+			if (done && HasTeamReachedTarget((uint8_t*) &objective->m_targets[i], p_star)) {
 				done = TRUE;
 			}
 			else {
@@ -550,7 +550,7 @@ void UpdateObjective(MechS32 p_star, MechS32 p_objective)
 		break;
 	case 0x20:
 		for (i = 0; i < objective->m_targetCount; i++) {
-			if (done && HasTeamReachedTarget((MechU8*) &objective->m_targets[i], p_star)) {
+			if (done && HasTeamReachedTarget((uint8_t*) &objective->m_targets[i], p_star)) {
 				done = TRUE;
 			}
 			else {
@@ -580,7 +580,7 @@ void UpdateObjective(MechS32 p_star, MechS32 p_objective)
 		}
 
 		for (i = 0; i < objective->m_targetCount; i++) {
-			if (done && IsTeamNearTarget((MechU8*) &objective->m_targets[i], p_star)) {
+			if (done && IsTeamNearTarget((uint8_t*) &objective->m_targets[i], p_star)) {
 				done = TRUE;
 			}
 			else {
@@ -590,7 +590,7 @@ void UpdateObjective(MechS32 p_star, MechS32 p_objective)
 		break;
 	case 0x2000:
 		for (i = 0; i < objective->m_targetCount; i++) {
-			if (done && !IsTeamNearTarget((MechU8*) &objective->m_targets[i], p_star)) {
+			if (done && !IsTeamNearTarget((uint8_t*) &objective->m_targets[i], p_star)) {
 				done = TRUE;
 			}
 			else {
@@ -810,12 +810,12 @@ void UpdateObjective(MechS32 p_star, MechS32 p_objective)
 // its current objective, the first whose conditions hold (ResetStarOrders hears of changes).
 void UpdateObjectives(void)
 {
-	MechS32 star;
-	MechS32 i;
-	MechS32 current;
+	int32_t star;
+	int32_t i;
+	int32_t current;
 	StarMission* mission;
-	MechS32 success;
-	MechS32 failed;
+	int32_t success;
+	int32_t failed;
 
 	g_missionTime = g_currentClock / 181;
 	for (star = 0; star < g_objectiveCount; star++) {
@@ -894,12 +894,12 @@ void EndTheMission1(void)
 }
 
 // Hands the local team's mission result to the shell. Returns whether it could.
-MechS32 EndTheMission2(void)
+int32_t EndTheMission2(void)
 {
 	MissionResult result;
 	StarMission* mission;
-	MechS32 i;
-	MechS32 count;
+	int32_t i;
+	int32_t count;
 
 	count = 0;
 	mission = &g_objectiveTable[g_localStar];
@@ -946,10 +946,10 @@ MechS32 EndTheMission2(void)
 // Restarts star p_star's mission (a player's own, in a network game): every objective goes back
 // to state 3 with no times. A completed objective of type 0x40000 toggles whether the objective
 // it names is listed on the objectives panel.
-void RestartStarMission(MechS32 p_star)
+void RestartStarMission(int32_t p_star)
 {
 	MissionObjective* objective;
-	MechS32 i;
+	int32_t i;
 	StarMission* mission;
 
 	g_missionTime = g_currentClock / 181;
@@ -977,10 +977,10 @@ void RestartStarMission(MechS32 p_star)
 
 // The target of team p_team's return objective (type 0x20), or else its first objective's
 // first target: the AI's "home" nav.
-MechU16 GetTeamHomeTarget(MechS32 p_team)
+uint16_t GetTeamHomeTarget(int32_t p_team)
 {
 	StarMission* mission;
-	MechS32 i;
+	int32_t i;
 
 	mission = &g_objectiveTable[p_team];
 	for (i = 0; i < mission->m_objectiveCount; i++) {

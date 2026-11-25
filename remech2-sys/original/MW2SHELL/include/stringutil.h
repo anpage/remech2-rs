@@ -9,8 +9,8 @@ extern "C"
 {
 #endif
 
-	MechChar* AllocateString(MechChar* p_string);
-	MechChar* UppercaseString(MechChar* p_string);
+	char* AllocateString(char* p_string);
+	char* UppercaseString(char* p_string);
 
 #ifdef __cplusplus
 }

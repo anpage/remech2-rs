@@ -29,9 +29,9 @@
 #include "weapons.h"
 
 // The size of the altimeter's mark shape (InitHudGauges), which spaces its columns.
-MechS32 g_altimeterMarkWidth = 0xf0f;
+int32_t g_altimeterMarkWidth = 0xf0f;
 
-MechS32 g_altimeterMarkHeight = 0xd79;
+int32_t g_altimeterMarkHeight = 0xd79;
 
 // The altimeter's place, in 16.16 fractions of its gauge until InitHudGauges scales it.
 Point g_altimeterOrigin = {0xb333, 0x8000};
@@ -45,50 +45,50 @@ Point g_hudGaugePositions[6] = {{0x73, 0x10}, {8, 0x4a}, {4, 0x28}, {4, 0x4a}, {
 // the altimeter.
 undefined4 g_showHud = 1;
 
-MechS32 g_showCrosshair = 1;
+int32_t g_showCrosshair = 1;
 
-MechS32 g_showTargetMarker = 1;
+int32_t g_showTargetMarker = 1;
 
-MechS32 g_showCompass = 1;
+int32_t g_showCompass = 1;
 
-MechS32 g_showAltimeter = 1;
+int32_t g_showAltimeter = 1;
 
 // The layout of the altimeter and the compass, from their shapes' extents (InitHudGauges).
 
-MechS32 g_compassArrowWidth;
+int32_t g_compassArrowWidth;
 
-MechS32 g_compassArrowHeight;
+int32_t g_compassArrowHeight;
 
-MechS32 g_compassSideArrowWidth;
+int32_t g_compassSideArrowWidth;
 
-MechS32 g_compassSideArrowHeight;
+int32_t g_compassSideArrowHeight;
 
-MechS32 g_altimeterGroundX;
+int32_t g_altimeterGroundX;
 
-MechS32 g_altimeterTargetX;
+int32_t g_altimeterTargetX;
 
 // The altimeter's scale: pixels per 16.16 unit of height.
-MechS32 g_altimeterScale;
+int32_t g_altimeterScale;
 
 // The compass's scale: pixels per degree, 16.16.
-MechS32 g_compassScale;
+int32_t g_compassScale;
 
-MechS32 g_compassTapeAbove;
+int32_t g_compassTapeAbove;
 
-MechS32 g_altimeterLevelX;
+int32_t g_altimeterLevelX;
 
-MechS32 g_compassTapeBelow;
+int32_t g_compassTapeBelow;
 
 // Draws the HUD's overlays the display options enable: the compass and its target markers, the
 // crosshair, the target marker and the altimeter, at the gauge positions.
 void DrawHudAt(
 	Mech* p_mech,
-	MechS32 p_heading,
-	MechS32 p_twist,
-	MechS32 p_bearing,
-	MechS32 p_twistBearing,
-	MechS32 p_pitch,
-	MechS32 p_distance
+	int32_t p_heading,
+	int32_t p_twist,
+	int32_t p_bearing,
+	int32_t p_twistBearing,
+	int32_t p_pitch,
+	int32_t p_distance
 )
 {
 	if (!g_showHud) {
@@ -124,13 +124,13 @@ void DrawHudAt(
 // p_drawCrosshair (the view is the cockpit's).
 void DrawHud(
 	Mech* p_mech,
-	MechS32 p_heading,
-	MechS32 p_twist,
-	MechS32 p_bearing,
-	MechS32 p_twistBearing,
-	MechS32 p_pitch,
-	MechS32 p_distance,
-	MechS32 p_drawCrosshair
+	int32_t p_heading,
+	int32_t p_twist,
+	int32_t p_bearing,
+	int32_t p_twistBearing,
+	int32_t p_pitch,
+	int32_t p_distance,
+	int32_t p_drawCrosshair
 )
 {
 	if (!g_showHud) {
@@ -157,18 +157,18 @@ void DrawHud(
 
 // Draws the altimeter: the mech's height, the height of m_player's mark (Player::m_groundHeight) and
 // the height of the target, clamped to the gauge. p_x and p_y go unused.
-void DrawAltimeter(Mech* p_mech, MechS32 p_x, MechS32 p_y)
+void DrawAltimeter(Mech* p_mech, int32_t p_x, int32_t p_y)
 {
 	CockpitPanel* gauge;
-	MechS32 height;
+	int32_t height;
 	Mech* mech;
-	MechS32 x;
+	int32_t x;
 	PANE* target;
-	MechS32 y;
-	MechS32 mark;
-	MechS32 unused;
-	MechS32 shape;
-	MechS32 level;
+	int32_t y;
+	int32_t mark;
+	int32_t unused;
+	int32_t shape;
+	int32_t level;
 
 	gauge = g_cockpitPanels[c_panelAltimeter];
 	target = g_cockpitPanels[c_panelAltimeter]->m_target;
@@ -236,15 +236,15 @@ void DrawAltimeter(Mech* p_mech, MechS32 p_x, MechS32 p_y)
 void InitHudGauges(void)
 {
 	void* shape;
-	MechS32 height;
-	MechS32 width;
+	int32_t height;
+	int32_t width;
 	PANE* target;
 
 	target = g_cockpitPanels[c_panelAltimeter]->m_target;
 	ScalePointToFrame(target, &g_altimeterOrigin, &g_altimeterOrigin);
 	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 1, g_resourceTypeTags[c_resTagShp], 0);
 	if (shape) {
-		MechS32 extent;
+		int32_t extent;
 
 		extent = VFX_shape_resolution(shape, 0);
 		g_altimeterMarkWidth = extent >> 16;
@@ -257,7 +257,7 @@ void InitHudGauges(void)
 	g_altimeterTargetX = g_altimeterMarkWidth + g_altimeterGroundX;
 	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 7, g_resourceTypeTags[c_resTagShp], 0);
 	if (shape) {
-		MechS32 extent;
+		int32_t extent;
 
 		extent = VFX_shape_resolution(shape, 0);
 		width = extent >> 16;
@@ -271,7 +271,7 @@ void InitHudGauges(void)
 	ScalePointToFrame(target, &g_compassOrigin, &g_compassOrigin);
 	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x19, g_resourceTypeTags[c_resTagShp], 0);
 	if (shape) {
-		MechS32 extent;
+		int32_t extent;
 
 		extent = VFX_shape_resolution(shape, 0);
 		width = extent >> 16;
@@ -282,8 +282,8 @@ void InitHudGauges(void)
 
 	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x13, g_resourceTypeTags[c_resTagShp], 0);
 	if (shape) {
-		MechS32 extent;
-		MechS32 origin;
+		int32_t extent;
+		int32_t origin;
 
 		extent = VFX_shape_resolution(shape, 0);
 		origin = VFX_shape_origin(shape, 0);
@@ -296,7 +296,7 @@ void InitHudGauges(void)
 
 	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x25, g_resourceTypeTags[c_resTagShp], 0);
 	if (shape) {
-		MechS32 extent;
+		int32_t extent;
 
 		extent = VFX_shape_resolution(shape, 0);
 		g_compassArrowWidth = extent >> 16;
@@ -306,7 +306,7 @@ void InitHudGauges(void)
 
 	shape = LoadCachedResource(g_mw2PrjHandle, g_artResolution + 0x1f, g_resourceTypeTags[c_resTagShp], 0);
 	if (shape) {
-		MechS32 extent;
+		int32_t extent;
 
 		extent = VFX_shape_resolution(shape, 0);
 		g_compassSideArrowWidth = extent >> 16;
@@ -325,18 +325,18 @@ Point* GetHudGaugePositions(void)
 // target, the locked shape when the target is in range and within 3 units and 3 degrees of the
 // aim (returns TRUE then); otherwise the lock or guided-state shapes, or 0x67 without a ready
 // weapon.
-MechS32 DrawCrosshair(Mech* p_mech, MechS32 p_bearing, MechS32 p_pitch, MechS32 p_distance)
+int32_t DrawCrosshair(Mech* p_mech, int32_t p_bearing, int32_t p_pitch, int32_t p_distance)
 {
-	MechS32 x;
-	MechS32 pitch;
-	MechS32 shape;
-	MechS32 shapeOut;
-	MechS32 shapeIn;
+	int32_t x;
+	int32_t pitch;
+	int32_t shape;
+	int32_t shapeOut;
+	int32_t shapeIn;
 	WeaponSlot* slot;
 	WeaponDef* def;
-	MechS32 range;
-	MechS32 result;
-	MechS32 y;
+	int32_t range;
+	int32_t result;
+	int32_t y;
 
 	result = FALSE;
 	shape = 0x76;
@@ -392,14 +392,14 @@ MechS32 DrawCrosshair(Mech* p_mech, MechS32 p_bearing, MechS32 p_pitch, MechS32 
 // off the screen.
 void DrawTargetMarker(Mech* p_mech)
 {
-	MechS32 index;
+	int32_t index;
 	Player* player;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 onScreen;
-	MechS32 offScreen;
-	MechS32 target;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t onScreen;
+	int32_t offScreen;
+	int32_t target;
 	Point point;
 
 	player = p_mech->m_player;
@@ -444,19 +444,19 @@ void DrawTargetMarker(Mech* p_mech)
 // its pitch p_pitch is beyond 3 degrees. p_x and p_y go unused.
 void DrawCompassMarkers(
 	Mech* p_mech,
-	MechS32 p_x,
-	MechS32 p_y,
-	MechS32 p_bearing,
-	MechS32 p_twistBearing,
-	MechS32 p_pitch
+	int32_t p_x,
+	int32_t p_y,
+	int32_t p_bearing,
+	int32_t p_twistBearing,
+	int32_t p_pitch
 )
 {
 	CockpitPanel* gauge;
 	PANE* target;
-	MechS32 x;
-	MechS32 y;
-	MechS32 x2;
-	MechS32 y2;
+	int32_t x;
+	int32_t y;
+	int32_t x2;
+	int32_t y2;
 
 	gauge = g_cockpitPanels[c_panelCompass];
 	target = g_cockpitPanels[c_panelCompass]->m_target;
@@ -520,14 +520,14 @@ void DrawCompassMarkers(
 
 // Draws the compass tape at heading p_heading (degrees), twice to wrap around, and the torso twist
 // p_twist as a bar from the center. p_x and p_y go unused.
-void DrawCompass(MechS32 p_x, MechS32 p_y, MechS32 p_heading, MechS32 p_twist)
+void DrawCompass(int32_t p_x, int32_t p_y, int32_t p_heading, int32_t p_twist)
 {
 	CockpitPanel* gauge;
-	MechS32 x2;
-	MechS32 x;
-	MechS32 heading;
+	int32_t x2;
+	int32_t x;
+	int32_t heading;
 	PANE* target;
-	MechS32 offset;
+	int32_t offset;
 
 	gauge = g_cockpitPanels[c_panelCompass];
 	target = g_cockpitPanels[c_panelCompass]->m_target;
@@ -571,13 +571,13 @@ void DrawCompass(MechS32 p_x, MechS32 p_y, MechS32 p_heading, MechS32 p_twist)
 
 // Projects the end of the mech's player's aim ray to the screen: returns ProjectWorldPoint's result,
 // and the point in p_x and p_y.
-MechS32 ProjectAimPoint(Mech* p_mech, MechS32* p_x, MechS32* p_y)
+int32_t ProjectAimPoint(Mech* p_mech, int32_t* p_x, int32_t* p_y)
 {
-	MechS32 result;
+	int32_t result;
 	Ray ray;
-	MechS32 z;
-	MechS32 y;
-	MechS32 x;
+	int32_t z;
+	int32_t y;
+	int32_t x;
 
 	BuildAimRay(p_mech->m_player, &ray);
 	SetRayLength(&ray, GetAimRange(p_mech->m_player));
@@ -592,18 +592,18 @@ MechS32 ProjectAimPoint(Mech* p_mech, MechS32* p_x, MechS32* p_y)
 
 // Marks player p_player on the screen: brackets at the corners of its mech, sized by its radius
 // and depth, in its side's shapes; off the screen, an arrow at the edge.
-void DrawPlayerBrackets(Player* p_player, MechS32 p_side)
+void DrawPlayerBrackets(Player* p_player, int32_t p_side)
 {
-	MechS32 topLeft;
-	MechS32 topRight;
-	MechS32 bottomLeft;
-	MechS32 bottomRight;
-	MechS32 sx;
-	MechS32 sy;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 size;
+	int32_t topLeft;
+	int32_t topRight;
+	int32_t bottomLeft;
+	int32_t bottomRight;
+	int32_t sx;
+	int32_t sy;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t size;
 	Point point;
 
 	x = p_player->m_position.m_x;
@@ -668,19 +668,19 @@ void DrawPlayerBrackets(Player* p_player, MechS32 p_side)
 
 // Marks the object p_object on the screen like DrawPlayerBrackets a player: brackets around its shape,
 // at most half the screen apart, or an arrow at the edge.
-void DrawObjectBrackets(struct SceneObject* p_object, MechS32 p_side)
+void DrawObjectBrackets(struct SceneObject* p_object, int32_t p_side)
 {
-	MechS32 maxSize;
-	MechS32 topLeft;
-	MechS32 topRight;
-	MechS32 bottomLeft;
-	MechS32 bottomRight;
-	MechS32 sx;
-	MechS32 sy;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 size;
+	int32_t maxSize;
+	int32_t topLeft;
+	int32_t topRight;
+	int32_t bottomLeft;
+	int32_t bottomRight;
+	int32_t sx;
+	int32_t sy;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t size;
 	Point point;
 
 	if (!p_object || !p_object->m_shape) {
@@ -750,7 +750,7 @@ void DrawObjectBrackets(struct SceneObject* p_object, MechS32 p_side)
 
 // Draws frame 0 of the "SHP" resource p_id (relative to g_artResolution) at p_x, p_y of the
 // current pane.
-void DrawHudShape(MechS32 p_x, MechS32 p_y, MechS32 p_id)
+void DrawHudShape(int32_t p_x, int32_t p_y, int32_t p_id)
 {
 	void* shape;
 
@@ -762,7 +762,7 @@ void DrawHudShape(MechS32 p_x, MechS32 p_y, MechS32 p_id)
 }
 
 // Draws frame 0 of the "SHP" resource p_id (relative to g_artResolution) at p_x, p_y.
-void DrawPaneShape(MechS32 p_x, MechS32 p_y, MechS32 p_id, PANE* p_target)
+void DrawPaneShape(int32_t p_x, int32_t p_y, int32_t p_id, PANE* p_target)
 {
 	void* shape;
 
@@ -774,7 +774,7 @@ void DrawPaneShape(MechS32 p_x, MechS32 p_y, MechS32 p_id, PANE* p_target)
 }
 
 // Draws DrawHudShape's shape at p_x, p_y of pane p_target.
-void DrawShapeOverPane(MechS32 p_x, MechS32 p_y, MechS32 p_id, PANE* p_target)
+void DrawShapeOverPane(int32_t p_x, int32_t p_y, int32_t p_id, PANE* p_target)
 {
 	DrawHudShape(p_target->m_x0 + p_x, p_target->m_y0 + p_y, p_id);
 }

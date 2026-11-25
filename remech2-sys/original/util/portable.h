@@ -35,13 +35,13 @@ PORTABLE_INLINE void PortableAssertFailed(const char* p_condition, const char* p
 
 // Reads a 32-bit register's bits as a signed value (two's complement). A plain cast of a value
 // above 0x7fffffff is implementation-defined before C23; compilers fold this to nothing.
-PORTABLE_INLINE MechS32 PortableS32(MechU32 p_value)
+PORTABLE_INLINE int32_t PortableS32(uint32_t p_value)
 {
 	if (p_value <= 0x7fffffff) {
-		return (MechS32) p_value;
+		return (int32_t) p_value;
 	}
 
-	return -(MechS32) ~p_value - 1;
+	return -(int32_t) ~p_value - 1;
 }
 
 // Reads a 64-bit register pair's bits (edx:eax, a sum that wraps) as a signed value.
@@ -55,18 +55,18 @@ PORTABLE_INLINE MechS64 PortableS64(MechU64 p_value)
 }
 
 // Reads a 16-bit register's bits as a signed value.
-PORTABLE_INLINE MechS16 PortableS16(MechU16 p_value)
+PORTABLE_INLINE int16_t PortableS16(uint16_t p_value)
 {
 	if (p_value <= 0x7fff) {
-		return (MechS16) p_value;
+		return (int16_t) p_value;
 	}
 
-	return (MechS16) (-(MechS32) (MechU16) ~p_value - 1);
+	return (int16_t) (-(int32_t) (uint16_t) ~p_value - 1);
 }
 
 // `sar` of a 32-bit register (0 <= n <= 31): an arithmetic right shift, rounding towards minus
 // infinity. C leaves the right shift of a negative value implementation-defined.
-PORTABLE_INLINE MechS32 PortableSar32(MechS32 p_value, MechS32 p_shift)
+PORTABLE_INLINE int32_t PortableSar32(int32_t p_value, int32_t p_shift)
 {
 	if (p_value >= 0) {
 		return p_value >> p_shift;
@@ -76,7 +76,7 @@ PORTABLE_INLINE MechS32 PortableSar32(MechS32 p_value, MechS32 p_shift)
 }
 
 // The same for a 64-bit value in edx:eax (`shrd eax, edx, n; sar edx, n`; 0 <= n <= 63).
-PORTABLE_INLINE MechS64 PortableSar64(MechS64 p_value, MechS32 p_shift)
+PORTABLE_INLINE MechS64 PortableSar64(MechS64 p_value, int32_t p_shift)
 {
 	if (p_value >= 0) {
 		return p_value >> p_shift;
@@ -87,9 +87,9 @@ PORTABLE_INLINE MechS64 PortableSar64(MechS64 p_value, MechS32 p_shift)
 
 // `bsr`: the index of the highest set bit. p_value must not be 0 (bsr leaves its destination
 // undefined then).
-PORTABLE_INLINE MechS32 PortableBsr(MechU32 p_value)
+PORTABLE_INLINE int32_t PortableBsr(uint32_t p_value)
 {
-	MechS32 bit = 31;
+	int32_t bit = 31;
 
 	while (!(p_value & 0x80000000)) {
 		p_value <<= 1;
@@ -100,34 +100,34 @@ PORTABLE_INLINE MechS32 PortableBsr(MechU32 p_value)
 }
 
 // `idiv` of edx:eax: the quotient, truncated towards zero. Out of domain (the idiv faults): a
-// divisor of 0, or a quotient outside MechS32.
-PORTABLE_INLINE MechS32 PortableIdiv(MechS64 p_dividend, MechS32 p_divisor)
+// divisor of 0, or a quotient outside int32_t.
+PORTABLE_INLINE int32_t PortableIdiv(MechS64 p_dividend, int32_t p_divisor)
 {
 	MechS64 quotient;
 
 	PORTABLE_ASSERT(p_divisor != 0);
 	quotient = p_dividend / p_divisor;
 	PORTABLE_ASSERT(quotient >= -0x7fffffff - 1 && quotient <= 0x7fffffff);
-	return (MechS32) quotient;
+	return (int32_t) quotient;
 }
 
 // `div` of edx:eax: the same, unsigned. Out of domain: a divisor of 0, or a quotient of more than
 // 32 bits.
-PORTABLE_INLINE MechU32 PortableDiv(MechU64 p_dividend, MechU32 p_divisor)
+PORTABLE_INLINE uint32_t PortableDiv(MechU64 p_dividend, uint32_t p_divisor)
 {
 	MechU64 quotient;
 
 	PORTABLE_ASSERT(p_divisor != 0);
 	quotient = p_dividend / p_divisor;
 	PORTABLE_ASSERT(quotient <= 0xffffffff);
-	return (MechU32) quotient;
+	return (uint32_t) quotient;
 }
 
 // `shrd lo, hi, n; adc lo, 0` on the 64-bit value hi:lo (1 <= n <= 31): the low 32 bits of the
 // value shifted right by n, rounded up by the last bit shifted out (wrapping like the adc).
-PORTABLE_INLINE MechU32 PortableShrdRound(MechU64 p_value, MechS32 p_shift)
+PORTABLE_INLINE uint32_t PortableShrdRound(MechU64 p_value, int32_t p_shift)
 {
-	return (MechU32) (p_value >> p_shift) + ((MechU32) (p_value >> (p_shift - 1)) & 1);
+	return (uint32_t) (p_value >> p_shift) + ((uint32_t) (p_value >> (p_shift - 1)) & 1);
 }
 
 #endif // PORTABLE_H

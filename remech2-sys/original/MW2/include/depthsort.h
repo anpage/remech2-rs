@@ -13,7 +13,7 @@ struct Shape;
 // shape whose polygons are queued once the list is sorted (QueuedPolygon::m_count bit 15).
 typedef struct DepthEntry {
 	struct QueuedPolygon* m_poly; // 0x00
-	MechS32 m_depth;              // 0x04
+	int32_t m_depth;              // 0x04
 } DepthEntry;
 
 // The functions and globals of depthsort.c that other units use.
@@ -22,16 +22,16 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_depthEntryCount;
-	extern MechS32 g_polygonCount;
-	extern MechS32 g_maxPolygons;
-	extern MechS32 g_shapesDrawn;
-	extern MechS32 g_queueDepth;
+	extern int32_t g_depthEntryCount;
+	extern int32_t g_polygonCount;
+	extern int32_t g_maxPolygons;
+	extern int32_t g_shapesDrawn;
+	extern int32_t g_queueDepth;
 	extern DepthEntry* g_depthList;
-	extern MechU32 g_queuedShapeFlags;
-	extern MechS32 g_shapesConsidered;
+	extern uint32_t g_queuedShapeFlags;
+	extern int32_t g_shapesConsidered;
 
-	MechS32 QueueShapeLod(struct Shape* p_shape, MechS32 p_depth);
+	int32_t QueueShapeLod(struct Shape* p_shape, int32_t p_depth);
 	void SortDepthEntries(DepthEntry* p_first, DepthEntry* p_last);
 	void DrawShapeList(struct Shape* p_root);
 	void DrawDepthQueue(void);
@@ -39,18 +39,18 @@ extern "C"
 	void QueueObjTree(struct SceneObject* p_object);
 	void DrawShapeListFrom(struct Shape* p_root, struct Eyepoint* p_eyepoint);
 	void DrawQueuedPolygon(struct QueuedPolygon* p_poly);
-	MechS32 ClipPolygonToScreen(struct QueuedPolygon* p_poly, MechU32* p_points);
-	MechS32 GetEdgeCrossingDepth(MechS32 p_a0, MechS32 p_a1, MechS32 p_edge, MechS32 p_isX, MechS32 p_z0, MechS32 p_z1);
+	int32_t ClipPolygonToScreen(struct QueuedPolygon* p_poly, uint32_t* p_points);
+	int32_t GetEdgeCrossingDepth(int32_t p_a0, int32_t p_a1, int32_t p_edge, int32_t p_isX, int32_t p_z0, int32_t p_z1);
 	void ClipEdgeToColumn(
 		struct ProjectedVertex* p_a,
 		struct ProjectedVertex* p_b,
-		MechS32 p_x,
+		int32_t p_x,
 		struct ProjectedVertex* p_out
 	);
 	void ClipEdgeToRow(
 		struct ProjectedVertex* p_a,
 		struct ProjectedVertex* p_b,
-		MechS32 p_y,
+		int32_t p_y,
 		struct ProjectedVertex* p_out
 	);
 

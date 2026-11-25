@@ -18,54 +18,54 @@
 #include <stdlib.h>
 #include <string.h>
 
-const MechS32 g_wtbTag = 0x4f425457;
+const int32_t g_wtbTag = 0x4f425457;
 
-MechS32 g_shapeLoadError = 0;
+int32_t g_shapeLoadError = 0;
 
-MechS32 g_shapeOffsetX = 0;
+int32_t g_shapeOffsetX = 0;
 
-MechS32 g_shapeOffsetY = 0;
+int32_t g_shapeOffsetY = 0;
 
-MechS32 g_shapeOffsetZ = 0;
+int32_t g_shapeOffsetZ = 0;
 
-MechS32 g_shapeScaleX = 1;
+int32_t g_shapeScaleX = 1;
 
-MechS32 g_shapeScaleY = 1;
+int32_t g_shapeScaleY = 1;
 
-MechS32 g_shapeScaleZ = 1;
+int32_t g_shapeScaleZ = 1;
 
-MechU32 g_shapeFlags = 0;
+uint32_t g_shapeFlags = 0;
 
-MechU32 g_faceIdCount = 0;
+uint32_t g_faceIdCount = 0;
 
-MechS32 g_subShapeCollisionType = 4;
+int32_t g_subShapeCollisionType = 4;
 
-MechS32 g_shapeHasObject;
+int32_t g_shapeHasObject;
 
-MechU32* g_faceIds;
+uint32_t* g_faceIds;
 
-MechS32 g_shapeHasKey;
+int32_t g_shapeHasKey;
 
-MechS32 g_shapeOwnerSet;
+int32_t g_shapeOwnerSet;
 
-MechS32 g_shapeOwnerKind;
+int32_t g_shapeOwnerKind;
 
-MechS32 g_shapeOwner;
+int32_t g_shapeOwner;
 
-void SetFaceIds(MechU32* p_ids, MechU32 p_count)
+void SetFaceIds(uint32_t* p_ids, uint32_t p_count)
 {
 	g_faceIds = p_ids;
 	g_faceIdCount = p_count;
 }
 
-void SetShapeOffset(MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void SetShapeOffset(int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	g_shapeOffsetX = p_x;
 	g_shapeOffsetY = p_y;
 	g_shapeOffsetZ = p_z;
 }
 
-void SetShapeScale(MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void SetShapeScale(int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	g_shapeScaleX = p_x;
 	if (!g_shapeScaleX) {
@@ -83,18 +83,18 @@ void SetShapeScale(MechS32 p_x, MechS32 p_y, MechS32 p_z)
 	}
 }
 
-void SetShapeFlags(MechU32 p_flags)
+void SetShapeFlags(uint32_t p_flags)
 {
 	g_shapeFlags = p_flags;
 }
 
 // Reads the shape records from p_offset up to p_size; the first becomes the shape, the others
 // its levels of detail.
-Shape* LoadShapes(MechU8* p_data, MechS32* p_offset, MechS32 p_size, SceneObject* p_parent)
+Shape* LoadShapes(uint8_t* p_data, int32_t* p_offset, int32_t p_size, SceneObject* p_parent)
 {
 	Shape* next;
 	Shape* shape;
-	MechS32 count;
+	int32_t count;
 
 	shape = NULL;
 	next = NULL;
@@ -117,33 +117,33 @@ Shape* LoadShapes(MechU8* p_data, MechS32* p_offset, MechS32 p_size, SceneObject
 	return shape;
 }
 
-MechS32 LoadShapeRecord(MechU8* p_data, MechS32* p_offset, Shape** p_shape, SceneObject* p_parent, MechS32* p_count)
+int32_t LoadShapeRecord(uint8_t* p_data, int32_t* p_offset, Shape** p_shape, SceneObject* p_parent, int32_t* p_count)
 {
-	MechChar* suffix;
-	MechS32 checksum;
-	MechU16* indices;
-	MechS32 key;
-	MechS32 facesSize;
-	MechU8* extra;
-	MechS32 extraSize;
+	char* suffix;
+	int32_t checksum;
+	uint16_t* indices;
+	int32_t key;
+	int32_t facesSize;
+	uint8_t* extra;
+	int32_t extraSize;
 	SceneObject* obj;
-	MechS32 count;
+	int32_t count;
 	WtbVertex* vertices;
-	MechS32 id;
-	MechS32 u;
-	MechS32 vertexCount;
-	MechS32 v;
-	MechS32 x;
-	MechChar name[40];
-	MechS32 size;
-	MechU8* face;
-	MechU8* faces;
-	MechS32 y;
-	MechS32 i;
+	int32_t id;
+	int32_t u;
+	int32_t vertexCount;
+	int32_t v;
+	int32_t x;
+	char name[40];
+	int32_t size;
+	uint8_t* face;
+	uint8_t* faces;
+	int32_t y;
+	int32_t i;
 	WtbHeader* header;
-	MechU8* record;
-	MechS32 z;
-	MechS32 j;
+	uint8_t* record;
+	int32_t z;
+	int32_t j;
 	struct Face* polygon;
 	WtbVertex* vertex;
 
@@ -187,7 +187,7 @@ MechS32 LoadShapeRecord(MechU8* p_data, MechS32* p_offset, Shape** p_shape, Scen
 	}
 
 	vertices = (WtbVertex*) (record + sizeof(WtbHeader));
-	faces = (MechU8*) (vertices + header->m_vertexCount);
+	faces = (uint8_t*) (vertices + header->m_vertexCount);
 	face = faces;
 	extraSize = 0;
 	i = header->m_faceCount;
@@ -329,10 +329,10 @@ MechS32 LoadShapeRecord(MechU8* p_data, MechS32* p_offset, Shape** p_shape, Scen
 
 // Maps a face id: ids 0 and 0x14 take the team colour of player g_shapeOwner while
 // g_shapeOwnerSet is set; ids with bit 15 index g_faceIds.
-MechU32 MapFaceId(MechU32 p_id)
+uint32_t MapFaceId(uint32_t p_id)
 {
-	MechS32 team;
-	MechS32 offset;
+	int32_t team;
+	int32_t offset;
 
 	offset = 0;
 	if (g_shapeOwnerSet && ((p_id & 0xff) == 0 || (p_id & 0xff) == 0x14)) {

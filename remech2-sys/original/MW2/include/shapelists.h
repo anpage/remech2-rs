@@ -29,7 +29,7 @@ extern "C"
 	void FreeSceneShapes(void);
 	void UnlinkShape(Shape* p_shape);
 	void LinkShape(Shape* p_shape, Shape* p_list);
-	void ShowDensityShapes(MechS32 p_enable);
+	void ShowDensityShapes(int32_t p_enable);
 
 #ifdef __cplusplus
 }

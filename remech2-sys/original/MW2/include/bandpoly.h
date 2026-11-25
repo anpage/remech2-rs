@@ -13,9 +13,9 @@ extern "C"
 
 	extern Point g_bandTexCoords[4];
 
-	void DrawBandPolygon(MechU32 p_flags, MechS32 p_count, MechU32* p_points, MechS32 p_unk0x0c);
-	MechS32 DrawBand(MechU32 p_color, MechS32 p_count, MechS32* p_points, MechS32 p_luma, MechS32 p_mode);
-	MechS32 DrawBandWithFlash(undefined4 p_unk0x00, MechS32 p_unk0x04, undefined4* p_unk0x08);
+	void DrawBandPolygon(uint32_t p_flags, int32_t p_count, uint32_t* p_points, int32_t p_unk0x0c);
+	int32_t DrawBand(uint32_t p_color, int32_t p_count, int32_t* p_points, int32_t p_luma, int32_t p_mode);
+	int32_t DrawBandWithFlash(undefined4 p_unk0x00, int32_t p_unk0x04, undefined4* p_unk0x08);
 
 #ifdef __cplusplus
 }

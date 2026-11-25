@@ -13,22 +13,22 @@ extern "C"
 #endif
 
 	extern PANE g_outlinePartRects[16];
-	extern MechS32 g_frameOutlineParts;
-	extern MechS32 g_outlinePartSections[16];
+	extern int32_t g_frameOutlineParts;
+	extern int32_t g_outlinePartSections[16];
 	extern Point g_htalLabelHPosition;
 	extern Point g_htalLabelTPosition;
 	extern Point g_htalLabelAPosition;
 	extern Point g_htalLabelLPosition;
-	extern MechS32 g_maxSectionArmor;
+	extern int32_t g_maxSectionArmor;
 	extern PANE g_outlineRect;
 	extern Point g_outlinePartOffsets[16];
-	extern MechChar g_htalLabelH[4];
-	extern MechChar g_htalLabelT[4];
-	extern MechChar g_htalLabelA[4];
-	extern MechChar g_htalLabelL[4];
+	extern char g_htalLabelH[4];
+	extern char g_htalLabelT[4];
+	extern char g_htalLabelA[4];
+	extern char g_htalLabelL[4];
 	extern Point g_armorBarPositions[8];
 	extern Point g_fullSectionArmor[8];
-	extern MechU8 g_outlineRemap[0x100];
+	extern uint8_t g_outlineRemap[0x100];
 	extern Point g_armorBarSize;
 
 	void InitDamagePanel(void);

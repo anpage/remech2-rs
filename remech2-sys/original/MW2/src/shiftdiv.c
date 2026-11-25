@@ -6,10 +6,10 @@
 #include "types.h"
 
 // Returns (p_value << p_shift) / p_depth, divided by 4 and rounded, plus p_center.
-MechS32 ProjectCoordinate(MechS32 p_value, MechS32 p_depth, MechS32 p_shift, MechS32 p_center)
+int32_t ProjectCoordinate(int32_t p_value, int32_t p_depth, int32_t p_shift, int32_t p_center)
 {
 	/* shld/shl take the count modulo 32; the rounding and the sum wrap. */
-	MechU32 quotient = (MechU32) PortableIdiv((MechS64) p_value * ((MechS64) 1 << (p_shift & 31)), p_depth);
+	uint32_t quotient = (uint32_t) PortableIdiv((MechS64) p_value * ((MechS64) 1 << (p_shift & 31)), p_depth);
 
-	return PortableS32((MechU32) PortableSar32(PortableS32(quotient + 2), 2) + (MechU32) p_center);
+	return PortableS32((uint32_t) PortableSar32(PortableS32(quotient + 2), 2) + (uint32_t) p_center);
 }

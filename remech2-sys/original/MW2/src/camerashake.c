@@ -13,17 +13,17 @@
 // orientation reached over a duration. The keys play in order, ramping from one offset to the
 // next, on top of the eyepoint's base values.
 
-MechS32 g_cameraShakeKeyCount = 10;
+int32_t g_cameraShakeKeyCount = 10;
 
-MechS32 g_cameraShakeActive = 0;
+int32_t g_cameraShakeActive = 0;
 
 Ramp g_cameraShakeHeading;
 
-MechS32 g_cameraShakeKey;
+int32_t g_cameraShakeKey;
 
 Ramp g_cameraShakeZ;
 
-MechS32 g_cameraShakeKeyTime;
+int32_t g_cameraShakeKeyTime;
 
 Ramp g_cameraShakeRoll;
 
@@ -41,14 +41,14 @@ void ResetCameraShake(void)
 }
 
 // Moves the eyepoint by the shake's current offset. Returns FALSE when no shake is playing.
-MechS32 UpdateCameraShake(void)
+int32_t UpdateCameraShake(void)
 {
-	MechS32 base10;
-	MechS32 base0c;
-	MechS32 base14;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
+	int32_t base10;
+	int32_t base0c;
+	int32_t base14;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 
 	if (g_cameraShakeKey < 0 || g_cameraShakeKey >= g_cameraShakeKeyCount) {
 		g_cameraShakeActive = FALSE;
@@ -89,16 +89,16 @@ void StartCameraShake(void)
 
 // Starts the ramps toward a key, from the eyepoint's current offset (the first key) or from the
 // previous key.
-void StartCameraShakeKey(MechS32 p_key)
+void StartCameraShakeKey(int32_t p_key)
 {
-	MechS32 x;
-	MechDouble seconds;
-	MechS32 off14;
-	MechS32 off0c;
-	MechS32 off10;
-	MechS32 z;
+	int32_t x;
+	double seconds;
+	int32_t off14;
+	int32_t off0c;
+	int32_t off10;
+	int32_t z;
 	CameraShakeKey* key;
-	MechS32 y;
+	int32_t y;
 
 	if (p_key >= g_cameraShakeKeyCount || p_key >= 10 || p_key < 0) {
 		return;
@@ -142,13 +142,13 @@ void ClearCameraShakeKeys(void)
 }
 
 void AddCameraShakeKey(
-	MechS32 p_x,
-	MechS32 p_y,
-	MechS32 p_z,
-	MechS32 p_pitch,
-	MechS32 p_heading,
-	MechS32 p_roll,
-	MechDouble p_seconds
+	int32_t p_x,
+	int32_t p_y,
+	int32_t p_z,
+	int32_t p_pitch,
+	int32_t p_heading,
+	int32_t p_roll,
+	double p_seconds
 )
 {
 	CameraShakeKey* key;
@@ -168,7 +168,7 @@ void AddCameraShakeKey(
 	g_cameraShakeKeyCount++;
 }
 
-MechS32 IsCameraShaking(void)
+int32_t IsCameraShaking(void)
 {
 	return g_cameraShakeActive;
 }

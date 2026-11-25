@@ -665,13 +665,13 @@ static const struct {
 };
 
 // What the globals held before the first shell run
-static MechU8* g_resetInitial = NULL;
+static uint8_t* g_resetInitial = NULL;
 
 void ResetShellGlobals()
 {
 	size_t i;
 	size_t size;
-	MechU8* initial;
+	uint8_t* initial;
 
 	if (g_resetInitial == NULL) {
 		size = 0;
@@ -680,7 +680,7 @@ void ResetShellGlobals()
 		}
 
 		// Not from g_primaryHeap, which each run creates and destroys.
-		g_resetInitial = (MechU8*) malloc(size);
+		g_resetInitial = (uint8_t*) malloc(size);
 		initial = g_resetInitial;
 		for (i = 0; i < sizeof(g_resetGlobals) / sizeof(g_resetGlobals[0]); i++) {
 			memcpy(initial, g_resetGlobals[i].m_address, g_resetGlobals[i].m_size);

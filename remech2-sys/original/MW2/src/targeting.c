@@ -27,73 +27,73 @@
 // (0x100 too: only the player's own), 2 game pieces only, 4 game things only, 8 game pieces and
 // things, with 0x10000 those flagged 0x40, 0x20000 friends and 0x40000 enemies (GetPlayerSide).
 
-MechS32 g_navCount = 0;
+int32_t g_navCount = 0;
 
 // What inspecting the local player's target did (UpdateTarget): 1 inspected it, 2 too far, 3
 // already inspected by the team, 0 nothing. The target panel reports it.
-MechS32 g_inspectResult = 0;
+int32_t g_inspectResult = 0;
 
 // Set once the local player has targeted at the reticle (TargetAtReticle), cleared when they
 // cycle targets: while it is clear, the local player's cycling skips game pieces flagged 0x10
 // and anything without flag 0x400 or 0x1000.
-MechS32 g_reticleTargeting = 0;
+int32_t g_reticleTargeting = 0;
 
 // The cockpit layouts' text buffers and saved viewports.
 
-MechChar g_satelliteRangeText[0x40];
+char g_satelliteRangeText[0x40];
 
-MechChar g_satelliteExtraText[0x20];
+char g_satelliteExtraText[0x20];
 
 PANE g_satelliteSavedViewport;
 
-MechChar g_smallMapRangeText[0x20];
+char g_smallMapRangeText[0x20];
 
-MechChar g_smallMapExtraText[0x20];
+char g_smallMapExtraText[0x20];
 
-MechChar g_readoutText[0x20];
+char g_readoutText[0x20];
 
 PANE g_largeMapSavedViewport;
 
-MechChar g_largeMapRangeText[0x20];
+char g_largeMapRangeText[0x20];
 
-MechChar g_bearingText[0x20];
+char g_bearingText[0x20];
 
 PANE g_smallMapSavedViewport;
 
-MechChar g_largeMapExtraText[0x20];
+char g_largeMapExtraText[0x20];
 
 // The cockpit views' layouts (g_cockpitLayouts): the map view of cockpit views 1 and 2 and the
 // satellite view (4), with their labels, icons, colors, rectangles and transitions.
 
-MechChar g_readoutLabel[8] = "x";
+char g_readoutLabel[8] = "x";
 
 CockpitReadout g_readout = {1, -1, g_readoutLabel, g_readoutText, {0x28f, 0x28f}};
 
 CockpitReadout* g_cockpitReadout = &g_readout;
 
-MechChar g_smallMapExtraLabel[4] = "x";
+char g_smallMapExtraLabel[4] = "x";
 
-MechChar g_smallMapRangeLabel[4] = "R: ";
+char g_smallMapRangeLabel[4] = "R: ";
 
-MechChar g_smallMapBearingLabel[12] = "Bearing: ";
+char g_smallMapBearingLabel[12] = "Bearing: ";
 
-MechChar g_largeMapExtraLabel[4] = "x";
+char g_largeMapExtraLabel[4] = "x";
 
-MechChar g_largeMapRangeLabel[8] = "R: ";
+char g_largeMapRangeLabel[8] = "R: ";
 
-MechChar g_largeMapBearingLabel[12] = "Bearing: ";
+char g_largeMapBearingLabel[12] = "Bearing: ";
 
-MechChar g_satelliteExtraLabel[4] = "x";
+char g_satelliteExtraLabel[4] = "x";
 
-MechChar g_satelliteRangeLabel[8] = "Range: ";
+char g_satelliteRangeLabel[8] = "Range: ";
 
-MechChar g_bearingLabel[12] = "Bearing: ";
+char g_bearingLabel[12] = "Bearing: ";
 
-MechChar g_metersUnit[4] = "m";
+char g_metersUnit[4] = "m";
 
-MechChar g_kilometersUnit[8] = "km";
+char g_kilometersUnit[8] = "km";
 
-MechS32 g_smallMapColors[7][3] = {
+int32_t g_smallMapColors[7][3] = {
 	{0xac, 0xac, 0xac},
 	{0x7c, 0x79, 0x7f},
 	{0x91, 0x8e, 0x94},
@@ -103,7 +103,7 @@ MechS32 g_smallMapColors[7][3] = {
 	{0xa6, 0xa3, 0xa9}
 };
 
-MechS32 g_largeMapColors[7][3] = {
+int32_t g_largeMapColors[7][3] = {
 	{0xac, 0xac, 0xac},
 	{0x7c, 0x79, 0x7f},
 	{0x91, 0x8e, 0x94},
@@ -113,7 +113,7 @@ MechS32 g_largeMapColors[7][3] = {
 	{0xa6, 0xa3, 0xa9}
 };
 
-MechS32 g_satelliteColors[7][3] = {
+int32_t g_satelliteColors[7][3] = {
 	{0xac, 0xac, 0xac},
 	{0x7c, 0x79, 0x7f},
 	{0x91, 0x8e, 0x94},
@@ -123,13 +123,13 @@ MechS32 g_satelliteColors[7][3] = {
 	{0xa6, 0xa3, 0xa9}
 };
 
-MechS32 g_mapColors[13] = {0xe, 0xa, 6, 0xf, 0xb, 0xf5, 2, 3, 0xf9, 0xff, 0xf0, 1, 2};
+int32_t g_mapColors[13] = {0xe, 0xa, 6, 0xf, 0xb, 0xf5, 2, 3, 0xf9, 0xff, 0xf0, 1, 2};
 
-MechS32 g_smallMapAnims[5] = {-1, -1, -1, -1, -1};
+int32_t g_smallMapAnims[5] = {-1, -1, -1, -1, -1};
 
-MechS32 g_largeMapAnims[5] = {-1, -1, -1, -1, -1};
+int32_t g_largeMapAnims[5] = {-1, -1, -1, -1, -1};
 
-MechS32 g_satelliteAnims[5] = {-1, -1, -1, -1, -1};
+int32_t g_satelliteAnims[5] = {-1, -1, -1, -1, -1};
 
 PANE g_smallMapTransitionFirst = {NULL, 0x8000, 0x8000, 0x8000, 0x8000};
 
@@ -274,9 +274,9 @@ NavPoint g_navTable[128];
 
 // Places a nav point for player p_owner at (p_x, p_y, p_z), named "!". Returns its index, or
 // -1 if the table is full.
-MechS32 AddNavPoint(MechU32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t AddNavPoint(uint32_t p_owner, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 index;
+	int32_t index;
 	NavPoint* nav;
 
 	index = -1;
@@ -303,10 +303,10 @@ MechS32 AddNavPoint(MechU32 p_owner, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 // Removes nav p_nav (an AI target id, 0x100 | index) if player p_owner placed it: the later navs
 // move down, and so do the players' targets, goals and navs pointing past it (not the local
 // player's own target). Returns the new nav count, or -1.
-MechS32 RemoveNavPoint(MechU32 p_owner, MechU32 p_nav)
+int32_t RemoveNavPoint(uint32_t p_owner, uint32_t p_nav)
 {
-	MechS32 index;
-	MechS32 i;
+	int32_t index;
+	int32_t i;
 	Player* player;
 
 	if (!(p_nav & 0x100)) {
@@ -358,15 +358,15 @@ MechS32 RemoveNavPoint(MechU32 p_owner, MechU32 p_nav)
 // things, in that cycle; with p_step 0, or no target, it starts over from the first player. Marks
 // the target missing (0x1000) when none qualifies, and a change of target outside the nav points
 // turns the autopilot's steering over.
-void CycleTarget(Player* p_player, MechS32 p_step, MechU32 p_flags)
+void CycleTarget(Player* p_player, int32_t p_step, uint32_t p_flags)
 {
-	MechS32 target;
-	MechS32 result;
-	MechS32 found;
-	MechS32 index;
-	MechS32 limit;
-	MechS32 tries;
-	MechS32 kind;
+	int32_t target;
+	int32_t result;
+	int32_t found;
+	int32_t index;
+	int32_t limit;
+	int32_t tries;
+	int32_t kind;
 
 	found = FALSE;
 	if (p_player->m_index == g_localPlayerId) {
@@ -478,20 +478,20 @@ void ResetTargeting(void)
 // or a negative code: -1 and -2 for an index out of range, -9 for flags 0xe, -3 for a free nav,
 // -4 when flag 0x10000 asks for a nav with flag 0x40, and -6 for a nav of another owner or team
 // (flag 0x100 accepts only a nav its owner placed).
-MechS32 TargetNavPoint(MechU32 p_player, MechS32 p_nav, MechU32 p_flags)
+int32_t TargetNavPoint(uint32_t p_player, int32_t p_nav, uint32_t p_flags)
 {
 	Player* player;
 	NavPoint* nav;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 dz;
-	MechS32 heading;
-	MechS32 range;
-	MechU32 distance;
-	MechS32 pitch;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t dx;
+	int32_t dy;
+	int32_t dz;
+	int32_t heading;
+	int32_t range;
+	uint32_t distance;
+	int32_t pitch;
 
 	if (p_nav < 0) {
 		return -1;
@@ -554,20 +554,20 @@ MechS32 TargetNavPoint(MechU32 p_player, MechS32 p_nav, MechU32 p_flags)
 // (flags 0x20000 and 0x40000), -3 for a player that can't be targeted or is p_player, -4 when
 // flag 0x10000 asks for a player with flag 0x40, -5 and -7 for targets the local player may not
 // pick, and -8 for a player without a shape.
-MechS32 TargetGamePiece(MechS32 p_player, MechS32 p_index, MechU32 p_flags)
+int32_t TargetGamePiece(int32_t p_player, int32_t p_index, uint32_t p_flags)
 {
 	Player* player;
 	Player* target;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 dz;
-	MechS32 heading;
-	MechS32 range;
-	MechU32 distance;
-	MechS32 pitch;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t dx;
+	int32_t dy;
+	int32_t dz;
+	int32_t heading;
+	int32_t range;
+	uint32_t distance;
+	int32_t pitch;
 
 	if (p_index < 0) {
 		return -1;
@@ -646,20 +646,20 @@ MechS32 TargetGamePiece(MechS32 p_player, MechS32 p_index, MechU32 p_flags)
 
 // Makes game thing p_index player p_player's target, like TargetGamePiece for a player. Returns 1,
 // or the same negative codes; its test of flag 0x10000 can never succeed.
-MechS32 TargetGameThing(MechS32 p_player, MechS32 p_index, MechU32 p_flags)
+int32_t TargetGameThing(int32_t p_player, int32_t p_index, uint32_t p_flags)
 {
 	Player* player;
 	GameThing* thing;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 dz;
-	MechS32 heading;
-	MechS32 range;
-	MechU32 distance;
-	MechS32 pitch;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t dx;
+	int32_t dy;
+	int32_t dz;
+	int32_t heading;
+	int32_t range;
+	uint32_t distance;
+	int32_t pitch;
 
 	if (p_index < 0) {
 		return -1;
@@ -731,13 +731,13 @@ MechS32 TargetGameThing(MechS32 p_player, MechS32 p_index, MechU32 p_flags)
 // the inspect key (PlayerSteering::m_inspectTarget) pressed, a player or game thing within 20000
 // of its radius is inspected for the team. Returns 0, flagging the target lost (0x1000), when it no longer
 // qualifies.
-MechS32 UpdateTarget(Player* p_player)
+int32_t UpdateTarget(Player* p_player)
 {
-	MechS32 isLocal;
-	MechS32 claim;
-	MechS32 lost;
-	MechS32 kind;
-	MechS32 index;
+	int32_t isLocal;
+	int32_t claim;
+	int32_t lost;
+	int32_t kind;
+	int32_t index;
 
 	lost = TRUE;
 	claim = 0;
@@ -836,11 +836,11 @@ MechS32 UpdateTarget(Player* p_player)
 }
 
 // Returns the player the local player targets, or -1.
-MechS32 GetLocalTargetGamePiece(void)
+int32_t GetLocalTargetGamePiece(void)
 {
-	MechS32 index;
+	int32_t index;
 	Player* player;
-	MechS32 kind;
+	int32_t kind;
 
 	player = g_players[g_localPlayerId];
 	kind = player->m_targetInfo.m_target & 0xf00;
@@ -853,11 +853,11 @@ MechS32 GetLocalTargetGamePiece(void)
 }
 
 // Returns the game thing the local player targets, or -1.
-MechS32 GetLocalTargetGameThing(void)
+int32_t GetLocalTargetGameThing(void)
 {
-	MechS32 index;
+	int32_t index;
 	Player* player;
-	MechS32 kind;
+	int32_t kind;
 
 	player = g_players[g_localPlayerId];
 	kind = player->m_targetInfo.m_target & 0xf00;
@@ -886,11 +886,11 @@ Shape* GetLocalTargetShape(void)
 // Returns the scene object of the local player's target: a player's or a game thing's.
 SceneObject* GetLocalTargetObject(void)
 {
-	MechS32 index;
+	int32_t index;
 	Player* player;
 	SceneObject* obj;
-	MechS32 kind;
-	MechS32 id;
+	int32_t kind;
+	int32_t id;
 
 	obj = NULL;
 	player = g_players[g_localPlayerId];
@@ -916,10 +916,10 @@ SceneObject* GetLocalTargetObject(void)
 // new target, the old one comes back, with the autopilot.
 void TargetAtReticle(void)
 {
-	MechS32 autopilot;
+	int32_t autopilot;
 	Player* player;
-	MechS32 target;
-	MechS32 previous;
+	int32_t target;
+	int32_t previous;
 	Shape* shape;
 
 	target = -1;
@@ -965,22 +965,22 @@ void TargetAtReticle(void)
 // Turns the vector (p_dx, p_dy, p_dz) into its heading (*p_heading), its length along the
 // ground (*p_distance), its full length (*p_length) and its pitch (*p_pitch).
 void GetBearingAndRange(
-	MechS32 p_dx,
-	MechS32 p_dy,
-	MechS32 p_dz,
-	MechS32* p_heading,
-	MechS32* p_length,
-	MechU32* p_distance,
-	MechS32* p_pitch
+	int32_t p_dx,
+	int32_t p_dy,
+	int32_t p_dz,
+	int32_t* p_heading,
+	int32_t* p_length,
+	uint32_t* p_distance,
+	int32_t* p_pitch
 )
 {
-	MechS32 pitch;
-	MechS32 cosine;
-	MechS32 ground;
-	MechS32 heading;
-	MechS32 sine;
-	MechS32 length;
-	MechS32 pitchCosine;
+	int32_t pitch;
+	int32_t cosine;
+	int32_t ground;
+	int32_t heading;
+	int32_t sine;
+	int32_t length;
+	int32_t pitchCosine;
 
 	heading = FixedAtan2(p_dx, p_dz);
 	if (abs(p_dx) > abs(p_dz)) {
@@ -1018,9 +1018,9 @@ void GetBearingAndRange(
 }
 
 // Steps p_player's nav point by p_step; with p_ownOnly, through the navs p_player placed only.
-void CycleNavTarget(Player* p_player, MechS32 p_step, MechS32 p_ownOnly)
+void CycleNavTarget(Player* p_player, int32_t p_step, int32_t p_ownOnly)
 {
-	MechU32 flags;
+	uint32_t flags;
 
 	flags = 1;
 	if (p_ownOnly) {
@@ -1030,7 +1030,7 @@ void CycleNavTarget(Player* p_player, MechS32 p_step, MechS32 p_ownOnly)
 	CycleTarget(p_player, p_step, flags);
 }
 
-void CycleGameThingTarget(MechS32 p_step)
+void CycleGameThingTarget(int32_t p_step)
 {
 	Player* player;
 
@@ -1038,7 +1038,7 @@ void CycleGameThingTarget(MechS32 p_step)
 	CycleTarget(player, p_step, 4);
 }
 
-void CycleGamePieceTarget(MechS32 p_step)
+void CycleGamePieceTarget(int32_t p_step)
 {
 	Player* player;
 
@@ -1046,7 +1046,7 @@ void CycleGamePieceTarget(MechS32 p_step)
 	CycleTarget(player, p_step, 2);
 }
 
-void CycleFriendlyTarget(MechS32 p_step)
+void CycleFriendlyTarget(int32_t p_step)
 {
 	Player* player;
 
@@ -1054,7 +1054,7 @@ void CycleFriendlyTarget(MechS32 p_step)
 	CycleTarget(player, p_step, 0x20008);
 }
 
-void CycleEnemyTarget(MechS32 p_step)
+void CycleEnemyTarget(int32_t p_step)
 {
 	Player* player;
 
@@ -1067,13 +1067,13 @@ void CycleEnemyTarget(MechS32 p_step)
 // steering flag (PlayerSteering::m_autopilot).
 void TargetNearestEnemy(void)
 {
-	MechS32 autopilot;
-	MechS32 target;
+	int32_t autopilot;
+	int32_t target;
 	Player* player;
-	MechS32 best;
-	MechS32 saved;
-	MechS32 distance;
-	MechS32 bestDistance;
+	int32_t best;
+	int32_t saved;
+	int32_t distance;
+	int32_t bestDistance;
 
 	target = 0;
 	best = -1;

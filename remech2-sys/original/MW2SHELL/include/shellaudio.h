@@ -16,28 +16,28 @@ extern "C"
 	void ShellAudioSubsystem_ApplyMidiVolume(ShellAudioSubsystem* p_subsystem);
 
 	// Both copy p_data, and return NULL when it can't be played
-	ShellMidiSequence* ShellMidiSequence_New(ShellAudioSubsystem* p_subsystem, const void* p_data, MechU32 p_size);
-	ShellAudioSample* ShellAudioSample_New(ShellAudioSubsystem* p_subsystem, const void* p_data, MechU32 p_size);
+	ShellMidiSequence* ShellMidiSequence_New(ShellAudioSubsystem* p_subsystem, const void* p_data, uint32_t p_size);
+	ShellAudioSample* ShellAudioSample_New(ShellAudioSubsystem* p_subsystem, const void* p_data, uint32_t p_size);
 
 	void ShellMidiSequence_Delete(ShellMidiSequence* p_sequence);
 	void ShellMidiSequence_Start(ShellMidiSequence* p_sequence);
 	void ShellMidiSequence_Stop(ShellMidiSequence* p_sequence);
-	void ShellMidiSequence_SetVolume(ShellMidiSequence* p_sequence, MechS32 p_volume);
+	void ShellMidiSequence_SetVolume(ShellMidiSequence* p_sequence, int32_t p_volume);
 
 	void ShellAudioSample_Delete(ShellAudioSample* p_sample);
 	void ShellAudioSample_SetFade(
 		ShellAudioSample* p_sample,
-		MechS32 p_initFadeRate,
-		MechS32 p_maxFade,
-		MechS32 p_startVolume,
-		MechS32 p_endVolume
+		int32_t p_initFadeRate,
+		int32_t p_maxFade,
+		int32_t p_startVolume,
+		int32_t p_endVolume
 	);
 	void ShellAudioSample_DoFade(ShellAudioSample* p_sample);
 	void ShellAudioSample_EnableLoop(ShellAudioSample* p_sample);
 	void ShellAudioSample_Start(ShellAudioSample* p_sample);
 	void ShellAudioSample_Stop(ShellAudioSample* p_sample);
-	MechS32 ShellAudioSample_IsPlaying(ShellAudioSample* p_sample);
-	void ShellAudioSample_SetVolume(ShellAudioSample* p_sample, MechS32 p_volume);
+	int32_t ShellAudioSample_IsPlaying(ShellAudioSample* p_sample);
+	void ShellAudioSample_SetVolume(ShellAudioSample* p_sample, int32_t p_volume);
 }
 
 #endif // SHELLAUDIO_H

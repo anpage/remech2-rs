@@ -10,85 +10,85 @@ PlayerSteering g_localSteering = {0};
 // The outputs of the sinks past the steering. pilot_tilt and pilot_pan are the cockpit
 // view's look offsets, zoom_factor the view scale (16.16, reset to 1 by FirstEyepoint), and the
 // glance sinks look aside while one is held.
-MechS32 g_sinkPilotTilt = 0;
+int32_t g_sinkPilotTilt = 0;
 
-MechS32 g_sinkPilotPan = 0;
+int32_t g_sinkPilotPan = 0;
 
-MechS32 g_sinkEyepointTilt = 0;
+int32_t g_sinkEyepointTilt = 0;
 
-MechS32 g_sinkEyepointPanDelta = 0;
+int32_t g_sinkEyepointPanDelta = 0;
 
-MechS32 g_sinkEyepointSlideDelta = 0;
+int32_t g_sinkEyepointSlideDelta = 0;
 
-MechS32 g_sinkTrackDistanceDelta = 0;
+int32_t g_sinkTrackDistanceDelta = 0;
 
-MechS32 g_sinkTrackHeightDelta = 0;
+int32_t g_sinkTrackHeightDelta = 0;
 
-MechS32 g_sinkZoomFactor = 0;
+int32_t g_sinkZoomFactor = 0;
 
-MechS8 g_sinkPilotTiltPlus = 0;
+int8_t g_sinkPilotTiltPlus = 0;
 
-MechS8 g_sinkPilotTiltMinus = 0;
+int8_t g_sinkPilotTiltMinus = 0;
 
-MechS8 g_sinkPilotTiltReset = 0;
+int8_t g_sinkPilotTiltReset = 0;
 
-MechS8 g_sinkPilotPanPlus = 0;
+int8_t g_sinkPilotPanPlus = 0;
 
-MechS8 g_sinkPilotPanMinus = 0;
+int8_t g_sinkPilotPanMinus = 0;
 
-MechS8 g_sinkPilotPanReset = 0;
+int8_t g_sinkPilotPanReset = 0;
 
-MechS8 g_sinkGlanceLeft = 0;
+int8_t g_sinkGlanceLeft = 0;
 
-MechS8 g_sinkGlanceRight = 0;
+int8_t g_sinkGlanceRight = 0;
 
-MechS8 g_sinkGlanceUp = 0;
+int8_t g_sinkGlanceUp = 0;
 
-MechS8 g_sinkGlanceDown = 0;
+int8_t g_sinkGlanceDown = 0;
 
-MechS8 g_sinkEyepointTiltPlus = 0;
+int8_t g_sinkEyepointTiltPlus = 0;
 
-MechS8 g_sinkEyepointTiltMinus = 0;
+int8_t g_sinkEyepointTiltMinus = 0;
 
-MechS8 g_sinkEyepointTiltReset = 0;
+int8_t g_sinkEyepointTiltReset = 0;
 
-MechS8 g_sinkEyepointPanPlus = 0;
+int8_t g_sinkEyepointPanPlus = 0;
 
-MechS8 g_sinkEyepointPanMinus = 0;
+int8_t g_sinkEyepointPanMinus = 0;
 
-MechS8 g_sinkEyepointPanReset = 0;
+int8_t g_sinkEyepointPanReset = 0;
 
-MechS8 g_sinkEyepointSlidePlus = 0;
+int8_t g_sinkEyepointSlidePlus = 0;
 
-MechS8 g_sinkEyepointSlideMinus = 0;
+int8_t g_sinkEyepointSlideMinus = 0;
 
-MechS8 g_sinkTrackDistancePlus = 0;
+int8_t g_sinkTrackDistancePlus = 0;
 
-MechS8 g_sinkTrackDistanceMinus = 0;
+int8_t g_sinkTrackDistanceMinus = 0;
 
-MechS8 g_sinkTrackHeightPlus = 0;
+int8_t g_sinkTrackHeightPlus = 0;
 
-MechS8 g_sinkTrackHeightMinus = 0;
+int8_t g_sinkTrackHeightMinus = 0;
 
-MechS8 g_sinkZoomFactorPlus = 0;
+int8_t g_sinkZoomFactorPlus = 0;
 
-MechS8 g_sinkZoomFactorMinus = 0;
+int8_t g_sinkZoomFactorMinus = 0;
 
-MechS8 g_sinkZoomFactorReset = 0;
+int8_t g_sinkZoomFactorReset = 0;
 
-MechS32 g_sinkMenuItem = 0;
+int32_t g_sinkMenuItem = 0;
 
-MechS32 g_sinkMenuValue = 0;
+int32_t g_sinkMenuValue = 0;
 
-MechS8 g_sinkMenuItemReset = 0;
+int8_t g_sinkMenuItemReset = 0;
 
-MechS8 g_sinkMenuValueReset = 0;
+int8_t g_sinkMenuValueReset = 0;
 
-MechS8 g_sinkMenuEnter = 0;
+int8_t g_sinkMenuEnter = 0;
 
-MechS8 g_sinkMenuAbort = 0;
+int8_t g_sinkMenuAbort = 0;
 
-MechS32 g_gameplayInputEnabled = 1;
+int32_t g_gameplayInputEnabled = 1;
 
 // The sinks the input layer writes.
 InputSink g_inputSinks[] = {

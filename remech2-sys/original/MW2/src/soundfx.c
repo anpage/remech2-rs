@@ -25,23 +25,23 @@
 
 #include <string.h>
 
-MechS32 g_temperature = 25;
+int32_t g_temperature = 25;
 
 // Set on a planet without a breathable atmosphere: the local player can't eject (the cockpit says
 // so), a life support hit kills, and a mech whose pilot ejects counts as lost.
-MechS32 g_hostileAtmosphere = 0;
+int32_t g_hostileAtmosphere = 0;
 
-MechS32 g_sampleRates[10] = {9922, 10143, 10364, 10584, 10804, 11025, 11246, 11466, 11686, 11907};
+int32_t g_sampleRates[10] = {9922, 10143, 10364, 10584, 10804, 11025, 11246, 11466, 11686, 11907};
 
 AudioEngine* g_audioEngine = NULL;
 
-MechChar g_sampleTag[] = "SFLX";
+char g_sampleTag[] = "SFLX";
 
 SoundInfo g_soundInfo[1200];
 
-MechS32 InitializeDigitalAudio(MechU32 p_numSamples)
+int32_t InitializeDigitalAudio(uint32_t p_numSamples)
 {
-	MechU32 i;
+	uint32_t i;
 
 	if (g_audioEngine) {
 		return -1;
@@ -94,7 +94,7 @@ MechS32 InitializeDigitalAudio(MechU32 p_numSamples)
 
 void ShutdownDigitalAudio(void)
 {
-	MechU32 i;
+	uint32_t i;
 
 	if (!g_audioEngine) {
 		return;
@@ -117,9 +117,9 @@ void ShutdownDigitalAudio(void)
 // finished with.
 void ServeSamples(void)
 {
-	MechU32 i;
-	MechU32 size;
-	MechS32 buffer;
+	uint32_t i;
+	uint32_t size;
+	int32_t buffer;
 
 	if (!g_audioEngine) {
 		return;
@@ -182,21 +182,21 @@ void ServeSamples(void)
 
 // Plays a sound resource (p_id), or the sound data at p_data, after p_delay clock ticks.
 // Returns the sample slot, or a negative error.
-MechS32 PlaySample(
-	MechS32 p_delay,
-	MechS32 p_bearing,
-	MechS32 p_id,
+int32_t PlaySample(
+	int32_t p_delay,
+	int32_t p_bearing,
+	int32_t p_id,
 	void* p_data,
-	MechU32 p_volume,
-	MechS32 p_volumeScale,
-	MechS32 p_pan,
-	MechS32 p_rate,
-	MechS32* p_userData,
-	MechU16 p_flags
+	uint32_t p_volume,
+	int32_t p_volumeScale,
+	int32_t p_pan,
+	int32_t p_rate,
+	int32_t* p_userData,
+	uint16_t p_flags
 )
 {
 	HSAMPLE sample;
-	MechS32 slot;
+	int32_t slot;
 
 	if (!g_audioEngine) {
 		return -2;
@@ -255,13 +255,13 @@ MechS32 PlaySample(
 // Sets up a sample slot for a sound: p_slot, or a free one, or one playing a sound of lower
 // priority. The m_flags bits: 0x100 keeps the slot, 0x200 restarts the same sound, 0x400
 // plays it only once, 0x1000 loops.
-MechS32 StartSample(MechS32 p_id, void* p_data, MechU16 p_flags, MechS16 p_slot, MechS32* p_userData)
+int32_t StartSample(int32_t p_id, void* p_data, uint16_t p_flags, int16_t p_slot, int32_t* p_userData)
 {
 	HSAMPLE sample;
-	MechS32 victim;
-	MechU32 i;
-	MechS32 slot;
-	MechU16 flags;
+	int32_t victim;
+	uint32_t i;
+	int32_t slot;
+	uint16_t flags;
 
 	if (p_data) {
 		p_id = -1;
@@ -290,7 +290,7 @@ MechS32 StartSample(MechS32 p_id, void* p_data, MechU16 p_flags, MechS16 p_slot,
 	flags = p_flags;
 	if (slot == -1) {
 		for (i = 0; i < g_audioEngine->m_numSamples && slot == -1; i++) {
-			if ((MechU8) (g_audioEngine->m_flags[i] >> 8)) {
+			if ((uint8_t) (g_audioEngine->m_flags[i] >> 8)) {
 				if (g_audioEngine->m_flags[i] & 0x100) {
 					if (flags & 0x100) {
 						return -9;
@@ -314,7 +314,7 @@ MechS32 StartSample(MechS32 p_id, void* p_data, MechU16 p_flags, MechS16 p_slot,
 			if (!g_audioEngine->m_playing[i]) {
 				slot = i;
 			}
-			else if ((MechS8) g_audioEngine->m_flags[i] < p_flags) {
+			else if ((int8_t) g_audioEngine->m_flags[i] < p_flags) {
 				victim = i;
 			}
 		}
@@ -372,7 +372,7 @@ MechS32 StartSample(MechS32 p_id, void* p_data, MechU16 p_flags, MechS16 p_slot,
 	sample = g_audioEngine->m_samples[slot];
 	AIL_init_sample(sample);
 
-	if (p_userData == (MechS32*) -1) {
+	if (p_userData == (int32_t*) -1) {
 		p_userData = &g_audioEngine->m_playing[slot];
 	}
 
@@ -397,11 +397,11 @@ MechS32 StartSample(MechS32 p_id, void* p_data, MechU16 p_flags, MechS16 p_slot,
 // next (-1 for none), 4 heap data to free.
 void AILCALLBACK SampleEosCallback(HSAMPLE p_sample)
 {
-	MechS32 id;
+	int32_t id;
 	void* data;
-	MechS32 next;
-	MechS32 slot;
-	MechS32* done;
+	int32_t next;
+	int32_t slot;
+	int32_t* done;
 
 	id = AIL_sample_user_data(p_sample, 1);
 	slot = AIL_sample_user_data(p_sample, 2);
@@ -447,7 +447,7 @@ void AILCALLBACK SampleEosCallback(HSAMPLE p_sample)
 	if (!next) {
 		g_audioEngine->m_ids[slot] = 0;
 		g_audioEngine->m_flags[slot] = 0;
-		done = (MechS32*) AIL_sample_user_data(p_sample, 0);
+		done = (int32_t*) AIL_sample_user_data(p_sample, 0);
 		*done = 0;
 		// The original passed &g_speechSample as the speech's done flag, which the 32-bit store
 		// above cleared; the handle is wider now.
@@ -459,21 +459,21 @@ void AILCALLBACK SampleEosCallback(HSAMPLE p_sample)
 
 void PlayEffectsVolumeTest(void)
 {
-	PlaySample(0, 0, 0xd2, NULL, 100, g_soundConfig.m_effectsVolume, 0x40, RandomSampleRate(), (MechS32*) -1, 0x250);
+	PlaySample(0, 0, 0xd2, NULL, 100, g_soundConfig.m_effectsVolume, 0x40, RandomSampleRate(), (int32_t*) -1, 0x250);
 }
 
-MechS32 PlaySoundOnce(MechS32 p_id, MechU32 p_volume, MechS32 p_pan, MechS32 p_rate)
+int32_t PlaySoundOnce(int32_t p_id, uint32_t p_volume, int32_t p_pan, int32_t p_rate)
 {
-	return PlaySample(0, 0, p_id, NULL, p_volume, g_soundConfig.m_effectsVolume, p_pan, p_rate, (MechS32*) -1, 0x450);
+	return PlaySample(0, 0, p_id, NULL, p_volume, g_soundConfig.m_effectsVolume, p_pan, p_rate, (int32_t*) -1, 0x450);
 }
 
-MechS32 PlaySoundRandomRate(
-	MechS32 p_delay,
-	MechS32 p_bearing,
-	MechS32 p_id,
-	MechU32 p_volume,
-	MechS32 p_pan,
-	MechU16 p_flags
+int32_t PlaySoundRandomRate(
+	int32_t p_delay,
+	int32_t p_bearing,
+	int32_t p_id,
+	uint32_t p_volume,
+	int32_t p_pan,
+	uint16_t p_flags
 )
 {
 	return PlaySample(
@@ -485,24 +485,24 @@ MechS32 PlaySoundRandomRate(
 		g_soundConfig.m_effectsVolume,
 		p_pan,
 		RandomSampleRate(),
-		(MechS32*) -1,
+		(int32_t*) -1,
 		p_flags
 	);
 }
 
 // Plays p_sound at the offset (p_dx, p_dy, p_dz) from the eyepoint, delayed by its distance
 // and fading with it; p_half halves the volume. Returns the distance.
-MechS32 PlayPositionalSound(MechS32 p_dx, MechS32 p_dy, MechS32 p_dz, MechS32 p_sound, MechS32 p_half)
+int32_t PlayPositionalSound(int32_t p_dx, int32_t p_dy, int32_t p_dz, int32_t p_sound, int32_t p_half)
 {
-	MechS32 horizontal;
-	MechS32 delay;
-	MechS32 pitch;
-	MechS32 volume;
-	MechS32 bearing;
-	MechS32 distance;
-	MechS32 range;
+	int32_t horizontal;
+	int32_t delay;
+	int32_t pitch;
+	int32_t volume;
+	int32_t bearing;
+	int32_t distance;
+	int32_t range;
 
-	GetBearingAndRange(p_dx, p_dy, p_dz, &bearing, &distance, (MechU32*) &horizontal, &pitch);
+	GetBearingAndRange(p_dx, p_dy, p_dz, &bearing, &distance, (uint32_t*) &horizontal, &pitch);
 	range = distance;
 	volume = GetDistanceVolume(range);
 	if (volume > 0) {
@@ -517,7 +517,7 @@ MechS32 PlayPositionalSound(MechS32 p_dx, MechS32 p_dy, MechS32 p_dz, MechS32 p_
 	return distance;
 }
 
-MechS32 PlaySoundEffect(MechS32 p_id, MechU32 p_volume, MechS32 p_pan, MechS32 p_rate, MechU16 p_flags)
+int32_t PlaySoundEffect(int32_t p_id, uint32_t p_volume, int32_t p_pan, int32_t p_rate, uint16_t p_flags)
 {
 	return PlaySample(
 		0,
@@ -528,32 +528,32 @@ MechS32 PlaySoundEffect(MechS32 p_id, MechU32 p_volume, MechS32 p_pan, MechS32 p
 		g_soundConfig.m_effectsVolume,
 		p_pan,
 		g_sampleRates[p_rate],
-		(MechS32*) -1,
+		(int32_t*) -1,
 		p_flags
 	);
 }
 
-MechS32 PlayDelayedSound(
-	MechS32 p_delay,
-	MechS32 p_bearing,
-	MechS32 p_id,
-	MechU32 p_volume,
-	MechS32 p_pan,
-	MechU16 p_flags
+int32_t PlayDelayedSound(
+	int32_t p_delay,
+	int32_t p_bearing,
+	int32_t p_id,
+	uint32_t p_volume,
+	int32_t p_pan,
+	uint16_t p_flags
 )
 {
 	return PlaySoundRandomRate(p_delay, p_bearing, p_id, p_volume, p_pan, p_flags);
 }
 
-MechS32 PlaySoundAt(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_sound, MechS32 p_half)
+int32_t PlaySoundAt(int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_sound, int32_t p_half)
 {
 	return PlayPositionalSound(p_x, p_y, p_z, p_sound, p_half);
 }
 
-MechS32 CalculateSamplePan(MechS32 p_bearing)
+int32_t CalculateSamplePan(int32_t p_bearing)
 {
-	MechS32 pan;
-	MechS32 angle;
+	int32_t pan;
+	int32_t angle;
 
 	angle = g_eyepoint->m_heading - p_bearing;
 	pan = FixedSin(angle) >> 23;
@@ -568,15 +568,15 @@ MechS32 CalculateSamplePan(MechS32 p_bearing)
 	return pan;
 }
 
-MechS32 RandomSampleRate(void)
+int32_t RandomSampleRate(void)
 {
 	return g_sampleRates[RandomIntBelow(10)];
 }
 
 // Stops the playing samples; p_all stops the speech sample too.
-void StopSamples(MechS32 p_all)
+void StopSamples(int32_t p_all)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (!g_audioEngine) {
 		return;
@@ -597,14 +597,14 @@ void StopSamples(MechS32 p_all)
 void UpdateAmbientSound(AmbientSound* p_sound)
 {
 	HSAMPLE sample;
-	MechS32 i;
-	MechS32 volume;
-	MechS32 x;
-	MechS32 started;
-	MechS32 distance;
-	MechS32 bearing;
-	MechS32 y;
-	MechS32 z;
+	int32_t i;
+	int32_t volume;
+	int32_t x;
+	int32_t started;
+	int32_t distance;
+	int32_t bearing;
+	int32_t y;
+	int32_t z;
 
 	started = 0;
 	if (!g_audioEngine) {
@@ -620,7 +620,7 @@ void UpdateAmbientSound(AmbientSound* p_sound)
 	x = g_eyepoint->m_x - x;
 	y = g_eyepoint->m_y - y;
 	z = g_eyepoint->m_z - z;
-	GetBearingAndRange(x, y, z, &bearing, &distance, (MechU32*) &i, &i);
+	GetBearingAndRange(x, y, z, &bearing, &distance, (uint32_t*) &i, &i);
 
 	if (p_sound->m_range < distance) {
 		StopAmbientSound(p_sound);
@@ -701,9 +701,9 @@ void StopAmbientSound(AmbientSound* p_sound)
 }
 
 // The volume, 0-100, at p_distance: full at 0, silent from 50000.
-MechS32 GetDistanceVolume(MechS32 p_distance)
+int32_t GetDistanceVolume(int32_t p_distance)
 {
-	MechS32 volume;
+	int32_t volume;
 
 	if (p_distance > 50000) {
 		return 0;

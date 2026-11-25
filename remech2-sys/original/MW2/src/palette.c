@@ -17,27 +17,27 @@
 
 #include <string.h>
 
-MechS32 g_paneIndex = -1;
+int32_t g_paneIndex = -1;
 
-MechS32 g_currentPalette = 0x10;
+int32_t g_currentPalette = 0x10;
 
-MechS32 g_palettePending = 0;
+int32_t g_palettePending = 0;
 
-MechS32 g_basePalette = 0;
+int32_t g_basePalette = 0;
 
-MechS32 g_settledPalette = 0x10;
+int32_t g_settledPalette = 0x10;
 
-MechS32 g_paletteFadeTarget = -1;
+int32_t g_paletteFadeTarget = -1;
 
-MechS32 g_paletteFadeBack = -1;
+int32_t g_paletteFadeBack = -1;
 
-MechS32 g_paletteFadeBackSteps = 0;
+int32_t g_paletteFadeBackSteps = 0;
 
-MechS32 g_paletteFadeSteps = 0;
+int32_t g_paletteFadeSteps = 0;
 
-MechS32 g_paletteCycling = 0;
+int32_t g_paletteCycling = 0;
 
-MechS32 g_paletteCycleResource = -1;
+int32_t g_paletteCycleResource = -1;
 
 PaletteFade g_paletteFade;
 
@@ -45,11 +45,11 @@ PaletteCycle g_paletteCycle;
 
 PANE g_panes[11];
 
-MechS32 g_paletteResourceIds[20];
+int32_t g_paletteResourceIds[20];
 
 void InitPanes(PANE* p_target)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 11; i++) {
 		g_panes[i] = *p_target;
@@ -63,10 +63,10 @@ void InitPanes(PANE* p_target)
 // SelectPane is implemented on the Rust side (src/sim/window.rs). In widescreen the 3D views
 // cover the whole frame.
 
-void GetViewCenter(Eyepoint* p_eyepoint, MechS32* p_x, MechS32* p_y)
+void GetViewCenter(Eyepoint* p_eyepoint, int32_t* p_x, int32_t* p_y)
 {
-	MechS32 x;
-	MechS32 y;
+	int32_t x;
+	int32_t y;
 
 	x = p_eyepoint->m_offsetX + (p_eyepoint->m_viewLeft + p_eyepoint->m_viewRight) / 2;
 	y = p_eyepoint->m_offsetY + (p_eyepoint->m_viewTop + p_eyepoint->m_viewBottom) / 2;
@@ -83,10 +83,10 @@ void ApplyPendingPalette(void)
 	}
 }
 
-void ApplyPaletteResource(MechS32 p_slot)
+void ApplyPaletteResource(int32_t p_slot)
 {
-	MechU8* palette;
-	MechS32* id;
+	uint8_t* palette;
+	int32_t* id;
 
 	id = &g_paletteResourceIds[p_slot];
 	if (*id > 0) {
@@ -100,7 +100,7 @@ void ApplyPaletteResource(MechS32 p_slot)
 
 void UpdatePaletteFade(void)
 {
-	MechS32 ticks;
+	int32_t ticks;
 
 	if (g_paletteFadeSteps) {
 		ticks = g_deltaTime < g_paletteFadeSteps ? g_deltaTime : g_paletteFadeSteps;
@@ -118,13 +118,13 @@ void UpdatePaletteFade(void)
 	}
 }
 
-MechS32 StartPaletteFade(MechS32 p_palette, MechS32 p_duration, MechS32 p_mode)
+int32_t StartPaletteFade(int32_t p_palette, int32_t p_duration, int32_t p_mode)
 {
-	MechU8* to;
-	MechU8* from;
-	MechS32 steps;
-	MechS32 fromSlot;
-	MechS32 result;
+	uint8_t* to;
+	uint8_t* from;
+	int32_t steps;
+	int32_t fromSlot;
+	int32_t result;
 
 	from = NULL;
 	fromSlot = -1;
@@ -178,14 +178,14 @@ MechS32 StartPaletteFade(MechS32 p_palette, MechS32 p_duration, MechS32 p_mode)
 	return result;
 }
 
-MechS32 StartPaletteFlash(MechS32 p_offset, MechS32 p_duration, MechS32 p_mode)
+int32_t StartPaletteFlash(int32_t p_offset, int32_t p_duration, int32_t p_mode)
 {
 	return StartPaletteFade(p_offset + g_basePalette, p_duration, p_mode);
 }
 
-void StartPaletteCycle(MechU8 p_first, MechS32 p_count)
+void StartPaletteCycle(uint8_t p_first, int32_t p_count)
 {
-	MechU8* palette;
+	uint8_t* palette;
 
 	if (g_paletteFadeSteps > 0 || g_paletteCycling) {
 		return;
@@ -218,9 +218,9 @@ void StopPaletteCycle(void)
 	ApplyPendingPalette();
 }
 
-MechS32 SetPaletteResourceId(MechS32 p_id, MechS32 p_slot)
+int32_t SetPaletteResourceId(int32_t p_id, int32_t p_slot)
 {
-	MechS32 old;
+	int32_t old;
 
 	old = g_paletteResourceIds[p_slot];
 	g_paletteResourceIds[p_slot] = p_id;
@@ -229,9 +229,9 @@ MechS32 SetPaletteResourceId(MechS32 p_id, MechS32 p_slot)
 	return old;
 }
 
-void FadeToBasePalette(MechS32 p_palette, MechS32 p_duration)
+void FadeToBasePalette(int32_t p_palette, int32_t p_duration)
 {
-	MechS32 palette;
+	int32_t palette;
 
 	palette = p_palette;
 	StartPaletteFade(palette, p_duration, 0);
@@ -239,7 +239,7 @@ void FadeToBasePalette(MechS32 p_palette, MechS32 p_duration)
 	g_settledPalette = palette;
 }
 
-void SetBasePalette(MechS32 p_palette)
+void SetBasePalette(int32_t p_palette)
 {
 	g_basePalette = p_palette;
 	g_settledPalette = p_palette;
@@ -248,19 +248,19 @@ void SetBasePalette(MechS32 p_palette)
 // Brings up the start palette (slot 0x10): with p_dissolve, it dissolves the screen to black
 // over 0x10f ticks first. It passes the result of the slot test, not the slot's resource id,
 // to the loader, so it always loads PAL resource 1 (SimMain has the same test).
-void StartPalettes(MechS32 p_dissolve)
+void StartPalettes(int32_t p_dissolve)
 {
-	MechU8* palette;
-	MechS32 last;
-	MechS32 handle;
+	uint8_t* palette;
+	int32_t last;
+	int32_t handle;
 	WINDOW buffer;
-	MechS32 hasPalette;
-	MechS32 seed;
+	int32_t hasPalette;
+	int32_t seed;
 	PANE* src;
 	PANE target;
-	MechS32 count;
+	int32_t count;
 	void* pixels;
-	MechS32 ticks;
+	int32_t ticks;
 
 	seed = 0;
 	last = -1;
@@ -309,7 +309,7 @@ void StartPalettes(MechS32 p_dissolve)
 	g_settledPalette = 0x10;
 }
 
-MechS32 GetPaletteFadeSteps(void)
+int32_t GetPaletteFadeSteps(void)
 {
 	return g_paletteFadeSteps;
 }

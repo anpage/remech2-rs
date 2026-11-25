@@ -24,9 +24,9 @@
 // The largest coordinates of the three resolutions the art comes in.
 Point g_artResolutionSizes[3] = {{319, 199}, {639, 479}, {1023, 767}};
 
-MechS32 g_pixelAspect;
+int32_t g_pixelAspect;
 
-MechS32 g_artResolution;
+int32_t g_artResolution;
 
 // SetPixelAspect is implemented on the Rust side (src/sim/window.rs).
 
@@ -37,7 +37,7 @@ MechS32 g_artResolution;
 // the resolution.
 void SetRes(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 8; i++) {
 		ScaleRectFromLowRes(&g_panes[i], &g_panes[i]);

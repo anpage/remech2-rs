@@ -30,18 +30,18 @@ EasedValue g_jumpFuelBarLevel = {0, 0, 1};
 Point g_throttleGaugeSize = {0x1e7a, 0x8dc9};
 
 // The throttle gauge's frame: left, top, right and bottom.
-MechS32 g_throttleFrameLeft = 0;
+int32_t g_throttleFrameLeft = 0;
 
-MechS32 g_throttleFrameTop = 0;
+int32_t g_throttleFrameTop = 0;
 
-MechS32 g_throttleFrameRight = 0;
+int32_t g_throttleFrameRight = 0;
 
-MechS32 g_throttleFrameBottom = 0;
+int32_t g_throttleFrameBottom = 0;
 
 // The left of the throttle bar and the level of zero throttle.
-MechS32 g_throttleBarLeft = 0;
+int32_t g_throttleBarLeft = 0;
 
-MechS32 g_throttleZeroY = 0;
+int32_t g_throttleZeroY = 0;
 
 // The heat bar: its position and size.
 Point g_heatBarPosition = {0, 0x3333};
@@ -88,19 +88,19 @@ void ScaleBarGauges(void)
 // Draws the heat bar: a band from each end that meets in the middle as the heat rises.
 void DrawHeatBar(PANE* p_target)
 {
-	MechS32 heat;
-	MechS32 width;
-	MechS32 middle;
-	MechS32 level;
-	MechS32 middleX;
+	int32_t heat;
+	int32_t width;
+	int32_t middle;
+	int32_t level;
+	int32_t middleX;
 	Mech* mech;
-	MechS32 rightX;
-	MechS32 x;
-	MechS32 y;
-	MechS32 edge;
-	MechS32 height;
-	MechS32 target;
-	MechS32 color;
+	int32_t rightX;
+	int32_t x;
+	int32_t y;
+	int32_t edge;
+	int32_t height;
+	int32_t target;
+	int32_t color;
 
 	mech = g_players[g_localPlayerId]->m_mech;
 	heat = mech->m_heat;
@@ -139,10 +139,10 @@ void DrawHeatBar(PANE* p_target)
 // Draws the heat rate bar.
 void DrawHeatRateBar(PANE* p_target)
 {
-	MechS32 level;
-	MechS32 backColor;
-	MechS32 fill;
-	MechS32 fillColor;
+	int32_t level;
+	int32_t backColor;
+	int32_t fill;
+	int32_t fillColor;
 	Mech* mech;
 
 	mech = g_players[g_localPlayerId]->m_mech;
@@ -201,13 +201,13 @@ void DrawHeatRateBar(PANE* p_target)
 // Draws the throttle gauge: its frame and a bar up from zero, or down in reverse.
 void DrawThrottleGauge(PANE* p_target)
 {
-	MechS32 color;
+	int32_t color;
 	Mech* mech;
-	MechS32 width;
-	MechS32 height;
-	MechS32 x;
-	MechS32 y;
-	MechS32 value;
+	int32_t width;
+	int32_t height;
+	int32_t x;
+	int32_t y;
+	int32_t value;
 
 	mech = g_players[g_localPlayerId]->m_mech;
 	VFX_line_draw(p_target, g_throttleFrameLeft, g_throttleFrameTop, g_throttleFrameLeft, g_throttleFrameBottom, 0, 10);
@@ -263,7 +263,7 @@ void DrawThrottleGauge(PANE* p_target)
 // Draws the jump jet fuel bar.
 void DrawJumpFuelBar(PANE* p_target)
 {
-	MechS32 fill;
+	int32_t fill;
 	Mech* mech;
 
 	mech = g_players[g_localPlayerId]->m_mech;
@@ -295,14 +295,14 @@ void DrawJumpFuelBar(PANE* p_target)
 }
 
 // Draws a bar p_height up from (p_x, p_y), shaded darker towards its edges.
-void DrawVerticalBar(PANE* p_target, MechS32 p_x, MechS32 p_y, MechS32 p_width, MechS32 p_height, MechS32 p_color)
+void DrawVerticalBar(PANE* p_target, int32_t p_x, int32_t p_y, int32_t p_width, int32_t p_height, int32_t p_color)
 {
-	MechS32 half;
-	MechS32 dark;
-	MechS32 end;
-	MechS32 darker;
-	MechS32 top;
-	MechS32 i;
+	int32_t half;
+	int32_t dark;
+	int32_t end;
+	int32_t darker;
+	int32_t top;
+	int32_t i;
 
 	half = p_width / 2;
 	end = half / 2;
@@ -332,14 +332,14 @@ void DrawVerticalBar(PANE* p_target, MechS32 p_x, MechS32 p_y, MechS32 p_width, 
 }
 
 // Draws a bar p_width across from (p_x, p_y), shaded darker towards its edges.
-void DrawHorizontalBar(PANE* p_target, MechS32 p_x, MechS32 p_y, MechS32 p_width, MechS32 p_height, MechS32 p_color)
+void DrawHorizontalBar(PANE* p_target, int32_t p_x, int32_t p_y, int32_t p_width, int32_t p_height, int32_t p_color)
 {
-	MechS32 half;
-	MechS32 dark;
-	MechS32 end;
-	MechS32 darker;
-	MechS32 right;
-	MechS32 i;
+	int32_t half;
+	int32_t dark;
+	int32_t end;
+	int32_t darker;
+	int32_t right;
+	int32_t i;
 
 	half = p_height / 2;
 	end = half / 2;

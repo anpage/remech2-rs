@@ -9,12 +9,12 @@
 // Whether the game is paused: ToggleFullScreen then leaves the timer paused, and
 // AdjustWindowSize shows the cursor in a window and hides it full screen. The simulator's copy of
 // the refresh mode code reads its pause flag here (g_simPaused); the shell never sets it.
-MechS32 g_paused = 0;
+int32_t g_paused = 0;
 
-MechS32 g_menuDialogOpen = 0;
+int32_t g_menuDialogOpen = 0;
 
 MechHeap* g_primaryHeap = NULL;
 
-MechS32 g_windowHeight;
+int32_t g_windowHeight;
 
-MechS32 g_windowWidth;
+int32_t g_windowWidth;

@@ -33,31 +33,31 @@
 #include <stdio.h>
 
 // A game-key toggle (GetSystemSetting's setting 0x3c).
-MechS32 g_autoEject = 0;
+int32_t g_autoEject = 0;
 
 // The armor per damage level of other players' sections (the local player's: g_localArmorPerLevel).
-MechS32 g_otherArmorPerLevel = 4;
+int32_t g_otherArmorPerLevel = 4;
 
-MechS32 g_localArmorPerLevel = 4;
+int32_t g_localArmorPerLevel = 4;
 
-MechS32 g_localMechHidden = 0;
+int32_t g_localMechHidden = 0;
 
 // The kill count the cockpit shows in a network game.
-MechS32 g_killCount = 0;
+int32_t g_killCount = 0;
 
 // Set while the local player has been warned of critical heat (CalculateHeat).
-MechS32 g_criticalHeatWarned = 0;
+int32_t g_criticalHeatWarned = 0;
 
 // When the warning was given.
-MechS32 g_criticalHeatWarningTime;
+int32_t g_criticalHeatWarningTime;
 
 // Runs the autopilot (m_autopilot): mode 1 follows the nav points in order, skipping the ones
 // already reached and marking each one it reaches (turning off after the last); then the AI
 // steers, the throttle saved while AvoidObstacles has it.
 void RunAutopilot(Mech* p_mech)
 {
-	MechS32 index;
-	MechS32 first;
+	int32_t index;
+	int32_t first;
 
 	if (p_mech->m_autopilot == 0) {
 		return;
@@ -120,7 +120,7 @@ void RunAutopilot(Mech* p_mech)
 // which the autopilot steers by) to where the torso faces, unless the autopilot is on.
 void PunchInAutoHeading(Mech* p_mech)
 {
-	MechS32 heading;
+	int32_t heading;
 
 	if (p_mech->m_autopilot == 1) {
 		return;
@@ -132,12 +132,12 @@ void PunchInAutoHeading(Mech* p_mech)
 
 // Destroys p_mech on behalf of player p_killer, unless g_mechPoweredUp is clear: an intact
 // section holding an ammunition bin with ammunition left blows up first (DestroyCriticalSlot) instead.
-void DestroyMech(MechS32 p_killer, Mech* p_mech)
+void DestroyMech(int32_t p_killer, Mech* p_mech)
 {
 	WeaponSlot* weapon;
-	MechS32 i;
-	MechS32 j;
-	MechS32 k;
+	int32_t i;
+	int32_t j;
+	int32_t k;
 	MechSection* section;
 	AmmoBin* bin;
 
@@ -184,10 +184,10 @@ void DestroyMech(MechS32 p_killer, Mech* p_mech)
 // 25 seconds; the local player hears the warnings. Cooling below 65 ends the shutdown.
 void CalculateHeat(Mech* p_mech)
 {
-	MechS32 delta;
-	MechS32 cooling;
-	MechS32 heat;
-	MechS32 shift;
+	int32_t delta;
+	int32_t cooling;
+	int32_t heat;
+	int32_t shift;
 
 	shift = 0;
 	if ((p_mech->m_player->m_flags & 2) || (p_mech->m_player->m_flags & 4)) {
@@ -279,10 +279,10 @@ void CalculateHeat(Mech* p_mech)
 }
 
 // Destroys p_mech, on behalf of player p_killer (-2: its player left the game).
-void KillMech(MechS32 p_killer, Mech* p_mech)
+void KillMech(int32_t p_killer, Mech* p_mech)
 {
-	MechS32 leader;
-	MechChar text[80];
+	int32_t leader;
+	char text[80];
 
 	if (p_mech->m_player->m_index == g_localPlayerId && g_difficulty->m_invulnerable) {
 		return;
@@ -444,11 +444,11 @@ void KillMech(MechS32 p_killer, Mech* p_mech)
 }
 
 // Calls DestroyCriticalSlot once for each of section p_section's m_slotCount.
-void DestroySectionSlots(MechS32 p_attacker, Mech* p_mech, MechU32 p_section)
+void DestroySectionSlots(int32_t p_attacker, Mech* p_mech, uint32_t p_section)
 {
-	MechS32 i;
+	int32_t i;
 	MechSection* section;
-	MechS32 count;
+	int32_t count;
 
 	section = p_mech->m_sections + p_section - 1;
 	count = section->m_slotCount;
@@ -460,7 +460,7 @@ void DestroySectionSlots(MechS32 p_attacker, Mech* p_mech, MechU32 p_section)
 // Destroys section p_section of p_mech, on behalf of player p_attacker.
 // Destroying section 3 takes sections 1, 2 and 4 to 6 with it; section 2 takes 5, and 4 takes 6.
 // Of sections 7 and 8, the first to go only marks the mech (0x20); the second destroys 1 and 3.
-void DestroySection(MechS32 p_attacker, Mech* p_mech, MechU32 p_section)
+void DestroySection(int32_t p_attacker, Mech* p_mech, uint32_t p_section)
 {
 	MechSection* section;
 
@@ -523,19 +523,19 @@ void DestroySection(MechS32 p_attacker, Mech* p_mech, MechU32 p_section)
 // 10000) explodes with its shots, damaging the section, and the equipment loses its function (the
 // jump jets, the heat sinks, the engine, the gyro...). The local player hears which, unless
 // p_recursing; 8000 and 9000 hit another, random slot instead.
-void DestroyCriticalSlot(MechS32 p_attacker, Mech* p_mech, MechU32 p_section, MechS32 p_slot, MechS32 p_recursing)
+void DestroyCriticalSlot(int32_t p_attacker, Mech* p_mech, uint32_t p_section, int32_t p_slot, int32_t p_recursing)
 {
-	MechS32 id;
+	int32_t id;
 	WeaponSlot* weapon;
-	MechS32 x;
-	MechS32 y;
-	MechS32 i;
-	MechS32 z;
+	int32_t x;
+	int32_t y;
+	int32_t i;
+	int32_t z;
 	struct SceneObject* obj;
-	MechS32 kind;
+	int32_t kind;
 	MechSection* section;
 	AmmoBin* bin;
-	MechS32 damage;
+	int32_t damage;
 
 	section = p_mech->m_sections + p_section - 1;
 	if (!section) {
@@ -888,14 +888,14 @@ void DestroyCriticalSlot(MechS32 p_attacker, Mech* p_mech, MechU32 p_section, Me
 // which may destroy the section or hit its critical slots. Section 3 stands for a random one of
 // 2 to 4. The local player takes none while invulnerable, and in a network game each machine
 // only damages its own mech.
-void ApplyDamageToMech(MechS32 p_attacker, Mech* p_mech, MechS32 p_damage, MechS32 p_section)
+void ApplyDamageToMech(int32_t p_attacker, Mech* p_mech, int32_t p_damage, int32_t p_section)
 {
-	MechS32 side;
-	MechU32 levels;
-	MechS32 rear;
-	MechS32 i;
-	MechS32 level;
-	MechS32 roll;
+	int32_t side;
+	uint32_t levels;
+	int32_t rear;
+	int32_t i;
+	int32_t level;
+	int32_t roll;
 	MechSection* section;
 
 	side = 0;
@@ -989,11 +989,11 @@ void ApplyDamageToMech(MechS32 p_attacker, Mech* p_mech, MechS32 p_damage, MechS
 	if (levels) {
 		if (p_mech->m_player->m_index == g_localPlayerId) {
 			level = 15 - ((section->m_internal + section->m_armor[side] / g_localArmorPerLevel) * 3) /
-							 (MechS32) (levels << 16);
+							 (int32_t) (levels << 16);
 		}
 		else {
 			level = 15 - ((section->m_internal + section->m_armor[side] / g_otherArmorPerLevel) * 3) /
-							 (MechS32) (levels << 16);
+							 (int32_t) (levels << 16);
 		}
 	}
 
@@ -1002,7 +1002,7 @@ void ApplyDamageToMech(MechS32 p_attacker, Mech* p_mech, MechS32 p_damage, MechS
 
 // Ejects from p_mech, unless it is already shutting down or ejecting: the local player (p_eject)
 // ejects with a sound, or hears that the ejection system is disabled, and the mech is destroyed.
-void EjectPlayer(Mech* p_mech, MechS32 p_eject)
+void EjectPlayer(Mech* p_mech, int32_t p_eject)
 {
 	if (p_mech->m_powerState == 4 || p_mech->m_powerState == 5) {
 		return;

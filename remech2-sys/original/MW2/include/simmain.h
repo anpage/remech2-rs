@@ -20,19 +20,19 @@ extern "C"
 	extern MissionReport* g_missionReport;
 	extern struct DifficultyCfg* g_difficulty;
 	extern struct TimedCallback* g_detachedTasks;
-	extern MechS32 g_shouldQuit;
-	extern MechS32 g_goLaunch;
-	extern MechS32 g_quitStage;
-	extern MechS32 g_localPlayerId;
-	extern MechS32 g_startOnAutopilot;
+	extern int32_t g_shouldQuit;
+	extern int32_t g_goLaunch;
+	extern int32_t g_quitStage;
+	extern int32_t g_localPlayerId;
+	extern int32_t g_startOnAutopilot;
 	extern MechHeap* g_primaryHeap;
-	extern MechS32 g_gameWindowWidth;
-	extern MechS32 g_gameWindowHeight;
-	extern MechS32 g_simPaused;
-	extern MechS32 g_pauseRequested;
-	extern MechS32 g_mouseOutsideClientWindow;
-	extern MechS32 g_remoteWaitTime;
-	extern MechS32 g_drawModeReady;
+	extern int32_t g_gameWindowWidth;
+	extern int32_t g_gameWindowHeight;
+	extern int32_t g_simPaused;
+	extern int32_t g_pauseRequested;
+	extern int32_t g_mouseOutsideClientWindow;
+	extern int32_t g_remoteWaitTime;
+	extern int32_t g_drawModeReady;
 
 	int SimMain(
 		char* p_cmdLine,

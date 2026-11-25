@@ -10,29 +10,29 @@ extern "C"
 
 	// Volumes as fixed point numbers, 0 to 0x10000
 	typedef struct SoundSettings {
-		MechS32 m_effectsVolume;
-		MechS32 m_voiceVolume;
-		MechS32 m_musicVolume;
+		int32_t m_effectsVolume;
+		int32_t m_voiceVolume;
+		int32_t m_musicVolume;
 	} SoundSettings;
 
 	// Each 0 or 1, except m_brightness (0-15)
 	typedef struct DisplaySettings {
-		MechS32 m_objectTextmaps;
-		MechS32 m_terrainTextmaps;
-		MechS32 m_highDetail;
-		MechS32 m_highObjectDensity;
-		MechS32 m_explosionChunks;
-		MechS32 m_brightness;
+		int32_t m_objectTextmaps;
+		int32_t m_terrainTextmaps;
+		int32_t m_highDetail;
+		int32_t m_highObjectDensity;
+		int32_t m_explosionChunks;
+		int32_t m_brightness;
 	} DisplaySettings;
 
 	// Each 0 or 1, except m_enemySkill: 0 easy, 1 medium, 2 hard
 	typedef struct DifficultySettings {
-		MechU8 m_unlimitedAmmo;
-		MechU8 m_invulnerable;
-		MechU8 m_splashDamage;
-		MechU8 m_collisionDamage;
-		MechU8 m_heatTracking;
-		MechU8 m_enemySkill;
+		uint8_t m_unlimitedAmmo;
+		uint8_t m_invulnerable;
+		uint8_t m_splashDamage;
+		uint8_t m_collisionDamage;
+		uint8_t m_heatTracking;
+		uint8_t m_enemySkill;
 	} DifficultySettings;
 
 	// The settings in remech2.toml, implemented on the Rust side (src/settings.rs)

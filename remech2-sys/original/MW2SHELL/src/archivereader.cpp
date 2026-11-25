@@ -36,27 +36,27 @@ size_t g_archiveReturnMessage = 0;
 AudioSample* g_archiveSound = NULL;
 
 // The text of the entry being loaded.
-MechChar g_archiveText[0x10000];
+char g_archiveText[0x10000];
 
 // The entry's title, the topic link names and the text line being read.
-MechChar g_archiveTitle[0x200];
+char g_archiveTitle[0x200];
 
-MechChar g_archiveTopicName[0x200];
+char g_archiveTopicName[0x200];
 
 // The link buttons of PrevPage and NextPage.
 MainMenuButton g_prevPageLinkButton;
 
 MainMenuButton g_nextPageLinkButton;
 
-MechChar g_archiveLine[0x400];
+char g_archiveLine[0x400];
 
-void ArchiveCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg);
+void ArchiveCallback(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t p_msg);
 
 // Opens the clan hall archive of a campaign.
-void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam)
+void DrawArchive(TMPackDataBase* p_database, int32_t p_campaign, size_t p_wParam)
 {
 	void* audioData;
-	MechS32 audioSize;
+	int32_t audioSize;
 
 	g_videoDriver->LoadBackground(p_database, g_archiveScreens[p_campaign].m_picture);
 	p_database->GetDBItem(103, &audioData, &audioSize);
@@ -78,7 +78,7 @@ void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam
 	RegisterScreenFunction(ArchiveCallback);
 }
 
-void ArchiveCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg)
+void ArchiveCallback(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t p_msg)
 {
 	if (p_msg == c_msgScreenFrame) {
 		p_msg = g_archiveReader->Run();
@@ -103,7 +103,7 @@ void ArchiveCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg)
 	}
 }
 
-void ArchiveReader::AddTopic(MechS16 p_entry, MechS32 p_index)
+void ArchiveReader::AddTopic(int16_t p_entry, int32_t p_index)
 {
 	Topic* topic = NULL;
 
@@ -144,7 +144,7 @@ void ArchiveReader::PrevPage()
 	Page* page = NULL;
 	Page::Link* link = NULL;
 	MainMenuButton* button = &g_prevPageLinkButton;
-	MechS32 i;
+	int32_t i;
 
 	button->m_textPos.x = 0;
 	button->m_textPos.y = 0;
@@ -198,7 +198,7 @@ void ArchiveReader::NextPage()
 {
 	Page* page = NULL;
 	MainMenuButton* button = &g_nextPageLinkButton;
-	MechS32 i;
+	int32_t i;
 	Page::Link* link;
 
 	button->m_textPos.x = 0;
@@ -240,11 +240,11 @@ void ArchiveReader::NextPage()
 }
 
 // Follows a topic link: opens its entry in a child reader.
-void ArchiveReader::OpenTopic(MechS32 p_id)
+void ArchiveReader::OpenTopic(int32_t p_id)
 {
 	Page* page = NULL;
 	Topic* topic = NULL;
-	MechS32 i;
+	int32_t i;
 
 	page = (Page*) CollectionGet(m_pages, m_page);
 	page->Hide();
@@ -269,10 +269,10 @@ void ArchiveReader::OpenTopic(MechS32 p_id)
 }
 
 // Returns c_msgArchive while the reader stays open.
-MechS32 ArchiveReader::Run()
+int32_t ArchiveReader::Run()
 {
-	MechS32 result;
-	MechS32 button;
+	int32_t result;
+	int32_t button;
 
 	if (m_child) {
 		result = m_child->Run();
@@ -358,24 +358,24 @@ MechS32 ArchiveReader::Run()
 
 // Reads an archive entry: a title command, then text, picture and topic commands up to the end
 // command. The text is laid out into as many pages as it needs.
-void ArchiveReader::Load(MechS32 p_entry)
+void ArchiveReader::Load(int32_t p_entry)
 {
 	Page* page;
 	void* data;
-	MechU8 soundStarted;
-	MechS32 topics;
-	MechS32 length;
-	MechS32 offset;
-	MechS16 command;
-	MechS32 result;
-	MechU8 picture;
-	MechU8 unk0x2c;
-	MechS16 topicEntry;
-	MechS32 size;
-	MechChar* text;
-	MechChar* rest;
-	MechS32 i;
-	MechU32 wordLength;
+	uint8_t soundStarted;
+	int32_t topics;
+	int32_t length;
+	int32_t offset;
+	int16_t command;
+	int32_t result;
+	uint8_t picture;
+	uint8_t unk0x2c;
+	int16_t topicEntry;
+	int32_t size;
+	char* text;
+	char* rest;
+	int32_t i;
+	uint32_t wordLength;
 
 	page = NULL;
 	data = NULL;
@@ -403,7 +403,7 @@ void ArchiveReader::Load(MechS32 p_entry)
 	}
 
 	result = m_database->ReadDBItemString(p_entry, offset, g_archiveTitle);
-	offset += (MechS32) strlen(g_archiveTitle) + 1;
+	offset += (int32_t) strlen(g_archiveTitle) + 1;
 	strcpy(m_title, "~");
 	strcat(m_title, g_archiveTitle);
 
@@ -463,7 +463,7 @@ void ArchiveReader::Load(MechS32 p_entry)
 			result = m_database->ReadDBItemData(p_entry, offset, &topicEntry, 2);
 			offset += 2;
 			result = m_database->ReadDBItemString(p_entry, offset, g_archiveTopicName);
-			offset += (MechS32) strlen(g_archiveTopicName) + 1;
+			offset += (int32_t) strlen(g_archiveTopicName) + 1;
 			AddTopic(topicEntry, topics++);
 			break;
 		case 0x300:
@@ -491,17 +491,17 @@ void ArchiveReader::Load(MechS32 p_entry)
 }
 
 ArchiveReader::ArchiveReader(
-	MechChar* p_name,
+	char* p_name,
 	Font* p_font,
-	MechS32 p_entry,
-	MechU8 p_ownsDatabase,
+	int32_t p_entry,
+	uint8_t p_ownsDatabase,
 	TMPackDataBase* p_database,
 	Collection* p_pages,
 	MainMenuButton* p_buttons,
-	MechS32 p_count
+	int32_t p_count
 )
 {
-	MechS32 i;
+	int32_t i;
 
 	m_font = p_font;
 	m_titleGlyph = NULL;
@@ -549,7 +549,7 @@ ArchiveReader::ArchiveReader(
 
 ArchiveReader::~ArchiveReader()
 {
-	MechS32 i;
+	int32_t i;
 	Page* page;
 
 	if (m_child) {

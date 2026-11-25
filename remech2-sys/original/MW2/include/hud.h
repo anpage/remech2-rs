@@ -13,66 +13,66 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_altimeterMarkWidth;
-	extern MechS32 g_altimeterMarkHeight;
+	extern int32_t g_altimeterMarkWidth;
+	extern int32_t g_altimeterMarkHeight;
 	extern Point g_altimeterOrigin;
 	extern Point g_compassOrigin;
 	extern Point g_hudGaugePositions[6];
 	extern undefined4 g_showHud;
-	extern MechS32 g_showCrosshair;
-	extern MechS32 g_showTargetMarker;
-	extern MechS32 g_showCompass;
-	extern MechS32 g_showAltimeter;
-	extern MechS32 g_compassArrowWidth;
-	extern MechS32 g_compassArrowHeight;
-	extern MechS32 g_compassSideArrowWidth;
-	extern MechS32 g_compassSideArrowHeight;
-	extern MechS32 g_altimeterGroundX;
-	extern MechS32 g_altimeterTargetX;
-	extern MechS32 g_altimeterScale;
-	extern MechS32 g_compassScale;
-	extern MechS32 g_compassTapeAbove;
-	extern MechS32 g_altimeterLevelX;
-	extern MechS32 g_compassTapeBelow;
+	extern int32_t g_showCrosshair;
+	extern int32_t g_showTargetMarker;
+	extern int32_t g_showCompass;
+	extern int32_t g_showAltimeter;
+	extern int32_t g_compassArrowWidth;
+	extern int32_t g_compassArrowHeight;
+	extern int32_t g_compassSideArrowWidth;
+	extern int32_t g_compassSideArrowHeight;
+	extern int32_t g_altimeterGroundX;
+	extern int32_t g_altimeterTargetX;
+	extern int32_t g_altimeterScale;
+	extern int32_t g_compassScale;
+	extern int32_t g_compassTapeAbove;
+	extern int32_t g_altimeterLevelX;
+	extern int32_t g_compassTapeBelow;
 	void DrawHudAt(
 		Mech* p_mech,
-		MechS32 p_heading,
-		MechS32 p_twist,
-		MechS32 p_bearing,
-		MechS32 p_twistBearing,
-		MechS32 p_pitch,
-		MechS32 p_distance
+		int32_t p_heading,
+		int32_t p_twist,
+		int32_t p_bearing,
+		int32_t p_twistBearing,
+		int32_t p_pitch,
+		int32_t p_distance
 	);
 	void DrawHud(
 		Mech* p_mech,
-		MechS32 p_heading,
-		MechS32 p_twist,
-		MechS32 p_bearing,
-		MechS32 p_twistBearing,
-		MechS32 p_pitch,
-		MechS32 p_distance,
-		MechS32 p_drawCrosshair
+		int32_t p_heading,
+		int32_t p_twist,
+		int32_t p_bearing,
+		int32_t p_twistBearing,
+		int32_t p_pitch,
+		int32_t p_distance,
+		int32_t p_drawCrosshair
 	);
-	void DrawAltimeter(Mech* p_mech, MechS32 p_x, MechS32 p_y);
+	void DrawAltimeter(Mech* p_mech, int32_t p_x, int32_t p_y);
 	void InitHudGauges(void);
 	Point* GetHudGaugePositions(void);
-	MechS32 DrawCrosshair(Mech* p_mech, MechS32 p_bearing, MechS32 p_pitch, MechS32 p_distance);
+	int32_t DrawCrosshair(Mech* p_mech, int32_t p_bearing, int32_t p_pitch, int32_t p_distance);
 	void DrawTargetMarker(Mech* p_mech);
 	void DrawCompassMarkers(
 		Mech* p_mech,
-		MechS32 p_x,
-		MechS32 p_y,
-		MechS32 p_bearing,
-		MechS32 p_twistBearing,
-		MechS32 p_pitch
+		int32_t p_x,
+		int32_t p_y,
+		int32_t p_bearing,
+		int32_t p_twistBearing,
+		int32_t p_pitch
 	);
-	void DrawCompass(MechS32 p_x, MechS32 p_y, MechS32 p_heading, MechS32 p_twist);
-	MechS32 ProjectAimPoint(Mech* p_mech, MechS32* p_x, MechS32* p_y);
-	void DrawPlayerBrackets(struct Player* p_player, MechS32 p_side);
-	void DrawObjectBrackets(struct SceneObject* p_object, MechS32 p_side);
-	void DrawHudShape(MechS32 p_x, MechS32 p_y, MechS32 p_id);
-	void DrawPaneShape(MechS32 p_x, MechS32 p_y, MechS32 p_id, PANE* p_target);
-	void DrawShapeOverPane(MechS32 p_x, MechS32 p_y, MechS32 p_id, PANE* p_target);
+	void DrawCompass(int32_t p_x, int32_t p_y, int32_t p_heading, int32_t p_twist);
+	int32_t ProjectAimPoint(Mech* p_mech, int32_t* p_x, int32_t* p_y);
+	void DrawPlayerBrackets(struct Player* p_player, int32_t p_side);
+	void DrawObjectBrackets(struct SceneObject* p_object, int32_t p_side);
+	void DrawHudShape(int32_t p_x, int32_t p_y, int32_t p_id);
+	void DrawPaneShape(int32_t p_x, int32_t p_y, int32_t p_id, PANE* p_target);
+	void DrawShapeOverPane(int32_t p_x, int32_t p_y, int32_t p_id, PANE* p_target);
 
 #ifdef __cplusplus
 }

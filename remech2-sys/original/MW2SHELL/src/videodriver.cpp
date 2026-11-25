@@ -16,25 +16,25 @@
 // Only the height field of the font data header is used by the text drawing wrappers.
 struct VideoFontHeader {
 	undefined m_unk0x00[8]; // 0x00
-	MechS32 m_height;       // 0x08
+	int32_t m_height;       // 0x08
 };
 
 // Set while RedrawGlyphs runs: text outside the dirty rectangle is skipped.
-MechS32 g_redrawingGlyphs = 0;
+int32_t g_redrawingGlyphs = 0;
 
 // Set by LoadPalette: DrawShell loads the new palette between two flips of a black one.
-MechS32 g_clearPaletteOnDraw = 0;
+int32_t g_clearPaletteOnDraw = 0;
 
 // The black palette of ClearPalette, and LoadBackground's picture palette.
 PaletteColor g_tempPalette[0x100];
 
 // The text colors when a glyph has none: each color maps to itself, but 0 is transparent.
-MechU8 g_defaultColorMap[0x100];
+uint8_t g_defaultColorMap[0x100];
 
 // 0 once the framebuffer can be drawn to.
 #define ACQUIRE_FRAMEBUFFER() (g_currentDisplayBackend->m_acquireFramebuffer())
 
-void QuitWithVDriverError(MechS32 p_code)
+void QuitWithVDriverError(int32_t p_code)
 {
 	ShutdownRefreshMode();
 
@@ -55,7 +55,7 @@ void ClearPalette()
 
 VideoDriver::VideoDriver()
 {
-	MechS32 i;
+	int32_t i;
 
 	if (!InitRefreshMode(5, 0, &m_screenBuffer, g_windowWidth, g_windowHeight, 1)) {
 		QuitWithVDriverError(1);
@@ -109,7 +109,7 @@ VideoDriver::~VideoDriver()
 	ShutdownRefreshMode();
 }
 
-void VideoDriver::ExpandRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom)
+void VideoDriver::ExpandRect(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom)
 {
 	if (p_left < m_dirtyView.m_x0) {
 		m_dirtyView.m_x0 = p_left;
@@ -125,10 +125,10 @@ void VideoDriver::ExpandRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, Mec
 	}
 }
 
-void VideoDriver::ExpandRectBySize(MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
+void VideoDriver::ExpandRectBySize(int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height)
 {
-	MechS32 right = p_left + p_width - 1;
-	MechS32 bottom = p_top + p_height - 1;
+	int32_t right = p_left + p_width - 1;
+	int32_t bottom = p_top + p_height - 1;
 
 	if (p_left < m_dirtyView.m_x0) {
 		m_dirtyView.m_x0 = p_left;
@@ -144,7 +144,7 @@ void VideoDriver::ExpandRectBySize(MechS32 p_left, MechS32 p_top, MechS32 p_widt
 	}
 }
 
-MechS32 VideoDriver::IntersectsRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom)
+int32_t VideoDriver::IntersectsRect(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom)
 {
 	if (p_left > m_dirtyView.m_x1 || p_right < m_dirtyView.m_x0 || p_top > m_dirtyView.m_y1 ||
 		p_bottom < m_dirtyView.m_y0) {
@@ -155,10 +155,10 @@ MechS32 VideoDriver::IntersectsRect(MechS32 p_left, MechS32 p_top, MechS32 p_rig
 	}
 }
 
-MechS32 VideoDriver::IntersectsRectBySize(MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
+int32_t VideoDriver::IntersectsRectBySize(int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height)
 {
-	MechS32 right = p_left + p_width - 1;
-	MechS32 bottom = p_top + p_height - 1;
+	int32_t right = p_left + p_width - 1;
+	int32_t bottom = p_top + p_height - 1;
 
 	if (p_left > m_dirtyView.m_x1 || right < m_dirtyView.m_x0 || p_top > m_dirtyView.m_y1 ||
 		bottom < m_dirtyView.m_y0) {
@@ -279,7 +279,7 @@ void VideoDriver::SetPalette(PaletteColor* p_palette, undefined4 p_allColors)
 	m_allColors = p_allColors;
 }
 
-void VideoDriver::ReadPictureSize(MechS32* p_maxX, MechS32* p_maxY, undefined* p_data, MechS32 p_size, MechS32 p_type)
+void VideoDriver::ReadPictureSize(int32_t* p_maxX, int32_t* p_maxY, undefined* p_data, int32_t p_size, int32_t p_type)
 {
 	switch (p_type) {
 	case 2:
@@ -294,9 +294,9 @@ void VideoDriver::ReadPictureSize(MechS32* p_maxX, MechS32* p_maxY, undefined* p
 	*p_maxY = (m_pictureSize & 0xffff) - 1;
 }
 
-void VideoDriver::LoadBackground(TMPackDataBase* p_database, MechS32 p_id)
+void VideoDriver::LoadBackground(TMPackDataBase* p_database, int32_t p_id)
 {
-	MechS32 size;
+	int32_t size;
 	undefined* data;
 
 	if (p_database->GetDBItemLZ(p_id, (void**) &data, &size)) {
@@ -324,7 +324,7 @@ void VideoDriver::LoadBackground(TMPackDataBase* p_database, MechS32 p_id)
 	MechHeapFree(g_primaryHeap, data);
 }
 
-void VideoDriver::DrawPicture(undefined* p_data, MechS32 p_type, PANE* p_view)
+void VideoDriver::DrawPicture(undefined* p_data, int32_t p_type, PANE* p_view)
 {
 	switch (p_type) {
 	case 2:
@@ -339,7 +339,7 @@ void VideoDriver::DrawPicture(undefined* p_data, MechS32 p_type, PANE* p_view)
 	ExpandRect(m_screenView.m_x0, m_screenView.m_y0, m_screenView.m_x1, m_screenView.m_y1);
 }
 
-void VideoDriver::DrawLine(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom, MechS32 p_color)
+void VideoDriver::DrawLine(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom, int32_t p_color)
 {
 	if (ACQUIRE_FRAMEBUFFER() == 0) {
 		VFX_line_draw(&m_screenView, p_left, p_top, p_right, p_bottom, 0, p_color);
@@ -349,7 +349,7 @@ void VideoDriver::DrawLine(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS
 }
 
 // Draws a block of pixels (a video's frame) to the screen.
-void VideoDriver::DrawPixels(undefined* p_pixels, MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
+void VideoDriver::DrawPixels(undefined* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height)
 {
 	PANE view;
 	WINDOW buffer;
@@ -371,10 +371,10 @@ void VideoDriver::DrawPixels(undefined* p_pixels, MechS32 p_left, MechS32 p_top,
 // DrawPixels, skipped unless the block meets the dirty rectangle.
 void VideoDriver::DrawPixelsClipped(
 	undefined* p_pixels,
-	MechS32 p_left,
-	MechS32 p_top,
-	MechS32 p_width,
-	MechS32 p_height
+	int32_t p_left,
+	int32_t p_top,
+	int32_t p_width,
+	int32_t p_height
 )
 {
 	PANE view;
@@ -398,7 +398,7 @@ void VideoDriver::DrawPixelsClipped(
 	ExpandRectBySize(p_left, p_top, p_width, p_height);
 }
 
-void VideoDriver::ReadPixels(undefined* p_pixels, MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
+void VideoDriver::ReadPixels(undefined* p_pixels, int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height)
 {
 	PANE view;
 	WINDOW buffer;
@@ -415,7 +415,7 @@ void VideoDriver::ReadPixels(undefined* p_pixels, MechS32 p_left, MechS32 p_top,
 	}
 }
 
-void VideoDriver::RestoreBackground(MechS32 p_left, MechS32 p_top, MechS32 p_width, MechS32 p_height)
+void VideoDriver::RestoreBackground(int32_t p_left, int32_t p_top, int32_t p_width, int32_t p_height)
 {
 	PANE view;
 
@@ -442,9 +442,9 @@ void VideoDriver::CopyBackgroundToScreen()
 	VFX_pane_copy(&m_backView, 0, 0, &m_screenView, 0, 0, -1);
 }
 
-void VideoDriver::LoadPalette(MechS32 p_id)
+void VideoDriver::LoadPalette(int32_t p_id)
 {
-	MechS32 size;
+	int32_t size;
 	undefined* data;
 
 	if (g_mw2Database->GetDBItemLZ(p_id, (void**) &data, &size)) {
@@ -468,10 +468,10 @@ void VideoDriver::LoadPalette(MechS32 p_id)
 void VideoDriver::DrawShpFrame(
 	void* p_shp,
 	undefined4 p_frame,
-	MechS32 p_left,
-	MechS32 p_top,
-	MechS32 p_width,
-	MechS32 p_height
+	int32_t p_left,
+	int32_t p_top,
+	int32_t p_width,
+	int32_t p_height
 )
 {
 	if (ACQUIRE_FRAMEBUFFER() == 0) {
@@ -485,10 +485,10 @@ void VideoDriver::DrawShpFrame(
 void VideoDriver::DrawShpFrameClipped(
 	void* p_shp,
 	undefined4 p_frame,
-	MechS32 p_left,
-	MechS32 p_top,
-	MechS32 p_width,
-	MechS32 p_height
+	int32_t p_left,
+	int32_t p_top,
+	int32_t p_width,
+	int32_t p_height
 )
 {
 	if (!IntersectsRectBySize(p_left, p_top, p_width, p_height)) {
@@ -502,11 +502,11 @@ void VideoDriver::DrawShpFrameClipped(
 	ExpandRectBySize(p_left, p_top, p_width, p_height);
 }
 
-MechS32 VideoDriver::DrawString(MechS32 p_left, MechS32 p_top, void* p_font, MechChar* p_text, undefined* p_colorMap)
+int32_t VideoDriver::DrawString(int32_t p_left, int32_t p_top, void* p_font, char* p_text, undefined* p_colorMap)
 {
-	MechChar* cursor;
-	MechS32 width;
-	MechS32 acquired;
+	char* cursor;
+	int32_t width;
+	int32_t acquired;
 
 	if (p_text == NULL) {
 		return 0;
@@ -538,10 +538,10 @@ MechS32 VideoDriver::DrawString(MechS32 p_left, MechS32 p_top, void* p_font, Mec
 	return width;
 }
 
-MechS32 VideoDriver::DrawChar(MechS32 p_left, MechS32 p_top, void* p_font, MechChar p_char, undefined* p_colorMap)
+int32_t VideoDriver::DrawChar(int32_t p_left, int32_t p_top, void* p_font, char p_char, undefined* p_colorMap)
 {
-	MechS32 width;
-	MechS32 acquired;
+	int32_t width;
+	int32_t acquired;
 
 	width = VFX_character_width(p_font, p_char);
 	if (g_redrawingGlyphs && !IntersectsRectBySize(p_left, p_top, width, ((VideoFontHeader*) p_font)->m_height)) {
@@ -561,7 +561,7 @@ MechS32 VideoDriver::DrawChar(MechS32 p_left, MechS32 p_top, void* p_font, MechC
 	return width;
 }
 
-void VideoDriver::AddGlyph(TextGlyph* p_item, MechS32 p_overlay)
+void VideoDriver::AddGlyph(TextGlyph* p_item, int32_t p_overlay)
 {
 	if (p_overlay) {
 		m_overlayGlyphs->Add(p_item);
@@ -577,7 +577,7 @@ void VideoDriver::RemoveGlyph(TextGlyph* p_item)
 	m_glyphs->Remove(p_item);
 }
 
-void VideoDriver::RedrawGlyphs(MechS32 p_overlay)
+void VideoDriver::RedrawGlyphs(int32_t p_overlay)
 {
 	g_redrawingGlyphs = 1;
 
@@ -591,7 +591,7 @@ void VideoDriver::RedrawGlyphs(MechS32 p_overlay)
 	g_redrawingGlyphs = 0;
 }
 
-void VideoDriver::ClearGlyphs(MechU8 p_delete)
+void VideoDriver::ClearGlyphs(uint8_t p_delete)
 {
 	m_overlayGlyphs->Clear(p_delete);
 	m_glyphs->Clear(p_delete);

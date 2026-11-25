@@ -22,7 +22,7 @@
 #include <string.h>
 
 // The player whose mech ReloadPlayerMech is reloading, or -1.
-MechS32 g_reloadingPlayer = -1;
+int32_t g_reloadingPlayer = -1;
 
 RememberedMech g_rememberedMechs[60] = {0};
 
@@ -30,10 +30,10 @@ MechSegment* g_mechSegments[60] = {NULL};
 
 // Reloads player p_player's mech as it was remembered. Without p_force, only a player with
 // flag 2 set. The original was declared without a prototype, and two callers passed two more zeros.
-MechS32 ReloadPlayerMech(MechS32 p_player, MechS32 p_force)
+int32_t ReloadPlayerMech(int32_t p_player, int32_t p_force)
 {
 	Mech* mech;
-	MechS16 flags;
+	int16_t flags;
 
 	mech = NULL;
 	if (p_player >= 0 && p_player < 60) {
@@ -106,9 +106,9 @@ MechS32 ReloadPlayerMech(MechS32 p_player, MechS32 p_force)
 	return 1;
 }
 
-void RememberLoadMech(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p_config)
+void RememberLoadMech(Mech* p_mech, char* p_name, int32_t p_id, char* p_config)
 {
-	MechS32 id;
+	int32_t id;
 
 	if (!p_mech || !p_mech->m_player) {
 		return;
@@ -128,7 +128,7 @@ void RememberLoadMech(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p_
 void RememberMechSegments(Mech* p_mech)
 {
 	SceneObject* obj;
-	MechS32 id;
+	int32_t id;
 
 	obj = NULL;
 	if (!p_mech || !p_mech->m_player) {

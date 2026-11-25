@@ -10,7 +10,7 @@ extern "C"
 #endif
 
 	void PrintVersion(void);
-	MechS32 StartupCheckStub(void);
+	int32_t StartupCheckStub(void);
 
 #ifdef __cplusplus
 }

@@ -12,9 +12,9 @@
 
 #define FRAME_SIZE 0x400
 
-MechU8 g_soundUpsampleBuffer[0x400] = {0};
-MechU8 g_soundFrame[0x401] = {0};
-MechU8 g_soundDeltas[0x43] = {0};
+uint8_t g_soundUpsampleBuffer[0x400] = {0};
+uint8_t g_soundFrame[0x401] = {0};
+uint8_t g_soundDeltas[0x43] = {0};
 
 enum SoundCoding {
 	c_codingSilence,
@@ -26,26 +26,28 @@ enum SoundCoding {
 };
 
 // The delta table's entries, dwords at an odd address.
-static MechS32 GetDelta(MechU32 p_index)
+static int32_t GetDelta(uint32_t p_index)
 {
-	const MechU8* entry = &g_soundDeltas[p_index * 4];
+	const uint8_t* entry = &g_soundDeltas[p_index * 4];
 
-	return PortableS32(entry[0] | ((MechU32) entry[1] << 8) | ((MechU32) entry[2] << 16) | ((MechU32) entry[3] << 24));
+	return PortableS32(
+		entry[0] | ((uint32_t) entry[1] << 8) | ((uint32_t) entry[2] << 16) | ((uint32_t) entry[3] << 24)
+	);
 }
 
 // Reads the table that follows a frame's code byte: each byte b is the delta 2b - 0x80.
-static const MechU8* ReadDeltas(const MechU8* p_src, MechU32 p_count)
+static const uint8_t* ReadDeltas(const uint8_t* p_src, uint32_t p_count)
 {
-	MechU32 i;
+	uint32_t i;
 
 	for (i = 0; i < p_count; i++) {
-		MechU32 delta = ((MechU32) *p_src++ << 1) - 0x80;
-		MechU8* entry = &g_soundDeltas[i * 4];
+		uint32_t delta = ((uint32_t) *p_src++ << 1) - 0x80;
+		uint8_t* entry = &g_soundDeltas[i * 4];
 
-		entry[0] = (MechU8) delta;
-		entry[1] = (MechU8) (delta >> 8);
-		entry[2] = (MechU8) (delta >> 16);
-		entry[3] = (MechU8) (delta >> 24);
+		entry[0] = (uint8_t) delta;
+		entry[1] = (uint8_t) (delta >> 8);
+		entry[2] = (uint8_t) (delta >> 16);
+		entry[3] = (uint8_t) (delta >> 24);
 	}
 
 	return p_src;
@@ -54,17 +56,17 @@ static const MechU8* ReadDeltas(const MechU8* p_src, MechU32 p_count)
 // Decodes indices of p_bits bits, lowest first, into the frame until it holds p_count samples
 // (whole bytes at a time, at least one), each delta added to *p_value (wrapping, from the
 // caller's state) and clamped to -127..127.
-static const MechU8* DecodeDeltas(const MechU8* p_src, MechU32 p_count, MechU32 p_bits, MechS32* p_value)
+static const uint8_t* DecodeDeltas(const uint8_t* p_src, uint32_t p_count, uint32_t p_bits, int32_t* p_value)
 {
-	MechU32 mask = (1 << p_bits) - 1;
-	MechU32 sample = 0;
-	MechU32 bits;
-	MechU32 i;
+	uint32_t mask = (1 << p_bits) - 1;
+	uint32_t sample = 0;
+	uint32_t bits;
+	uint32_t i;
 
 	do {
 		bits = *p_src++;
 		for (i = 0; i < 8 / p_bits; i++) {
-			MechS32 value = PortableS32((MechU32) *p_value + (MechU32) GetDelta(bits & mask));
+			int32_t value = PortableS32((uint32_t) *p_value + (uint32_t) GetDelta(bits & mask));
 
 			if (value > 0x7f) {
 				value = 0x7f;
@@ -74,7 +76,7 @@ static const MechU8* DecodeDeltas(const MechU8* p_src, MechU32 p_count, MechU32 
 			}
 
 			*p_value = value;
-			g_soundFrame[sample++] = (MechU8) (value + 0x80);
+			g_soundFrame[sample++] = (uint8_t) (value + 0x80);
 			bits >>= p_bits;
 		}
 	} while (sample < p_count);
@@ -84,17 +86,17 @@ static const MechU8* DecodeDeltas(const MechU8* p_src, MechU32 p_count, MechU32 
 
 // UpsampleSoundFrame2: upsamples the frame twice in place, interpolating linearly through the scratch
 // buffer, to p_size samples. The last pair reads the sample past the decoded ones.
-static void Upsample2(MechU32 p_size)
+static void Upsample2(uint32_t p_size)
 {
-	MechU8* frame = g_soundFrame;
-	MechU32 i = 0;
+	uint8_t* frame = g_soundFrame;
+	uint32_t i = 0;
 
 	do {
-		MechU32 a = frame[i >> 1];
-		MechU32 b = frame[(i >> 1) + 1];
+		uint32_t a = frame[i >> 1];
+		uint32_t b = frame[(i >> 1) + 1];
 
-		g_soundUpsampleBuffer[i] = (MechU8) a;
-		g_soundUpsampleBuffer[i + 1] = (MechU8) ((a + b) >> 1);
+		g_soundUpsampleBuffer[i] = (uint8_t) a;
+		g_soundUpsampleBuffer[i + 1] = (uint8_t) ((a + b) >> 1);
 		i += 2;
 	} while (i < p_size - 1);
 
@@ -102,20 +104,20 @@ static void Upsample2(MechU32 p_size)
 }
 
 // UpsampleSoundFrame4: the same four times.
-static void Upsample4(MechU32 p_size)
+static void Upsample4(uint32_t p_size)
 {
-	MechU8* frame = g_soundFrame;
-	MechU32 i = 0;
+	uint8_t* frame = g_soundFrame;
+	uint32_t i = 0;
 
 	do {
-		MechU32 a = frame[i >> 2];
-		MechU32 b = frame[(i >> 2) + 1];
-		MechU32 middle = (a + b) >> 1;
+		uint32_t a = frame[i >> 2];
+		uint32_t b = frame[(i >> 2) + 1];
+		uint32_t middle = (a + b) >> 1;
 
-		g_soundUpsampleBuffer[i] = (MechU8) a;
-		g_soundUpsampleBuffer[i + 1] = (MechU8) ((middle + a) >> 1);
-		g_soundUpsampleBuffer[i + 2] = (MechU8) middle;
-		g_soundUpsampleBuffer[i + 3] = (MechU8) ((middle + b) >> 1);
+		g_soundUpsampleBuffer[i] = (uint8_t) a;
+		g_soundUpsampleBuffer[i + 1] = (uint8_t) ((middle + a) >> 1);
+		g_soundUpsampleBuffer[i + 2] = (uint8_t) middle;
+		g_soundUpsampleBuffer[i + 3] = (uint8_t) ((middle + b) >> 1);
 		i += 4;
 	} while (i < p_size - 1);
 
@@ -125,17 +127,17 @@ static void Upsample4(MechU32 p_size)
 // p_count is at least 1, and p_frameSize 1 to 0x400; a raw frame has at least one sample before
 // the upsampling (the original's loops run 2^32 times otherwise). An unknown coding ends the
 // decoding with NULL, leaving *p_state at the previous frame's value.
-MechU8* DecodeSoundFrames(MechU8* p_src, MechU8* p_dst, MechU32 p_count, MechU32 p_frameSize, MechS32* p_state)
+uint8_t* DecodeSoundFrames(uint8_t* p_src, uint8_t* p_dst, uint32_t p_count, uint32_t p_frameSize, int32_t* p_state)
 {
-	const MechU8* src = p_src;
+	const uint8_t* src = p_src;
 
 	PORTABLE_ASSERT(p_count != 0);
 	PORTABLE_ASSERT(p_frameSize != 0 && p_frameSize <= FRAME_SIZE);
 	do {
-		MechU32 upsampling = *src >> 6;
-		MechU32 coding = *src & 0xf;
-		MechU32 samples = p_frameSize;
-		MechS32 value = *p_state;
+		uint32_t upsampling = *src >> 6;
+		uint32_t coding = *src & 0xf;
+		uint32_t samples = p_frameSize;
+		int32_t value = *p_state;
 
 		if (upsampling == 1) {
 			samples >>= 1;
@@ -183,5 +185,5 @@ MechU8* DecodeSoundFrames(MechU8* p_src, MechU8* p_dst, MechU32 p_count, MechU32
 		p_dst += p_frameSize;
 	} while (--p_count);
 
-	return (MechU8*) src;
+	return (uint8_t*) src;
 }

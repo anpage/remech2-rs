@@ -11,11 +11,11 @@ class LoopingMovie;
 
 // The functions and globals of options.cpp that other units use.
 extern LoopingMovie* g_optionsMovie;
-extern MechChar g_optionsMovieName[0x10];
+extern char g_optionsMovieName[0x10];
 extern AudioSample* g_volumeTestSample;
 extern PaletteColor g_savedPalette[0x100];
 extern void* g_sliderImages;
-extern MechChar* g_skillNames[3];
+extern char* g_skillNames[3];
 extern ScreenField g_optionFields[18];
 void LoadSoundConfig();
 void LoadDifficultyConfig();
@@ -36,6 +36,6 @@ extern "C" TextGlyph* DrawOptionLabel(ScreenField* p_label);
 // for the answer and returns 0 for the first and 1 for the second. Otherwise it returns 0 at once,
 // and the message stays over the screen until its button is clicked.
 // Originally the dialogs 0x80 (two buttons) and 0x81 (one), which both waited.
-extern "C" MechS32 ShowDialog(const char* p_text, MechS32);
+extern "C" int32_t ShowDialog(const char* p_text, int32_t);
 
 #endif // OPTIONS_H

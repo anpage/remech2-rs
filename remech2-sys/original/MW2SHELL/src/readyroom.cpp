@@ -33,9 +33,9 @@
 // The ready room screen.
 
 // The video playing before the screen moves on, -1 for none, and the message it moves on with.
-MechS32 g_readyRoomExitVideo = -1;
+int32_t g_readyRoomExitVideo = -1;
 
-MechS32 g_readyRoomExitMessage = c_msgScreenFrame;
+int32_t g_readyRoomExitMessage = c_msgScreenFrame;
 
 // Database item 0x64, played with the mech bay's video.
 AudioSample* g_readyRoomSound = NULL;
@@ -46,7 +46,7 @@ ButtonMenu* g_readyRoomMenu;
 size_t g_readyRoomMessage;
 
 // Play the second faction grid animation only when video slot zero is idle.
-void PlayReadyRoomGrid(MechS32 p_campaign)
+void PlayReadyRoomGrid(int32_t p_campaign)
 {
 	if (!IsVideoPlaying(0)) {
 		switch (p_campaign) {
@@ -61,11 +61,11 @@ void PlayReadyRoomGrid(MechS32 p_campaign)
 	}
 }
 
-void ReadyRoomCallback(TMPackDataBase* p_database, MechS32* p_campaign, MechU8*, MechChar** p_scenario, MechS32 p_msg);
+void ReadyRoomCallback(TMPackDataBase* p_database, int32_t* p_campaign, uint8_t*, char** p_scenario, int32_t p_msg);
 
 // Opens the ready room. Coming from the clan hall (c_msgClanHall) or a mission (c_msgDebrief) sets
 // up the pilot's next mission first; only the pilot FREEBIRTHTOAD gets the mission buttons.
-void DrawReadyRoom(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scenario, size_t p_wParam)
+void DrawReadyRoom(TMPackDataBase* p_database, int32_t p_campaign, char** p_scenario, size_t p_wParam)
 {
 	if (p_wParam == c_msgClanHall || p_wParam == c_msgDebrief) {
 		SelectStar(0, 0, 3, 1, 100);
@@ -111,13 +111,13 @@ void DrawReadyRoom(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scen
 
 // The ready room's frame: CLAN HALL, MECH LAB, STAR CONFIG, MISSION BRIEFING, and for
 // FREEBIRTHTOAD the missions. The mech lab and briefing play a video before moving on.
-void ReadyRoomCallback(TMPackDataBase* p_database, MechS32* p_campaign, MechU8*, MechChar** p_scenario, MechS32 p_msg)
+void ReadyRoomCallback(TMPackDataBase* p_database, int32_t* p_campaign, uint8_t*, char** p_scenario, int32_t p_msg)
 {
 	void* data = NULL;
-	MechChar name[16];
-	MechS32 type;
-	MechS32 button;
-	MechS32 size;
+	char name[16];
+	int32_t type;
+	int32_t button;
+	int32_t size;
 
 	// The original skips the frame's work with a goto, like StarConfigCallback.
 	if (p_msg != c_msgScreenFrame) {

@@ -9,13 +9,13 @@
 #include <string.h>
 
 // The ring buffer of GetDBItemLZ's LZSS decoder.
-MechU8 g_lzWindow[c_lzWindowSize];
+uint8_t g_lzWindow[c_lzWindowSize];
 
 // Prints the database's entries to stdout. Unused.
 void TMPackDataBase::DumpEntries()
 {
 	TMPackDBEntry* entry;
-	MechS32 i;
+	int32_t i;
 
 	fprintf(stdout, "MPack File: %s Items: %d\n", m_name, m_numEntries);
 	for (i = 0; i < m_entries->m_count; i++) {
@@ -39,7 +39,7 @@ TMPackDataBase::TMPackDataBase(char* p_name)
 	undefined4 offset;
 
 	strcpy(m_name, p_name);
-	m_data = (MechU8*) MechReadFile(g_primaryHeap, m_name);
+	m_data = (uint8_t*) MechReadFile(g_primaryHeap, m_name);
 	if (m_data == NULL) {
 		MechLogErrorf("Could not open mpack DB: %s\n", m_name);
 		exit(1);
@@ -58,7 +58,7 @@ TMPackDataBase::TMPackDataBase(char* p_name)
 	}
 
 	CreateCollection(&m_entries, m_numEntries, NULL, 4, NULL);
-	for (MechS32 i = 0; i < m_numEntries; i++) {
+	for (int32_t i = 0; i < m_numEntries; i++) {
 		memcpy(&offset, m_data + 4 + i * 4, 4);
 		entry = new TMPackDBEntry(offset, 0);
 		ExpandCollection(m_entries, entry);
@@ -66,7 +66,7 @@ TMPackDataBase::TMPackDataBase(char* p_name)
 
 	current = (TMPackDBEntry*) CollectionGet(m_entries, 0);
 	next = current;
-	for (MechS32 i = 1; i < m_numEntries; i++) {
+	for (int32_t i = 1; i < m_numEntries; i++) {
 		next = (TMPackDBEntry*) CollectionGet(m_entries, i);
 		current->m_size = next->m_offset - current->m_offset;
 		if (i < m_numEntries - 1) {
@@ -80,7 +80,7 @@ TMPackDataBase::TMPackDataBase(char* p_name)
 TMPackDataBase::~TMPackDataBase()
 {
 	TMPackDBEntry* entry;
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < m_entries->m_count; i++) {
 		entry = (TMPackDBEntry*) CollectionGet(m_entries, i);
@@ -92,13 +92,13 @@ TMPackDataBase::~TMPackDataBase()
 	MechHeapFree(g_primaryHeap, m_data);
 }
 
-MechS32 TMPackDataBase::GetEntryCount()
+int32_t TMPackDataBase::GetEntryCount()
 {
 	return m_entries->m_count;
 }
 
 // The ids are 1-based.
-TMPackDataBase::TMPackDBEntry* TMPackDataBase::GetEntry(MechS32 p_id)
+TMPackDataBase::TMPackDBEntry* TMPackDataBase::GetEntry(int32_t p_id)
 {
 	TMPackDBEntry* entry;
 
@@ -110,7 +110,7 @@ TMPackDataBase::TMPackDBEntry* TMPackDataBase::GetEntry(MechS32 p_id)
 	return entry;
 }
 
-MechS32 TMPackDataBase::GetDBItem(MechS32 p_id, void** p_data, MechS32* p_size)
+int32_t TMPackDataBase::GetDBItem(int32_t p_id, void** p_data, int32_t* p_size)
 {
 	TMPackDBEntry* entry;
 	void* data;
@@ -137,16 +137,16 @@ MechS32 TMPackDataBase::GetDBItem(MechS32 p_id, void** p_data, MechS32* p_size)
 	return 0;
 }
 
-MechS32 TMPackDataBase::GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size)
+int32_t TMPackDataBase::GetDBItemLZ(int32_t p_id, void** p_data, int32_t* p_size)
 {
-	MechU32 flags;
-	MechS32 remaining;
+	uint32_t flags;
+	int32_t remaining;
 	TMPackDBEntry* entry;
-	MechU8* dst;
-	MechU8* src;
-	MechU8* out;
-	MechS32 n;
-	MechS32 pos;
+	uint8_t* dst;
+	uint8_t* src;
+	uint8_t* out;
+	int32_t n;
+	int32_t pos;
 
 	entry = GetEntry(p_id);
 	if (entry == NULL) {
@@ -161,7 +161,7 @@ MechS32 TMPackDataBase::GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size
 	memcpy(&remaining, m_data + pos, 4);
 	pos += 4;
 
-	out = (MechU8*) MechHeapAlloc(g_primaryHeap, remaining);
+	out = (uint8_t*) MechHeapAlloc(g_primaryHeap, remaining);
 	if (out == NULL) {
 		fprintf(stderr, "Out of memory in TMPackDataBaseObj :: GetDBItem\n");
 		fflush(stderr);
@@ -196,7 +196,7 @@ MechS32 TMPackDataBase::GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size
 			n = ByteAt(pos++);
 			n += ByteAt(pos++) << 8;
 			src = g_lzWindow + (n & (c_lzWindowSize - 1));
-			n = (((MechU32) n >> 12) & 0xf) + 3;
+			n = (((uint32_t) n >> 12) & 0xf) + 3;
 			n &= c_lzWindowSize - 1;
 			remaining -= n;
 			while (n--) {
@@ -216,16 +216,16 @@ MechS32 TMPackDataBase::GetDBItemLZ(MechS32 p_id, void** p_data, MechS32* p_size
 }
 
 // Reads p_size bytes of item p_id, from p_offset on.
-MechS32 TMPackDataBase::ReadDBItemData(MechS32 p_id, MechS32 p_offset, void* p_buffer, size_t p_size)
+int32_t TMPackDataBase::ReadDBItemData(int32_t p_id, int32_t p_offset, void* p_buffer, size_t p_size)
 {
 	TMPackDBEntry* entry = GetEntry(p_id);
 	if (entry == NULL) {
 		return 1;
 	}
 
-	MechS32 pos = entry->m_offset + p_offset;
+	int32_t pos = entry->m_offset + p_offset;
 
-	if (pos < 0 || p_size > (size_t) m_size || pos > m_size - (MechS32) p_size) {
+	if (pos < 0 || p_size > (size_t) m_size || pos > m_size - (int32_t) p_size) {
 		return 1;
 	}
 
@@ -234,12 +234,12 @@ MechS32 TMPackDataBase::ReadDBItemData(MechS32 p_id, MechS32 p_offset, void* p_b
 }
 
 // Reads a line; returns 2 if it ended at a NUL rather than a newline.
-MechS32 TMPackDataBase::ReadDBItemLine(MechS32 p_id, MechS32 p_offset, MechChar* p_buffer)
+int32_t TMPackDataBase::ReadDBItemLine(int32_t p_id, int32_t p_offset, char* p_buffer)
 {
 	TMPackDBEntry* entry;
-	MechChar c;
-	MechS32 i;
-	MechS32 pos;
+	char c;
+	int32_t i;
+	int32_t pos;
 
 	entry = GetEntry(p_id);
 	if (entry == NULL) {
@@ -262,12 +262,12 @@ MechS32 TMPackDataBase::ReadDBItemLine(MechS32 p_id, MechS32 p_offset, MechChar*
 }
 
 // Reads a NUL-terminated string.
-MechS32 TMPackDataBase::ReadDBItemString(MechS32 p_id, MechS32 p_offset, MechChar* p_buffer)
+int32_t TMPackDataBase::ReadDBItemString(int32_t p_id, int32_t p_offset, char* p_buffer)
 {
 	TMPackDBEntry* entry;
-	MechChar c;
-	MechS32 i;
-	MechS32 pos;
+	char c;
+	int32_t i;
+	int32_t pos;
 
 	entry = GetEntry(p_id);
 	if (entry == NULL) {
@@ -285,7 +285,7 @@ MechS32 TMPackDataBase::ReadDBItemString(MechS32 p_id, MechS32 p_offset, MechCha
 	return 0;
 }
 
-MechS32 TMPackDataBase::ByteAt(MechS32 p_offset)
+int32_t TMPackDataBase::ByteAt(int32_t p_offset)
 {
 	return p_offset >= 0 && p_offset < m_size ? m_data[p_offset] : -1;
 }

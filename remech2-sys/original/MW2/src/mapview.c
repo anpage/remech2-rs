@@ -21,29 +21,29 @@
 
 // The map (satellite) view's projection: a top-down view of p_worldSpan units across.
 
-MechS32 g_savedPalettePending;
+int32_t g_savedPalettePending;
 
 Eyepoint g_savedEyepoint;
 
-MechS32 g_mapViewMinX;
+int32_t g_mapViewMinX;
 
-MechS32 g_mapViewMaxX;
+int32_t g_mapViewMaxX;
 
-MechS32 g_mapViewMaxY;
+int32_t g_mapViewMaxY;
 
-MechS32 g_mapViewMinY;
+int32_t g_mapViewMinY;
 
-MechS32 g_mapViewNear;
+int32_t g_mapViewNear;
 
-MechS32 g_mapViewFar;
+int32_t g_mapViewFar;
 
-MechS32 g_mapViewScale;
+int32_t g_mapViewScale;
 
 RenderSettings g_savedRenderSettings;
 
 // Saves the eyepoint and the rendering settings, and sets up a view from p_pose (position, then
 // rotation) of p_worldSpan units across pane p_slot, as far as p_far.
-void BeginMapView(MechS32* p_pose, MechS32 p_slot, MechS32 p_worldSpan, MechS32 p_far)
+void BeginMapView(int32_t* p_pose, int32_t p_slot, int32_t p_worldSpan, int32_t p_far)
 {
 	p_worldSpan = MechWidenMapSpan(p_slot, p_worldSpan);
 	g_mapViewScale = p_worldSpan / (g_panes[p_slot].m_x1 - g_panes[p_slot].m_x0 + 1);
@@ -75,7 +75,7 @@ void BeginMapView(MechS32* p_pose, MechS32 p_slot, MechS32 p_worldSpan, MechS32 
 }
 
 // Draws the map view's scene: the terrain when bit 0 of p_flags is set, then the shapes.
-void DrawMapViewScene(MechU32 p_flags)
+void DrawMapViewScene(uint32_t p_flags)
 {
 	if (p_flags & 1) {
 		DrawSkyAndGround(g_eyepoint);
@@ -99,19 +99,19 @@ void EndMapView(void)
 
 // Culls a shape against the map view's frustum: 1 hidden, 4 in front of the near plane, 5 past
 // the far plane, 6 and 7 outside the side planes, 0 visible. Keeps its depth in g_queueDepth.
-MechS32 CullMapViewShape(Shape* p_shape)
+int32_t CullMapViewShape(Shape* p_shape)
 {
-	MechS32 y;
-	MechS32 z;
-	MechS32 radius;
-	MechS32 dist;
-	MechS32 dx;
-	MechS32 side;
-	MechS32 dy;
-	MechS32 height;
-	MechS32 dz;
-	MechS32 depth;
-	MechS32 x;
+	int32_t y;
+	int32_t z;
+	int32_t radius;
+	int32_t dist;
+	int32_t dx;
+	int32_t side;
+	int32_t dy;
+	int32_t height;
+	int32_t dz;
+	int32_t depth;
+	int32_t x;
 
 	if (p_shape->m_flags & 0x1000) {
 		return 1;
@@ -164,9 +164,9 @@ MechS32 CullMapViewShape(Shape* p_shape)
 // outcodes, and adds it to the polygon being built: ProjectVertex's map-view counterpart.
 ProjectedVertex* ProjectMapViewVertex(ProjectedVertex* p_vertex)
 {
-	MechS32 x;
-	MechU8 outcode;
-	MechS32 y;
+	int32_t x;
+	uint8_t outcode;
+	int32_t y;
 
 	outcode = 0;
 	if (!p_vertex->m_projected) {
@@ -211,15 +211,15 @@ ProjectedVertex* ProjectMapViewVertex(ProjectedVertex* p_vertex)
 
 // Projects p_point onto the map view in place. Returns whether it is in front of the eye and
 // on the screen.
-MechS32 ProjectMapPoint(MapPoint* p_point)
+int32_t ProjectMapPoint(MapPoint* p_point)
 {
-	MechS32 visible;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 dz;
+	int32_t visible;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t dx;
+	int32_t dy;
+	int32_t dz;
 
 	visible = FALSE;
 	x = p_point->m_xy.m_x;

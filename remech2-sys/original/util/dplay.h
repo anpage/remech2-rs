@@ -13,7 +13,7 @@ typedef unsigned int DWORD, *LPDWORD;
 typedef int HRESULT;
 typedef char* LPSTR;
 typedef void* LPVOID;
-typedef void* HANDLE, **LPHANDLE;
+typedef void *HANDLE, **LPHANDLE;
 
 typedef struct GUID {
 	unsigned int Data1;

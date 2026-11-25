@@ -16,44 +16,44 @@
 
 #include <stddef.h>
 
-MechChar g_mainMenuTitle[] = "MAIN MENU";
+char g_mainMenuTitle[] = "MAIN MENU";
 
-MechChar g_abortMissionItem[] = "Abort Mission";
+char g_abortMissionItem[] = "Abort Mission";
 
-MechChar g_monitorBrightnessItem[] = "Monitor Brightness";
+char g_monitorBrightnessItem[] = "Monitor Brightness";
 
 // The original said "Windows" here and in the title
-MechChar g_fleeToWindowsItem[] = "Flee to Desktop";
+char g_fleeToWindowsItem[] = "Flee to Desktop";
 
-MechChar g_acceptText[] = "Accept (Esc to cancel)";
+char g_acceptText[] = "Accept (Esc to cancel)";
 
-MechChar g_escToExitText[] = "(Esc to exit)";
+char g_escToExitText[] = "(Esc to exit)";
 
-MechChar g_fleeToWindowsTitle[] = "FLEE TO DESKTOP";
+char g_fleeToWindowsTitle[] = "FLEE TO DESKTOP";
 
-MechChar g_abortMissionTitle[] = "ABORT MISSION";
+char g_abortMissionTitle[] = "ABORT MISSION";
 
-MechChar g_monitorBrightnessTitle[] = "MONITOR BRIGHTNESS";
+char g_monitorBrightnessTitle[] = "MONITOR BRIGHTNESS";
 
-MechChar g_areYouSureText[] = "Are you sure?";
+char g_areYouSureText[] = "Are you sure?";
 
-MechChar g_confirmCowardiceText[] = "Confirm your cowardice";
+char g_confirmCowardiceText[] = "Confirm your cowardice";
 
-MechChar g_confirmationRequestedText[] = "Confirmation requested";
+char g_confirmationRequestedText[] = "Confirmation requested";
 
-MechChar g_noText[] = "No";
+char g_noText[] = "No";
 
-MechChar g_yesText[] = "Yes";
+char g_yesText[] = "Yes";
 
-MechChar g_offText[] = "Off";
+char g_offText[] = "Off";
 
-MechChar g_onText[] = "On";
+char g_onText[] = "On";
 
-MechChar g_lowText[] = "Low";
+char g_lowText[] = "Low";
 
-MechChar g_mediumText[] = "Medium";
+char g_mediumText[] = "Medium";
 
-MechChar g_highText[] = "High";
+char g_highText[] = "High";
 
 MenuChoices g_offOnChoices = {NULL, 2, {g_offText, g_onText}};
 
@@ -63,7 +63,7 @@ MenuChoices g_lowHighChoices = {NULL, 2, {g_lowText, g_highText}};
 
 MenuChoices g_offLowMediumHighChoices = {NULL, 4, {g_offText, g_lowText, g_mediumText, g_highText}};
 
-MechS32 g_sliderShapes[8] = {67, 0, 64, 0, 70, 0, 82, 0};
+int32_t g_sliderShapes[8] = {67, 0, 64, 0, 70, 0, 82, 0};
 
 MenuControl g_confirmControl = {2, 0, NULL, 0, NULL, NULL, NULL, NULL, NULL};
 

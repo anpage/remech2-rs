@@ -14,19 +14,19 @@
 // Animated textures: up to 0x200 animations, each playing one of 0x200 sets of up to 0x20 CEL
 // frames. The frames load on first use; each animation advances with the clock.
 
-MechS32 g_animInitialized = -2;
+int32_t g_animInitialized = -2;
 
-MechS32 g_lumaResourceId = 0;
+int32_t g_lumaResourceId = 0;
 
-MechS32 g_currentAnimSet = 0;
+int32_t g_currentAnimSet = 0;
 
-MechS32 g_animSetUsed = 0;
+int32_t g_animSetUsed = 0;
 
-MechS32 g_animSetIsSequence = 0;
+int32_t g_animSetIsSequence = 0;
 
-MechU16* g_lumaTables = NULL;
+uint16_t* g_lumaTables = NULL;
 
-MechS32 g_preloadCels[] = {
+int32_t g_preloadCels[] = {
 	562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582,
 	583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 593, 88,  89,  90,  91,  92,  93,  94,  95,  96,  97,
 	98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118,
@@ -40,24 +40,24 @@ Animation g_animations[0x200];
 
 WINDOW g_animFrameBuffer;
 
-MechS32 DrawAnimatedPolygon(
-	MechS32 p_index,
-	MechS32 p_count,
-	MechU32* p_points,
-	MechS32 p_luma,
-	MechS32 p_scale,
-	MechS32 p_direct
+int32_t DrawAnimatedPolygon(
+	int32_t p_index,
+	int32_t p_count,
+	uint32_t* p_points,
+	int32_t p_luma,
+	int32_t p_scale,
+	int32_t p_direct
 )
 {
-	MechS16 height;
-	MechS32 i;
-	MechS32 useLuma;
+	int16_t height;
+	int32_t i;
+	int32_t useLuma;
 	AnimFrame* frame;
-	MechU16* data;
+	uint16_t* data;
 	Animation* anim;
-	MechS16 width;
-	MechU16* luma;
-	MechS32 mode;
+	int16_t width;
+	uint16_t* luma;
+	int32_t mode;
 
 	data = NULL;
 	luma = NULL;
@@ -96,8 +96,8 @@ MechS32 DrawAnimatedPolygon(
 	data += 2;
 	if (p_scale) {
 		for (i = 0; i < 4; i++) {
-			p_points[i * 6 + 3] *= (MechS16) (width - 1);
-			p_points[i * 6 + 4] *= (MechS16) (height - 1);
+			p_points[i * 6 + 3] *= (int16_t) (width - 1);
+			p_points[i * 6 + 4] *= (int16_t) (height - 1);
 		}
 	}
 
@@ -114,7 +114,7 @@ MechS32 DrawAnimatedPolygon(
 
 	if (p_direct) {
 		luma = g_lumaTables + p_luma * 0x80;
-		DrawTexturedPolygon(&g_currentPane, (MechU8*) data, width, height, p_count, p_points, useLuma, luma);
+		DrawTexturedPolygon(&g_currentPane, (uint8_t*) data, width, height, p_count, p_points, useLuma, luma);
 	}
 	else {
 		if (useLuma) {
@@ -134,14 +134,14 @@ MechS32 DrawAnimatedPolygon(
 
 void AdvanceAnimations(void)
 {
-	MechS32 remainder;
-	MechS32 j;
-	MechS32 now;
-	MechS32 i;
-	MechU32 frame;
-	MechS32 steps;
+	int32_t remainder;
+	int32_t j;
+	int32_t now;
+	int32_t i;
+	uint32_t frame;
+	int32_t steps;
 	Animation* anim;
-	MechS32 elapsed;
+	int32_t elapsed;
 
 	now = g_currentClock;
 	for (i = 0; i < 0x200; i++) {
@@ -176,10 +176,10 @@ void AdvanceAnimations(void)
 	}
 }
 
-MechS32 AddAnimFrame(MechS32 p_resourceId, MechS32 p_set)
+int32_t AddAnimFrame(int32_t p_resourceId, int32_t p_set)
 {
-	MechS32 found;
-	MechS32 slot;
+	int32_t found;
+	int32_t slot;
 
 	slot = 0;
 	found = FALSE;
@@ -223,14 +223,14 @@ MechS32 AddAnimFrame(MechS32 p_resourceId, MechS32 p_set)
 
 void PreloadAnimCels(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; g_preloadCels[i] != -1; i++) {
 		PreloadResource(g_preloadCels[i], g_resourceTypeTags[c_resTagCel]);
 	}
 }
 
-MechS32 StartAnimation(MechS32 p_index, MechS32 p_set)
+int32_t StartAnimation(int32_t p_index, int32_t p_set)
 {
 	if (p_set == -1) {
 		p_set = g_currentAnimSet;
@@ -254,8 +254,8 @@ MechS32 StartAnimation(MechS32 p_index, MechS32 p_set)
 
 void InitAnimations(void)
 {
-	MechS32 j;
-	MechS32 i;
+	int32_t j;
+	int32_t i;
 	AnimFrame* frame;
 	Animation* anim;
 
@@ -284,7 +284,7 @@ void InitAnimations(void)
 	g_animSetIsSequence = 0;
 }
 
-void SetAnimMode(MechS16 p_index, MechS16 p_mode)
+void SetAnimMode(int16_t p_index, int16_t p_mode)
 {
 	if (g_animations[p_index].m_flags != -2) {
 		g_animations[p_index].m_mode = p_mode;
@@ -295,7 +295,7 @@ void SetAnimMode(MechS16 p_index, MechS16 p_mode)
 	}
 }
 
-void SetAnimFrame(MechS16 p_index, MechU16 p_frame)
+void SetAnimFrame(int16_t p_index, uint16_t p_frame)
 {
 	Animation* anim;
 
@@ -314,15 +314,15 @@ void SetAnimFrame(MechS16 p_index, MechU16 p_frame)
 	}
 }
 
-void SetAnimDelay(MechS16 p_index, MechU16 p_delay)
+void SetAnimDelay(int16_t p_index, uint16_t p_delay)
 {
 	g_animations[p_index].m_delay = p_delay;
 }
 
 void FreeAnimations(void)
 {
-	MechS32 j;
-	MechS32 i;
+	int32_t j;
+	int32_t i;
 	AnimFrame* frame;
 	Animation* anim;
 

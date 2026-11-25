@@ -51,18 +51,18 @@ int ComparePilotRecords(const void* p_first, const void* p_second)
 	return 0;
 }
 
-void HallOfHonorCallback(MechS32 p_active);
+void HallOfHonorCallback(int32_t p_active);
 
 LoopingMovie* g_hallOfHonorMovie = NULL;
 
-MechChar g_hallOfHonorText[0x20];
+char g_hallOfHonorText[0x20];
 
 // Draw the eight highest-ranking active pilots from both clan rosters.
 void DrawHallOfHonor()
 {
 	PilotRecord* pilots[20];
-	MechS32 i;
-	MechS32 top;
+	int32_t i;
+	int32_t top;
 
 	g_videoDriver->GetPalette(g_savedScreenPalette);
 	g_keyboardInput->FlushKeys();
@@ -98,7 +98,7 @@ void DrawHallOfHonor()
 		sprintf(g_hallOfHonorText, "%d", pilots[i]->m_kills);
 		g_videoDriver->DrawString(400, top, g_defaultFont->m_dataCopy, g_hallOfHonorText, NULL);
 		if (pilots[i]->m_shotsFired != 0) {
-			sprintf(g_hallOfHonorText, "%d%%", (MechS32) pilots[i]->m_hits * 100 / (MechS32) pilots[i]->m_shotsFired);
+			sprintf(g_hallOfHonorText, "%d%%", (int32_t) pilots[i]->m_hits * 100 / (int32_t) pilots[i]->m_shotsFired);
 		}
 		else {
 			strcpy(g_hallOfHonorText, "-");
@@ -122,7 +122,7 @@ void DrawHallOfHonor()
 	RegisterMenuFunction(HallOfHonorCallback);
 }
 
-void HallOfHonorCallback(MechS32 p_active)
+void HallOfHonorCallback(int32_t p_active)
 {
 	if (p_active && g_hallOfHonorMovie != NULL) {
 		g_hallOfHonorMovie->Update();

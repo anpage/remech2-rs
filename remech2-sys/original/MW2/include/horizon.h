@@ -11,9 +11,9 @@ extern "C"
 {
 #endif
 
-	MechS32 IsAboveHorizon(MechS32 p_x, MechS32 p_y, struct Eyepoint* p_eyepoint);
-	MechS32 HorizonYAtX(MechS32 p_x, struct Eyepoint* p_eyepoint);
-	MechS32 HorizonXAtY(MechS32 p_y, struct Eyepoint* p_eyepoint);
+	int32_t IsAboveHorizon(int32_t p_x, int32_t p_y, struct Eyepoint* p_eyepoint);
+	int32_t HorizonYAtX(int32_t p_x, struct Eyepoint* p_eyepoint);
+	int32_t HorizonXAtY(int32_t p_y, struct Eyepoint* p_eyepoint);
 
 #ifdef __cplusplus
 }

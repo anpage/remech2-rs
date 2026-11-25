@@ -14,23 +14,23 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_savedPalettePending;
+	extern int32_t g_savedPalettePending;
 	extern Eyepoint g_savedEyepoint;
-	extern MechS32 g_mapViewMinX;
-	extern MechS32 g_mapViewMaxX;
-	extern MechS32 g_mapViewMaxY;
-	extern MechS32 g_mapViewMinY;
-	extern MechS32 g_mapViewNear;
-	extern MechS32 g_mapViewFar;
-	extern MechS32 g_mapViewScale;
+	extern int32_t g_mapViewMinX;
+	extern int32_t g_mapViewMaxX;
+	extern int32_t g_mapViewMaxY;
+	extern int32_t g_mapViewMinY;
+	extern int32_t g_mapViewNear;
+	extern int32_t g_mapViewFar;
+	extern int32_t g_mapViewScale;
 	extern RenderSettings g_savedRenderSettings;
 
-	void BeginMapView(MechS32* p_pose, MechS32 p_slot, MechS32 p_worldSpan, MechS32 p_far);
-	void DrawMapViewScene(MechU32 p_flags);
+	void BeginMapView(int32_t* p_pose, int32_t p_slot, int32_t p_worldSpan, int32_t p_far);
+	void DrawMapViewScene(uint32_t p_flags);
 	void EndMapView(void);
-	MechS32 CullMapViewShape(Shape* p_shape);
+	int32_t CullMapViewShape(Shape* p_shape);
 	ProjectedVertex* ProjectMapViewVertex(ProjectedVertex* p_vertex);
-	MechS32 ProjectMapPoint(MapPoint* p_point);
+	int32_t ProjectMapPoint(MapPoint* p_point);
 
 #ifdef __cplusplus
 }

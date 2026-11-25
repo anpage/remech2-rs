@@ -16,37 +16,37 @@
 
 TimeOfDayPhase g_timeOfDayPhases[4] = {{4, 2715}, {0, 2715}, {4, 3620}, {8, 2715}};
 
-MechS32 g_timeOfDayPhase = -1;
+int32_t g_timeOfDayPhase = -1;
 
-MechS32 g_soundDelayPerUnit = 0x168;
+int32_t g_soundDelayPerUnit = 0x168;
 
-MechS32 g_gravity = 0x794;
+int32_t g_gravity = 0x794;
 
-MechS32 g_gravityScale = 0x10000;
+int32_t g_gravityScale = 0x10000;
 
-MechS32 g_secondsPerDay = 86400;
+int32_t g_secondsPerDay = 86400;
 
-MechS32 g_daysPerYear = 365;
+int32_t g_daysPerYear = 365;
 
-MechS32 g_dayOfYear = 0;
+int32_t g_dayOfYear = 0;
 
-MechS32 g_timeOfDay = 43200;
+int32_t g_timeOfDay = 43200;
 
-MechS32 g_startTimeOfDay = 43200;
+int32_t g_startTimeOfDay = 43200;
 
-MechS32 g_timeOfDayFrames;
+int32_t g_timeOfDayFrames;
 
-MechS32 g_timeOfDayStarts[4];
+int32_t g_timeOfDayStarts[4];
 
-MechS32 g_timeOfDayEnabled;
+int32_t g_timeOfDayEnabled;
 
-MechS32 g_nextTimeOfDayUpdate;
+int32_t g_nextTimeOfDayUpdate;
 
-MechS32 g_infraredOn;
+int32_t g_infraredOn;
 
 void FirstEnvironment(void)
 {
-	MechS32 hour;
+	int32_t hour;
 
 	g_timeOfDayEnabled = 1;
 	hour = g_secondsPerDay / 24;
@@ -65,10 +65,10 @@ void FirstEnvironment(void)
 
 void UpdateTimeOfDay(void)
 {
-	MechS32 phase;
-	MechS32 seconds;
-	MechS32 time;
-	MechS32 i;
+	int32_t phase;
+	int32_t seconds;
+	int32_t time;
+	int32_t i;
 
 	phase = 3;
 	if (g_cockpitPanels[c_panelRadar]->m_damage >= 1 && g_infraredOn == 1) {
@@ -104,9 +104,9 @@ void UpdateTimeOfDay(void)
 	}
 }
 
-void FadeToTimeOfDayPhase(MechS32 p_phase)
+void FadeToTimeOfDayPhase(int32_t p_phase)
 {
-	MechS32 duration;
+	int32_t duration;
 
 	if (g_timeOfDayEnabled == 1 && p_phase != g_timeOfDayPhase) {
 		if (g_infraredOn == 1) {
@@ -127,12 +127,12 @@ void FadeToTimeOfDayPhase(MechS32 p_phase)
 	}
 }
 
-MechS32 IsInfraredOn(undefined4 p_unk0x00)
+int32_t IsInfraredOn(undefined4 p_unk0x00)
 {
 	return g_infraredOn;
 }
 
-void SetInfrared(undefined4 p_unk0x00, MechS32 p_state)
+void SetInfrared(undefined4 p_unk0x00, int32_t p_state)
 {
 	if (g_infraredOn != p_state) {
 		if (p_state == 1) {
@@ -154,7 +154,7 @@ void SetInfrared(undefined4 p_unk0x00, MechS32 p_state)
 
 void QuadrupleMechCooling(void)
 {
-	MechS32 i;
+	int32_t i;
 	Mech* mech;
 
 	for (i = 0; i < g_playerCount; i++) {
@@ -165,7 +165,7 @@ void QuadrupleMechCooling(void)
 
 void QuarterMechCooling(void)
 {
-	MechS32 i;
+	int32_t i;
 	Mech* mech;
 
 	for (i = 0; i < g_playerCount; i++) {

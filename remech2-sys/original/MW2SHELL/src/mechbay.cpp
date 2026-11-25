@@ -32,13 +32,13 @@
 // The mech bay: the variant being edited, its engine, weapons and armor, and the fields that
 // show them.
 
-MechS32 PlayVideo(
-	MechS32 p_index,
+int32_t PlayVideo(
+	int32_t p_index,
 	const char* p_name,
 	undefined4 p_unk0x08,
 	undefined4 p_unk0x0c,
-	MechU32 p_unk0x10,
-	MechU32 p_unk0x14
+	uint32_t p_unk0x10,
+	uint32_t p_unk0x14
 );
 
 Equipment g_equipment[23] = {
@@ -67,7 +67,7 @@ Equipment g_equipment[23] = {
 	{9000, "Ferro-Fibrous"},
 };
 
-MechChar* g_locationNames[8] =
+char* g_locationNames[8] =
 	{"Head", "Right Torso", "Center Torso", "Left Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg"};
 
 InternalStructure g_internalStructure[19] = {
@@ -146,12 +146,12 @@ ScreenField* g_componentFields = NULL;
 ScreenField* g_screenFields = NULL;
 
 // The location UpdateArmor takes the next point of armor from.
-MechS32 g_armorTrimLocation = 0;
+int32_t g_armorTrimLocation = 0;
 
 // Where the location map's frame of each location goes.
-MechS32 g_locationMapLefts[8] = {75, 46, 86, 126, 10, 162, 39, 109};
+int32_t g_locationMapLefts[8] = {75, 46, 86, 126, 10, 162, 39, 109};
 
-MechS32 g_locationMapTops[8] = {171, 206, 206, 206, 204, 204, 310, 310};
+int32_t g_locationMapTops[8] = {171, 206, 206, 206, 204, 204, 310, 310};
 
 AudioSample* g_locationSound = NULL;
 
@@ -178,30 +178,30 @@ MechChassis g_mechChassis[] = {
 };
 
 // The chassis on offer: 15, and up to 18 in a trial (GetChassisCount).
-MechS32 g_chassisCount = 15;
+int32_t g_chassisCount = 15;
 
 // The chassis video of each campaign's bay, with the chassis code.
-MechChar g_wolfChassisVideo[] = "awomp%s";
+char g_wolfChassisVideo[] = "awomp%s";
 
-MechChar g_jadeFalconChassisVideo[] = "ajfmp%s";
+char g_jadeFalconChassisVideo[] = "ajfmp%s";
 
-MechChar g_trialChassisVideo[] = "aiamp%s";
+char g_trialChassisVideo[] = "aiamp%s";
 
-MechChar* g_chassisVideoFormat = g_wolfChassisVideo;
+char* g_chassisVideoFormat = g_wolfChassisVideo;
 
-MechS32 g_selectedChassis = 7;
+int32_t g_selectedChassis = 7;
 
 AudioSample* g_chassisNameSound = NULL;
 
 // Set by the star screen when it opens the bay to change one of the star's mechs.
-MechS32 g_pickStarMech = 0;
+int32_t g_pickStarMech = 0;
 
 ButtonMenu* g_mechBayMenu = NULL;
 
 AudioSample* g_mechBayAmbience = NULL;
 
 // The wParam the screen was opened with.
-MechS32 g_mechBayWParam = c_msgScreenFrame;
+int32_t g_mechBayWParam = c_msgScreenFrame;
 
 undefined4 g_chassisVideoLeft;
 
@@ -209,16 +209,16 @@ undefined4 g_chassisVideoTop;
 
 // g_pickStarMech as the bay was opened: ACCEPT MECH checks the star's tonnage, and the other
 // screens are out of reach.
-MechS32 g_pickingStarMech;
+int32_t g_pickingStarMech;
 
-MechChar g_userMekName[0x20];
+char g_userMekName[0x20];
 
 AudioSample* g_acceptSound;
 
 // The pilot's callsign and the star's maximum weight.
-MechChar g_callsignLine[0x80];
+char g_callsignLine[0x80];
 
-MechChar g_tempBuffer[0x100];
+char g_tempBuffer[0x100];
 
 // The image of a .mek file, besides g_mekLocations: its header, the ammunition and weapons
 // and the variant name.
@@ -228,19 +228,19 @@ AudioSample* g_variantSound;
 
 MekHeader g_mekHeader;
 
-MechChar g_chassisVideoName[0x10];
+char g_chassisVideoName[0x10];
 
-MechChar g_mekVariantName[0x32];
+char g_mekVariantName[0x32];
 
 // The chassis' variant files: its standard ones in 0-99, the user's in 100-199.
-MechChar g_variantFiles[200][13];
+char g_variantFiles[200][13];
 
 MekItem g_mekWeapons[10];
 
 // DrawMechBay's p_wParam. Never read.
-MechS32 g_mechBayMessage;
+int32_t g_mechBayMessage;
 
-MechChar g_variantFileName[0x20];
+char g_variantFileName[0x20];
 
 undefined g_mekFileBuffer[0x800];
 
@@ -255,33 +255,33 @@ undefined g_activeColors[0x100];
 undefined g_textColors[0x100];
 
 // The path of the .mek file being saved.
-MechChar g_mekPath[0x20];
+char g_mekPath[0x20];
 
 // The variant shown, an index into g_variantFiles.
-MechS32 g_selectedVariant;
+int32_t g_selectedVariant;
 
-MechS32 RoundUpTons(MechS32 p_value)
+int32_t RoundUpTons(int32_t p_value)
 {
-	MechS32 remainder;
+	int32_t remainder;
 
 	remainder = p_value % 100;
 	return remainder ? p_value + 100 - remainder : p_value;
 }
 
-MechS32 RoundDownTons(MechS32 p_value)
+int32_t RoundDownTons(int32_t p_value)
 {
 	return p_value - p_value % 100;
 }
 
-MechS32 RoundTons(MechS32 p_value)
+int32_t RoundTons(int32_t p_value)
 {
 	return RoundDownTons(p_value + 50);
 }
 
 void ShowFields(ScreenField* p_tabs)
 {
-	MechS32 top;
-	MechS32 height;
+	int32_t top;
+	int32_t height;
 
 	top = 0;
 	height = 0;
@@ -361,11 +361,11 @@ void HideFields(ScreenField* p_tabs)
 	}
 }
 
-MechS32 RemoveCriticals(MechS32 p_id)
+int32_t RemoveCriticals(int32_t p_id)
 {
-	MechS32 count;
-	MechS32 j;
-	MechS32 i;
+	int32_t count;
+	int32_t j;
+	int32_t i;
 
 	count = 0;
 	if (p_id <= 0) {
@@ -384,9 +384,9 @@ MechS32 RemoveCriticals(MechS32 p_id)
 	return count;
 }
 
-MechS32 PlaceCriticals(MechS32 p_location, MechS32 p_id, MechS32 p_count)
+int32_t PlaceCriticals(int32_t p_location, int32_t p_id, int32_t p_count)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (p_id <= 0) {
 		return FALSE;
@@ -412,10 +412,10 @@ MechS32 PlaceCriticals(MechS32 p_location, MechS32 p_id, MechS32 p_count)
 	return TRUE;
 }
 
-void RemoveUnassigned(MechS32 p_id)
+void RemoveUnassigned(int32_t p_id)
 {
-	MechS32 j;
-	MechS32 i;
+	int32_t j;
+	int32_t i;
 
 	if (p_id <= 0) {
 		return;
@@ -438,7 +438,7 @@ void RemoveUnassigned(MechS32 p_id)
 	}
 }
 
-void AddUnassigned(MechS32 p_id, MechS32 p_unk0x04)
+void AddUnassigned(int32_t p_id, int32_t p_unk0x04)
 {
 	if (p_id <= 0) {
 		return;
@@ -451,9 +451,9 @@ void AddUnassigned(MechS32 p_id, MechS32 p_unk0x04)
 	}
 }
 
-void UnassignItem(MechS32 p_id)
+void UnassignItem(int32_t p_id)
 {
-	MechS32 count;
+	int32_t count;
 
 	if (p_id <= 0) {
 		return;
@@ -465,7 +465,7 @@ void UnassignItem(MechS32 p_id)
 	}
 }
 
-MechS32 AssignItem(MechS32 p_location, MechS32 p_id, MechS32 p_count)
+int32_t AssignItem(int32_t p_location, int32_t p_id, int32_t p_count)
 {
 	if (p_id <= 0) {
 		return FALSE;
@@ -479,13 +479,13 @@ MechS32 AssignItem(MechS32 p_location, MechS32 p_id, MechS32 p_count)
 	return FALSE;
 }
 
-void DeleteItem(MechS32 p_id)
+void DeleteItem(int32_t p_id)
 {
-	MechS32 id;
-	MechS32 group;
-	MechS32 index;
-	MechS32 i;
-	MechS32 j;
+	int32_t id;
+	int32_t group;
+	int32_t index;
+	int32_t i;
+	int32_t j;
 
 	group = p_id / 100;
 	index = p_id % 100;
@@ -551,9 +551,9 @@ void DeleteItem(MechS32 p_id)
 	}
 }
 
-MechS32 AddAmmo(MechS32 p_id)
+int32_t AddAmmo(int32_t p_id)
 {
-	MechS32 i;
+	int32_t i;
 
 	p_id -= p_id % 100;
 	p_id++;
@@ -575,10 +575,10 @@ MechS32 AddAmmo(MechS32 p_id)
 	return 0;
 }
 
-MechS32 CountAmmo(MechS32 p_id)
+int32_t CountAmmo(int32_t p_id)
 {
-	MechS32 count;
-	MechS32 i;
+	int32_t count;
+	int32_t i;
 
 	count = 0;
 	p_id = (p_id * 100 + 10000) / 100;
@@ -595,10 +595,10 @@ MechS32 CountAmmo(MechS32 p_id)
 	return count;
 }
 
-void RemoveAmmo(MechS32 p_id)
+void RemoveAmmo(int32_t p_id)
 {
-	MechS32 j;
-	MechS32 i;
+	int32_t j;
+	int32_t i;
 
 	j = 0;
 	for (i = 0; i < 25; i++) {
@@ -621,9 +621,9 @@ void RemoveAmmo(MechS32 p_id)
 	}
 }
 
-MechS32 AddWeapon(MechS32 p_id)
+int32_t AddWeapon(int32_t p_id)
 {
-	MechS32 i;
+	int32_t i;
 
 	p_id -= p_id % 100;
 	p_id++;
@@ -641,10 +641,10 @@ MechS32 AddWeapon(MechS32 p_id)
 	return 0;
 }
 
-void RemoveWeapon(MechS32 p_id)
+void RemoveWeapon(int32_t p_id)
 {
-	MechS32 j;
-	MechS32 i;
+	int32_t j;
+	int32_t i;
 
 	j = 0;
 	for (i = 0; i < 10; i++) {
@@ -690,7 +690,7 @@ void RemoveWeapon(MechS32 p_id)
 
 void UpdateMass()
 {
-	g_variant.m_gyroMass = RoundUpTons((MechS32) (g_variant.m_engineRating / 100.0 * 100.0));
+	g_variant.m_gyroMass = RoundUpTons((int32_t) (g_variant.m_engineRating / 100.0 * 100.0));
 	g_variant.m_internalMass = g_variant.m_maxMass / (g_variant.m_endoSteel ? 20 : 10);
 	g_variant.m_cockpitMass = 300;
 	g_variant.m_usedMass = g_variant.m_jumpJetMass + g_variant.m_heatSinkMass + g_variant.m_equipmentMass +
@@ -708,7 +708,7 @@ void UpdateSpeed()
 
 void UpdateHeatSinks()
 {
-	MechS32 count;
+	int32_t count;
 
 	count = g_variant.m_externalHeatSinks;
 	g_variant.m_externalHeatSinks = g_variant.m_heatSinkMass / 100 + 10 - g_variant.m_engineRating / 25;
@@ -767,7 +767,7 @@ void UpdateStats()
 
 void UpdateWeaponMass()
 {
-	MechS32 i;
+	int32_t i;
 
 	g_variant.m_weaponMass = 0;
 	for (i = 0; i < 10; i++) {
@@ -779,13 +779,13 @@ void UpdateWeaponMass()
 
 void UpdateArmor()
 {
-	MechS32 i;
+	int32_t i;
 
 	if (!g_variant.m_ferroFibrous) {
 		g_variant.m_armorFactor = (g_variant.m_armorMass * 16 + 49) / 100;
 	}
 	else {
-		g_variant.m_armorFactor = ((MechS32) (g_variant.m_armorMass * 16 * 1.2) + 49) / 100;
+		g_variant.m_armorFactor = ((int32_t) (g_variant.m_armorMass * 16 * 1.2) + 49) / 100;
 	}
 
 	g_variant.m_armorAllocated = 0;
@@ -820,7 +820,7 @@ void UpdateArmor()
 
 void UpdateAmmoMass()
 {
-	MechS32 i;
+	int32_t i;
 
 	g_variant.m_ammoMass = 0;
 	for (i = 0; i < 25; i++) {
@@ -846,19 +846,19 @@ TextGlyph* DrawLocationMap(ScreenField* p_tab)
 
 TextGlyph* DrawMass(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	sprintf(g_tempBuffer, "%d.%d%d T", value / 100, value / 10 % 10, value % 10);
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
 TextGlyph* DrawUsedMass(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 	undefined* colors;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	colors = p_tab->m_colors;
 	if (value > g_variant.m_maxMass) {
 		colors = g_warningColors;
@@ -870,46 +870,46 @@ TextGlyph* DrawUsedMass(ScreenField* p_tab)
 
 TextGlyph* DrawEngineRating(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	sprintf(g_tempBuffer, value >= 10000 ? "%dXL" : "%d", g_engines[value % 10000].m_rating);
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
 TextGlyph* DrawEngineType(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	return g_defaultFont
-		->AddOverlayText(p_tab->m_left, p_tab->m_top, (MechChar*) (value >= 10000 ? "XL" : "Std"), p_tab->m_colors);
+		->AddOverlayText(p_tab->m_left, p_tab->m_top, (char*) (value >= 10000 ? "XL" : "Std"), p_tab->m_colors);
 }
 
 TextGlyph* DrawEngineMaker(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	sprintf(g_tempBuffer, "%s", g_engines[value % 10000].m_name);
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
 TextGlyph* DrawSpeed(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	sprintf(g_tempBuffer, "%1.1f kph", value * 10.8);
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
 TextGlyph* DrawHeatSinkCount(ScreenField* p_tab)
 {
-	MechS32 value;
-	MechS32 count;
+	int32_t value;
+	int32_t count;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	count = (g_variant.m_heatSinkMass + 50) / 100 + 10;
 	if (value == 1) {
 		sprintf(g_tempBuffer, "%d", count);
@@ -923,27 +923,27 @@ TextGlyph* DrawHeatSinkCount(ScreenField* p_tab)
 
 TextGlyph* DrawHeatSinkType(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	return g_defaultFont
-		->AddOverlayText(p_tab->m_left, p_tab->m_top, (MechChar*) (value == 1 ? "Single" : "Double"), p_tab->m_colors);
+		->AddOverlayText(p_tab->m_left, p_tab->m_top, (char*) (value == 1 ? "Single" : "Double"), p_tab->m_colors);
 }
 
 TextGlyph* DrawNumber(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	sprintf(g_tempBuffer, "%d", value);
 	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, g_tempBuffer, p_tab->m_colors);
 }
 
 TextGlyph* DrawLabel(ScreenField* p_tab)
 {
-	MechChar* text;
+	char* text;
 
-	text = (MechChar*) p_tab->m_data;
+	text = (char*) p_tab->m_data;
 	if (text == NULL) {
 		return NULL;
 	}
@@ -953,9 +953,9 @@ TextGlyph* DrawLabel(ScreenField* p_tab)
 
 TextGlyph* DrawTitle(ScreenField* p_tab)
 {
-	MechChar* text;
+	char* text;
 
-	text = (MechChar*) p_tab->m_data;
+	text = (char*) p_tab->m_data;
 	if (text == NULL) {
 		return NULL;
 	}
@@ -965,20 +965,20 @@ TextGlyph* DrawTitle(ScreenField* p_tab)
 
 TextGlyph* DrawInternalType(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	return g_defaultFont
-		->AddOverlayText(p_tab->m_left, p_tab->m_top, (MechChar*) (value ? "Endo-S" : "Std"), p_tab->m_colors);
+		->AddOverlayText(p_tab->m_left, p_tab->m_top, (char*) (value ? "Endo-S" : "Std"), p_tab->m_colors);
 }
 
 TextGlyph* DrawArmorType(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	return g_defaultFont
-		->AddOverlayText(p_tab->m_left, p_tab->m_top, (MechChar*) (value ? "Ferro-F" : "Std"), p_tab->m_colors);
+		->AddOverlayText(p_tab->m_left, p_tab->m_top, (char*) (value ? "Ferro-F" : "Std"), p_tab->m_colors);
 }
 
 TextGlyph* DrawLocationArmor(ScreenField* p_tab)
@@ -1018,7 +1018,7 @@ TextGlyph* DrawArmorAllocation(ScreenField* p_tab)
 
 TextGlyph* DrawLocationMaxArmor(ScreenField* p_tab)
 {
-	MechS32 location;
+	int32_t location;
 
 	location = MECH_PTR_TO_S32(p_tab->m_data);
 	if (location == -1) {
@@ -1031,9 +1031,9 @@ TextGlyph* DrawLocationMaxArmor(ScreenField* p_tab)
 
 TextGlyph* DrawSelectedLocation(ScreenField* p_tab)
 {
-	MechS32 location;
+	int32_t location;
 
-	location = *(MechS32*) p_tab->m_data;
+	location = *(int32_t*) p_tab->m_data;
 	if (location == -1) {
 		return NULL;
 	}
@@ -1044,11 +1044,11 @@ TextGlyph* DrawSelectedLocation(ScreenField* p_tab)
 
 TextGlyph* DrawWeaponEntry(ScreenField* p_tab)
 {
-	MechS32 value;
-	MechS32 count;
+	int32_t value;
+	int32_t count;
 	undefined* colors;
 
-	value = *(MechS32*) p_tab->m_data;
+	value = *(int32_t*) p_tab->m_data;
 	colors = p_tab->m_colors;
 	if (value == -1) {
 		strcpy(g_tempBuffer, "-");
@@ -1084,7 +1084,7 @@ TextGlyph* DrawWeaponEntry(ScreenField* p_tab)
 
 TextGlyph* DrawWeaponTableEntry(ScreenField* p_tab)
 {
-	MechS32 index;
+	int32_t index;
 	undefined* colors;
 
 	index = MECH_PTR_TO_S32(p_tab->m_data);
@@ -1103,7 +1103,7 @@ TextGlyph* DrawWeaponTableEntry(ScreenField* p_tab)
 // Draws one statistic (p_tab->m_data) of the highlighted weapon.
 TextGlyph* DrawWeaponInfo(ScreenField* p_tab)
 {
-	MechS32 weapon;
+	int32_t weapon;
 
 	if (g_variant.m_selectedWeapon == -1) {
 		return NULL;
@@ -1206,9 +1206,9 @@ TextGlyph* DrawWeaponInfo(ScreenField* p_tab)
 
 TextGlyph* DrawLocationName(ScreenField* p_tab)
 {
-	MechS32 location;
+	int32_t location;
 
-	location = *(MechS32*) p_tab->m_data;
+	location = *(int32_t*) p_tab->m_data;
 	if (location == -1) {
 		return NULL;
 	}
@@ -1220,8 +1220,8 @@ TextGlyph* DrawLocationName(ScreenField* p_tab)
 // piece of equipment or ammunition (ids from 10000 up).
 TextGlyph* DrawCritical(ScreenField* p_tab)
 {
-	MechS32 id;
-	MechS32 i;
+	int32_t id;
+	int32_t i;
 
 	if (g_variant.m_selectedLocation == -1) {
 		return NULL;
@@ -1261,9 +1261,9 @@ TextGlyph* DrawCritical(ScreenField* p_tab)
 // Draws one entry (p_tab->m_data) of the items list with its count, like DrawCritical.
 TextGlyph* DrawUnassigned(ScreenField* p_tab)
 {
-	MechS32 id;
-	MechS32 count;
-	MechS32 i;
+	int32_t id;
+	int32_t count;
+	int32_t i;
 
 	if (g_variant.m_selectedLocation == -1) {
 		return NULL;
@@ -1307,17 +1307,16 @@ TextGlyph* DrawMore(ScreenField* p_tab)
 
 TextGlyph* DrawYesNo(ScreenField* p_tab)
 {
-	MechS32 value;
+	int32_t value;
 
-	value = *(MechS32*) p_tab->m_data;
-	return g_defaultFont
-		->AddOverlayText(p_tab->m_left, p_tab->m_top, (MechChar*) (value ? "Yes" : "No"), p_tab->m_colors);
+	value = *(int32_t*) p_tab->m_data;
+	return g_defaultFont->AddOverlayText(p_tab->m_left, p_tab->m_top, (char*) (value ? "Yes" : "No"), p_tab->m_colors);
 }
 
 TextGlyph* DrawEquipmentName(ScreenField* p_tab)
 {
-	MechS32 id;
-	MechChar* text;
+	int32_t id;
+	char* text;
 
 	id = MECH_PTR_TO_S32(p_tab->m_data);
 	switch (id) {
@@ -1394,17 +1393,17 @@ void EditVariantName(ScreenField* p_tab)
 		g_defaultFont,
 		p_tab->m_left,
 		p_tab->m_top,
-		(MechChar*) p_tab->m_data,
+		(char*) p_tab->m_data,
 		p_tab->m_colors,
 		0x1c,
 		p_tab->m_width
 	);
-	p_tab->m_glyph = g_defaultFont->AddText(p_tab->m_left, p_tab->m_top, (MechChar*) p_tab->m_data, p_tab->m_colors);
+	p_tab->m_glyph = g_defaultFont->AddText(p_tab->m_left, p_tab->m_top, (char*) p_tab->m_data, p_tab->m_colors);
 }
 
 void ClickFaster(ScreenField* p_tab)
 {
-	MechS32 rating;
+	int32_t rating;
 
 	rating = ((g_variant.m_walkingSpeed + 1) * (g_variant.m_maxMass / 100) * 5 + 4) / 5;
 	if (rating < 10) {
@@ -1430,7 +1429,7 @@ void ClickFaster(ScreenField* p_tab)
 
 void ClickSlower(ScreenField* p_tab)
 {
-	MechS32 rating;
+	int32_t rating;
 
 	if (!g_variant.m_walkingSpeed) {
 		return;
@@ -1460,7 +1459,7 @@ void ClickSlower(ScreenField* p_tab)
 
 void ToggleEngineType(ScreenField* p_tab)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (g_variant.m_engine >= 10000) {
 		g_variant.m_engine -= 10000;
@@ -1540,7 +1539,7 @@ void RemoveHeatSink(ScreenField* p_tab)
 
 void ToggleHeatSinkType(ScreenField* p_tab)
 {
-	MechS32 i;
+	int32_t i;
 
 	g_variant.m_heatSinkType = 3 - g_variant.m_heatSinkType;
 	UpdateHeatSinks();
@@ -1627,7 +1626,7 @@ void ToggleInternalType(ScreenField* p_tab)
 
 void ClickAddWeapon(ScreenField* p_tab)
 {
-	MechS32 id;
+	int32_t id;
 
 	if (g_variant.m_selectedWeapon < 0) {
 		return;
@@ -1670,7 +1669,7 @@ void ClickDeleteWeapon(ScreenField* p_tab)
 
 void ClickAddAmmo(ScreenField* p_tab)
 {
-	MechS32 id;
+	int32_t id;
 
 	if (g_variant.m_selectedWeapon < 0) {
 		return;
@@ -1692,7 +1691,7 @@ void ClickAddAmmo(ScreenField* p_tab)
 
 void ClickDeleteAmmo(ScreenField* p_tab)
 {
-	MechS32 count;
+	int32_t count;
 
 	if (g_variant.m_selectedWeapon < 0) {
 		return;
@@ -1714,9 +1713,9 @@ void ClickDeleteAmmo(ScreenField* p_tab)
 
 void SelectWeapon(ScreenField* p_tab)
 {
-	MechS32 id;
+	int32_t id;
 
-	id = *(MechS32*) p_tab->m_data;
+	id = *(int32_t*) p_tab->m_data;
 	if (id < 0) {
 		return;
 	}
@@ -1725,7 +1724,7 @@ void SelectWeapon(ScreenField* p_tab)
 		ClickDeleteWeapon(p_tab);
 	}
 
-	g_variant.m_selectedWeapon = *(MechS32*) p_tab->m_data;
+	g_variant.m_selectedWeapon = *(int32_t*) p_tab->m_data;
 }
 
 void SelectWeaponType(ScreenField* p_tab)
@@ -1757,8 +1756,8 @@ void SelectLocation(ScreenField* p_tab)
 
 void ClickUnassigned(ScreenField* p_tab)
 {
-	MechS32 id;
-	MechS32 count;
+	int32_t id;
+	int32_t count;
 
 	id = g_variant.m_unassigned[MECH_PTR_TO_S32(p_tab->m_data)].m_id;
 	count = g_variant.m_unassigned[MECH_PTR_TO_S32(p_tab->m_data)].m_criticals;
@@ -1786,7 +1785,7 @@ void ClickMore(ScreenField* p_tab)
 
 void ClickCritical(ScreenField* p_tab)
 {
-	MechS32 id;
+	int32_t id;
 
 	if (g_variant.m_selectedLocation < 0) {
 		return;
@@ -1887,10 +1886,10 @@ void RemoveRearArmor(ScreenField* p_tab)
 // actuators (5401, 5402, 5451, 5452) take a fixed slot in the arms, replacing what is there.
 void ToggleEquipment(ScreenField* p_tab)
 {
-	MechS32* flag;
-	MechS32 i;
+	int32_t* flag;
+	int32_t i;
 
-	flag = (MechS32*) p_tab->m_data;
+	flag = (int32_t*) p_tab->m_data;
 	if (*flag == 0) {
 		*flag = 1;
 	}
@@ -1953,7 +1952,7 @@ void ToggleEquipment(ScreenField* p_tab)
 }
 
 // Returns the first tab with a click callback that contains the point.
-ScreenField* FindFieldAt(ScreenField* p_tabs, MechS32 p_x, MechS32 p_y)
+ScreenField* FindFieldAt(ScreenField* p_tabs, int32_t p_x, int32_t p_y)
 {
 	if (p_tabs) {
 		while (p_tabs->m_left != -1) {
@@ -1969,9 +1968,9 @@ ScreenField* FindFieldAt(ScreenField* p_tabs, MechS32 p_x, MechS32 p_y)
 	return NULL;
 }
 
-MechS32 FindMekItemInLocation(MechS32 p_id, MechS32 p_location, MechS32* p_slot)
+int32_t FindMekItemInLocation(int32_t p_id, int32_t p_location, int32_t* p_slot)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < g_mekLocations[p_location].m_slotCount; i++) {
 		if (g_mekLocations[p_location].m_items[i] == p_id) {
@@ -1985,10 +1984,10 @@ MechS32 FindMekItemInLocation(MechS32 p_id, MechS32 p_location, MechS32* p_slot)
 	return FALSE;
 }
 
-MechS32 FindMekItem(MechS32 p_id, MechS32* p_location, MechS32* p_slot)
+int32_t FindMekItem(int32_t p_id, int32_t* p_location, int32_t* p_slot)
 {
-	MechS32 location;
-	MechS32 slot;
+	int32_t location;
+	int32_t slot;
 
 	for (location = 0; location < 8; location++) {
 		if (FindMekItemInLocation(p_id, location, &slot)) {
@@ -2007,12 +2006,12 @@ MechS32 FindMekItem(MechS32 p_id, MechS32* p_location, MechS32* p_slot)
 
 // Saves the variant being edited to the .mek file p_name in the mek directory, creating the
 // directory if needed. Returns 1, or 0 on failure.
-MechS32 SaveMekFile(MechChar* p_name)
+int32_t SaveMekFile(char* p_name)
 {
-	MechS32 ammo;
-	MechS32 i;
-	MechS32 j;
-	MechS32 k;
+	int32_t ammo;
+	int32_t i;
+	int32_t j;
+	int32_t k;
 
 	memset(&g_mekHeader, 0, sizeof(g_mekHeader));
 	memset(g_mekLocations, 0, sizeof(g_mekLocations));
@@ -2070,25 +2069,25 @@ MechS32 SaveMekFile(MechChar* p_name)
 		}
 	}
 
-	g_mekLocations[0].m_internal = (MechS16) g_variant.m_armor[0].m_internal;
-	g_mekLocations[1].m_internal = (MechS16) g_variant.m_armor[1].m_internal;
-	g_mekLocations[2].m_internal = (MechS16) g_variant.m_armor[2].m_internal;
-	g_mekLocations[3].m_internal = (MechS16) g_variant.m_armor[3].m_internal;
-	g_mekLocations[4].m_internal = (MechS16) g_variant.m_armor[4].m_internal;
-	g_mekLocations[5].m_internal = (MechS16) g_variant.m_armor[5].m_internal;
-	g_mekLocations[6].m_internal = (MechS16) g_variant.m_armor[6].m_internal;
-	g_mekLocations[7].m_internal = (MechS16) g_variant.m_armor[7].m_internal;
-	g_mekLocations[0].m_front = (MechS16) g_variant.m_armor[0].m_front;
-	g_mekLocations[1].m_front = (MechS16) g_variant.m_armor[1].m_front;
-	g_mekLocations[2].m_front = (MechS16) g_variant.m_armor[2].m_front;
-	g_mekLocations[3].m_front = (MechS16) g_variant.m_armor[3].m_front;
-	g_mekLocations[4].m_front = (MechS16) g_variant.m_armor[4].m_front;
-	g_mekLocations[5].m_front = (MechS16) g_variant.m_armor[5].m_front;
-	g_mekLocations[6].m_front = (MechS16) g_variant.m_armor[6].m_front;
-	g_mekLocations[7].m_front = (MechS16) g_variant.m_armor[7].m_front;
-	g_mekLocations[1].m_rear = (MechS16) g_variant.m_armor[1].m_rear;
-	g_mekLocations[2].m_rear = (MechS16) g_variant.m_armor[2].m_rear;
-	g_mekLocations[3].m_rear = (MechS16) g_variant.m_armor[3].m_rear;
+	g_mekLocations[0].m_internal = (int16_t) g_variant.m_armor[0].m_internal;
+	g_mekLocations[1].m_internal = (int16_t) g_variant.m_armor[1].m_internal;
+	g_mekLocations[2].m_internal = (int16_t) g_variant.m_armor[2].m_internal;
+	g_mekLocations[3].m_internal = (int16_t) g_variant.m_armor[3].m_internal;
+	g_mekLocations[4].m_internal = (int16_t) g_variant.m_armor[4].m_internal;
+	g_mekLocations[5].m_internal = (int16_t) g_variant.m_armor[5].m_internal;
+	g_mekLocations[6].m_internal = (int16_t) g_variant.m_armor[6].m_internal;
+	g_mekLocations[7].m_internal = (int16_t) g_variant.m_armor[7].m_internal;
+	g_mekLocations[0].m_front = (int16_t) g_variant.m_armor[0].m_front;
+	g_mekLocations[1].m_front = (int16_t) g_variant.m_armor[1].m_front;
+	g_mekLocations[2].m_front = (int16_t) g_variant.m_armor[2].m_front;
+	g_mekLocations[3].m_front = (int16_t) g_variant.m_armor[3].m_front;
+	g_mekLocations[4].m_front = (int16_t) g_variant.m_armor[4].m_front;
+	g_mekLocations[5].m_front = (int16_t) g_variant.m_armor[5].m_front;
+	g_mekLocations[6].m_front = (int16_t) g_variant.m_armor[6].m_front;
+	g_mekLocations[7].m_front = (int16_t) g_variant.m_armor[7].m_front;
+	g_mekLocations[1].m_rear = (int16_t) g_variant.m_armor[1].m_rear;
+	g_mekLocations[2].m_rear = (int16_t) g_variant.m_armor[2].m_rear;
+	g_mekLocations[3].m_rear = (int16_t) g_variant.m_armor[3].m_rear;
 
 	g_mekHeader.m_tonnage = (g_variant.m_maxMass + 50) / 100;
 	g_mekHeader.m_walkingSpeed = g_variant.m_walkingSpeed;
@@ -2097,7 +2096,7 @@ MechS32 SaveMekFile(MechChar* p_name)
 	strcpy(g_mekVariantName, g_variant.m_variantName);
 
 	sprintf(g_mekPath, "mek\\%s", p_name);
-	MechS32 file = MechOpen(g_mekPath, c_mechOpenWrite);
+	int32_t file = MechOpen(g_mekPath, c_mechOpenWrite);
 	if (file == -1) {
 		sprintf(g_mekPath, "mek\\");
 		if (MechMakeDir(g_mekPath) != 0) {
@@ -2123,9 +2122,9 @@ MechS32 SaveMekFile(MechChar* p_name)
 
 // Returns the image of a .mek file: a user variant from the mek directory, or a standard one
 // ("…std") from the project file.
-void* LoadMekImage(MechChar* p_name)
+void* LoadMekImage(char* p_name)
 {
-	MechChar path[0x20];
+	char path[0x20];
 
 	if (strncasecmp(p_name + 5, "std", 3)) {
 		strcpy(path, "mek\\");
@@ -2134,7 +2133,7 @@ void* LoadMekImage(MechChar* p_name)
 			strcat(path, ".mek");
 		}
 
-		MechS32 file = MechOpen(path, c_mechOpenRead);
+		int32_t file = MechOpen(path, c_mechOpenRead);
 		if (file == -1) {
 			return NULL;
 		}
@@ -2147,7 +2146,7 @@ void* LoadMekImage(MechChar* p_name)
 	return g_projectArchive->GetResourceByName(p_name, 6, "MEK");
 }
 
-void ReleaseMekImage(MechChar* p_name)
+void ReleaseMekImage(char* p_name)
 {
 	if (!strncasecmp(p_name + 5, "std", 3)) {
 		g_projectArchive->ReleaseResourceByName(p_name, 6, "MEK");
@@ -2155,16 +2154,16 @@ void ReleaseMekImage(MechChar* p_name)
 }
 
 // Copies p_size bytes and returns the source position after them.
-undefined* ReadBytes(undefined* p_dst, undefined* p_src, MechU32 p_size)
+undefined* ReadBytes(undefined* p_dst, undefined* p_src, uint32_t p_size)
 {
 	memcpy(p_dst, p_src, p_size);
 	return p_src + p_size;
 }
 
-void SetCritical(MechS32 p_location, MechS32 p_slot, MechS32 p_id)
+void SetCritical(int32_t p_location, int32_t p_slot, int32_t p_id)
 {
-	MechS32 count;
-	MechS32 id;
+	int32_t count;
+	int32_t id;
 
 	id = g_variant.m_criticals[p_location][p_slot];
 	if (id) {
@@ -2179,13 +2178,13 @@ void SetCritical(MechS32 p_location, MechS32 p_slot, MechS32 p_id)
 
 // Loads the .mek file p_name into the variant being edited, keeping the previous variant in
 // g_previousVariant, and derives the engine, armor and internal structure from it.
-void LoadMekFile(MechChar* p_name)
+void LoadMekFile(char* p_name)
 {
-	MechS32 id;
+	int32_t id;
 	undefined* data;
-	MechS32 i;
-	MechS32 j;
-	MechS32 k;
+	int32_t i;
+	int32_t j;
+	int32_t k;
 
 	data = (undefined*) LoadMekImage(p_name);
 	if (data == NULL) {
@@ -2279,10 +2278,10 @@ void LoadMekFile(MechChar* p_name)
 		g_variant.m_armorFactor += g_mekLocations[i].m_rear + g_mekLocations[i].m_front;
 	}
 	if (g_variant.m_ferroFibrous == 1) {
-		g_variant.m_armorMass = (MechS32) (g_variant.m_armorFactor / 19.2 * 100.0);
+		g_variant.m_armorMass = (int32_t) (g_variant.m_armorFactor / 19.2 * 100.0);
 	}
 	else {
-		g_variant.m_armorMass = (MechS32) (g_variant.m_armorFactor / 16.0 * 100.0);
+		g_variant.m_armorMass = (int32_t) (g_variant.m_armorFactor / 16.0 * 100.0);
 	}
 	g_variant.m_armorMass = RoundTons(g_variant.m_armorMass * 2) / 2;
 	g_variant.m_armorAllocated = g_variant.m_armorFactor;
@@ -2396,9 +2395,9 @@ void LoadMekFile(MechChar* p_name)
 
 // Lists the variants of a mech: the standard ones from the project file in 1-99 (and the name
 // of the first in 0), the user's from the mek directory in 100-199.
-void LoadMechBuildList(MechChar* p_prefix)
+void LoadMechBuildList(char* p_prefix)
 {
-	MechS32 i;
+	int32_t i;
 	MechFileList* files;
 	size_t count;
 	size_t file;
@@ -2443,7 +2442,7 @@ void LoadChassis()
 void PlayChassisName()
 {
 	void* audioData;
-	MechS32 audioSize;
+	int32_t audioSize;
 
 	if (g_mechChassis[g_selectedChassis].m_nameSample < 0) {
 		return;
@@ -2529,9 +2528,9 @@ void PreviousVariant()
 }
 
 // Saves the variant under the first free user slot. Returns FALSE when the variant is invalid.
-MechS32 SaveUserVariant()
+int32_t SaveUserVariant()
 {
-	MechS32 i;
+	int32_t i;
 
 	if (g_variant.m_unassigned[0].m_id != -1) {
 		ShowDialog("Invalid 'Mech specification:|Unassigned criticals detected.#Ok", 0);
@@ -2570,7 +2569,7 @@ MechS32 SaveUserVariant()
 // The mech bay's field tables: the bay's own (g_mechBayFields), the customize screen's
 // (g_customizeFields) and the ones its components switch to on the right.
 // A field's m_top: a packed row and offset below the previous field (see ScreenField).
-#define MB_ROW(row, offset) ((MechS32) (0x80000000 | ((row) << 4) | (offset)))
+#define MB_ROW(row, offset) ((int32_t) (0x80000000 | ((row) << 4) | (offset)))
 #define MB_TAB(left, top, width, height, colors, draw, click, data, next)                                              \
 	{left, top, width, height, colors, NULL, draw, click, (void*) (data), next}
 #define MB_END {-1, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL}
@@ -3021,13 +3020,13 @@ ScreenField g_mechBayFields[] = {
 
 // Opens the mech bay: its sounds, color maps, menu and videos, the chassis and variant of the
 // current star's selected mech, and its fields.
-void DrawMechBay(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam)
+void DrawMechBay(TMPackDataBase* p_database, int32_t p_campaign, size_t p_wParam)
 {
 	CustomStar* star;
 	void* data;
-	MechS32 i;
-	MechChar* variant;
-	MechS32 size;
+	int32_t i;
+	char* variant;
+	int32_t size;
 
 	g_mechBayMessage = p_wParam;
 	if (g_pickStarMech && p_wParam == c_msgStarConfig) {

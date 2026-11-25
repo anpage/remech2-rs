@@ -11,12 +11,12 @@ struct SimHandoffState {
 	undefined4 m_msg;             // 0x00 — the message to post on return
 	undefined4 m_campaign;        // 0x04
 	undefined4 m_pilotChosen;     // 0x08
-	MechS32 m_playerStarSelected; // 0x0c
+	int32_t m_playerStarSelected; // 0x0c
 	CustomStar m_playerStar;      // 0x10
 	CustomStar m_enemyStar;       // 0x90
 	undefined4 m_briefingMission; // 0x110 — an index into g_briefingScenarios (missionui.cpp)
-	MechS32 m_pilot;              // 0x114 — an index into g_pilotRoster, -1 for none
-	MechChar m_cmdLine[0x100];    // 0x118 — the simulator's command line
+	int32_t m_pilot;              // 0x114 — an index into g_pilotRoster, -1 for none
+	char m_cmdLine[0x100];        // 0x118 — the simulator's command line
 };
 
 #endif // SIMHANDOFFSTATE_H

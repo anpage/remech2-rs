@@ -8,9 +8,9 @@
 
 // A condition of a mission table entry, which SetUpStarMission turns into an ObjectiveCondition.
 typedef struct MissionEntryCondition {
-	MechChar m_kind;     // 0x00 — 'C' done, 'S' successful, 'F' failed; anything else ends the list
-	MechU8 m_objective;  // 0x01 — copied to the ObjectiveCondition's (SetUpStarMission)
-	MechU8 m_star;       // 0x02
+	char m_kind;         // 0x00 — 'C' done, 'S' successful, 'F' failed; anything else ends the list
+	uint8_t m_objective; // 0x01 — copied to the ObjectiveCondition's (SetUpStarMission)
+	uint8_t m_star;      // 0x02
 	undefined m_unk0x03; // 0x03
 } MissionEntryCondition;
 

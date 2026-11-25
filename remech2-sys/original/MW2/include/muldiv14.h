@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-	MechS32 ProjectRadius(MechS32 p_scale, MechS32 p_radius, MechS32 p_depth);
+	int32_t ProjectRadius(int32_t p_scale, int32_t p_radius, int32_t p_depth);
 
 #ifdef __cplusplus
 }

@@ -21,19 +21,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-MechChar* g_fatalErrorTitle = "\nMW2.EXE - fatal error";
+char* g_fatalErrorTitle = "\nMW2.EXE - fatal error";
 
-MechChar* g_warningTitle = "\nMW2.EXE - warning";
+char* g_warningTitle = "\nMW2.EXE - warning";
 
 // The code of the last error.
-MechS32 g_errorCode = 0;
+int32_t g_errorCode = 0;
 
 // The error message; the length is unknown.
-MechChar g_errorMessage[0x400];
+char g_errorMessage[0x400];
 
 // Reports error p_code, with a printf-style message: codes that are warnings are logged, the
 // others are fatal and end the game, most of them after shutting the subsystems down.
-void Error(MechS32 p_code, const char* p_format, ...)
+void Error(int32_t p_code, const char* p_format, ...)
 {
 	va_list args;
 
@@ -167,7 +167,7 @@ void ShowFatalError(const char* p_format, va_list p_args)
 // Formats an error's message: p_title, the code, the code's text from the "SystemError" section,
 // and the printf-style message p_format, if any. The message is logged and shown. The original
 // took a pointer to p_format on Error's stack and read the arguments from the slots after it.
-MechChar* FormatErrorMessage(MechChar* p_title, MechS32 p_code, const char* p_format, va_list p_args)
+char* FormatErrorMessage(char* p_title, int32_t p_code, const char* p_format, va_list p_args)
 {
 	int written;
 

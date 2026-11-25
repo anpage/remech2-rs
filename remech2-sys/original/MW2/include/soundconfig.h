@@ -6,20 +6,20 @@
 
 // The sound and display settings, copied field by field to and from the player's settings.
 struct SoundConfig {
-	MechS32 m_effectsVolume;
-	MechS32 m_voiceVolume;
+	int32_t m_effectsVolume;
+	int32_t m_voiceVolume;
 	// the simulator plays its music from CD
-	MechS32 m_midiVolume;
+	int32_t m_midiVolume;
 	// the simulator's sound flags
 	undefined4 m_simFlags;
-	MechS32 m_objectTextmaps;
-	MechS32 m_terrainTextmaps;
+	int32_t m_objectTextmaps;
+	int32_t m_terrainTextmaps;
 	// high or low
-	MechS32 m_displayDetail;
+	int32_t m_displayDetail;
 	// high or low
-	MechS32 m_objectDensity;
-	MechS32 m_explosionChunks;
-	MechS32 m_displayBrightness;
+	int32_t m_objectDensity;
+	int32_t m_explosionChunks;
+	int32_t m_displayBrightness;
 };
 typedef struct SoundConfig SoundConfig;
 

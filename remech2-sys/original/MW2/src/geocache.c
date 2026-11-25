@@ -39,36 +39,36 @@
 // Two maps from world stream IDs to indices: the game things' (FindThingIdxById, filled by
 // CreateObjectNode), and the stars', the static objects' (FindStarIdxById, AllocStaticObject).
 // Their sizes come from the static memory table (AllocGeoTables).
-MechS32* g_thingIndices = NULL;
+int32_t* g_thingIndices = NULL;
 
-MechS32* g_thingIds = NULL;
+int32_t* g_thingIds = NULL;
 
 // Set inside a world stream's repeated section (REPR to ENDR); g_repeatPass counts its passes.
-MechS32 g_inRepeat = 0;
+int32_t g_inRepeat = 0;
 
-MechS32 g_repeatPass = 0;
+int32_t g_repeatPass = 0;
 
-MechS32* g_starIndices = NULL;
+int32_t* g_starIndices = NULL;
 
-MechS32* g_starIds = NULL;
+int32_t* g_starIds = NULL;
 
-MechS32 g_classCount = 0;
+int32_t g_classCount = 0;
 
-MechS32 g_classCapacity = 0;
+int32_t g_classCapacity = 0;
 
 GeoClass* g_classes = NULL;
 
-MechS32 g_staticObjectCount = 0;
+int32_t g_staticObjectCount = 0;
 
 undefined4 g_staticCacheReady = 0;
 
 // The block BeginBlock opens next.
-MechS32 g_nextBlock = 0;
+int32_t g_nextBlock = 0;
 
 // The block BeginBlock opened last, -1: none.
-MechS32 g_currentBlock = -1;
+int32_t g_currentBlock = -1;
 
-MechS32 g_blockDepth = 0;
+int32_t g_blockDepth = 0;
 
 // The transform the next block opens with (ApplyBlockXform).
 Xform g_pendingXform = {1, 1, 1, 0, 0, 0, 0, 0, 0};
@@ -76,38 +76,38 @@ Xform g_pendingXform = {1, 1, 1, 0, 0, 0, 0, 0, 0};
 // The transform BeginBlock resets g_pendingXform to.
 Xform g_defaultXform = {1, 1, 1, 0, 0, 0, 0, 0, 0};
 
-MechS32 g_explosionChunks = 1;
+int32_t g_explosionChunks = 1;
 
 StaticBlock g_staticBlocks[32];
 
 StaticObject g_staticObjects[0x402];
 
-MechS32 g_starCapacity;
+int32_t g_starCapacity;
 
-MechS32 g_thingCount;
+int32_t g_thingCount;
 
 // The blocks BeginBlock opened.
-MechS32 g_blockStack[32];
+int32_t g_blockStack[32];
 
 // Set when PropagateStaticObjectStates changed an entry; UpdateGeoCache propagates again.
-MechS32 g_staticObjectsChanged;
+int32_t g_staticObjectsChanged;
 
 // The shapes ToggleBlockBoxes shows for the blocks' boxes.
 Shape* g_blockBoxes[32];
 
-MechS32 g_thingCapacity;
+int32_t g_thingCapacity;
 
 // Whether ToggleBlockBoxes shows the blocks' boxes.
-MechS32 g_blockBoxesShown;
+int32_t g_blockBoxesShown;
 
-MechS32 g_starCount;
+int32_t g_starCount;
 
 // Allocates the class, thing and star tables to the sizes in the mission's static memory table.
 // Returns whether it could.
-MechS32 AllocGeoTables(void)
+int32_t AllocGeoTables(void)
 {
-	MechU32 size;
-	MechS32 result;
+	uint32_t size;
+	int32_t result;
 
 	result = 0;
 	FreeGeoTables();
@@ -144,9 +144,9 @@ MechS32 AllocGeoTables(void)
 }
 
 // Adds a class to the class table. Returns whether there was room.
-MechS32 AddClass(MechS32 p_id, Shape* p_class)
+int32_t AddClass(int32_t p_id, Shape* p_class)
 {
-	MechS32 result;
+	int32_t result;
 
 	result = 0;
 	if (g_classCount < g_classCapacity) {
@@ -160,10 +160,10 @@ MechS32 AddClass(MechS32 p_id, Shape* p_class)
 }
 
 // Returns the class of an ID (the last one added), or NULL.
-Shape* FindClassById(MechS32 p_id)
+Shape* FindClassById(int32_t p_id)
 {
 	Shape* result;
-	MechS32 i;
+	int32_t i;
 
 	result = NULL;
 	for (i = g_classCount - 1; i >= 0; i--) {
@@ -211,10 +211,10 @@ void FreeGeoTables(void)
 }
 
 // Returns the thing index of an ID (the last one listed), or -1.
-MechS32 FindThingIdxById(MechS32 p_id)
+int32_t FindThingIdxById(int32_t p_id)
 {
-	MechS32 i;
-	MechS32 result;
+	int32_t i;
+	int32_t result;
 
 	result = -1;
 	for (i = 0; i < g_thingCount; i++) {
@@ -238,10 +238,10 @@ void UpdateGeoCache(void)
 }
 
 // Returns the star index of an ID (the last one listed), or -1.
-MechS32 FindStarIdxById(MechS32 p_id)
+int32_t FindStarIdxById(int32_t p_id)
 {
-	MechS32 i;
-	MechS32 result;
+	int32_t i;
+	int32_t result;
 
 	result = -1;
 	if (p_id >= 0) {
@@ -257,9 +257,9 @@ MechS32 FindStarIdxById(MechS32 p_id)
 
 // Takes the next free static object for ID p_id, mapping the ID to it. Returns its index, or -1
 // when the cache or the map is full.
-MechS32 AllocStaticObject(undefined4 p_id)
+int32_t AllocStaticObject(undefined4 p_id)
 {
-	MechS32 result = -1;
+	int32_t result = -1;
 
 	if (!g_staticCacheReady) {
 		ResetStaticCache();
@@ -276,31 +276,31 @@ MechS32 AllocStaticObject(undefined4 p_id)
 	return result;
 }
 
-Shape** GetStaticShapeSlot(MechS32 p_index)
+Shape** GetStaticShapeSlot(int32_t p_index)
 {
 	return &g_staticObjects[p_index].m_shape;
 }
 
-Shape* GetStaticShape(MechS32 p_index)
+Shape* GetStaticShape(int32_t p_index)
 {
 	return g_staticObjects[p_index].m_shape;
 }
 
 // Places static object p_id: its resource, transform, block and parent, and the object it hangs
 // from (none for a shape-only entry, -2). Returns its index, or -1 if p_id isn't cached.
-MechS32 PlaceStaticObject(
-	MechS32 p_id,
-	MechS32 p_resource,
+int32_t PlaceStaticObject(
+	int32_t p_id,
+	int32_t p_resource,
 	Xform p_xform,
-	MechS32 p_block,
-	MechS32 p_parent,
-	MechS32 p_unk0x3c,
-	MechU32 p_flags,
-	MechU32 p_kind,
+	int32_t p_block,
+	int32_t p_parent,
+	int32_t p_unk0x3c,
+	uint32_t p_flags,
+	uint32_t p_kind,
 	undefined4 p_shapeKind
 )
 {
-	MechS32 index;
+	int32_t index;
 	StaticObject* entry;
 	Matrix matrix;
 
@@ -354,7 +354,7 @@ void BeginBlock(BwdBlockRecord* p_record)
 	StaticBlock* block;
 	Matrix* matrix;
 	Matrix scale;
-	MechS32 i;
+	int32_t i;
 	StaticBlock* parent;
 	Matrix translate;
 	Matrix rotation;
@@ -448,7 +448,7 @@ void ApplyBlockXform(Xform p_xform)
 }
 
 // Transforms a point by the current block's matrix.
-void TransformBlockPoint(MechS32* p_point)
+void TransformBlockPoint(int32_t* p_point)
 {
 	if (g_currentBlock != -1) {
 		TransformPoint(&g_staticBlocks[g_currentBlock].m_matrix, p_point, p_point + 1, p_point + 2);
@@ -456,7 +456,7 @@ void TransformBlockPoint(MechS32* p_point)
 }
 
 // Resets a static object cache entry.
-void ResetStaticObject(MechS32 p_index)
+void ResetStaticObject(int32_t p_index)
 {
 	StaticObject* entry;
 
@@ -478,7 +478,7 @@ void ResetStaticObject(MechS32 p_index)
 
 void ResetStaticCache(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x402; i++) {
 		ResetStaticObject(i);
@@ -490,7 +490,7 @@ void ResetStaticCache(void)
 
 void FirstStaticCache(void)
 {
-	MechS32 i;
+	int32_t i;
 	StaticObject* entry;
 
 	for (i = 0; i < g_staticObjectCount; i++) {
@@ -499,7 +499,7 @@ void FirstStaticCache(void)
 	}
 }
 
-void AttachTaskToObj(MechS32 p_index, TimedCallbackFn p_fn, MechS32 p_period, MechChar* p_data)
+void AttachTaskToObj(int32_t p_index, TimedCallbackFn p_fn, int32_t p_period, char* p_data)
 {
 	StaticObject* entry;
 
@@ -510,7 +510,7 @@ void AttachTaskToObj(MechS32 p_index, TimedCallbackFn p_fn, MechS32 p_period, Me
 // Runs the timed callbacks of the cache entries.
 void RunStaticObjectTasks(void)
 {
-	MechS32 i;
+	int32_t i;
 	StaticObject* entry;
 
 	for (i = 0; i < g_staticObjectCount; i++) {
@@ -523,7 +523,7 @@ void RunStaticObjectTasks(void)
 
 // The static object's timed callbacks: removes one, removes them all, or signals them all (-1)
 // when the object is loaded again.
-void RemoveStaticObjectTask(MechS32 p_index, TimedCallback* p_callback)
+void RemoveStaticObjectTask(int32_t p_index, TimedCallback* p_callback)
 {
 	StaticObject* entry;
 
@@ -531,7 +531,7 @@ void RemoveStaticObjectTask(MechS32 p_index, TimedCallback* p_callback)
 	RemoveTask(&entry->m_callback, p_callback);
 }
 
-void RemoveStaticObjectTasks(MechS32 p_index)
+void RemoveStaticObjectTasks(int32_t p_index)
 {
 	StaticObject* entry;
 
@@ -539,7 +539,7 @@ void RemoveStaticObjectTasks(MechS32 p_index)
 	RemoveAllTasks(&entry->m_callback);
 }
 
-void SignalStaticObjectTasks(MechS32 p_index)
+void SignalStaticObjectTasks(int32_t p_index)
 {
 	StaticObject* entry;
 
@@ -547,7 +547,7 @@ void SignalStaticObjectTasks(MechS32 p_index)
 	SignalAllTasks(&entry->m_callback);
 }
 
-void SetStaticObjectKind(MechS32 p_index, MechU32 p_kind)
+void SetStaticObjectKind(int32_t p_index, uint32_t p_kind)
 {
 	StaticObject* entry;
 
@@ -558,7 +558,7 @@ void SetStaticObjectKind(MechS32 p_index, MechU32 p_kind)
 
 // Links cache entry p_index to its game thing and to the entry that replaces it when the thing is
 // destroyed (DestroyStaticObject), which stays unloaded (0x800) until then.
-void LinkStaticObjectThing(MechS32 p_index, MechS32 p_replacement, MechS32 p_thing)
+void LinkStaticObjectThing(int32_t p_index, int32_t p_replacement, int32_t p_thing)
 {
 	StaticObject* replacement;
 	StaticObject* entry;
@@ -570,8 +570,8 @@ void LinkStaticObjectThing(MechS32 p_index, MechS32 p_replacement, MechS32 p_thi
 	entry = &g_staticObjects[p_index];
 	entry->m_flags |= 0x400;
 	entry->m_shapeKind |= 0x200;
-	entry->m_replacement = (MechS16) p_replacement;
-	entry->m_thing = (MechS16) p_thing;
+	entry->m_replacement = (int16_t) p_replacement;
+	entry->m_thing = (int16_t) p_thing;
 	if (p_replacement > -1) {
 		replacement = &g_staticObjects[p_replacement];
 		replacement->m_flags |= 0x800;
@@ -582,10 +582,10 @@ void LinkStaticObjectThing(MechS32 p_index, MechS32 p_replacement, MechS32 p_thi
 // Destroys the game thing of cache entry p_index: marks both (0x200 and 0x800, 4), frees its shape
 // and loads the entry that replaces it (m_replacement) where the old object was. Returns the
 // replacement's index, or -1.
-MechS32 DestroyStaticObject(MechS32 p_index)
+int32_t DestroyStaticObject(int32_t p_index)
 {
 	Matrix matrix;
-	MechS32 replacement;
+	int32_t replacement;
 	struct SceneObject* obj;
 	StaticObject* entry;
 	Shape* shape;
@@ -643,8 +643,8 @@ MechS32 DestroyStaticObject(MechS32 p_index)
 // game thing has flag 0x8000, its object tree is handed to BlowOffObjTree and FreeStaticObjectTree.
 void DestroyThingObject(GameThing* p_thing)
 {
-	MechS32 index;
-	MechS32 current;
+	int32_t index;
+	int32_t current;
 	GameThing* thing;
 	StaticObject* entry;
 
@@ -674,8 +674,8 @@ void DestroyThingObject(GameThing* p_thing)
 void PropagateStaticObjectStates(void)
 {
 	GameThing* thing;
-	MechS32 i;
-	MechS32 index;
+	int32_t i;
+	int32_t index;
 	StaticObject* entry;
 
 	for (i = 0; i < g_staticObjectCount; i++) {
@@ -715,10 +715,10 @@ void PropagateStaticObjectStates(void)
 }
 
 // Returns whether every static object in use has a resource (the world loader's check).
-MechS32 AreStaticObjectsComplete(void)
+int32_t AreStaticObjectsComplete(void)
 {
-	MechS32 i;
-	MechS32 found;
+	int32_t i;
+	int32_t found;
 
 	found = FALSE;
 	for (i = 0; i < g_staticObjectCount && !found; i++) {
@@ -738,14 +738,14 @@ MechS32 AreStaticObjectsComplete(void)
 // Loads cache entry p_index's shape and places it: a shape-only entry (-2) in block p_block's
 // frame, otherwise on its object. Returns TRUE while the shape is loaded, FALSE if it can't be or
 // shouldn't be: a hidden entry (0x800), or a destroyed game thing's (without explosion chunks).
-MechS32 LoadStaticObject(MechS32 p_index, MechS32 p_block)
+int32_t LoadStaticObject(int32_t p_index, int32_t p_block)
 {
-	MechS32 size;
-	MechS32 offset;
-	MechS32 thing;
-	MechU8* data;
+	int32_t size;
+	int32_t offset;
+	int32_t thing;
+	uint8_t* data;
 	struct SceneObject* parent;
-	MechU32 kind;
+	uint32_t kind;
 	StaticObject* entry;
 	Matrix matrix;
 
@@ -858,7 +858,7 @@ MechS32 LoadStaticObject(MechS32 p_index, MechS32 p_block)
 }
 
 // Frees a cache entry's shape.
-void UnloadStaticObject(MechS32 p_index)
+void UnloadStaticObject(int32_t p_index)
 {
 	StaticObject* entry;
 
@@ -869,7 +869,7 @@ void UnloadStaticObject(MechS32 p_index)
 	}
 }
 
-struct SceneObject* GetStaticSceneObject(MechS32 p_index)
+struct SceneObject* GetStaticSceneObject(int32_t p_index)
 {
 	struct SceneObject* result;
 
@@ -881,7 +881,7 @@ struct SceneObject* GetStaticSceneObject(MechS32 p_index)
 	return result;
 }
 
-Shape* GetStaticObjectShape(MechS32 p_index)
+Shape* GetStaticObjectShape(int32_t p_index)
 {
 	Shape* result;
 
@@ -895,7 +895,7 @@ Shape* GetStaticObjectShape(MechS32 p_index)
 
 // Returns a cache entry's position: its shape's, or its object's. A bad index (the test lets
 // g_staticObjectCount itself through) or an empty entry gives 0, 0, 0.
-void GetStaticObjectPosition(MechS32 p_index, MechS32* p_x, MechS32* p_y, MechS32* p_z)
+void GetStaticObjectPosition(int32_t p_index, int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
 	struct SceneObject* obj;
 	StaticObject* entry;
@@ -926,24 +926,24 @@ void GetStaticObjectPosition(MechS32 p_index, MechS32* p_x, MechS32* p_y, MechS3
 
 // Shows the static blocks' boxes (the "unitbox" model scaled to each), or frees them when they are
 // shown. Returns whether any is shown.
-MechS32 ToggleBlockBoxes(void)
+int32_t ToggleBlockBoxes(void)
 {
-	MechS32 result;
-	MechS32 size;
+	int32_t result;
+	int32_t size;
 	ResourceRef* ref;
-	MechS32 dz;
-	MechS32 dy;
-	MechS32 dx;
-	MechS32 scaleZ;
-	MechS32 scaleY;
-	MechS32 scaleX;
-	MechS32 offset;
+	int32_t dz;
+	int32_t dy;
+	int32_t dx;
+	int32_t scaleZ;
+	int32_t scaleY;
+	int32_t scaleX;
+	int32_t offset;
 	Shape* shape;
 	StaticBlock* block;
-	MechS32 i;
+	int32_t i;
 	ResourceRef local;
 	Matrix matrix;
-	MechU8* data;
+	uint8_t* data;
 
 	result = FALSE;
 	if (!g_blockBoxesShown) {
@@ -1019,10 +1019,10 @@ MechS32 ToggleBlockBoxes(void)
 // Loads the "unitbox" model into every box of the tree p_root.
 void ShowQuadtreeBoxes(QuadtreeNode* p_root)
 {
-	MechS32 size;
+	int32_t size;
 	ResourceRef* ref;
 	ResourceRef local;
-	MechU8* data;
+	uint8_t* data;
 
 	ref = &local;
 	ref->m_id = -1;
@@ -1045,20 +1045,20 @@ void ShowQuadtreeBoxes(QuadtreeNode* p_root)
 }
 
 // Loads model p_data scaled to the box of p_node at its center, then to its children's.
-void LoadQuadtreeBoxes(QuadtreeNode* p_node, MechU8* p_data, MechS32 p_size)
+void LoadQuadtreeBoxes(QuadtreeNode* p_node, uint8_t* p_data, int32_t p_size)
 {
-	MechS32 dz;
-	MechS32 dy;
-	MechS32 dx;
-	MechS32 scaleZ;
-	MechS32 scaleY;
-	MechS32 scaleX;
-	MechS32 offset;
-	MechS32 x;
+	int32_t dz;
+	int32_t dy;
+	int32_t dx;
+	int32_t scaleZ;
+	int32_t scaleY;
+	int32_t scaleX;
+	int32_t offset;
+	int32_t x;
 	Shape* shape;
-	MechS32 z;
-	MechS32 i;
-	MechS32 y;
+	int32_t z;
+	int32_t i;
+	int32_t y;
 	Matrix matrix;
 
 	if (!p_node) {
@@ -1095,11 +1095,11 @@ void LoadQuadtreeBoxes(QuadtreeNode* p_node, MechU8* p_data, MechS32 p_size)
 
 // Frees cache entry p_index and, first, every entry hanging from it, zeroing its game thing.
 // Returns whether p_index is an entry.
-MechS32 FreeStaticObjectTree(MechU32 p_index)
+int32_t FreeStaticObjectTree(uint32_t p_index)
 {
-	MechS32 result;
-	MechU32 thing;
-	MechS32 i;
+	int32_t result;
+	uint32_t thing;
+	int32_t i;
 	StaticObject* entry;
 
 	result = FALSE;
@@ -1142,12 +1142,12 @@ void DestroyObjTreeAndShapes(struct SceneObject* p_obj)
 	DestroyObjTree(p_obj, callback);
 }
 
-MechS32 GetExplosionChunks(MechS32 p_arg)
+int32_t GetExplosionChunks(int32_t p_arg)
 {
 	return g_explosionChunks;
 }
 
-void SetExplosionChunks(MechS32 p_arg, MechS32 p_explosionChunks)
+void SetExplosionChunks(int32_t p_arg, int32_t p_explosionChunks)
 {
 	g_explosionChunks = p_explosionChunks;
 	g_mw2SndCfgData->m_explosionChunks = p_explosionChunks;

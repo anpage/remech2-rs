@@ -8,10 +8,10 @@
 // What the shell hands SimMain for a network game: its DirectPlay session, the local player's
 // id and the ids of the players, by slot.
 typedef struct NetLaunchInfo {
-	LPDIRECTPLAY m_directPlay;        // 0x00
-	DPID m_localPlayerId;             // 0x04
-	DPID* m_playerIds;                // 0x10
-	char* m_missionName;              // 0x24
+	LPDIRECTPLAY m_directPlay; // 0x00
+	DPID m_localPlayerId;      // 0x04
+	DPID* m_playerIds;         // 0x10
+	char* m_missionName;       // 0x24
 } NetLaunchInfo;
 
 #endif // NETLAUNCHINFO_H

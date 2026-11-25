@@ -9,7 +9,7 @@
 
 #include <math.h>
 
-void BuildRayFromSegment(Ray* p_ray, MechS32 p_x0, MechS32 p_y0, MechS32 p_z0, MechS32 p_x1, MechS32 p_y1, MechS32 p_z1)
+void BuildRayFromSegment(Ray* p_ray, int32_t p_x0, int32_t p_y0, int32_t p_z0, int32_t p_x1, int32_t p_y1, int32_t p_z1)
 {
 	p_ray->m_x0 = p_x0;
 	p_ray->m_y0 = p_y0;
@@ -26,13 +26,13 @@ void BuildRayFromSegment(Ray* p_ray, MechS32 p_x0, MechS32 p_y0, MechS32 p_z0, M
 
 void BuildRayFromDirection(
 	Ray* p_ray,
-	MechS32 p_x0,
-	MechS32 p_y0,
-	MechS32 p_z0,
-	MechS32 p_dirX,
-	MechS32 p_dirY,
-	MechS32 p_dirZ,
-	MechS32 p_length
+	int32_t p_x0,
+	int32_t p_y0,
+	int32_t p_z0,
+	int32_t p_dirX,
+	int32_t p_dirY,
+	int32_t p_dirZ,
+	int32_t p_length
 )
 {
 	p_ray->m_x0 = p_x0;
@@ -51,7 +51,7 @@ void BuildRayFromDirection(
 	p_ray->m_state = c_rayFixed;
 }
 
-MechS32 GetRayLength(Ray* p_ray)
+int32_t GetRayLength(Ray* p_ray)
 {
 	if (p_ray->m_state == c_rayNone) {
 		BuildRayFixed(p_ray);
@@ -62,7 +62,7 @@ MechS32 GetRayLength(Ray* p_ray)
 
 void BuildRayFixed(Ray* p_ray)
 {
-	MechS32 length;
+	int32_t length;
 
 	if (p_ray->m_state == c_rayNone) {
 		p_ray->m_length = ApproximateVectorLength(p_ray->m_dx, p_ray->m_dy, p_ray->m_dz);
@@ -78,10 +78,10 @@ void BuildRayFixed(Ray* p_ray)
 
 void BuildRayFloat(Ray* p_ray)
 {
-	MechDouble dx;
-	MechDouble dy;
-	MechDouble dz;
-	MechDouble length;
+	double dx;
+	double dy;
+	double dz;
+	double length;
 
 	if (p_ray->m_state == c_rayFloat) {
 		return;
@@ -93,14 +93,14 @@ void BuildRayFloat(Ray* p_ray)
 	dx /= length = sqrt(dx * dx + dy * dy + dz * dz);
 	dy /= length;
 	dz /= length;
-	p_ray->m_dirX = (MechS32) (dx * 65536.0);
-	p_ray->m_dirY = (MechS32) (dy * 65536.0);
-	p_ray->m_dirZ = (MechS32) (dz * 65536.0);
-	p_ray->m_length = (MechS32) (length + 0.5);
+	p_ray->m_dirX = (int32_t) (dx * 65536.0);
+	p_ray->m_dirY = (int32_t) (dy * 65536.0);
+	p_ray->m_dirZ = (int32_t) (dz * 65536.0);
+	p_ray->m_length = (int32_t) (length + 0.5);
 	p_ray->m_state = c_rayFloat;
 }
 
-void SetRayLength(Ray* p_ray, MechS32 p_length)
+void SetRayLength(Ray* p_ray, int32_t p_length)
 {
 	if (p_ray->m_state == c_rayNone) {
 		BuildRayFixed(p_ray);
@@ -117,9 +117,9 @@ void SetRayLength(Ray* p_ray, MechS32 p_length)
 	}
 }
 
-void AdvanceRayStart(Ray* p_ray, MechS32 p_distance)
+void AdvanceRayStart(Ray* p_ray, int32_t p_distance)
 {
-	MechS32 state;
+	int32_t state;
 
 	state = p_ray->m_state;
 	if (state == c_rayNone) {
@@ -143,9 +143,9 @@ void AdvanceRayStart(Ray* p_ray, MechS32 p_distance)
 	}
 }
 
-void SetRayEnd(Ray* p_ray, MechS32 p_x1, MechS32 p_y1, MechS32 p_z1)
+void SetRayEnd(Ray* p_ray, int32_t p_x1, int32_t p_y1, int32_t p_z1)
 {
-	MechS32 state;
+	int32_t state;
 
 	p_ray->m_x1 = p_x1;
 	p_ray->m_y1 = p_y1;
@@ -168,9 +168,9 @@ void SetRayEnd(Ray* p_ray, MechS32 p_x1, MechS32 p_y1, MechS32 p_z1)
 	}
 }
 
-void ClipRayToGround(Ray* p_ray, MechS32 p_y)
+void ClipRayToGround(Ray* p_ray, int32_t p_y)
 {
-	MechS32 length;
+	int32_t length;
 
 	if (p_ray->m_dy) {
 		length = MulDiv64(p_ray->m_length, p_y - p_ray->m_y0, p_ray->m_dy);
@@ -183,14 +183,14 @@ void CopyRay(Ray* p_dst, Ray* p_src)
 	*p_dst = *p_src;
 }
 
-MechS32 ClipRaySlab(MechS32 p_origin, MechS32 p_delta, MechS32 p_min, MechS32 p_max, MechS32* p_tMin, MechS32* p_tMax)
+int32_t ClipRaySlab(int32_t p_origin, int32_t p_delta, int32_t p_min, int32_t p_max, int32_t* p_tMin, int32_t* p_tMax)
 {
-	MechS32 toMax;
-	MechS32 t0;
-	MechS32 t1;
-	MechS32 toMin;
-	MechS32 overflow;
-	MechS32 quotient;
+	int32_t toMax;
+	int32_t t0;
+	int32_t t1;
+	int32_t toMin;
+	int32_t overflow;
+	int32_t quotient;
 
 	overflow = FALSE;
 	if (p_delta == 0) {

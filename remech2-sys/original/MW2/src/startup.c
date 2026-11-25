@@ -16,7 +16,7 @@ void PrintVersion(void)
 }
 
 // Always returns 0. SimMain raises Error(0x51) if it doesn't, so it's a stubbed-out startup check.
-MechS32 StartupCheckStub(void)
+int32_t StartupCheckStub(void)
 {
 	return 0;
 }

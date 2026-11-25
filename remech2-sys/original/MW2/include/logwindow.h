@@ -11,7 +11,7 @@ extern "C"
 {
 #endif
 
-	void DebugPrintInternal(const MechChar* p_format, ...);
+	void DebugPrintInternal(const char* p_format, ...);
 
 #ifdef __cplusplus
 }

@@ -14,11 +14,11 @@
 // 2D animations: up to seven SHP resources whose frames play on the clock, once or looping,
 // drawn into a pane.
 
-MechS32 g_anim2dCount = 0;
+int32_t g_anim2dCount = 0;
 
 Anim2d* g_anim2ds[7];
 
-MechS16 LoadAnim2d(MechU32 p_flags, MechS32 p_frameTime, MechS32 p_type, MechS16* p_resourceId)
+int16_t LoadAnim2d(uint32_t p_flags, int32_t p_frameTime, int32_t p_type, int16_t* p_resourceId)
 {
 	Anim2d* anim;
 
@@ -50,7 +50,7 @@ MechS16 LoadAnim2d(MechU32 p_flags, MechS32 p_frameTime, MechS32 p_type, MechS16
 }
 
 // Frees one animation, or all of them for a negative index.
-void FreeAnim2ds(MechS32 p_index)
+void FreeAnim2ds(int32_t p_index)
 {
 	if (p_index >= 0) {
 		FreeAnim2d(p_index);
@@ -62,7 +62,7 @@ void FreeAnim2ds(MechS32 p_index)
 	}
 }
 
-void FreeAnim2d(MechS32 p_index)
+void FreeAnim2d(int32_t p_index)
 {
 	if (g_anim2ds[p_index]) {
 		if (g_anim2ds[p_index]->m_shape) {
@@ -76,11 +76,11 @@ void FreeAnim2d(MechS32 p_index)
 
 // Draws the animation's current frame, loading its shape on first use. The index test never
 // rejects anything (the original tests p_index < 0 && p_index >= 7).
-void DrawAnim2d(PANE* p_target, MechS32 p_index, MechS32 p_x, MechS32 p_y)
+void DrawAnim2d(PANE* p_target, int32_t p_index, int32_t p_x, int32_t p_y)
 {
-	MechS32 frame;
+	int32_t frame;
 	Anim2d* anim;
-	MechU16 shown;
+	uint16_t shown;
 
 	if (p_index < 0 && p_index >= 7) {
 		return;
@@ -152,7 +152,7 @@ void DrawAnim2d(PANE* p_target, MechS32 p_index, MechS32 p_x, MechS32 p_y)
 }
 
 // Restarts the animation. As in DrawAnim2d, the index test never rejects anything.
-void RestartAnim2d(MechS32 p_index)
+void RestartAnim2d(int32_t p_index)
 {
 	if (p_index < 0 && p_index >= 7) {
 		return;

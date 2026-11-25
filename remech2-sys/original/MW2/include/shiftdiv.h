@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-	MechS32 ProjectCoordinate(MechS32 p_value, MechS32 p_depth, MechS32 p_shift, MechS32 p_center);
+	int32_t ProjectCoordinate(int32_t p_value, int32_t p_depth, int32_t p_shift, int32_t p_center);
 
 #ifdef __cplusplus
 }

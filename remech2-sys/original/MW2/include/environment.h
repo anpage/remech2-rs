@@ -5,8 +5,8 @@
 #include "types.h"
 
 typedef struct TimeOfDayPhase {
-	MechS32 m_palette;  // 0x00
-	MechS32 m_duration; // 0x04
+	int32_t m_palette;  // 0x00
+	int32_t m_duration; // 0x04
 } TimeOfDayPhase;
 
 // The functions and globals of environment.c that other units use.
@@ -15,28 +15,28 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_infraredOn;
+	extern int32_t g_infraredOn;
 
-	extern MechS32 g_soundDelayPerUnit;
-	extern MechS32 g_gravity;
-	extern MechS32 g_daysPerYear;
-	extern MechS32 g_dayOfYear;
-	extern MechS32 g_secondsPerDay;
-	extern MechS32 g_timeOfDayPhase;
-	extern MechS32 g_gravityScale;
+	extern int32_t g_soundDelayPerUnit;
+	extern int32_t g_gravity;
+	extern int32_t g_daysPerYear;
+	extern int32_t g_dayOfYear;
+	extern int32_t g_secondsPerDay;
+	extern int32_t g_timeOfDayPhase;
+	extern int32_t g_gravityScale;
 	extern TimeOfDayPhase g_timeOfDayPhases[4];
-	extern MechS32 g_timeOfDay;
-	extern MechS32 g_startTimeOfDay;
-	extern MechS32 g_timeOfDayFrames;
-	extern MechS32 g_timeOfDayStarts[4];
-	extern MechS32 g_timeOfDayEnabled;
-	extern MechS32 g_nextTimeOfDayUpdate;
+	extern int32_t g_timeOfDay;
+	extern int32_t g_startTimeOfDay;
+	extern int32_t g_timeOfDayFrames;
+	extern int32_t g_timeOfDayStarts[4];
+	extern int32_t g_timeOfDayEnabled;
+	extern int32_t g_nextTimeOfDayUpdate;
 
 	void FirstEnvironment(void);
 	void UpdateTimeOfDay(void);
-	void FadeToTimeOfDayPhase(MechS32 p_index);
-	MechS32 IsInfraredOn(undefined4 p_unk0x00);
-	void SetInfrared(undefined4 p_unk0x00, MechS32 p_state);
+	void FadeToTimeOfDayPhase(int32_t p_index);
+	int32_t IsInfraredOn(undefined4 p_unk0x00);
+	void SetInfrared(undefined4 p_unk0x00, int32_t p_state);
 	void QuadrupleMechCooling(void);
 	void QuarterMechCooling(void);
 

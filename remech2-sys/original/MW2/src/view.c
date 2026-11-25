@@ -22,99 +22,99 @@
 #include "types.h"
 
 // The level of detail: 1 high, 2 low (TOGGLE_LOD_QUALITY); it divides Eyepoint::m_detailScale.
-MechS32 g_lodQuality = 1;
+int32_t g_lodQuality = 1;
 
-MechS32 g_viewNear;
+int32_t g_viewNear;
 
-MechS32 g_viewShiftX;
+int32_t g_viewShiftX;
 
-MechS32 g_viewShiftY;
+int32_t g_viewShiftY;
 
-MechS32 g_viewFar;
+int32_t g_viewFar;
 
-MechS32 g_viewLeft;
+int32_t g_viewLeft;
 
-MechS32 g_viewCenterX;
+int32_t g_viewCenterX;
 
-MechS32 g_viewHalfHeight;
+int32_t g_viewHalfHeight;
 
-MechS32 g_viewHalfWidth;
+int32_t g_viewHalfWidth;
 
-MechS32 g_viewBottom;
+int32_t g_viewBottom;
 
-MechS32 g_viewProjectScaleX;
+int32_t g_viewProjectScaleX;
 
-MechS32 g_viewProjectScaleY;
+int32_t g_viewProjectScaleY;
 
-MechS32 g_viewRight;
+int32_t g_viewRight;
 
-MechS32 g_viewTop;
+int32_t g_viewTop;
 
-MechS32 g_viewLeftScaled;
+int32_t g_viewLeftScaled;
 
-MechS32 g_viewCenterY;
+int32_t g_viewCenterY;
 
-MechS32 g_viewBottomScaled;
+int32_t g_viewBottomScaled;
 
-MechS32 g_viewFarPlane;
+int32_t g_viewFarPlane;
 
-MechS32 g_viewProjX0;
+int32_t g_viewProjX0;
 
-MechS32 g_viewProjX1;
+int32_t g_viewProjX1;
 
-MechS32 g_viewProjX2;
+int32_t g_viewProjX2;
 
-MechS32 g_viewProjY0;
+int32_t g_viewProjY0;
 
-MechS32 g_viewProjY1;
+int32_t g_viewProjY1;
 
-MechS32 g_viewProjY2;
+int32_t g_viewProjY2;
 
-MechS32 g_viewProjZ0;
+int32_t g_viewProjZ0;
 
-MechS32 g_viewProjZ1;
+int32_t g_viewProjZ1;
 
-MechS32 g_viewProjZ2;
+int32_t g_viewProjZ2;
 
-MechS32 g_viewProjectScaleX16;
+int32_t g_viewProjectScaleX16;
 
-MechS32 g_viewProjectScaleY16;
+int32_t g_viewProjectScaleY16;
 
-MechS32 g_viewRotX0;
+int32_t g_viewRotX0;
 
-MechS32 g_viewRotX1;
+int32_t g_viewRotX1;
 
-MechS32 g_viewRotX2;
+int32_t g_viewRotX2;
 
-MechS32 g_viewRotY0;
+int32_t g_viewRotY0;
 
-MechS32 g_viewRotY1;
+int32_t g_viewRotY1;
 
-MechS32 g_viewRotY2;
+int32_t g_viewRotY2;
 
-MechS32 g_viewRotZ0;
+int32_t g_viewRotZ0;
 
-MechS32 g_viewRotZ1;
+int32_t g_viewRotZ1;
 
-MechS32 g_viewRotZ2;
+int32_t g_viewRotZ2;
 
-MechS32 g_viewEyeY;
+int32_t g_viewEyeY;
 
-MechS32 g_viewEyeX;
+int32_t g_viewEyeX;
 
-MechS32 g_viewEyeZ;
+int32_t g_viewEyeZ;
 
-MechS32 g_viewLightZ;
+int32_t g_viewLightZ;
 
-MechS32 g_viewLightX;
+int32_t g_viewLightX;
 
-MechS32 g_viewLightY;
+int32_t g_viewLightY;
 
-MechS32 g_viewTopScaled;
+int32_t g_viewTopScaled;
 
-MechS32 g_viewNearPlane;
+int32_t g_viewNearPlane;
 
-MechS32 g_viewRightScaled;
+int32_t g_viewRightScaled;
 
 // Makes p_eyepoint the current eyepoint and copies what the renderer uses each frame out of it:
 // its rotation (also scaled by the projection factors), position, view rectangle and shading.
@@ -173,36 +173,36 @@ void SelectEyepoint(Eyepoint* p_eyepoint)
 // Sets up the eyepoint's projection from its view rectangle, field of view and pixel aspect.
 void UpdateProjection(Eyepoint* p_eyepoint)
 {
-	MechS32 centerX;
-	MechS32 bottom;
-	MechS32 c;
-	MechS32 centerY;
-	MechS32 right;
-	MechS32 aspect;
-	MechS32 left;
-	MechS32 scaled2;
-	MechS32 low2;
-	MechS32 offsetY;
-	MechS16 shift1;
-	MechS16 shift2;
+	int32_t centerX;
+	int32_t bottom;
+	int32_t c;
+	int32_t centerY;
+	int32_t right;
+	int32_t aspect;
+	int32_t left;
+	int32_t scaled2;
+	int32_t low2;
+	int32_t offsetY;
+	int16_t shift1;
+	int16_t shift2;
 	Eyepoint* eyepoint;
-	MechS32 fovY;
-	MechS32 d;
-	MechS32 offsetX;
-	MechS32 b;
-	MechS32 halfWidth;
-	MechS32 top;
-	MechS32 halfHeight;
-	MechS32 scaled1;
-	MechS32 low1;
-	MechS32 fov;
-	MechS32 a;
+	int32_t fovY;
+	int32_t d;
+	int32_t offsetX;
+	int32_t b;
+	int32_t halfWidth;
+	int32_t top;
+	int32_t halfHeight;
+	int32_t scaled1;
+	int32_t low1;
+	int32_t fov;
+	int32_t a;
 
 	eyepoint = p_eyepoint;
 	fov = eyepoint->m_fovX;
 	aspect = eyepoint->m_pixelAspect;
-	offsetX = (MechS16) eyepoint->m_offsetX;
-	offsetY = (MechS16) eyepoint->m_offsetY;
+	offsetX = (int16_t) eyepoint->m_offsetX;
+	offsetY = (int16_t) eyepoint->m_offsetY;
 	top = eyepoint->m_viewTop;
 	bottom = eyepoint->m_viewBottom;
 	left = eyepoint->m_viewLeft;
@@ -256,13 +256,13 @@ void UpdateProjection(Eyepoint* p_eyepoint)
 	eyepoint->m_detailScale = low2 / (g_lodQuality * 160);
 }
 
-void SetNearPlane(Eyepoint* p_eyepoint, MechS32 p_value)
+void SetNearPlane(Eyepoint* p_eyepoint, int32_t p_value)
 {
 	p_eyepoint->m_nearPlane = g_viewNearPlane = p_value;
 	g_viewNear = p_value << 2;
 }
 
-void SetFarPlane(Eyepoint* p_eyepoint, MechS32 p_value)
+void SetFarPlane(Eyepoint* p_eyepoint, int32_t p_value)
 {
 	p_eyepoint->m_farPlane = g_viewFarPlane = p_value;
 	if (p_value < 0x1fffffff) {
@@ -325,15 +325,15 @@ void GetEyepointTransform(Eyepoint* p_eyepoint, Matrix* p_matrix)
 // Projects the world point (*p_x, *p_y, *p_z) onto the screen in place (*p_z the depth). A point
 // at or behind the near plane is projected mirrored. Returns whether it is in front and on the
 // screen.
-MechS32 ProjectWorldPoint(MechS32* p_x, MechS32* p_y, MechS32* p_z)
+int32_t ProjectWorldPoint(int32_t* p_x, int32_t* p_y, int32_t* p_z)
 {
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 behind;
-	MechS32 dz;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t dx;
+	int32_t dy;
+	int32_t behind;
+	int32_t dz;
 
 	x = *p_x;
 	y = *p_y;
@@ -370,20 +370,20 @@ MechS32 ProjectWorldPoint(MechS32* p_x, MechS32* p_y, MechS32* p_z)
 // The scene's shape filter (RenderSettings::m_shapeFilter): culls a shape against the view frustum,
 // like CullMapViewShape the map view's. 1: a shape of kind 0xa0 with g_inCockpitView, 5: out of
 // range or past the far plane, 4: in front of the near plane, 6 and 7: outside the side planes.
-MechS32 CullSceneShape(Shape* p_shape)
+int32_t CullSceneShape(Shape* p_shape)
 {
-	MechS32 y;
-	MechS32 z;
-	MechS32 radius;
-	MechS32 limit;
-	MechS32 dx;
-	MechS32 side;
-	MechS32 dy;
-	MechS32 height;
-	MechS32 fov;
-	MechS32 dz;
-	MechS32 depth;
-	MechS32 x;
+	int32_t y;
+	int32_t z;
+	int32_t radius;
+	int32_t limit;
+	int32_t dx;
+	int32_t side;
+	int32_t dy;
+	int32_t height;
+	int32_t fov;
+	int32_t dz;
+	int32_t depth;
+	int32_t x;
 
 	if (g_inCockpitView && (p_shape->m_kind & 0xf0) == 0xa0) {
 		return 1;
@@ -440,20 +440,20 @@ MechS32 CullSceneShape(Shape* p_shape)
 
 // Culls a shape against the view frustum like CullSceneShape, without its range test. 1 for a
 // hidden shape (bit 0x1000).
-MechS32 CullShapeToFrustum(Shape* p_shape)
+int32_t CullShapeToFrustum(Shape* p_shape)
 {
-	MechS32 y;
-	MechS32 z;
-	MechS32 radius;
-	MechS32 limit;
-	MechS32 dx;
-	MechS32 side;
-	MechS32 dy;
-	MechS32 height;
-	MechS32 fov;
-	MechS32 dz;
-	MechS32 depth;
-	MechS32 x;
+	int32_t y;
+	int32_t z;
+	int32_t radius;
+	int32_t limit;
+	int32_t dx;
+	int32_t side;
+	int32_t dy;
+	int32_t height;
+	int32_t fov;
+	int32_t dz;
+	int32_t depth;
+	int32_t x;
 
 	x = p_shape->m_centerX;
 	y = p_shape->m_centerY;
@@ -500,7 +500,7 @@ MechS32 CullShapeToFrustum(Shape* p_shape)
 	return 0;
 }
 
-MechS32 CullHiddenShape(Shape* p_shape)
+int32_t CullHiddenShape(Shape* p_shape)
 {
 	if (p_shape->m_flags & 0x1000) {
 		return TRUE;
@@ -509,12 +509,12 @@ MechS32 CullHiddenShape(Shape* p_shape)
 	return FALSE;
 }
 
-MechS32 IsLodQualityHigh(undefined4 p_unk0x00)
+int32_t IsLodQualityHigh(undefined4 p_unk0x00)
 {
 	return g_lodQuality == 1;
 }
 
-void SetLodQualityHigh(undefined4 p_unk0x00, MechS32 p_enable)
+void SetLodQualityHigh(undefined4 p_unk0x00, int32_t p_enable)
 {
 	if (p_enable) {
 		g_lodQuality = 1;

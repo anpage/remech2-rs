@@ -29,35 +29,35 @@
 // stops it at the first mech (CollideWithMechs), building (CollideWithBuildings) or terrain shape it hits,
 // bouncing its velocity off the surface. Returns the number of ticks it has been colliding (0:
 // free); *p_hit is the shape it hit and *p_player the mech's player.
-MechS32 MoveMechWithCollisions(
+int32_t MoveMechWithCollisions(
 	Mech* p_mech,
 	Shape** p_hit,
 	Player** p_player,
-	MechS32 p_dx,
-	MechS32 p_dy,
-	MechS32 p_dz,
-	MechS32* p_x,
-	MechS32* p_y,
-	MechS32* p_z
+	int32_t p_dx,
+	int32_t p_dy,
+	int32_t p_dz,
+	int32_t* p_x,
+	int32_t* p_y,
+	int32_t* p_z
 )
 {
-	MechS32 bounce;
-	MechS32 nx;
-	MechS32 ny;
-	MechS32 nz;
-	MechS32 x0;
-	MechS32 over;
-	MechS32 y0;
-	MechS32 hit;
-	MechS32 z0;
+	int32_t bounce;
+	int32_t nx;
+	int32_t ny;
+	int32_t nz;
+	int32_t x0;
+	int32_t over;
+	int32_t y0;
+	int32_t hit;
+	int32_t z0;
 	Shape* shape;
-	MechS32 x1;
-	MechS32 y1;
-	MechS32 length;
-	MechS32 z1;
+	int32_t x1;
+	int32_t y1;
+	int32_t length;
+	int32_t z1;
 	Ray ray;
-	MechS32 lift;
-	MechS32 dot;
+	int32_t lift;
+	int32_t dot;
 	Ray normal;
 
 	x0 = p_mech->m_player->m_position.m_x;
@@ -169,22 +169,22 @@ MechS32 MoveMechWithCollisions(
 // gives p_mech a velocity away from it. A mech pushing into one that pushed into it first (whose
 // m_collidedWith is p_mech's player) always collides. A mech in state 4 is knocked down
 // (KnockMechOver) instead. Returns 1 on a collision, with *p_hit the other mech's player.
-MechS32 CollideWithMechs(Mech* p_mech, MechS32* p_x, MechS32* p_y, MechS32* p_z, Player** p_hit)
+int32_t CollideWithMechs(Mech* p_mech, int32_t* p_x, int32_t* p_y, int32_t* p_z, Player** p_hit)
 {
-	MechS32 radius;
-	MechS32 otherRadius;
+	int32_t radius;
+	int32_t otherRadius;
 	Player* player;
-	MechS32 reach;
-	MechS32 dist;
-	MechS32 result;
-	MechS32 i;
+	int32_t reach;
+	int32_t dist;
+	int32_t result;
+	int32_t i;
 	Vector3* pos;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t dx;
+	int32_t dy;
 	Mech* mech;
-	MechS32 dz;
-	MechS32 speed;
-	MechS32 id;
+	int32_t dz;
+	int32_t speed;
+	int32_t id;
 
 	id = p_mech->m_player->m_index;
 	radius = p_mech->m_radius;
@@ -311,21 +311,21 @@ MechS32 CollideWithMechs(Mech* p_mech, MechS32* p_x, MechS32* p_y, MechS32* p_z,
 // Pushes the point (*p_x, *p_y, *p_z) of p_mech out of the first building (a shape of type 6)
 // it overlaps and bounces its velocity away. A shape of kind 0x50 isn't solid: it only gets a
 // push and a sound. Returns 1 on a collision, with *p_hit the shape.
-MechS32 CollideWithBuildings(Mech* p_mech, MechS32* p_x, MechS32* p_y, MechS32* p_z, Shape** p_hit)
+int32_t CollideWithBuildings(Mech* p_mech, int32_t* p_x, int32_t* p_y, int32_t* p_z, Shape** p_hit)
 {
-	MechS32 dz;
+	int32_t dz;
 	Shape* root;
-	MechS32 reach;
-	MechS32 dist;
+	int32_t reach;
+	int32_t dist;
 	Shape* shape;
-	MechS32 bounce;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t bounce;
+	int32_t dx;
+	int32_t dy;
 	SceneObject* obj;
-	MechS32 index;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
+	int32_t index;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 
 	root = g_sceneShapes;
 	if (!root) {
@@ -404,8 +404,8 @@ MechS32 CollideWithBuildings(Mech* p_mech, MechS32* p_x, MechS32* p_y, MechS32* 
 // they met faster than 200000.
 void DamageMechsInCollision(Mech* p_mech, Mech* p_other)
 {
-	MechS32 speed;
-	MechS32 damage;
+	int32_t speed;
+	int32_t damage;
 
 	if (!g_difficulty->m_collisionDamage) {
 		return;
@@ -425,11 +425,11 @@ void DamageMechsInCollision(Mech* p_mech, Mech* p_other)
 // Damages p_mech by a collision along the last collision normal: from below (the normal points
 // down) the legs, scaled by the other mech's mass, from above both side torsos at half, and
 // otherwise the section facing the normal. p_other is NULL for a building or the ground.
-void ApplyCollisionDamage(Mech* p_mech, Mech* p_other, MechS32 p_damage)
+void ApplyCollisionDamage(Mech* p_mech, Mech* p_other, int32_t p_damage)
 {
-	MechS32 attacker;
-	MechS32 damage;
-	MechS32 angle;
+	int32_t attacker;
+	int32_t damage;
+	int32_t angle;
 
 	if (p_other) {
 		attacker = p_other->m_player->m_index;
@@ -487,8 +487,8 @@ void ApplyCollisionDamage(Mech* p_mech, Mech* p_other, MechS32 p_damage)
 // when it can be damaged. In a network game, a shape of kind 0xb0 destroys both legs and itself.
 void DamageMechHittingShape(Mech* p_mech, Shape* p_shape)
 {
-	MechS32 damage;
-	MechS32 speed;
+	int32_t damage;
+	int32_t speed;
 
 	if (g_isNetworkGame && p_shape && (p_shape->m_kind & 0xf0) == 0xb0) {
 		ApplyDamageToMech(-2, p_mech, 0x320000, 7);
@@ -531,9 +531,9 @@ void DamageMechHittingShape(Mech* p_mech, Shape* p_shape)
 // marks it fallen and plays the crash sound.
 void KnockMechOver(Mech* p_mech)
 {
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 
 	if (!g_netRole || p_mech->m_player->m_index == g_localPlayerId) {
 		BlowOffObjTree(p_mech->m_player->m_obj, ReleaseObjShape, 999);

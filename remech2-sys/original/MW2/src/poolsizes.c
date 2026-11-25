@@ -28,21 +28,21 @@
 // A mission stream's first record: the BWD version it was written for.
 typedef struct RevRecord {
 	BwdRecord m_header; // 0x00
-	MechU32 m_version;  // 0x08 — four characters, "1.22"
+	uint32_t m_version; // 0x08 — four characters, "1.22"
 } RevRecord;
 
 // A mission stream's data table: the counts its static memory pools are sized for.
 typedef struct DtblRecord {
 	BwdRecord m_header;       // 0x00
-	MechS16 m_players;        // 0x08
-	MechS16 m_unk0x0a;        // 0x0a
-	MechS16 m_objects;        // 0x0c
-	MechS16 m_classEntries;   // 0x0e
-	MechS16 m_unk0x10;        // 0x10
-	MechS16 m_unk0x12;        // 0x12
-	MechS16 m_anims;          // 0x14
-	MechS16 m_animTracks;     // 0x16
-	MechS32 m_animFrameBytes; // 0x18
+	int16_t m_players;        // 0x08
+	int16_t m_unk0x0a;        // 0x0a
+	int16_t m_objects;        // 0x0c
+	int16_t m_classEntries;   // 0x0e
+	int16_t m_unk0x10;        // 0x10
+	int16_t m_unk0x12;        // 0x12
+	int16_t m_anims;          // 0x14
+	int16_t m_animTracks;     // 0x16
+	int32_t m_animFrameBytes; // 0x18
 } DtblRecord;
 
 // A four-character tag read as a big-endian number, so that versions compare in order.
@@ -51,31 +51,31 @@ typedef struct DtblRecord {
 
 // The pool's block tags, four characters each: players (AGP), mechs (MGP), SEG, TLIS, ADAT, ANTK,
 // ANFL, OBJI, CID and CINS.
-MechU32 g_staticPoolTags[10] =
+uint32_t g_staticPoolTags[10] =
 	{0x504741, 0x50474d, 0x474553, 0x53494c54, 0x54414441, 0x4b544e41, 0x4c464e41, 0x494a424f, 0x444943, 0x534e4943};
 
 // The counts of a mission's data tables (and of the streams it includes), which size its static
 // memory pools.
 
-MechS16 g_missionPlayers;
+int16_t g_missionPlayers;
 
-MechS16 g_missionObjects;
+int16_t g_missionObjects;
 
-MechS16 g_missionClassEntries;
+int16_t g_missionClassEntries;
 
-MechS16 g_missionAnims;
+int16_t g_missionAnims;
 
-MechS16 g_missionAnimTracks;
+int16_t g_missionAnimTracks;
 
-MechS32 g_missionAnimFrameBytes;
+int32_t g_missionAnimFrameBytes;
 
 // The mission's static memory table, which ReadStaticMemoryTable fills.
 StaticPoolSize g_staticPoolSizes[10];
 
 // Returns the size of the table's entry at an index, or 0.
-MechU32 GetStaticPoolSize(MechS32 p_index)
+uint32_t GetStaticPoolSize(int32_t p_index)
 {
-	MechU32 size;
+	uint32_t size;
 
 	size = 0;
 	if (p_index >= 0 && p_index < 10) {
@@ -123,14 +123,14 @@ StaticPoolSize* ReadStaticMemoryTable(char* p_mission)
 // Reads a mission stream: checks its version, adds its data table's counts (a stream read for the
 // first time adds all of them), and runs its scenario table and the streams it includes. Returns
 // FALSE on an error.
-MechS32 CountMissionStream(BwdStream* p_stream)
+int32_t CountMissionStream(BwdStream* p_stream)
 {
-	MechS32 result;
+	int32_t result;
 	RevRecord* rev;
 	BwdNode* node;
 	DtblRecord* table;
-	MechS32 known;
-	MechU32 type;
+	int32_t known;
+	uint32_t type;
 
 	result = TRUE;
 	rev = (RevRecord*) (node = GetNextNode(p_stream));
@@ -138,7 +138,7 @@ MechS32 CountMissionStream(BwdStream* p_stream)
 		result = FALSE;
 		Error(0x48, NULL);
 	}
-	else if (SWAP_TAG(rev->m_version) < SWAP_TAG(*(MechU32*) g_bwdVersion)) {
+	else if (SWAP_TAG(rev->m_version) < SWAP_TAG(*(uint32_t*) g_bwdVersion)) {
 		result = FALSE;
 		Error(0x49, NULL);
 	}

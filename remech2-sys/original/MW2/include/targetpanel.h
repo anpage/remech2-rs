@@ -11,12 +11,12 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_targetPanelMode;
-	extern MechChar g_anonymousInstallationName[8];
-	extern MechS32 g_announceTargetSide;
-	extern MechS32 g_targetFullNameTime;
-	extern MechS32 g_lastPanelTarget;
-	extern MechS32 g_targetPanelStatic;
+	extern int32_t g_targetPanelMode;
+	extern char g_anonymousInstallationName[8];
+	extern int32_t g_announceTargetSide;
+	extern int32_t g_targetFullNameTime;
+	extern int32_t g_lastPanelTarget;
+	extern int32_t g_targetPanelStatic;
 
 	void DrawTargetPanelText(struct CockpitPanel* p_panel);
 	void DrawTargetPanel(struct CockpitPanel* p_panel);

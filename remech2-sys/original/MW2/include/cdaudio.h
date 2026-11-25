@@ -23,19 +23,19 @@ extern "C"
 #endif
 
 	// Finds the tracks and sets the music volume. Returns 0 when there is no music.
-	MechS32 StartCdAudio(void);
+	int32_t StartCdAudio(void);
 	void DeInitCdAudio(void);
-	MechS32 IsCdAudioInitialized(void);
-	MechS32 IsCdTrackOnDisc(MechS32 p_track);
+	int32_t IsCdAudioInitialized(void);
+	int32_t IsCdTrackOnDisc(int32_t p_track);
 
-	MechS32 GetCdStatus(void);
+	int32_t GetCdStatus(void);
 	// GetCdStatus, remembered for PollCdDrive
-	MechS32 RefreshCdStatus(void);
+	int32_t RefreshCdStatus(void);
 	// Returns whether the status changed since it was last remembered, and remembers it
-	MechS32 PollCdDrive(void);
+	int32_t PollCdDrive(void);
 
 	// Plays track p_track to its end.
-	void PlayCdTrack(MechS32 p_track);
+	void PlayCdTrack(int32_t p_track);
 	void CdAudioTogglePaused(void);
 	void StopCdAudioAndWait(void);
 	// Sets the music volume from the sound configuration

@@ -8,17 +8,17 @@
 // (LoadSoundConfig, SaveSoundConfig). The options screen's sliders and rows point at the members.
 // The names come from the simulator's in-mission menus ("SET AUDIO VOLUME", "COMBAT VARIABLES").
 struct SoundConfig {
-	MechS32 m_effectsVolume;
-	MechS32 m_voiceVolume;
-	MechS32 m_midiVolume;
-	MechS32 m_objectTextmaps;
-	MechS32 m_terrainTextmaps;
+	int32_t m_effectsVolume;
+	int32_t m_voiceVolume;
+	int32_t m_midiVolume;
+	int32_t m_objectTextmaps;
+	int32_t m_terrainTextmaps;
 	// high or low
-	MechS32 m_displayDetail;
+	int32_t m_displayDetail;
 	// high or low
-	MechS32 m_objectDensity;
-	MechS32 m_explosionChunks;
-	MechS32 m_displayBrightness;
+	int32_t m_objectDensity;
+	int32_t m_explosionChunks;
+	int32_t m_displayBrightness;
 };
 
 #endif // SOUNDCONFIG_H

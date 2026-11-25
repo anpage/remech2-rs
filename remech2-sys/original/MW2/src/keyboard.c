@@ -32,7 +32,7 @@ undefined4 g_keyCodeWriteIndex;
 undefined4 g_keyCodeReadIndex;
 
 // A ring buffer of key codes, filled by KeyboardQueueKeyCode.
-MechS16 g_keyCodes[c_keyCodeBufferSize];
+int16_t g_keyCodes[c_keyCodeBufferSize];
 
 // One bit per (remapped) scan code, set while the key is down. Word 3 also holds the modifier
 // bits (see KeyModifier): the original keeps them in the same memory, so clearing the states
@@ -41,7 +41,7 @@ undefined4 g_keyStates[4];
 
 // clang-format off
 // The key code for each virtual key; 0 falls back to MapVirtualKey.
-MechS16 g_keyCodeMap[256] = {
+int16_t g_keyCodeMap[256] = {
 	0,     0,     0,     0,     0,     0,     0,     0,     0x08,  0x09,  0,     0,     0,     0x0d,  0,     0,
 	0,     0,     0,     0x1ff, 0,     0,     0,     0,     0,     0,     0,     0x1b,  0,     0,     0,     0,
 	0x20,  0xc4,  0xc5,  0xc3,  0xc2,  0xc9,  0xc6,  0xc8,  0xc7,  0,     0,     0,     0,     0xc0,  0xc1,  0,
@@ -55,7 +55,7 @@ MechS16 g_keyCodeMap[256] = {
 
 // clang-format off
 // The key state index of the extended (0xe0-prefixed) scan codes.
-MechS32 g_extendedScanCodeMap[0x59] = {
+int32_t g_extendedScanCodeMap[0x59] = {
 	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0x55,  0x70,  0,     0,
 	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
@@ -66,9 +66,9 @@ MechS32 g_extendedScanCodeMap[0x59] = {
 // clang-format on
 
 void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam);
-void KeyboardRecordKeyState(size_t p_virtualKey, MechU32 p_lParam, MechS32 p_pressed);
+void KeyboardRecordKeyState(size_t p_virtualKey, uint32_t p_lParam, int32_t p_pressed);
 
-MechS32 KeyboardReadKeyCode(MechS16* p_keyCode)
+int32_t KeyboardReadKeyCode(int16_t* p_keyCode)
 {
 	if (g_keyCodeReadIndex == g_keyCodeWriteIndex) {
 		*p_keyCode = 0;
@@ -84,7 +84,7 @@ MechS32 KeyboardReadKeyCode(MechS16* p_keyCode)
 	return 0;
 }
 
-MechS32 KeyboardFlushKeyCodes(void)
+int32_t KeyboardFlushKeyCodes(void)
 {
 	MechMessage msg;
 
@@ -98,10 +98,10 @@ MechS32 KeyboardFlushKeyCodes(void)
 
 // The original simulator queued a key's code when the key was released. We queue it on the
 // press, as the bindings fire, and only once however long the key is held.
-void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
+void HandleKeyboardMessages(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam)
 {
 	MechMessage msg;
-	MechS32 done;
+	int32_t done;
 
 	done = FALSE;
 	do {
@@ -135,12 +135,12 @@ void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam
 
 void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam)
 {
-	MechS16 keyCode;
+	int16_t keyCode;
 
 	keyCode = g_keyCodeMap[p_virtualKey];
 	if (keyCode == 0) {
 		// The original asked MapVirtualKey for the key's character.
-		keyCode = (MechChar) (p_lParam & 0xff);
+		keyCode = (char) (p_lParam & 0xff);
 		keyCode = tolower(keyCode);
 	}
 
@@ -170,9 +170,9 @@ void KeyboardQueueKeyCode(size_t p_virtualKey, MECH_INTPTR p_lParam)
 	}
 }
 
-void KeyboardRecordKeyState(size_t p_virtualKey, MechU32 p_lParam, MechS32 p_pressed)
+void KeyboardRecordKeyState(size_t p_virtualKey, uint32_t p_lParam, int32_t p_pressed)
 {
-	MechS32 key;
+	int32_t key;
 
 	key = (p_lParam >> 16) & 0xff;
 	if (key != 0 && ((p_lParam >> 16) & 0x100) && key < 0x59) {
@@ -220,10 +220,10 @@ void KeyboardRecordKeyState(size_t p_virtualKey, MechU32 p_lParam, MechS32 p_pre
 	}
 }
 
-MechS16 KeyboardPollKeyCode(void)
+int16_t KeyboardPollKeyCode(void)
 {
 	MechMessage msg;
-	MechS16 keyCode;
+	int16_t keyCode;
 
 	KeyboardReadKeyCode(&keyCode);
 	if (keyCode == 0 && MechPeekMessage(&msg, c_mechMsgKeyFirst, c_mechMsgKeyLast, TRUE)) {

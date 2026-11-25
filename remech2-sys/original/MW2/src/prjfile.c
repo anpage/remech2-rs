@@ -22,7 +22,7 @@ void SetPrjAllocator(PrjAllocFn p_alloc, PrjFreeFn p_free)
 	g_prjFree = p_free;
 }
 
-void* PrjAlloc(MechU32 p_size)
+void* PrjAlloc(uint32_t p_size)
 {
 	return g_prjAlloc(p_size);
 }
@@ -33,11 +33,11 @@ void PrjFreeBlock(void* p_block)
 }
 
 // Writes in chunks of at most 16K. Returns p_length, or -1 on a short write.
-MechS32 WritePrjBytes(MechS32 p_fd, void* p_buffer, MechU32 p_length)
+int32_t WritePrjBytes(int32_t p_fd, void* p_buffer, uint32_t p_length)
 {
-	MechU32 chunk;
-	MechU32 left;
-	MechU8* buffer;
+	uint32_t chunk;
+	uint32_t left;
+	uint8_t* buffer;
 
 	left = p_length;
 	buffer = p_buffer;
@@ -56,11 +56,11 @@ MechS32 WritePrjBytes(MechS32 p_fd, void* p_buffer, MechU32 p_length)
 }
 
 // Reads in chunks of at most 16K. Returns p_length, or -1 on a short read.
-MechS32 ReadPrjBytes(MechS32 p_fd, void* p_buffer, MechU32 p_length)
+int32_t ReadPrjBytes(int32_t p_fd, void* p_buffer, uint32_t p_length)
 {
-	MechU32 chunk;
-	MechU32 left;
-	MechU8* buffer;
+	uint32_t chunk;
+	uint32_t left;
+	uint8_t* buffer;
 
 	left = p_length;
 	buffer = p_buffer;
@@ -80,12 +80,12 @@ MechS32 ReadPrjBytes(MechS32 p_fd, void* p_buffer, MechU32 p_length)
 
 // Opens a PROJ file (p_mode 0: read-only, 2: read-write, which rejects a file marked 0xfe).
 // Returns its slot, -1 on failure or -2 for a rejected file.
-MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
+int32_t OpenPrjFile(const char* p_name, char p_mode)
 {
-	MechChar tag[12];
-	MechS32 fd;
-	MechU32 size;
-	MechU16 slot;
+	char tag[12];
+	int32_t fd;
+	uint32_t size;
+	uint16_t slot;
 	PrjHeader* header;
 
 	for (slot = 0; slot < 1 && g_prjFiles[slot].m_open; slot++) {
@@ -106,7 +106,7 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 				return -1;
 			}
 
-			if ((MechU8) tag[8] == 0xfe) {
+			if ((uint8_t) tag[8] == 0xfe) {
 				MechClose(fd);
 				return -2;
 			}
@@ -153,9 +153,9 @@ MechS32 OpenPrjFile(const MechChar* p_name, MechChar p_mode)
 	return slot;
 }
 
-MechS32 ClosePrjFile(MechS32 p_file)
+int32_t ClosePrjFile(int32_t p_file)
 {
-	MechU16 i;
+	uint16_t i;
 
 	PrjFreeBlock(g_prjFiles[p_file].m_header);
 	g_prjFiles[p_file].m_header = NULL;
@@ -172,12 +172,12 @@ MechS32 ClosePrjFile(MechS32 p_file)
 }
 
 // Returns the type's index in the header, or 0xffff.
-MechU16 FindPrjType(MechS32 p_file, const MechChar* p_type)
+uint16_t FindPrjType(int32_t p_file, const char* p_type)
 {
-	MechS8 found;
-	MechU16 count;
+	int8_t found;
+	uint16_t count;
 	PrjType* types;
-	MechU16 i;
+	uint16_t i;
 
 	found = FALSE;
 	count = g_prjFiles[p_file].m_header->m_typeCount;
@@ -201,13 +201,13 @@ MechU16 FindPrjType(MechS32 p_file, const MechChar* p_type)
 }
 
 // Loads every type's index.
-MechS32 LoadPrjIndexes(MechS32 p_file)
+int32_t LoadPrjIndexes(int32_t p_file)
 {
 	PrjType* types;
-	MechU16 count;
+	uint16_t count;
 	PrjIndex* index;
-	MechU16 i;
-	MechU32 size;
+	uint16_t i;
+	uint32_t size;
 
 	count = g_prjFiles[p_file].m_header->m_typeCount;
 	types = g_prjFiles[p_file].m_header->m_types;
@@ -232,13 +232,13 @@ MechS32 LoadPrjIndexes(MechS32 p_file)
 	return 0;
 }
 
-MechS32 GetPrjResourceSize(MechS32 p_file, const MechChar* p_type, MechU16 p_id)
+int32_t GetPrjResourceSize(int32_t p_file, const char* p_type, uint16_t p_id)
 {
 	PrjIndexEntry* entries;
-	MechS32 size;
+	int32_t size;
 	PrjType* types;
-	MechS16 type;
-	MechU16 id;
+	int16_t type;
+	uint16_t id;
 
 	if (!p_id) {
 		return -1;
@@ -263,17 +263,17 @@ MechS32 GetPrjResourceSize(MechS32 p_file, const MechChar* p_type, MechU16 p_id)
 
 // Seeks the file to a resource, and returns its offset and size. The type test never fails (a
 // 16-bit index compared with -1).
-MechS32 SeekPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, MechS32* p_offset, MechS32* p_size)
+int32_t SeekPrjResource(int32_t p_file, const char* p_type, uint16_t p_id, int32_t* p_offset, int32_t* p_size)
 {
 	PrjIndexEntry* entries;
 	PrjType* types;
-	MechS32 offset;
-	MechU16 type;
+	int32_t offset;
+	uint16_t type;
 
 	type = FindPrjType(p_file, p_type);
 	// FindPrjType's -1 as the 16 bits it's kept in: compared with an int, as the original's
 	// source has it, it never matches
-	if (type == (MechU16) -1) {
+	if (type == (uint16_t) -1) {
 		return -1;
 	}
 
@@ -296,21 +296,21 @@ MechS32 SeekPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, Me
 	return 0;
 }
 
-MechS32 ReadPrjAt(void* p_buffer, MechS32 p_file, MechS32 p_offset, MechU32 p_length)
+int32_t ReadPrjAt(void* p_buffer, int32_t p_file, int32_t p_offset, uint32_t p_length)
 {
 	p_file = g_prjFiles[p_file].m_fd;
 	MechSeek(p_file, p_offset, 0);
 	return ReadPrjBytes(p_file, p_buffer, p_length);
 }
 
-MechS32 ReadPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, void* p_buffer)
+int32_t ReadPrjResource(int32_t p_file, const char* p_type, uint16_t p_id, void* p_buffer)
 {
 	PrjIndexEntry* entries;
 	PrjType* types;
-	MechS32 offset;
-	MechS16 type;
-	MechU32 size;
-	MechU16 id;
+	int32_t offset;
+	int16_t type;
+	uint32_t size;
+	uint16_t id;
 
 	type = FindPrjType(p_file, p_type);
 	if (type != -1) {
@@ -340,13 +340,13 @@ MechS32 ReadPrjResource(MechS32 p_file, const MechChar* p_type, MechU16 p_id, vo
 }
 
 // Returns a resource's offset in the file, and the file's descriptor.
-MechS32 GetPrjResourceOffset(MechS32 p_file, const MechChar* p_type, MechU16 p_id, MechS32* p_fd)
+int32_t GetPrjResourceOffset(int32_t p_file, const char* p_type, uint16_t p_id, int32_t* p_fd)
 {
 	PrjIndexEntry* entries;
 	PrjType* types;
-	MechS32 offset;
-	MechS16 type;
-	MechU16 id;
+	int32_t offset;
+	int16_t type;
+	uint16_t id;
 
 	type = FindPrjType(p_file, p_type);
 	if (type != -1) {

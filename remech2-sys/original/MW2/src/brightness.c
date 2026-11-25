@@ -10,21 +10,21 @@
 
 // Display brightness: a gamma table with one row per brightness level, applied to the palette.
 
-MechS32 g_displayBrightness = 9;
+int32_t g_displayBrightness = 9;
 
-MechS32 g_brightnessSetting = 9;
+int32_t g_brightnessSetting = 9;
 
 PaletteColor g_paletteColorsPreBrightness[0x100];
 
-MechU8 g_gammaTable[16][64];
+uint8_t g_gammaTable[16][64];
 
 // Row i maps a 6-bit color component c to 63 * (c / 63) ^ (1 / (0.5 + i / 16)).
 void InitGammaTable(void)
 {
 	double x;
-	MechS32 j;
-	MechS32 i;
-	MechU8* row;
+	int32_t j;
+	int32_t i;
+	uint8_t* row;
 	double exponent;
 
 	for (i = 0; i < 16; i++) {
@@ -33,7 +33,7 @@ void InitGammaTable(void)
 		row = g_gammaTable[i];
 		for (j = 0; j < 64; j++) {
 			x = j / 63.0;
-			row[j] = (MechU8) (pow(x, exponent) * 63.0);
+			row[j] = (uint8_t) (pow(x, exponent) * 63.0);
 		}
 	}
 }
@@ -44,9 +44,9 @@ void SavePreBrightnessPalette(void)
 }
 
 // Sets the palette at brightness p_brightness without changing g_displayBrightness.
-void PreviewBrightness(MechS32 p_brightness)
+void PreviewBrightness(int32_t p_brightness)
 {
-	MechS32 brightness;
+	int32_t brightness;
 
 	brightness = g_displayBrightness;
 	g_displayBrightness = p_brightness;
@@ -56,7 +56,7 @@ void PreviewBrightness(MechS32 p_brightness)
 
 void CopyPaletteColorWithBrightness(PaletteColor* p_src, PaletteColor* p_dst)
 {
-	MechU8* row;
+	uint8_t* row;
 
 	row = g_gammaTable[g_displayBrightness];
 	p_dst->m_red = row[p_src->m_red];

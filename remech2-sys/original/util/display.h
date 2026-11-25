@@ -13,15 +13,15 @@ extern "C"
 #endif
 
 	// Allocates the frame, zeroed, in place of any earlier one. NULL when out of memory.
-	MechU8* MechDisplayBegin(MechS32 p_width, MechS32 p_height);
+	uint8_t* MechDisplayBegin(int32_t p_width, int32_t p_height);
 	// Frees the frame
 	void MechDisplayEnd(void);
 	// All 256 colours as red, green and blue, 6 bits each. Shown from the next present.
-	void MechDisplaySetPalette(const MechU8* p_palette);
+	void MechDisplaySetPalette(const uint8_t* p_palette);
 	// Shows the frame, and returns once it is on screen
 	void MechDisplayPresent(void);
 	// The same, showing only the inclusive rectangle, scaled to where the whole frame would be
-	void MechDisplayPresentRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom);
+	void MechDisplayPresentRect(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom);
 
 #ifdef __cplusplus
 }

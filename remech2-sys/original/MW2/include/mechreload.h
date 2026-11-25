@@ -14,12 +14,12 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_reloadingPlayer;
+	extern int32_t g_reloadingPlayer;
 	extern RememberedMech g_rememberedMechs[60];
 	extern MechSegment* g_mechSegments[60];
 
-	MechS32 ReloadPlayerMech(MechS32 p_player, MechS32 p_force);
-	void RememberLoadMech(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p_config);
+	int32_t ReloadPlayerMech(int32_t p_player, int32_t p_force);
+	void RememberLoadMech(Mech* p_mech, char* p_name, int32_t p_id, char* p_config);
 	void RememberMechSegments(Mech* p_mech);
 	SceneObject* RestoreMechSegments(MechSegment* p_segment);
 	MechSegment* SaveMechSegments(SceneObject* p_obj);

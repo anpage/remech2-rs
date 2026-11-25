@@ -16,11 +16,11 @@
 
 void operator delete(void*);
 
-void CreditsCallback(MechS32 p_active);
+void CreditsCallback(int32_t p_active);
 
 // The lines of the credits: '<' marks a title, '>' a heading, '~' a title in
 // g_creditsTitleColors, and NULL a blank line.
-MechChar* g_creditLines[0x21f] = {
+char* g_creditLines[0x21f] = {
 	"<ACTIVISION presents",
 	NULL,
 	"<MECHWARRIOR 2",
@@ -569,24 +569,24 @@ MechChar* g_creditLines[0x21f] = {
 
 LoopingMovie* g_creditsMovie = NULL;
 
-MechChar g_creditsMovieName[0x10] = "amwlogo1";
+char g_creditsMovieName[0x10] = "amwlogo1";
 
 // The first line still on screen.
-MechS32 g_creditsFirstLine;
+int32_t g_creditsFirstLine;
 
 undefined g_creditsTitleColors[0x100];
 
 // The screen position of line 0.
-MechS32 g_creditsScrollTop;
+int32_t g_creditsScrollTop;
 
 #define c_creditsPixelsPerSecond 60
 
-MechU32 g_creditsLastTime;
-MechU32 g_creditsOwed;
+uint32_t g_creditsLastTime;
+uint32_t g_creditsOwed;
 
 void DrawCredits()
 {
-	MechS32 i;
+	int32_t i;
 
 	g_creditsFirstLine = 0;
 	g_videoDriver->GetPalette(g_savedScreenPalette);
@@ -598,7 +598,7 @@ void DrawCredits()
 	g_creditsTitleColors[0] = 0xff;
 	g_creditsTitleColors[1] = 0x10;
 	for (i = 2; i < 0x100; i++) {
-		g_creditsTitleColors[i] = (MechU8) i;
+		g_creditsTitleColors[i] = (uint8_t) i;
 	}
 	g_creditsScrollTop = 0x1cc;
 	g_creditsLastTime = MechMilliseconds();
@@ -607,19 +607,19 @@ void DrawCredits()
 }
 
 // Scroll the credits, and restore the shell once dismissed by a key or mouse click.
-void CreditsCallback(MechS32 p_active)
+void CreditsCallback(int32_t p_active)
 {
-	MechU32 index;
-	MechS32 top;
-	MechS32 width;
+	uint32_t index;
+	int32_t top;
+	int32_t width;
 
 	if (p_active) {
 		g_videoDriver->RestoreBackground(0, 0x7d, 0x280, 0x14f);
 		top = g_creditsFirstLine * 0x14 + g_creditsScrollTop;
-		MechU32 now = MechMilliseconds();
+		uint32_t now = MechMilliseconds();
 		g_creditsOwed += (now - g_creditsLastTime) * c_creditsPixelsPerSecond;
 		g_creditsLastTime = now;
-		g_creditsScrollTop -= (MechS32) (g_creditsOwed / 1000);
+		g_creditsScrollTop -= (int32_t) (g_creditsOwed / 1000);
 		g_creditsOwed %= 1000;
 		for (index = g_creditsFirstLine; index < 0x21f && top < 0x1cc; index++) {
 			if (top >= 0x69) {

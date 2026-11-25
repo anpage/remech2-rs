@@ -43,56 +43,56 @@
 #include <stdio.h>
 #include <string.h>
 
-MechS32 g_missionEndTime = 0;
+int32_t g_missionEndTime = 0;
 
-MechS32 g_speechFlushTime = 0;
+int32_t g_speechFlushTime = 0;
 
 // A game-key toggle (GetSystemSetting's setting 0x40).
-MechS32 g_overrideShutdown = 0;
+int32_t g_overrideShutdown = 0;
 
 // Set by game key 0x11.
-MechS32 g_feetToTorso = 0;
+int32_t g_feetToTorso = 0;
 
-MechS32 g_mechViewMode = 1;
+int32_t g_mechViewMode = 1;
 
-MechS32 g_missionEnded = 0;
+int32_t g_missionEnded = 0;
 
-MechS32 g_missionTimerStopped = 0;
+int32_t g_missionTimerStopped = 0;
 
 // The "meepmeep" cheat: enables the time compression key.
-MechS32 g_timeCompressionCheat = 0;
+int32_t g_timeCompressionCheat = 0;
 
 // The length of the chat message being typed (HandleChatKey).
-MechS32 g_chatLength = 0;
+int32_t g_chatLength = 0;
 
-MechS32 g_missionResolved = 0;
+int32_t g_missionResolved = 0;
 
-MechS32 g_statusMessage = 0;
+int32_t g_statusMessage = 0;
 
 // The last 15 characters typed, the newest last.
-MechChar g_typedKeys[0xf];
+char g_typedKeys[0xf];
 
-MechS32 g_frontViewForRear;
+int32_t g_frontViewForRear;
 
 // Appends a character key (key code type 7) to the typed keys. Returns whether it was one.
-MechS32 AppendTypedKey(MechS16 p_key)
+int32_t AppendTypedKey(int16_t p_key)
 {
 	if ((p_key & 0xff00) != 0x700) {
 		return FALSE;
 	}
 
 	memmove(g_typedKeys, &g_typedKeys[1], 0xe);
-	g_typedKeys[0xe] = (MechChar) p_key;
+	g_typedKeys[0xe] = (char) p_key;
 	return TRUE;
 }
 
 // Returns whether the typed keys end with the code p_code, whose characters are stored XORed
 // with 0x1a.
-MechS32 TypedCodeMatches(MechChar* p_code)
+int32_t TypedCodeMatches(char* p_code)
 {
-	MechChar* typed;
-	MechU32 n;
-	MechChar* c;
+	char* typed;
+	uint32_t n;
+	char* c;
 
 	n = strlen(p_code);
 	typed = &g_typedKeys[0xe];
@@ -107,10 +107,10 @@ MechS32 TypedCodeMatches(MechChar* p_code)
 
 // Takes a typed key for the cheat codes: when the last keys typed spell one (TypedCodeMatches; the codes
 // are stored XORed with 0x1a), toggles or runs its cheat and says so.
-void HandleCheatInput(MechS16 p_key)
+void HandleCheatInput(int16_t p_key)
 {
-	MechS32 target;
-	MechS32 victim;
+	int32_t target;
+	int32_t victim;
 
 	if (!AppendTypedKey(p_key)) {
 		return;
@@ -287,9 +287,9 @@ void HandleCheatInput(MechS16 p_key)
 }
 
 // Turns a typed character into the one its key gives with shift held (the US layout).
-void ShiftCharacter(MechChar* p_char)
+void ShiftCharacter(char* p_char)
 {
-	MechChar shifted[16] = {'<', '_', '>', '?', ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', ':', ':'};
+	char shifted[16] = {'<', '_', '>', '?', ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', ':', ':'};
 
 	if (*p_char == '\'') {
 		*p_char = '"';
@@ -309,11 +309,11 @@ void ShiftCharacter(MechChar* p_char)
 // Takes a key while a chat message is being typed (g_chatRecipient is the recipient): Backspace
 // edits, Enter sends it (to everyone from -1), Esc cancels, F-keys e and f pick the team (-3) or
 // everyone (-2), and printable characters are added up to 40. Returns whether it took the key.
-MechS32 HandleChatKey(MechU32 p_keyCode)
+int32_t HandleChatKey(uint32_t p_keyCode)
 {
-	MechChar text[80];
-	MechChar c;
-	MechS32 to;
+	char text[80];
+	char c;
+	int32_t to;
 
 	if (g_localPlayerId == g_chatRecipient) {
 		to = 0;
@@ -326,7 +326,7 @@ MechS32 HandleChatKey(MechU32 p_keyCode)
 		return FALSE;
 	}
 
-	c = (MechChar) p_keyCode;
+	c = (char) p_keyCode;
 	if (c == '\b') {
 		if (g_chatLength > 0) {
 			g_chatLength--;
@@ -402,7 +402,7 @@ MechS32 HandleChatKey(MechU32 p_keyCode)
 // Runs the frame's game keys: after the mission ends, waits a while before offering to quit (or,
 // with DifficultyCfg::m_regenerate, to regenerate); otherwise passes the key code (from the local
 // steering, through the cheat codes, the chat message and LookupGameKey) to RunGameKey.
-void HandleGameKeys(MechS32 p_unk0x00, MechS32 p_unk0x04, MechU16 p_key)
+void HandleGameKeys(int32_t p_unk0x00, int32_t p_unk0x04, uint16_t p_key)
 {
 	if (g_simPaused) {
 		return;
@@ -528,11 +528,11 @@ void HandleGameKeys(MechS32 p_unk0x00, MechS32 p_unk0x04, MechU16 p_key)
 // the controls the local steering takes (a flag set for the frame), the menus, the chat
 // recipients, ejecting (0x3b) and the screenshot (0x5b). Any other key goes to HandleDebugKey while
 // the mission timer is stopped.
-void RunGameKey(MechS32 p_key)
+void RunGameKey(int32_t p_key)
 {
 	Mech* mech;
-	MechS32 step;
-	MechChar text[40];
+	int32_t step;
+	char text[40];
 
 	step = -1;
 	mech = g_players[g_localPlayerId]->m_mech;

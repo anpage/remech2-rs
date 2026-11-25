@@ -5,25 +5,25 @@
 
 typedef struct MissionResultObjective {
 	// 1 when the objective reached state 5, else 0
-	MechS32 m_succeeded;
+	int32_t m_succeeded;
 	// MissionObjective::m_priority: 1 primary, 2 secondary, 4 tertiary, 8 return
-	MechS32 m_type;
-	MechS32 m_startTime;
+	int32_t m_type;
+	int32_t m_startTime;
 	// in seconds, negative when never reached
-	MechS32 m_endTime;
+	int32_t m_endTime;
 	// MissionObjective::m_mandatory
-	MechS32 m_mandatory;
-	MechChar m_name[0x20];
+	int32_t m_mandatory;
+	char m_name[0x20];
 } MissionResultObjective;
 
 typedef struct MissionResult {
 	// 'MW2M'
-	MechU32 m_tag;
-	MechS32 m_objectiveCount;
-	MechS32 m_startTime;
-	MechS32 m_endTime;
+	uint32_t m_tag;
+	int32_t m_objectiveCount;
+	int32_t m_startTime;
+	int32_t m_endTime;
 	// StarMission::m_status: 2 completed, 3 failed
-	MechS32 m_outcome;
+	int32_t m_outcome;
 	MissionResultObjective m_objectives[48];
 } MissionResult;
 

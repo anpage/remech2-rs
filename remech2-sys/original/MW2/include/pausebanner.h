@@ -10,17 +10,17 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_debugSlot;
-	extern MechS32 g_debugSection;
+	extern int32_t g_debugSlot;
+	extern int32_t g_debugSection;
 	extern PANE g_pausedBannerRect;
-	extern MechS32 g_pausedBannerUnscaled;
+	extern int32_t g_pausedBannerUnscaled;
 
 	void DrawPausedBanner(void);
 	void PlayPauseSound(void);
 	void PlayResumeSound(void);
 	void PauseGame(void);
 	void ResumeGame(void);
-	void HandleDebugKey(MechU16 p_key);
+	void HandleDebugKey(uint16_t p_key);
 
 #ifdef __cplusplus
 }

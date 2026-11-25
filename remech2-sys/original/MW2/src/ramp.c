@@ -7,9 +7,9 @@
 // the target after a duration given in seconds, optionally wrapping around a period (angles),
 // and eased values, which close a fixed fraction of the distance at each step.
 
-MechS32 StartRamp(Ramp* p_ramp, MechS32 p_target, MechS32 p_value, MechDouble p_seconds)
+int32_t StartRamp(Ramp* p_ramp, int32_t p_target, int32_t p_value, double p_seconds)
 {
-	MechS32 result = FALSE;
+	int32_t result = FALSE;
 
 	p_ramp->m_target = p_target;
 	p_ramp->m_value = p_value;
@@ -22,10 +22,10 @@ MechS32 StartRamp(Ramp* p_ramp, MechS32 p_target, MechS32 p_value, MechDouble p_
 	return result;
 }
 
-MechS32 UpdateRamp(Ramp* p_ramp)
+int32_t UpdateRamp(Ramp* p_ramp)
 {
-	MechS32 delta;
-	MechS32 step;
+	int32_t delta;
+	int32_t step;
 
 	delta = p_ramp->m_target - p_ramp->m_value;
 	if (delta != 0) {
@@ -42,9 +42,9 @@ MechS32 UpdateRamp(Ramp* p_ramp)
 	return p_ramp->m_value;
 }
 
-MechS32 StartWrappedRamp(WrappedRamp* p_ramp, MechS32 p_target, MechS32 p_value, MechDouble p_seconds, MechS32 p_period)
+int32_t StartWrappedRamp(WrappedRamp* p_ramp, int32_t p_target, int32_t p_value, double p_seconds, int32_t p_period)
 {
-	MechS32 result = FALSE;
+	int32_t result = FALSE;
 
 	p_ramp->m_target = p_target;
 	p_ramp->m_value = p_value;
@@ -59,11 +59,11 @@ MechS32 StartWrappedRamp(WrappedRamp* p_ramp, MechS32 p_target, MechS32 p_value,
 }
 
 // Moves the value the short way around the period.
-MechS32 UpdateWrappedRamp(WrappedRamp* p_ramp)
+int32_t UpdateWrappedRamp(WrappedRamp* p_ramp)
 {
-	MechS32 half;
-	MechS32 delta;
-	MechS32 step;
+	int32_t half;
+	int32_t delta;
+	int32_t step;
 
 	half = p_ramp->m_period >> 1;
 	delta = p_ramp->m_target - p_ramp->m_value;
@@ -89,10 +89,10 @@ MechS32 UpdateWrappedRamp(WrappedRamp* p_ramp)
 }
 
 // Sets the target, brought within half a period of zero.
-MechS32 SetWrappedRampTarget(WrappedRamp* p_ramp, MechS32 p_target)
+int32_t SetWrappedRampTarget(WrappedRamp* p_ramp, int32_t p_target)
 {
-	MechS32 half;
-	MechS32 target;
+	int32_t half;
+	int32_t target;
 
 	half = p_ramp->m_period >> 1;
 	target = p_target % p_ramp->m_period;

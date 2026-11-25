@@ -23,13 +23,13 @@ void* g_supAnimBackdrop = NULL;
 
 void* g_supAnimShape = NULL;
 
-MechS32 g_supAnimFrameCount = 0;
+int32_t g_supAnimFrameCount = 0;
 
 // The command line's overrides of the backdrop and dropship file names (ProcessCmdLineArgs).
 
-MechChar* g_supAnimBackdropName = NULL;
+char* g_supAnimBackdropName = NULL;
 
-MechChar* g_supAnimShapeName = NULL;
+char* g_supAnimShapeName = NULL;
 
 // The first 16 palette entries in single player.
 PaletteColor g_supAnimPalette[16] = {
@@ -51,9 +51,9 @@ PaletteColor g_supAnimPalette[16] = {
 	{0x01, 0x01, 0x02},
 };
 
-MechS32 g_supAnimY;
+int32_t g_supAnimY;
 
-MechS32 g_supAnimX;
+int32_t g_supAnimX;
 
 PANE g_supAnimTarget;
 
@@ -62,10 +62,10 @@ WINDOW g_supAnimBuffer;
 // Starts the dropship loading screen: loads the backdrop (launch\\supanm6.shp, netmech6.shp
 // in a network game, or the command line's override), draws it and fades its palette in (slowly with p_slowFade), then
 // loads the dropship (launch6.shp) and draws its first frame.
-void StartSupAnim(MechS32 p_slowFade)
+void StartSupAnim(int32_t p_slowFade)
 {
-	MechChar backdropPath[256];
-	MechChar shapePath[256];
+	char backdropPath[256];
+	char shapePath[256];
 	PaletteColor* palette;
 
 	if (g_supAnimBackdropName == NULL || *g_supAnimBackdropName == '\0') {
@@ -109,7 +109,7 @@ void StartSupAnim(MechS32 p_slowFade)
 	VFX_shape_draw(&g_supAnimTarget, g_supAnimBackdrop, 0, 0, 0);
 	g_currentRefreshMode->m_flip();
 
-	VFX_shape_palette(g_supAnimBackdrop, 0, (MechU8*) palette);
+	VFX_shape_palette(g_supAnimBackdrop, 0, (uint8_t*) palette);
 	if (p_slowFade) {
 		g_currentDisplayBackend->m_blendPalettes(palette, 30);
 	}

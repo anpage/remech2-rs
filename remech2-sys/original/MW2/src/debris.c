@@ -21,7 +21,7 @@
 // Wreckage: scene objects knocked off a model fly as debris pieces, bounce on the terrain and
 // come to rest; the chunks among them can be shot to pieces and time out.
 
-MechS32 g_debrisCount = 0;
+int32_t g_debrisCount = 0;
 
 DebrisChunk g_emptyDebrisChunk = {0};
 
@@ -29,9 +29,9 @@ DebrisPiece g_debrisPieces[0x80];
 
 DebrisChunk g_debrisChunks[0x80];
 
-MechS32 IsDebrisFull(void)
+int32_t IsDebrisFull(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x80 && g_debrisPieces[i].m_obj; i++) {
 	}
@@ -39,9 +39,9 @@ MechS32 IsDebrisFull(void)
 	return i == 0x80;
 }
 
-MechS32 AddDebrisPiece(SceneObject* p_obj)
+int32_t AddDebrisPiece(SceneObject* p_obj)
 {
-	MechS32 i;
+	int32_t i;
 	DebrisPiece* piece;
 
 	if (p_obj == NULL) {
@@ -71,7 +71,7 @@ MechS32 AddDebrisPiece(SceneObject* p_obj)
 }
 
 // Throws the piece off in a random direction, spinning.
-void ThrowDebrisPiece(MechS32 p_index)
+void ThrowDebrisPiece(int32_t p_index)
 {
 	DebrisPiece* piece;
 
@@ -89,11 +89,11 @@ void ThrowDebrisPiece(MechS32 p_index)
 }
 
 // Blows p_obj off its model as a chunk of debris; p_callback gets it when it's gone.
-void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x16)
+void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0x16)
 {
-	MechS32 i;
-	MechS32 destroy;
-	MechS32 piece;
+	int32_t i;
+	int32_t destroy;
+	int32_t piece;
 	DebrisChunk* chunk;
 
 	if (!p_obj || !p_obj->m_shape) {
@@ -135,7 +135,7 @@ void BlowOffChunk(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x
 	}
 }
 
-void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk0x16)
+void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, uint32_t p_unk0x16)
 {
 	SceneObject* child;
 	SceneObject* sibling;
@@ -159,7 +159,7 @@ void BlowOffObjTree(SceneObject* p_obj, ObjectCallback p_callback, MechU32 p_unk
 
 void DisposeDebris(SceneObject* p_obj, ObjectCallback p_callback)
 {
-	MechS32 index;
+	int32_t index;
 
 	if (p_obj) {
 		HideDebrisObj(p_obj);
@@ -176,7 +176,7 @@ void DisposeDebris(SceneObject* p_obj, ObjectCallback p_callback)
 
 void UpdateDebris(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x80; i++) {
 		UpdateDebrisPiece(i);
@@ -192,14 +192,14 @@ void UpdateDebris(void)
 }
 
 // Blows the chunk up.
-void ExplodeChunk(MechS32 p_index)
+void ExplodeChunk(int32_t p_index)
 {
 	DebrisChunk* chunk;
 	SceneObject* obj;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 piece;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t piece;
 
 	chunk = &g_debrisChunks[p_index];
 	obj = chunk->m_obj;
@@ -220,7 +220,7 @@ void ExplodeChunk(MechS32 p_index)
 	}
 }
 
-void DamageChunk(MechS32 p_index, MechS32 p_damage)
+void DamageChunk(int32_t p_index, int32_t p_damage)
 {
 	g_debrisChunks[p_index].m_health -= p_damage;
 	if (g_debrisChunks[p_index].m_health < 0) {
@@ -228,24 +228,24 @@ void DamageChunk(MechS32 p_index, MechS32 p_damage)
 	}
 }
 
-void UpdateDebrisPiece(MechS32 p_index)
+void UpdateDebrisPiece(int32_t p_index)
 {
-	MechS32 velocityY;
-	MechS32 rising;
-	MechS32 landed;
+	int32_t velocityY;
+	int32_t rising;
+	int32_t landed;
 	DebrisPiece* piece;
-	MechS32 ground;
-	MechS32 radius;
-	MechS32 z;
-	MechS32 spinZ;
-	MechS32 y;
-	MechS32 spinY;
-	MechS32 x;
-	MechS32 spinX;
-	MechS32 dz;
-	MechS32 newY;
-	MechS32 dx;
-	MechS32 dy;
+	int32_t ground;
+	int32_t radius;
+	int32_t z;
+	int32_t spinZ;
+	int32_t y;
+	int32_t spinY;
+	int32_t x;
+	int32_t spinX;
+	int32_t dz;
+	int32_t newY;
+	int32_t dx;
+	int32_t dy;
 
 	landed = FALSE;
 	piece = &g_debrisPieces[p_index];
@@ -301,10 +301,10 @@ void UpdateDebrisPiece(MechS32 p_index)
 }
 
 // Pushes the piece by (p_x, p_y, p_z) on top of a random throw.
-void PushDebrisPiece(MechS32 p_index, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+void PushDebrisPiece(int32_t p_index, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 length;
-	MechS32 speed;
+	int32_t length;
+	int32_t speed;
 	DebrisPiece* piece;
 
 	piece = &g_debrisPieces[p_index];
@@ -333,7 +333,7 @@ void PushDebrisPiece(MechS32 p_index, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 
 void ZeroChunx(void)
 {
-	MechS32 i;
+	int32_t i;
 	SceneObject* obj;
 
 	for (i = 0; i < 0x80; i++) {
@@ -350,7 +350,7 @@ void ZeroChunx(void)
 	}
 }
 
-void ResetDebrisPiece(MechS32 p_index)
+void ResetDebrisPiece(int32_t p_index)
 {
 	DebrisPiece* piece;
 
@@ -361,10 +361,10 @@ void ResetDebrisPiece(MechS32 p_index)
 	piece->m_acceleration = 0;
 }
 
-MechS32 FindDebrisPiece(SceneObject* p_obj)
+int32_t FindDebrisPiece(SceneObject* p_obj)
 {
-	MechS32 index;
-	MechS32 i;
+	int32_t index;
+	int32_t i;
 
 	index = -1;
 	for (i = 0; i < 0x80; i++) {
@@ -378,18 +378,18 @@ MechS32 FindDebrisPiece(SceneObject* p_obj)
 }
 
 // Damages the chunks within p_radius of (p_x, p_y, p_z) by p_damage per second.
-void DamageChunksInRadius(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_radius, MechS32 p_damage)
+void DamageChunksInRadius(int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_radius, int32_t p_damage)
 {
 	DebrisChunk* chunk;
-	MechS32 x;
-	MechS32 y;
-	MechS32 z;
-	MechS32 radius;
-	MechS32 dx;
-	MechS32 dy;
-	MechS32 dz;
-	MechS32 reach;
-	MechS32 i;
+	int32_t x;
+	int32_t y;
+	int32_t z;
+	int32_t radius;
+	int32_t dx;
+	int32_t dy;
+	int32_t dz;
+	int32_t reach;
+	int32_t i;
 
 	i = 0x80;
 	while (i--) {
@@ -411,7 +411,7 @@ void DamageChunksInRadius(MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32 p_radiu
 
 void RemoveChunk(SceneObject* p_obj, ObjectCallback p_callback)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (p_obj == NULL) {
 		return;

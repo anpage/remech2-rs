@@ -6,7 +6,7 @@
 #include "types.h"
 
 // Returns (p_a * p_b + (p_c << 16)) / p_d, with a 64-bit intermediate.
-MechS32 MulAddDiv(MechS32 p_a, MechS32 p_b, MechS32 p_c, MechS32 p_d)
+int32_t MulAddDiv(int32_t p_a, int32_t p_b, int32_t p_c, int32_t p_d)
 {
 	return PortableIdiv((MechS64) p_a * p_b + (MechS64) p_c * 0x10000, p_d);
 }

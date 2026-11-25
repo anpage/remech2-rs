@@ -6,7 +6,7 @@
 #include "types.h"
 
 // Divides p_a, shifted left by 29, by p_b.
-MechS32 FixedDiv29(MechS32 p_a, MechS32 p_b)
+int32_t FixedDiv29(int32_t p_a, int32_t p_b)
 {
 	return PortableIdiv((MechS64) p_a * 0x20000000, p_b);
 }

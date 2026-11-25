@@ -28,60 +28,60 @@
 // A .MEK file's header. The file goes on with the eight sections (MechSection), the weapons
 // (MekWeapon) and the ammunition bins (MekAmmo).
 typedef struct MekHeader {
-	MechS32 m_tons;        // 0x00
-	MechS32 m_speed;       // 0x04
-	MechS32 m_jump;        // 0x08 — 0: no jump jets, negative: none either
-	MechS32 m_heatSinks;   // 0x0c
-	MechS32 m_weaponCount; // 0x10
-	MechS32 m_ammoCount;   // 0x14
+	int32_t m_tons;        // 0x00
+	int32_t m_speed;       // 0x04
+	int32_t m_jump;        // 0x08 — 0: no jump jets, negative: none either
+	int32_t m_heatSinks;   // 0x0c
+	int32_t m_weaponCount; // 0x10
+	int32_t m_ammoCount;   // 0x14
 } MekHeader;
 
 // A .MEK file's weapon: its type and the part it fires from.
 typedef struct MekWeapon {
-	MechS32 m_type;      // 0x00 — a weapon type, times 100, and its id in MechSection::m_slots
-	MechS32 m_hardpoint; // 0x04 — an index into Mech::m_objects; negative: the section holding it
+	int32_t m_type;      // 0x00 — a weapon type, times 100, and its id in MechSection::m_slots
+	int32_t m_hardpoint; // 0x04 — an index into Mech::m_objects; negative: the section holding it
 } MekWeapon;
 
 // A .MEK file's ammunition bin.
 typedef struct MekAmmo {
-	MechS32 m_id;   // 0x00 — its id in MechSection::m_slots
-	MechS32 m_type; // 0x04 — the MekWeapon::m_type it feeds
+	int32_t m_id;   // 0x00 — its id in MechSection::m_slots
+	int32_t m_type; // 0x04 — the MekWeapon::m_type it feeds
 } MekAmmo;
 
 // The value each weapon type adds to a mech's (GetMechValue).
-MechU16 g_weaponValues[30] = {183, 137, 91,  46,  51,  34, 17,  74,  49, 25, 2,   228, 42, 82, 123,
-							  157, 74,  144, 247, 329, 4,  228, 166, 51, 21, 177, 74,  16, 50, 40};
+uint16_t g_weaponValues[30] = {183, 137, 91,  46,  51,  34, 17,  74,  49, 25, 2,   228, 42, 82, 123,
+							   157, 74,  144, 247, 329, 4,  228, 166, 51, 21, 177, 74,  16, 50, 40};
 
 // Loads mech p_mech's configuration mek\<p_config>.mek (or MEK resource p_id when the file is
 // missing) for chassis p_name, logging it to mw2.log: the sections, whose armor the difficulty
 // scales (the local player's by g_localArmorPerLevel, its side's by armorScale, the others' by
 // g_otherArmorPerLevel), the weapons and their ammunition bins, the heat sinks (scaled by the difficulty
 // and the temperature, g_temperature) and the jump jets. Returns TRUE.
-MechS32 LoadMechConfig(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p_config)
+int32_t LoadMechConfig(Mech* p_mech, char* p_name, int32_t p_id, char* p_config)
 {
-	MechS32 armorScale;
-	MechS32 binSlot;
-	MechS32 group;
-	MechS32 i;
-	MechS32 fromResource;
-	MechChar name[52];
+	int32_t armorScale;
+	int32_t binSlot;
+	int32_t group;
+	int32_t i;
+	int32_t fromResource;
+	char name[52];
 	WeaponBin* bin;
 	MechSection* mekSections;
-	MechChar text[128];
+	char text[128];
 	MekWeapon* weapon;
-	MechS32 binCount;
+	int32_t binCount;
 	WeaponSlot* slot;
-	MechS32 heat;
-	MechS32 jumpRatio;
-	MechS32 level;
-	MechS32 piece;
-	MechS32 j;
-	MechS32 type;
-	MechS32 file;
+	int32_t heat;
+	int32_t jumpRatio;
+	int32_t level;
+	int32_t piece;
+	int32_t j;
+	int32_t type;
+	int32_t file;
 	MekAmmo* ammo;
 	MekAmmo* ammos;
 	MekWeapon* weapons;
-	MechS32 size;
+	int32_t size;
 	MechSection* section;
 	MekHeader* header;
 
@@ -366,18 +366,18 @@ MechS32 LoadMechConfig(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p
 
 // Returns a mech's value: its tonnage, scaled by the critical slots it fills (by kind), plus its
 // armor and the value of each of its weapons (up to ten).
-MechU16 GetMechValue(MekHeader* p_header, MechSection* p_sections, MekWeapon* p_weapons)
+uint16_t GetMechValue(MekHeader* p_header, MechSection* p_sections, MekWeapon* p_weapons)
 {
-	MechS32 armor;
-	MechS16 kinds[23][3] = {{5000, 1, 0}, {5050, 1, 0}, {5100, -60, 0}, {5150, -60, 0}, {5200, -50, 0}, {5250, 1, 0},
+	int32_t armor;
+	int16_t kinds[23][3] = {{5000, 1, 0}, {5050, 1, 0}, {5100, -60, 0}, {5150, -60, 0}, {5200, -50, 0}, {5250, 1, 0},
 							{5300, 1, 0}, {5350, 1, 0}, {5400, 1, 0},   {5450, 1, 0},   {5500, 1, 0},   {5550, 1, 0},
 							{5600, 1, 0}, {5650, 1, 0}, {5700, 2, 0},   {5750, 0, 0},   {5800, 2, 0},   {5850, 3, 0},
 							{5900, 2, 0}, {6000, 1, 0}, {7000, 1, 0},   {8000, 0, 0},   {9000, 0, 0}};
-	MechS32 count;
-	MechS32 i;
-	MechU16 value;
-	MechS32 j;
-	MechS32 k;
+	int32_t count;
+	int32_t i;
+	uint16_t value;
+	int32_t j;
+	int32_t k;
 
 	value = p_header->m_tons;
 	count = 0;
@@ -413,7 +413,7 @@ MechU16 GetMechValue(MekHeader* p_header, MechSection* p_sections, MekWeapon* p_
 		}
 
 		value += armor;
-		value += (MechU16) p_sections->m_internal;
+		value += (uint16_t) p_sections->m_internal;
 	}
 
 	for (i = 0; i < p_header->m_weaponCount && i < 10; i++, p_weapons++) {

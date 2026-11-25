@@ -22,22 +22,22 @@
 
 // A player's model level as ChoosePlayerDetailLevels chooses it.
 typedef struct PlayerDetail {
-	MechS32 m_distance; // 0x00 — from the eyepoint
-	MechS32 m_level;    // 0x04 — -2 until chosen by distance
-	MechS32 m_player;   // 0x08
+	int32_t m_distance; // 0x00 — from the eyepoint
+	int32_t m_level;    // 0x04 — -2 until chosen by distance
+	int32_t m_player;   // 0x08
 } PlayerDetail;
 
-MechS32 g_classEntryCount = 0;
+int32_t g_classEntryCount = 0;
 
-MechS32 g_classTableReady = 0;
+int32_t g_classTableReady = 0;
 
 ClassEntry g_classTable[0x30c];
 
 // Loads the shapes of p_player's entries for its base level (m_baseLevel) into one pool block.
-MechS32 LoadBaseLevelShapes(Player* p_player)
+int32_t LoadBaseLevelShapes(Player* p_player)
 {
-	MechS32 i;
-	MechS32 count;
+	int32_t i;
+	int32_t count;
 	undefined* buffer;
 
 	count = 0;
@@ -66,20 +66,20 @@ MechS32 LoadBaseLevelShapes(Player* p_player)
 // Adds p_unk0x00 as level p_level of a class entry: level 0 starts a new entry, a later level
 // goes to entry p_index. The unset levels above it take the same value. Returns the entry's
 // index, or -1.
-MechS32 AddClassEntryLevel(
-	MechS32 p_unk0x00,
+int32_t AddClassEntryLevel(
+	int32_t p_unk0x00,
 	undefined4 p_unk0x04,
 	undefined4 p_unk0x08,
 	undefined4 p_unk0x0c,
-	MechS32 p_unk0x10,
-	MechS32 p_level,
-	MechS32 p_index,
-	MechS16 p_unk0x1c
+	int32_t p_unk0x10,
+	int32_t p_level,
+	int32_t p_index,
+	int16_t p_unk0x1c
 )
 {
-	MechS32 index;
+	int32_t index;
 	ClassEntry* entry;
-	MechS32 i;
+	int32_t i;
 
 	index = -1;
 	if (!g_classTableReady) {
@@ -135,8 +135,8 @@ MechS32 AddClassEntryLevel(
 void ResetClassTable(void)
 {
 	ClassEntry* entry;
-	MechS32 i;
-	MechS32 level;
+	int32_t i;
+	int32_t level;
 
 	for (i = 0; i < 0x30c; i++) {
 		entry = &g_classTable[i];
@@ -161,7 +161,7 @@ void ResetClassTable(void)
 // Gives the entries added since the last call (owner -2) to p_player.
 void ClaimNewClassEntries(Player* p_player)
 {
-	MechS32 i;
+	int32_t i;
 	ClassEntry* entry;
 
 	for (i = 0; i < g_classEntryCount; i++) {
@@ -177,11 +177,11 @@ void ClaimNewClassEntries(Player* p_player)
 
 // Loads the level-p_level shapes of p_owner's entries, or, for a player with flag 2, keeps the
 // shape already loaded. Returns 0 when a shape doesn't load.
-MechS32 LoadClassLevel(MechS32 p_owner, MechS32 p_level)
+int32_t LoadClassLevel(int32_t p_owner, int32_t p_level)
 {
-	MechS32 i;
+	int32_t i;
 	ClassEntry* entry;
-	MechS32 result;
+	int32_t result;
 
 	result = 1;
 	if (p_level == -1) {
@@ -212,9 +212,9 @@ MechS32 LoadClassLevel(MechS32 p_owner, MechS32 p_level)
 }
 
 // Releases the level-p_level shapes of p_owner's entries.
-void ReleaseClassLevel(MechS32 p_owner, MechS32 p_level)
+void ReleaseClassLevel(int32_t p_owner, int32_t p_level)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < g_classEntryCount; i++) {
 		if (g_classTable[i].m_owner == p_owner) {
@@ -226,17 +226,17 @@ void ReleaseClassLevel(MechS32 p_owner, MechS32 p_level)
 // Loads the level-p_level shape of entry p_index in place of the one it has, and gives it an object:
 // under its player's object, or under the object (or shape object) of entry m_parent, made in
 // p_buffer if given. Returns whether the entry has its shape.
-MechS32 LoadClassEntryShape(MechS32 p_index, MechS32 p_level, void* p_buffer)
+int32_t LoadClassEntryShape(int32_t p_index, int32_t p_level, void* p_buffer)
 {
-	MechS32 kind;
-	MechS32 offset;
-	MechU8* data;
+	int32_t kind;
+	int32_t offset;
+	uint8_t* data;
 	ClassEntry* entry;
-	MechU32 flags;
-	MechS32 size;
+	uint32_t flags;
+	int32_t size;
 	struct SceneObject* parent;
 	struct SceneObject* obj;
-	MechS32 placed;
+	int32_t placed;
 	Shape* shape;
 
 	size = 0;
@@ -352,8 +352,8 @@ MechS32 LoadClassEntryShape(MechS32 p_index, MechS32 p_level, void* p_buffer)
 // Releases the shapes of the first player whose m_detailLevel names a level, and clears it.
 void ReleasePendingDetailLevel(void)
 {
-	MechS32 i;
-	MechS32 done;
+	int32_t i;
+	int32_t done;
 
 	done = FALSE;
 	for (i = 0; i < g_playerCount && !done; i++) {
@@ -366,7 +366,7 @@ void ReleasePendingDetailLevel(void)
 }
 
 // Releases entry p_index's shape if it is the one loaded for level p_level.
-void ReleaseClassEntryShape(MechS32 p_index, MechS32 p_level)
+void ReleaseClassEntryShape(int32_t p_index, int32_t p_level)
 {
 	ClassEntry* entry;
 
@@ -378,7 +378,7 @@ void ReleaseClassEntryShape(MechS32 p_index, MechS32 p_level)
 	}
 }
 
-struct SceneObject* GetClassObject(MechS32 p_index)
+struct SceneObject* GetClassObject(int32_t p_index)
 {
 	struct SceneObject* obj;
 
@@ -390,7 +390,7 @@ struct SceneObject* GetClassObject(MechS32 p_index)
 	return obj;
 }
 
-Shape* GetClassShape(MechS32 p_index)
+Shape* GetClassShape(int32_t p_index)
 {
 	Shape* shape;
 
@@ -402,7 +402,7 @@ Shape* GetClassShape(MechS32 p_index)
 	return shape;
 }
 
-void SetClassEntryPartId(MechS32 p_index, MechU16 p_value)
+void SetClassEntryPartId(int32_t p_index, uint16_t p_value)
 {
 	ClassEntry* entry;
 
@@ -415,30 +415,30 @@ void SetClassEntryPartId(MechS32 p_index, MechU16 p_value)
 // The local player's own view (GetViewMode == 0) takes level 4, and dead players 0 or 1.
 void ChoosePlayerDetailLevels(void)
 {
-	MechS32 scale;
-	MechS32 third;
-	MechS32 second;
-	MechS32 range1;
-	MechS32 dz;
-	MechS32 best;
-	MechS32 unk0x18;
-	MechS32 level;
-	MechS32 range2;
+	int32_t scale;
+	int32_t third;
+	int32_t second;
+	int32_t range1;
+	int32_t dz;
+	int32_t best;
+	int32_t unk0x18;
+	int32_t level;
+	int32_t range2;
 	PlayerDetail* entry;
-	MechS32 ex;
-	MechS32 ground;
-	MechS32 heading;
-	MechS32 ey;
-	MechS32 range0;
-	MechS32 ez;
-	MechS32 count;
-	MechS32 length;
+	int32_t ex;
+	int32_t ground;
+	int32_t heading;
+	int32_t ey;
+	int32_t range0;
+	int32_t ez;
+	int32_t count;
+	int32_t length;
 	PlayerDetail entries[60];
-	MechS32 i;
-	MechS32 dx;
-	MechS32 nearest;
+	int32_t i;
+	int32_t dx;
+	int32_t nearest;
 	Player* player;
-	MechS32 dy;
+	int32_t dy;
 
 	count = 0;
 	nearest = -1;
@@ -473,7 +473,7 @@ void ChoosePlayerDetailLevels(void)
 			dx = player->m_position.m_x - ex;
 			dy = player->m_position.m_y - ey;
 			dz = player->m_position.m_z - ez;
-			GetBearingAndRange(dx, dy, dz, &heading, &length, (MechU32*) &ground, &unk0x18);
+			GetBearingAndRange(dx, dy, dz, &heading, &length, (uint32_t*) &ground, &unk0x18);
 			entry->m_distance = length;
 			if (ground < best) {
 				best = ground;
@@ -517,7 +517,7 @@ void ChoosePlayerDetailLevels(void)
 // Releases the shape of the entry whose object is p_obj.
 void ReleaseObjShape(struct SceneObject* p_obj)
 {
-	MechS32 i;
+	int32_t i;
 	ClassEntry* entry;
 
 	for (i = 0; i < g_classEntryCount; i++) {
@@ -539,7 +539,7 @@ void ReleaseObjShape(struct SceneObject* p_obj)
 void ForgetObjShape(struct SceneObject* p_obj)
 {
 	ClassEntry* entry;
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < g_classEntryCount; i++) {
 		entry = &g_classTable[i];

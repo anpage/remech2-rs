@@ -24,15 +24,15 @@
 #include <stdlib.h>
 
 // The trainer's idle video alternates between two takes; a countdown to the next.
-MechS32 g_trainerTake = 0;
+int32_t g_trainerTake = 0;
 
-MechS32 g_trainerIdleCountdown = -1;
+int32_t g_trainerIdleCountdown = -1;
 
 // Set once the trainer's welcome video is over and the mission buttons are up.
-MechS32 g_trainingButtonsShown = 0;
+int32_t g_trainingButtonsShown = 0;
 
 // The trainer's video playing before a training mission starts, -1 for none.
-MechS32 g_trainingExitVideo = -1;
+int32_t g_trainingExitVideo = -1;
 
 // The room's sound, database item 0x4c, looped once the welcome is over.
 AudioSample* g_trainingAmbience = NULL;
@@ -43,11 +43,11 @@ ButtonMenu* g_cadetTrainingMenu;
 // (c_msgClanHall).
 size_t g_trainingMessage;
 
-void CadetTrainingCallback(TMPackDataBase*, MechS32*, MechU8*, MechChar**, MechS32);
+void CadetTrainingCallback(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t);
 
 // Sets up the campaign's training screen: its first button, its background and the videos of
 // the trainer.
-void DrawCadetTraining(TMPackDataBase* p_database, MechS32 p_campaign, char**, size_t p_wParam)
+void DrawCadetTraining(TMPackDataBase* p_database, int32_t p_campaign, char**, size_t p_wParam)
 {
 	g_trainingMessage = p_wParam;
 	g_cadetTrainingMenu =
@@ -72,18 +72,12 @@ void DrawCadetTraining(TMPackDataBase* p_database, MechS32 p_campaign, char**, s
 
 // The training screen's frame: once the trainer's welcome is over, the mission buttons and the
 // room's sound; EXIT, or a training mission after the trainer's video.
-void CadetTrainingCallback(
-	TMPackDataBase* p_database,
-	MechS32* p_campaign,
-	MechU8*,
-	MechChar** p_scenario,
-	MechS32 p_msg
-)
+void CadetTrainingCallback(TMPackDataBase* p_database, int32_t* p_campaign, uint8_t*, char** p_scenario, int32_t p_msg)
 {
 	void* data = NULL;
-	MechS32 i;
-	MechS32 button;
-	MechS32 size;
+	int32_t i;
+	int32_t button;
+	int32_t size;
 
 	// The original skips the frame's work with a goto, like StarConfigCallback.
 	if (p_msg != c_msgScreenFrame) {

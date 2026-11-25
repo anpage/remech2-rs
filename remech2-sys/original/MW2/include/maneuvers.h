@@ -36,70 +36,70 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_jumpJetDrag;
-	extern MechS32 g_slideSlope;
+	extern int32_t g_jumpJetDrag;
+	extern int32_t g_slideSlope;
 	extern Point g_probeDirections[16];
 	extern ManeuverEntry g_mechManeuvers[13];
 	extern ManeuverEntry g_stupidManeuvers;
 	extern ManeuverEntry g_circleManeuvers;
 	extern ManeuverEntry g_behindManeuvers;
 	extern ManeuverEntry g_altMechManeuvers[13];
-	extern MechS32 g_maneuverTablesReady;
+	extern int32_t g_maneuverTablesReady;
 	extern ManeuverTable g_maneuverTables[9];
-	void RunManeuver(struct Player* p_player, MechU16 p_target);
+	void RunManeuver(struct Player* p_player, uint16_t p_target);
 	void InitializeManeuvers(struct Player* p_player);
-	MechS32 ChooseManeuver(struct Player* p_player);
-	MechS16 FindManeuver(ManeuverTable* p_table, MechS16 p_id);
+	int32_t ChooseManeuver(struct Player* p_player);
+	int16_t FindManeuver(ManeuverTable* p_table, int16_t p_id);
 	void StartManeuver(struct Player* p_player);
 	void EndManeuver(struct Player* p_player);
-	void PlaceOffsetNav(struct Player* p_player, MechU32 p_target, MechS16 p_direction, MechS16 p_distance);
+	void PlaceOffsetNav(struct Player* p_player, uint32_t p_target, int16_t p_direction, int16_t p_distance);
 	void GetOffsetPoint(
-		MechU32 p_target,
-		MechS16 p_direction,
-		MechS32* p_x,
-		MechS32* p_z,
-		MechS32* p_y,
-		MechS16 p_distance
+		uint32_t p_target,
+		int16_t p_direction,
+		int32_t* p_x,
+		int32_t* p_z,
+		int32_t* p_y,
+		int16_t p_distance
 	);
-	MechS32 IsSharpTurn(struct Player* p_player, MechS32 p_turn);
-	void ManeuverStupid(struct Player* p_player, MechS16 p_target);
-	void ManeuverBehind(struct Player* p_player, MechS16 p_target);
-	MechS32 ManeuverAchick(struct Player* p_player, MechS16 p_target);
-	MechS32 ManeuverKama(struct Player* p_player, MechS16 p_target);
-	MechS32 ManeuverWbackp(struct Player* p_player, MechS16 p_target);
-	MechS32 ManeuverWchick(struct Player* p_player, MechS16 p_target);
-	MechS32 ManeuverWpeek(struct Player* p_player, MechS16 p_target);
-	MechS32 ManeuverAjmpin(struct Player* p_player, MechS16 p_target);
-	MechS32 ManeuverSprint(struct Player* p_player, MechS16 p_target);
-	MechS32 ManeuverAdfa(struct Player* p_player, MechS16 p_target);
-	void ManeuverAvoid(struct Player* p_player, MechS16 p_target);
-	MechS32 ManeuverCircle(struct Player* p_player, MechS16 p_target);
-	MechS32 IsBelowHiddenTarget(struct Player* p_player);
-	MechS32 BrakeFall(struct Player* p_player);
-	void SetJumpJets(struct Player* p_player, MechS8 p_value);
-	MechS32 AvoidObstacles(struct Player* p_player);
-	MechS32 IsStandableShape(struct Shape* p_shape);
+	int32_t IsSharpTurn(struct Player* p_player, int32_t p_turn);
+	void ManeuverStupid(struct Player* p_player, int16_t p_target);
+	void ManeuverBehind(struct Player* p_player, int16_t p_target);
+	int32_t ManeuverAchick(struct Player* p_player, int16_t p_target);
+	int32_t ManeuverKama(struct Player* p_player, int16_t p_target);
+	int32_t ManeuverWbackp(struct Player* p_player, int16_t p_target);
+	int32_t ManeuverWchick(struct Player* p_player, int16_t p_target);
+	int32_t ManeuverWpeek(struct Player* p_player, int16_t p_target);
+	int32_t ManeuverAjmpin(struct Player* p_player, int16_t p_target);
+	int32_t ManeuverSprint(struct Player* p_player, int16_t p_target);
+	int32_t ManeuverAdfa(struct Player* p_player, int16_t p_target);
+	void ManeuverAvoid(struct Player* p_player, int16_t p_target);
+	int32_t ManeuverCircle(struct Player* p_player, int16_t p_target);
+	int32_t IsBelowHiddenTarget(struct Player* p_player);
+	int32_t BrakeFall(struct Player* p_player);
+	void SetJumpJets(struct Player* p_player, int8_t p_value);
+	int32_t AvoidObstacles(struct Player* p_player);
+	int32_t IsStandableShape(struct Shape* p_shape);
 	void BuildProbeRay(
 		struct Player* p_player,
 		struct Ray* p_ray,
-		MechS32 p_side,
-		MechS16 p_step,
-		MechS32 p_length,
-		MechS32 p_fromEdge
+		int32_t p_side,
+		int16_t p_step,
+		int32_t p_length,
+		int32_t p_fromEdge
 	);
-	MechS16 GetAvoidSide(struct Player* p_player, struct Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 GetHeadingTo(struct Player* p_player, MechS16 p_target);
-	MechS32 ClampMagnitude(MechS32 p_value, MechS32 p_limit);
-	MechS32 HasLineToTarget(struct Player* p_player, MechS32 p_y);
-	MechS32 IsOutOfAmmo(struct Mech* p_mech);
-	void SetJumpDirection(struct Player* p_player, MechS16 p_value);
-	MechS32 GetClosingRate(struct Player* p_player);
+	int16_t GetAvoidSide(struct Player* p_player, struct Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t GetHeadingTo(struct Player* p_player, int16_t p_target);
+	int32_t ClampMagnitude(int32_t p_value, int32_t p_limit);
+	int32_t HasLineToTarget(struct Player* p_player, int32_t p_y);
+	int32_t IsOutOfAmmo(struct Mech* p_mech);
+	void SetJumpDirection(struct Player* p_player, int16_t p_value);
+	int32_t GetClosingRate(struct Player* p_player);
 	void JumpToTurn(struct Player* p_player);
-	MechS32 CanJump(struct Player* p_player, MechS32 p_limit);
-	struct Shape* GetTargetShape(MechS16 p_target);
+	int32_t CanJump(struct Player* p_player, int32_t p_limit);
+	struct Shape* GetTargetShape(int16_t p_target);
 	void DodgeShot(struct WeaponSlot* p_slot, struct Mech* p_mech);
-	MechS16 ChooseFlankPlace(struct Player* p_player);
-	MechS32 IsStuck(struct Mech* p_mech);
+	int16_t ChooseFlankPlace(struct Player* p_player);
+	int32_t IsStuck(struct Mech* p_mech);
 
 #ifdef __cplusplus
 }

@@ -18,9 +18,9 @@ static const long c_savedGlyphSize = 4;
 void LoadPilotRoster()
 {
 	PilotRecord* pilot;
-	MechS32 i;
+	int32_t i;
 
-	MechS32 file = MechOpen("MW2REG.CFG", c_mechOpenRead);
+	int32_t file = MechOpen("MW2REG.CFG", c_mechOpenRead);
 	if (file == -1) {
 		for (i = 0; i < 20; i++) {
 			pilot = &g_pilotRoster[i];
@@ -59,10 +59,10 @@ void LoadPilotRoster()
 
 void SavePilotRoster()
 {
-	static const MechU8 glyph[4] = {0};
-	MechS32 i;
+	static const uint8_t glyph[4] = {0};
+	int32_t i;
 
-	MechS32 file = MechOpen("MW2REG.CFG", c_mechOpenWrite);
+	int32_t file = MechOpen("MW2REG.CFG", c_mechOpenWrite);
 	if (file == -1) {
 		ShowMessage("Error Writing Career File\n");
 		return;

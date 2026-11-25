@@ -12,46 +12,46 @@ extern "C"
 #endif
 
 	extern PlayerSteering g_localSteering;
-	extern MechS32 g_sinkPilotTilt;
-	extern MechS32 g_sinkPilotPan;
-	extern MechS32 g_sinkEyepointTilt;
-	extern MechS32 g_sinkEyepointPanDelta;
-	extern MechS32 g_sinkEyepointSlideDelta;
-	extern MechS32 g_sinkTrackDistanceDelta;
-	extern MechS32 g_sinkTrackHeightDelta;
-	extern MechS32 g_sinkZoomFactor;
-	extern MechS8 g_sinkPilotTiltPlus;
-	extern MechS8 g_sinkPilotTiltMinus;
-	extern MechS8 g_sinkPilotTiltReset;
-	extern MechS8 g_sinkPilotPanPlus;
-	extern MechS8 g_sinkPilotPanMinus;
-	extern MechS8 g_sinkPilotPanReset;
-	extern MechS8 g_sinkGlanceLeft;
-	extern MechS8 g_sinkGlanceRight;
-	extern MechS8 g_sinkGlanceUp;
-	extern MechS8 g_sinkGlanceDown;
-	extern MechS8 g_sinkEyepointTiltPlus;
-	extern MechS8 g_sinkEyepointTiltMinus;
-	extern MechS8 g_sinkEyepointTiltReset;
-	extern MechS8 g_sinkEyepointPanPlus;
-	extern MechS8 g_sinkEyepointPanMinus;
-	extern MechS8 g_sinkEyepointPanReset;
-	extern MechS8 g_sinkEyepointSlidePlus;
-	extern MechS8 g_sinkEyepointSlideMinus;
-	extern MechS8 g_sinkTrackDistancePlus;
-	extern MechS8 g_sinkTrackDistanceMinus;
-	extern MechS8 g_sinkTrackHeightPlus;
-	extern MechS8 g_sinkTrackHeightMinus;
-	extern MechS8 g_sinkZoomFactorPlus;
-	extern MechS8 g_sinkZoomFactorMinus;
-	extern MechS8 g_sinkZoomFactorReset;
-	extern MechS32 g_sinkMenuItem;
-	extern MechS32 g_sinkMenuValue;
-	extern MechS8 g_sinkMenuItemReset;
-	extern MechS8 g_sinkMenuValueReset;
-	extern MechS8 g_sinkMenuEnter;
-	extern MechS8 g_sinkMenuAbort;
-	extern MechS32 g_gameplayInputEnabled;
+	extern int32_t g_sinkPilotTilt;
+	extern int32_t g_sinkPilotPan;
+	extern int32_t g_sinkEyepointTilt;
+	extern int32_t g_sinkEyepointPanDelta;
+	extern int32_t g_sinkEyepointSlideDelta;
+	extern int32_t g_sinkTrackDistanceDelta;
+	extern int32_t g_sinkTrackHeightDelta;
+	extern int32_t g_sinkZoomFactor;
+	extern int8_t g_sinkPilotTiltPlus;
+	extern int8_t g_sinkPilotTiltMinus;
+	extern int8_t g_sinkPilotTiltReset;
+	extern int8_t g_sinkPilotPanPlus;
+	extern int8_t g_sinkPilotPanMinus;
+	extern int8_t g_sinkPilotPanReset;
+	extern int8_t g_sinkGlanceLeft;
+	extern int8_t g_sinkGlanceRight;
+	extern int8_t g_sinkGlanceUp;
+	extern int8_t g_sinkGlanceDown;
+	extern int8_t g_sinkEyepointTiltPlus;
+	extern int8_t g_sinkEyepointTiltMinus;
+	extern int8_t g_sinkEyepointTiltReset;
+	extern int8_t g_sinkEyepointPanPlus;
+	extern int8_t g_sinkEyepointPanMinus;
+	extern int8_t g_sinkEyepointPanReset;
+	extern int8_t g_sinkEyepointSlidePlus;
+	extern int8_t g_sinkEyepointSlideMinus;
+	extern int8_t g_sinkTrackDistancePlus;
+	extern int8_t g_sinkTrackDistanceMinus;
+	extern int8_t g_sinkTrackHeightPlus;
+	extern int8_t g_sinkTrackHeightMinus;
+	extern int8_t g_sinkZoomFactorPlus;
+	extern int8_t g_sinkZoomFactorMinus;
+	extern int8_t g_sinkZoomFactorReset;
+	extern int32_t g_sinkMenuItem;
+	extern int32_t g_sinkMenuValue;
+	extern int8_t g_sinkMenuItemReset;
+	extern int8_t g_sinkMenuValueReset;
+	extern int8_t g_sinkMenuEnter;
+	extern int8_t g_sinkMenuAbort;
+	extern int32_t g_gameplayInputEnabled;
 	extern InputSink g_inputSinks[87];
 
 	void DisableGameplayInput(void);
@@ -61,9 +61,9 @@ extern "C"
 	void FirstInputs(void);
 	void UpdateInputs(void);
 	void CloseInputDevices(void);
-	MechS16 LookupGameKey(MechS16 p_keyCode);
+	int16_t LookupGameKey(int16_t p_keyCode);
 	// The key code the bindings give the open menu this frame, or 0
-	MechS16 TakeBoundMenuKey(void);
+	int16_t TakeBoundMenuKey(void);
 
 #ifdef __cplusplus
 }

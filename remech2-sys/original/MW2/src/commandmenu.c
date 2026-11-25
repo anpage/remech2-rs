@@ -44,109 +44,109 @@ MenuDefinition g_commandPoint2Menu = {
 	&g_commandPoint2Page
 };
 
-MechChar g_commandComputerTitle[] = "COMMAND COMPUTER";
+char g_commandComputerTitle[] = "COMMAND COMPUTER";
 
-MechChar g_commandAllItem[] = "Command All";
+char g_commandAllItem[] = "Command All";
 
-MechChar g_changeFormationItem[] = "Change Formation";
+char g_changeFormationItem[] = "Change Formation";
 
-MechChar g_noStarMatesText[] = "NO STAR MATES";
+char g_noStarMatesText[] = "NO STAR MATES";
 
-MechChar g_currentFormationLabel[] = "Current Form:";
+char g_currentFormationLabel[] = "Current Form:";
 
-MechChar g_commandPoint2Item[] = "Command Point 2";
+char g_commandPoint2Item[] = "Command Point 2";
 
-MechChar g_commandPoint3Item[] = "Command Point 3";
+char g_commandPoint3Item[] = "Command Point 3";
 
-MechChar g_commandPoint4Item[] = "Command Point 4";
+char g_commandPoint4Item[] = "Command Point 4";
 
-MechChar g_commandPoint5Item[] = "Command Point 5";
+char g_commandPoint5Item[] = "Command Point 5";
 
-MechChar g_statusLabel[] = "Status:";
+char g_statusLabel[] = "Status:";
 
-MechChar g_notAvailableText[] = "NOT AVAILABLE";
+char g_notAvailableText[] = "NOT AVAILABLE";
 
-MechChar g_commandAllTitle[] = "COMMAND ALL";
+char g_commandAllTitle[] = "COMMAND ALL";
 
-MechChar g_changeFormationTitle[] = "CHANGE FORMATION";
+char g_changeFormationTitle[] = "CHANGE FORMATION";
 
-MechChar g_commandPoint2Title[] = "COMMAND POINT 2";
+char g_commandPoint2Title[] = "COMMAND POINT 2";
 
-MechChar g_commandPoint3Title[] = "COMMAND POINT 3";
+char g_commandPoint3Title[] = "COMMAND POINT 3";
 
-MechChar g_commandPoint4Title[] = "COMMAND POINT 4";
+char g_commandPoint4Title[] = "COMMAND POINT 4";
 
-MechChar g_commandPoint5Title[] = "COMMAND POINT 5";
+char g_commandPoint5Title[] = "COMMAND POINT 5";
 
-MechChar g_echelonLeftText[] = "Echelon Left";
+char g_echelonLeftText[] = "Echelon Left";
 
-MechChar g_echelonRightText[] = "Echelon Right";
+char g_echelonRightText[] = "Echelon Right";
 
-MechChar g_lineAbreastText[] = "Line Abreast";
+char g_lineAbreastText[] = "Line Abreast";
 
-MechChar g_lineAsternText[] = "Line Astern";
+char g_lineAsternText[] = "Line Astern";
 
-MechChar g_vFormText[] = "V Form";
+char g_vFormText[] = "V Form";
 
-MechChar g_wedgeText[] = "Wedge";
+char g_wedgeText[] = "Wedge";
 
-MechChar g_noFormationText[] = "No Formation";
+char g_noFormationText[] = "No Formation";
 
-MechChar g_orderAttackText[] = "Attack";
+char g_orderAttackText[] = "Attack";
 
-MechChar g_orderDefendText[] = "Defend";
+char g_orderDefendText[] = "Defend";
 
-MechChar g_orderJoinFormationText[] = "Join Formation";
+char g_orderJoinFormationText[] = "Join Formation";
 
-MechChar g_orderChangeFormationText[] = "Change Formation";
+char g_orderChangeFormationText[] = "Change Formation";
 
-MechChar g_orderDisengageText[] = "Disengage";
+char g_orderDisengageText[] = "Disengage";
 
-MechChar g_orderEngageAtWillText[] = "Engage at Will";
+char g_orderEngageAtWillText[] = "Engage at Will";
 
-MechChar g_orderShutdownText[] = "Shutdown";
+char g_orderShutdownText[] = "Shutdown";
 
-MechChar g_orderNoneText[] = "No Cmd";
+char g_orderNoneText[] = "No Cmd";
 
-MechChar g_attackMyTargetItem[] = "Attack My Target";
+char g_attackMyTargetItem[] = "Attack My Target";
 
-MechChar g_defendMyTargetItem[] = "Defend My Target";
+char g_defendMyTargetItem[] = "Defend My Target";
 
-MechChar g_joinFormationItem[] = "Join Formation";
+char g_joinFormationItem[] = "Join Formation";
 
-MechChar g_disengageItem[] = "Disengage";
+char g_disengageItem[] = "Disengage";
 
-MechChar g_engageAtWillItem[] = "Engage at Will";
+char g_engageAtWillItem[] = "Engage at Will";
 
-MechChar g_shutdownItem[] = "Shutdown";
+char g_shutdownItem[] = "Shutdown";
 
-MechChar g_aiStateNoneText[] = "None ";
+char g_aiStateNoneText[] = "None ";
 
-MechChar g_aiStateIdleText[] = "Idle ";
+char g_aiStateIdleText[] = "Idle ";
 
-MechChar g_aiStateAvoidText[] = "Avoiding ";
+char g_aiStateAvoidText[] = "Avoiding ";
 
-MechChar g_aiStateTargetText[] = "Targeting ";
+char g_aiStateTargetText[] = "Targeting ";
 
-MechChar g_aiStateAttackText[] = "Engaging ";
+char g_aiStateAttackText[] = "Engaging ";
 
-MechChar g_aiStateFleeText[] = "Disengaging ";
+char g_aiStateFleeText[] = "Disengaging ";
 
-MechChar g_aiStateFollowText[] = "In Formation ";
+char g_aiStateFollowText[] = "In Formation ";
 
-MechChar g_aiStateReconText[] = "Reconning ";
+char g_aiStateReconText[] = "Reconning ";
 
-MechChar g_aiStatePatrolText[] = "Defending ";
+char g_aiStatePatrolText[] = "Defending ";
 
-MechChar g_aiStateGoDirectText[] = "En Route ";
+char g_aiStateGoDirectText[] = "En Route ";
 
-MechChar g_aiState9Text[] = "Disengaging ";
+char g_aiState9Text[] = "Disengaging ";
 
-MechChar g_aiStateRestText[] = "Silent ";
+char g_aiStateRestText[] = "Silent ";
 
-MechChar g_aiStateShutdownText[] = "Shutdown ";
+char g_aiStateShutdownText[] = "Shutdown ";
 
-MechChar g_aiStateDeadText[] = "Destroyed ";
+char g_aiStateDeadText[] = "Destroyed ";
 
 MenuChoices g_formationChoices = {
 	NULL,

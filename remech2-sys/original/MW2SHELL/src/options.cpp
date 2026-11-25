@@ -25,84 +25,72 @@
 #include <stdlib.h>
 #include <string.h>
 
-void OptionsCallback(MechS32);
+void OptionsCallback(int32_t);
 extern ScreenField g_optionFields[18];
 
 LoopingMovie* g_optionsMovie = NULL;
 
-MechChar g_optionsMovieName[0x10] = "amwlogo1";
+char g_optionsMovieName[0x10] = "amwlogo1";
 
 AudioSample* g_volumeTestSample;
 PaletteColor g_savedPalette[0x100];
 void* g_sliderImages;
 
-MechChar* g_skillNames[] = {"~EASY", "~MEDIUM", "~HARD"};
+char* g_skillNames[] = {"~EASY", "~MEDIUM", "~HARD"};
 
 TextGlyph* DrawSkillOption(ScreenField* p_option)
 {
-	MechU8 value = *(MechU8*) p_option->m_data;
+	uint8_t value = *(uint8_t*) p_option->m_data;
 
 	return g_titleFont->AddText(p_option->m_left + p_option->m_width / 2, p_option->m_top, g_skillNames[value], NULL);
 }
 
 TextGlyph* DrawIntToggle(ScreenField* p_option)
 {
-	MechS32 value = *(MechS32*) p_option->m_data;
+	int32_t value = *(int32_t*) p_option->m_data;
 
-	return g_titleFont->AddText(
-		p_option->m_left + p_option->m_width / 2,
-		p_option->m_top,
-		(MechChar*) (value ? "~ON" : "~OFF"),
-		NULL
-	);
+	return g_titleFont
+		->AddText(p_option->m_left + p_option->m_width / 2, p_option->m_top, (char*) (value ? "~ON" : "~OFF"), NULL);
 }
 
 TextGlyph* DrawByteToggle(ScreenField* p_option)
 {
-	MechU8 value = *(MechU8*) p_option->m_data;
+	uint8_t value = *(uint8_t*) p_option->m_data;
 
-	return g_titleFont->AddText(
-		p_option->m_left + p_option->m_width / 2,
-		p_option->m_top,
-		(MechChar*) (value ? "~ON" : "~OFF"),
-		NULL
-	);
+	return g_titleFont
+		->AddText(p_option->m_left + p_option->m_width / 2, p_option->m_top, (char*) (value ? "~ON" : "~OFF"), NULL);
 }
 
 TextGlyph* DrawDishonorableToggle(ScreenField* p_option)
 {
-	MechU8 value = *(MechU8*) p_option->m_data;
+	uint8_t value = *(uint8_t*) p_option->m_data;
 
 	return g_titleFont->AddText(
 		p_option->m_left + p_option->m_width / 2 - (value ? 14 : 0),
 		p_option->m_top,
-		(MechChar*) (value ? "ON (Dishonorable)" : "~OFF"),
+		(char*) (value ? "ON (Dishonorable)" : "~OFF"),
 		NULL
 	);
 }
 
 TextGlyph* DrawInvertedDishonorableToggle(ScreenField* p_option)
 {
-	MechU8 value = *(MechU8*) p_option->m_data;
+	uint8_t value = *(uint8_t*) p_option->m_data;
 
 	return g_titleFont->AddText(
 		p_option->m_left + p_option->m_width / 2 - (value ? 0 : 14),
 		p_option->m_top,
-		(MechChar*) (value ? "~OFF" : "ON (Dishonorable)"),
+		(char*) (value ? "~OFF" : "ON (Dishonorable)"),
 		NULL
 	);
 }
 
 TextGlyph* DrawHighLowToggle(ScreenField* p_option)
 {
-	MechS32 value = *(MechS32*) p_option->m_data;
+	int32_t value = *(int32_t*) p_option->m_data;
 
-	return g_titleFont->AddText(
-		p_option->m_left + p_option->m_width / 2,
-		p_option->m_top,
-		(MechChar*) (value ? "~HIGH" : "~LOW"),
-		NULL
-	);
+	return g_titleFont
+		->AddText(p_option->m_left + p_option->m_width / 2, p_option->m_top, (char*) (value ? "~HIGH" : "~LOW"), NULL);
 }
 
 // DrawResolutionOption and ToggleRenderResolution are implemented on the Rust side
@@ -110,9 +98,9 @@ TextGlyph* DrawHighLowToggle(ScreenField* p_option)
 
 void CycleByteOption(ScreenField* p_option)
 {
-	MechU8* value;
+	uint8_t* value;
 
-	value = (MechU8*) p_option->m_data;
+	value = (uint8_t*) p_option->m_data;
 	++*value;
 	if (*value >= 3) {
 		*value = 0;
@@ -121,9 +109,9 @@ void CycleByteOption(ScreenField* p_option)
 
 void ToggleIntOption(ScreenField* p_toggle)
 {
-	MechS32* value;
+	int32_t* value;
 
-	value = (MechS32*) p_toggle->m_data;
+	value = (int32_t*) p_toggle->m_data;
 	if (*value) {
 		*value = 0;
 	}
@@ -134,9 +122,9 @@ void ToggleIntOption(ScreenField* p_toggle)
 
 void ToggleByteOption(ScreenField* p_option)
 {
-	MechU8* value;
+	uint8_t* value;
 
-	value = (MechU8*) p_option->m_data;
+	value = (uint8_t*) p_option->m_data;
 	if (*value) {
 		*value = 0;
 	}
@@ -154,9 +142,9 @@ TextGlyph* RestoreFieldBackground(ScreenField* p_option)
 
 TextGlyph* DrawVolumeSlider(ScreenField* p_option)
 {
-	MechS32 position;
+	int32_t position;
 
-	position = *(MechS32*) p_option->m_data;
+	position = *(int32_t*) p_option->m_data;
 	position /= 0x100;
 	g_videoDriver
 		->DrawShpFrame(g_sliderImages, 1, p_option->m_left, p_option->m_top, p_option->m_width, p_option->m_height);
@@ -169,11 +157,11 @@ TextGlyph* DrawVolumeSlider(ScreenField* p_option)
 // change of 0xa00 or more plays the test sample at the new volume.
 void DragVolumeSlider(ScreenField* p_option)
 {
-	MechS32 previous;
-	MechS32* value;
-	MechS32 volume;
+	int32_t previous;
+	int32_t* value;
+	int32_t volume;
 
-	value = (MechS32*) p_option->m_data;
+	value = (int32_t*) p_option->m_data;
 	previous = *value;
 	do {
 		MechAppPump();
@@ -268,9 +256,9 @@ void SaveSoundConfig()
 
 void DrawOptions()
 {
-	MechS32 paletteSize;
+	int32_t paletteSize;
 	void* audioData;
-	MechS32 audioSize;
+	int32_t audioSize;
 	g_videoDriver->GetPalette(g_savedPalette);
 	g_mw2Database->GetDBItem(8, &g_sliderImages, &paletteSize);
 	g_mw2Database->GetDBItem(0x66, &audioData, &audioSize);
@@ -290,7 +278,7 @@ void DrawOptions()
 
 // The options screen's per-frame callback: handles clicks on the options, and closes the
 // screen on a right click, a key, or when called with p_active FALSE, saving the settings.
-void OptionsCallback(MechS32 p_active)
+void OptionsCallback(int32_t p_active)
 {
 	ScreenField* option;
 

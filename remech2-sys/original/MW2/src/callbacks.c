@@ -17,7 +17,7 @@ TimedCallback* GetCurrentCallback(void)
 	return g_currentCallback;
 }
 
-TimedCallback* CreateDetachedTask(TimedCallback** p_list, TimedCallbackFn p_fn, MechS32 p_period, MechChar* p_data)
+TimedCallback* CreateDetachedTask(TimedCallback** p_list, TimedCallbackFn p_fn, int32_t p_period, char* p_data)
 {
 	TimedCallback* callback;
 
@@ -110,7 +110,7 @@ void RunTimedCallbacks(TimedCallback** p_list)
 	}
 }
 
-MechS32 GetTimedCallbackSize(void)
+int32_t GetTimedCallbackSize(void)
 {
 	return sizeof(TimedCallback);
 }

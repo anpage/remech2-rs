@@ -11,15 +11,15 @@ struct MenuPage;
 // are GetBrightnessFraction, PreviewBrightnessFraction, SetBrightnessFraction and
 // RestoreBrightness).
 typedef struct MenuControl {
-	MechU32 m_flags; // 0x00 — 1: read the value through m_get every time
-	MechS32 m_value; // 0x04
-	void* m_data;    // 0x08 — shape ids, MenuChoices or a MenuTextBox
-	MechS32 m_arg;   // 0x0c — passed to the callbacks
+	uint32_t m_flags; // 0x00 — 1: read the value through m_get every time
+	int32_t m_value;  // 0x04
+	void* m_data;     // 0x08 — shape ids, MenuChoices or a MenuTextBox
+	int32_t m_arg;    // 0x0c — passed to the callbacks
 	void (*m_init)(struct MenuPage* p_page, struct MenuControl* p_control); // 0x10
-	MechS32 (*m_get)(MechS32 p_arg);                                        // 0x14
-	void (*m_preview)(MechS32 p_arg, MechS32 p_value);                      // 0x18 — when the value changes
-	void (*m_set)(MechS32 p_arg, MechS32 p_value);                          // 0x1c — when the menu is accepted
-	void (*m_cancel)(MechS32 p_arg);                                        // 0x20 — when the menu is cancelled
+	int32_t (*m_get)(int32_t p_arg);                                        // 0x14
+	void (*m_preview)(int32_t p_arg, int32_t p_value);                      // 0x18 — when the value changes
+	void (*m_set)(int32_t p_arg, int32_t p_value);                          // 0x1c — when the menu is accepted
+	void (*m_cancel)(int32_t p_arg);                                        // 0x20 — when the menu is cancelled
 } MenuControl;
 
 #endif // MENUCONTROL_H

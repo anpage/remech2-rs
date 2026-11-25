@@ -12,8 +12,8 @@ extern "C"
 #endif
 
 	void SetUpStarMission(struct MissionTable* p_table);
-	MechU32 FindEventList(MechChar* p_name);
-	void PostEventToList(MechChar* p_name, MechS32 p_types, MechU16 p_target);
+	uint32_t FindEventList(char* p_name);
+	void PostEventToList(char* p_name, int32_t p_types, uint16_t p_target);
 
 #ifdef __cplusplus
 }

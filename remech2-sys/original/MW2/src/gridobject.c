@@ -15,15 +15,15 @@
 // The grid SetGridObject sets up: its cell size, whether the object is on, has been shown and
 // snaps to the nearest cell.
 
-MechS32 g_gridCellSize = 0;
+int32_t g_gridCellSize = 0;
 
-MechS32 g_gridObjectSet = 0;
+int32_t g_gridObjectSet = 0;
 
-MechS32 g_gridObjectPlaced = 0;
+int32_t g_gridObjectPlaced = 0;
 
-MechS32 g_gridObjectShown = 0;
+int32_t g_gridObjectShown = 0;
 
-MechS32 g_gridObjectSnaps = 0;
+int32_t g_gridObjectSnaps = 0;
 
 SceneObject* g_gridObject = NULL;
 
@@ -34,7 +34,7 @@ Vector3 g_gridCell;
 Vector3 g_gridAnchor;
 
 // How far the eyepoint may stray from the object before it snaps to another cell.
-MechS32 g_gridSnapDistance;
+int32_t g_gridSnapDistance;
 
 // Makes p_obj the object that follows the eyepoint on a grid, a cell at a time: the cells are its
 // model's span (with children) or a third of it, in steps of 0x4000, and it is snapped to the
@@ -42,15 +42,15 @@ MechS32 g_gridSnapDistance;
 // under the eyepoint.
 void SetGridObject(SceneObject* p_obj)
 {
-	MechS32 depth;
-	MechS32 minX;
+	int32_t depth;
+	int32_t minX;
 	Model* model;
-	MechS32 minZ;
+	int32_t minZ;
 	Vertex* vertex;
-	MechS32 span;
-	MechS32 count;
-	MechS32 maxX;
-	MechS32 maxZ;
+	int32_t span;
+	int32_t count;
+	int32_t maxX;
+	int32_t maxZ;
 
 	if (!p_obj) {
 		return;
@@ -119,14 +119,14 @@ void SetGridObject(SceneObject* p_obj)
 // Moves the grid object (SetGridObject) to the eyepoint's cell when that changes.
 void UpdateGridObject(void)
 {
-	MechS32 dx;
-	MechS32 dz;
-	MechS32 halfZ;
-	MechS32 halfX;
-	MechS32 x;
-	MechS32 cellZ;
-	MechS32 cellX;
-	MechS32 z;
+	int32_t dx;
+	int32_t dz;
+	int32_t halfZ;
+	int32_t halfX;
+	int32_t x;
+	int32_t cellZ;
+	int32_t cellX;
+	int32_t z;
 
 	if (g_gridObjectShown && g_gridObjectSet) {
 		x = g_eyepoint->m_x;
@@ -184,7 +184,7 @@ void UpdateGridObject(void)
 	}
 }
 
-void ShowGridObject(MechS32 p_enable)
+void ShowGridObject(int32_t p_enable)
 {
 	if (g_gridObject) {
 		if (p_enable) {

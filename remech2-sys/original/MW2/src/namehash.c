@@ -6,14 +6,14 @@
 #include "types.h"
 
 // Hashes a name, ignoring case: each character is added and the low word rotated left.
-MechU32 HashName(const MechChar* p_name)
+uint32_t HashName(const char* p_name)
 {
-	MechU32 hash = 0;
-	MechU32 low;
+	uint32_t hash = 0;
+	uint32_t low;
 
 	while (*p_name) {
 		/* The add carries into the high word; only the low word rotates. */
-		hash += (MechU8) *p_name++ | 0x20;
+		hash += (uint8_t) *p_name++ | 0x20;
 		low = hash & 0xffff;
 		hash = (hash & 0xffff0000) | (((low << 1) | (low >> 15)) & 0xffff);
 	}

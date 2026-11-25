@@ -40,38 +40,38 @@ Collection* g_debriefPages = NULL;
 ArchiveReader* g_aftermathReader = NULL;
 
 // The debriefing's text buffers.
-MechChar g_objectiveStatus[0x80];
+char g_objectiveStatus[0x80];
 
-MechChar g_debriefText[0x1000];
+char g_debriefText[0x1000];
 
 // The mission's objectives, in the order CompareObjectives sorts them.
 MissionResultObjective* g_sortedObjectives[48];
 
-MechChar g_objectiveLine[0x400];
+char g_objectiveLine[0x400];
 
-MechChar g_careerHonor[0x200];
+char g_careerHonor[0x200];
 
 // The pilot as the mission found them, restored by a replay.
 PilotRecord g_pilotBeforeMission;
 
 MissionResult g_missionResults;
 
-MechChar g_objectiveDescription[0x80];
+char g_objectiveDescription[0x80];
 
-MechChar g_honorPoints[0x200];
+char g_honorPoints[0x200];
 
-MechChar g_objectiveType[0x80];
+char g_objectiveType[0x80];
 
-MechChar g_skillName[0x200];
+char g_skillName[0x200];
 
-MechChar g_careerHonorLine[0x200];
+char g_careerHonorLine[0x200];
 
-MechChar g_honorLine[0x200];
+char g_honorLine[0x200];
 
-MechChar g_objectiveTime[0x80];
+char g_objectiveTime[0x80];
 
 // Returns TRUE when one of the options that makes a trial easier is set.
-MechU8 HasEasyOptions()
+uint8_t HasEasyOptions()
 {
 	if (g_difficultyConfig.m_unlimitedAmmo == 1) {
 		return TRUE;
@@ -112,26 +112,26 @@ int CompareObjectives(const void* p_a, const void* p_b)
 }
 
 // Appends the honor breakdown of the mission to p_text and returns the honor it earns.
-MechS32 AppendHonorBreakdown(
+int32_t AppendHonorBreakdown(
 	DifficultyConfig* p_difficulty,
 	CareerRecord* p_career,
 	MissionResult* p_results,
-	MechChar* p_text
+	char* p_text
 )
 {
-	MechS32 honor = 0;
+	int32_t honor = 0;
 	MissionResultObjective* objective = NULL;
-	MechS32 points = 5000;
-	MechS32 i;
-	MechS32 width;
-	MechS32 secondary;
-	MechS32 tertiary;
+	int32_t points = 5000;
+	int32_t i;
+	int32_t width;
+	int32_t secondary;
+	int32_t tertiary;
 	CustomStar* star;
-	MechS32 tons;
-	MechDouble hit;
-	MechS32 hitBonus;
-	MechDouble multiplier;
-	MechS32 bonus;
+	int32_t tons;
+	double hit;
+	int32_t hitBonus;
+	double multiplier;
+	int32_t bonus;
 
 	for (i = 0; i < p_results->m_objectiveCount; i++) {
 		objective = &p_results->m_objectives[i];
@@ -285,7 +285,7 @@ MechS32 AppendHonorBreakdown(
 		hit = 0.0;
 	}
 	else {
-		hit = (MechDouble) (MechU32) p_career->m_hits / (MechDouble) (MechU32) p_career->m_shotsFired;
+		hit = (double) (uint32_t) p_career->m_hits / (double) (uint32_t) p_career->m_shotsFired;
 	}
 
 	if (hit >= 0.7) {
@@ -340,7 +340,7 @@ MechS32 AppendHonorBreakdown(
 		snprintf(g_honorLine, sizeof(g_honorLine), "\\nMission Honor:\\g%03d\\b%03d%s\\n", 350, width, g_honorPoints);
 		strcat(p_text, g_honorLine);
 
-		bonus = (MechS32) (honor * multiplier) - honor;
+		bonus = (int32_t) (honor * multiplier) - honor;
 		honor += bonus;
 		sprintf(g_honorPoints, "%d", honor);
 		width = g_bodyFont->GetTextWidth(g_honorPoints);
@@ -373,9 +373,9 @@ MechS32 AppendHonorBreakdown(
 }
 
 // Copies p_src to p_dst with every run of spaces and control characters turned into one space.
-void CollapseWhitespace(MechChar* p_dst, MechChar* p_src)
+void CollapseWhitespace(char* p_dst, char* p_src)
 {
-	MechS32 space = FALSE;
+	int32_t space = FALSE;
 
 	while (*p_src) {
 		if (*p_src <= ' ') {
@@ -395,19 +395,14 @@ void CollapseWhitespace(MechChar* p_dst, MechChar* p_src)
 
 // Builds the debriefing's text in p_text: the objectives, sorted by time, and the honor
 // breakdown, whose honor a completed mission adds to the pilot's.
-void BuildDebriefText(
-	CareerRecord* p_career,
-	MissionResult* p_results,
-	MechChar* p_text,
-	DifficultyConfig* p_difficulty
-)
+void BuildDebriefText(CareerRecord* p_career, MissionResult* p_results, char* p_text, DifficultyConfig* p_difficulty)
 {
-	MechS32 i;
-	MechS32 time;
-	MechS32 seconds;
-	MechS32 minutes;
-	MechS32 honor;
-	MechS32 width;
+	int32_t i;
+	int32_t time;
+	int32_t seconds;
+	int32_t minutes;
+	int32_t honor;
+	int32_t width;
 
 	strcpy(p_text, "");
 
@@ -500,19 +495,19 @@ void BuildDebriefText(
 // the clan's own).
 void LayoutDebriefPages(
 	MissionResult* p_results,
-	MechChar* p_name,
+	char* p_name,
 	ButtonMenu*,
-	MechS32 p_left,
-	MechS32 p_top,
-	MechS32 p_width,
-	MechS32 p_height,
+	int32_t p_left,
+	int32_t p_top,
+	int32_t p_width,
+	int32_t p_height,
 	Collection* p_pages,
-	MechChar* p_scenario,
-	MechChar* p_text,
-	MechS32 p_campaign
+	char* p_scenario,
+	char* p_text,
+	int32_t p_campaign
 )
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 4 && p_scenario[i] && p_scenario[i] != '.'; i++) {
 		p_name[i] = p_scenario[i];
@@ -548,10 +543,10 @@ void LayoutDebriefPages(
 
 // Returns the rank a trial earns: its successful primary objectives, when a clan pilot has
 // completed a trial without the options that make it easier (p_difficulty, g_difficultyConfig).
-MechS32 GetTrialRank(MissionResult* p_results, DifficultyConfig* p_difficulty)
+int32_t GetTrialRank(MissionResult* p_results, DifficultyConfig* p_difficulty)
 {
-	MechS32 count;
-	MechS32 i;
+	int32_t count;
+	int32_t i;
 
 	if (g_currentPilot->m_clan != 2 &&
 		g_campaignMissions[g_currentPilot->m_clan][g_currentPilot->m_mission].m_trial == 1 && !HasEasyOptions() &&
@@ -571,14 +566,14 @@ MechS32 GetTrialRank(MissionResult* p_results, DifficultyConfig* p_difficulty)
 
 // Opens the debriefing screen: reads the mission's results and statistics, scores them for the
 // pilot and lays the text out on pages under the menu.
-void DrawMissionDebrief(TMPackDataBase* p_database, MechS32 p_campaign, char** p_scenario)
+void DrawMissionDebrief(TMPackDataBase* p_database, int32_t p_campaign, char** p_scenario)
 {
-	MechS32 left;
-	MechS32 top;
-	MechS32 width;
-	MechS32 height;
+	int32_t left;
+	int32_t top;
+	int32_t width;
+	int32_t height;
 	MissionReport report;
-	MechChar name[0x10];
+	char name[0x10];
 
 	g_videoDriver->LoadBackground(p_database, g_debriefScreens[p_campaign].m_picture);
 	switch (p_campaign) {

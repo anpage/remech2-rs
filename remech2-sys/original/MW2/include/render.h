@@ -7,8 +7,8 @@
 #include "window.h"
 
 typedef struct GameWindowGeometry {
-	MechS32 m_width;  // 0x00
-	MechS32 m_height; // 0x04
+	int32_t m_width;  // 0x00
+	int32_t m_height; // 0x04
 } GameWindowGeometry;
 
 struct Shape;
@@ -20,37 +20,37 @@ extern "C"
 #endif
 
 	extern void* g_bannerBuffer;
-	extern MechS32 g_projectionDirty;
-	extern MechS32 g_displayReady;
-	extern MechS32 g_showBoundingSpheres;
-	extern MechS32 g_drawModeIndex;
-	extern MechS32 g_initDrawModeParam2;
+	extern int32_t g_projectionDirty;
+	extern int32_t g_displayReady;
+	extern int32_t g_showBoundingSpheres;
+	extern int32_t g_drawModeIndex;
+	extern int32_t g_initDrawModeParam2;
 	extern PANE g_screenPane;
 	extern PANE g_currentPane;
 	extern WINDOW g_mainPixelBuffer;
-	extern MechS32 g_hasLightObject;
-	extern MechS32 g_lightFollowsObject;
-	extern MechS32 g_lightObject;
+	extern int32_t g_hasLightObject;
+	extern int32_t g_lightFollowsObject;
+	extern int32_t g_lightObject;
 	extern GameWindowGeometry* g_gameWindowGeometry;
-	extern MechS32 g_screenHeight;
-	extern MechS32 g_screenHeightMinus1;
-	extern MechS32 g_screenPixelCount;
-	extern MechS32 g_screenWidth;
-	extern MechS32 g_screenWidthMinus1;
-	extern MechS32 g_screenHalfWidth;
-	extern MechS32 g_screenHalfHeight;
-	extern MechS32 g_stretchPending;
-	extern MechS32 g_framePane;
-	extern MechS32 g_drawnPolygonCount;
+	extern int32_t g_screenHeight;
+	extern int32_t g_screenHeightMinus1;
+	extern int32_t g_screenPixelCount;
+	extern int32_t g_screenWidth;
+	extern int32_t g_screenWidthMinus1;
+	extern int32_t g_screenHalfWidth;
+	extern int32_t g_screenHalfHeight;
+	extern int32_t g_stretchPending;
+	extern int32_t g_framePane;
+	extern int32_t g_drawnPolygonCount;
 	extern struct SceneObject* g_skyObject;
 	extern struct SceneObject* g_cockpitObject;
 
-	MechS32 InitGameWindowGeometry(void);
-	MechS32 InitDisplayGeometry(void);
+	int32_t InitGameWindowGeometry(void);
+	int32_t InitDisplayGeometry(void);
 	void FirstRender(void);
 	void SecondRender(void);
 	void DrawScene(void);
-	void SetFramePane(MechS32 p_value);
+	void SetFramePane(int32_t p_value);
 	void ResetPane(void);
 	void Blit(void);
 	void ShutdownRender(void);

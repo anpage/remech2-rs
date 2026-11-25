@@ -13,13 +13,13 @@ struct Shape;
 // after the header (undefined4 each). AllocQuadtreeNode allocates it; Shape::m_collisionData holds the root
 // when the shape's m_collisionType is 5.
 typedef struct QuadtreeNode {
-	MechS32 m_minX;                     // 0x00
-	MechS32 m_maxX;                     // 0x04
-	MechS32 m_minY;                     // 0x08
-	MechS32 m_maxY;                     // 0x0c
-	MechS32 m_minZ;                     // 0x10
-	MechS32 m_maxZ;                     // 0x14
-	MechS32 m_faceCount;                // 0x18
+	int32_t m_minX;                     // 0x00
+	int32_t m_maxX;                     // 0x04
+	int32_t m_minY;                     // 0x08
+	int32_t m_maxY;                     // 0x0c
+	int32_t m_minZ;                     // 0x10
+	int32_t m_maxZ;                     // 0x14
+	int32_t m_faceCount;                // 0x18
 	struct QuadtreeNode* m_children[4]; // 0x1c
 } QuadtreeNode;
 
@@ -29,10 +29,10 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_quadtreesDisabled;
+	extern int32_t g_quadtreesDisabled;
 
 	void BuildShapeQuadtree(struct Shape* p_shape);
-	QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, MechS32 p_quadrant, Model* p_model);
+	QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, int32_t p_quadrant, Model* p_model);
 	QuadtreeNode* AllocQuadtreeNode(
 		undefined4 p_minX,
 		undefined4 p_maxX,
@@ -40,25 +40,25 @@ extern "C"
 		undefined4 p_maxY,
 		undefined4 p_minZ,
 		undefined4 p_maxZ,
-		MechS32 p_faceCount
+		int32_t p_faceCount
 	);
 	void FreeQuadtree(QuadtreeNode* p_node);
-	MechS32 FaceOverlapsBox(
+	int32_t FaceOverlapsBox(
 		struct Face* p_face,
 		Model* p_model,
-		MechS32 p_minX,
-		MechS32 p_maxX,
-		MechS32 p_minZ,
-		MechS32 p_maxZ,
-		MechS32* p_minY,
-		MechS32* p_maxY
+		int32_t p_minX,
+		int32_t p_maxX,
+		int32_t p_minZ,
+		int32_t p_maxZ,
+		int32_t* p_minY,
+		int32_t* p_maxY
 	);
-	MechS32 ClassifyQuadtreePoint(QuadtreeNode* p_node, Model* p_model, MechS32 p_x, MechS32 p_y, MechS32 p_z);
-	MechS32 TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray);
-	MechS32 TestQuadtreeChildrenRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray);
-	MechS32 GetQuadtreeTop(QuadtreeNode* p_node, Model* p_model, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32* p_top);
+	int32_t ClassifyQuadtreePoint(QuadtreeNode* p_node, Model* p_model, int32_t p_x, int32_t p_y, int32_t p_z);
+	int32_t TestQuadtreeRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray);
+	int32_t TestQuadtreeChildrenRay(QuadtreeNode* p_node, Model* p_model, Ray* p_ray);
+	int32_t GetQuadtreeTop(QuadtreeNode* p_node, Model* p_model, int32_t p_x, int32_t p_y, int32_t p_z, int32_t* p_top);
 	void DisableQuadtrees(void);
-	MechS32 GetQuadtreeSize(QuadtreeNode* p_node);
+	int32_t GetQuadtreeSize(QuadtreeNode* p_node);
 
 #ifdef __cplusplus
 }

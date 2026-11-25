@@ -9,7 +9,7 @@ struct PANE;
 // menu's target until first drawn, and its text.
 typedef struct MenuTextBox {
 	struct PANE* m_target; // 0x00
-	MechChar* m_text;      // 0x04
+	char* m_text;          // 0x04
 } MenuTextBox;
 
 #endif // MENUTEXTBOX_H

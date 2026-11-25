@@ -18,15 +18,15 @@ extern "C"
 
 	extern undefined4 g_keyCodeWriteIndex;
 	extern undefined4 g_keyCodeReadIndex;
-	extern MechS16 g_keyCodes[c_keyCodeBufferSize];
+	extern int16_t g_keyCodes[c_keyCodeBufferSize];
 	extern undefined4 g_keyStates[4];
-	extern MechS16 g_keyCodeMap[256];
-	extern MechS32 g_extendedScanCodeMap[0x59];
+	extern int16_t g_keyCodeMap[256];
+	extern int32_t g_extendedScanCodeMap[0x59];
 
-	void HandleKeyboardMessages(MechU32 p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
-	MechS32 KeyboardReadKeyCode(MechS16* p_keyCode);
-	MechS32 KeyboardFlushKeyCodes(void);
-	MechS16 KeyboardPollKeyCode(void);
+	void HandleKeyboardMessages(uint32_t p_msg, size_t p_wParam, MECH_INTPTR p_lParam);
+	int32_t KeyboardReadKeyCode(int16_t* p_keyCode);
+	int32_t KeyboardFlushKeyCodes(void);
+	int16_t KeyboardPollKeyCode(void);
 
 #ifdef __cplusplus
 }

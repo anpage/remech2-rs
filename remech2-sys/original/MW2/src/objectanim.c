@@ -46,31 +46,31 @@
 typedef struct ColorCycle {
 	Shape** m_shape;      // 0x00 — the star's shape (GetStaticShapeSlot)
 	Shape* m_model;       // 0x04
-	MechS32 m_faceCount;  // 0x08 — -1 until counted
-	MechS32 m_colorCount; // 0x0c
-	MechS32 m_colors[16]; // 0x10
+	int32_t m_faceCount;  // 0x08 — -1 until counted
+	int32_t m_colorCount; // 0x0c
+	int32_t m_colors[16]; // 0x10
 } ColorCycle;
 
 // The state of SpinTask's callback: an object turning at constant rates.
 typedef struct ObjectSpin {
 	Shape** m_shape;       // 0x00
 	SceneObject* m_object; // 0x04
-	MechS32 m_rateX;       // 0x08 — 16.16 per period
-	MechS32 m_rateY;       // 0x0c
-	MechS32 m_rateZ;       // 0x10
-	MechS32 m_period;      // 0x14 — clock ticks
-	MechS32 m_lastClock;   // 0x18
+	int32_t m_rateX;       // 0x08 — 16.16 per period
+	int32_t m_rateY;       // 0x0c
+	int32_t m_rateZ;       // 0x10
+	int32_t m_period;      // 0x14 — clock ticks
+	int32_t m_lastClock;   // 0x18
 } ObjectSpin;
 
 // The state of OrbitTask's callback: an object circling while it turns.
 typedef struct ObjectOrbit {
 	Shape** m_shape;       // 0x00
 	SceneObject* m_object; // 0x04
-	MechS32 m_angle;       // 0x08 — 16.16 degrees
-	MechS32 m_turnRate;    // 0x0c
-	MechS32 m_speed;       // 0x10
-	MechS32 m_enabled;     // 0x14
-	MechS32 m_lastClock;   // 0x18
+	int32_t m_angle;       // 0x08 — 16.16 degrees
+	int32_t m_turnRate;    // 0x0c
+	int32_t m_speed;       // 0x10
+	int32_t m_enabled;     // 0x14
+	int32_t m_lastClock;   // 0x18
 } ObjectOrbit;
 
 // The state of ReelMotionTask's callback: an object moving through an animation (Reel)
@@ -80,13 +80,13 @@ typedef struct ReelMotion {
 	Reel* m_initial;       // 0x04
 	SceneObject* m_object; // 0x08
 	Player* m_player;      // 0x0c
-	MechS32 m_rate;        // 0x10 — clock ticks per frame
-	MechS32 m_timer;       // 0x14 — until the next frame
-	MechS32 m_amount;      // 0x18 — left to move in this frame
-	MechS32 m_lastClock;   // 0x1c
-	MechS32 m_enabled;     // 0x20
-	MechS32 m_frame;       // 0x24 — -1 before the first
-	MechU32 m_flags;       // 0x28 — 1: drives the player's animation state
+	int32_t m_rate;        // 0x10 — clock ticks per frame
+	int32_t m_timer;       // 0x14 — until the next frame
+	int32_t m_amount;      // 0x18 — left to move in this frame
+	int32_t m_lastClock;   // 0x1c
+	int32_t m_enabled;     // 0x20
+	int32_t m_frame;       // 0x24 — -1 before the first
+	uint32_t m_flags;      // 0x28 — 1: drives the player's animation state
 } ReelMotion;
 
 // The state of PathTask's callback: a star's object following a path, eased by the ramps.
@@ -94,10 +94,10 @@ typedef struct PathFollower {
 	Shape** m_shape;       // 0x00 — the star's shape (GetStaticShapeSlot)
 	SceneObject* m_object; // 0x04
 	Path* m_path;          // 0x08
-	MechS32 m_startClock;  // 0x0c
-	MechS32 m_duration;    // 0x10 — the points' times added up
-	MechS32 m_rotate;      // 0x14 — turns along the path
-	MechS32 m_mode;        // 0x18 — at the end: 0 "loop" runs on, 1 "repeat" restarts, 2 stops
+	int32_t m_startClock;  // 0x0c
+	int32_t m_duration;    // 0x10 — the points' times added up
+	int32_t m_rotate;      // 0x14 — turns along the path
+	int32_t m_mode;        // 0x18 — at the end: 0 "loop" runs on, 1 "repeat" restarts, 2 stops
 	Ramp m_x;              // 0x1c
 	Ramp m_y;              // 0x2c
 	Ramp m_z;              // 0x3c
@@ -107,45 +107,45 @@ typedef struct PathFollower {
 } PathFollower;
 
 // Why ReelMotionTask last failed: 1 no player, 2 disabled, 3 no object, 4-7 missing state.
-MechS32 g_reelMotionError = 0;
+int32_t g_reelMotionError = 0;
 
 // The number of entries in g_paths.
-MechS32 g_pathCount = 0;
+int32_t g_pathCount = 0;
 
-MechS32 g_maxAnimNumber = 0;
+int32_t g_maxAnimNumber = 0;
 
 // The base of the animation numbers of the file being loaded.
-MechS32 g_animBase = 0;
+int32_t g_animBase = 0;
 
 // The number of entries in g_animFiles.
-MechS32 g_animFileCount = 0;
+int32_t g_animFileCount = 0;
 
 // Set to shade from the origin rather than the light (GetFaceShade).
-MechS32 g_directionalLight;
+int32_t g_directionalLight;
 
 // The outcodes of the polygon being built: any vertex's (or) and every vertex's (and).
-MechU8 g_polygonOrCodes;
+uint8_t g_polygonOrCodes;
 
-MechU8 g_polygonAndCodes;
+uint8_t g_polygonAndCodes;
 
 // The projected vertices of the polygon being built, and their count.
 ProjectedVertex* g_polygonPoints[20];
 
-MechS32 g_polygonPointCount;
+int32_t g_polygonPointCount;
 
 // Where QueueFace copies the next polygon's vertex pointers in the draw buffer.
-MechU8* g_polygonPointCursor;
+uint8_t* g_polygonPointCursor;
 
 // QueueFace's counts: faces it took (5bc), faces past the back-face test (538), vertices it
 // projected (5b4) and polygons it queued (5a8).
 
-MechS32 g_facesTried;
+int32_t g_facesTried;
 
-MechS32 g_facesFrontFacing;
+int32_t g_facesFrontFacing;
 
-MechS32 g_verticesTransformed;
+int32_t g_verticesTransformed;
 
-MechS32 g_polygonsQueued;
+int32_t g_polygonsQueued;
 
 Path g_paths[0x40];
 
@@ -159,35 +159,35 @@ AnimFile g_animFiles[60];
 // (g_lastPlayer). Each frame moves or turns the object by the frame's amount, spread over
 // the rate; the frame events jump to other frames by the player's animation state (m_motionState,
 // the frame it reached, and m_nextMotionState, the one it wants).
-MechS32 ReelMotionTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
+int32_t ReelMotionTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p_period)
 {
-	MechS32 next;
-	MechS32 elapsed;
-	MechS32 y;
-	MechChar* token;
-	MechS32 z;
-	MechS32 jump;
+	int32_t next;
+	int32_t elapsed;
+	int32_t y;
+	char* token;
+	int32_t z;
+	int32_t jump;
 	ReelMotion* motion;
-	MechS32 thing;
-	MechS32 back;
-	MechS32 enabled;
-	MechS32 found;
-	MechS32 amount;
-	MechS32 turnX;
-	MechS32 step;
-	MechS32 target;
-	MechS32 turnY;
-	MechS32 value;
-	MechS32 number;
-	MechS32 turnZ;
-	MechS32 frame;
+	int32_t thing;
+	int32_t back;
+	int32_t enabled;
+	int32_t found;
+	int32_t amount;
+	int32_t turnX;
+	int32_t step;
+	int32_t target;
+	int32_t turnY;
+	int32_t value;
+	int32_t number;
+	int32_t turnZ;
+	int32_t frame;
 	Shape* shape;
-	MechS32 rate;
-	MechS32 id;
+	int32_t rate;
+	int32_t id;
 	void** slot;
-	MechS32 x;
-	MechS32 match;
-	MechS32 i;
+	int32_t x;
+	int32_t match;
+	int32_t i;
 
 	rate = 0;
 	enabled = 0;
@@ -466,7 +466,7 @@ MechS32 ReelMotionTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS
 							}
 
 							if (motion->m_reel->m_events[frame].m_values[i] ==
-								(MechS8) motion->m_player->m_nextMotionState) {
+								(int8_t) motion->m_player->m_nextMotionState) {
 								match = TRUE;
 							}
 							else {
@@ -539,9 +539,9 @@ MechS32 ReelMotionTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS
 }
 
 // Scales p_value by mode p_mode: 1 by 1.5, 3 by 0.75, any other mode leaves it.
-MechS32 ScaleBySpeedLevel(MechS32 p_mode, MechS32 p_value)
+int32_t ScaleBySpeedLevel(int32_t p_mode, int32_t p_value)
 {
-	MechS32 result;
+	int32_t result;
 
 	switch (p_mode) {
 	case 1:
@@ -563,11 +563,11 @@ MechS32 ScaleBySpeedLevel(MechS32 p_mode, MechS32 p_value)
 
 // Loads the animation file p_ref unless it has been, and sets the base of its animation numbers
 // (g_animBase). Returns -1 if it was already loaded.
-MechS32 LoadAnimFile(ResourceRef* p_ref)
+int32_t LoadAnimFile(ResourceRef* p_ref)
 {
-	MechS32 result;
-	MechS32 i;
-	MechS32 id;
+	int32_t result;
+	int32_t i;
+	int32_t id;
 
 	result = 0;
 	id = p_ref->m_id;
@@ -592,27 +592,27 @@ MechS32 LoadAnimFile(ResourceRef* p_ref)
 	return result;
 }
 
-MechS32 GetAnimBase(void)
+int32_t GetAnimBase(void)
 {
 	return g_animBase;
 }
 
-MechS32 GetReelMotionSize(void)
+int32_t GetReelMotionSize(void)
 {
 	return sizeof(ReelMotion);
 }
 
 // A timed callback (TimedCallbackFn) cycling the face colors of a star's shape. Its data is
 // "<star id>;<color>,<color>,...": up to sixteen colors, each a palette row.
-MechS32 ColorCycleTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
+int32_t ColorCycleTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p_period)
 {
-	MechChar* token;
+	char* token;
 	ColorCycle* cycle;
-	MechS32 vertexCount;
-	MechS32 offset;
-	MechS32 i;
-	MechS32 star;
-	MechS32 id;
+	int32_t vertexCount;
+	int32_t offset;
+	int32_t i;
+	int32_t star;
+	int32_t id;
 	void** slot;
 
 	if (!p_period) {
@@ -689,21 +689,21 @@ MechS32 ColorCycleTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS
 
 // A timed callback (TimedCallbackFn) turning a star's object. Its data is
 // "<star id>;<x>,<y>,<z>,<period>": the turns in degrees per period of seconds.
-MechS32 SpinTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
+int32_t SpinTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p_period)
 {
-	MechS32 dz;
-	MechChar* token;
+	int32_t dz;
+	char* token;
 	ObjectSpin* spin;
-	MechFloat x;
-	MechFloat y;
-	MechFloat z;
-	MechFloat period;
-	MechS32 star;
-	MechS32 t;
-	MechS32 id;
-	MechS32 dx;
+	float x;
+	float y;
+	float z;
+	float period;
+	int32_t star;
+	int32_t t;
+	int32_t id;
+	int32_t dx;
 	void** slot;
-	MechS32 dy;
+	int32_t dy;
 
 	switch (p_event) {
 	case 0:
@@ -774,23 +774,23 @@ MechS32 SpinTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_p
 
 // A timed callback (TimedCallbackFn) moving a star's object around a circle. Its data is
 // "<star id>;<radius>,<period>,<enabled>,<unused>".
-MechS32 OrbitTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
+int32_t OrbitTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p_period)
 {
-	MechChar* token;
-	MechS32 z;
-	MechS32 cosine;
+	char* token;
+	int32_t z;
+	int32_t cosine;
 	ObjectOrbit* orbit;
-	MechS32 t;
-	MechS32 step;
-	MechS32 star;
-	MechS32 sine;
-	MechS32 enabled;
-	MechFloat radius;
-	MechS32 unused;
-	MechFloat period;
-	MechS32 id;
+	int32_t t;
+	int32_t step;
+	int32_t star;
+	int32_t sine;
+	int32_t enabled;
+	float radius;
+	int32_t unused;
+	float period;
+	int32_t id;
 	void** slot;
-	MechS32 x;
+	int32_t x;
 
 	switch (p_event) {
 	case 0:
@@ -864,14 +864,14 @@ MechS32 OrbitTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_
 
 // A timed callback (TimedCallbackFn) looping a sound on a star's object. Its data is
 // "<star id>;<range>,<sound name>,<enabled>".
-MechS32 AmbientSoundTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
+int32_t AmbientSoundTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p_period)
 {
-	MechChar* token;
+	char* token;
 	AmbientSound* sound;
-	MechS32 star;
-	MechS32 id;
+	int32_t star;
+	int32_t id;
 	void** slot;
-	MechChar name[100];
+	char name[100];
 
 	switch (p_event) {
 	case 0:
@@ -940,29 +940,29 @@ MechS32 AmbientSoundTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, Mec
 // A timed callback (TimedCallbackFn) moving a star's object along a path. Its data is
 // "<star id>;<mode>,<rotate>,<path name>": mode "loop", "repeat" or else stop at the end, and
 // "rotate" to turn the object along the path. Event -1 restarts it.
-MechS32 PathTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_period)
+int32_t PathTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p_period)
 {
-	MechChar rotate[64];
-	MechChar* token;
+	char rotate[64];
+	char* token;
 	PathFollower* follower;
-	MechS32 total;
-	MechChar name[64];
-	MechS32 i;
-	MechChar mode[64];
-	MechS32 star;
-	MechS32 id;
+	int32_t total;
+	char name[64];
+	int32_t i;
+	char mode[64];
+	int32_t star;
+	int32_t id;
 	void** slot;
 	PathPoint* first;
 	PathPoint* origin;
-	MechS32 elapsed;
+	int32_t elapsed;
 	Path* path;
-	MechS32 start;
-	MechS32 end;
+	int32_t start;
+	int32_t end;
 	PathPoint* point;
-	MechS32 t;
-	MechS32 delta;
+	int32_t t;
+	int32_t delta;
 	PathPoint* next;
-	MechS32 angle;
+	int32_t angle;
 
 	switch (p_event) {
 	case -1:
@@ -1210,26 +1210,26 @@ MechS32 PathTask(MechS32 p_event, MechChar* p_data, MechS32 p_clock, MechS32 p_p
 
 // The 64-bit product of two 32-bit values, as imul leaves it in edx:eax. Sums of products wrap,
 // like the add/adc chains.
-static MechU64 Product(MechS32 p_a, MechS32 p_b)
+static MechU64 Product(int32_t p_a, int32_t p_b)
 {
 	return (MechU64) ((MechS64) p_a * p_b);
 }
 
 // sub: wraps.
-static MechS32 Difference(MechS32 p_a, MechS32 p_b)
+static int32_t Difference(int32_t p_a, int32_t p_b)
 {
-	return PortableS32((MechU32) p_a - (MechU32) p_b);
+	return PortableS32((uint32_t) p_a - (uint32_t) p_b);
 }
 
 // add: wraps.
-static MechS32 Sum(MechS32 p_a, MechS32 p_b)
+static int32_t Sum(int32_t p_a, int32_t p_b)
 {
-	return PortableS32((MechU32) p_a + (MechU32) p_b);
+	return PortableS32((uint32_t) p_a + (uint32_t) p_b);
 }
 
 // The view transform's row (p_a, p_b, p_c) times the vertex's offset from the eyepoint
 // (g_viewEyeX, g_viewEyeY, g_viewEyeZ), shifted right by 27 and rounded.
-static MechS32 ViewRow(MechS32 p_a, MechS32 p_b, MechS32 p_c, Vertex* p_vertex)
+static int32_t ViewRow(int32_t p_a, int32_t p_b, int32_t p_c, Vertex* p_vertex)
 {
 	MechU64 sum = Product(p_a, Difference(p_vertex->m_worldX, g_viewEyeX)) +
 				  Product(p_b, Difference(p_vertex->m_worldY, g_viewEyeY)) +
@@ -1240,15 +1240,15 @@ static MechS32 ViewRow(MechS32 p_a, MechS32 p_b, MechS32 p_c, Vertex* p_vertex)
 
 // A screen offset: p_value shifted left by p_shift (modulo 32, like the shld's count), divided by
 // the depth, and rounded to a quarter.
-static MechS32 ProjectAxis(MechS32 p_value, MechS32 p_shift, MechS32 p_depth)
+static int32_t ProjectAxis(int32_t p_value, int32_t p_shift, int32_t p_depth)
 {
-	MechS64 scaled = (MechS64) p_value * ((MechS64) 1 << ((MechU32) p_shift & 31));
+	MechS64 scaled = (MechS64) p_value * ((MechS64) 1 << ((uint32_t) p_shift & 31));
 
 	return PortableSar32(Sum(PortableIdiv(scaled, p_depth), 2), 2);
 }
 
 // The edge value at the near plane: p_from plus the share p_toPlane / p_span of the way to p_to.
-static MechS32 Interpolate(MechS32 p_from, MechS32 p_to, MechS32 p_toPlane, MechS32 p_span)
+static int32_t Interpolate(int32_t p_from, int32_t p_to, int32_t p_toPlane, int32_t p_span)
 {
 	return Sum(PortableIdiv((MechS64) Difference(p_from, p_to) * p_toPlane, p_span), p_to);
 }
@@ -1259,8 +1259,8 @@ static MechS32 Interpolate(MechS32 p_from, MechS32 p_to, MechS32 p_toPlane, Mech
 ProjectedVertex* GetViewVertex(Vertex* p_vertex)
 {
 	ProjectedVertex* result = p_vertex->m_projection;
-	MechS32 x;
-	MechS32 y;
+	int32_t x;
+	int32_t y;
 
 	if (result) {
 		return result;
@@ -1286,18 +1286,18 @@ ProjectedVertex* ClipEdgeToNearPlane(Vertex* p_a, Vertex* p_b)
 	ProjectedVertex* a;
 	ProjectedVertex* b;
 	ProjectedVertex* result;
-	MechS32 x0;
-	MechS32 y0;
-	MechS32 z0;
-	MechS32 u0;
-	MechS32 v0;
-	MechS32 x1;
-	MechS32 y1;
-	MechS32 z1;
-	MechS32 u1;
-	MechS32 v1;
-	MechS32 toPlane;
-	MechS32 span;
+	int32_t x0;
+	int32_t y0;
+	int32_t z0;
+	int32_t u0;
+	int32_t v0;
+	int32_t x1;
+	int32_t y1;
+	int32_t z1;
+	int32_t u1;
+	int32_t v1;
+	int32_t toPlane;
+	int32_t span;
 
 	a = p_a->m_projection;
 	if (!a) {
@@ -1356,8 +1356,8 @@ ProjectedVertex* ClipEdgeToNearPlane(Vertex* p_a, Vertex* p_b)
 // polygon being built and adds the vertex to its list (up to 20). The body is an __asm block.
 ProjectedVertex* ProjectVertex(ProjectedVertex* p_vertex)
 {
-	MechS32 screen;
-	MechU8 outcode;
+	int32_t screen;
+	uint8_t outcode;
 
 	if (!p_vertex->m_projected) {
 		screen = Sum(ProjectAxis(p_vertex->m_x, g_viewShiftX, p_vertex->m_z), g_viewCenterX);
@@ -1398,19 +1398,19 @@ ProjectedVertex* ProjectVertex(ProjectedVertex* p_vertex)
 // Returns the shade (0x7f: full) of p_face from the angle between its normal and the direction
 // from its first vertex to the light (g_viewLightZ, or the origin with g_directionalLight). The
 // shading is an __asm block.
-MechS32 GetFaceShade(Face* p_face, Vertex* p_vertices)
+int32_t GetFaceShade(Face* p_face, Vertex* p_vertices)
 {
-	Vertex* vertex = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset]];
-	MechS32 x = vertex->m_worldX;
-	MechS32 y = vertex->m_worldY;
-	MechS32 z = vertex->m_worldZ;
-	MechU32 magnitudeX;
-	MechU32 magnitudeY;
-	MechU32 magnitudeZ;
-	MechU32 bits;
-	MechU32 squares;
+	Vertex* vertex = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset]];
+	int32_t x = vertex->m_worldX;
+	int32_t y = vertex->m_worldY;
+	int32_t z = vertex->m_worldZ;
+	uint32_t magnitudeX;
+	uint32_t magnitudeY;
+	uint32_t magnitudeZ;
+	uint32_t bits;
+	uint32_t squares;
 	MechU64 dot;
-	MechS32 scale;
+	int32_t scale;
 
 	if (g_directionalLight) {
 		x = y = z = 0;
@@ -1420,17 +1420,17 @@ MechS32 GetFaceShade(Face* p_face, Vertex* p_vertices)
 	   the light's coordinate is the smaller one, which leaves a difference that wrapped as it is. */
 	dot = Product(Difference(g_viewLightX, x), p_face->m_normal[0]) +
 		  Product(Difference(g_viewLightY, y), p_face->m_normal[1]);
-	magnitudeX = (MechU32) Difference(g_viewLightX, x);
+	magnitudeX = (uint32_t) Difference(g_viewLightX, x);
 	if (g_viewLightX < x) {
 		magnitudeX = 0 - magnitudeX;
 	}
 
-	magnitudeY = (MechU32) Difference(g_viewLightY, y);
+	magnitudeY = (uint32_t) Difference(g_viewLightY, y);
 	if (g_viewLightY < y) {
 		magnitudeY = 0 - magnitudeY;
 	}
 
-	magnitudeZ = (MechU32) Difference(g_viewLightZ, z);
+	magnitudeZ = (uint32_t) Difference(g_viewLightZ, z);
 	if (g_viewLightZ < z) {
 		magnitudeZ = 0 - magnitudeZ;
 	}
@@ -1461,7 +1461,7 @@ MechS32 GetFaceShade(Face* p_face, Vertex* p_vertices)
 	/* Divided by the length from the square root table, of the low bytes' squares. */
 	squares = (magnitudeX & 0xff) * (magnitudeX & 0xff) + (magnitudeY & 0xff) * (magnitudeY & 0xff) +
 			  (magnitudeZ & 0xff) * (magnitudeZ & 0xff);
-	return PortableS16((MechU16) PortableIdiv(PortableS64(dot), g_sqrtTable[squares >> 8]));
+	return PortableS16((uint16_t) PortableIdiv(PortableS64(dot), g_sqrtTable[squares >> 8]));
 }
 
 // Queues a face of a model for drawing, unless it faces away: projects the vertices it hasn't
@@ -1476,16 +1476,16 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 	Vertex* first;
 	Vertex* previous;
 	QueuedPolygon* poly;
-	MechU8* index;
-	MechU16 count;
-	MechU8 andCodes;
-	MechU8 clipped;
-	MechU8 firstClipped;
-	MechU8 previousClipped;
+	uint8_t* index;
+	uint16_t count;
+	uint8_t andCodes;
+	uint8_t clipped;
+	uint8_t firstClipped;
+	uint8_t previousClipped;
 	MechU64 dot;
 	MechS64 last;
-	MechS32 depth;
-	MechS32 i;
+	int32_t depth;
+	int32_t i;
 
 	g_facesTried++;
 
@@ -1493,7 +1493,7 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 	   has a dot product with the normal that isn't negative. The flags (jl) test the exact sum
 	   of the first two products, which wraps at 64 bits, and the third. */
 	if (p_face->m_indexCount >= 3) {
-		vertex = &p_vertices[((MechU8*) p_face)[p_face->m_indexOffset]];
+		vertex = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset]];
 		dot = Product(Difference(vertex->m_worldX, g_viewEyeX), p_face->m_normal[0]) +
 			  Product(Difference(vertex->m_worldY, g_viewEyeY), p_face->m_normal[1]);
 		last = (MechS64) Difference(vertex->m_worldZ, g_viewEyeZ) * p_face->m_normal[2];
@@ -1507,15 +1507,15 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 	g_facesFrontFacing++;
 	andCodes = 3;
 	count = p_face->m_indexCount;
-	index = (MechU8*) p_face + p_face->m_indexOffset;
+	index = (uint8_t*) p_face + p_face->m_indexOffset;
 	do {
 		vertex = &p_vertices[*index];
 		if (!(vertex->m_flags & 4)) {
-			MechU8 codes = 0;
+			uint8_t codes = 0;
 
 			g_verticesTransformed++;
 			depth = ViewRow(g_viewProjZ0, g_viewProjZ1, g_viewProjZ2, vertex);
-			vertex->m_depth = (MechU32) depth;
+			vertex->m_depth = (uint32_t) depth;
 			vertex->m_flags |= 4;
 			if (depth < g_viewNear) {
 				codes |= 1;
@@ -1524,7 +1524,7 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 				codes |= 2;
 			}
 
-			vertex->m_flags = (MechU8) ((vertex->m_flags & 0xfc) | codes);
+			vertex->m_flags = (uint8_t) ((vertex->m_flags & 0xfc) | codes);
 		}
 
 		andCodes &= vertex->m_flags;
@@ -1539,7 +1539,7 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 	g_polygonOrCodes = 0;
 	g_polygonAndCodes = 0xf;
 	g_polygonPointCount = 0;
-	index = (MechU8*) p_face + p_face->m_indexOffset;
+	index = (uint8_t*) p_face + p_face->m_indexOffset;
 	count = p_face->m_indexCount;
 	first = previous = &p_vertices[*index];
 	firstClipped = previousClipped = first->m_flags & 1;
@@ -1573,20 +1573,20 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 	poly = (QueuedPolygon*) AllocQueuedPolygon();
 	poly->m_face = p_face;
 	g_polygonPointCursor = g_drawBufferBottom;
-	poly->m_count = (MechS16) g_polygonPointCount;
+	poly->m_count = (int16_t) g_polygonPointCount;
 
 	/* The loops run their count (loop) times: the polygon has a point, as the projection hook
 	   has added one whenever it cleared g_polygonAndCodes. */
 	PORTABLE_ASSERT(g_polygonPointCount > 0);
 	if (g_queuedShapeFlags & 2) {
-		MechU32 sum = 0;
+		uint32_t sum = 0;
 
 		for (i = 0; i < g_polygonPointCount; i++) {
-			sum += (MechU32) g_polygonPoints[i]->m_z;
+			sum += (uint32_t) g_polygonPoints[i]->m_z;
 		}
 
 		/* The sum is unsigned (xor edx, edx), and the count a word. */
-		depth = PortableIdiv(sum, (MechU16) g_polygonPointCount);
+		depth = PortableIdiv(sum, (uint16_t) g_polygonPointCount);
 	}
 	else if (g_queuedShapeFlags & 4) {
 		depth = 0x7fffffff;
@@ -1613,7 +1613,7 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 	memcpy(g_polygonPointCursor, g_polygonPoints, g_polygonPointCount * sizeof(g_polygonPoints[0]));
 	g_polygonPointCursor += g_polygonPointCount * sizeof(g_polygonPoints[0]);
 	g_drawBufferBottom = g_polygonPointCursor;
-	poly->m_flags = (MechU16) g_renderSettings.m_drawFace(p_face, p_vertices, p_face->m_color, depth);
+	poly->m_flags = (uint16_t) g_renderSettings.m_drawFace(p_face, p_vertices, p_face->m_color, depth);
 	if (g_depthEntryCount < g_depthListCapacity) {
 		g_polygonsQueued++;
 		if (g_polygonPointCount > 1) {

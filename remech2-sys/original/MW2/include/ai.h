@@ -62,17 +62,17 @@ enum {
 
 // A name for a value, for the AI's log.
 struct AiName {
-	const MechChar* m_name; // 0x00
-	MechS32 m_value;        // 0x04
+	const char* m_name; // 0x00
+	int32_t m_value;    // 0x04
 };
 
 // For each script slot, the script (by resource index) for a player that leads its team
 // ([1] == 0) or follows ([1] == 1).
-typedef MechS16 AiScriptTable[16][2];
+typedef int16_t AiScriptTable[16][2];
 
-typedef void (*AiStateFn)(struct Player* p_player, MechU16 p_target);
-typedef MechS16 (*AiMessageFn)(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
-typedef MechS32 (*AiTransitionFn)(struct Player* p_player, AiRule* p_rule);
+typedef void (*AiStateFn)(struct Player* p_player, uint16_t p_target);
+typedef int16_t (*AiMessageFn)(struct Player* p_player, int16_t p_target, int16_t p_arg);
+typedef int32_t (*AiTransitionFn)(struct Player* p_player, AiRule* p_rule);
 
 // The functions and globals of ai.c that other units use.
 #ifdef __cplusplus
@@ -80,12 +80,12 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_debugStar;
-	extern MechS32 g_debugObjective;
-	extern MechS32 g_lairdoCheat;
-	extern MechS32 g_debugLastLine;
-	extern MechS32 g_debugFirstLine;
-	extern MechS32 g_debugListedStar;
+	extern int32_t g_debugStar;
+	extern int32_t g_debugObjective;
+	extern int32_t g_lairdoCheat;
+	extern int32_t g_debugLastLine;
+	extern int32_t g_debugFirstLine;
+	extern int32_t g_debugListedStar;
 	extern AiName g_aiMessageNames[8];
 	extern AiName g_aiTransitionNames[7];
 	extern AiName g_aiStateNames[13];
@@ -98,101 +98,101 @@ extern "C"
 	extern AiName g_powerStateNames[8];
 	extern AiName g_objectiveTypeNames[15];
 	extern AiName g_aiBehaviorNames[14];
-	extern MechS16 g_invalidTargetLogCount;
+	extern int16_t g_invalidTargetLogCount;
 	extern AiScriptTable g_mechScripts;
 	extern AiScriptTable g_artilleryScripts;
 	extern AiScriptTable g_wandererScripts;
 	extern AiScriptTable g_truckScripts;
 	extern AiScriptTable g_tankScripts;
-	extern MechS16 g_helicopterScripts[15][2];
-	extern MechS32 g_aiSpreadTargets;
-	extern MechS32 g_localStarAssigned;
+	extern int16_t g_helicopterScripts[15][2];
+	extern int32_t g_aiSpreadTargets;
+	extern int32_t g_localStarAssigned;
 	extern AiStateFn g_aiStateFns[14];
 	extern AiMessageFn g_aiMessageFns[8];
 	extern AiTransitionFn g_aiTransitionFns[5];
 	extern void* g_aiScripts[10];
-	extern MechS16 g_hiddenTargetCount;
+	extern int16_t g_hiddenTargetCount;
 	extern AiRule* g_aiRules[60][6];
-	extern MechS32 g_aiStateTime;
+	extern int32_t g_aiStateTime;
 
 	void UpdateAI(struct Player* p_player);
-	MechS32 RunAIRules(struct Player* p_player);
+	int32_t RunAIRules(struct Player* p_player);
 	void CollectAIRules(struct Player* p_player);
 	void FirstAI(void);
 	void InitializeAI(struct Player* p_player);
 	void ResetAI(struct Player* p_player);
 	void TargetAttacker(struct Player* p_player);
-	const MechChar* FindAIName(MechS16 p_value, AiName* p_names, MechS16 p_count);
+	const char* FindAIName(int16_t p_value, AiName* p_names, int16_t p_count);
 	void LogPlayerStatusLines(void);
-	MechU32 GetPointDistance(MechS32* p_a, MechS32* p_b);
-	MechS32 ChooseTeamLeader(MechS32 p_team);
-	void RetargetGoals(MechS32 p_team, MechS32 p_index, MechS32 p_target);
-	MechS16 ResolveTarget(struct Player* p_player, MechS16 p_target);
-	MechS16 AiMessageTrue(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
-	MechS16 AiMessageFalse(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
-	MechS16 AiMessageReach(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
-	MechS16 AiMessageProx(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
+	uint32_t GetPointDistance(int32_t* p_a, int32_t* p_b);
+	int32_t ChooseTeamLeader(int32_t p_team);
+	void RetargetGoals(int32_t p_team, int32_t p_index, int32_t p_target);
+	int16_t ResolveTarget(struct Player* p_player, int16_t p_target);
+	int16_t AiMessageTrue(struct Player* p_player, int16_t p_target, int16_t p_arg);
+	int16_t AiMessageFalse(struct Player* p_player, int16_t p_target, int16_t p_arg);
+	int16_t AiMessageReach(struct Player* p_player, int16_t p_target, int16_t p_arg);
+	int16_t AiMessageProx(struct Player* p_player, int16_t p_target, int16_t p_arg);
 	void LogPlayerSkillLines(void);
-	MechS16 AiMessageDist(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
-	void LogStarMissionLines(MechS32 p_team);
-	MechS32 IsTargetDetectable(struct Player* p_player, MechS16 p_target, MechS16 p_distance, MechS32 p_check);
+	int16_t AiMessageDist(struct Player* p_player, int16_t p_target, int16_t p_arg);
+	void LogStarMissionLines(int32_t p_team);
+	int32_t IsTargetDetectable(struct Player* p_player, int16_t p_target, int16_t p_distance, int32_t p_check);
 	struct Player* FindNearestTarget(
 		struct Player* p_player,
-		MechS16 p_target,
-		MechS16 p_arg,
-		MechS16* p_nearest,
-		MechS16* p_best
+		int16_t p_target,
+		int16_t p_arg,
+		int16_t* p_nearest,
+		int16_t* p_best
 	);
 	void LogAIStatus(void);
-	MechS16 AiMessageTargetable(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
-	MechS16 AiMessageDestroy(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
-	void AiStateIdle(struct Player* p_player, MechU16 p_target);
-	void AiStateMove(struct Player* p_player, MechU16 p_target);
-	void AiStateAttack(struct Player* p_player, MechU16 p_target);
-	MechS32 AiTransitionNull(struct Player* p_player, AiRule* p_rule);
-	MechS32 AiTransitionClearStack(struct Player* p_player, AiRule* p_rule);
-	MechS32 AiTransitionPush(struct Player* p_player, AiRule* p_rule);
-	MechS32 AiTransitionPop(struct Player* p_player, AiRule* p_rule);
-	MechU16 FindAttacker(struct Player* p_player);
-	MechS16 ResolveRuleTarget(MechU16 p_value, MechS16 p_goal, MechS16 p_found, MechS16 p_target);
-	MechS32 SetTarget(struct Player* p_player, MechS16 p_target);
-	MechS32 GetTargetRange(MechS16 p_target);
-	MechS32 GetApproachThrottle(struct Player* p_player, MechS32 p_range);
-	MechS32 AimTorsoPan(struct Player* p_player, MechS32 p_angle, MechS32 p_delta);
-	MechS32 AimTorsoTilt(struct Player* p_player, MechS32 p_delta);
-	MechS32 SteerToTarget(struct Player* p_player);
+	int16_t AiMessageTargetable(struct Player* p_player, int16_t p_target, int16_t p_arg);
+	int16_t AiMessageDestroy(struct Player* p_player, int16_t p_target, int16_t p_arg);
+	void AiStateIdle(struct Player* p_player, uint16_t p_target);
+	void AiStateMove(struct Player* p_player, uint16_t p_target);
+	void AiStateAttack(struct Player* p_player, uint16_t p_target);
+	int32_t AiTransitionNull(struct Player* p_player, AiRule* p_rule);
+	int32_t AiTransitionClearStack(struct Player* p_player, AiRule* p_rule);
+	int32_t AiTransitionPush(struct Player* p_player, AiRule* p_rule);
+	int32_t AiTransitionPop(struct Player* p_player, AiRule* p_rule);
+	uint16_t FindAttacker(struct Player* p_player);
+	int16_t ResolveRuleTarget(uint16_t p_value, int16_t p_goal, int16_t p_found, int16_t p_target);
+	int32_t SetTarget(struct Player* p_player, int16_t p_target);
+	int32_t GetTargetRange(int16_t p_target);
+	int32_t GetApproachThrottle(struct Player* p_player, int32_t p_range);
+	int32_t AimTorsoPan(struct Player* p_player, int32_t p_angle, int32_t p_delta);
+	int32_t AimTorsoTilt(struct Player* p_player, int32_t p_delta);
+	int32_t SteerToTarget(struct Player* p_player);
 	void LeaveAIState(struct Player* p_player);
-	void EnterAIState(struct Player* p_player, MechU16 p_state);
-	MechS16 NextTarget(struct Player* p_player, MechS16 p_target, MechS16 p_previous);
-	MechS32 GetTargetBearing(struct Player* p_player);
-	MechS32 IsTargetDone(MechU16 p_target, MechS32 p_check);
-	void QueueAIState(struct Player* p_player, MechS16 p_state, MechU16 p_target);
-	MechS32 HasAIState(struct Player* p_player, MechS16 p_state);
-	void SetAIState(struct Player* p_player, MechS16 p_state, MechS16 p_target, MechS32 p_push);
+	void EnterAIState(struct Player* p_player, uint16_t p_state);
+	int16_t NextTarget(struct Player* p_player, int16_t p_target, int16_t p_previous);
+	int32_t GetTargetBearing(struct Player* p_player);
+	int32_t IsTargetDone(uint16_t p_target, int32_t p_check);
+	void QueueAIState(struct Player* p_player, int16_t p_state, uint16_t p_target);
+	int32_t HasAIState(struct Player* p_player, int16_t p_state);
+	void SetAIState(struct Player* p_player, int16_t p_state, int16_t p_target, int32_t p_push);
 	void ReleaseNavPoints(struct Player* p_player);
 	void PlacePatrolNavs(struct Player* p_player);
-	void AdvanceNavTarget(struct Player* p_player, MechS16 p_target);
+	void AdvanceNavTarget(struct Player* p_player, int16_t p_target);
 	void PlaceFormationNav(struct Player* p_player);
-	void RecordAttack(MechS32 p_index, MechU32 p_target);
-	MechS32 LoadAIScripts(void);
-	MechS32 AiTransitionNotify(struct Player* p_player, AiRule* p_rule);
-	MechS32 FindStarSlotPlayer(MechS32 p_slot);
-	void PostAIMessage(struct Player* p_player, MechS16 p_message, MechU16 p_target, MechS16 p_arg);
-	MechS16 OrderPlayers(struct Player* p_player, MechS16 p_targets, MechS16 p_state, MechS16 p_target);
-	MechS32 OrderStarSlot(MechS32 p_slot, MechS16 p_command);
-	MechS32 AddClamped(MechS32 p_value, MechS32 p_delta, MechS32 p_sameSign);
-	void ResetStarOrders(MechS32 p_team);
-	void AssignStarObjective(MechS32 p_team);
-	MechS16 GetEngagementAIFlags(MechS32 p_value);
-	void SetAIScript(struct Player* p_player, MechS16 p_slot, MechS16 p_script, MechS16 p_leader);
-	MechU16 GetObjectiveTarget(MechS32 p_team, MechS16 p_objective, MechS32 p_index);
-	MechS32 GetTeamMembers(MechS32 p_team, struct Player** p_members, MechS32 p_aliveOnly);
-	void HandleStarOrder(MechS32 p_team, AiMessage* p_order);
-	MechS32 AssignStarTarget(MechS32 p_team, MechU16 p_target);
-	void LeadStar(MechS32 p_team);
+	void RecordAttack(int32_t p_index, uint32_t p_target);
+	int32_t LoadAIScripts(void);
+	int32_t AiTransitionNotify(struct Player* p_player, AiRule* p_rule);
+	int32_t FindStarSlotPlayer(int32_t p_slot);
+	void PostAIMessage(struct Player* p_player, int16_t p_message, uint16_t p_target, int16_t p_arg);
+	int16_t OrderPlayers(struct Player* p_player, int16_t p_targets, int16_t p_state, int16_t p_target);
+	int32_t OrderStarSlot(int32_t p_slot, int16_t p_command);
+	int32_t AddClamped(int32_t p_value, int32_t p_delta, int32_t p_sameSign);
+	void ResetStarOrders(int32_t p_team);
+	void AssignStarObjective(int32_t p_team);
+	int16_t GetEngagementAIFlags(int32_t p_value);
+	void SetAIScript(struct Player* p_player, int16_t p_slot, int16_t p_script, int16_t p_leader);
+	uint16_t GetObjectiveTarget(int32_t p_team, int16_t p_objective, int32_t p_index);
+	int32_t GetTeamMembers(int32_t p_team, struct Player** p_members, int32_t p_aliveOnly);
+	void HandleStarOrder(int32_t p_team, AiMessage* p_order);
+	int32_t AssignStarTarget(int32_t p_team, uint16_t p_target);
+	void LeadStar(int32_t p_team);
 	void ReleaseAnchorNav(struct Player* p_player);
-	MechS32 GetLocalStarSize(void);
-	void RunStarCommand(MechS32 p_command, MechS32 p_slot);
+	int32_t GetLocalStarSize(void);
+	void RunStarCommand(int32_t p_command, int32_t p_slot);
 	void SweepTorso(struct Player* p_player);
 
 #ifdef __cplusplus

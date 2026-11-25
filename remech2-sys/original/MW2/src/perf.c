@@ -18,33 +18,33 @@
 // The player's display performance settings: a getter and a setter each,
 // with the unused leading argument of the in-mission menu's callbacks.
 
-MechS32 ApplyPerfSettings(MenuDefinition* p_menu, MenuPage* p_page);
-MechS32 GetObjectTextmaps(MechS32 p_arg);
-MechS32 GetTerrainTextmaps(MechS32 p_arg);
-MechS32 GetDisplayDetail(MechS32 p_arg);
-MechS32 GetObjectDensity(MechS32 p_arg);
-void SetObjectTextmaps(MechS32 p_arg, MechS32 p_objectTextmaps);
-void SetTerrainTextmaps(MechS32 p_arg, MechS32 p_terrainTextmaps);
-void SetDisplayDetail(MechS32 p_arg, MechS32 p_displayDetail);
-void SetObjectDensity(MechS32 p_arg, MechS32 p_objectDensity);
+int32_t ApplyPerfSettings(MenuDefinition* p_menu, MenuPage* p_page);
+int32_t GetObjectTextmaps(int32_t p_arg);
+int32_t GetTerrainTextmaps(int32_t p_arg);
+int32_t GetDisplayDetail(int32_t p_arg);
+int32_t GetObjectDensity(int32_t p_arg);
+void SetObjectTextmaps(int32_t p_arg, int32_t p_objectTextmaps);
+void SetTerrainTextmaps(int32_t p_arg, int32_t p_terrainTextmaps);
+void SetDisplayDetail(int32_t p_arg, int32_t p_displayDetail);
+void SetObjectDensity(int32_t p_arg, int32_t p_objectDensity);
 
-MechChar g_combatVariablesItem[] = "Combat Variables";
+char g_combatVariablesItem[] = "Combat Variables";
 
-MechChar g_combatVariablesTitle[] = "COMBAT VARIABLES";
+char g_combatVariablesTitle[] = "COMBAT VARIABLES";
 
-MechChar g_objectTextmapsItem[] = "Object textmaps";
+char g_objectTextmapsItem[] = "Object textmaps";
 
-MechChar g_terrainTextmapsItem[] = "Terrain textmaps";
+char g_terrainTextmapsItem[] = "Terrain textmaps";
 
-MechChar g_displayDetailItem[] = "Display detail";
+char g_displayDetailItem[] = "Display detail";
 
-MechChar g_objectDensityItem[] = "Object density";
+char g_objectDensityItem[] = "Object density";
 
-MechChar g_explosionChunksItem[] = "Explosion chunks";
+char g_explosionChunksItem[] = "Explosion chunks";
 
-MechChar g_affineText[] = "Affine";
+char g_affineText[] = "Affine";
 
-MechChar g_perspectiveText[] = "Perspective";
+char g_perspectiveText[] = "Perspective";
 
 MenuChoices g_affinePerspectiveChoices = {NULL, 2, {g_affineText, g_perspectiveText}};
 
@@ -81,9 +81,9 @@ void FirstPerfSetting(void)
 	ApplyPerfSettings(NULL, NULL);
 }
 
-MechS32 ApplyPerfSettings(MenuDefinition* p_menu, MenuPage* p_page)
+int32_t ApplyPerfSettings(MenuDefinition* p_menu, MenuPage* p_page)
 {
-	MechS32 result = 1;
+	int32_t result = 1;
 
 	if (g_mw2SndCfgData != NULL) {
 		SetObjectTextmaps(result, g_mw2SndCfgData->m_objectTextmaps);
@@ -96,48 +96,48 @@ MechS32 ApplyPerfSettings(MenuDefinition* p_menu, MenuPage* p_page)
 	return result;
 }
 
-MechS32 GetObjectTextmaps(MechS32 p_arg)
+int32_t GetObjectTextmaps(int32_t p_arg)
 {
 	return AreTextureMapsOn(0x100) || AreTextureMapsOn(0x200);
 }
 
-void SetObjectTextmaps(MechS32 p_arg, MechS32 p_objectTextmaps)
+void SetObjectTextmaps(int32_t p_arg, int32_t p_objectTextmaps)
 {
 	EnableTextureMaps(0x100, p_objectTextmaps);
 	EnableTextureMaps(0x200, p_objectTextmaps);
 	g_mw2SndCfgData->m_objectTextmaps = p_objectTextmaps;
 }
 
-MechS32 GetTerrainTextmaps(MechS32 p_arg)
+int32_t GetTerrainTextmaps(int32_t p_arg)
 {
 	return AreTextureMapsOn(0x800) || g_gridObjectShown;
 }
 
-void SetTerrainTextmaps(MechS32 p_arg, MechS32 p_terrainTextmaps)
+void SetTerrainTextmaps(int32_t p_arg, int32_t p_terrainTextmaps)
 {
 	EnableTextureMaps(0x800, p_terrainTextmaps);
 	ShowGridObject(p_terrainTextmaps);
 	g_mw2SndCfgData->m_terrainTextmaps = p_terrainTextmaps;
 }
 
-MechS32 GetDisplayDetail(MechS32 p_arg)
+int32_t GetDisplayDetail(int32_t p_arg)
 {
 	return IsLodQualityHigh(p_arg) || ArePerspectiveTexturesOn(p_arg);
 }
 
-void SetDisplayDetail(MechS32 p_arg, MechS32 p_displayDetail)
+void SetDisplayDetail(int32_t p_arg, int32_t p_displayDetail)
 {
 	SetLodQualityHigh(p_arg, p_displayDetail);
 	EnablePerspectiveTextures(p_arg, p_displayDetail);
 	g_mw2SndCfgData->m_displayDetail = p_displayDetail;
 }
 
-MechS32 GetObjectDensity(MechS32 p_arg)
+int32_t GetObjectDensity(int32_t p_arg)
 {
 	return g_mw2SndCfgData->m_objectDensity;
 }
 
-void SetObjectDensity(MechS32 p_arg, MechS32 p_objectDensity)
+void SetObjectDensity(int32_t p_arg, int32_t p_objectDensity)
 {
 	ShowDensityShapes(p_objectDensity);
 	g_mw2SndCfgData->m_objectDensity = p_objectDensity;

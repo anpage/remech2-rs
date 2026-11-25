@@ -15,13 +15,13 @@
    ray against a shape's bounding box, its floor or ceiling faces, or the quadtree of a
    terrain shape. Each hit leaves the surface normal in g_hitNormal. */
 
-MechS32 g_rayBoxEntryBehind = 0;
+int32_t g_rayBoxEntryBehind = 0;
 
-MechS32 TestPointInBox(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t TestPointInBox(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 inColumn;
-	MechS32 top;
-	MechS32 inside;
+	int32_t inColumn;
+	int32_t top;
+	int32_t inside;
 
 	ClassifyPointInBox(p_shape, p_x, p_y, p_z, &inside, &inColumn, &top);
 	return inside;
@@ -29,11 +29,11 @@ MechS32 TestPointInBox(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 
 // Tests whether (p_x, p_z) lies over the shape's bounding box; if it does, returns the top in
 // p_top and an upward normal.
-MechS32 GetBoxTop(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32* p_top)
+int32_t GetBoxTop(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z, int32_t* p_top)
 {
-	MechS32 top;
-	MechS32 inColumn;
-	MechS32 inside;
+	int32_t top;
+	int32_t inColumn;
+	int32_t inside;
 
 	inColumn = 0;
 	ClassifyPointInBox(p_shape, p_x, p_y, p_z, &inside, &inColumn, &top);
@@ -50,12 +50,12 @@ MechS32 GetBoxTop(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32
 // within it, with the box's top in p_top, and p_inside when p_y does as well.
 void ClassifyPointInBox(
 	Shape* p_shape,
-	MechS32 p_x,
-	MechS32 p_y,
-	MechS32 p_z,
-	MechS32* p_inside,
-	MechS32* p_inColumn,
-	MechS32* p_top
+	int32_t p_x,
+	int32_t p_y,
+	int32_t p_z,
+	int32_t* p_inside,
+	int32_t* p_inColumn,
+	int32_t* p_top
 )
 {
 	BoundBox* box;
@@ -84,14 +84,14 @@ void ClassifyPointInBox(
 
 // Clips the ray against the shape's bounding box, one slab per axis. On a hit, advances the
 // ray's start to the entry point and sets the normal of the face it entered through.
-MechS32 TestRayBox(Shape* p_shape, Ray* p_ray)
+int32_t TestRayBox(Shape* p_shape, Ray* p_ray)
 {
-	MechS32 tNear;
-	MechS32 axis;
-	MechS32 tEnter;
+	int32_t tNear;
+	int32_t axis;
+	int32_t tEnter;
 	BoundBox* box;
-	MechS32 tFar;
-	MechS32 tExit;
+	int32_t tFar;
+	int32_t tExit;
 
 	EnsureBoundBox(p_shape);
 	box = p_shape->m_collisionData;
@@ -181,7 +181,7 @@ MechS32 TestRayBox(Shape* p_shape, Ray* p_ray)
 }
 
 // Tests whether (p_x, p_z) lies over the shape's bounding box.
-MechS32 TestPointInBoxColumn(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t TestPointInBoxColumn(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	BoundBox* box;
 
@@ -194,28 +194,28 @@ MechS32 TestPointInBoxColumn(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p
 	return p_x >= box->m_minX && p_x <= box->m_maxX && p_z >= box->m_minZ && p_z <= box->m_maxZ;
 }
 
-MechS32 TestPointNever(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t TestPointNever(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	return 0;
 }
 
-MechS32 TestRayNever(Shape* p_shape, Ray* p_ray)
+int32_t TestRayNever(Shape* p_shape, Ray* p_ray)
 {
 	return 0;
 }
 
 // Finds the upward-facing face under (p_x, p_z) and tests whether p_y lies below it.
-MechS32 TestPointUnderFloor(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t TestPointUnderFloor(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 i;
-	MechS32 height;
-	MechS32 done;
+	int32_t i;
+	int32_t height;
+	int32_t done;
 	Face* face;
 
 	i = 0;
 	done = FALSE;
 	while (!done) {
-		face = (Face*) ((MechU8*) p_shape->m_model + p_shape->m_model->m_faceOffset) + i;
+		face = (Face*) ((uint8_t*) p_shape->m_model + p_shape->m_model->m_faceOffset) + i;
 		if (face->m_normal[1] > 0 && IsPointInFaceXZ(face, (Vertex*) (p_shape->m_model + 1), p_x, p_z)) {
 			done = TRUE;
 			if (IsBelowFacePlane(face, (Vertex*) (p_shape->m_model + 1), p_x, p_y, p_z, &height)) {
@@ -236,7 +236,7 @@ MechS32 TestPointUnderFloor(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_
 	return 0;
 }
 
-MechS32 TestPointTerrain(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t TestPointTerrain(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z)
 {
 	Model* model;
 
@@ -249,34 +249,34 @@ MechS32 TestPointTerrain(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
 	}
 }
 
-MechS32 TestRayTerrain(Shape* p_shape, Ray* p_ray)
+int32_t TestRayTerrain(Shape* p_shape, Ray* p_ray)
 {
 	return TestQuadtreeRay(p_shape->m_collisionData, p_shape->m_models, p_ray) & 1;
 }
 
-MechS32 GetTerrainShapeTop(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z, MechS32* p_top)
+int32_t GetTerrainShapeTop(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z, int32_t* p_top)
 {
 	return GetQuadtreeTop(p_shape->m_collisionData, p_shape->m_models, p_x, p_y, p_z, p_top);
 }
 
 // Finds the downward-facing face over (p_x, p_z) and tests whether p_y lies above it.
-MechS32 TestPointAboveFaces(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_z)
+int32_t TestPointAboveFaces(Shape* p_shape, int32_t p_x, int32_t p_y, int32_t p_z)
 {
-	MechS32 i;
+	int32_t i;
 	Vertex* vertices;
-	MechS32 done;
+	int32_t done;
 	Face* face;
-	MechS32 height;
+	int32_t height;
 	Vertex* vertex;
 
 	i = 0;
 	done = FALSE;
 	vertices = (Vertex*) (p_shape->m_model + 1);
 	while (!done) {
-		face = (Face*) ((MechU8*) p_shape->m_model + p_shape->m_model->m_faceOffset) + i;
+		face = (Face*) ((uint8_t*) p_shape->m_model + p_shape->m_model->m_faceOffset) + i;
 		if (face->m_normal[1] < 0 && IsPointInFaceXZ(face, vertices, p_x, p_z)) {
 			done = TRUE;
-			vertex = &vertices[*((MechU8*) face + face->m_indexOffset)];
+			vertex = &vertices[*((uint8_t*) face + face->m_indexOffset)];
 			height = vertex->m_worldY - SolvePlaneY(
 											face->m_normal[0],
 											face->m_normal[1],
@@ -307,11 +307,11 @@ MechS32 TestPointAboveFaces(Shape* p_shape, MechS32 p_x, MechS32 p_y, MechS32 p_
 }
 
 // Tests the ray against each face of the shape's model.
-MechS32 TestRayFaces(Shape* p_shape, Ray* p_ray)
+int32_t TestRayFaces(Shape* p_shape, Ray* p_ray)
 {
 	Model* model;
 	Vertex* vertices;
-	MechS32 i;
+	int32_t i;
 	Face* face;
 
 	model = p_shape->m_model;
@@ -321,7 +321,7 @@ MechS32 TestRayFaces(Shape* p_shape, Ray* p_ray)
 
 	vertices = (Vertex*) (model + 1);
 	for (i = 0; i < model->m_faceCount; i++) {
-		face = (Face*) ((MechU8*) model + model->m_faceOffset) + i;
+		face = (Face*) ((uint8_t*) model + model->m_faceOffset) + i;
 		if (IntersectRayFace(face, vertices, p_ray)) {
 			return 1;
 		}

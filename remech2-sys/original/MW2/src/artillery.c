@@ -116,8 +116,8 @@ void UpdateArtillery(Mech* p_mech)
 void LateUpdateArtillery(Mech* p_mech)
 {
 	Mech* mech;
-	MechS32 twist;
-	MechS32 delta;
+	int32_t twist;
+	int32_t delta;
 
 	mech = p_mech;
 	UpdateAI(mech->m_player);
@@ -207,7 +207,7 @@ void ShutdownArtillery(Mech* p_mech)
 }
 
 // Allocates p_player's mech, its weapons and sections, and sets them up.
-MechS32 CreateArtillery(MechS32 p_index, Player* p_player)
+int32_t CreateArtillery(int32_t p_index, Player* p_player)
 {
 	void* buffer = NULL;
 	MechSection* sections = NULL;
@@ -215,8 +215,8 @@ MechS32 CreateArtillery(MechS32 p_index, Player* p_player)
 	void* extra = NULL;
 	Mech* mech = NULL;
 	WeaponSlot* slot;
-	MechS32 i;
-	MechS32 size;
+	int32_t i;
+	int32_t size;
 
 	p_player->m_mech = NULL;
 	size = GetMechAllocSize();

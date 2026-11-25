@@ -7,14 +7,14 @@
 
 PopupPicture::PopupPicture(
 	undefined* p_data,
-	MechS32 p_size,
+	int32_t p_size,
 	VideoDriver* p_videoDriver,
-	MechS32 p_left,
-	MechS32 p_top,
+	int32_t p_left,
+	int32_t p_top,
 	AudioSample* p_sample
 )
 {
-	MechS32 size;
+	int32_t size;
 
 	m_data = p_data;
 	m_size = p_size;

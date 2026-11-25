@@ -53,22 +53,22 @@ TMPackDataBase* g_mw2Database = NULL;
 
 ProjectArchive* g_projectArchive = NULL;
 
-MechS32 g_midiAudio = 1;
+int32_t g_midiAudio = 1;
 
-MechS32 g_digitalAudio = 1;
+int32_t g_digitalAudio = 1;
 
 // Cleared when the shell runs without a command line, outside MECH2.EXE: LAUNCH then skips the
 // simulator (ShellWindowProc posts the result message straight away) and the mouse shows its
 // position.
-MechS32 g_runSim = 1;
+int32_t g_runSim = 1;
 
 // The flags the shell opens Smacker movies with.
-MechU32 g_movieOpenFlags = 0;
+uint32_t g_movieOpenFlags = 0;
 
-MechU8 g_drawFmv = 0;
+uint8_t g_drawFmv = 0;
 
 // The pilot roster clamps rank + 1 and rank + 2 to index 9: the NULL after Khan.
-MechChar* g_rankNames[10] = {
+char* g_rankNames[10] = {
 	"Mechwarrior",
 	"Star Commander",
 	"Nova Commander",
@@ -81,16 +81,16 @@ MechChar* g_rankNames[10] = {
 	NULL,
 };
 
-MechChar* g_clanNames[6] = {"Wolf", "Jade Falcon", "Ghost Bear", "Smoke Jaguar", "Nova Cat", "Steel Vipers"};
+char* g_clanNames[6] = {"Wolf", "Jade Falcon", "Ghost Bear", "Smoke Jaguar", "Nova Cat", "Steel Vipers"};
 
 // The song of each shell message from c_msgBriefing (0x406) up, per campaign (PlayMidiSong): a
 // database item (plus the base), 0 to keep the current one, 0x20000000 to stop the music.
 // 0x10000000 restarts the song. The Trials of Grievance's...
-MechS32 g_trialsSongs[18] =
+int32_t g_trialsSongs[18] =
 	{0x23, 0, 0, 0, 0x20000000, 0, 0, 0x23, 0x20000000, 0x23, 0x20000000, 0, 0, 0x23, 0, 0x20000000, 0x20000000, 0};
 
 // ...Wolf's...
-MechS32 g_wolfSongs[18] = {
+int32_t g_wolfSongs[18] = {
 	0x25,
 	0x24,
 	0,
@@ -112,7 +112,7 @@ MechS32 g_wolfSongs[18] = {
 };
 
 // ...and Jade Falcon's.
-MechS32 g_jadeFalconSongs[18] = {
+int32_t g_jadeFalconSongs[18] = {
 	0x28,
 	0x27,
 	0,
@@ -136,7 +136,7 @@ MechS32 g_jadeFalconSongs[18] = {
 PilotRecord* g_currentPilot = NULL;
 
 // Set when a new pilot is registered, for the clan hall's welcome (g_welcomeSound).
-MechS32 g_newPilotRegistered = 0;
+int32_t g_newPilotRegistered = 0;
 
 // The palette the leaderboard, credits and cockpit controls screens, which load palettes of
 // their own, restore on exit.

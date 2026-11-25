@@ -29,46 +29,46 @@ enum BwdTag {
 };
 
 struct BwdRootNode {
-	MechS32 m_type;       // 0x00
-	MechS32 m_size;       // 0x04
+	int32_t m_type;       // 0x00
+	int32_t m_size;       // 0x04
 	undefined4 m_unk0x08; // 0x08 — written as 0 for the simulator
 };
 
 struct BwdRevisionNode {
-	MechS32 m_type;     // 0x00
-	MechS32 m_size;     // 0x04
+	int32_t m_type;     // 0x00
+	int32_t m_size;     // 0x04
 	char m_revision[4]; // 0x08
 };
 
 struct BwdTableNode {
-	MechS32 m_type;          // 0x00
-	MechS32 m_size;          // 0x04
+	int32_t m_type;          // 0x00
+	int32_t m_size;          // 0x04
 	undefined4 m_unk0x08[5]; // 0x08 — written as zeros for the simulator
 };
 
 struct BwdLinkNode {
-	MechS32 m_type;    // 0x00
-	MechS32 m_size;    // 0x04
-	MechS16 m_unk0x08; // 0x08 — 0x114, 0x115 or 0x101 after each bitmap name node
-	MechS16 m_unk0x0a; // 0x0a — written as -1 for the simulator
+	int32_t m_type;    // 0x00
+	int32_t m_size;    // 0x04
+	int16_t m_unk0x08; // 0x08 — 0x114, 0x115 or 0x101 after each bitmap name node
+	int16_t m_unk0x0a; // 0x0a — written as -1 for the simulator
 };
 
 // One mech of a star; the registry takes its first 0x5a bytes.
 struct BwdGpsNode {
-	MechS32 m_type;                   // 0x00
-	MechS32 m_size;                   // 0x04
-	MechS16 m_variantId;              // 0x08 — the variant's resource, -2 for a user variant
-	MechS16 m_chassisId;              // 0x0a — the chassis' resource
-	MechU8 m_level;                   // 0x0c
-	MechU8 m_firstInStar;             // 0x0d
-	MechU8 m_unk0x0e;                 // 0x0e — 0 for a star's leader at level 0, else 2; written for the simulator
+	int32_t m_type;                   // 0x00
+	int32_t m_size;                   // 0x04
+	int16_t m_variantId;              // 0x08 — the variant's resource, -2 for a user variant
+	int16_t m_chassisId;              // 0x0a — the chassis' resource
+	uint8_t m_level;                  // 0x0c
+	uint8_t m_firstInStar;            // 0x0d
+	uint8_t m_unk0x0e;                // 0x0e — 0 for a star's leader at level 0, else 2; written for the simulator
 	undefined m_unk0x0f;              // 0x0f — never written, the node is cleared first
-	MechS16 m_difficultySettings[5];  // 0x10 — g_bwdDifficultySettings' row
-	MechS16 m_unk0x1a;                // 0x1a — written as 0 for the simulator
-	MechS16 m_unk0x1c;                // 0x1c — written as 0 for the simulator
-	MechS16 m_unk0x1e;                // 0x1e — written as 0 for the simulator
-	MechS16 m_unk0x20;                // 0x20 — written as 6 for the simulator
-	MechS16 m_unk0x22;                // 0x22 — written as 0x400 for the simulator
+	int16_t m_difficultySettings[5];  // 0x10 — g_bwdDifficultySettings' row
+	int16_t m_unk0x1a;                // 0x1a — written as 0 for the simulator
+	int16_t m_unk0x1c;                // 0x1c — written as 0 for the simulator
+	int16_t m_unk0x1e;                // 0x1e — written as 0 for the simulator
+	int16_t m_unk0x20;                // 0x20 — written as 6 for the simulator
+	int16_t m_unk0x22;                // 0x22 — written as 0x400 for the simulator
 	char m_chassis[9];                // 0x24
 	char m_mech[9];                   // 0x2d
 	char m_variant[16];               // 0x36
@@ -77,9 +77,9 @@ struct BwdGpsNode {
 
 // A node whose size depends on the name it carries.
 struct BwdNameNode {
-	MechS32 m_type;       // 0x00
-	MechS32 m_size;       // 0x04
-	MechS16 m_resourceId; // 0x08
+	int32_t m_type;       // 0x00
+	int32_t m_size;       // 0x04
+	int16_t m_resourceId; // 0x08
 	char m_name[1];       // 0x0a
 };
 
@@ -88,10 +88,10 @@ struct BwdNameNode {
 void* PrjHeapAlloc(undefined4 p_size);
 void PrjHeapFree(void* p_block);
 
-void BwdAddRegistryTemplate(void* p_node, MechS32 p_size);
+void BwdAddRegistryTemplate(void* p_node, int32_t p_size);
 void BwdInitRegistry();
 void BwdWriteRegistry(char* p_fileName);
-void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, MechS32 p_index, MechS32 p_level, MechS32 p_difficulty);
+void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, int32_t p_index, int32_t p_level, int32_t p_difficulty);
 
 char g_bwdTags[][4] = {
 	{'B', 'W', 'D', 0},   {'R', 'E', 'V', 0},   {'D', 'T', 'B', 'L'}, {'P', 'L', 'N', 'T'}, {'P', 'A', 'L', 'G'},
@@ -111,11 +111,11 @@ char g_bwdTags[][4] = {
 	{'S', 'D', 'S', 'C'}, {'S', 'U', 'P', 'S'},
 };
 
-MechS32 g_bwdRegistrySize = 0;
+int32_t g_bwdRegistrySize = 0;
 
-MechS32 g_bwdLargestTemplate = 0;
+int32_t g_bwdLargestTemplate = 0;
 
-MechS16 g_bwdDifficultySettings[9][5] = {
+int16_t g_bwdDifficultySettings[9][5] = {
 	{0, 0, 0, 0, 0},
 	{1, 850, 1, 850, 1},
 	{2, 700, 1, 700, 2},
@@ -129,12 +129,12 @@ MechS16 g_bwdDifficultySettings[9][5] = {
 
 // The enemy star's difficulty, from the mission's BWD file (ShellApplyMissionUiInfo).
 // PrjWriteStarTemplates starts the enemy templates at this less 2, adjusted by the enemy skill.
-MechS32 g_enemyStarDifficulty = 8;
+int32_t g_enemyStarDifficulty = 8;
 
 // The clans' type 8 resources, by clan; the player's clan and rival go into instmap1.bwd.
 char* g_clanBitmapNames[] = {"l1wolfcl", "l1jadefn", "l1gostbr", "l1smojag", "l1novact", "l1steelv"};
 
-MechS32 g_bwdTemplateRegistry[0x200];
+int32_t g_bwdTemplateRegistry[0x200];
 
 ProjectArchive::ProjectArchive(const char* p_name)
 {
@@ -161,7 +161,7 @@ void PrjHeapFree(void* p_block)
 	MechHeapFree(g_primaryHeap, p_block);
 }
 
-MechS32 ProjectArchive::FindResourceId(char* p_name, MechS32 p_type)
+int32_t ProjectArchive::FindResourceId(char* p_name, int32_t p_type)
 {
 	if (m_handle < 0) {
 		return -1;
@@ -170,7 +170,7 @@ MechS32 ProjectArchive::FindResourceId(char* p_name, MechS32 p_type)
 	return FindResourceIdByName(p_type, p_name);
 }
 
-void* ProjectArchive::GetResource(MechS32 p_id, char* p_tag)
+void* ProjectArchive::GetResource(int32_t p_id, char* p_tag)
 {
 	if (p_id == -1 || p_id == -2) {
 		return NULL;
@@ -179,12 +179,12 @@ void* ProjectArchive::GetResource(MechS32 p_id, char* p_tag)
 	return LoadCachedResource(m_handle, p_id, p_tag, 0);
 }
 
-void* ProjectArchive::GetResourceByName(char* p_name, MechS32 p_type, char* p_tag)
+void* ProjectArchive::GetResourceByName(char* p_name, int32_t p_type, char* p_tag)
 {
 	return GetResource(FindResourceId(p_name, p_type), p_tag);
 }
 
-void ProjectArchive::ReleaseResource(MechS32 p_id, char* p_tag)
+void ProjectArchive::ReleaseResource(int32_t p_id, char* p_tag)
 {
 	if (p_id == -1 || p_id == -2) {
 		return;
@@ -193,21 +193,21 @@ void ProjectArchive::ReleaseResource(MechS32 p_id, char* p_tag)
 	FreeCachedResource(p_id, p_tag);
 }
 
-void ProjectArchive::ReleaseResourceByName(char* p_name, MechS32 p_type, char* p_tag)
+void ProjectArchive::ReleaseResourceByName(char* p_name, int32_t p_type, char* p_tag)
 {
 	ReleaseResource(FindResourceId(p_name, p_type), p_tag);
 }
 
-MechS32* ProjectArchive::FindNextBwdNode(MechS32* p_list, MechS32 p_index, MechS32* p_previous)
+int32_t* ProjectArchive::FindNextBwdNode(int32_t* p_list, int32_t p_index, int32_t* p_previous)
 {
-	MechS32* node;
-	MechS32* end;
-	MechS32 type;
+	int32_t* node;
+	int32_t* end;
+	int32_t type;
 
-	type = *(MechS32*) g_bwdTags[p_index];
-	end = (MechS32*) ((char*) p_list + p_list[1]);
+	type = *(int32_t*) g_bwdTags[p_index];
+	end = (int32_t*) ((char*) p_list + p_list[1]);
 	if (p_previous != NULL) {
-		node = (MechS32*) ((char*) p_previous + p_previous[1]);
+		node = (int32_t*) ((char*) p_previous + p_previous[1]);
 	}
 	else {
 		node = p_list + 3;
@@ -222,9 +222,9 @@ MechS32* ProjectArchive::FindNextBwdNode(MechS32* p_list, MechS32 p_index, MechS
 	return NULL;
 }
 
-MechU8 ProjectArchive::LoadBwd(char* p_name)
+uint8_t ProjectArchive::LoadBwd(char* p_name)
 {
-	MechS32 id;
+	int32_t id;
 
 	m_bwdSize = 0;
 	if (m_handle < 0) {
@@ -238,7 +238,7 @@ MechU8 ProjectArchive::LoadBwd(char* p_name)
 	case -2:
 		return FALSE;
 	default:
-		m_bwd = (MechS32*) LoadCachedResource(m_handle, id, "BWD", 0);
+		m_bwd = (int32_t*) LoadCachedResource(m_handle, id, "BWD", 0);
 		m_bwdSize = m_bwd[1];
 		if (m_bwd == NULL) {
 			return FALSE;
@@ -248,14 +248,14 @@ MechU8 ProjectArchive::LoadBwd(char* p_name)
 	return TRUE;
 }
 
-MechS32* ProjectArchive::FindBwdNode(MechS32 p_type)
+int32_t* ProjectArchive::FindBwdNode(int32_t p_type)
 {
-	MechS32* node;
-	MechS32 offset;
+	int32_t* node;
+	int32_t offset;
 
 	offset = 0xc;
 	while (offset < m_bwdSize) {
-		node = (MechS32*) ((char*) m_bwd + offset);
+		node = (int32_t*) ((char*) m_bwd + offset);
 		if (*node == p_type) {
 			return node;
 		}
@@ -276,12 +276,12 @@ ProjectArchive::~ProjectArchive()
 	CloseArchive(m_handle);
 }
 
-void BwdAddRegistryTemplate(void* p_node, MechS32 p_size)
+void BwdAddRegistryTemplate(void* p_node, int32_t p_size)
 {
 	char* destination;
 
 	destination = (char*) g_bwdTemplateRegistry + g_bwdRegistrySize;
-	if (g_bwdRegistrySize + p_size > (MechS32) sizeof(g_bwdTemplateRegistry)) {
+	if (g_bwdRegistrySize + p_size > (int32_t) sizeof(g_bwdTemplateRegistry)) {
 		return;
 	}
 
@@ -303,12 +303,12 @@ void BwdInitRegistry()
 	g_bwdRegistrySize = 0;
 	g_bwdLargestTemplate = 0;
 
-	root.m_type = *(MechS32*) g_bwdTags[c_tagBwd];
+	root.m_type = *(int32_t*) g_bwdTags[c_tagBwd];
 	root.m_size = 0;
 	root.m_unk0x08 = 0;
 	BwdAddRegistryTemplate(&root, sizeof(root));
 
-	revision.m_type = *(MechS32*) g_bwdTags[c_tagRev];
+	revision.m_type = *(int32_t*) g_bwdTags[c_tagRev];
 	revision.m_size = sizeof(revision);
 	revision.m_revision[0] = '1';
 	revision.m_revision[1] = '.';
@@ -316,7 +316,7 @@ void BwdInitRegistry()
 	revision.m_revision[3] = '2';
 	BwdAddRegistryTemplate(&revision, sizeof(revision));
 
-	table.m_type = *(MechS32*) g_bwdTags[c_tagDtbl];
+	table.m_type = *(int32_t*) g_bwdTags[c_tagDtbl];
 	table.m_size = sizeof(table);
 	memset(table.m_unk0x08, 0, sizeof(table.m_unk0x08));
 	BwdAddRegistryTemplate(&table, sizeof(table));
@@ -330,11 +330,11 @@ void BwdWriteRegistry(char* p_fileName)
 
 // Adds the template of one mech of a star to the registry: its chassis and variant, and the
 // settings of p_difficulty (1 to 8; 0 for a mech without a level).
-void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, MechS32 p_index, MechS32 p_level, MechS32 p_difficulty)
+void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, int32_t p_index, int32_t p_level, int32_t p_difficulty)
 {
-	MechS32 i;
+	int32_t i;
 	BwdGpsNode node;
-	MechS16 variant;
+	int16_t variant;
 
 	for (i = 0; g_mechChassis[i].m_prefix; i++) {
 		if (!strncasecmp(p_mech, g_mechChassis[i].m_prefix, 3)) {
@@ -357,7 +357,7 @@ void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, MechS32 p_index,
 	}
 
 	memset(&node, 0, 0x5a);
-	node.m_type = *(MechS32*) g_bwdTags[c_tagGps];
+	node.m_type = *(int32_t*) g_bwdTags[c_tagGps];
 	node.m_size = sizeof(node);
 	strncpy(node.m_mech, p_mech, 8);
 	node.m_mech[8] = '\0';
@@ -399,11 +399,11 @@ void PrjBuildMechVariantTemplate(char* p_mech, char* p_variant, MechS32 p_index,
 	BwdAddRegistryTemplate(&node, 0x5a);
 }
 
-void PrjWriteStarTemplates(MechS32 p_count, StarMech* p_mechs, MechS32 p_enemyCount, StarMech* p_enemies)
+void PrjWriteStarTemplates(int32_t p_count, StarMech* p_mechs, int32_t p_enemyCount, StarMech* p_enemies)
 {
-	MechS32 i;
-	MechS32 level;
-	MechS32 difficulty;
+	int32_t i;
+	int32_t level;
+	int32_t difficulty;
 	char fileName[0x10];
 	DifficultySettings settings;
 
@@ -437,16 +437,16 @@ void PrjWriteStarTemplates(MechS32 p_count, StarMech* p_mechs, MechS32 p_enemyCo
 	}
 }
 
-void PrjBuildPlayerStarTemplates(MechS32 p_clan, MechS32 p_rival)
+void PrjBuildPlayerStarTemplates(int32_t p_clan, int32_t p_rival)
 {
-	MechS32 size;
+	int32_t size;
 	BwdNameNode* node;
 	char buffer[0x20];
 	BwdLinkNode link;
 
 	node = (BwdNameNode*) buffer;
-	node->m_type = *(MechS32*) g_bwdTags[c_tagBmpj];
-	link.m_type = *(MechS32*) g_bwdTags[c_tagBmid];
+	node->m_type = *(int32_t*) g_bwdTags[c_tagBmpj];
+	link.m_type = *(int32_t*) g_bwdTags[c_tagBmid];
 	link.m_size = sizeof(link);
 	link.m_unk0x08 = 0;
 	link.m_unk0x0a = -1;

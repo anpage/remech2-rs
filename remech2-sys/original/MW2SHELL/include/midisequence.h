@@ -14,7 +14,7 @@ public:
 
 	void Start();
 	void Stop();
-	void SetVolume(MechS32 p_volume);
+	void SetVolume(int32_t p_volume);
 	undefined IsAnySequencePlaying();
 
 private:

@@ -20,9 +20,9 @@ PANE g_topMessagePane = {&g_mainPixelBuffer, 0, 0, 0x10000, 0x10000};
 
 PANE g_bottomMessagePane = {&g_mainPixelBuffer, 0, 0, 0x10000, 0x10000};
 
-MechChar g_bottomMessageText[0x100];
+char g_bottomMessageText[0x100];
 
-MechChar g_topMessageText[0x100];
+char g_topMessageText[0x100];
 
 TimedOverlay g_timedOverlays[2] = {
 	{g_topMessageText, {0x28f, 0}, 0, 0, 1, 0x4c, 0, &g_topMessagePane},
@@ -34,16 +34,16 @@ TimedOverlay g_timedOverlays[2] = {
 // text vertically.
 void LayoutMessageBoxes(void)
 {
-	MechS32 fontHeight;
-	MechS32 sign;
-	MechS32 dy;
-	MechS32 dx;
+	int32_t fontHeight;
+	int32_t sign;
+	int32_t dy;
+	int32_t dx;
 	PANE* target;
 	void* font;
-	MechS32 i;
+	int32_t i;
 	TimedOverlay* overlay;
 	void* shape;
-	MechS32 height;
+	int32_t height;
 
 	for (i = 0; i < 2; i++) {
 		overlay = &g_timedOverlays[i];
@@ -87,14 +87,14 @@ void LayoutMessageBoxes(void)
 
 // Shows p_text in a free message box for p_duration ticks, or replaces the one of the lowest
 // priority not above p_priority (of those, the one that expires last). Returns 1 if shown.
-MechS32 ShowInGameMessage(MechChar* p_text, MechS32 p_font, MechS32 p_duration, MechS32 p_priority)
+int32_t ShowInGameMessage(char* p_text, int32_t p_font, int32_t p_duration, int32_t p_priority)
 {
-	MechS32 result;
-	MechS32 slot;
-	MechS32 latest;
-	MechS32 i;
-	MechS32 done;
-	MechS32 lowestPriority;
+	int32_t result;
+	int32_t slot;
+	int32_t latest;
+	int32_t i;
+	int32_t done;
+	int32_t lowestPriority;
 	TimedOverlay* overlay;
 
 	done = FALSE;
@@ -148,7 +148,7 @@ MechS32 ShowInGameMessage(MechChar* p_text, MechS32 p_font, MechS32 p_duration, 
 
 void DrawTimedOverlays(void)
 {
-	MechS32 i;
+	int32_t i;
 	TimedOverlay* overlay;
 	void* font;
 	void* background;
@@ -192,7 +192,7 @@ void DrawTimedOverlays(void)
 
 // Draws text in a box sized to it, on a tiled background shape (p_background, -1 for none),
 // at p_x, p_y or centered on the screen along an axis where that is negative.
-void DrawTextBox(MechS32 p_background, MechS32 p_font, MechChar* p_text, MechS32 p_x, MechS32 p_y)
+void DrawTextBox(int32_t p_background, int32_t p_font, char* p_text, int32_t p_x, int32_t p_y)
 {
 	PANE centered;
 	void* background;
@@ -244,11 +244,11 @@ void DrawTextBox(MechS32 p_background, MechS32 p_font, MechChar* p_text, MechS32
 }
 
 // Draws a TEXT resource, stored with each character negated (mod 256), as DrawTextBox does.
-void DrawTextResourceBox(MechS32 p_background, MechS32 p_font, MechS32 p_id, MechS32 p_x, MechS32 p_y)
+void DrawTextResourceBox(int32_t p_background, int32_t p_font, int32_t p_id, int32_t p_x, int32_t p_y)
 {
-	MechChar* text;
-	MechChar* c;
-	MechS32 ch;
+	char* text;
+	char* c;
+	int32_t ch;
 
 	text = LoadCachedResource(g_mw2PrjHandle, p_id, g_resourceTypeTags[c_resTagText], 0);
 	if (text != NULL) {

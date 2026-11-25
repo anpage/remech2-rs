@@ -141,16 +141,16 @@ SpeechEntry* g_speechQueue = NULL;
 
 HSAMPLE g_speechSample = 0;
 
-MechS32 g_speechLocked = 0;
+int32_t g_speechLocked = 0;
 
 SpeechEntry g_speechEntries[8];
 
 // Queues p_line, followed by p_suffix, by priority (-1: the sound's own). Returns whether it
 // was queued.
-MechS32 QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, MechS32 p_priority)
+int32_t QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, int32_t p_priority)
 {
 	SpeechEntry* entry;
-	MechS32 i;
+	int32_t i;
 	SpeechEntry* prev;
 	SpeechEntry* cur;
 
@@ -286,8 +286,8 @@ MechS32 QueueSpeech(SpeechLine* p_line, SpeechLine* p_suffix, MechS32 p_priority
 // Moves to the next queued message once the current one has finished.
 void AdvanceSpeechQueue(void)
 {
-	MechS32 done;
-	MechS32 started;
+	int32_t done;
+	int32_t started;
 
 	if (g_speechQueue) {
 		done = 0;
@@ -314,11 +314,11 @@ void AdvanceSpeechQueue(void)
 }
 
 // Plays a queued message: the line and its suffix as sounds, or its text.
-MechS32 StartSpeech(SpeechEntry* p_entry)
+int32_t StartSpeech(SpeechEntry* p_entry)
 {
-	MechS32 id;
-	MechS32 suffix;
-	MechS32 slot;
+	int32_t id;
+	int32_t suffix;
+	int32_t slot;
 
 	slot = -1;
 	g_speechSample = 0;
@@ -356,7 +356,7 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 				UnlockCachedResource(suffix, g_resourceTypeTags[c_resTagSnds]);
 			}
 			else {
-				slot = PlaySample(0, 0, id, NULL, 100, g_soundConfig.m_voiceVolume, 0x40, 11025, (MechS32*) -1, 0x150);
+				slot = PlaySample(0, 0, id, NULL, 100, g_soundConfig.m_voiceVolume, 0x40, 11025, (int32_t*) -1, 0x150);
 				if (slot >= 0) {
 					g_speechSample = g_audioEngine->m_samples[slot];
 					AIL_set_sample_user_data(g_speechSample, 1, id);
@@ -368,7 +368,7 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 	}
 	else if (id) {
 		slot =
-			PlaySample(0, 0, id, p_entry->m_data, 100, g_soundConfig.m_voiceVolume, 0x40, 11025, (MechS32*) -1, 0x150);
+			PlaySample(0, 0, id, p_entry->m_data, 100, g_soundConfig.m_voiceVolume, 0x40, 11025, (int32_t*) -1, 0x150);
 		if (slot >= 0) {
 			g_speechSample = g_audioEngine->m_samples[slot];
 		}
@@ -383,19 +383,19 @@ MechS32 StartSpeech(SpeechEntry* p_entry)
 void PlayVoiceVolumeTest(void)
 {
 	if (g_soundConfig.m_simFlags & 2) {
-		PlaySample(0, 0, 0x36, NULL, 100, g_soundConfig.m_voiceVolume, 0x40, 11025, (MechS32*) -1, 0x250);
+		PlaySample(0, 0, 0x36, NULL, 100, g_soundConfig.m_voiceVolume, 0x40, 11025, (int32_t*) -1, 0x250);
 	}
 	else {
-		PlaySample(0, 0, 0x54, NULL, 100, 0x10000, 0x40, 11025, (MechS32*) -1, 0x250);
+		PlaySample(0, 0, 0x54, NULL, 100, 0x10000, 0x40, 11025, (int32_t*) -1, 0x250);
 	}
 }
 
 // Stops the queue taking messages and drops the queued ones; p_keep keeps sound data and
 // messages of priority 0x50 and above.
-void FlushSpeechQueue(MechS32 p_keep)
+void FlushSpeechQueue(int32_t p_keep)
 {
 	SpeechEntry* prev;
-	MechS32 remove;
+	int32_t remove;
 	SpeechEntry* cur;
 
 	if (g_speechLocked) {
@@ -476,8 +476,8 @@ void StopSpeech(void)
 
 void ResumeSpeech(void)
 {
-	MechS32 slot;
-	MechS32 volume;
+	int32_t slot;
+	int32_t volume;
 
 	if (g_speechSample) {
 		volume = FixedMul16(g_soundConfig.m_voiceVolume, 100);
@@ -492,7 +492,7 @@ void ResumeSpeech(void)
 }
 
 // A lancemate's report: p_message of g_lancemateSpeech, addressed by p_slot (-1: none).
-void SayLancemateReport(MechS32 p_message, MechS32 p_slot)
+void SayLancemateReport(int32_t p_message, int32_t p_slot)
 {
 	SpeechLine* slot;
 	SpeechLine* message;
@@ -512,14 +512,14 @@ void SayLancemateReport(MechS32 p_message, MechS32 p_slot)
 	QueueSpeech(slot, message, -1);
 }
 
-void SayFormation(MechS32 p_formation)
+void SayFormation(int32_t p_formation)
 {
 	if (p_formation >= 0 && p_formation < 6) {
 		QueueSpeech(g_formationSpeech, &g_formationSpeech[p_formation + 1], -1);
 	}
 }
 
-void PlayCockpitSound(MechS32 p_message, MechS32 p_engage)
+void PlayCockpitSound(int32_t p_message, int32_t p_engage)
 {
 	SpeechLine* suffix;
 
@@ -538,12 +538,12 @@ void PlayCockpitSound(MechS32 p_message, MechS32 p_engage)
 }
 
 // "Critical hit : " and the part of g_damageSpeech.
-void SayCriticalHit(MechS32 p_part)
+void SayCriticalHit(int32_t p_part)
 {
 	QueueSpeech(&g_cockpitSpeech[11], &g_damageSpeech[p_part], -1);
 }
 
-MechS32 QueueSpeechLine(SpeechLine* p_line)
+int32_t QueueSpeechLine(SpeechLine* p_line)
 {
 	return QueueSpeech(p_line, NULL, 0x50);
 }

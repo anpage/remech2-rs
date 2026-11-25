@@ -12,16 +12,16 @@
 // Resource file helpers: loading a file whole, and prefixing names with the base directory.
 
 // Optional base directory for resource names.
-MechChar g_resourceDir[0x100] = {0};
+char g_resourceDir[0x100] = {0};
 
 // Shared scratch buffer returned by the path helpers (overwritten on each call).
-MechChar g_resourcePath[0x50];
+char g_resourcePath[0x50];
 
 // Read a whole file into memory, allocated here unless p_preallocated; returns the open handle,
 // or -1 on failure.
-MechS32 LoadFile(MechChar* p_name, MechS32* p_size, void** p_data, MechS32 p_preallocated)
+int32_t LoadFile(char* p_name, int32_t* p_size, void** p_data, int32_t p_preallocated)
 {
-	MechS32 handle;
+	int32_t handle;
 
 	handle = MechOpen(p_name, c_mechOpenRead);
 	if (handle == -1) {
@@ -50,9 +50,9 @@ MechS32 LoadFile(MechChar* p_name, MechS32* p_size, void** p_data, MechS32 p_pre
 }
 
 // Prefix a bare name with the base directory; leave paths containing a separator unchanged.
-MechChar* MakeResourcePath(MechChar* p_name)
+char* MakeResourcePath(char* p_name)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x50; i++) {
 		g_resourcePath[i] = '\0';
@@ -69,9 +69,9 @@ MechChar* MakeResourcePath(MechChar* p_name)
 }
 
 // Prefix a name with the base directory without checking for path separators.
-MechChar* MakeResourcePathUnchecked(MechChar* p_name)
+char* MakeResourcePathUnchecked(char* p_name)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x50; i++) {
 		g_resourcePath[i] = '\0';

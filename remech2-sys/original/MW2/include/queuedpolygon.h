@@ -9,10 +9,10 @@ struct Face;
 // A polygon queued for drawing, taken from the bottom of the draw buffer (AllocQueuedPolygon):
 // m_count pointers to its projected vertices (struct ProjectedVertex*) follow the header.
 typedef struct QueuedPolygon {
-	MechS16 m_count;     // 0x00 — bit 15 marks a shape queued in its place (DrawShapeList)
-	MechU16 m_flags;     // 0x02 — the drawing flags
+	int16_t m_count;     // 0x00 — bit 15 marks a shape queued in its place (DrawShapeList)
+	uint16_t m_flags;    // 0x02 — the drawing flags
 	struct Face* m_face; // 0x04
-	MechS32 m_depth;     // 0x08
+	int32_t m_depth;     // 0x08
 } QueuedPolygon;
 
 #endif // QUEUEDPOLYGON_H

@@ -10,15 +10,15 @@
 
 // String collections: Collections of heap-copied strings, ordered by strcmp when sorted.
 
-MechU8 FindString(Collection* p_collection, MechChar* p_string, MechChar** p_found);
+uint8_t FindString(Collection* p_collection, char* p_string, char** p_found);
 int CompareStringEntries(const void* p_a, const void* p_b);
 
-Collection* CreateStringCollection(MechS32 p_flags)
+Collection* CreateStringCollection(int32_t p_flags)
 {
 	Collection* collection;
-	MechS32 result;
+	int32_t result;
 
-	result = CreateCollection(&collection, 10, free, (MechU8) p_flags, CompareStringEntries);
+	result = CreateCollection(&collection, 10, free, (uint8_t) p_flags, CompareStringEntries);
 	if (result != 0) {
 		return NULL;
 	}
@@ -26,9 +26,9 @@ Collection* CreateStringCollection(MechS32 p_flags)
 	return collection;
 }
 
-MechU8 AddUniqueString(Collection* p_collection, MechChar* p_string)
+uint8_t AddUniqueString(Collection* p_collection, char* p_string)
 {
-	MechChar* copy;
+	char* copy;
 
 	if (p_string == NULL) {
 		return TRUE;
@@ -43,11 +43,11 @@ MechU8 AddUniqueString(Collection* p_collection, MechChar* p_string)
 	return TRUE;
 }
 
-MechU8 FindString(Collection* p_collection, MechChar* p_string, MechChar** p_found)
+uint8_t FindString(Collection* p_collection, char* p_string, char** p_found)
 {
-	MechS32 i;
-	MechChar** entry;
-	MechChar* item;
+	int32_t i;
+	char** entry;
+	char* item;
 
 	if (p_collection->m_flags & c_collectionSorted) {
 		EnsureCollectionSorted(p_collection);
@@ -85,8 +85,8 @@ MechU8 FindString(Collection* p_collection, MechChar* p_string, MechChar** p_fou
 // Moves every string of p_source into p_collection, freeing the ones it already holds.
 void MoveStrings(Collection* p_collection, Collection* p_source)
 {
-	MechS32 i;
-	MechChar* item;
+	int32_t i;
+	char* item;
 
 	for (i = 0; i < p_source->m_count; i++) {
 		item = CollectionGet(p_source, i);
@@ -100,23 +100,23 @@ void MoveStrings(Collection* p_collection, Collection* p_source)
 	ClearCollection(p_source);
 }
 
-void RemoveString(Collection* p_collection, MechChar* p_string)
+void RemoveString(Collection* p_collection, char* p_string)
 {
 	CollectionRemove(p_collection, p_string, TRUE);
 }
 
-void AddString(Collection* p_collection, MechChar* p_string)
+void AddString(Collection* p_collection, char* p_string)
 {
-	MechChar* copy;
+	char* copy;
 
 	copy = AllocateString(p_string);
 	ExpandCollection(p_collection, copy);
 }
 
-MechU8 StringsEqualAt(Collection* p_a, MechS32 p_indexA, Collection* p_b, MechS32 p_indexB)
+uint8_t StringsEqualAt(Collection* p_a, int32_t p_indexA, Collection* p_b, int32_t p_indexB)
 {
-	MechChar* a;
-	MechChar* b;
+	char* a;
+	char* b;
 
 	a = CollectionGet(p_a, p_indexA);
 	b = CollectionGet(p_b, p_indexB);
@@ -127,9 +127,9 @@ MechU8 StringsEqualAt(Collection* p_a, MechS32 p_indexA, Collection* p_b, MechS3
 	return FALSE;
 }
 
-void DumpStrings(MechChar* p_title, Collection* p_collection)
+void DumpStrings(char* p_title, Collection* p_collection)
 {
-	MechS32 i;
+	int32_t i;
 
 	fprintf(stdout, "%s\n", p_title);
 	fflush(stdout);
@@ -144,10 +144,10 @@ void DumpStrings(MechChar* p_title, Collection* p_collection)
 
 Collection* CopyStringCollection(Collection* p_source)
 {
-	MechChar* copy;
-	MechS32 i;
+	char* copy;
+	int32_t i;
 	Collection* collection;
-	MechChar* item;
+	char* item;
 
 	collection = CreateStringCollection(p_source->m_flags);
 	for (i = 0; i < p_source->m_count; i++) {
@@ -161,13 +161,13 @@ Collection* CopyStringCollection(Collection* p_source)
 
 int CompareStringEntries(const void* p_a, const void* p_b)
 {
-	MechChar* a;
-	MechChar* b;
-	MechChar** entryA;
-	MechChar** entryB;
+	char* a;
+	char* b;
+	char** entryA;
+	char** entryB;
 
-	entryA = (MechChar**) p_a;
-	entryB = (MechChar**) p_b;
+	entryA = (char**) p_a;
+	entryB = (char**) p_b;
 	a = *entryA;
 	b = *entryB;
 	return strcmp(a, b);

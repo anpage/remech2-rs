@@ -25,21 +25,21 @@
 
 FmvSlot g_fmvSlots[32] = {0};
 
-MechS32 g_fullscreenVideoMsg = c_msgScreenFrame;
+int32_t g_fullscreenVideoMsg = c_msgScreenFrame;
 
-MechS32 g_fullscreenVideoWParam = c_msgScreenFrame;
+int32_t g_fullscreenVideoWParam = c_msgScreenFrame;
 
-MechChar g_videoPath[0x20];
+char g_videoPath[0x20];
 
-MechChar g_shpPath[0x20];
+char g_shpPath[0x20];
 
-MechChar* GetPathToVideo(const MechChar* p_name)
+char* GetPathToVideo(const char* p_name)
 {
 	sprintf(g_videoPath, "smk\\%s.smk", p_name);
 	return g_videoPath;
 }
 
-MechChar* GetPathToShp(const MechChar* p_name)
+char* GetPathToShp(const char* p_name)
 {
 	sprintf(g_shpPath, "smk\\%s.shp", p_name);
 	return g_shpPath;
@@ -47,16 +47,16 @@ MechChar* GetPathToShp(const MechChar* p_name)
 
 // The original looked for the video on the game CD when it wasn't on the hard disk, here and
 // wherever a video or its SHP animation is opened.
-MechS32 CheckVideoExists(const MechChar* p_name)
+int32_t CheckVideoExists(const char* p_name)
 {
 	return MechFileExists(GetPathToVideo(p_name));
 }
 
 // The screen callback while a full-screen video plays: a click, a key or any other message ends
 // it.
-void FullscreenVideoCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg)
+void FullscreenVideoCallback(TMPackDataBase*, int32_t*, uint8_t*, char**, int32_t p_msg)
 {
-	MechS32 msg;
+	int32_t msg;
 
 	if (!IsVideoPlaying(0) || g_mouseState->GetLeftPressed() == 1 || g_keyboardInput->PollKey() ||
 		p_msg != c_msgScreenFrame) {
@@ -79,9 +79,9 @@ void FullscreenVideoCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32
 	}
 }
 
-MechS32 BeginFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam)
+int32_t BeginFullscreenVideo(const char* p_name, int32_t p_msg, int32_t p_wParam)
 {
-	MechS32 result;
+	int32_t result;
 
 	CloseAllVideos();
 	result = PlayVideo(0, p_name, 0, 0, 0x1000, 0);
@@ -96,7 +96,7 @@ MechS32 BeginFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam
 	return 1;
 }
 
-MechS32 PlayFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam)
+int32_t PlayFullscreenVideo(const char* p_name, int32_t p_msg, int32_t p_wParam)
 {
 	if (BeginFullscreenVideo(p_name, p_msg, p_wParam) == 0) {
 		return 0;
@@ -109,9 +109,9 @@ MechS32 PlayFullscreenVideo(const char* p_name, MechS32 p_msg, MechS32 p_wParam)
 
 // Opens the movie p_name and draws its first
 // frame at (p_left, p_top). Without a framebuffer it closes the movie again.
-LoopingMovie::LoopingMovie(MechChar* p_name, MechS32 p_left, MechS32 p_top)
+LoopingMovie::LoopingMovie(char* p_name, int32_t p_left, int32_t p_top)
 {
-	MechS32 result;
+	int32_t result;
 
 	m_smack = SmackOpen(GetPathToVideo(p_name), g_movieOpenFlags, 0);
 	if (m_smack == NULL) {
@@ -148,9 +148,9 @@ LoopingMovie::~LoopingMovie()
 
 // Moves the movie: restores the background under the old rectangle and draws the current
 // frame at the new position.
-void LoopingMovie::MoveTo(MechS32 p_left, MechS32 p_top)
+void LoopingMovie::MoveTo(int32_t p_left, int32_t p_top)
 {
-	MechS32 result;
+	int32_t result;
 
 	if (m_smack == NULL) {
 		return;
@@ -191,7 +191,7 @@ void LoopingMovie::Update()
 	}
 }
 
-MechS32 IsVideoFrameDue(FmvSlot* p_video, MechU32 p_time)
+int32_t IsVideoFrameDue(FmvSlot* p_video, uint32_t p_time)
 {
 	if (p_time >= p_video->m_nextFrameTime) {
 		p_video->m_nextFrameTime = p_video->m_frameInterval + p_time;
@@ -212,7 +212,7 @@ void StreamVideoSound(FmvSlot* p_video)
 // Plays the next frame of the full-screen video in slot 0, closing it after the last.
 void PlayFullscreenVideoFrame()
 {
-	MechS32 result;
+	int32_t result;
 	PaletteColor* palette;
 	FmvSlot* video;
 
@@ -255,7 +255,7 @@ void PlayFullscreenVideoFrame()
 void UpdateVideos()
 {
 	FmvSlot* video;
-	MechS32 i;
+	int32_t i;
 
 	if (g_audioSubsystem) {
 		AIL_serve();
@@ -407,7 +407,7 @@ void UpdateVideos()
 	g_videoDriver->RedrawGlyphs(1);
 }
 
-MechS32 IsVideoPlaying(MechS32 p_index)
+int32_t IsVideoPlaying(int32_t p_index)
 {
 	if (p_index >= 0 && p_index < 0x20 && (g_fmvSlots[p_index].m_flags & 0x80000000) &&
 		!(g_fmvSlots[p_index].m_flags & 1)) {
@@ -419,9 +419,9 @@ MechS32 IsVideoPlaying(MechS32 p_index)
 }
 
 // Whether any video plays Smacker's sound (flag 0x2000). Unused.
-MechS32 IsVideoSoundPlaying()
+int32_t IsVideoSoundPlaying()
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x20; i++) {
 		if ((g_fmvSlots[i].m_flags & 0x80000000) && (g_fmvSlots[i].m_flags & 0x2000)) {
@@ -432,7 +432,7 @@ MechS32 IsVideoSoundPlaying()
 	return 0;
 }
 
-MechS32 IsFullscreenVideoPlaying()
+int32_t IsFullscreenVideoPlaying()
 {
 	if ((g_fmvSlots[0].m_flags & 0x80000000) && (g_fmvSlots[0].m_flags & 0x1000)) {
 		return 1;
@@ -441,23 +441,23 @@ MechS32 IsFullscreenVideoPlaying()
 	return 0;
 }
 
-void SetVideoFlags(MechS32 p_index, MechS32 p_mask, MechS32 p_value)
+void SetVideoFlags(int32_t p_index, int32_t p_mask, int32_t p_value)
 {
 	if (p_index >= 0 && p_index < 0x20) {
-		g_fmvSlots[p_index].m_flags &= ~(MechU32) p_mask;
+		g_fmvSlots[p_index].m_flags &= ~(uint32_t) p_mask;
 		g_fmvSlots[p_index].m_flags |= p_mask & p_value;
 	}
 }
 
 // Shows a video opened hidden (flag 0x20), redrawing it.
-void ShowVideo(MechS32 p_index)
+void ShowVideo(int32_t p_index)
 {
 	if (p_index >= 0 && p_index < 0x20 && (g_fmvSlots[p_index].m_flags & 0x20)) {
 		g_fmvSlots[p_index].m_flags = g_fmvSlots[p_index].m_flags & ~0x20 | 0x100;
 	}
 }
 
-void CloseVideo(MechS32 p_index)
+void CloseVideo(int32_t p_index)
 {
 	if (p_index < 0 || p_index >= 0x20) {
 		return;
@@ -487,14 +487,14 @@ void CloseVideo(MechS32 p_index)
 
 void CloseAllVideos()
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x20; i++) {
 		CloseVideo(i);
 	}
 }
 
-void MoveVideo(MechS32 p_index, MechS32 p_left, MechS32 p_top)
+void MoveVideo(int32_t p_index, int32_t p_left, int32_t p_top)
 {
 	if (p_index >= 0 && p_index < 0x20 && (g_fmvSlots[p_index].m_flags & 0x80000000)) {
 		if (g_fmvSlots[p_index].m_flags & 0x80) {
@@ -510,9 +510,9 @@ void MoveVideo(MechS32 p_index, MechS32 p_left, MechS32 p_top)
 // Opens the video p_name in the slot. A video with sound that the audio subsystem can play gets
 // Smacker's sound (flag 0x2000). With flag 0x1000 the first frame goes straight to the screen, with
 // flag 2 to the back buffer, otherwise to a buffer of its own.
-MechS32 LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
+int32_t LoadVideoFile(FmvSlot* p_slot, const char* p_name)
 {
-	MechS32 result;
+	int32_t result;
 
 	p_slot->m_smack = SmackOpen(GetPathToVideo(p_name), ((p_slot->m_flags & 0x40) >> 1) | 0xfe00, 0);
 	if (!p_slot->m_smack) {
@@ -588,9 +588,9 @@ MechS32 LoadVideoFile(FmvSlot* p_slot, const MechChar* p_name)
 }
 
 // Loads the SHP animation p_name into the slot.
-MechS32 LoadShpFile(FmvSlot* p_slot, const MechChar* p_name)
+int32_t LoadShpFile(FmvSlot* p_slot, const char* p_name)
 {
-	MechS32 size;
+	int32_t size;
 
 	p_slot->m_shp = MechReadFile(g_primaryHeap, GetPathToShp(p_name));
 	if (!p_slot->m_shp) {
@@ -616,13 +616,13 @@ MechS32 LoadShpFile(FmvSlot* p_slot, const MechChar* p_name)
 
 // Plays the video or SHP animation p_name in slot p_index at (p_left, p_top), p_fps frames a
 // second (10 for 0), replacing what the slot played. Returns the slot, or -1.
-MechS32 PlayVideo(
-	MechS32 p_index,
+int32_t PlayVideo(
+	int32_t p_index,
 	const char* p_name,
 	undefined4 p_left,
 	undefined4 p_top,
-	MechU32 p_flags,
-	MechU32 p_fps
+	uint32_t p_flags,
+	uint32_t p_fps
 )
 {
 	FmvSlot* slot = &g_fmvSlots[p_index];
@@ -664,9 +664,9 @@ MechS32 PlayVideo(
 }
 
 // Plays a video in the first free slot.
-MechS32 PlayVideoInFreeSlot(MechChar* p_name, MechS32 p_left, MechS32 p_top, MechU32 p_flags, MechU32 p_fps)
+int32_t PlayVideoInFreeSlot(char* p_name, int32_t p_left, int32_t p_top, uint32_t p_flags, uint32_t p_fps)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < 0x20; i++) {
 		if (!(g_fmvSlots[i].m_flags & 0x80000000)) {
@@ -677,7 +677,7 @@ MechS32 PlayVideoInFreeSlot(MechChar* p_name, MechS32 p_left, MechS32 p_top, Mec
 	return -1;
 }
 
-MechS32 GetVideoFrame(MechS32 p_index)
+int32_t GetVideoFrame(int32_t p_index)
 {
 	if (p_index >= 0 && p_index < 0x20) {
 		return g_fmvSlots[p_index].m_frame;
@@ -687,7 +687,7 @@ MechS32 GetVideoFrame(MechS32 p_index)
 	}
 }
 
-void SetVideoFrame(MechS32 p_index, MechS32 p_frame)
+void SetVideoFrame(int32_t p_index, int32_t p_frame)
 {
 	if (p_index >= 0 && p_index < 0x20) {
 		if (p_frame >= g_fmvSlots[p_index].m_frameCount) {

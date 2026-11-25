@@ -12,14 +12,14 @@ public:
 	AudioSample(AudioSubsystem* p_subsystem, void* p_data, undefined4 p_size);
 	~AudioSample();
 
-	void SetFade(MechS32 p_initFadeRate, MechS32 p_maxFade, MechS32 p_startVolume, MechS32 p_endVolume);
+	void SetFade(int32_t p_initFadeRate, int32_t p_maxFade, int32_t p_startVolume, int32_t p_endVolume);
 	void DoFade();
 	void EnableLoop();
 	void Start();
 	void PlayAndWait();
 	void Stop();
 	undefined IsPlaying();
-	void SetVolume(MechS32 p_volume);
+	void SetVolume(int32_t p_volume);
 
 private:
 	ShellAudioSample* m_impl; // NULL when digital audio is off or the sample couldn't be loaded

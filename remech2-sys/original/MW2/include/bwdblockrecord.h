@@ -8,8 +8,8 @@
 // and a size, which may be negative.
 typedef struct BwdBlockRecord {
 	BwdRecord m_header;  // 0x00
-	MechS32 m_origin[3]; // 0x08
-	MechS32 m_size[3];   // 0x14
+	int32_t m_origin[3]; // 0x08
+	int32_t m_size[3];   // 0x14
 } BwdBlockRecord;
 
 #endif // BWDBLOCKRECORD_H

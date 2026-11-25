@@ -11,13 +11,13 @@ extern "C"
 {
 #endif
 
-	extern MechS32 g_mechViewStatic;
+	extern int32_t g_mechViewStatic;
 
 	void CycleMechViewMode(void);
 	void DrawMechViewPanel(CockpitPanel* p_panel);
 	void SetMechViewRenderSettings(RenderSettings* p_saved);
 	void DrawMechViewStatic(CockpitPanel* p_panel);
-	void DrawMechViewFrame(CockpitPanel* p_panel, MechS32 p_color, MechS32 p_shapeId);
+	void DrawMechViewFrame(CockpitPanel* p_panel, int32_t p_color, int32_t p_shapeId);
 	void DrawMechViewStartup(CockpitPanel* p_panel);
 	void DrawMechViewShutdown(CockpitPanel* p_panel);
 

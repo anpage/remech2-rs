@@ -16,9 +16,9 @@ extern "C"
 #define MECH_RAND_MAX 0x7fff
 
 	// Seeds the sequence, like srand: the same seed gives the same numbers
-	void MechSRand(MechU32 p_seed);
+	void MechSRand(uint32_t p_seed);
 	// The next number of the sequence, 0 to MECH_RAND_MAX, like rand
-	MechS32 MechRand(void);
+	int32_t MechRand(void);
 
 #ifdef __cplusplus
 }

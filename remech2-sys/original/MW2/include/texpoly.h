@@ -12,13 +12,13 @@ extern "C"
 
 	void DrawTexturedPolygon(
 		PANE* p_target,
-		MechU8* p_pixels,
-		MechS16 p_width,
-		MechS16 p_height,
-		MechS32 p_count,
-		MechU32* p_points,
-		MechS32 p_useLuma,
-		MechU16* p_luma
+		uint8_t* p_pixels,
+		int16_t p_width,
+		int16_t p_height,
+		int32_t p_count,
+		uint32_t* p_points,
+		int32_t p_useLuma,
+		uint16_t* p_luma
 	);
 
 #ifdef __cplusplus

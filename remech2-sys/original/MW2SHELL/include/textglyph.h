@@ -11,14 +11,14 @@ class VideoDriver;
 #pragma pack(1)
 class TextGlyph {
 public:
-	TextGlyph(MechChar* p_text, MechS32 p_left, MechS32 p_top, undefined* p_colors, Font* p_font);
+	TextGlyph(char* p_text, int32_t p_left, int32_t p_top, undefined* p_colors, Font* p_font);
 	~TextGlyph();
 
 	void SetTyped(undefined4 p_typed);
 	void Draw();
 	void DrawAllChars();
-	MechU8 DrawNextChar();
-	MechU8 TypeStep();
+	uint8_t DrawNextChar();
+	uint8_t TypeStep();
 	void Shutdown();
 
 private:
@@ -27,29 +27,29 @@ private:
 	undefined* m_currentColors; // 0x08 — m_colors, or the "\A" escape's map
 	VideoDriver* m_videoDriver; // 0x0c
 	undefined4 m_typed;         // 0x10 — 1: drawn one character per TypeStep
-	MechU8 m_registered;        // 0x14 — in the video driver's typed glyph list
-	MechChar* m_text;           // 0x19
+	uint8_t m_registered;       // 0x14 — in the video driver's typed glyph list
+	char* m_text;               // 0x19
 
 public:
-	MechS32 m_height; // 0x1d
-	MechS32 m_width;  // 0x21
+	int32_t m_height; // 0x1d
+	int32_t m_width;  // 0x21
 
 private:
-	MechS32 m_left; // 0x25
-	MechS32 m_top;  // 0x29
+	int32_t m_left; // 0x25
+	int32_t m_top;  // 0x29
 
 public:
 	// The cockpit controls screen places a field after the previous one's glyph.
-	MechS32 m_right; // 0x2d
+	int32_t m_right; // 0x2d
 
 private:
-	MechS32 m_bottom; // 0x31
+	int32_t m_bottom; // 0x31
 
 public:
 	// Page restarts the typing and checks for the end directly.
-	MechU8 m_done;       // 0x35 — every character drawn
-	MechS32 m_cursorX;   // 0x36
-	MechS32 m_textIndex; // 0x3a
+	uint8_t m_done;      // 0x35 — every character drawn
+	int32_t m_cursorX;   // 0x36
+	int32_t m_textIndex; // 0x3a
 };
 #pragma pack()
 

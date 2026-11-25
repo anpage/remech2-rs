@@ -12,13 +12,13 @@
 // window to suit. One back end and one refresh mode are left, over util/display.h: the Rust side
 // owns the frame, the window and how the one reaches the other.
 
-static MechS32 DisplayBegin(WINDOW* p_buffer, MechS32 p_width, MechS32 p_height);
-static MechS32 DisplayEnd(void);
-static MechS32 DisplaySetPalette(MechS32 p_first, MechS32 p_count, PaletteColor* p_palette, MechS32 p_allColors);
-static MechS32 DisplayAcquireFramebuffer(void);
-static MechS32 DisplayFlip(void);
-static MechS32 DisplayBlitRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom);
-static MechS32 DisplayStretchBlit(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom);
+static int32_t DisplayBegin(WINDOW* p_buffer, int32_t p_width, int32_t p_height);
+static int32_t DisplayEnd(void);
+static int32_t DisplaySetPalette(int32_t p_first, int32_t p_count, PaletteColor* p_palette, int32_t p_allColors);
+static int32_t DisplayAcquireFramebuffer(void);
+static int32_t DisplayFlip(void);
+static int32_t DisplayBlitRect(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom);
+static int32_t DisplayStretchBlit(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom);
 
 // Takes the place of the GDI back end. Nothing in the shell sets the brightness or blends
 // palettes.
@@ -49,31 +49,31 @@ PaletteColor g_paletteColors[0x100] = {0};
 
 // The frame, restored into g_refreshModeBuffer by m_acquireFramebuffer. Originally g_dibBits, the
 // DIB bits of the GDI and DisplayDib back ends.
-MechU8* g_frame = NULL;
+uint8_t* g_frame = NULL;
 
 // Always windowed: full screen is the Rust side's business. The original set it from the back
 // end, or to full screen when the frame covered the desktop.
-MechS32 g_windowMode = c_windowModeWindowed;
+int32_t g_windowMode = c_windowModeWindowed;
 
 // The frame's size in pixels, p_width * p_height of InitRefreshMode.
-MechS32 g_refreshModePixelCount;
+int32_t g_refreshModePixelCount;
 
-MechS32 g_refreshModeWidth;
+int32_t g_refreshModeWidth;
 
-MechS32 g_refreshModeHeight;
+int32_t g_refreshModeHeight;
 
 // Starts a frame of p_width x p_height in p_buffer, in place of one of another size. Returns 0
 // if it can't be allocated.
 // The original switched to refresh mode p_mode, falling through the later modes with
 // p_allowFallback while a mode was unavailable, and sized the window to the frame, with room for
 // a menu bar with p_menu.
-MechS32 InitRefreshMode(
-	MechS32 p_mode,
-	MechS32 p_allowFallback,
+int32_t InitRefreshMode(
+	int32_t p_mode,
+	int32_t p_allowFallback,
 	WINDOW* p_buffer,
-	MechS32 p_width,
-	MechS32 p_height,
-	MechS32 p_menu
+	int32_t p_width,
+	int32_t p_height,
+	int32_t p_menu
 )
 {
 	if (g_currentRefreshMode != NULL && (g_refreshModeWidth != p_width || g_refreshModeHeight != p_height)) {
@@ -101,9 +101,9 @@ void ShutdownRefreshMode(void)
 }
 
 // Copies p_count colors of g_paletteColors from p_first into p_palette.
-MechS32 GetPaletteColors(MechS32 p_first, MechS32 p_count, PaletteColor* p_palette)
+int32_t GetPaletteColors(int32_t p_first, int32_t p_count, PaletteColor* p_palette)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (p_palette == NULL || p_first < 0 || p_first > 0xff || p_count <= 0 || p_count > 0x100 - p_first) {
 		return -1;
@@ -118,7 +118,7 @@ MechS32 GetPaletteColors(MechS32 p_first, MechS32 p_count, PaletteColor* p_palet
 
 // Allocates the frame p_buffer describes and shows it, black. Returns 0 on success, also when
 // there already is a frame, and 2 if the allocation fails.
-static MechS32 DisplayBegin(WINDOW* p_buffer, MechS32 p_width, MechS32 p_height)
+static int32_t DisplayBegin(WINDOW* p_buffer, int32_t p_width, int32_t p_height)
 {
 	if (g_frame != NULL) {
 		return 0;
@@ -134,12 +134,12 @@ static MechS32 DisplayBegin(WINDOW* p_buffer, MechS32 p_width, MechS32 p_height)
 	p_buffer->m_yMax = p_height - 1;
 	p_buffer->m_shadow = 0;
 	p_buffer->m_stencil = NULL;
-	MechDisplaySetPalette((MechU8*) g_paletteColors);
+	MechDisplaySetPalette((uint8_t*) g_paletteColors);
 	MechDisplayPresent();
 	return 0;
 }
 
-static MechS32 DisplayEnd(void)
+static int32_t DisplayEnd(void)
 {
 	MechDisplayEnd();
 	g_frame = NULL;
@@ -152,9 +152,9 @@ static MechS32 DisplayEnd(void)
 
 // Stores p_count colors from p_first in g_paletteColors. p_allColors said whether to take over
 // the system's static colors on an 8-bit desktop.
-static MechS32 DisplaySetPalette(MechS32 p_first, MechS32 p_count, PaletteColor* p_palette, MechS32 p_allColors)
+static int32_t DisplaySetPalette(int32_t p_first, int32_t p_count, PaletteColor* p_palette, int32_t p_allColors)
 {
-	MechS32 i;
+	int32_t i;
 
 	if (g_frame == NULL) {
 		return -1;
@@ -168,17 +168,17 @@ static MechS32 DisplaySetPalette(MechS32 p_first, MechS32 p_count, PaletteColor*
 		g_paletteColors[p_first + i] = p_palette[i];
 	}
 
-	MechDisplaySetPalette((MechU8*) g_paletteColors);
+	MechDisplaySetPalette((uint8_t*) g_paletteColors);
 	return 0;
 }
 
-static MechS32 DisplayAcquireFramebuffer(void)
+static int32_t DisplayAcquireFramebuffer(void)
 {
 	g_refreshModeBuffer->m_buffer = g_frame;
 	return 0;
 }
 
-static MechS32 DisplayFlip(void)
+static int32_t DisplayFlip(void)
 {
 	MechDisplayPresent();
 	return 0;
@@ -186,14 +186,14 @@ static MechS32 DisplayFlip(void)
 
 // The original copied only the inclusive rectangle (p_left, p_top)-(p_right, p_bottom) to the
 // window. The whole frame is redrawn every time now.
-static MechS32 DisplayBlitRect(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom)
+static int32_t DisplayBlitRect(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom)
 {
 	MechDisplayPresent();
 	return 0;
 }
 
 // Stretches the inclusive rectangle (p_left, p_top)-(p_right, p_bottom) over the whole window.
-static MechS32 DisplayStretchBlit(MechS32 p_left, MechS32 p_top, MechS32 p_right, MechS32 p_bottom)
+static int32_t DisplayStretchBlit(int32_t p_left, int32_t p_top, int32_t p_right, int32_t p_bottom)
 {
 	MechDisplayPresentRect(p_left, p_top, p_right, p_bottom);
 	return 0;

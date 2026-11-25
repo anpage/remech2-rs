@@ -33,33 +33,33 @@
 void* (*VFX_describe_driver)(void);
 void (*VFX_init_driver)(void);
 void (*VFX_shutdown_driver)(void);
-void (*VFX_area_wipe)(MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, MechS32 p_y1, MechS32 p_color);
+void (*VFX_area_wipe)(int32_t p_x0, int32_t p_y0, int32_t p_x1, int32_t p_y1, int32_t p_color);
 void (*VFX_wait_vblank)(void);
 void (*VFX_wait_vblank_leading)(void);
-void (*VFX_window_refresh)(WINDOW* p_target, MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, MechS32 p_y1);
-void (*VFX_window_read)(WINDOW* p_destination, MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, MechS32 p_y1);
-void (*VFX_DAC_read)(MechS32 p_colorNumber, MechU8* p_triplet);
-void (*VFX_DAC_write)(MechS32 p_colorNumber, MechU8* p_triplet);
+void (*VFX_window_refresh)(WINDOW* p_target, int32_t p_x0, int32_t p_y0, int32_t p_x1, int32_t p_y1);
+void (*VFX_window_read)(WINDOW* p_destination, int32_t p_x0, int32_t p_y0, int32_t p_x1, int32_t p_y1);
+void (*VFX_DAC_read)(int32_t p_colorNumber, uint8_t* p_triplet);
+void (*VFX_DAC_write)(int32_t p_colorNumber, uint8_t* p_triplet);
 void (*VFX_bank_reset)(void);
-void (*VFX_pane_refresh)(PANE* p_target, MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, MechS32 p_y1);
-void (*VFX_line_address)(MechS32 p_x, MechS32 p_y, MechU8** p_addr, MechU32* p_nbytes);
+void (*VFX_pane_refresh)(PANE* p_target, int32_t p_x0, int32_t p_y0, int32_t p_x1, int32_t p_y1);
+void (*VFX_line_address)(int32_t p_x, int32_t p_y, uint8_t** p_addr, uint32_t* p_nbytes);
 
 // A driver's table: its entry points in the order above, as the first's type. The first returns
 // the driver's name to VFX_driver_name.
-typedef MechChar* (*VfxDriverEntry)(void);
+typedef char* (*VfxDriverEntry)(void);
 
-MechChar driver_name[0xd] = "MCGA.DLL";
+char driver_name[0xd] = "MCGA.DLL";
 
 // VFX_shape_lookaside's table, for the remapped blits and VFX_shape_remap_colors.
-MechU8 lookaside[0x100] = {0};
+uint8_t lookaside[0x100] = {0};
 
 // VFX_window_fade's error terms, three per color. Each fade sets only as many as it found colors
 // less one, from the start, and reads those of the colors it found: the rest are what earlier
 // fades left.
-MechU8 color_error[0x300] = {0};
+uint8_t color_error[0x300] = {0};
 
 // The 16.16 cosine of 0 to 90 degrees in tenths of a degree; read backwards, the sine.
-static const MechS32 g_cosTable[0x385] = {
+static const int32_t g_cosTable[0x385] = {
 	0x10000, 0x10000, 0x10000, 0xffff, 0xfffe, 0xfffe, 0xfffc, 0xfffb, 0xfffa, 0xfff8, 0xfff6, 0xfff4, 0xfff2, 0xffef,
 	0xffec,  0xffea,  0xffe6,  0xffe3, 0xffe0, 0xffdc, 0xffd8, 0xffd4, 0xffd0, 0xffcb, 0xffc7, 0xffc2, 0xffbd, 0xffb7,
 	0xffb2,  0xffac,  0xffa6,  0xffa0, 0xff9a, 0xff93, 0xff8d, 0xff86, 0xff7f, 0xff77, 0xff70, 0xff68, 0xff60, 0xff58,
@@ -127,84 +127,84 @@ static const MechS32 g_cosTable[0x385] = {
 	0x1ca,   0x157,   0xe5,    0x72,   0x0
 };
 
-static MechChar g_bmhdProp[4] = {'B', 'M', 'H', 'D'};
-static MechChar g_cmapProp[4] = {'C', 'M', 'A', 'P'};
-static MechChar g_bodyProp[4] = {'B', 'O', 'D', 'Y'};
+static char g_bmhdProp[4] = {'B', 'M', 'H', 'D'};
+static char g_cmapProp[4] = {'C', 'M', 'A', 'P'};
+static char g_bodyProp[4] = {'B', 'O', 'D', 'Y'};
 
 // The GIF decoder's masks of 0 to 8 low bits, and its interlaced passes' row steps and first rows.
-static const MechU8 g_gifCmask[9] = {0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff};
-static const MechU8 g_gifIncTable[5] = {8, 8, 4, 2, 0};
-static const MechU8 g_gifStartTable[5] = {0, 4, 2, 1, 0};
+static const uint8_t g_gifCmask[9] = {0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff};
+static const uint8_t g_gifIncTable[5] = {8, 8, 4, 2, 0};
+static const uint8_t g_gifStartTable[5] = {0, 4, 2, 1, 0};
 
 // The tap masks of maximal-length LFSRs, for 2 to 32 bits.
-static const MechU32 g_pfConstants[0x1f] = {0x3,       0x6,       0xc,       0x14,       0x30,       0x60,
-											0xb8,      0x110,     0x240,     0x500,      0xca0,      0x1b00,
-											0x3500,    0x6000,    0xb400,    0x12000,    0x20400,    0x72000,
-											0x90000,   0x140000,  0x300000,  0x420000,   0xd80000,   0x1200000,
-											0x3880000, 0x7200000, 0x9000000, 0x14000000, 0x32800000, 0x48000000,
-											0xa3000000};
+static const uint32_t g_pfConstants[0x1f] = {0x3,       0x6,       0xc,       0x14,       0x30,       0x60,
+											 0xb8,      0x110,     0x240,     0x500,      0xca0,      0x1b00,
+											 0x3500,    0x6000,    0xb400,    0x12000,    0x20400,    0x72000,
+											 0x90000,   0x140000,  0x300000,  0x420000,   0xd80000,   0x1200000,
+											 0x3880000, 0x7200000, 0x9000000, 0x14000000, 0x32800000, 0x48000000,
+											 0xa3000000};
 
 // --- Helpers ---
 
 // A little-endian dword of the resources the routines read (shapes, fonts), at any alignment.
-static MechU32 ReadU32(const MechU8* p_data)
+static uint32_t ReadU32(const uint8_t* p_data)
 {
-	return p_data[0] | ((MechU32) p_data[1] << 8) | ((MechU32) p_data[2] << 16) | ((MechU32) p_data[3] << 24);
+	return p_data[0] | ((uint32_t) p_data[1] << 8) | ((uint32_t) p_data[2] << 16) | ((uint32_t) p_data[3] << 24);
 }
 
-static MechS32 ReadS32(const MechU8* p_data)
+static int32_t ReadS32(const uint8_t* p_data)
 {
 	return PortableS32(ReadU32(p_data));
 }
 
-static void WriteU32(MechU8* p_data, MechU32 p_value)
+static void WriteU32(uint8_t* p_data, uint32_t p_value)
 {
-	p_data[0] = (MechU8) p_value;
-	p_data[1] = (MechU8) (p_value >> 8);
-	p_data[2] = (MechU8) (p_value >> 16);
-	p_data[3] = (MechU8) (p_value >> 24);
+	p_data[0] = (uint8_t) p_value;
+	p_data[1] = (uint8_t) (p_value >> 8);
+	p_data[2] = (uint8_t) (p_value >> 16);
+	p_data[3] = (uint8_t) (p_value >> 24);
 }
 
-static MechU32 ReadU16(const MechU8* p_data)
+static uint32_t ReadU16(const uint8_t* p_data)
 {
-	return p_data[0] | ((MechU32) p_data[1] << 8);
+	return p_data[0] | ((uint32_t) p_data[1] << 8);
 }
 
 // A big-endian word (IFF).
-static MechU32 ReadBigU16(const MechU8* p_data)
+static uint32_t ReadBigU16(const uint8_t* p_data)
 {
-	return ((MechU32) p_data[0] << 8) | p_data[1];
+	return ((uint32_t) p_data[0] << 8) | p_data[1];
 }
 
-static MechS32 Add(MechS32 p_a, MechS32 p_b)
+static int32_t Add(int32_t p_a, int32_t p_b)
 {
-	return PortableS32((MechU32) p_a + (MechU32) p_b);
+	return PortableS32((uint32_t) p_a + (uint32_t) p_b);
 }
 
-static MechS32 Sub(MechS32 p_a, MechS32 p_b)
+static int32_t Sub(int32_t p_a, int32_t p_b)
 {
-	return PortableS32((MechU32) p_a - (MechU32) p_b);
+	return PortableS32((uint32_t) p_a - (uint32_t) p_b);
 }
 
 // `cdq; xor eax, edx; sub eax, edx`: the most negative value stays as it is.
-static MechS32 Abs(MechS32 p_value)
+static int32_t Abs(int32_t p_value)
 {
-	return p_value < 0 ? PortableS32(0 - (MechU32) p_value) : p_value;
+	return p_value < 0 ? PortableS32(0 - (uint32_t) p_value) : p_value;
 }
 
 // A view clipped to its pixel buffer, in buffer coordinates.
 typedef struct ClippedView {
-	MechU8* m_pixels;
-	MechU32 m_pitch;
-	MechS32 m_left;
-	MechS32 m_top;
-	MechS32 m_right;
-	MechS32 m_bottom;
-	MechS32 m_originX; // the view's own top left, unclipped
-	MechS32 m_originY;
+	uint8_t* m_pixels;
+	uint32_t m_pitch;
+	int32_t m_left;
+	int32_t m_top;
+	int32_t m_right;
+	int32_t m_bottom;
+	int32_t m_originX; // the view's own top left, unclipped
+	int32_t m_originY;
 } ClippedView;
 
-static MechS32 ClipView(ClippedView* p_clip, const PANE* p_view)
+static int32_t ClipView(ClippedView* p_clip, const PANE* p_view)
 {
 	const WINDOW* buffer = p_view->m_window;
 
@@ -213,7 +213,7 @@ static MechS32 ClipView(ClippedView* p_clip, const PANE* p_view)
 	}
 
 	p_clip->m_pixels = buffer->m_buffer;
-	p_clip->m_pitch = (MechU32) buffer->m_xMax + 1;
+	p_clip->m_pitch = (uint32_t) buffer->m_xMax + 1;
 	p_clip->m_originX = p_view->m_x0;
 	p_clip->m_originY = p_view->m_y0;
 	p_clip->m_left = p_view->m_x0 > 0 ? p_view->m_x0 : 0;
@@ -228,17 +228,17 @@ static MechS32 ClipView(ClippedView* p_clip, const PANE* p_view)
 }
 
 // A pixel's offset in the buffer: `imul` by the pitch, which wraps like the unsigned product.
-static MechU32 PixelOffset(const ClippedView* p_clip, MechS32 p_x, MechS32 p_y)
+static uint32_t PixelOffset(const ClippedView* p_clip, int32_t p_x, int32_t p_y)
 {
-	return (MechU32) p_y * p_clip->m_pitch + (MechU32) p_x;
+	return (uint32_t) p_y * p_clip->m_pitch + (uint32_t) p_x;
 }
 
 // The sides of the clipped view a point lies beyond: left 8, right 4, top 2, bottom 1, from the
 // signs of the differences (which wrap).
-static MechU32 OutCode(const ClippedView* p_clip, MechS32 p_x, MechS32 p_y)
+static uint32_t OutCode(const ClippedView* p_clip, int32_t p_x, int32_t p_y)
 {
-	return ((MechU32) Sub(p_x, p_clip->m_left) >> 31) << 3 | ((MechU32) Sub(p_clip->m_right, p_x) >> 31) << 2 |
-		   ((MechU32) Sub(p_y, p_clip->m_top) >> 31) << 1 | (MechU32) Sub(p_clip->m_bottom, p_y) >> 31;
+	return ((uint32_t) Sub(p_x, p_clip->m_left) >> 31) << 3 | ((uint32_t) Sub(p_clip->m_right, p_x) >> 31) << 2 |
+		   ((uint32_t) Sub(p_y, p_clip->m_top) >> 31) << 1 | (uint32_t) Sub(p_clip->m_bottom, p_y) >> 31;
 }
 
 // --- The display driver ---
@@ -246,9 +246,9 @@ static MechU32 OutCode(const ClippedView* p_clip, MechS32 p_x, MechS32 p_y)
 // Calls the driver's first entry point, and copies the name it returns into driver_name,
 // which it returns. The names are at most 12 characters (the assembly writes on into the
 // variables after the buffer).
-MechChar* VFX_driver_name(MechChar* (**p_vfxScanDll)(void) )
+char* VFX_driver_name(char* (**p_vfxScanDll)(void) )
 {
-	MechChar* name = p_vfxScanDll[0]();
+	char* name = p_vfxScanDll[0]();
 
 	PORTABLE_ASSERT(strlen(name) < sizeof(driver_name));
 	strcpy(driver_name, name);
@@ -256,36 +256,36 @@ MechChar* VFX_driver_name(MechChar* (**p_vfxScanDll)(void) )
 }
 
 // Each entry goes through void (*)(void), which any function pointer converts through.
-void VFX_register_driver(MechChar* (**p_dllBase)(void) )
+void VFX_register_driver(char* (**p_dllBase)(void) )
 {
 	VfxDriverEntry* table = p_dllBase;
 
 	VFX_describe_driver = (void* (*) (void) )(void (*)(void)) table[0];
 	VFX_init_driver = (void (*)(void)) table[1];
 	VFX_shutdown_driver = (void (*)(void)) table[2];
-	VFX_area_wipe = (void (*)(MechS32, MechS32, MechS32, MechS32, MechS32))(void (*)(void)) table[3];
+	VFX_area_wipe = (void (*)(int32_t, int32_t, int32_t, int32_t, int32_t))(void (*)(void)) table[3];
 	VFX_wait_vblank = (void (*)(void)) table[4];
 	VFX_wait_vblank_leading = (void (*)(void)) table[5];
-	VFX_window_refresh = (void (*)(WINDOW*, MechS32, MechS32, MechS32, MechS32))(void (*)(void)) table[6];
-	VFX_window_read = (void (*)(WINDOW*, MechS32, MechS32, MechS32, MechS32))(void (*)(void)) table[7];
-	VFX_DAC_read = (void (*)(MechS32, MechU8*))(void (*)(void)) table[8];
-	VFX_DAC_write = (void (*)(MechS32, MechU8*))(void (*)(void)) table[9];
+	VFX_window_refresh = (void (*)(WINDOW*, int32_t, int32_t, int32_t, int32_t))(void (*)(void)) table[6];
+	VFX_window_read = (void (*)(WINDOW*, int32_t, int32_t, int32_t, int32_t))(void (*)(void)) table[7];
+	VFX_DAC_read = (void (*)(int32_t, uint8_t*))(void (*)(void)) table[8];
+	VFX_DAC_write = (void (*)(int32_t, uint8_t*))(void (*)(void)) table[9];
 	VFX_bank_reset = (void (*)(void)) table[10];
-	VFX_pane_refresh = (void (*)(PANE*, MechS32, MechS32, MechS32, MechS32))(void (*)(void)) table[11];
-	VFX_line_address = (void (*)(MechS32, MechS32, MechU8**, MechU32*))(void (*)(void)) table[12];
+	VFX_pane_refresh = (void (*)(PANE*, int32_t, int32_t, int32_t, int32_t))(void (*)(void)) table[11];
+	VFX_line_address = (void (*)(int32_t, int32_t, uint8_t**, uint32_t*))(void (*)(void)) table[12];
 }
 
 // --- Pixels ---
 
 // Writes a pixel, and returns the one it replaced; -3 when the point lies outside the view.
-MechS32 VFX_pixel_write(PANE* p_pane, MechS32 p_x, MechS32 p_y, MechU32 p_color)
+int32_t VFX_pixel_write(PANE* p_pane, int32_t p_x, int32_t p_y, uint32_t p_color)
 {
 	ClippedView clip;
-	MechS32 result = ClipView(&clip, p_pane);
-	MechS32 x;
-	MechS32 y;
-	MechU8* pixel;
-	MechU8 old;
+	int32_t result = ClipView(&clip, p_pane);
+	int32_t x;
+	int32_t y;
+	uint8_t* pixel;
+	uint8_t old;
 
 	if (result) {
 		return result;
@@ -299,16 +299,16 @@ MechS32 VFX_pixel_write(PANE* p_pane, MechS32 p_x, MechS32 p_y, MechU32 p_color)
 
 	pixel = clip.m_pixels + PixelOffset(&clip, x, y);
 	old = *pixel;
-	*pixel = (MechU8) p_color;
+	*pixel = (uint8_t) p_color;
 	return old;
 }
 
-MechS32 VFX_pixel_read(PANE* p_pane, MechS32 p_x, MechS32 p_y)
+int32_t VFX_pixel_read(PANE* p_pane, int32_t p_x, int32_t p_y)
 {
 	ClippedView clip;
-	MechS32 result = ClipView(&clip, p_pane);
-	MechS32 x;
-	MechS32 y;
+	int32_t result = ClipView(&clip, p_pane);
+	int32_t x;
+	int32_t y;
 
 	if (result) {
 		return result;
@@ -336,28 +336,28 @@ enum LineMode {
 };
 
 typedef struct LineDraw {
-	MechU8* m_pixels;
-	MechS32 m_mode;
-	MechS32 m_color;
+	uint8_t* m_pixels;
+	int32_t m_mode;
+	int32_t m_color;
 } LineDraw;
 
-static void DrawLinePoint(const LineDraw* p_draw, MechU32 p_offset)
+static void DrawLinePoint(const LineDraw* p_draw, uint32_t p_offset)
 {
-	MechU8* pixel = p_draw->m_pixels + p_offset;
+	uint8_t* pixel = p_draw->m_pixels + p_offset;
 
 	if (p_draw->m_mode < c_lineRemap) {
-		*pixel = (MechU8) p_draw->m_color;
+		*pixel = (uint8_t) p_draw->m_color;
 	}
 	else if (p_draw->m_mode == c_lineRemap) {
-		*pixel = ((const MechU8*) (size_t) (MechU32) p_draw->m_color)[*pixel];
+		*pixel = ((const uint8_t*) (size_t) (uint32_t) p_draw->m_color)[*pixel];
 	}
 	else {
-		((void (*)(void))(size_t) (MechU32) p_draw->m_color)();
+		((void (*)(void))(size_t) (uint32_t) p_draw->m_color)();
 	}
 }
 
 // p_count points from p_offset, each p_step bytes after the previous one.
-static void DrawLineRun(const LineDraw* p_draw, MechU32 p_offset, MechU32 p_step, MechU32 p_count)
+static void DrawLineRun(const LineDraw* p_draw, uint32_t p_offset, uint32_t p_step, uint32_t p_count)
 {
 	do {
 		DrawLinePoint(p_draw, p_offset);
@@ -367,19 +367,19 @@ static void DrawLineRun(const LineDraw* p_draw, MechU32 p_offset, MechU32 p_step
 
 // The minor axis's distance for p_distance along the major one: the 0.32 slope's product,
 // rounded.
-static MechU32 MajorToMinor(MechU32 p_distance, MechU32 p_slope)
+static uint32_t MajorToMinor(uint32_t p_distance, uint32_t p_slope)
 {
-	return (MechU32) (((MechU64) p_distance * p_slope + 0x80000000u) >> 32);
+	return (uint32_t) (((MechU64) p_distance * p_slope + 0x80000000u) >> 32);
 }
 
 // The major axis's distance for p_distance along the minor one, by dividing by the slope (with
 // half a pixel added): rounded up for the line's first point (from p_distance - 1), and down
 // for its last (less one when the division is exact).
-static MechU32 MinorToMajor(MechU32 p_distance, MechU32 p_slope, MechS32 p_first)
+static uint32_t MinorToMajor(uint32_t p_distance, uint32_t p_slope, int32_t p_first)
 {
 	MechU64 dividend = ((MechU64) (p_first ? p_distance - 1 : p_distance) << 32) | 0x80000000u;
-	MechU32 quotient = PortableDiv(dividend, p_slope);
-	MechU32 remainder = (MechU32) (dividend - (MechU64) quotient * p_slope);
+	uint32_t quotient = PortableDiv(dividend, p_slope);
+	uint32_t remainder = (uint32_t) (dividend - (MechU64) quotient * p_slope);
 
 	if (p_first) {
 		return quotient + (remainder != 0);
@@ -389,7 +389,7 @@ static MechU32 MinorToMajor(MechU32 p_distance, MechU32 p_slope, MechS32 p_first
 }
 
 // Negates p_value when p_mask is all ones.
-static MechU32 ApplySign(MechU32 p_value, MechU32 p_mask)
+static uint32_t ApplySign(uint32_t p_value, uint32_t p_mask)
 {
 	return (p_value ^ p_mask) - p_mask;
 }
@@ -397,36 +397,36 @@ static MechU32 ApplySign(MechU32 p_value, MechU32 p_mask)
 // Draws a line from (p_x1, p_y1) to (p_x2, p_y2), clipped to the view. Returns 0 when it didn't
 // need clipping, 1 when it did, and 2 when nothing of it is in the view. For horizontal and
 // vertical lines, the assembly returns the clipping flag without having set it; here, 0.
-MechS32 VFX_line_draw(
+int32_t VFX_line_draw(
 	PANE* p_pane,
-	MechS32 p_x0,
-	MechS32 p_y0,
-	MechS32 p_x1,
-	MechS32 p_y1,
-	MechS32 p_mode,
-	MechS32 p_parm
+	int32_t p_x0,
+	int32_t p_y0,
+	int32_t p_x1,
+	int32_t p_y1,
+	int32_t p_mode,
+	int32_t p_parm
 )
 {
 	ClippedView clip;
 	LineDraw draw;
-	MechS32 result = ClipView(&clip, p_pane);
-	MechS32 dx;
-	MechS32 dy;
-	MechU32 signX;
-	MechU32 signY;
-	MechU32 sign;
-	MechS32 absX;
-	MechS32 absY;
-	MechU32 slope;
-	MechU32 clipped;
-	MechS32 x0;
-	MechS32 y0;
-	MechS32 x1;
-	MechS32 y1;
-	MechU32 offset;
-	MechU32 rowStep;
-	MechU32 fraction;
-	MechU32 count;
+	int32_t result = ClipView(&clip, p_pane);
+	int32_t dx;
+	int32_t dy;
+	uint32_t signX;
+	uint32_t signY;
+	uint32_t sign;
+	int32_t absX;
+	int32_t absY;
+	uint32_t slope;
+	uint32_t clipped;
+	int32_t x0;
+	int32_t y0;
+	int32_t x1;
+	int32_t y1;
+	uint32_t offset;
+	uint32_t rowStep;
+	uint32_t fraction;
+	uint32_t count;
 
 	if (result) {
 		return result;
@@ -454,8 +454,8 @@ MechS32 VFX_line_draw(
 	rowStep = (clip.m_pitch ^ signY) - signY;
 
 	if (dx == 0) {
-		MechS32 high = p_y0 > p_y1 ? p_y0 : p_y1;
-		MechS32 low = p_y0 < p_y1 ? p_y0 : p_y1;
+		int32_t high = p_y0 > p_y1 ? p_y0 : p_y1;
+		int32_t low = p_y0 < p_y1 ? p_y0 : p_y1;
 
 		if (p_x0 < clip.m_left || p_x0 > clip.m_right || high < clip.m_top || low > clip.m_bottom) {
 			return 2;
@@ -465,14 +465,14 @@ MechS32 VFX_line_draw(
 		y0 = y0 < clip.m_bottom ? y0 : clip.m_bottom;
 		y1 = p_y1 > clip.m_top ? p_y1 : clip.m_top;
 		y1 = y1 < clip.m_bottom ? y1 : clip.m_bottom;
-		count = (MechU32) Abs(Sub(y1, y0)) + 1;
+		count = (uint32_t) Abs(Sub(y1, y0)) + 1;
 		DrawLineRun(&draw, PixelOffset(&clip, x0, y0), rowStep, count);
 		return 0;
 	}
 
 	if (dy == 0) {
-		MechS32 high = p_x0 > p_x1 ? p_x0 : p_x1;
-		MechS32 low = p_x0 < p_x1 ? p_x0 : p_x1;
+		int32_t high = p_x0 > p_x1 ? p_x0 : p_x1;
+		int32_t low = p_x0 < p_x1 ? p_x0 : p_x1;
 
 		if (p_y0 < clip.m_top || p_y0 > clip.m_bottom || high < clip.m_left || low > clip.m_right) {
 			return 2;
@@ -482,7 +482,7 @@ MechS32 VFX_line_draw(
 		x0 = x0 < clip.m_right ? x0 : clip.m_right;
 		x1 = p_x1 > clip.m_left ? p_x1 : clip.m_left;
 		x1 = x1 < clip.m_right ? x1 : clip.m_right;
-		count = (MechU32) Abs(Sub(x1, x0)) + 1;
+		count = (uint32_t) Abs(Sub(x1, x0)) + 1;
 		DrawLineRun(&draw, PixelOffset(&clip, x0, y0), signX ? 0xffffffff : 1, count);
 		return 0;
 	}
@@ -493,23 +493,23 @@ MechS32 VFX_line_draw(
 		slope = 0xffffffff;
 	}
 	else if (absX < absY) {
-		slope = PortableDiv((MechU64) (MechU32) absX << 32, (MechU32) absY);
+		slope = PortableDiv((MechU64) (uint32_t) absX << 32, (uint32_t) absY);
 	}
 	else {
-		slope = PortableDiv((MechU64) (MechU32) absY << 32, (MechU32) absX);
+		slope = PortableDiv((MechU64) (uint32_t) absY << 32, (uint32_t) absX);
 	}
 
 	// Clip both ends to the view, recomputing each moved point from the line's start
 	clipped = 0;
 	for (;;) {
-		MechU32 first = OutCode(&clip, x0, y0);
-		MechU32 last = OutCode(&clip, x1, y1);
-		MechU32 left = (MechU32) clip.m_left;
-		MechU32 top = (MechU32) clip.m_top;
-		MechU32 right = (MechU32) clip.m_right;
-		MechU32 bottom = (MechU32) clip.m_bottom;
-		MechU32 startX = (MechU32) p_x0;
-		MechU32 startY = (MechU32) p_y0;
+		uint32_t first = OutCode(&clip, x0, y0);
+		uint32_t last = OutCode(&clip, x1, y1);
+		uint32_t left = (uint32_t) clip.m_left;
+		uint32_t top = (uint32_t) clip.m_top;
+		uint32_t right = (uint32_t) clip.m_right;
+		uint32_t bottom = (uint32_t) clip.m_bottom;
+		uint32_t startX = (uint32_t) p_x0;
+		uint32_t startY = (uint32_t) p_y0;
 
 		clipped |= first | last << 8;
 		if (!(first | last)) {
@@ -592,13 +592,13 @@ MechS32 VFX_line_draw(
 
 	offset = PixelOffset(&clip, x0, y0);
 	if (absX == absY) {
-		count = (MechU32) Abs(Sub(x1, x0)) + 1;
+		count = (uint32_t) Abs(Sub(x1, x0)) + 1;
 		DrawLineRun(&draw, offset, rowStep + (signX ? 0xffffffff : 1), count);
 	}
 	else if (absX > absY) {
 		// Along x, a row whenever the fraction carries
-		count = (MechU32) Abs(Sub(x1, x0)) + 1;
-		fraction = (MechU32) Abs(Sub(x0, p_x0)) * slope + 0x80000000u;
+		count = (uint32_t) Abs(Sub(x1, x0)) + 1;
+		fraction = (uint32_t) Abs(Sub(x0, p_x0)) * slope + 0x80000000u;
 		do {
 			DrawLinePoint(&draw, offset);
 			offset += signX ? 0xffffffff : 1;
@@ -610,8 +610,8 @@ MechS32 VFX_line_draw(
 	}
 	else {
 		// Along y, a column whenever the fraction carries
-		count = (MechU32) Abs(Sub(y1, y0)) + 1;
-		fraction = (MechU32) Abs(Sub(y0, p_y0)) * slope + 0x80000000u;
+		count = (uint32_t) Abs(Sub(y1, y0)) + 1;
+		fraction = (uint32_t) Abs(Sub(y0, p_y0)) * slope + 0x80000000u;
 		do {
 			DrawLinePoint(&draw, offset);
 			offset += rowStep;
@@ -628,12 +628,12 @@ MechS32 VFX_line_draw(
 // Fills the rectangle from (p_left, p_top) to (p_right, p_bottom), clipped to the view, with
 // every other pixel, in a checkerboard that counts from the rectangle's bottom right. A
 // rectangle one pixel wide is drawn one pixel to the right on alternate rows.
-void VFX_rectangle_hash(PANE* p_pane, MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, MechS32 p_y1, MechU8 p_color)
+void VFX_rectangle_hash(PANE* p_pane, int32_t p_x0, int32_t p_y0, int32_t p_x1, int32_t p_y1, uint8_t p_color)
 {
 	ClippedView clip;
-	MechU32 row;
-	MechS32 width;
-	MechS32 rows;
+	uint32_t row;
+	int32_t width;
+	int32_t rows;
 
 	if (ClipView(&clip, p_pane)) {
 		return;
@@ -655,8 +655,8 @@ void VFX_rectangle_hash(PANE* p_pane, MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, 
 	rows = Sub(p_y1, p_y0);
 	row = PixelOffset(&clip, p_x0, p_y0);
 	for (; rows >= 0; rows--) {
-		MechU32 offset = row;
-		MechS32 count = width;
+		uint32_t offset = row;
+		int32_t count = width;
 
 		if (rows & 1) {
 			offset++;
@@ -682,35 +682,35 @@ void VFX_rectangle_hash(PANE* p_pane, MechS32 p_x0, MechS32 p_y0, MechS32 p_x1, 
 // 2n draws n pixels of the next byte's color, and 2n + 1 copies the next n bytes.
 #define SHP_FRAME_HEADER 0x18
 
-static const MechU8* ShpEntry(const void* p_shape, MechS32 p_frame)
+static const uint8_t* ShpEntry(const void* p_shape, int32_t p_frame)
 {
-	return (const MechU8*) p_shape + 8 + (MechU32) p_frame * 8;
+	return (const uint8_t*) p_shape + 8 + (uint32_t) p_frame * 8;
 }
 
-static MechU8* ShpFrame(void* p_shape, MechS32 p_frame)
+static uint8_t* ShpFrame(void* p_shape, int32_t p_frame)
 {
-	return (MechU8*) p_shape + ReadU32(ShpEntry(p_shape, p_frame));
+	return (uint8_t*) p_shape + ReadU32(ShpEntry(p_shape, p_frame));
 }
 
 // The bytes after a run's or a literal's code that its data takes.
-static MechU32 ShpCodeData(MechU32 p_code)
+static uint32_t ShpCodeData(uint32_t p_code)
 {
 	return p_code & 1 ? p_code >> 1 : 1;
 }
 
 // The frame's rows: bottom + 1 - top, 0 when that isn't positive.
-static MechU32 ShpFrameRows(const MechU8* p_frame)
+static uint32_t ShpFrameRows(const uint8_t* p_frame)
 {
-	MechS32 end = Add(ReadS32(p_frame + 0x14), 1);
-	MechS32 top = ReadS32(p_frame + 0xc);
+	int32_t end = Add(ReadS32(p_frame + 0x14), 1);
+	int32_t top = ReadS32(p_frame + 0xc);
 
-	return end > top ? (MechU32) end - (MechU32) top : 0;
+	return end > top ? (uint32_t) end - (uint32_t) top : 0;
 }
 
-static const MechU8* SkipShpRow(const MechU8* p_codes)
+static const uint8_t* SkipShpRow(const uint8_t* p_codes)
 {
 	for (;;) {
-		MechU32 code = *p_codes++;
+		uint32_t code = *p_codes++;
 
 		if (code == 0) {
 			return p_codes;
@@ -730,21 +730,21 @@ enum ShpRowState {
 };
 
 typedef struct ShpRow {
-	MechU8* m_pixels;
-	MechS32 m_leftEdge; // the offsets of the clipped view's first and last pixel on the row
-	MechS32 m_rightEdge;
-	MechS32 m_clipRight; // whether to clip at the right edge, after the left one
-	const MechU8* m_remap;
+	uint8_t* m_pixels;
+	int32_t m_leftEdge; // the offsets of the clipped view's first and last pixel on the row
+	int32_t m_rightEdge;
+	int32_t m_clipRight; // whether to clip at the right edge, after the left one
+	const uint8_t* m_remap;
 } ShpRow;
 
 // Draws a run (p_code even) or copies a literal, of p_count pixels at p_at.
-static void DrawShpRun(const ShpRow* p_row, MechS32 p_at, MechU32 p_code, const MechU8* p_data, MechU32 p_count)
+static void DrawShpRun(const ShpRow* p_row, int32_t p_at, uint32_t p_code, const uint8_t* p_data, uint32_t p_count)
 {
-	MechU8* pixels = p_row->m_pixels + (MechU32) p_at;
-	MechU32 i;
+	uint8_t* pixels = p_row->m_pixels + (uint32_t) p_at;
+	uint32_t i;
 
 	if (!(p_code & 1)) {
-		MechU8 color = p_row->m_remap ? p_row->m_remap[*p_data] : *p_data;
+		uint8_t color = p_row->m_remap ? p_row->m_remap[*p_data] : *p_data;
 
 		memset(pixels, color, p_count);
 	}
@@ -759,11 +759,11 @@ static void DrawShpRun(const ShpRow* p_row, MechS32 p_at, MechU32 p_code, const 
 }
 
 // Draws a row of codes from p_at, and returns where the next row's start.
-static const MechU8* DrawShpRow(const ShpRow* p_row, MechS32 p_at, const MechU8* p_codes, MechS32 p_state)
+static const uint8_t* DrawShpRow(const ShpRow* p_row, int32_t p_at, const uint8_t* p_codes, int32_t p_state)
 {
 	for (;;) {
-		MechU32 code = *p_codes++;
-		MechU32 count = code >> 1;
+		uint32_t code = *p_codes++;
+		uint32_t count = code >> 1;
 
 		if (code == 0) {
 			return p_codes;
@@ -775,17 +775,17 @@ static const MechU8* DrawShpRow(const ShpRow* p_row, MechS32 p_at, const MechU8*
 		}
 
 		if (p_state == c_rowLeft) {
-			MechS32 before = Sub(p_row->m_leftEdge, p_at);
+			int32_t before = Sub(p_row->m_leftEdge, p_at);
 
-			if (before >= (MechS32) count) {
-				p_at = Add(p_at, (MechS32) count);
+			if (before >= (int32_t) count) {
+				p_at = Add(p_at, (int32_t) count);
 				p_codes += code & 1 ? count : 1;
 				continue;
 			}
 
 			if (before >= 0) {
 				p_at = Add(p_at, before);
-				count -= (MechU32) before;
+				count -= (uint32_t) before;
 				if (code & 1) {
 					p_codes += before;
 				}
@@ -799,38 +799,44 @@ static const MechU8* DrawShpRow(const ShpRow* p_row, MechS32 p_at, const MechU8*
 		}
 
 		if (p_state == c_rowPast) {
-			p_at = Add(p_at, (MechS32) count);
+			p_at = Add(p_at, (int32_t) count);
 			p_codes += code & 1 ? count : 1;
 			continue;
 		}
 
 		if (p_state == c_rowRight) {
-			MechS32 over = Sub(Sub(Add(p_at, (MechS32) count), 1), p_row->m_rightEdge);
+			int32_t over = Sub(Sub(Add(p_at, (int32_t) count), 1), p_row->m_rightEdge);
 
 			if (over < 0) {
 				over = 0;
 			}
 
-			DrawShpRun(p_row, p_at, code, p_codes, count - (MechU32) over);
-			p_at = Add(p_at, (MechS32) count);
+			DrawShpRun(p_row, p_at, code, p_codes, count - (uint32_t) over);
+			p_at = Add(p_at, (int32_t) count);
 			p_codes += code & 1 ? count : 1;
 			continue;
 		}
 
 		DrawShpRun(p_row, p_at, code, p_codes, count);
-		p_at = Add(p_at, (MechS32) count);
+		p_at = Add(p_at, (int32_t) count);
 		p_codes += code & 1 ? count : 1;
 	}
 }
 
 // Draws a frame (its header) at (p_x, p_y) from the view's origin, without clipping.
-static void DrawShapeUnclippedWith(PANE* p_view, const MechU8* p_frame, MechS32 p_x, MechS32 p_y, const MechU8* p_remap)
+static void DrawShapeUnclippedWith(
+	PANE* p_view,
+	const uint8_t* p_frame,
+	int32_t p_x,
+	int32_t p_y,
+	const uint8_t* p_remap
+)
 {
 	const WINDOW* buffer = p_view->m_window;
-	const MechU8* codes = p_frame + SHP_FRAME_HEADER;
-	MechU32 pitch;
-	MechU32 row;
-	MechU32 rows;
+	const uint8_t* codes = p_frame + SHP_FRAME_HEADER;
+	uint32_t pitch;
+	uint32_t row;
+	uint32_t rows;
 	ShpRow draw;
 
 	p_x = Add(p_x, p_view->m_x0);
@@ -839,8 +845,8 @@ static void DrawShapeUnclippedWith(PANE* p_view, const MechU8* p_frame, MechS32 
 		return;
 	}
 
-	pitch = (MechU32) buffer->m_xMax + 1;
-	row = (MechU32) Add(ReadS32(p_frame + 8), p_x) + (MechU32) Add(ReadS32(p_frame + 0xc), p_y) * pitch;
+	pitch = (uint32_t) buffer->m_xMax + 1;
+	row = (uint32_t) Add(ReadS32(p_frame + 8), p_x) + (uint32_t) Add(ReadS32(p_frame + 0xc), p_y) * pitch;
 	rows = ShpFrameRows(p_frame);
 	draw.m_pixels = buffer->m_buffer;
 	draw.m_leftEdge = 0;
@@ -853,40 +859,40 @@ static void DrawShapeUnclippedWith(PANE* p_view, const MechU8* p_frame, MechS32 
 	}
 }
 
-void DrawShapeUnclipped(PANE* p_pane, void* p_shape, MechS32 p_hotX, MechS32 p_hotY, undefined4 p_cpW)
+void DrawShapeUnclipped(PANE* p_pane, void* p_shape, int32_t p_hotX, int32_t p_hotY, undefined4 p_cpW)
 {
-	DrawShapeUnclippedWith(p_pane, (const MechU8*) p_shape, p_hotX, p_hotY, NULL);
+	DrawShapeUnclippedWith(p_pane, (const uint8_t*) p_shape, p_hotX, p_hotY, NULL);
 }
 
-MechS32 XlatShapeUnclipped(PANE* p_pane, void* p_shape, MechS32 p_hotX, MechS32 p_hotY, undefined4 p_cpW)
+int32_t XlatShapeUnclipped(PANE* p_pane, void* p_shape, int32_t p_hotX, int32_t p_hotY, undefined4 p_cpW)
 {
-	DrawShapeUnclippedWith(p_pane, (const MechU8*) p_shape, p_hotX, p_hotY, lookaside);
+	DrawShapeUnclippedWith(p_pane, (const uint8_t*) p_shape, p_hotX, p_hotY, lookaside);
 	return 0;
 }
 
 // Draws frame p_frame of an SHP animation at (p_x, p_y), clipped to the view. Returns -4 for a
 // frame without pixels, -3 when it lies beyond the view, else 0.
-static MechS32 ShapeDrawWith(
+static int32_t ShapeDrawWith(
 	PANE* p_view,
 	void* p_shape,
-	MechS32 p_frame,
-	MechS32 p_x,
-	MechS32 p_y,
-	const MechU8* p_remap
+	int32_t p_frame,
+	int32_t p_x,
+	int32_t p_y,
+	const uint8_t* p_remap
 )
 {
 	ClippedView clip;
-	MechS32 result = ClipView(&clip, p_view);
-	const MechU8* frame;
-	const MechU8* codes;
-	MechU32 first;
-	MechU32 last;
-	MechS32 x0;
-	MechS32 y0;
-	MechS32 x1;
-	MechS32 y1;
-	MechS32 y;
-	MechU32 row;
+	int32_t result = ClipView(&clip, p_view);
+	const uint8_t* frame;
+	const uint8_t* codes;
+	uint32_t first;
+	uint32_t last;
+	int32_t x0;
+	int32_t y0;
+	int32_t x1;
+	int32_t y1;
+	int32_t y;
+	uint32_t row;
 	ShpRow draw;
 
 	if (result) {
@@ -924,8 +930,8 @@ static MechS32 ShapeDrawWith(
 	}
 
 	draw.m_pixels = clip.m_pixels;
-	draw.m_leftEdge = PortableS32(row - (MechU32) x0 + (MechU32) clip.m_left);
-	draw.m_rightEdge = PortableS32(row - (MechU32) x0 + (MechU32) clip.m_right);
+	draw.m_leftEdge = PortableS32(row - (uint32_t) x0 + (uint32_t) clip.m_left);
+	draw.m_rightEdge = PortableS32(row - (uint32_t) x0 + (uint32_t) clip.m_right);
 	draw.m_clipRight = (last & 4) != 0;
 	draw.m_remap = p_remap;
 	for (; y <= y1; y++) {
@@ -935,46 +941,46 @@ static MechS32 ShapeDrawWith(
 
 		codes = DrawShpRow(&draw, PortableS32(row), codes, first & 8 ? c_rowLeft : last & 4 ? c_rowRight : c_rowNormal);
 		row += clip.m_pitch;
-		draw.m_leftEdge = Add(draw.m_leftEdge, (MechS32) clip.m_pitch);
-		draw.m_rightEdge = Add(draw.m_rightEdge, (MechS32) clip.m_pitch);
+		draw.m_leftEdge = Add(draw.m_leftEdge, (int32_t) clip.m_pitch);
+		draw.m_rightEdge = Add(draw.m_rightEdge, (int32_t) clip.m_pitch);
 	}
 
 	return 0;
 }
 
-void VFX_shape_draw(PANE* p_pane, void* p_shapeTable, MechS32 p_shapeNumber, MechS32 p_hotX, MechS32 p_hotY)
+void VFX_shape_draw(PANE* p_pane, void* p_shapeTable, int32_t p_shapeNumber, int32_t p_hotX, int32_t p_hotY)
 {
 	ShapeDrawWith(p_pane, p_shapeTable, p_shapeNumber, p_hotX, p_hotY, NULL);
 }
 
-void VFX_shape_lookaside(MechU8* p_table)
+void VFX_shape_lookaside(uint8_t* p_table)
 {
 	memcpy(lookaside, p_table, sizeof(lookaside));
 }
 
 // VFX_shape_draw through lookaside.
-MechS32 VFX_shape_translate_draw(
+int32_t VFX_shape_translate_draw(
 	PANE* p_pane,
 	void* p_shapeTable,
-	MechS32 p_shapeNumber,
-	MechS32 p_hotX,
-	MechS32 p_hotY
+	int32_t p_shapeNumber,
+	int32_t p_hotX,
+	int32_t p_hotY
 )
 {
 	return ShapeDrawWith(p_pane, p_shapeTable, p_shapeNumber, p_hotX, p_hotY, lookaside);
 }
 
 // Maps frame p_frame's pixels through lookaside, in place.
-MechS32 VFX_shape_remap_colors(void* p_shapeTable, MechS32 p_shapeNumber)
+int32_t VFX_shape_remap_colors(void* p_shapeTable, int32_t p_shapeNumber)
 {
-	MechU8* frame = ShpFrame(p_shapeTable, p_shapeNumber);
-	MechU8* codes = frame + SHP_FRAME_HEADER;
-	MechU32 rows = ShpFrameRows(frame);
+	uint8_t* frame = ShpFrame(p_shapeTable, p_shapeNumber);
+	uint8_t* codes = frame + SHP_FRAME_HEADER;
+	uint32_t rows = ShpFrameRows(frame);
 
 	for (; rows; rows--) {
 		for (;;) {
-			MechU32 code = *codes++;
-			MechU32 i;
+			uint32_t code = *codes++;
+			uint32_t i;
 
 			if (code == 0) {
 				break;
@@ -1003,24 +1009,24 @@ MechS32 VFX_shape_remap_colors(void* p_shapeTable, MechS32 p_shapeNumber)
 // The bounds of frame p_frame's pixels drawn at (p_x, p_y): the least and the greatest x (one
 // past the last pixel) and y of its runs, mirrored about p_x when p_flags has bit 0 and about
 // p_y when it has bit 1, written to p_bounds as left, top, right, bottom.
-MechS32 VFX_shape_visible_rectangle(
+int32_t VFX_shape_visible_rectangle(
 	void* p_shapeTable,
-	MechS32 p_shapeNumber,
-	MechS32 p_hotX,
-	MechS32 p_hotY,
+	int32_t p_shapeNumber,
+	int32_t p_hotX,
+	int32_t p_hotY,
 	undefined4 p_mirror,
-	MechS32* p_rectangle
+	int32_t* p_rectangle
 )
 {
-	const MechU8* frame = ShpFrame(p_shapeTable, p_shapeNumber);
-	const MechU8* codes = frame + SHP_FRAME_HEADER;
-	MechS32 left = 0;
-	MechS32 top = 0;
-	MechS32 right = 0;
-	MechS32 bottom = 0;
-	MechU32 rows = ShpFrameRows(frame);
-	MechS32 y = Add(ReadS32(frame + 0xc), p_hotY);
-	MechS32 swap;
+	const uint8_t* frame = ShpFrame(p_shapeTable, p_shapeNumber);
+	const uint8_t* codes = frame + SHP_FRAME_HEADER;
+	int32_t left = 0;
+	int32_t top = 0;
+	int32_t right = 0;
+	int32_t bottom = 0;
+	uint32_t rows = ShpFrameRows(frame);
+	int32_t y = Add(ReadS32(frame + 0xc), p_hotY);
+	int32_t swap;
 
 	if (rows) {
 		left = 0x7fffffff;
@@ -1028,10 +1034,10 @@ MechS32 VFX_shape_visible_rectangle(
 		right = -0x7fffffff - 1;
 		bottom = -0x7fffffff - 1;
 		for (; rows; rows--) {
-			MechS32 x = Add(ReadS32(frame + 8), p_hotX);
+			int32_t x = Add(ReadS32(frame + 8), p_hotX);
 
 			for (;;) {
-				MechU32 code = *codes++;
+				uint32_t code = *codes++;
 
 				if (code == 0) {
 					break;
@@ -1047,7 +1053,7 @@ MechS32 VFX_shape_visible_rectangle(
 					left = x;
 				}
 
-				x = Add(x, (MechS32) (code >> 1));
+				x = Add(x, (int32_t) (code >> 1));
 				if (right <= x) {
 					right = x;
 				}
@@ -1087,47 +1093,47 @@ MechS32 VFX_shape_visible_rectangle(
 // --- Frame queries ---
 
 // The frame's size, (width - 1) << 16 | (height - 1): its first dword.
-MechS32 VFX_shape_bounds(void* p_shapeTable, MechS32 p_shapeNum)
+int32_t VFX_shape_bounds(void* p_shapeTable, int32_t p_shapeNum)
 {
 	return ReadS32(ShpFrame(p_shapeTable, p_shapeNum));
 }
 
-MechS32 VFX_shape_origin(void* p_shapeTable, MechS32 p_shapeNum)
+int32_t VFX_shape_origin(void* p_shapeTable, int32_t p_shapeNum)
 {
 	return ReadS32(ShpFrame(p_shapeTable, p_shapeNum) + 4);
 }
 
 // The frame's width << 16 | height, from its bounds.
-MechS32 VFX_shape_resolution(void* p_shapeTable, MechS32 p_shapeNum)
+int32_t VFX_shape_resolution(void* p_shapeTable, int32_t p_shapeNum)
 {
-	const MechU8* frame = ShpFrame(p_shapeTable, p_shapeNum);
-	MechU32 width = (MechU32) ReadS32(frame + 0x10) - (MechU32) ReadS32(frame + 8) + 1;
-	MechU32 height = (MechU32) ReadS32(frame + 0x14) - (MechU32) ReadS32(frame + 0xc) + 1;
+	const uint8_t* frame = ShpFrame(p_shapeTable, p_shapeNum);
+	uint32_t width = (uint32_t) ReadS32(frame + 0x10) - (uint32_t) ReadS32(frame + 8) + 1;
+	uint32_t height = (uint32_t) ReadS32(frame + 0x14) - (uint32_t) ReadS32(frame + 0xc) + 1;
 
 	return PortableS32(width << 16 | (height & 0xffff));
 }
 
 // The frame's left << 16 | top.
-MechS32 VFX_shape_minxy(void* p_shapeTable, MechS32 p_shapeNum)
+int32_t VFX_shape_minxy(void* p_shapeTable, int32_t p_shapeNum)
 {
-	const MechU8* frame = ShpFrame(p_shapeTable, p_shapeNum);
+	const uint8_t* frame = ShpFrame(p_shapeTable, p_shapeNum);
 
 	return PortableS32(ReadU32(frame + 8) << 16 | ReadU16(frame + 0xc));
 }
 
 // The frame's palette entries: a count (at least 1), then for each a color index and its three
 // components.
-static const MechU8* ShpPalette(const void* p_shape, MechS32 p_frame)
+static const uint8_t* ShpPalette(const void* p_shape, int32_t p_frame)
 {
-	MechU32 offset = ReadU32(ShpEntry(p_shape, p_frame) + 4);
+	uint32_t offset = ReadU32(ShpEntry(p_shape, p_frame) + 4);
 
-	return offset ? (const MechU8*) p_shape + offset : NULL;
+	return offset ? (const uint8_t*) p_shape + offset : NULL;
 }
 
-void VFX_shape_palette(void* p_shapeTable, MechS32 p_shapeNum, MechU8* p_palette)
+void VFX_shape_palette(void* p_shapeTable, int32_t p_shapeNum, uint8_t* p_palette)
 {
-	const MechU8* entries = ShpPalette(p_shapeTable, p_shapeNum);
-	MechU32 count;
+	const uint8_t* entries = ShpPalette(p_shapeTable, p_shapeNum);
+	uint32_t count;
 
 	if (!entries) {
 		return;
@@ -1137,7 +1143,7 @@ void VFX_shape_palette(void* p_shapeTable, MechS32 p_shapeNum, MechU8* p_palette
 	PORTABLE_ASSERT(count != 0);
 	entries += 4;
 	do {
-		MechU32 color = entries[0] * 3;
+		uint32_t color = entries[0] * 3;
 
 		p_palette[color] = entries[1];
 		p_palette[color + 1] = entries[2];
@@ -1148,11 +1154,11 @@ void VFX_shape_palette(void* p_shapeTable, MechS32 p_shapeNum, MechU8* p_palette
 
 // Copies the frame's palette entries (dwords) to p_out when not NULL. Returns their count, 0 for
 // none.
-MechS32 VFX_shape_colors(void* p_shapeTable, MechS32 p_shapeNum, MechU32* p_colors)
+int32_t VFX_shape_colors(void* p_shapeTable, int32_t p_shapeNum, uint32_t* p_colors)
 {
-	const MechU8* entries = ShpPalette(p_shapeTable, p_shapeNum);
-	MechU32 count;
-	MechU32 i;
+	const uint8_t* entries = ShpPalette(p_shapeTable, p_shapeNum);
+	uint32_t count;
+	uint32_t i;
 
 	if (!entries) {
 		return 0;
@@ -1170,11 +1176,11 @@ MechS32 VFX_shape_colors(void* p_shapeTable, MechS32 p_shapeNum, MechU32* p_colo
 }
 
 // Copies p_in, when not NULL, over the frame's palette entries. Returns their count, 0 for none.
-MechS32 VFX_shape_set_colors(void* p_shapeTable, MechS32 p_shapeNumber, MechU32* p_colors)
+int32_t VFX_shape_set_colors(void* p_shapeTable, int32_t p_shapeNumber, uint32_t* p_colors)
 {
-	MechU8* entries = (MechU8*) ShpPalette(p_shapeTable, p_shapeNumber);
-	MechU32 count;
-	MechU32 i;
+	uint8_t* entries = (uint8_t*) ShpPalette(p_shapeTable, p_shapeNumber);
+	uint32_t count;
+	uint32_t i;
 
 	if (!entries) {
 		return 0;
@@ -1191,19 +1197,19 @@ MechS32 VFX_shape_set_colors(void* p_shapeTable, MechS32 p_shapeNumber, MechU32*
 	return PortableS32(count);
 }
 
-MechS32 VFX_shape_count(void* p_shapeTable)
+int32_t VFX_shape_count(void* p_shapeTable)
 {
-	return ReadS32((const MechU8*) p_shapeTable + 4);
+	return ReadS32((const uint8_t*) p_shapeTable + 4);
 }
 
 // Counts the distinct dwords at p_first, p_first + 8... (one per frame), and stores the index of
 // each first occurrence in p_out when not NULL. The shape has at least one frame.
-static MechS32 CountDistinctEntries(const void* p_shape, const MechU8* p_first, MechS32* p_out)
+static int32_t CountDistinctEntries(const void* p_shape, const uint8_t* p_first, int32_t* p_out)
 {
-	MechU32 count = ReadU32((const MechU8*) p_shape + 4);
-	MechS32 distinct = 1;
-	MechU32 i;
-	MechU32 j;
+	uint32_t count = ReadU32((const uint8_t*) p_shape + 4);
+	int32_t distinct = 1;
+	uint32_t i;
+	uint32_t j;
 
 	PORTABLE_ASSERT(count != 0);
 	if (p_out) {
@@ -1211,7 +1217,7 @@ static MechS32 CountDistinctEntries(const void* p_shape, const MechU8* p_first, 
 	}
 
 	for (i = 1; i < count; i++) {
-		MechU32 value = ReadU32(p_first + i * 8);
+		uint32_t value = ReadU32(p_first + i * 8);
 
 		for (j = 0; j < i; j++) {
 			if (ReadU32(p_first + j * 8) == value) {
@@ -1221,7 +1227,7 @@ static MechS32 CountDistinctEntries(const void* p_shape, const MechU8* p_first, 
 
 		if (j == i) {
 			if (p_out) {
-				*p_out++ = (MechS32) i;
+				*p_out++ = (int32_t) i;
 			}
 
 			distinct++;
@@ -1232,33 +1238,33 @@ static MechS32 CountDistinctEntries(const void* p_shape, const MechU8* p_first, 
 }
 
 // The frames with distinct offsets.
-MechS32 VFX_shape_list(void* p_shapeTable, MechS32* p_indexList)
+int32_t VFX_shape_list(void* p_shapeTable, int32_t* p_indexList)
 {
-	return CountDistinctEntries(p_shapeTable, (const MechU8*) p_shapeTable + 8, p_indexList);
+	return CountDistinctEntries(p_shapeTable, (const uint8_t*) p_shapeTable + 8, p_indexList);
 }
 
 // The frames with distinct palettes.
-MechS32 VFX_shape_palette_list(void* p_shapeTable, MechS32* p_indexList)
+int32_t VFX_shape_palette_list(void* p_shapeTable, int32_t* p_indexList)
 {
-	return CountDistinctEntries(p_shapeTable, (const MechU8*) p_shapeTable + 0xc, p_indexList);
+	return CountDistinctEntries(p_shapeTable, (const uint8_t*) p_shapeTable + 0xc, p_indexList);
 }
 
 // --- Views ---
 
-static MechS32 PaneWipeWith(PANE* p_view, MechU8 p_color)
+static int32_t PaneWipeWith(PANE* p_view, uint8_t p_color)
 {
 	ClippedView clip;
-	MechS32 result = ClipView(&clip, p_view);
-	MechU32 row;
-	MechU32 width;
-	MechS32 y;
+	int32_t result = ClipView(&clip, p_view);
+	uint32_t row;
+	uint32_t width;
+	int32_t y;
 
 	if (result) {
 		return result;
 	}
 
 	row = PixelOffset(&clip, clip.m_left, clip.m_top);
-	width = (MechU32) clip.m_right + 1 - (MechU32) clip.m_left;
+	width = (uint32_t) clip.m_right + 1 - (uint32_t) clip.m_left;
 	for (y = clip.m_top; y <= clip.m_bottom; y++) {
 		memset(clip.m_pixels + row, p_color, width);
 		row += clip.m_pitch;
@@ -1268,28 +1274,28 @@ static MechS32 PaneWipeWith(PANE* p_view, MechU8 p_color)
 }
 
 // Fills the view, clipped to its buffer.
-void VFX_pane_wipe(PANE* p_pane, MechS32 p_color)
+void VFX_pane_wipe(PANE* p_pane, int32_t p_color)
 {
-	PaneWipeWith(p_pane, (MechU8) p_color);
+	PaneWipeWith(p_pane, (uint8_t) p_color);
 }
 
 // Copies a row as `rep movsb` then `rep movsd` do: the odd bytes, then dwords (each read whole
 // before it's written), forwards from its start, or backwards from its end. Where the row
 // overlaps itself, the order decides what's copied.
-static void CopyRow(MechU8* p_to, const MechU8* p_from, MechU32 p_width, MechS32 p_backwards)
+static void CopyRow(uint8_t* p_to, const uint8_t* p_from, uint32_t p_width, int32_t p_backwards)
 {
-	MechU32 odd = p_width & 3;
-	MechU32 i;
+	uint32_t odd = p_width & 3;
+	uint32_t i;
 
 	for (i = 0; i < odd; i++) {
-		MechU32 at = p_backwards ? p_width - 1 - i : i;
+		uint32_t at = p_backwards ? p_width - 1 - i : i;
 
 		p_to[at] = p_from[at];
 	}
 
 	for (i = 0; i < p_width >> 2; i++) {
-		MechU32 at = p_backwards ? p_width - odd - 4 - i * 4 : odd + i * 4;
-		MechU8 dword[4];
+		uint32_t at = p_backwards ? p_width - odd - 4 - i * 4 : odd + i * 4;
+		uint8_t dword[4];
 
 		memcpy(dword, p_from + at, 4);
 		memcpy(p_to + at, dword, 4);
@@ -1302,43 +1308,43 @@ static void CopyRow(MechU8* p_to, const MechU8* p_from, MechU32 p_width, MechS32
 // destination's in its own, else up, and each row forwards when the source's starts further
 // right, else backwards. That copies an overlapping rectangle whole when the views share their
 // origin, not always otherwise. Returns -3 when nothing is left of the rectangle.
-MechS32 VFX_pane_copy(
+int32_t VFX_pane_copy(
 	PANE* p_source,
-	MechS32 p_sx,
-	MechS32 p_sy,
+	int32_t p_sx,
+	int32_t p_sy,
 	PANE* p_target,
-	MechS32 p_tx,
-	MechS32 p_ty,
-	MechS32 p_fill
+	int32_t p_tx,
+	int32_t p_ty,
+	int32_t p_fill
 )
 {
 	ClippedView source;
 	ClippedView dest;
-	MechS32 result;
-	MechS32 sourceLeft;
-	MechS32 sourceTop;
-	MechS32 sourceRight;
-	MechS32 sourceBottom;
-	MechS32 destLeft;
-	MechS32 destTop;
-	MechS32 destRight;
-	MechS32 destBottom;
-	MechS32 offsetX;
-	MechS32 offsetY;
-	MechS32 left;
-	MechS32 top;
-	MechS32 right;
-	MechS32 bottom;
-	MechS32 toLeft;
-	MechS32 toTop;
-	MechS32 toBottom;
-	MechU32 width;
-	MechU32 height;
-	MechU32 from;
-	MechU32 to;
-	MechU32 fromStep;
-	MechU32 toStep;
-	MechS32 backwards;
+	int32_t result;
+	int32_t sourceLeft;
+	int32_t sourceTop;
+	int32_t sourceRight;
+	int32_t sourceBottom;
+	int32_t destLeft;
+	int32_t destTop;
+	int32_t destRight;
+	int32_t destBottom;
+	int32_t offsetX;
+	int32_t offsetY;
+	int32_t left;
+	int32_t top;
+	int32_t right;
+	int32_t bottom;
+	int32_t toLeft;
+	int32_t toTop;
+	int32_t toBottom;
+	uint32_t width;
+	uint32_t height;
+	uint32_t from;
+	uint32_t to;
+	uint32_t fromStep;
+	uint32_t toStep;
+	int32_t backwards;
 
 	result = ClipView(&source, p_source);
 	if (result) {
@@ -1372,19 +1378,19 @@ MechS32 VFX_pane_copy(
 	toLeft = destLeft > Sub(sourceLeft, offsetX) ? destLeft : Sub(sourceLeft, offsetX);
 	toTop = destTop > Sub(sourceTop, offsetY) ? destTop : Sub(sourceTop, offsetY);
 	toBottom = destBottom < Sub(sourceBottom, offsetY) ? destBottom : Sub(sourceBottom, offsetY);
-	width = (MechU32) right + 1 - (MechU32) left;
-	height = (MechU32) bottom + 1 - (MechU32) top;
-	from = PixelOffset(&source, source.m_originX, source.m_originY) + (MechU32) left;
-	to = PixelOffset(&dest, dest.m_originX, dest.m_originY) + (MechU32) toLeft;
+	width = (uint32_t) right + 1 - (uint32_t) left;
+	height = (uint32_t) bottom + 1 - (uint32_t) top;
+	from = PixelOffset(&source, source.m_originX, source.m_originY) + (uint32_t) left;
+	to = PixelOffset(&dest, dest.m_originX, dest.m_originY) + (uint32_t) toLeft;
 	if (top > toTop) {
-		from += (MechU32) top * source.m_pitch;
-		to += (MechU32) toTop * dest.m_pitch;
+		from += (uint32_t) top * source.m_pitch;
+		to += (uint32_t) toTop * dest.m_pitch;
 		fromStep = source.m_pitch;
 		toStep = dest.m_pitch;
 	}
 	else {
-		from += (MechU32) bottom * source.m_pitch;
-		to += (MechU32) toBottom * dest.m_pitch;
+		from += (uint32_t) bottom * source.m_pitch;
+		to += (uint32_t) toBottom * dest.m_pitch;
 		fromStep = 0 - source.m_pitch;
 		toStep = 0 - dest.m_pitch;
 	}
@@ -1395,7 +1401,7 @@ MechS32 VFX_pane_copy(
 			CopyRow(dest.m_pixels + to, source.m_pixels + from, width, backwards);
 		}
 		else {
-			memset(dest.m_pixels + to, (MechU8) p_fill, width);
+			memset(dest.m_pixels + to, (uint8_t) p_fill, width);
 		}
 
 		from += fromStep;
@@ -1409,14 +1415,14 @@ MechS32 VFX_pane_copy(
 // the view's size (where pointers are 32 bits; with p_color 0, it returns the size instead);
 // another mode fills what the scroll uncovers with p_color, and the whole view when the scroll
 // is the view's size or more. Returns -2 for an empty view.
-MechS32 VFX_pane_scroll(PANE* p_pane, MechS32 p_dx, MechS32 p_dy, MechS32 p_mode, MechS32 p_parm)
+int32_t VFX_pane_scroll(PANE* p_pane, int32_t p_dx, int32_t p_dy, int32_t p_mode, int32_t p_parm)
 {
 	WINDOW scratch;
 	PANE scratchView;
 	PANE* source;
-	MechS32 width;
-	MechS32 height;
-	MechS32 fill;
+	int32_t width;
+	int32_t height;
+	int32_t fill;
 
 	if (Add(p_pane->m_x1, 1) <= p_pane->m_x0 || Add(p_pane->m_y1, 1) <= p_pane->m_y0) {
 		return -2;
@@ -1426,7 +1432,7 @@ MechS32 VFX_pane_scroll(PANE* p_pane, MechS32 p_dx, MechS32 p_dy, MechS32 p_mode
 	height = Sub(Add(p_pane->m_y1, 1), p_pane->m_y0);
 	if (p_mode != 1) {
 		if (Abs(p_dx) >= width || Abs(p_dy) >= height) {
-			return PaneWipeWith(p_pane, (MechU8) p_parm);
+			return PaneWipeWith(p_pane, (uint8_t) p_parm);
 		}
 
 		source = p_pane;
@@ -1434,11 +1440,11 @@ MechS32 VFX_pane_scroll(PANE* p_pane, MechS32 p_dx, MechS32 p_dy, MechS32 p_mode
 	}
 	else {
 		if (p_parm == 0) {
-			return PortableS32((MechU32) width * (MechU32) height);
+			return PortableS32((uint32_t) width * (uint32_t) height);
 		}
 
 		PORTABLE_ASSERT(sizeof(void*) == 4);
-		scratch.m_buffer = (undefined*) (size_t) (MechU32) p_parm;
+		scratch.m_buffer = (undefined*) (size_t) (uint32_t) p_parm;
 		scratch.m_xMax = width - 1;
 		scratch.m_yMax = height - 1;
 		scratch.m_stencil = NULL;
@@ -1476,16 +1482,16 @@ MechS32 VFX_pane_scroll(PANE* p_pane, MechS32 p_dx, MechS32 p_dy, MechS32 p_mode
 // The midpoint ellipse of VFX_ellipse_draw and VFX_ellipse_fill, in 32-bit sums that wrap.
 typedef struct Ellipse {
 	ClippedView m_clip;
-	MechS32 m_centerX;
-	MechS32 m_centerY;
-	MechU8 m_color;
-	MechS32 m_x; // the point on the first quadrant's arc, from the center
-	MechS32 m_y;
+	int32_t m_centerX;
+	int32_t m_centerY;
+	uint8_t m_color;
+	int32_t m_x; // the point on the first quadrant's arc, from the center
+	int32_t m_y;
 } Ellipse;
 
 typedef void (*EllipsePlotFn)(const Ellipse* p_ellipse);
 
-static void PutEllipsePixel(const Ellipse* p_ellipse, MechS32 p_x, MechS32 p_y)
+static void PutEllipsePixel(const Ellipse* p_ellipse, int32_t p_x, int32_t p_y)
 {
 	const ClippedView* clip = &p_ellipse->m_clip;
 
@@ -1497,10 +1503,10 @@ static void PutEllipsePixel(const Ellipse* p_ellipse, MechS32 p_x, MechS32 p_y)
 // The four points symmetric to the arc's.
 static void PlotEllipsePoints(const Ellipse* p_ellipse)
 {
-	MechS32 right = Add(p_ellipse->m_centerX, p_ellipse->m_x);
-	MechS32 left = Sub(p_ellipse->m_centerX, p_ellipse->m_x);
-	MechS32 below = Add(p_ellipse->m_centerY, p_ellipse->m_y);
-	MechS32 above = Sub(p_ellipse->m_centerY, p_ellipse->m_y);
+	int32_t right = Add(p_ellipse->m_centerX, p_ellipse->m_x);
+	int32_t left = Sub(p_ellipse->m_centerX, p_ellipse->m_x);
+	int32_t below = Add(p_ellipse->m_centerY, p_ellipse->m_y);
+	int32_t above = Sub(p_ellipse->m_centerY, p_ellipse->m_y);
 
 	PutEllipsePixel(p_ellipse, right, below);
 	PutEllipsePixel(p_ellipse, right, above);
@@ -1513,10 +1519,10 @@ static void PlotEllipsePoints(const Ellipse* p_ellipse)
 static void FillEllipseRows(const Ellipse* p_ellipse)
 {
 	const ClippedView* clip = &p_ellipse->m_clip;
-	MechS32 right = Add(p_ellipse->m_centerX, p_ellipse->m_x);
-	MechS32 left = Sub(p_ellipse->m_centerX, p_ellipse->m_x);
-	MechS32 y = Add(p_ellipse->m_centerY, p_ellipse->m_y);
-	MechU32 count;
+	int32_t right = Add(p_ellipse->m_centerX, p_ellipse->m_x);
+	int32_t left = Sub(p_ellipse->m_centerX, p_ellipse->m_x);
+	int32_t y = Add(p_ellipse->m_centerY, p_ellipse->m_y);
+	uint32_t count;
 
 	if (right < clip->m_left || left > clip->m_right || y < clip->m_top) {
 		return;
@@ -1524,7 +1530,7 @@ static void FillEllipseRows(const Ellipse* p_ellipse)
 
 	right = right < clip->m_right ? right : clip->m_right;
 	left = left > clip->m_left ? left : clip->m_left;
-	count = (MechU32) right - (MechU32) left + 1;
+	count = (uint32_t) right - (uint32_t) left + 1;
 	if (y <= clip->m_bottom) {
 		memset(clip->m_pixels + PixelOffset(clip, left, y), p_ellipse->m_color, count);
 	}
@@ -1537,23 +1543,23 @@ static void FillEllipseRows(const Ellipse* p_ellipse)
 
 static void DrawEllipseWith(
 	PANE* p_view,
-	MechS32 p_centerX,
-	MechS32 p_centerY,
-	MechS32 p_radiusX,
-	MechS32 p_radiusY,
-	MechS32 p_color,
+	int32_t p_centerX,
+	int32_t p_centerY,
+	int32_t p_radiusX,
+	int32_t p_radiusY,
+	int32_t p_color,
 	EllipsePlotFn p_plot
 )
 {
 	Ellipse ellipse;
-	MechU32 squareY;
-	MechU32 squareX;
-	MechU32 stepX;
-	MechU32 stepY;
-	MechU32 slopeX;
-	MechU32 slopeY;
-	MechU32 decision;
-	MechU32 rows;
+	uint32_t squareY;
+	uint32_t squareX;
+	uint32_t stepX;
+	uint32_t stepY;
+	uint32_t slopeX;
+	uint32_t slopeY;
+	uint32_t decision;
+	uint32_t rows;
 
 	if (p_radiusX == 0 || p_radiusY == 0) {
 		VFX_line_draw(
@@ -1572,19 +1578,19 @@ static void DrawEllipseWith(
 		return;
 	}
 
-	ellipse.m_color = (MechU8) p_color;
+	ellipse.m_color = (uint8_t) p_color;
 	ellipse.m_centerX = Add(p_centerX, ellipse.m_clip.m_originX);
 	ellipse.m_centerY = Add(p_centerY, ellipse.m_clip.m_originY);
 	ellipse.m_x = 0;
 	ellipse.m_y = p_radiusY;
-	squareY = (MechU32) p_radiusY * (MechU32) p_radiusY;
+	squareY = (uint32_t) p_radiusY * (uint32_t) p_radiusY;
 	stepY = squareY << 1;
-	squareX = (MechU32) p_radiusX * (MechU32) p_radiusX;
+	squareX = (uint32_t) p_radiusX * (uint32_t) p_radiusX;
 	stepX = squareX << 1;
 	slopeX = 0;
-	slopeY = stepX * (MechU32) p_radiusY;
-	decision = (squareX >> 2) + squareY - squareX * (MechU32) p_radiusY;
-	rows = (MechU32) p_radiusY;
+	slopeY = stepX * (uint32_t) p_radiusY;
+	decision = (squareX >> 2) + squareY - squareX * (uint32_t) p_radiusY;
+	rows = (uint32_t) p_radiusY;
 
 	// Where the arc is flatter than 45 degrees: a column per point
 	while (PortableS32(slopeX - slopeY) < 0) {
@@ -1602,8 +1608,10 @@ static void DrawEllipseWith(
 	}
 
 	// Where it's steeper: a row per point
-	decision += (MechU32) PortableSar32(
-		PortableS32((MechU32) PortableSar32(PortableS32(squareX - squareY), 1) + (squareX - squareY) - slopeX - slopeY),
+	decision += (uint32_t) PortableSar32(
+		PortableS32(
+			(uint32_t) PortableSar32(PortableS32(squareX - squareY), 1) + (squareX - squareY) - slopeX - slopeY
+		),
 		1
 	);
 	do {
@@ -1622,12 +1630,12 @@ static void DrawEllipseWith(
 
 // Draws the outline of an ellipse centered on (p_centerX, p_centerY), clipped to the view; a
 // radius of 0 draws a line.
-void VFX_ellipse_draw(PANE* p_pane, MechS32 p_xc, MechS32 p_yc, MechS32 p_width, MechS32 p_height, MechS32 p_color)
+void VFX_ellipse_draw(PANE* p_pane, int32_t p_xc, int32_t p_yc, int32_t p_width, int32_t p_height, int32_t p_color)
 {
 	DrawEllipseWith(p_pane, p_xc, p_yc, p_width, p_height, p_color, PlotEllipsePoints);
 }
 
-void VFX_ellipse_fill(PANE* p_pane, MechS32 p_xc, MechS32 p_yc, MechS32 p_width, MechS32 p_height, MechS32 p_color)
+void VFX_ellipse_fill(PANE* p_pane, int32_t p_xc, int32_t p_yc, int32_t p_width, int32_t p_height, int32_t p_color)
 {
 	DrawEllipseWith(p_pane, p_xc, p_yc, p_width, p_height, p_color, FillEllipseRows);
 }
@@ -1635,10 +1643,10 @@ void VFX_ellipse_fill(PANE* p_pane, MechS32 p_xc, MechS32 p_yc, MechS32 p_width,
 // --- Rotation ---
 
 // The 16.16 cosine and sine of p_angle, in tenths of a degree.
-void VFX_Cos_Sin(MechS32 p_angle, MechS32* p_cos, MechS32* p_sin)
+void VFX_Cos_Sin(int32_t p_angle, int32_t* p_cos, int32_t* p_sin)
 {
-	MechS32 angle = p_angle;
-	MechS32 base;
+	int32_t angle = p_angle;
+	int32_t base;
 
 	while (angle < 0) {
 		angle += 3600;
@@ -1674,18 +1682,18 @@ void VFX_Cos_Sin(MechS32 p_angle, MechS32* p_cos, MechS32* p_sin)
 }
 
 // The 64-bit product plus half of 1.0, as 16.16: its middle 32 bits.
-static MechS32 MulRound16(MechS32 p_a, MechS32 p_b)
+static int32_t MulRound16(int32_t p_a, int32_t p_b)
 {
-	return PortableS32((MechU32) ((MechU64) ((MechS64) p_a * p_b + 0x8000) >> 16));
+	return PortableS32((uint32_t) ((MechU64) ((MechS64) p_a * p_b + 0x8000) >> 16));
 }
 
 // Its top 32 bits.
-static MechS32 MulRound32(MechS32 p_a, MechS32 p_b)
+static int32_t MulRound32(int32_t p_a, int32_t p_b)
 {
-	return PortableS32((MechU32) ((MechU64) ((MechS64) p_a * p_b + 0x8000) >> 32));
+	return PortableS32((uint32_t) ((MechU64) ((MechS64) p_a * p_b + 0x8000) >> 32));
 }
 
-void VFX_fixed_mul(MechS32 p_m1, MechS32 p_m2, MechS32* p_result)
+void VFX_fixed_mul(int32_t p_m1, int32_t p_m2, int32_t* p_result)
 {
 	*p_result = MulRound16(p_m1, p_m2);
 }
@@ -1693,22 +1701,22 @@ void VFX_fixed_mul(MechS32 p_m1, MechS32 p_m2, MechS32* p_result)
 // Rotates p_point about p_origin by p_angle (tenths of a degree), its offsets scaled by p_scaleX
 // and p_scaleY (16.16), into p_result. Points are x, y.
 void VFX_point_transform(
-	MechS32* p_in,
-	MechS32* p_out,
-	MechS32* p_origin,
-	MechS32 p_rot,
-	MechS32 p_xScale,
-	MechS32 p_yScale
+	int32_t* p_in,
+	int32_t* p_out,
+	int32_t* p_origin,
+	int32_t p_rot,
+	int32_t p_xScale,
+	int32_t p_yScale
 )
 {
-	MechS32 cosine;
-	MechS32 sine;
-	MechS32 x;
-	MechS32 y;
+	int32_t cosine;
+	int32_t sine;
+	int32_t x;
+	int32_t y;
 
 	VFX_Cos_Sin(p_rot, &cosine, &sine);
-	x = MulRound32(PortableS32(((MechU32) p_in[0] - (MechU32) p_origin[0]) << 16), p_xScale);
-	y = MulRound32(PortableS32(((MechU32) p_in[1] - (MechU32) p_origin[1]) << 16), p_yScale);
+	x = MulRound32(PortableS32(((uint32_t) p_in[0] - (uint32_t) p_origin[0]) << 16), p_xScale);
+	y = MulRound32(PortableS32(((uint32_t) p_in[1] - (uint32_t) p_origin[1]) << 16), p_yScale);
 	p_out[0] = Add(Sub(MulRound16(x, cosine), MulRound16(y, sine)), p_origin[0]);
 	p_out[1] = Add(Add(MulRound16(y, cosine), MulRound16(x, sine)), p_origin[1]);
 }
@@ -1717,51 +1725,51 @@ void VFX_point_transform(
 
 // A font: its height at +8, then at +0x10 the offsets of its characters, each a width and the
 // width by height pixels.
-MechS32 VFX_font_height(void* p_font)
+int32_t VFX_font_height(void* p_font)
 {
-	return ReadS32((const MechU8*) p_font + 8);
+	return ReadS32((const uint8_t*) p_font + 8);
 }
 
-static const MechU8* FontChar(const void* p_font, MechS32 p_char)
+static const uint8_t* FontChar(const void* p_font, int32_t p_char)
 {
-	const MechU8* font = (const MechU8*) p_font;
+	const uint8_t* font = (const uint8_t*) p_font;
 
-	return font + ReadU32(font + 0x10 + (MechU32) p_char * 4);
+	return font + ReadU32(font + 0x10 + (uint32_t) p_char * 4);
 }
 
-MechS32 VFX_character_width(void* p_font, MechS32 p_character)
+int32_t VFX_character_width(void* p_font, int32_t p_character)
 {
 	return ReadS32(FontChar(p_font, p_character));
 }
 
 // Whether a + b, in the assembly's flags, is no more than 0 (`add; jle`): it compares the exact
 // sum.
-static MechS32 SumNotPositive(MechS32 p_a, MechS32 p_b)
+static int32_t SumNotPositive(int32_t p_a, int32_t p_b)
 {
 	return (MechS64) p_a + p_b <= 0;
 }
 
 // Draws a character, clipped to the view: through p_palette when not NULL, which maps a pixel
 // to 0xff to leave it out, else copied. Returns its width.
-MechS32 VFX_character_draw(
+int32_t VFX_character_draw(
 	PANE* p_pane,
-	MechS32 p_x,
-	MechS32 p_y,
+	int32_t p_x,
+	int32_t p_y,
 	void* p_font,
-	MechS32 p_character,
+	int32_t p_character,
 	void* p_colorTranslate
 )
 {
 	ClippedView clip;
-	MechS32 result = ClipView(&clip, p_pane);
-	const MechU8* glyph;
-	const MechU8* palette = (const MechU8*) p_colorTranslate;
-	MechS32 width;
-	MechS32 height;
-	MechS32 columns;
-	MechS32 cut;
-	MechU32 to;
-	MechS32 i;
+	int32_t result = ClipView(&clip, p_pane);
+	const uint8_t* glyph;
+	const uint8_t* palette = (const uint8_t*) p_colorTranslate;
+	int32_t width;
+	int32_t height;
+	int32_t columns;
+	int32_t cut;
+	uint32_t to;
+	int32_t i;
 
 	if (result) {
 		return result;
@@ -1769,7 +1777,7 @@ MechS32 VFX_character_draw(
 
 	p_x = Add(p_x, clip.m_originX);
 	p_y = Add(p_y, clip.m_originY);
-	height = ReadS32((const MechU8*) p_font + 8);
+	height = ReadS32((const uint8_t*) p_font + 8);
 	glyph = FontChar(p_font, p_character);
 	width = ReadS32(glyph);
 	if (width == 0) {
@@ -1815,20 +1823,20 @@ MechS32 VFX_character_draw(
 
 		height = Add(height, cut);
 		p_y = Sub(p_y, cut);
-		glyph -= PortableS32((MechU32) cut * (MechU32) width);
+		glyph -= PortableS32((uint32_t) cut * (uint32_t) width);
 	}
 
 	to = PixelOffset(&clip, p_x, p_y);
 	do {
 		if (!palette) {
-			memcpy(clip.m_pixels + to, glyph, (MechU32) columns);
+			memcpy(clip.m_pixels + to, glyph, (uint32_t) columns);
 		}
 		else {
 			for (i = 0; i < columns; i++) {
-				MechU8 pixel = palette[glyph[i]];
+				uint8_t pixel = palette[glyph[i]];
 
 				if (pixel != 0xff) {
-					clip.m_pixels[to + (MechU32) i] = pixel;
+					clip.m_pixels[to + (uint32_t) i] = pixel;
 				}
 			}
 		}
@@ -1842,9 +1850,9 @@ MechS32 VFX_character_draw(
 
 // Draws p_text, a character at a time, through VFX_character_draw. It draws the first character even when
 // it ends the string.
-void VFX_string_draw(PANE* p_pane, MechS32 p_x, MechS32 p_y, void* p_font, MechChar* p_string, void* p_colorTranslate)
+void VFX_string_draw(PANE* p_pane, int32_t p_x, int32_t p_y, void* p_font, char* p_string, void* p_colorTranslate)
 {
-	const MechU8* text = (const MechU8*) p_string;
+	const uint8_t* text = (const uint8_t*) p_string;
 
 	do {
 		p_x = Add(p_x, VFX_character_draw(p_pane, p_x, p_y, p_font, *text, p_colorTranslate));
@@ -1856,12 +1864,12 @@ void VFX_string_draw(PANE* p_pane, MechS32 p_x, MechS32 p_y, void* p_font, MechC
 
 // Copies p_width pixels to row p_row of the view, clipped. Returns -1 or -2 for an empty buffer
 // or view, else 0 (the assembly leaves what it last computed).
-MechS32 VFX_line_to_pane(PANE* p_target, MechS32 p_y, MechU8* p_lineBuffer, MechS32 p_lineLength)
+int32_t VFX_line_to_pane(PANE* p_target, int32_t p_y, uint8_t* p_lineBuffer, int32_t p_lineLength)
 {
 	ClippedView clip;
-	MechS32 result = ClipView(&clip, p_target);
-	MechS32 x;
-	MechS32 cut;
+	int32_t result = ClipView(&clip, p_target);
+	int32_t x;
+	int32_t cut;
 
 	if (result) {
 		return result;
@@ -1894,15 +1902,15 @@ MechS32 VFX_line_to_pane(PANE* p_target, MechS32 p_y, MechU8* p_lineBuffer, Mech
 	}
 
 	PORTABLE_ASSERT(p_lineLength >= 0);
-	memcpy(clip.m_pixels + PixelOffset(&clip, x, p_y), p_lineBuffer, (MechU32) p_lineLength);
+	memcpy(clip.m_pixels + PixelOffset(&clip, x, p_y), p_lineBuffer, (uint32_t) p_lineLength);
 	return 0;
 }
 
 // The data of the IFF chunk with the tag p_tag: its chunks start at +0xc, and may be padded with
 // zero bytes. The chunk must be there.
-MechU8* find_ILBM_property(MechChar* p_tag, MechU8* p_iff)
+uint8_t* find_ILBM_property(char* p_tag, uint8_t* p_iff)
 {
-	MechU8* chunk = p_iff + 0xc;
+	uint8_t* chunk = p_iff + 0xc;
 
 	for (;;) {
 		while (*chunk == 0) {
@@ -1926,23 +1934,23 @@ MechU8* find_ILBM_property(MechChar* p_tag, MechU8* p_iff)
 // most 640 pixels wide, and ILBM ones a multiple of 16 (the assembly reads eight planes, which
 // are wider for other widths than the row it decodes). With a masking of 1 it draws nothing,
 // and returns a local it never set (here, 0).
-MechS32 VFX_ILBM_draw(PANE* p_pane, MechU8* p_ilbmBuffer)
+int32_t VFX_ILBM_draw(PANE* p_pane, uint8_t* p_ilbmBuffer)
 {
-	MechU8 decoded[LINE_BUFFER];
-	MechU8 line[LINE_BUFFER];
-	MechS32 viewWidth = Add(Sub(p_pane->m_x1, p_pane->m_x0), 1);
-	MechS32 viewHeight = Add(Sub(p_pane->m_y1, p_pane->m_y0), 1);
-	MechS32 planar = ReadU32(p_ilbmBuffer + 8) == 0x4d424c49;
-	const MechU8* header = find_ILBM_property(g_bmhdProp, p_ilbmBuffer);
-	const MechU8* body;
-	MechS32 width = (MechS32) ReadBigU16(header);
-	MechS32 rows = (MechS32) ReadBigU16(header + 2);
-	MechS32 compression;
-	MechS32 transparent;
-	MechU32 planeBytes;
-	MechU32 rowBytes;
-	MechS32 columns;
-	MechS32 row = 0;
+	uint8_t decoded[LINE_BUFFER];
+	uint8_t line[LINE_BUFFER];
+	int32_t viewWidth = Add(Sub(p_pane->m_x1, p_pane->m_x0), 1);
+	int32_t viewHeight = Add(Sub(p_pane->m_y1, p_pane->m_y0), 1);
+	int32_t planar = ReadU32(p_ilbmBuffer + 8) == 0x4d424c49;
+	const uint8_t* header = find_ILBM_property(g_bmhdProp, p_ilbmBuffer);
+	const uint8_t* body;
+	int32_t width = (int32_t) ReadBigU16(header);
+	int32_t rows = (int32_t) ReadBigU16(header + 2);
+	int32_t compression;
+	int32_t transparent;
+	uint32_t planeBytes;
+	uint32_t rowBytes;
+	int32_t columns;
+	int32_t row = 0;
 
 	rows = rows < viewHeight ? rows : viewHeight;
 	if (header[9] == 1) {
@@ -1951,21 +1959,21 @@ MechS32 VFX_ILBM_draw(PANE* p_pane, MechU8* p_ilbmBuffer)
 
 	compression = header[10];
 	transparent = header[13];
-	planeBytes = ((MechU32) width >> 3) + ((width & 7) != 0);
+	planeBytes = ((uint32_t) width >> 3) + ((width & 7) != 0);
 	planeBytes += planeBytes & 1;
-	rowBytes = (MechU32) width + (width & 1);
+	rowBytes = (uint32_t) width + (width & 1);
 	columns = width < viewWidth ? width : viewWidth;
 	body = find_ILBM_property(g_bodyProp, p_ilbmBuffer);
 	PORTABLE_ASSERT(rows > 0);
 	PORTABLE_ASSERT(rowBytes + RUN_MAX <= LINE_BUFFER);
 	do {
-		const MechU8* data;
+		const uint8_t* data;
 
 		if (compression == 1) {
-			MechU32 count = 0;
+			uint32_t count = 0;
 
 			while (count < rowBytes) {
-				MechU32 code = *body++;
+				uint32_t code = *body++;
 
 				if (code < 0x80) {
 					memcpy(decoded + count, body, code + 1);
@@ -1973,7 +1981,7 @@ MechS32 VFX_ILBM_draw(PANE* p_pane, MechU8* p_ilbmBuffer)
 					count += code + 1;
 				}
 				else if (code > 0x80) {
-					MechU32 repeat = (0x101 - code) & 0xff;
+					uint32_t repeat = (0x101 - code) & 0xff;
 
 					memset(decoded + count, *body++, repeat);
 					count += repeat;
@@ -1989,16 +1997,16 @@ MechS32 VFX_ILBM_draw(PANE* p_pane, MechU8* p_ilbmBuffer)
 
 		if (planar) {
 			// Eight planes, a bit of each per pixel, from the high bit of each byte
-			MechS32 pixels = columns;
-			MechU32 bytes = planeBytes;
-			MechU32 out = 0;
+			int32_t pixels = columns;
+			uint32_t bytes = planeBytes;
+			uint32_t out = 0;
 
 			for (;;) {
-				MechU32 mask = 0x80;
+				uint32_t mask = 0x80;
 
 				for (;;) {
-					MechU32 value = 0;
-					MechU32 plane;
+					uint32_t value = 0;
+					uint32_t plane;
 
 					for (plane = 0; plane < 8; plane++) {
 						if (data[plane * planeBytes] & mask) {
@@ -2006,7 +2014,7 @@ MechS32 VFX_ILBM_draw(PANE* p_pane, MechU8* p_ilbmBuffer)
 						}
 					}
 
-					line[out++] = (MechU8) value;
+					line[out++] = (uint8_t) value;
 					if (--pixels == 0) {
 						break;
 					}
@@ -2030,7 +2038,7 @@ MechS32 VFX_ILBM_draw(PANE* p_pane, MechU8* p_ilbmBuffer)
 			VFX_line_to_pane(p_pane, row, line, columns);
 		}
 		else {
-			VFX_line_to_pane(p_pane, row, (MechU8*) data, columns);
+			VFX_line_to_pane(p_pane, row, (uint8_t*) data, columns);
 		}
 
 		row++;
@@ -2039,10 +2047,10 @@ MechS32 VFX_ILBM_draw(PANE* p_pane, MechU8* p_ilbmBuffer)
 	return transparent;
 }
 
-void VFX_ILBM_palette(MechU8* p_ilbmBuffer, MechU8* p_palette)
+void VFX_ILBM_palette(uint8_t* p_ilbmBuffer, uint8_t* p_palette)
 {
-	const MechU8* colors = find_ILBM_property(g_cmapProp, p_ilbmBuffer);
-	MechS32 i;
+	const uint8_t* colors = find_ILBM_property(g_cmapProp, p_ilbmBuffer);
+	int32_t i;
 
 	for (i = 0; i < 0x300; i++) {
 		p_palette[i] = colors[i] >> 2;
@@ -2050,36 +2058,36 @@ void VFX_ILBM_palette(MechU8* p_ilbmBuffer, MechU8* p_palette)
 }
 
 // The image's width << 16 | height.
-MechS32 VFX_ILBM_resolution(MechU8* p_ilbmBuffer)
+int32_t VFX_ILBM_resolution(uint8_t* p_ilbmBuffer)
 {
-	const MechU8* header = find_ILBM_property(g_bmhdProp, p_ilbmBuffer);
+	const uint8_t* header = find_ILBM_property(g_bmhdProp, p_ilbmBuffer);
 
 	return PortableS32(ReadBigU16(header) << 16 | ReadBigU16(header + 2));
 }
 
 // Decodes a PCX image (one plane, run-length coded) into the view, through VFX_line_to_pane. A run
 // may end past the row, which the next row then overwrites.
-MechS32 VFX_PCX_draw(PANE* p_pane, MechU8* p_pcxBuffer)
+int32_t VFX_PCX_draw(PANE* p_pane, uint8_t* p_pcxBuffer)
 {
-	MechU8 line[LINE_BUFFER + 0x40];
-	const MechU8* data = p_pcxBuffer + 0x80;
-	MechS32 rows = (MechS32) ((ReadU16(p_pcxBuffer + 0xa) - ReadU16(p_pcxBuffer + 6)) & 0xffff);
-	MechS32 bytes = (MechS32) ReadU16(p_pcxBuffer + 0x42);
-	MechS32 row = 0;
+	uint8_t line[LINE_BUFFER + 0x40];
+	const uint8_t* data = p_pcxBuffer + 0x80;
+	int32_t rows = (int32_t) ((ReadU16(p_pcxBuffer + 0xa) - ReadU16(p_pcxBuffer + 6)) & 0xffff);
+	int32_t bytes = (int32_t) ReadU16(p_pcxBuffer + 0x42);
+	int32_t row = 0;
 
 	PORTABLE_ASSERT(bytes <= LINE_BUFFER);
 	do {
-		MechS32 count = 0;
+		int32_t count = 0;
 
 		do {
-			MechU32 code = *data++;
+			uint32_t code = *data++;
 
 			if ((code & 0xc0) == 0xc0) {
 				memset(line + count, *data++, code & 0x3f);
-				count += (MechS32) (code & 0x3f);
+				count += (int32_t) (code & 0x3f);
 			}
 			else {
-				line[count++] = (MechU8) code;
+				line[count++] = (uint8_t) code;
 			}
 		} while (count < bytes);
 
@@ -2090,11 +2098,11 @@ MechS32 VFX_PCX_draw(PANE* p_pane, MechU8* p_pcxBuffer)
 }
 
 // The PCX file's palette, its last 0x300 bytes, with 6-bit components.
-void VFX_PCX_palette(MechU8* p_pcxBuffer, MechS32 p_pcxFileSize, void* p_palette)
+void VFX_PCX_palette(uint8_t* p_pcxBuffer, int32_t p_pcxFileSize, void* p_palette)
 {
-	const MechU8* colors = p_pcxBuffer + p_pcxFileSize - 0x300;
-	MechU8* palette = (MechU8*) p_palette;
-	MechS32 i;
+	const uint8_t* colors = p_pcxBuffer + p_pcxFileSize - 0x300;
+	uint8_t* palette = (uint8_t*) p_palette;
+	int32_t i;
 
 	for (i = 0; i < 0x300; i++) {
 		palette[i] = colors[i] >> 2;
@@ -2102,10 +2110,10 @@ void VFX_PCX_palette(MechU8* p_pcxBuffer, MechS32 p_pcxFileSize, void* p_palette
 }
 
 // The image's width << 16 | height, from its header's bounds, as words.
-MechS32 VFX_PCX_resolution(MechU8* p_pcxBuffer)
+int32_t VFX_PCX_resolution(uint8_t* p_pcxBuffer)
 {
-	MechU32 width = (ReadU16(p_pcxBuffer + 8) - ReadU16(p_pcxBuffer + 4) + 1) & 0xffff;
-	MechU32 height = (ReadU16(p_pcxBuffer + 0xa) - ReadU16(p_pcxBuffer + 6) + 1) & 0xffff;
+	uint32_t width = (ReadU16(p_pcxBuffer + 8) - ReadU16(p_pcxBuffer + 4) + 1) & 0xffff;
+	uint32_t height = (ReadU16(p_pcxBuffer + 0xa) - ReadU16(p_pcxBuffer + 6) + 1) & 0xffff;
 
 	return PortableS32(width << 16 | height);
 }
@@ -2139,38 +2147,38 @@ enum GifField {
 #define GIF_UNUSED 0xfffe
 
 typedef struct GifDecoder {
-	MechU8* m_state;
-	const MechU8* m_data;
+	uint8_t* m_state;
+	const uint8_t* m_data;
 	PANE* m_view;
-	MechU8 m_line[LINE_BUFFER];
+	uint8_t m_line[LINE_BUFFER];
 } GifDecoder;
 
-static MechU32 GifField(const GifDecoder* p_gif, MechU32 p_field)
+static uint32_t GifField(const GifDecoder* p_gif, uint32_t p_field)
 {
 	return ReadU32(p_gif->m_state + p_field);
 }
 
-static void SetGifField(GifDecoder* p_gif, MechU32 p_field, MechU32 p_value)
+static void SetGifField(GifDecoder* p_gif, uint32_t p_field, uint32_t p_value)
 {
 	WriteU32(p_gif->m_state + p_field, p_value);
 }
 
-static MechU32 GifPrefix(const GifDecoder* p_gif, MechU32 p_code)
+static uint32_t GifPrefix(const GifDecoder* p_gif, uint32_t p_code)
 {
 	return ReadU16(p_gif->m_state + c_gifPrefix + p_code * 2);
 }
 
-static void SetGifPrefix(GifDecoder* p_gif, MechU32 p_code, MechU32 p_prefix)
+static void SetGifPrefix(GifDecoder* p_gif, uint32_t p_code, uint32_t p_prefix)
 {
-	MechU8* entry = p_gif->m_state + c_gifPrefix + p_code * 2;
+	uint8_t* entry = p_gif->m_state + c_gifPrefix + p_code * 2;
 
-	entry[0] = (MechU8) p_prefix;
-	entry[1] = (MechU8) (p_prefix >> 8);
+	entry[0] = (uint8_t) p_prefix;
+	entry[1] = (uint8_t) (p_prefix >> 8);
 }
 
 // The next byte of the image data's sub-blocks. A sub-block's length of 0 isn't the end here:
 // the count wraps.
-static MechU32 GIF_getb(GifDecoder* p_gif)
+static uint32_t GIF_getb(GifDecoder* p_gif)
 {
 	if (GifField(p_gif, c_gifBlock) == 0) {
 		SetGifField(p_gif, c_gifBlock, *p_gif->m_data++);
@@ -2181,10 +2189,10 @@ static MechU32 GIF_getb(GifDecoder* p_gif)
 }
 
 // The next p_bits (1 to 8) bits of the code stream.
-static MechU32 GIF_getbcode(GifDecoder* p_gif, MechU32 p_bits)
+static uint32_t GIF_getbcode(GifDecoder* p_gif, uint32_t p_bits)
 {
-	MechU32 bits;
-	MechU32 count;
+	uint32_t bits;
+	uint32_t count;
 
 	if (GifField(p_gif, c_gifBitCount) == 0) {
 		SetGifField(p_gif, c_gifBits, GIF_getb(p_gif));
@@ -2192,7 +2200,7 @@ static MechU32 GIF_getbcode(GifDecoder* p_gif, MechU32 p_bits)
 	}
 
 	count = GifField(p_gif, c_gifBitCount);
-	if (PortableS32(count) < (MechS32) p_bits) {
+	if (PortableS32(count) < (int32_t) p_bits) {
 		SetGifField(p_gif, c_gifBits, GifField(p_gif, c_gifBits) | GIF_getb(p_gif) << (count & 31));
 		SetGifField(p_gif, c_gifBitCount, count + 8);
 	}
@@ -2203,15 +2211,15 @@ static MechU32 GIF_getbcode(GifDecoder* p_gif, MechU32 p_bits)
 	return bits & g_gifCmask[p_bits];
 }
 
-static void GIF_init_codetable(GifDecoder* p_gif, MechU32 p_roots)
+static void GIF_init_codetable(GifDecoder* p_gif, uint32_t p_roots)
 {
-	MechU32 code;
+	uint32_t code;
 
 	SetGifField(p_gif, c_gifNext, p_roots + 2);
 	SetGifField(p_gif, c_gifLimit, p_roots * 2);
 	for (code = 0; code < p_roots; code++) {
-		p_gif->m_state[c_gifFirst + code] = (MechU8) code;
-		p_gif->m_state[c_gifLast + code] = (MechU8) code;
+		p_gif->m_state[c_gifFirst + code] = (uint8_t) code;
+		p_gif->m_state[c_gifLast + code] = (uint8_t) code;
 		SetGifPrefix(p_gif, code, GIF_NO_PREFIX);
 	}
 
@@ -2222,9 +2230,9 @@ static void GIF_init_codetable(GifDecoder* p_gif, MechU32 p_roots)
 
 // Adds the code p_prefix followed by p_code's first character, and grows the code size when the
 // table reaches its limit (up to 12 bits).
-static void GIF_insertcode(GifDecoder* p_gif, MechU32 p_code, MechU32 p_prefix)
+static void GIF_insertcode(GifDecoder* p_gif, uint32_t p_code, uint32_t p_prefix)
 {
-	MechU32 next = GifField(p_gif, c_gifNext);
+	uint32_t next = GifField(p_gif, c_gifNext);
 
 	PORTABLE_ASSERT(next < GIF_CODES && p_code < GIF_CODES && p_prefix < GIF_CODES);
 	SetGifPrefix(p_gif, next, p_prefix);
@@ -2239,10 +2247,10 @@ static void GIF_insertcode(GifDecoder* p_gif, MechU32 p_code, MechU32 p_prefix)
 }
 
 // Adds a pixel to the row, and draws the row when it's complete.
-static void GIF_dopixel(GifDecoder* p_gif, MechU8 p_pixel)
+static void GIF_dopixel(GifDecoder* p_gif, uint8_t p_pixel)
 {
-	MechU32 column = GifField(p_gif, c_gifColumn);
-	MechU32 row;
+	uint32_t column = GifField(p_gif, c_gifColumn);
+	uint32_t row;
 
 	PORTABLE_ASSERT(column < LINE_BUFFER);
 	p_gif->m_line[column] = p_pixel;
@@ -2280,15 +2288,15 @@ static void GIF_dopixel(GifDecoder* p_gif, MechU8 p_pixel)
 }
 
 // A GIF's palette sizes from a flags byte: 3 << ((flags & 7) + 1) bytes.
-static MechU32 GifPaletteSize(MechU32 p_flags)
+static uint32_t GifPaletteSize(uint32_t p_flags)
 {
 	return 3u << ((p_flags & 7) + 1);
 }
 
 // The image descriptor, after the header and the global palette.
-static const MechU8* GifImage(const MechU8* p_gif)
+static const uint8_t* GifImage(const uint8_t* p_gif)
 {
-	const MechU8* image = p_gif + 0xd;
+	const uint8_t* image = p_gif + 0xd;
 
 	if (p_gif[0xa] & 0x80) {
 		image += GifPaletteSize(p_gif[0xa]);
@@ -2299,13 +2307,13 @@ static const MechU8* GifImage(const MechU8* p_gif)
 
 // Decodes a GIF's first image into the view, with p_state (0x502e bytes) as the decoder's state,
 // rows of at most 0x300 pixels. Returns the background color index.
-MechS32 VFX_GIF_draw(PANE* p_pane, MechU8* p_gifBuffer, MechU8* p_gifScratch)
+int32_t VFX_GIF_draw(PANE* p_pane, uint8_t* p_gifBuffer, uint8_t* p_gifScratch)
 {
 	GifDecoder gif;
-	const MechU8* image = GifImage(p_gifBuffer);
-	MechU32 minimum;
-	MechU32 clear;
-	MechU32 previous = GIF_NO_PREFIX;
+	const uint8_t* image = GifImage(p_gifBuffer);
+	uint32_t minimum;
+	uint32_t clear;
+	uint32_t previous = GIF_NO_PREFIX;
 
 	gif.m_state = p_gifScratch;
 	gif.m_view = p_pane;
@@ -2320,7 +2328,7 @@ MechS32 VFX_GIF_draw(PANE* p_pane, MechU8* p_gifBuffer, MechU8* p_gifScratch)
 
 	SetGifField(&gif, c_gifBlock, 0);
 	minimum = *gif.m_data++;
-	clear = (MechU32) 1 << (minimum & 31);
+	clear = (uint32_t) 1 << (minimum & 31);
 	SetGifField(&gif, c_gifCodeSize, minimum + 1);
 	GIF_init_codetable(&gif, clear);
 	p_gifScratch[c_gifPass] = 0;
@@ -2328,8 +2336,8 @@ MechS32 VFX_GIF_draw(PANE* p_pane, MechU8* p_gifBuffer, MechU8* p_gifScratch)
 	SetGifField(&gif, c_gifColumn, 0);
 	SetGifField(&gif, c_gifRow, 0);
 	for (;;) {
-		MechU32 size = GifField(&gif, c_gifCodeSize);
-		MechU32 code;
+		uint32_t size = GifField(&gif, c_gifCodeSize);
+		uint32_t code;
 
 		if (PortableS32(size) <= 8) {
 			code = GIF_getbcode(&gif, size);
@@ -2353,8 +2361,8 @@ MechS32 VFX_GIF_draw(PANE* p_pane, MechU8* p_gifBuffer, MechU8* p_gifScratch)
 			break;
 		}
 		else {
-			MechU32 count = 0;
-			MechU32 chain = code;
+			uint32_t count = 0;
+			uint32_t chain = code;
 
 			PORTABLE_ASSERT(code < GIF_CODES);
 			if (GifPrefix(&gif, code) == GIF_UNUSED) {
@@ -2381,11 +2389,11 @@ MechS32 VFX_GIF_draw(PANE* p_pane, MechU8* p_gifBuffer, MechU8* p_gifScratch)
 }
 
 // The GIF's global palette, then its first image's local one, with 6-bit components.
-void VFX_GIF_palette(MechU8* p_gifBuffer, MechU8* p_palette)
+void VFX_GIF_palette(uint8_t* p_gifBuffer, uint8_t* p_palette)
 {
-	const MechU8* image = p_gifBuffer + 0xd;
-	MechU32 size;
-	MechU32 i;
+	const uint8_t* image = p_gifBuffer + 0xd;
+	uint32_t size;
+	uint32_t i;
 
 	if (p_gifBuffer[0xa] & 0x80) {
 		size = GifPaletteSize(p_gifBuffer[0xa]);
@@ -2403,9 +2411,9 @@ void VFX_GIF_palette(MechU8* p_gifBuffer, MechU8* p_palette)
 }
 
 // The first image's width << 16 | height.
-MechS32 VFX_GIF_resolution(void* p_gifBuffer)
+int32_t VFX_GIF_resolution(void* p_gifBuffer)
 {
-	const MechU8* image = GifImage((const MechU8*) p_gifBuffer);
+	const uint8_t* image = GifImage((const uint8_t*) p_gifBuffer);
 
 	return PortableS32(ReadU16(image + 5) << 16 | ReadU16(image + 7));
 }
@@ -2416,23 +2424,23 @@ MechS32 VFX_GIF_resolution(void* p_gifBuffer)
 // VFX_map_polygon, repeated: these helpers are vfx3d.c's.
 
 // (p_delta << 16) / (p_count << 16): a 64-bit dividend, and a 32-bit divisor.
-static MechU32 Slope(MechU32 p_delta, MechU32 p_count)
+static uint32_t Slope(uint32_t p_delta, uint32_t p_count)
 {
-	return (MechU32) PortableIdiv((MechS64) PortableS32(p_delta) * 0x10000, PortableS32(p_count << 16));
+	return (uint32_t) PortableIdiv((MechS64) PortableS32(p_delta) * 0x10000, PortableS32(p_count << 16));
 }
 
 // p_count steps of p_step: `imul` by the count in 16.16, then `shrd 16`.
-static MechU32 Advance(MechU32 p_step, MechU32 p_count)
+static uint32_t Advance(uint32_t p_step, uint32_t p_count)
 {
 	MechS64 product = (MechS64) PortableS32(p_step) * PortableS32(p_count << 16);
 
-	return (MechU32) ((MechU64) product >> 16);
+	return (uint32_t) ((MechU64) product >> 16);
 }
 
 // A texture step's whole texels, rounded towards zero (u's sign-extended, v's a word).
-static MechU32 WholeTexels(MechU32 p_step, MechS32 p_extend)
+static uint32_t WholeTexels(uint32_t p_step, int32_t p_extend)
 {
-	MechU32 whole = (p_step >> 16) & 0xffff;
+	uint32_t whole = (p_step >> 16) & 0xffff;
 
 	if (PortableS32(p_step) < 0) {
 		if (p_extend) {
@@ -2449,7 +2457,7 @@ static MechU32 WholeTexels(MechU32 p_step, MechS32 p_extend)
 
 // A coordinate's fraction and its step, in the top half of a word: the complement's, stepping
 // up, for a negative step.
-static void StartFraction(MechU32 p_value, MechU32 p_step, MechU32* p_fraction, MechU32* p_fractionStep)
+static void StartFraction(uint32_t p_value, uint32_t p_step, uint32_t* p_fraction, uint32_t* p_fractionStep)
 {
 	if (PortableS32(p_step) < 0) {
 		p_step = 0 - p_step;
@@ -2460,9 +2468,9 @@ static void StartFraction(MechU32 p_value, MechU32 p_step, MechU32* p_fraction, 
 	*p_fractionStep = p_step << 16;
 }
 
-static MechU32 AddCarry(MechU32* p_value, MechU32 p_step)
+static uint32_t AddCarry(uint32_t* p_value, uint32_t p_step)
 {
-	MechU32 value = *p_value;
+	uint32_t value = *p_value;
 
 	*p_value = value + p_step;
 	return *p_value < value;
@@ -2470,55 +2478,55 @@ static MechU32 AddCarry(MechU32* p_value, MechU32 p_step)
 
 // A corner of the rotated frame: where it lands, and the texel it maps (whole texels).
 typedef struct RotatedCorner {
-	MechS32 m_x;
-	MechS32 m_y;
-	MechS32 m_u;
-	MechS32 m_v;
+	int32_t m_x;
+	int32_t m_y;
+	int32_t m_u;
+	int32_t m_v;
 } RotatedCorner;
 
 typedef struct RotatedEdge {
 	const RotatedCorner* m_start;
 	const RotatedCorner* m_end;
-	MechU32 m_count;
-	MechU32 m_x;
-	MechU32 m_xStep;
-	MechU32 m_u;
-	MechU32 m_uStep;
-	MechU32 m_v;
-	MechU32 m_vStep;
+	uint32_t m_count;
+	uint32_t m_x;
+	uint32_t m_xStep;
+	uint32_t m_u;
+	uint32_t m_uStep;
+	uint32_t m_v;
+	uint32_t m_vStep;
 } RotatedEdge;
 
 typedef struct RotatedQuad {
 	RotatedCorner m_corners[4];
 	ClippedView m_clip;
-	const MechU8* m_texels;
-	MechU32 m_texturePitch;
+	const uint8_t* m_texels;
+	uint32_t m_texturePitch;
 	RotatedEdge m_left; // walks the corners backwards
 	RotatedEdge m_right;
-	MechU32 m_lines;
-	MechU32 m_row;
+	uint32_t m_lines;
+	uint32_t m_row;
 } RotatedQuad;
 
 static void AdvanceRotatedEdge(const RotatedQuad* p_quad, RotatedEdge* p_edge)
 {
-	MechS32 index = (MechS32) (p_edge->m_end - p_quad->m_corners);
+	int32_t index = (int32_t) (p_edge->m_end - p_quad->m_corners);
 
 	p_edge->m_start = p_edge->m_end;
 	p_edge->m_end = &p_quad->m_corners[(index + (p_edge == &p_quad->m_left ? 3 : 1)) % 4];
 }
 
-static void StartRotatedEdge(RotatedEdge* p_edge, MechU32 p_count)
+static void StartRotatedEdge(RotatedEdge* p_edge, uint32_t p_count)
 {
 	const RotatedCorner* start = p_edge->m_start;
 	const RotatedCorner* end = p_edge->m_end;
 
 	p_edge->m_count = p_count;
-	p_edge->m_xStep = Slope(((MechU32) end->m_x - (MechU32) start->m_x) << 16, p_count);
-	p_edge->m_uStep = Slope(((MechU32) end->m_u - (MechU32) start->m_u) << 16, p_count);
-	p_edge->m_vStep = Slope(((MechU32) end->m_v - (MechU32) start->m_v) << 16, p_count);
-	p_edge->m_x = ((MechU32) start->m_x << 16) + 0x8000;
-	p_edge->m_u = ((MechU32) start->m_u << 16) + 0x8000;
-	p_edge->m_v = ((MechU32) start->m_v << 16) + 0x8000;
+	p_edge->m_xStep = Slope(((uint32_t) end->m_x - (uint32_t) start->m_x) << 16, p_count);
+	p_edge->m_uStep = Slope(((uint32_t) end->m_u - (uint32_t) start->m_u) << 16, p_count);
+	p_edge->m_vStep = Slope(((uint32_t) end->m_v - (uint32_t) start->m_v) << 16, p_count);
+	p_edge->m_x = ((uint32_t) start->m_x << 16) + 0x8000;
+	p_edge->m_u = ((uint32_t) start->m_u << 16) + 0x8000;
+	p_edge->m_v = ((uint32_t) start->m_v << 16) + 0x8000;
 }
 
 static void StepRotatedEdge(RotatedEdge* p_edge)
@@ -2534,10 +2542,10 @@ static void FillRotatedQuad(RotatedQuad* p_quad)
 	const ClippedView* clip = &p_quad->m_clip;
 	const RotatedCorner* top = NULL;
 	RotatedEdge* edges[2];
-	MechS32 minY = 0x7fff;
-	MechS32 maxY = -0x8000;
-	MechU32 inside = 0xf;
-	MechS32 i;
+	int32_t minY = 0x7fff;
+	int32_t maxY = -0x8000;
+	uint32_t inside = 0xf;
+	int32_t i;
 
 	for (i = 0; i < 4; i++) {
 		const RotatedCorner* corner = &p_quad->m_corners[i];
@@ -2572,22 +2580,22 @@ static void FillRotatedQuad(RotatedQuad* p_quad)
 			AdvanceRotatedEdge(p_quad, edge);
 		} while ((edge->m_start->m_y < clip->m_top && edge->m_end->m_y <= clip->m_top) ||
 				 edge->m_end->m_y == edge->m_start->m_y);
-		StartRotatedEdge(edge, (MechU32) edge->m_end->m_y - (MechU32) edge->m_start->m_y);
+		StartRotatedEdge(edge, (uint32_t) edge->m_end->m_y - (uint32_t) edge->m_start->m_y);
 	}
 
 	if (maxY > clip->m_bottom) {
-		p_quad->m_lines = (MechU32) clip->m_bottom - (MechU32) minY;
+		p_quad->m_lines = (uint32_t) clip->m_bottom - (uint32_t) minY;
 	}
 	else {
-		p_quad->m_lines = (MechU32) maxY - (MechU32) minY;
+		p_quad->m_lines = (uint32_t) maxY - (uint32_t) minY;
 	}
 
 	if (clip->m_top > minY) {
-		p_quad->m_lines -= (MechU32) clip->m_top - (MechU32) minY;
+		p_quad->m_lines -= (uint32_t) clip->m_top - (uint32_t) minY;
 		minY = clip->m_top;
 		for (i = 0; i < 2; i++) {
 			RotatedEdge* edge = edges[i];
-			MechU32 lines = (MechU32) clip->m_top - (MechU32) edge->m_start->m_y;
+			uint32_t lines = (uint32_t) clip->m_top - (uint32_t) edge->m_start->m_y;
 
 			edge->m_count -= lines;
 			edge->m_x += Advance(edge->m_xStep, lines);
@@ -2596,12 +2604,12 @@ static void FillRotatedQuad(RotatedQuad* p_quad)
 		}
 	}
 
-	p_quad->m_row = (MechU32) minY * clip->m_pitch;
+	p_quad->m_row = (uint32_t) minY * clip->m_pitch;
 	for (;;) {
 		const RotatedEdge* low = &p_quad->m_left;
 		const RotatedEdge* high = &p_quad->m_right;
-		MechS32 left;
-		MechS32 right;
+		int32_t left;
+		int32_t right;
 
 		if (!(PortableS32(high->m_x) > PortableS32(low->m_x))) {
 			low = &p_quad->m_right;
@@ -2611,36 +2619,36 @@ static void FillRotatedQuad(RotatedQuad* p_quad)
 		left = PortableSar32(PortableS32(low->m_x), 16);
 		right = PortableSar32(PortableS32(high->m_x), 16);
 		if (left <= clip->m_right && right >= clip->m_left) {
-			MechU32 u = low->m_u;
-			MechU32 v = low->m_v;
-			MechU32 uStep = 0;
-			MechU32 vStep = 0;
-			MechU32 offsets[4] = {0, 0, 0, 0};
-			MechU32 uFraction;
-			MechU32 uFractionStep;
-			MechU32 vFraction;
-			MechU32 vFractionStep;
-			MechU32 texel;
-			MechU8* pixels;
-			MechS32 count;
+			uint32_t u = low->m_u;
+			uint32_t v = low->m_v;
+			uint32_t uStep = 0;
+			uint32_t vStep = 0;
+			uint32_t offsets[4] = {0, 0, 0, 0};
+			uint32_t uFraction;
+			uint32_t uFractionStep;
+			uint32_t vFraction;
+			uint32_t vFractionStep;
+			uint32_t texel;
+			uint8_t* pixels;
+			int32_t count;
 
 			if (right != left) {
-				MechU32 width = (MechU32) right - (MechU32) left;
-				MechU32 uWhole;
-				MechU32 vOffset;
-				MechU32 vCarry;
+				uint32_t width = (uint32_t) right - (uint32_t) left;
+				uint32_t uWhole;
+				uint32_t vOffset;
+				uint32_t vCarry;
 
 				uStep = Slope(high->m_u - u, width);
 				uWhole = WholeTexels(uStep, 1);
 				vStep = Slope(high->m_v - v, width);
-				vOffset = (MechU32) PortableS16((MechU16) (p_quad->m_texturePitch * WholeTexels(vStep, 0)));
+				vOffset = (uint32_t) PortableS16((uint16_t) (p_quad->m_texturePitch * WholeTexels(vStep, 0)));
 				vCarry = PortableS32(vStep) < 0 ? 0 - p_quad->m_texturePitch : p_quad->m_texturePitch;
 				offsets[0] = uWhole + vOffset;
 				offsets[1] = offsets[0] + vCarry;
 				offsets[2] = uWhole + (PortableS32(uStep) < 0 ? 0xffffffff : 1) + vOffset;
 				offsets[3] = offsets[2] + vCarry;
 				if (clip->m_left > left) {
-					MechU32 skipped = (MechU32) clip->m_left - (MechU32) left;
+					uint32_t skipped = (uint32_t) clip->m_left - (uint32_t) left;
 
 					left = clip->m_left;
 					u += Advance(uStep, skipped);
@@ -2655,17 +2663,17 @@ static void FillRotatedQuad(RotatedQuad* p_quad)
 			texel = (v >> 16) * p_quad->m_texturePitch + (u >> 16);
 			StartFraction(u, uStep, &uFraction, &uFractionStep);
 			StartFraction(v, vStep, &vFraction, &vFractionStep);
-			pixels = clip->m_pixels + (MechU32) (p_quad->m_row + (MechU32) left);
+			pixels = clip->m_pixels + (uint32_t) (p_quad->m_row + (uint32_t) left);
 			count = right - left + 1;
 			for (i = 0; i < count; i++) {
-				MechU8 value = p_quad->m_texels[texel];
+				uint8_t value = p_quad->m_texels[texel];
 
 				if (value != 0xff) {
 					pixels[i] = value;
 				}
 
 				if (i + 1 < count) {
-					MechU32 carry = AddCarry(&uFraction, uFractionStep) << 1;
+					uint32_t carry = AddCarry(&uFraction, uFractionStep) << 1;
 
 					carry |= AddCarry(&vFraction, vFractionStep);
 					texel += offsets[carry];
@@ -2689,10 +2697,10 @@ static void FillRotatedQuad(RotatedQuad* p_quad)
 			RotatedEdge* edge = edges[i];
 
 			if (--edge->m_count == 0) {
-				MechU32 lines;
+				uint32_t lines;
 
 				AdvanceRotatedEdge(p_quad, edge);
-				lines = (MechU32) edge->m_end->m_y - (MechU32) edge->m_start->m_y;
+				lines = (uint32_t) edge->m_end->m_y - (uint32_t) edge->m_start->m_y;
 				StartRotatedEdge(edge, lines ? lines : 1);
 			}
 			else {
@@ -2709,40 +2717,40 @@ static void FillRotatedQuad(RotatedQuad* p_quad)
 // scaling it's VFX_shape_draw (or VFX_shape_translate_draw), whose result it returns; the mapping
 // returns -1 or -2 for an empty buffer or view, else 0 (the assembly leaves what it last
 // computed).
-MechS32 VFX_shape_transform(
+int32_t VFX_shape_transform(
 	PANE* p_pane,
 	void* p_shapeTable,
-	MechS32 p_shapeNumber,
-	MechS32 p_hotX,
-	MechS32 p_hotY,
-	MechU8* p_buffer,
-	MechS32 p_rot,
-	MechS32 p_xScale,
-	MechS32 p_yScale,
-	MechU32 p_flags
+	int32_t p_shapeNumber,
+	int32_t p_hotX,
+	int32_t p_hotY,
+	uint8_t* p_buffer,
+	int32_t p_rot,
+	int32_t p_xScale,
+	int32_t p_yScale,
+	uint32_t p_flags
 )
 {
-	const MechU8* remap = p_flags & 1 ? lookaside : NULL;
+	const uint8_t* remap = p_flags & 1 ? lookaside : NULL;
 	WINDOW scratch;
 	PANE scratchView;
 	RotatedQuad quad;
-	MechU32 extent;
-	MechU32 origin;
-	MechS32 right;
-	MechS32 bottom;
-	MechS32 pivot[2];
-	MechS32 offsetX;
-	MechS32 offsetY;
-	MechS32 result;
-	MechS32 i;
+	uint32_t extent;
+	uint32_t origin;
+	int32_t right;
+	int32_t bottom;
+	int32_t pivot[2];
+	int32_t offsetX;
+	int32_t offsetY;
+	int32_t result;
+	int32_t i;
 
 	if (p_xScale == 0x10000 && p_yScale == 0x10000 && p_rot == 0) {
 		return ShapeDrawWith(p_pane, p_shapeTable, p_shapeNumber, p_hotX, p_hotY, remap);
 	}
 
-	extent = (MechU32) VFX_shape_resolution(p_shapeTable, p_shapeNumber);
-	right = (MechS32) (extent >> 16) - 1;
-	bottom = (MechS32) (extent & 0xffff) - 1;
+	extent = (uint32_t) VFX_shape_resolution(p_shapeTable, p_shapeNumber);
+	right = (int32_t) (extent >> 16) - 1;
+	bottom = (int32_t) (extent & 0xffff) - 1;
 	scratch.m_buffer = p_buffer;
 	scratch.m_xMax = right;
 	scratch.m_yMax = bottom;
@@ -2755,9 +2763,9 @@ MechS32 VFX_shape_transform(
 	scratchView.m_y1 = bottom;
 
 	// The frame drawn with its top left at the scratch view's
-	origin = (MechU32) VFX_shape_minxy(p_shapeTable, p_shapeNumber);
-	pivot[0] = PortableS32(0 - (MechU32) PortableSar32(PortableS32(origin), 16));
-	pivot[1] = PortableS32(0 - (MechU32) (MechS32) PortableS16((MechU16) origin));
+	origin = (uint32_t) VFX_shape_minxy(p_shapeTable, p_shapeNumber);
+	pivot[0] = PortableS32(0 - (uint32_t) PortableSar32(PortableS32(origin), 16));
+	pivot[1] = PortableS32(0 - (uint32_t) (int32_t) PortableS16((uint16_t) origin));
 	if (!(p_flags & 2)) {
 		PaneWipeWith(&scratchView, 0xff);
 		ShapeDrawWith(&scratchView, p_shapeTable, p_shapeNumber, pivot[0], pivot[1], remap);
@@ -2771,8 +2779,8 @@ MechS32 VFX_shape_transform(
 	offsetX = Sub(p_hotX, pivot[0]);
 	offsetY = Sub(p_hotY, pivot[1]);
 	for (i = 0; i < 4; i++) {
-		MechS32 point[2];
-		MechS32 rotated[2];
+		int32_t point[2];
+		int32_t rotated[2];
 
 		point[0] = i == 1 || i == 2 ? right : 0;
 		point[1] = i >= 2 ? bottom : 0;
@@ -2784,7 +2792,7 @@ MechS32 VFX_shape_transform(
 	}
 
 	quad.m_texels = p_buffer;
-	quad.m_texturePitch = (MechU32) right + 1;
+	quad.m_texturePitch = (uint32_t) right + 1;
 	FillRotatedQuad(&quad);
 	return 0;
 }
@@ -2794,16 +2802,16 @@ MechS32 VFX_shape_transform(
 // VFX_shape_scan's encoder: the assembly keeps it in globals (SHP_building...), for its two
 // helpers, ScanLine and FlushPacket.
 typedef struct RleEncoder {
-	MechU8* m_output; // NULL only measures
-	MechU32 m_cursor; // the bytes written so far
-	const MechU8* m_row;
-	const MechU8* m_run;      // past the end of the run to emit
-	const MechU8* m_runStart; // the pixels emitted so far end there
-	MechU32 m_skip;           // the transparent pixels before the next run
-	MechS32 m_left;           // the opaque pixels' bounds
-	MechS32 m_top;
-	MechS32 m_right;
-	MechS32 m_bottom;
+	uint8_t* m_output; // NULL only measures
+	uint32_t m_cursor; // the bytes written so far
+	const uint8_t* m_row;
+	const uint8_t* m_run;      // past the end of the run to emit
+	const uint8_t* m_runStart; // the pixels emitted so far end there
+	uint32_t m_skip;           // the transparent pixels before the next run
+	int32_t m_left;            // the opaque pixels' bounds
+	int32_t m_top;
+	int32_t m_right;
+	int32_t m_bottom;
 } RleEncoder;
 
 // FlushPacket's operations.
@@ -2816,10 +2824,10 @@ enum RleOp {
 	c_rleNone
 };
 
-static void PutRleByte(RleEncoder* p_encoder, MechU32 p_byte)
+static void PutRleByte(RleEncoder* p_encoder, uint32_t p_byte)
 {
 	if (p_encoder->m_output) {
-		p_encoder->m_output[p_encoder->m_cursor] = (MechU8) p_byte;
+		p_encoder->m_output[p_encoder->m_cursor] = (uint8_t) p_byte;
 	}
 
 	p_encoder->m_cursor++;
@@ -2828,12 +2836,12 @@ static void PutRleByte(RleEncoder* p_encoder, MechU32 p_byte)
 // Emits the run from m_runStart to p_back pixels before m_run, as p_op. A run's bounds update the
 // encoder's; a run that reaches past the right one, the assembly only emits when it isn't
 // empty.
-static void FlushPacket(RleEncoder* p_encoder, MechS32 p_op, MechU32 p_back, MechS32 p_left)
+static void FlushPacket(RleEncoder* p_encoder, int32_t p_op, uint32_t p_back, int32_t p_left)
 {
-	const MechU8* start = p_encoder->m_runStart;
-	MechU32 length;
-	MechU32 chunk;
-	MechS32 x;
+	const uint8_t* start = p_encoder->m_runStart;
+	uint32_t length;
+	uint32_t chunk;
+	int32_t x;
 
 	switch (p_op) {
 	case c_rleStartRow:
@@ -2843,7 +2851,7 @@ static void FlushPacket(RleEncoder* p_encoder, MechS32 p_op, MechU32 p_back, Mec
 	case c_rleLiteral:
 	case c_rleRepeat:
 		if (p_encoder->m_skip) {
-			MechU32 skip = p_encoder->m_skip;
+			uint32_t skip = p_encoder->m_skip;
 
 			do {
 				chunk = PortableS32(skip) < 0xff ? skip : 0xff;
@@ -2856,13 +2864,13 @@ static void FlushPacket(RleEncoder* p_encoder, MechS32 p_op, MechU32 p_back, Mec
 			p_encoder->m_skip = 0;
 		}
 
-		length = (MechU32) (p_encoder->m_run - start) - p_back;
-		x = PortableS32((MechU32) p_left + (MechU32) (start - p_encoder->m_row));
+		length = (uint32_t) (p_encoder->m_run - start) - p_back;
+		x = PortableS32((uint32_t) p_left + (uint32_t) (start - p_encoder->m_row));
 		if (x < p_encoder->m_left) {
 			p_encoder->m_left = x;
 		}
 
-		x = PortableS32((MechU32) x + length - 1);
+		x = PortableS32((uint32_t) x + length - 1);
 		if (x > p_encoder->m_right) {
 			p_encoder->m_right = x;
 			if (!length) {
@@ -2890,7 +2898,7 @@ static void FlushPacket(RleEncoder* p_encoder, MechS32 p_op, MechU32 p_back, Mec
 		} while (length);
 		break;
 	case c_rleSkip:
-		p_encoder->m_skip = (MechU32) (p_encoder->m_run - start) - p_back;
+		p_encoder->m_skip = (uint32_t) (p_encoder->m_run - start) - p_back;
 		break;
 	case c_rleEndRow:
 		PutRleByte(p_encoder, 0);
@@ -2902,13 +2910,13 @@ static void FlushPacket(RleEncoder* p_encoder, MechS32 p_op, MechU32 p_back, Mec
 
 // Encodes a row of p_count pixels: transparent pixels as skips, then runs of at least two equal
 // pixels (three in a literal), and literals.
-static void ScanLine(RleEncoder* p_encoder, MechU32 p_count, MechU8 p_transparent, MechS32 p_left)
+static void ScanLine(RleEncoder* p_encoder, uint32_t p_count, uint8_t p_transparent, int32_t p_left)
 {
-	const MechU8* pixel = p_encoder->m_row;
-	MechS32 last = c_rleNone;
-	MechU8 previous;
-	MechU8 current;
-	MechS32 equal;
+	const uint8_t* pixel = p_encoder->m_row;
+	int32_t last = c_rleNone;
+	uint8_t previous;
+	uint8_t current;
+	int32_t equal;
 
 	p_encoder->m_run = pixel;
 	FlushPacket(p_encoder, c_rleStartRow, 0, p_left);
@@ -3025,14 +3033,14 @@ end:
 // Encodes the view's pixels other than p_transparent as an SHP frame at (p_x, p_y): a 0x18-byte
 // header, then its rows' codes, bounded by the opaque pixels. With p_out NULL, it only measures.
 // Returns the frame's size.
-MechS32 VFX_shape_scan(PANE* p_pane, MechU8 p_transparentColor, MechS32 p_hotX, MechS32 p_hotY, MechU8* p_buffer)
+int32_t VFX_shape_scan(PANE* p_pane, uint8_t p_transparentColor, int32_t p_hotX, int32_t p_hotY, uint8_t* p_buffer)
 {
 	ClippedView clip;
 	RleEncoder encoder;
-	MechS32 result = ClipView(&clip, p_pane);
-	MechU32 width;
-	MechU32 row;
-	MechS32 y;
+	int32_t result = ClipView(&clip, p_pane);
+	uint32_t width;
+	uint32_t row;
+	int32_t y;
 
 	if (result) {
 		return result;
@@ -3042,10 +3050,10 @@ MechS32 VFX_shape_scan(PANE* p_pane, MechU8 p_transparentColor, MechS32 p_hotX, 
 	if (p_buffer) {
 		WriteU32(
 			p_buffer,
-			((MechU32) Sub(p_pane->m_x1, p_pane->m_x0) << 16) |
-				(((MechU32) p_pane->m_y1 - (MechU32) p_pane->m_y0) & 0xffff)
+			((uint32_t) Sub(p_pane->m_x1, p_pane->m_x0) << 16) |
+				(((uint32_t) p_pane->m_y1 - (uint32_t) p_pane->m_y0) & 0xffff)
 		);
-		WriteU32(p_buffer + 4, ((MechU32) p_hotX << 16) | ((MechU32) p_hotY & 0xffff));
+		WriteU32(p_buffer + 4, ((uint32_t) p_hotX << 16) | ((uint32_t) p_hotY & 0xffff));
 		WriteU32(p_buffer + 8, 0);
 		WriteU32(p_buffer + 0xc, 0);
 		WriteU32(p_buffer + 0x10, 0xffffffff);
@@ -3054,7 +3062,7 @@ MechS32 VFX_shape_scan(PANE* p_pane, MechU8 p_transparentColor, MechS32 p_hotX, 
 
 	p_hotX = Add(p_hotX, clip.m_originX);
 	p_hotY = Add(p_hotY, clip.m_originY);
-	width = (MechU32) clip.m_right + 1 - (MechU32) clip.m_left;
+	width = (uint32_t) clip.m_right + 1 - (uint32_t) clip.m_left;
 	encoder.m_left = 0x7fffffff;
 	encoder.m_top = 0x7fffffff;
 	encoder.m_right = -0x7fffffff;
@@ -3063,9 +3071,9 @@ MechS32 VFX_shape_scan(PANE* p_pane, MechU8 p_transparentColor, MechS32 p_hotX, 
 	// The opaque pixels' bounds
 	row = PixelOffset(&clip, clip.m_left, clip.m_top);
 	for (y = clip.m_top; y <= clip.m_bottom; y++) {
-		const MechU8* pixels = clip.m_pixels + row;
-		MechU32 first;
-		MechU32 last;
+		const uint8_t* pixels = clip.m_pixels + row;
+		uint32_t first;
+		uint32_t last;
 
 		for (first = 0; first < width && pixels[first] == p_transparentColor; first++) {
 		}
@@ -3077,25 +3085,25 @@ MechS32 VFX_shape_scan(PANE* p_pane, MechU8 p_transparentColor, MechS32 p_hotX, 
 			encoder.m_top = encoder.m_top < y ? encoder.m_top : y;
 			encoder.m_bottom = encoder.m_bottom > y ? encoder.m_bottom : y;
 			encoder.m_left =
-				encoder.m_left < Add(clip.m_left, (MechS32) first) ? encoder.m_left : Add(clip.m_left, (MechS32) first);
+				encoder.m_left < Add(clip.m_left, (int32_t) first) ? encoder.m_left : Add(clip.m_left, (int32_t) first);
 			encoder.m_right =
-				encoder.m_right > Add(clip.m_left, (MechS32) last) ? encoder.m_right : Add(clip.m_left, (MechS32) last);
+				encoder.m_right > Add(clip.m_left, (int32_t) last) ? encoder.m_right : Add(clip.m_left, (int32_t) last);
 		}
 
 		row += clip.m_pitch;
 	}
 
 	if (p_buffer) {
-		WriteU32(p_buffer + 8, (MechU32) Sub(encoder.m_left, p_hotX));
-		WriteU32(p_buffer + 0xc, (MechU32) Sub(encoder.m_top, p_hotY));
-		WriteU32(p_buffer + 0x10, (MechU32) Sub(encoder.m_right, p_hotX));
-		WriteU32(p_buffer + 0x14, (MechU32) Sub(encoder.m_bottom, p_hotY));
+		WriteU32(p_buffer + 8, (uint32_t) Sub(encoder.m_left, p_hotX));
+		WriteU32(p_buffer + 0xc, (uint32_t) Sub(encoder.m_top, p_hotY));
+		WriteU32(p_buffer + 0x10, (uint32_t) Sub(encoder.m_right, p_hotX));
+		WriteU32(p_buffer + 0x14, (uint32_t) Sub(encoder.m_bottom, p_hotY));
 	}
 
 	encoder.m_cursor = 0x18;
 	if (encoder.m_top <= encoder.m_bottom) {
-		MechU32 bounds = (MechU32) encoder.m_right + 1 - (MechU32) encoder.m_left;
-		MechS32 bottom = encoder.m_bottom;
+		uint32_t bounds = (uint32_t) encoder.m_right + 1 - (uint32_t) encoder.m_left;
+		int32_t bottom = encoder.m_bottom;
 
 		encoder.m_row = clip.m_pixels + PixelOffset(&clip, encoder.m_left, encoder.m_top);
 		for (y = encoder.m_top; y <= bottom; y++) {
@@ -3116,21 +3124,21 @@ MechS32 VFX_shape_scan(PANE* p_pane, MechU8 p_transparentColor, MechS32 p_hotX, 
 // from. The views are at most 768 rows high (576 for p_dest: the assembly's row tables run on
 // into other globals), and must share a pixel: the assembly looks for one forever otherwise, as
 // it does from a state wider than the LFSR, which can fall to 0.
-MechS32 VFX_pixel_fade(PANE* p_source, PANE* p_destination, MechS32 p_intervals, MechS32 p_rnd)
+int32_t VFX_pixel_fade(PANE* p_source, PANE* p_destination, int32_t p_intervals, int32_t p_rnd)
 {
 	ClippedView source;
 	ClippedView dest;
-	MechS32 result;
-	MechS32 width;
-	MechS32 height;
-	MechU32 yMask = 0;
-	MechU32 yBits = 0;
-	MechU32 bits;
-	MechU32 taps;
-	MechU32 state;
-	MechU32 x;
-	MechU32 y;
-	MechU32 value;
+	int32_t result;
+	int32_t width;
+	int32_t height;
+	uint32_t yMask = 0;
+	uint32_t yBits = 0;
+	uint32_t bits;
+	uint32_t taps;
+	uint32_t state;
+	uint32_t x;
+	uint32_t y;
+	uint32_t value;
 
 	result = ClipView(&source, p_source);
 	if (result) {
@@ -3157,7 +3165,7 @@ MechS32 VFX_pixel_fade(PANE* p_source, PANE* p_destination, MechS32 p_intervals,
 	}
 
 	// The LFSR's width: y's bits, then x's
-	value = (MechU32) height;
+	value = (uint32_t) height;
 	do {
 		yBits++;
 		yMask = yMask << 1 | 1;
@@ -3165,7 +3173,7 @@ MechS32 VFX_pixel_fade(PANE* p_source, PANE* p_destination, MechS32 p_intervals,
 	} while (value);
 
 	bits = yBits;
-	value = (MechU32) width;
+	value = (uint32_t) width;
 	do {
 		bits++;
 		value >>= 1;
@@ -3173,7 +3181,7 @@ MechS32 VFX_pixel_fade(PANE* p_source, PANE* p_destination, MechS32 p_intervals,
 
 	PORTABLE_ASSERT(bits >= 2 && bits <= 32 && yBits < 32);
 	taps = g_pfConstants[bits - 2];
-	state = (MechU32) p_rnd;
+	state = (uint32_t) p_rnd;
 	if (state == 0) {
 		state = 1;
 		x = 0;
@@ -3188,21 +3196,21 @@ MechS32 VFX_pixel_fade(PANE* p_source, PANE* p_destination, MechS32 p_intervals,
 		}
 
 		x = state >> yBits;
-		if (x >= (MechU32) width) {
+		if (x >= (uint32_t) width) {
 			continue;
 		}
 
 		y = state & yMask;
-		if (y >= (MechU32) height) {
+		if (y >= (uint32_t) height) {
 			continue;
 		}
 
 	visit:
 		p_intervals--;
-		if (Add((MechS32) x, dest.m_originX) < dest.m_left || Add((MechS32) x, dest.m_originX) > dest.m_right ||
-			Add((MechS32) x, source.m_originX) < source.m_left || Add((MechS32) x, source.m_originX) > source.m_right ||
-			Add((MechS32) y, dest.m_originY) < dest.m_top || Add((MechS32) y, dest.m_originY) > dest.m_bottom ||
-			Add((MechS32) y, source.m_originY) < source.m_top || Add((MechS32) y, source.m_originY) > source.m_bottom) {
+		if (Add((int32_t) x, dest.m_originX) < dest.m_left || Add((int32_t) x, dest.m_originX) > dest.m_right ||
+			Add((int32_t) x, source.m_originX) < source.m_left || Add((int32_t) x, source.m_originX) > source.m_right ||
+			Add((int32_t) y, dest.m_originY) < dest.m_top || Add((int32_t) y, dest.m_originY) > dest.m_bottom ||
+			Add((int32_t) y, source.m_originY) < source.m_top || Add((int32_t) y, source.m_originY) > source.m_bottom) {
 			continue;
 		}
 
@@ -3217,36 +3225,36 @@ MechS32 VFX_pixel_fade(PANE* p_source, PANE* p_destination, MechS32 p_intervals,
 // --- Colors ---
 
 // A byte compared as signed.
-static MechS32 SignedByte(MechU32 p_value)
+static int32_t SignedByte(uint32_t p_value)
 {
 	p_value &= 0xff;
-	return p_value < 0x80 ? (MechS32) p_value : (MechS32) p_value - 0x100;
+	return p_value < 0x80 ? (int32_t) p_value : (int32_t) p_value - 0x100;
 }
 
 // Fades the colors used in p_buffer's pixels to p_palette's in steps, through the display
 // driver: it reads each color's components, steps them towards the palette's by Bresenham
 // errors (color_error), sets them at each step, and waits between steps p_steps times over all.
-void VFX_window_fade(WINDOW* p_buffer, MechU8* p_palette, MechS32 p_intervals)
+void VFX_window_fade(WINDOW* p_buffer, uint8_t* p_palette, int32_t p_intervals)
 {
-	MechU8 used[0x100];
-	MechU8 colors[0x100];
-	MechU8 current[0x300];
-	MechU8 distances[0x300];
-	MechU8 directions[0x300];
-	const MechU8* pixels = p_buffer->m_buffer;
-	MechU32 count = ((MechU32) p_buffer->m_xMax + 1) * ((MechU32) p_buffer->m_yMax + 1);
-	MechS32 last = -1;
-	MechU8 farthest = 0;
-	MechU32 steps;
-	MechU32 stepFraction;
-	MechU32 wait;
-	MechS32 i;
-	MechS32 j;
+	uint8_t used[0x100];
+	uint8_t colors[0x100];
+	uint8_t current[0x300];
+	uint8_t distances[0x300];
+	uint8_t directions[0x300];
+	const uint8_t* pixels = p_buffer->m_buffer;
+	uint32_t count = ((uint32_t) p_buffer->m_xMax + 1) * ((uint32_t) p_buffer->m_yMax + 1);
+	int32_t last = -1;
+	uint8_t farthest = 0;
+	uint32_t steps;
+	uint32_t stepFraction;
+	uint32_t wait;
+	int32_t i;
+	int32_t j;
 
 	PORTABLE_ASSERT(count != 0);
 	memset(used, 0, sizeof(used));
 	do {
-		MechU8 color = *pixels++;
+		uint8_t color = *pixels++;
 
 		if (!used[color]) {
 			used[color] = 1;
@@ -3256,18 +3264,18 @@ void VFX_window_fade(WINDOW* p_buffer, MechU8* p_palette, MechS32 p_intervals)
 	} while (--count);
 
 	for (i = last; i >= 0; i--) {
-		MechU32 base = colors[i] * 3u;
+		uint32_t base = colors[i] * 3u;
 
 		for (j = 0; j < 3; j++) {
-			MechU32 index = base + (MechU32) j;
-			MechU8 distance = (MechU8) (current[index] - p_palette[index]);
+			uint32_t index = base + (uint32_t) j;
+			uint8_t distance = (uint8_t) (current[index] - p_palette[index]);
 
 			if (SignedByte(current[index]) >= SignedByte(p_palette[index])) {
 				directions[index] = 0xff;
 			}
 			else {
 				directions[index] = 1;
-				distance = (MechU8) (0 - distance);
+				distance = (uint8_t) (0 - distance);
 			}
 
 			distances[index] = distance;
@@ -3277,25 +3285,25 @@ void VFX_window_fade(WINDOW* p_buffer, MechU8* p_palette, MechS32 p_intervals)
 		}
 	}
 
-	memset(color_error, farthest >> 1, (MechU32) last);
+	memset(color_error, farthest >> 1, (uint32_t) last);
 	steps = farthest;
 	if (!steps) {
 		return;
 	}
 
-	stepFraction = PortableDiv((MechU64) (MechU32) p_intervals << 16, steps);
+	stepFraction = PortableDiv((MechU64) (uint32_t) p_intervals << 16, steps);
 	wait = 0x8000;
 	do {
 		for (i = last; i >= 0; i--) {
-			MechU32 base = colors[i] * 3u;
+			uint32_t base = colors[i] * 3u;
 
 			for (j = 2; j >= 0; j--) {
-				MechU32 index = base + (MechU32) j;
-				MechU8 error = (MechU8) (color_error[index] + distances[index]);
+				uint32_t index = base + (uint32_t) j;
+				uint8_t error = (uint8_t) (color_error[index] + distances[index]);
 
 				if (SignedByte(error) >= SignedByte(farthest)) {
-					error = (MechU8) (error - farthest);
-					current[index] = (MechU8) (current[index] + directions[index]);
+					error = (uint8_t) (error - farthest);
+					current[index] = (uint8_t) (current[index] + directions[index]);
 				}
 
 				color_error[index] = error;
@@ -3305,8 +3313,8 @@ void VFX_window_fade(WINDOW* p_buffer, MechU8* p_palette, MechS32 p_intervals)
 		}
 
 		wait += stepFraction;
-		if (PortableS16((MechU16) (wait >> 16)) >= 1) {
-			MechU32 waits = (wait >> 16) & 0xffff;
+		if (PortableS16((uint16_t) (wait >> 16)) >= 1) {
+			uint32_t waits = (wait >> 16) & 0xffff;
 
 			do {
 				VFX_wait_vblank_leading();
@@ -3319,21 +3327,21 @@ void VFX_window_fade(WINDOW* p_buffer, MechU8* p_palette, MechS32 p_intervals)
 
 // Counts the distinct colors in the view (its rectangle, not clipped), storing each in p_out
 // when not NULL, in the order it finds them: rows down, each from its right.
-MechS32 VFX_color_scan(PANE* p_pane, MechU32* p_colors)
+int32_t VFX_color_scan(PANE* p_pane, uint32_t* p_colors)
 {
-	MechU8 used[0x100];
-	MechU32 pitch = (MechU32) p_pane->m_window->m_xMax + 1;
-	const MechU8* row = p_pane->m_window->m_buffer + ((MechU32) p_pane->m_y0 * pitch + (MechU32) p_pane->m_x0);
-	MechS32 right = Sub(p_pane->m_x1, p_pane->m_x0);
-	MechS32 rows = Sub(p_pane->m_y1, p_pane->m_y0);
-	MechS32 count = 0;
-	MechS32 x;
+	uint8_t used[0x100];
+	uint32_t pitch = (uint32_t) p_pane->m_window->m_xMax + 1;
+	const uint8_t* row = p_pane->m_window->m_buffer + ((uint32_t) p_pane->m_y0 * pitch + (uint32_t) p_pane->m_x0);
+	int32_t right = Sub(p_pane->m_x1, p_pane->m_x0);
+	int32_t rows = Sub(p_pane->m_y1, p_pane->m_y0);
+	int32_t count = 0;
+	int32_t x;
 
 	memset(used, 0, sizeof(used));
 	do {
 		x = right;
 		do {
-			MechU8 color = row[x];
+			uint8_t color = row[x];
 
 			if (!used[color]) {
 				used[color] = 1;

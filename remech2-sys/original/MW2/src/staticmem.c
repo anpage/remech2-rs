@@ -11,28 +11,28 @@
 
 #include <stdlib.h>
 
-MechS32 g_staticPoolGroupCount = 0;
+int32_t g_staticPoolGroupCount = 0;
 
-MechS32 g_staticPoolCount = 0;
+int32_t g_staticPoolCount = 0;
 
 StaticPoolGroup g_staticPoolGroups[5];
 
 StaticPool g_staticPools[32];
 
 void ResetStaticPools(void);
-MechS32 ParseStaticPoolConfig(char* p_mission);
+int32_t ParseStaticPoolConfig(char* p_mission);
 int CompareStaticPools(const void* p_a, const void* p_b);
-MechS32 AddStaticPoolType(MechS32 p_size, MechU32 p_tag);
+int32_t AddStaticPoolType(int32_t p_size, uint32_t p_tag);
 
 // Reads the mission's pool sizes, places the pools in groups of up to 0xffdc bytes, largest
 // first, and allocates the groups. Returns whether it could read the sizes.
-MechS32 InitStaticMem(char* p_mission)
+int32_t InitStaticMem(char* p_mission)
 {
-	MechS32 i;
+	int32_t i;
 	StaticPool* pool;
-	MechS32 j;
+	int32_t j;
 	StaticPoolGroup* group;
-	MechS32 best;
+	int32_t best;
 
 	g_staticPoolGroupCount = 0;
 	g_staticPoolCount = 0;
@@ -92,9 +92,9 @@ MechS32 InitStaticMem(char* p_mission)
 }
 
 // Takes a block from the pool of a tag, logging the call to mw2.log.
-void* StaticPoolAlloc(MechU32 p_size, MechU32 p_tag)
+void* StaticPoolAlloc(uint32_t p_size, uint32_t p_tag)
 {
-	MechS32 i;
+	int32_t i;
 	StaticPool* pool;
 	void* block;
 	StaticPoolGroup* group;
@@ -113,7 +113,7 @@ void* StaticPoolAlloc(MechU32 p_size, MechU32 p_tag)
 	pool = &g_staticPools[i];
 	WriteToMw2Log("\nstatic_malloc called ");
 	WriteToMw2Log(GetKeywordName(p_tag));
-	if (pool->m_size - pool->m_used >= (MechS32) p_size) {
+	if (pool->m_size - pool->m_used >= (int32_t) p_size) {
 		group = &g_staticPoolGroups[pool->m_group];
 		block = group->m_size - group->m_free + group->m_block;
 		group->m_free = group->m_free - p_size;
@@ -131,7 +131,7 @@ void* StaticPoolAlloc(MechU32 p_size, MechU32 p_tag)
 // Frees the groups' blocks.
 void FreeStaticMem(void)
 {
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < g_staticPoolGroupCount; i++) {
 		MechHeapFree(g_primaryHeap, g_staticPoolGroups[i].m_block);
@@ -146,7 +146,7 @@ void FreeStaticMem(void)
 int CompareStaticPools(const void* p_a, const void* p_b)
 {
 	StaticPool* a;
-	MechS32 difference;
+	int32_t difference;
 	StaticPool* b;
 
 	a = (StaticPool*) p_a;
@@ -169,11 +169,11 @@ void ResetStaticPools(void)
 
 // Adds the pool sizes of the mission's static memory table (seven tag and size pairs).
 // Returns whether the mission has the table.
-MechS32 ParseStaticPoolConfig(char* p_mission)
+int32_t ParseStaticPoolConfig(char* p_mission)
 {
 	StaticPoolSize* entry;
-	MechS32 i;
-	MechS32 result;
+	int32_t i;
+	int32_t result;
 
 	result = 1;
 	entry = ReadStaticMemoryTable(p_mission);
@@ -192,10 +192,10 @@ MechS32 ParseStaticPoolConfig(char* p_mission)
 
 // Adds room for a tag, making its pool on first use. Returns whether the pool still fits in a
 // group.
-MechS32 AddStaticPoolType(MechS32 p_size, MechU32 p_tag)
+int32_t AddStaticPoolType(int32_t p_size, uint32_t p_tag)
 {
 	StaticPool* pool;
-	MechS32 i;
+	int32_t i;
 
 	for (i = 0; i < g_staticPoolCount && g_staticPools[i].m_tag != p_tag; i++) {
 	}
