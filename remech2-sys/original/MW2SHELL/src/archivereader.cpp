@@ -60,7 +60,7 @@ MainMenuButton g_prevPageLinkButton;
 MainMenuButton g_nextPageLinkButton;
 
 // GLOBAL: MW2SHELL 0x1008d250
-MechChar g_archiveLine[0x100];
+MechChar g_archiveLine[0x400];
 
 void ArchiveCallback(TMPackDataBase*, MechS32*, MechU8*, char**, MechS32 p_msg);
 

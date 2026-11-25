@@ -1208,14 +1208,15 @@ void DrawSatelliteStatic(void)
 		g_satelliteStaticState = 2;
 		g_staticNoiseUntil = g_currentClock + RandomIntBelow(transition->m_def->m_duration);
 		StartRectTransition(transition);
-		g_showHud = 0;
 	case 2:
+		g_showHud = 0;
 		transition->m_state->m_elapsed = RandomIntBelow(transition->m_def->m_duration - g_deltaTime - 1);
 		DrawMapViewTransition(1, layout, transition, 1);
 		if (g_staticNoiseUntil < g_currentClock) {
 			g_satelliteStaticState = 0;
-			break;
 		}
+		break;
+	default:
 		break;
 	}
 }

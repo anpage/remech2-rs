@@ -1231,10 +1231,24 @@ void LogStarMissionLines(MechS32 p_team)
 
 		switch (objective->m_state) {
 		case 5:
-			snprintf(line, sizeof(line), "%s successful at %3.3d sec   %s", prefix, objective->m_endTime, objective->m_name);
+			snprintf(
+				line,
+				sizeof(line),
+				"%s successful at %3.3d sec   %s",
+				prefix,
+				objective->m_endTime,
+				objective->m_name
+			);
 			break;
 		case 6:
-			snprintf(line, sizeof(line), "%s failed     at %3.3d sec   %s", prefix, objective->m_endTime, objective->m_name);
+			snprintf(
+				line,
+				sizeof(line),
+				"%s failed     at %3.3d sec   %s",
+				prefix,
+				objective->m_endTime,
+				objective->m_name
+			);
 			break;
 		default:
 			if (objective->m_active) {
@@ -1246,7 +1260,15 @@ void LogStarMissionLines(MechS32 p_team)
 
 			if (objective->m_timeLimit > 0 && objective->m_active) {
 				secondsLeft = objective->m_timeLimit - (g_missionTime - objective->m_startTime);
-				snprintf(line, sizeof(line), "%s %s   %3.3d sec   %s", prefix, activity, secondsLeft, objective->m_name);
+				snprintf(
+					line,
+					sizeof(line),
+					"%s %s   %3.3d sec   %s",
+					prefix,
+					activity,
+					secondsLeft,
+					objective->m_name
+				);
 			}
 			else {
 				snprintf(line, sizeof(line), "%s %s             %s", prefix, activity, objective->m_name);
@@ -1436,18 +1458,6 @@ MechS16 AiMessageTargetable(Player* p_player, MechS16 p_target, MechS16 p_arg)
 	else {
 		return best;
 	}
-}
-
-// FUNCTION: MW2 0x100531d1
-MechS16 FUN_100531d1(void)
-{
-	return 0;
-}
-
-// FUNCTION: MW2 0x100531e4
-MechS16 FUN_100531e4(void)
-{
-	return 0;
 }
 
 // M_DESTROY: p_target when it is destroyed, reporting it when the local player leads the star.

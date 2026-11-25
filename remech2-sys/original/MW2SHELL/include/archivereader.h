@@ -91,7 +91,7 @@ extern MechChar g_archiveTitle[0x200];
 extern MechChar g_archiveTopicName[0x200];
 extern MainMenuButton g_prevPageLinkButton;
 extern MainMenuButton g_nextPageLinkButton;
-extern MechChar g_archiveLine[0x100];
+extern MechChar g_archiveLine[0x400];
 void DrawArchive(TMPackDataBase* p_database, MechS32 p_campaign, size_t p_wParam);
 
 #endif // ARCHIVEREADER_H

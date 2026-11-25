@@ -188,16 +188,6 @@ MechS32 GetPlayerSlotFromNetId(DPID p_id)
 	}
 }
 
-// FUNCTION: MW2 0x1000e47d
-void FUN_1000e47d(void)
-{
-}
-
-// FUNCTION: MW2 0x1000e488
-void FUN_1000e488(void)
-{
-}
-
 // FUNCTION: MW2 0x1000e493
 void FirstNetwork(NetLaunchInfo* p_netLaunch)
 {
@@ -715,7 +705,13 @@ void ReceiveStateMsg(NetStateMsg* p_msg, MechS32 p_slot)
 					sprintf(text, "'%s' destroyed.", player->m_name);
 				}
 				else {
-					snprintf(text, sizeof(text), "'%s' destroyed by '%s'.", player->m_name, g_players[player->m_killer]->m_name);
+					snprintf(
+						text,
+						sizeof(text),
+						"'%s' destroyed by '%s'.",
+						player->m_name,
+						g_players[player->m_killer]->m_name
+					);
 				}
 			}
 			else {

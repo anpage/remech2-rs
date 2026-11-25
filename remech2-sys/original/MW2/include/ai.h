@@ -146,8 +146,6 @@ extern "C"
 	);
 	void LogAIStatus(void);
 	MechS16 AiMessageTargetable(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
-	MechS16 FUN_100531d1(void);
-	MechS16 FUN_100531e4(void);
 	MechS16 AiMessageDestroy(struct Player* p_player, MechS16 p_target, MechS16 p_arg);
 	void AiStateIdle(struct Player* p_player, MechU16 p_target);
 	void AiStateMove(struct Player* p_player, MechU16 p_target);
