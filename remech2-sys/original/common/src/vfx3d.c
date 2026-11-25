@@ -96,15 +96,15 @@ static int32_t Integer(uint32_t p_value)
 // divisor (which a count of 0x8000 or more overflows).
 static uint32_t Slope(uint32_t p_delta, uint32_t p_count)
 {
-	return (uint32_t) PortableIdiv((MechS64) PortableS32(p_delta) * 0x10000, PortableS32(p_count << 16));
+	return (uint32_t) PortableIdiv((int64_t) PortableS32(p_delta) * 0x10000, PortableS32(p_count << 16));
 }
 
 // p_count steps of p_step at once: `imul` by the count shifted to 16.16, then `shrd 16`.
 static uint32_t Advance(uint32_t p_step, uint32_t p_count)
 {
-	MechS64 product = (MechS64) PortableS32(p_step) * PortableS32(p_count << 16);
+	int64_t product = (int64_t) PortableS32(p_step) * PortableS32(p_count << 16);
 
-	return (uint32_t) ((MechU64) product >> 16);
+	return (uint32_t) ((uint64_t) product >> 16);
 }
 
 static const uint32_t* PreviousVertex(const Polygon* p_polygon, const uint32_t* p_vertex)

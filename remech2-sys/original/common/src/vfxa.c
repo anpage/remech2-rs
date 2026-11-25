@@ -368,7 +368,7 @@ static void DrawLineRun(const LineDraw* p_draw, uint32_t p_offset, uint32_t p_st
 // rounded.
 static uint32_t MajorToMinor(uint32_t p_distance, uint32_t p_slope)
 {
-	return (uint32_t) (((MechU64) p_distance * p_slope + 0x80000000u) >> 32);
+	return (uint32_t) (((uint64_t) p_distance * p_slope + 0x80000000u) >> 32);
 }
 
 // The major axis's distance for p_distance along the minor one, by dividing by the slope (with
@@ -376,9 +376,9 @@ static uint32_t MajorToMinor(uint32_t p_distance, uint32_t p_slope)
 // for its last (less one when the division is exact).
 static uint32_t MinorToMajor(uint32_t p_distance, uint32_t p_slope, int32_t p_first)
 {
-	MechU64 dividend = ((MechU64) (p_first ? p_distance - 1 : p_distance) << 32) | 0x80000000u;
+	uint64_t dividend = ((uint64_t) (p_first ? p_distance - 1 : p_distance) << 32) | 0x80000000u;
 	uint32_t quotient = PortableDiv(dividend, p_slope);
-	uint32_t remainder = (uint32_t) (dividend - (MechU64) quotient * p_slope);
+	uint32_t remainder = (uint32_t) (dividend - (uint64_t) quotient * p_slope);
 
 	if (p_first) {
 		return quotient + (remainder != 0);
@@ -492,10 +492,10 @@ int32_t VFX_line_draw(
 		slope = 0xffffffff;
 	}
 	else if (absX < absY) {
-		slope = PortableDiv((MechU64) (uint32_t) absX << 32, (uint32_t) absY);
+		slope = PortableDiv((uint64_t) (uint32_t) absX << 32, (uint32_t) absY);
 	}
 	else {
-		slope = PortableDiv((MechU64) (uint32_t) absY << 32, (uint32_t) absX);
+		slope = PortableDiv((uint64_t) (uint32_t) absY << 32, (uint32_t) absX);
 	}
 
 	// Clip both ends to the view, recomputing each moved point from the line's start
@@ -1683,13 +1683,13 @@ void VFX_Cos_Sin(int32_t p_angle, int32_t* p_cos, int32_t* p_sin)
 // The 64-bit product plus half of 1.0, as 16.16: its middle 32 bits.
 static int32_t MulRound16(int32_t p_a, int32_t p_b)
 {
-	return PortableS32((uint32_t) ((MechU64) ((MechS64) p_a * p_b + 0x8000) >> 16));
+	return PortableS32((uint32_t) ((uint64_t) ((int64_t) p_a * p_b + 0x8000) >> 16));
 }
 
 // Its top 32 bits.
 static int32_t MulRound32(int32_t p_a, int32_t p_b)
 {
-	return PortableS32((uint32_t) ((MechU64) ((MechS64) p_a * p_b + 0x8000) >> 32));
+	return PortableS32((uint32_t) ((uint64_t) ((int64_t) p_a * p_b + 0x8000) >> 32));
 }
 
 void VFX_fixed_mul(int32_t p_m1, int32_t p_m2, int32_t* p_result)
@@ -1745,7 +1745,7 @@ int32_t VFX_character_width(void* p_font, int32_t p_character)
 // sum.
 static int32_t SumNotPositive(int32_t p_a, int32_t p_b)
 {
-	return (MechS64) p_a + p_b <= 0;
+	return (int64_t) p_a + p_b <= 0;
 }
 
 // Draws a character, clipped to the view: through p_palette when not NULL, which maps a pixel
@@ -2425,15 +2425,15 @@ int32_t VFX_GIF_resolution(void* p_gifBuffer)
 // (p_delta << 16) / (p_count << 16): a 64-bit dividend, and a 32-bit divisor.
 static uint32_t Slope(uint32_t p_delta, uint32_t p_count)
 {
-	return (uint32_t) PortableIdiv((MechS64) PortableS32(p_delta) * 0x10000, PortableS32(p_count << 16));
+	return (uint32_t) PortableIdiv((int64_t) PortableS32(p_delta) * 0x10000, PortableS32(p_count << 16));
 }
 
 // p_count steps of p_step: `imul` by the count in 16.16, then `shrd 16`.
 static uint32_t Advance(uint32_t p_step, uint32_t p_count)
 {
-	MechS64 product = (MechS64) PortableS32(p_step) * PortableS32(p_count << 16);
+	int64_t product = (int64_t) PortableS32(p_step) * PortableS32(p_count << 16);
 
-	return (uint32_t) ((MechU64) product >> 16);
+	return (uint32_t) ((uint64_t) product >> 16);
 }
 
 // A texture step's whole texels, rounded towards zero (u's sign-extended, v's a word).
@@ -3290,7 +3290,7 @@ void VFX_window_fade(WINDOW* p_buffer, uint8_t* p_palette, int32_t p_intervals)
 		return;
 	}
 
-	stepFraction = PortableDiv((MechU64) (uint32_t) p_intervals << 16, steps);
+	stepFraction = PortableDiv((uint64_t) (uint32_t) p_intervals << 16, steps);
 	wait = 0x8000;
 	do {
 		for (i = last; i >= 0; i--) {

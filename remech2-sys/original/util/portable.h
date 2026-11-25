@@ -7,11 +7,6 @@
 // replacements are standard C with defined behaviour; the register-level operations whose C
 // spelling would be implementation-defined are written here once, in defined terms.
 
-// 64-bit integers (imul products, edx:eax dividends)
-#include <stdint.h>
-typedef int64_t MechS64;
-typedef uint64_t MechU64;
-
 #define PORTABLE_INLINE static inline
 
 // Preconditions. Inputs where the original faults (an idiv by zero or overflowing), or does what
@@ -45,13 +40,13 @@ PORTABLE_INLINE int32_t PortableS32(uint32_t p_value)
 }
 
 // Reads a 64-bit register pair's bits (edx:eax, a sum that wraps) as a signed value.
-PORTABLE_INLINE MechS64 PortableS64(MechU64 p_value)
+PORTABLE_INLINE int64_t PortableS64(uint64_t p_value)
 {
-	if (p_value <= (((MechU64) 0x7fffffff << 32) | 0xffffffff)) {
-		return (MechS64) p_value;
+	if (p_value <= (((uint64_t) 0x7fffffff << 32) | 0xffffffff)) {
+		return (int64_t) p_value;
 	}
 
-	return -(MechS64) ~p_value - 1;
+	return -(int64_t) ~p_value - 1;
 }
 
 // Reads a 16-bit register's bits as a signed value.
@@ -76,7 +71,7 @@ PORTABLE_INLINE int32_t PortableSar32(int32_t p_value, int32_t p_shift)
 }
 
 // The same for a 64-bit value in edx:eax (`shrd eax, edx, n; sar edx, n`; 0 <= n <= 63).
-PORTABLE_INLINE MechS64 PortableSar64(MechS64 p_value, int32_t p_shift)
+PORTABLE_INLINE int64_t PortableSar64(int64_t p_value, int32_t p_shift)
 {
 	if (p_value >= 0) {
 		return p_value >> p_shift;
@@ -101,9 +96,9 @@ PORTABLE_INLINE int32_t PortableBsr(uint32_t p_value)
 
 // `idiv` of edx:eax: the quotient, truncated towards zero. Out of domain (the idiv faults): a
 // divisor of 0, or a quotient outside int32_t.
-PORTABLE_INLINE int32_t PortableIdiv(MechS64 p_dividend, int32_t p_divisor)
+PORTABLE_INLINE int32_t PortableIdiv(int64_t p_dividend, int32_t p_divisor)
 {
-	MechS64 quotient;
+	int64_t quotient;
 
 	PORTABLE_ASSERT(p_divisor != 0);
 	quotient = p_dividend / p_divisor;
@@ -113,9 +108,9 @@ PORTABLE_INLINE int32_t PortableIdiv(MechS64 p_dividend, int32_t p_divisor)
 
 // `div` of edx:eax: the same, unsigned. Out of domain: a divisor of 0, or a quotient of more than
 // 32 bits.
-PORTABLE_INLINE uint32_t PortableDiv(MechU64 p_dividend, uint32_t p_divisor)
+PORTABLE_INLINE uint32_t PortableDiv(uint64_t p_dividend, uint32_t p_divisor)
 {
-	MechU64 quotient;
+	uint64_t quotient;
 
 	PORTABLE_ASSERT(p_divisor != 0);
 	quotient = p_dividend / p_divisor;
@@ -125,7 +120,7 @@ PORTABLE_INLINE uint32_t PortableDiv(MechU64 p_dividend, uint32_t p_divisor)
 
 // `shrd lo, hi, n; adc lo, 0` on the 64-bit value hi:lo (1 <= n <= 31): the low 32 bits of the
 // value shifted right by n, rounded up by the last bit shifted out (wrapping like the adc).
-PORTABLE_INLINE uint32_t PortableShrdRound(MechU64 p_value, int32_t p_shift)
+PORTABLE_INLINE uint32_t PortableShrdRound(uint64_t p_value, int32_t p_shift)
 {
 	return (uint32_t) (p_value >> p_shift) + ((uint32_t) (p_value >> (p_shift - 1)) & 1);
 }

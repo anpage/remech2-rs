@@ -16,9 +16,9 @@
 
 // The 64-bit product of two 32-bit values, as imul leaves it in edx:eax. Sums of products wrap,
 // like the add/adc chains.
-static MechU64 Product(int32_t p_a, int32_t p_b)
+static uint64_t Product(int32_t p_a, int32_t p_b)
 {
-	return (MechU64) ((MechS64) p_a * p_b);
+	return (uint64_t) ((int64_t) p_a * p_b);
 }
 
 // sub: wraps.
@@ -38,7 +38,7 @@ static int32_t Negate(int32_t p_value)
 static int32_t TransformRow(Matrix* p_matrix, int32_t p_row, int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_offset)
 {
 	int32_t* row = p_matrix->m_rows[p_row];
-	MechU64 sum = Product(row[0], p_x) + Product(row[1], p_y) + Product(row[2], p_z);
+	uint64_t sum = Product(row[0], p_x) + Product(row[1], p_y) + Product(row[2], p_z);
 
 	return PortableS32(PortableShrdRound(sum, 29) + (uint32_t) p_offset);
 }
@@ -134,7 +134,7 @@ int32_t SolvePlaneY(
 )
 {
 	/* p_distance is added unsigned (adc edx, 0), and the sum wraps at 64 bits. */
-	MechU64 sum = Product(p_normalX, p_dx) + Product(p_normalZ, p_dz) + (uint32_t) p_distance;
+	uint64_t sum = Product(p_normalX, p_dx) + Product(p_normalZ, p_dz) + (uint32_t) p_distance;
 
 	return PortableIdiv(PortableS64(sum), p_normalY);
 }
@@ -199,7 +199,7 @@ int32_t ComputeTriangleNormal(
 	int32_t* p_nz
 )
 {
-	MechS64 normal[3];
+	int64_t normal[3];
 	uint32_t values[3];
 	int32_t quotients[3];
 	uint32_t high = 0;
@@ -212,14 +212,14 @@ int32_t ComputeTriangleNormal(
 
 	/* The cross product of the edges, each component a 64-bit difference of products (which
 	   can't overflow), and the bits of their magnitudes. */
-	normal[0] = (MechS64) Difference(p_y1, p_y0) * Difference(p_z2, p_z1) -
-				(MechS64) Difference(p_y2, p_y1) * Difference(p_z1, p_z0);
-	normal[1] = (MechS64) Difference(p_z1, p_z0) * Difference(p_x2, p_x1) -
-				(MechS64) Difference(p_z2, p_z1) * Difference(p_x1, p_x0);
-	normal[2] = (MechS64) Difference(p_x1, p_x0) * Difference(p_y2, p_y1) -
-				(MechS64) Difference(p_x2, p_x1) * Difference(p_y1, p_y0);
+	normal[0] = (int64_t) Difference(p_y1, p_y0) * Difference(p_z2, p_z1) -
+				(int64_t) Difference(p_y2, p_y1) * Difference(p_z1, p_z0);
+	normal[1] = (int64_t) Difference(p_z1, p_z0) * Difference(p_x2, p_x1) -
+				(int64_t) Difference(p_z2, p_z1) * Difference(p_x1, p_x0);
+	normal[2] = (int64_t) Difference(p_x1, p_x0) * Difference(p_y2, p_y1) -
+				(int64_t) Difference(p_x2, p_x1) * Difference(p_y1, p_y0);
 	for (i = 0; i < 3; i++) {
-		MechU64 magnitude = (MechU64) (normal[i] < 0 ? -normal[i] : normal[i]);
+		uint64_t magnitude = (uint64_t) (normal[i] < 0 ? -normal[i] : normal[i]);
 
 		high |= (uint32_t) (magnitude >> 32);
 		low |= (uint32_t) magnitude;
@@ -230,7 +230,7 @@ int32_t ComputeTriangleNormal(
 	if (high) {
 		scale = PortableBsr(high) + 3;
 		for (i = 0; i < 3; i++) {
-			values[i] = (uint32_t) ((MechU64) normal[i] >> (scale & 31));
+			values[i] = (uint32_t) ((uint64_t) normal[i] >> (scale & 31));
 		}
 
 		shift = scale + 29;
@@ -240,7 +240,7 @@ int32_t ComputeTriangleNormal(
 		scale = 29 - shift;
 		for (i = 0; i < 3; i++) {
 			if (scale < 0) {
-				values[i] = (uint32_t) ((MechU64) normal[i] >> -scale);
+				values[i] = (uint32_t) ((uint64_t) normal[i] >> -scale);
 			}
 			else {
 				values[i] = (uint32_t) normal[i] << scale;
@@ -261,7 +261,7 @@ int32_t ComputeTriangleNormal(
 
 	divisor = (uint16_t) g_sqrtTable[squares >> 20];
 	for (i = 0; i < 3; i++) {
-		quotients[i] = PortableIdiv((MechS64) PortableS32(values[i]) * 0x2000, divisor);
+		quotients[i] = PortableIdiv((int64_t) PortableS32(values[i]) * 0x2000, divisor);
 	}
 
 	*p_nx = Negate(quotients[0]);
@@ -279,7 +279,7 @@ int32_t DivDifference17(int32_t p_a, int32_t p_b, int32_t p_value)
 		return 0;
 	}
 
-	return PortableIdiv((MechS64) p_value * 0x20000, divisor);
+	return PortableIdiv((int64_t) p_value * 0x20000, divisor);
 }
 
 // Returns how far along p_ray it passes closest to the shape's center, less the radius, or
@@ -290,9 +290,9 @@ int32_t RayShapeDistance(struct Shape* p_shape, Ray* p_ray)
 	int32_t deltaX;
 	int32_t deltaY;
 	int32_t deltaZ;
-	MechU64 excess;
-	MechU64 partial;
-	MechU64 dot;
+	uint64_t excess;
+	uint64_t partial;
+	uint64_t dot;
 	int32_t t;
 
 	if (radius <= 0) {

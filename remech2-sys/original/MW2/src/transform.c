@@ -12,14 +12,14 @@
 
 // The 64-bit product of two 32-bit values, as imul leaves it in edx:eax. Sums of products wrap,
 // like the add/adc chains.
-static MechU64 Product(int32_t p_a, int32_t p_b)
+static uint64_t Product(int32_t p_a, int32_t p_b)
 {
-	return (MechU64) ((MechS64) p_a * p_b);
+	return (uint64_t) ((int64_t) p_a * p_b);
 }
 
 // A 2.29 product, or sum of products, back to 32 bits: shifted right by 29 and rounded by the
 // adc, which also adds p_offset.
-static int32_t Round29(MechU64 p_value, int32_t p_offset)
+static int32_t Round29(uint64_t p_value, int32_t p_offset)
 {
 	return PortableS32(PortableShrdRound(p_value, 29) + (uint32_t) p_offset);
 }

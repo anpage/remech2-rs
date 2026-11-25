@@ -9,7 +9,7 @@
 // and the quotient by 6 after it.
 int32_t ProjectRadius(int32_t p_scale, int32_t p_radius, int32_t p_depth)
 {
-	MechS64 scaled = PortableSar64((MechS64) p_scale * p_radius, 8);
+	int64_t scaled = PortableSar64((int64_t) p_scale * p_radius, 8);
 
 	return PortableSar32(PortableIdiv(scaled, p_depth), 6);
 }

@@ -11,7 +11,7 @@ void MulNormalize16(int32_t* p_low, int32_t* p_scaled, int16_t* p_shift, uint32_
 {
 	/* bsr of a zero low dword leaves the cleared ecx as it is (the processors' behaviour, which
 	   the xor before it relies on): no shift. */
-	MechU64 product = (MechU64) p_a * p_b;
+	uint64_t product = (uint64_t) p_a * p_b;
 	uint32_t low = (uint32_t) product;
 	int32_t shift;
 

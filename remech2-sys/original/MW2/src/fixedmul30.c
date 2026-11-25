@@ -8,5 +8,5 @@
 // Multiplies two 2.30 fixed-point values, rounding.
 int32_t FixedMul30(int32_t p_a, int32_t p_b)
 {
-	return PortableS32(PortableShrdRound((MechU64) ((MechS64) p_a * p_b), 30));
+	return PortableS32(PortableShrdRound((uint64_t) ((int64_t) p_a * p_b), 30));
 }

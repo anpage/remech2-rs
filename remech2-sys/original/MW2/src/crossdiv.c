@@ -9,5 +9,5 @@
 int32_t CrossDiv(int32_t p_a, int32_t p_b, int32_t p_c, int32_t p_d, int32_t p_divisor)
 {
 	/* The difference of the products fits in 64 bits. */
-	return PortableIdiv((MechS64) p_a * p_d - (MechS64) p_b * p_c, p_divisor);
+	return PortableIdiv((int64_t) p_a * p_d - (int64_t) p_b * p_c, p_divisor);
 }

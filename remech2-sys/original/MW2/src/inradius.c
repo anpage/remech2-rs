@@ -10,8 +10,9 @@ int32_t IsWithinRadius(int32_t p_x, int32_t p_y, int32_t p_z, int32_t p_radius)
 {
 	/* The squares are compared unsigned, and a sum at or above the radius's square counts as
 	   inside when their difference's low dword is 0. */
-	MechU64 sum = (MechU64) ((MechS64) p_x * p_x) + (MechU64) ((MechS64) p_y * p_y) + (MechU64) ((MechS64) p_z * p_z);
-	MechU64 square = (MechU64) ((MechS64) p_radius * p_radius);
+	uint64_t sum =
+		(uint64_t) ((int64_t) p_x * p_x) + (uint64_t) ((int64_t) p_y * p_y) + (uint64_t) ((int64_t) p_z * p_z);
+	uint64_t square = (uint64_t) ((int64_t) p_radius * p_radius);
 
 	return sum < square || (uint32_t) (sum - square) == 0;
 }

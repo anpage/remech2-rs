@@ -15,8 +15,8 @@ int32_t IsAboveHorizon(int32_t p_x, int32_t p_y, Eyepoint* p_eyepoint)
 	int32_t offsetY = PortableS32((uint32_t) p_eyepoint->m_centerY - (uint32_t) p_y);
 	uint32_t sum =
 		(uint32_t)
-			PortableIdiv((MechS64) offsetX * p_eyepoint->m_viewMatrix.m_rows[0][1], p_eyepoint->m_projectScaleX) +
-		(uint32_t) PortableIdiv((MechS64) offsetY * p_eyepoint->m_viewMatrix.m_rows[1][1], p_eyepoint->m_projectScaleY);
+			PortableIdiv((int64_t) offsetX * p_eyepoint->m_viewMatrix.m_rows[0][1], p_eyepoint->m_projectScaleX) +
+		(uint32_t) PortableIdiv((int64_t) offsetY * p_eyepoint->m_viewMatrix.m_rows[1][1], p_eyepoint->m_projectScaleY);
 	int32_t horizon = PortableSar32(PortableS32(0 - (uint32_t) p_eyepoint->m_viewMatrix.m_rows[2][1]), 16);
 
 	return PortableS32(sum) >= horizon;
@@ -27,10 +27,10 @@ int32_t HorizonYAtX(int32_t p_x, Eyepoint* p_eyepoint)
 {
 	int32_t x = PortableS32((uint32_t) p_x - (uint32_t) p_eyepoint->m_centerX);
 	uint32_t height =
-		(uint32_t) PortableIdiv((MechS64) x * p_eyepoint->m_viewMatrix.m_rows[0][1], p_eyepoint->m_projectScaleX) +
+		(uint32_t) PortableIdiv((int64_t) x * p_eyepoint->m_viewMatrix.m_rows[0][1], p_eyepoint->m_projectScaleX) +
 		(uint32_t) PortableSar32(p_eyepoint->m_viewMatrix.m_rows[2][1], 16);
 	uint32_t y = (uint32_t) PortableIdiv(
-		(MechS64) PortableS32(0 - height) * p_eyepoint->m_projectScaleY,
+		(int64_t) PortableS32(0 - height) * p_eyepoint->m_projectScaleY,
 		p_eyepoint->m_viewMatrix.m_rows[1][1]
 	);
 
@@ -42,10 +42,10 @@ int32_t HorizonXAtY(int32_t p_y, Eyepoint* p_eyepoint)
 {
 	int32_t y = PortableS32((uint32_t) p_eyepoint->m_centerY - (uint32_t) p_y);
 	uint32_t width =
-		(uint32_t) PortableIdiv((MechS64) y * p_eyepoint->m_viewMatrix.m_rows[1][1], p_eyepoint->m_projectScaleY) +
+		(uint32_t) PortableIdiv((int64_t) y * p_eyepoint->m_viewMatrix.m_rows[1][1], p_eyepoint->m_projectScaleY) +
 		(uint32_t) PortableSar32(p_eyepoint->m_viewMatrix.m_rows[2][1], 16);
 	uint32_t x = (uint32_t) PortableIdiv(
-		(MechS64) PortableS32(0 - width) * p_eyepoint->m_projectScaleX,
+		(int64_t) PortableS32(0 - width) * p_eyepoint->m_projectScaleX,
 		p_eyepoint->m_viewMatrix.m_rows[0][1]
 	);
 

@@ -15,7 +15,7 @@ int32_t FixedSin(int32_t p_angle)
 
 	/* The angle in 1024ths of the circle (8.16 per quadrant): bit 24 selects the falling half
 	   of a half wave, bit 25 the negative half wave. */
-	uint32_t steps = PortableShrdRound((MechU64) ((MechS64) p_angle * 0x5b05b05b), 29);
+	uint32_t steps = PortableShrdRound((uint64_t) ((int64_t) p_angle * 0x5b05b05b), 29);
 	uint32_t index = (steps >> 16) & 0xff;
 	uint32_t fraction = steps;
 	uint32_t low;
@@ -27,7 +27,7 @@ int32_t FixedSin(int32_t p_angle)
 	}
 
 	low = (uint32_t) g_sinTable[index];
-	sine = low + PortableShrdRound((MechU64) ((uint32_t) g_sinTable[index + 1] - low) * (fraction & 0xffff), 16);
+	sine = low + PortableShrdRound((uint64_t) ((uint32_t) g_sinTable[index + 1] - low) * (fraction & 0xffff), 16);
 	if (steps & 0x2000000) {
 		sine = 0 - sine;
 	}
@@ -91,11 +91,11 @@ int32_t FixedAsin(int32_t p_sine)
 			else {
 				position =
 					(position & 0xffff0000) |
-					((uint32_t) PortableIdiv((MechS64) PortableS32(offset) * 0x10000, PortableS32(span)) & 0xffff);
+					((uint32_t) PortableIdiv((int64_t) PortableS32(offset) * 0x10000, PortableS32(span)) & 0xffff);
 			}
 		}
 
-		result = (int32_t) (((MechS64) 0x5a000000 * PortableS32(position)) >> 32);
+		result = (int32_t) (((int64_t) 0x5a000000 * PortableS32(position)) >> 32);
 	}
 
 	return negative ? -result : result;
@@ -137,7 +137,7 @@ int32_t FixedAtan2(int32_t p_x, int32_t p_z)
 		}
 		else {
 			/* The ratio in 8.24 fixed point */
-			ratio = PortableDiv((MechU64) (uint32_t) smaller << 24, (uint32_t) larger);
+			ratio = PortableDiv((uint64_t) (uint32_t) smaller << 24, (uint32_t) larger);
 			index = (ratio >> 16) & 0xff;
 			product = (ratio & 0xffff) * ((uint32_t) g_atanTable[index + 1] - (uint32_t) g_atanTable[index]);
 			angle = (product >> 16) + (uint32_t) g_atanTable[index] + ((product >> 15) & 1);

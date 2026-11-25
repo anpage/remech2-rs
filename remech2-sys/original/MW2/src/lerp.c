@@ -11,17 +11,17 @@ int32_t Lerp(int32_t p_x0, int32_t p_x1, int32_t p_x, int32_t p_y0, int32_t p_y1
 {
 	/* The differences and the sum wrap at 32 bits. */
 	int32_t run;
-	MechS64 rise;
+	int64_t rise;
 	int32_t base;
 
 	if (p_x1 > p_x0) {
 		run = PortableS32((uint32_t) p_x0 - (uint32_t) p_x1);
-		rise = (MechS64) PortableS32((uint32_t) p_x - (uint32_t) p_x1) * PortableS32((uint32_t) p_y0 - (uint32_t) p_y1);
+		rise = (int64_t) PortableS32((uint32_t) p_x - (uint32_t) p_x1) * PortableS32((uint32_t) p_y0 - (uint32_t) p_y1);
 		base = p_y1;
 	}
 	else {
 		run = PortableS32((uint32_t) p_x1 - (uint32_t) p_x0);
-		rise = (MechS64) PortableS32((uint32_t) p_x - (uint32_t) p_x0) * PortableS32((uint32_t) p_y1 - (uint32_t) p_y0);
+		rise = (int64_t) PortableS32((uint32_t) p_x - (uint32_t) p_x0) * PortableS32((uint32_t) p_y1 - (uint32_t) p_y0);
 		base = p_y0;
 	}
 

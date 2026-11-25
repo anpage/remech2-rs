@@ -7,5 +7,5 @@
 
 int32_t FixedMul16(int32_t p_a, int32_t p_b)
 {
-	return PortableS32(PortableShrdRound((MechU64) ((MechS64) p_a * p_b), 16));
+	return PortableS32(PortableShrdRound((uint64_t) ((int64_t) p_a * p_b), 16));
 }

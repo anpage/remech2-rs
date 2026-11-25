@@ -141,21 +141,21 @@ static int32_t Integer(uint32_t p_value)
 // p_count shifted into a 32-bit divisor (which a count of 0x10000 makes 0).
 static uint32_t Slope(uint32_t p_delta, uint32_t p_count)
 {
-	return (uint32_t) PortableIdiv((MechS64) PortableS32(p_delta) * 0x10000, PortableS32(p_count << 16));
+	return (uint32_t) PortableIdiv((int64_t) PortableS32(p_delta) * 0x10000, PortableS32(p_count << 16));
 }
 
 // FPDIVONE: a perspective coordinate (16.16, times w) over w (2.30).
 static uint32_t DivideOne(uint32_t p_value, uint32_t p_w)
 {
-	return (uint32_t) PortableIdiv((MechS64) PortableS32(p_value) * 0x40000000, PortableS32(p_w));
+	return (uint32_t) PortableIdiv((int64_t) PortableS32(p_value) * 0x40000000, PortableS32(p_w));
 }
 
 // The quotient of two magnitudes, in 32 bits, rounded half up: the remainder carries when it is
 // at least half the divisor (rounded up).
-static uint32_t DivideRounded(MechU64 p_dividend, uint32_t p_divisor)
+static uint32_t DivideRounded(uint64_t p_dividend, uint32_t p_divisor)
 {
 	uint32_t quotient = PortableDiv(p_dividend, p_divisor);
-	uint32_t remainder = (uint32_t) (p_dividend - (MechU64) quotient * p_divisor);
+	uint32_t remainder = (uint32_t) (p_dividend - (uint64_t) quotient * p_divisor);
 
 	if ((p_divisor >> 1) + (p_divisor & 1) - 1 < remainder) {
 		quotient++;
@@ -181,7 +181,7 @@ static uint32_t DivideToF30(uint32_t p_dividend, uint32_t p_divisor)
 	int32_t negative = 0;
 	uint32_t dividend = Magnitude(p_dividend, &negative, 1);
 	uint32_t divisor = Magnitude(p_divisor, &negative, -1);
-	MechU64 wide = (MechU64) (uint32_t) PortableSar32(PortableS32(dividend), 2) << 32 | (uint32_t) (dividend << 30);
+	uint64_t wide = (uint64_t) (uint32_t) PortableSar32(PortableS32(dividend), 2) << 32 | (uint32_t) (dividend << 30);
 	uint32_t quotient = DivideRounded(wide, divisor);
 
 	return negative ? 0 - quotient : quotient;
@@ -190,7 +190,7 @@ static uint32_t DivideToF30(uint32_t p_dividend, uint32_t p_divisor)
 // MMUL_F30: the product of p_value and the 2.30 p_factor, rounded, shifted down by 30.
 static uint32_t MultiplyF30(uint32_t p_value, uint32_t p_factor)
 {
-	MechU64 product = (MechU64) ((MechS64) PortableS32(p_value) * PortableS32(p_factor));
+	uint64_t product = (uint64_t) ((int64_t) PortableS32(p_value) * PortableS32(p_factor));
 
 	return (uint32_t) ((product + 0x20000000) >> 30);
 }
@@ -223,7 +223,7 @@ int32_t F30_reciprocal(int32_t p_value)
 {
 	int32_t negative = 0;
 	uint32_t divisor = Magnitude((uint32_t) p_value, &negative, -1);
-	uint32_t quotient = DivideRounded((MechU64) 0x4000 << 32, divisor);
+	uint32_t quotient = DivideRounded((uint64_t) 0x4000 << 32, divisor);
 
 	return PortableS32(negative ? 0 - quotient : quotient);
 }
@@ -537,19 +537,19 @@ static void DrawFlatCue(const Render* p_render)
 
 // A run of pixels' walk through the texture: u and v in 32.32, the texel in the high word.
 typedef struct TextureWalk {
-	MechU64 m_u;
-	MechU64 m_v;
-	MechU64 m_uStep;
-	MechU64 m_vStep;
+	uint64_t m_u;
+	uint64_t m_v;
+	uint64_t m_uStep;
+	uint64_t m_vStep;
 } TextureWalk;
 
 // A walk from 16.16 coordinates and steps.
 static void StartWalk(TextureWalk* p_walk, uint32_t p_u, uint32_t p_uStep, uint32_t p_v, uint32_t p_vStep)
 {
-	p_walk->m_u = (MechU64) p_u << 16;
-	p_walk->m_v = (MechU64) p_v << 16;
-	p_walk->m_uStep = (MechU64) ((MechS64) PortableS32(p_uStep) * 0x10000);
-	p_walk->m_vStep = (MechU64) ((MechS64) PortableS32(p_vStep) * 0x10000);
+	p_walk->m_u = (uint64_t) p_u << 16;
+	p_walk->m_v = (uint64_t) p_v << 16;
+	p_walk->m_uStep = (uint64_t) ((int64_t) PortableS32(p_uStep) * 0x10000);
+	p_walk->m_vStep = (uint64_t) ((int64_t) PortableS32(p_vStep) * 0x10000);
 }
 
 // TEXTURE_INDEX and TEXTURE_XP: the texel at the walk's position, through the flat lookaside
@@ -596,8 +596,8 @@ static void DrawTexels(const Render* p_render, uint8_t* p_pixels, uint32_t p_cou
 	uint8_t texel;
 
 	if (p_render->m_operation & c_sampleCoarse) {
-		MechU64 uStep = p_walk->m_uStep * 2;
-		MechU64 vStep = p_walk->m_vStep * 2;
+		uint64_t uStep = p_walk->m_uStep * 2;
+		uint64_t vStep = p_walk->m_vStep * 2;
 
 		while (p_count >= 8) {
 			int32_t i;

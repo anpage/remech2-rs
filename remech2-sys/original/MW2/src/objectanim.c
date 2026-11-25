@@ -1209,9 +1209,9 @@ int32_t PathTask(int32_t p_event, char* p_data, int32_t p_clock, int32_t p_perio
 
 // The 64-bit product of two 32-bit values, as imul leaves it in edx:eax. Sums of products wrap,
 // like the add/adc chains.
-static MechU64 Product(int32_t p_a, int32_t p_b)
+static uint64_t Product(int32_t p_a, int32_t p_b)
 {
-	return (MechU64) ((MechS64) p_a * p_b);
+	return (uint64_t) ((int64_t) p_a * p_b);
 }
 
 // sub: wraps.
@@ -1230,9 +1230,9 @@ static int32_t Sum(int32_t p_a, int32_t p_b)
 // (g_viewEyeX, g_viewEyeY, g_viewEyeZ), shifted right by 27 and rounded.
 static int32_t ViewRow(int32_t p_a, int32_t p_b, int32_t p_c, Vertex* p_vertex)
 {
-	MechU64 sum = Product(p_a, Difference(p_vertex->m_worldX, g_viewEyeX)) +
-				  Product(p_b, Difference(p_vertex->m_worldY, g_viewEyeY)) +
-				  Product(p_c, Difference(p_vertex->m_worldZ, g_viewEyeZ));
+	uint64_t sum = Product(p_a, Difference(p_vertex->m_worldX, g_viewEyeX)) +
+				   Product(p_b, Difference(p_vertex->m_worldY, g_viewEyeY)) +
+				   Product(p_c, Difference(p_vertex->m_worldZ, g_viewEyeZ));
 
 	return PortableS32(PortableShrdRound(sum, 27));
 }
@@ -1241,7 +1241,7 @@ static int32_t ViewRow(int32_t p_a, int32_t p_b, int32_t p_c, Vertex* p_vertex)
 // the depth, and rounded to a quarter.
 static int32_t ProjectAxis(int32_t p_value, int32_t p_shift, int32_t p_depth)
 {
-	MechS64 scaled = (MechS64) p_value * ((MechS64) 1 << ((uint32_t) p_shift & 31));
+	int64_t scaled = (int64_t) p_value * ((int64_t) 1 << ((uint32_t) p_shift & 31));
 
 	return PortableSar32(Sum(PortableIdiv(scaled, p_depth), 2), 2);
 }
@@ -1249,7 +1249,7 @@ static int32_t ProjectAxis(int32_t p_value, int32_t p_shift, int32_t p_depth)
 // The edge value at the near plane: p_from plus the share p_toPlane / p_span of the way to p_to.
 static int32_t Interpolate(int32_t p_from, int32_t p_to, int32_t p_toPlane, int32_t p_span)
 {
-	return Sum(PortableIdiv((MechS64) Difference(p_from, p_to) * p_toPlane, p_span), p_to);
+	return Sum(PortableIdiv((int64_t) Difference(p_from, p_to) * p_toPlane, p_span), p_to);
 }
 
 // Returns the vertex's projected copy (m_projection), transforming it into view space
@@ -1408,7 +1408,7 @@ int32_t GetFaceShade(Face* p_face, Vertex* p_vertices)
 	uint32_t magnitudeZ;
 	uint32_t bits;
 	uint32_t squares;
-	MechU64 dot;
+	uint64_t dot;
 	int32_t scale;
 
 	if (g_directionalLight) {
@@ -1442,13 +1442,13 @@ int32_t GetFaceShade(Face* p_face, Vertex* p_vertices)
 	/* The dot product in 64 bits, shifted right by 16, and the magnitudes scaled to put the
 	   highest bit of any at bit 7, the dot product with them. */
 	dot += Product(Difference(g_viewLightZ, z), p_face->m_normal[2]);
-	dot = (MechU64) PortableSar64(PortableS64(dot), 16);
+	dot = (uint64_t) PortableSar64(PortableS64(dot), 16);
 	scale = PortableBsr(bits) - 7;
 	if (scale > 0) {
 		magnitudeX >>= scale;
 		magnitudeY >>= scale;
 		magnitudeZ >>= scale;
-		dot = (MechU64) PortableSar64(PortableS64(dot), scale);
+		dot = (uint64_t) PortableSar64(PortableS64(dot), scale);
 	}
 	else if (scale < 0) {
 		magnitudeX <<= -scale;
@@ -1481,8 +1481,8 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 	uint8_t clipped;
 	uint8_t firstClipped;
 	uint8_t previousClipped;
-	MechU64 dot;
-	MechS64 last;
+	uint64_t dot;
+	int64_t last;
 	int32_t depth;
 	int32_t i;
 
@@ -1495,7 +1495,7 @@ void QueueFace(Face* p_face, Vertex* p_vertices)
 		vertex = &p_vertices[((uint8_t*) p_face)[p_face->m_indexOffset]];
 		dot = Product(Difference(vertex->m_worldX, g_viewEyeX), p_face->m_normal[0]) +
 			  Product(Difference(vertex->m_worldY, g_viewEyeY), p_face->m_normal[1]);
-		last = (MechS64) Difference(vertex->m_worldZ, g_viewEyeZ) * p_face->m_normal[2];
+		last = (int64_t) Difference(vertex->m_worldZ, g_viewEyeZ) * p_face->m_normal[2];
 		if (PortableS64(dot) >= -last) {
 			return;
 		}
