@@ -135,12 +135,12 @@ void SetObjName(SceneObject* p_obj, char* p_name)
 	p_obj->m_name = strdup(p_name);
 }
 
-void GetObjWorldAngles(SceneObject* p_obj, uint32_t* p_angleX, uint32_t* p_angleY, uint32_t* p_angleZ)
+void GetObjWorldAngles(SceneObject* p_obj, int32_t* p_angleX, int32_t* p_angleY, int32_t* p_angleZ)
 {
 	GetMatrixAngles(&p_obj->m_world, p_angleX, p_angleY, p_angleZ);
 }
 
-void GetObjAngles(SceneObject* p_obj, uint32_t* p_angleX, uint32_t* p_angleY, uint32_t* p_angleZ)
+void GetObjAngles(SceneObject* p_obj, int32_t* p_angleX, int32_t* p_angleY, int32_t* p_angleZ)
 {
 	GetMatrixAngles(&p_obj->m_local, p_angleX, p_angleY, p_angleZ);
 }

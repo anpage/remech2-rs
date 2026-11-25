@@ -47,7 +47,7 @@ extern "C"
 		int32_t p_y,
 		int32_t p_z
 	);
-	void GetMatrixAngles(Matrix* p_matrix, uint32_t* p_angleX, uint32_t* p_angleY, uint32_t* p_angleZ);
+	void GetMatrixAngles(Matrix* p_matrix, int32_t* p_angleX, int32_t* p_angleY, int32_t* p_angleZ);
 
 #ifdef __cplusplus
 }

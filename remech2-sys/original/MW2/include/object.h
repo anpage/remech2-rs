@@ -44,8 +44,8 @@ extern "C"
 	Shape* GetObjShape(SceneObject* p_obj);
 	char* GetObjName(SceneObject* p_obj);
 	void SetObjName(SceneObject* p_obj, char* p_name);
-	void GetObjWorldAngles(SceneObject* p_obj, uint32_t* p_angleX, uint32_t* p_angleY, uint32_t* p_angleZ);
-	void GetObjAngles(SceneObject* p_obj, uint32_t* p_angleX, uint32_t* p_angleY, uint32_t* p_angleZ);
+	void GetObjWorldAngles(SceneObject* p_obj, int32_t* p_angleX, int32_t* p_angleY, int32_t* p_angleZ);
+	void GetObjAngles(SceneObject* p_obj, int32_t* p_angleX, int32_t* p_angleY, int32_t* p_angleZ);
 	void GetObjPosition(SceneObject* p_obj, int32_t* p_x, int32_t* p_y, int32_t* p_z);
 	void GetObjLocalPosition(SceneObject* p_obj, int32_t* p_x, int32_t* p_y, int32_t* p_z);
 	void SetObjPosition(SceneObject* p_obj, int32_t p_x, int32_t p_y, int32_t p_z);

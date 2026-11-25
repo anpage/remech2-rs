@@ -33,12 +33,12 @@ extern "C"
 	void BuildShapeQuadtree(struct Shape* p_shape);
 	QuadtreeNode* BuildQuadtreeChild(QuadtreeNode* p_node, int32_t p_quadrant, Model* p_model);
 	QuadtreeNode* AllocQuadtreeNode(
-		uint32_t p_minX,
-		uint32_t p_maxX,
-		uint32_t p_minY,
-		uint32_t p_maxY,
-		uint32_t p_minZ,
-		uint32_t p_maxZ,
+		int32_t p_minX,
+		int32_t p_maxX,
+		int32_t p_minY,
+		int32_t p_maxY,
+		int32_t p_minZ,
+		int32_t p_maxZ,
 		int32_t p_faceCount
 	);
 	void FreeQuadtree(QuadtreeNode* p_node);
