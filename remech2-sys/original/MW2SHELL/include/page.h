@@ -80,7 +80,6 @@ private:
 	PopupPicture* m_banner;     // 0x20
 	VideoDriver* m_videoDriver; // 0x24
 	AudioSample* m_sample;      // 0x28
-	undefined4 m_unk0x2c;       // 0x2c — never accessed
 
 public:
 	// The archive reader turns the links into buttons.

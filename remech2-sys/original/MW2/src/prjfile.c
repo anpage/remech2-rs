@@ -164,11 +164,6 @@ MechS32 ClosePrjFile(MechS32 p_file)
 			PrjFreeBlock(g_prjFiles[p_file].m_types[i].m_index);
 			g_prjFiles[p_file].m_types[i].m_index = NULL;
 		}
-
-		if (g_prjFiles[p_file].m_types[i].m_unk0x04) {
-			PrjFreeBlock(g_prjFiles[p_file].m_types[i].m_unk0x04);
-			g_prjFiles[p_file].m_types[i].m_unk0x04 = NULL;
-		}
 	}
 
 	g_prjFiles[p_file].m_open = FALSE;

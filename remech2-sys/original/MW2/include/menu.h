@@ -40,7 +40,6 @@ typedef struct MenuSlot {
 	MechS32 m_state;              // 0x04 — 1: open
 	MechS32 m_requested;          // 0x08 — the state UpdateMenus moves it to
 	MenuDefinition* m_definition; // 0x0c — while open
-	undefined4 m_unk0x10;         // 0x10
 	struct MenuSlot* m_next;      // 0x14
 } MenuSlot;
 

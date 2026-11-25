@@ -224,7 +224,7 @@ void ReleaseClassLevel(MechS32 p_owner, MechS32 p_level)
 }
 
 // Loads the level-p_level shape of entry p_index in place of the one it has, and gives it an object:
-// under its player's object, or under the object (or shape object) of entry m_unk0x1c, made in
+// under its player's object, or under the object (or shape object) of entry m_parent, made in
 // p_buffer if given. Returns whether the entry has its shape.
 MechS32 LoadClassEntryShape(MechS32 p_index, MechS32 p_level, void* p_buffer)
 {

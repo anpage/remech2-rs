@@ -20,7 +20,6 @@ typedef struct MenuControl {
 	void (*m_preview)(MechS32 p_arg, MechS32 p_value);                      // 0x18 — when the value changes
 	void (*m_set)(MechS32 p_arg, MechS32 p_value);                          // 0x1c — when the menu is accepted
 	void (*m_cancel)(MechS32 p_arg);                                        // 0x20 — when the menu is cancelled
-	undefined4 m_unk0x24;                                                   // 0x24
 } MenuControl;
 
 #endif // MENUCONTROL_H

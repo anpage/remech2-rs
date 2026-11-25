@@ -140,7 +140,6 @@ void SetMechViewRenderSettings(RenderSettings* p_saved)
 {
 	*p_saved = g_renderSettings;
 	g_renderSettings.m_drawPixels = 0;
-	g_renderSettings.m_unk0x08 = 0;
 	g_renderSettings.m_textures = 1;
 	g_renderSettings.m_gouraud = 1;
 	g_renderSettings.m_untexturedKinds = 0xb00;

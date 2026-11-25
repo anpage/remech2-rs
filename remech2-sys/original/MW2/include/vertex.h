@@ -21,7 +21,6 @@ typedef struct Vertex {
 	struct ProjectedVertex* m_projection; // 0x24 — the projected copy (GetViewVertex), once made
 	MechU8 m_flags; // 0x28 — bit 0: nearer than the near plane, 1: farther than the far plane, 2: depth computed this
 					// frame
-	undefined m_unk0x29[0x2c - 0x29]; // 0x29
 } Vertex;
 
 #endif // VERTEX_H

@@ -194,7 +194,6 @@ TextGlyph::TextGlyph(MechChar* p_text, MechS32 p_left, MechS32 p_top, undefined*
 	m_textIndex = -1;
 	m_typed = 0;
 	m_registered = 0;
-	m_unk0x15 = 0;
 	m_colors = p_colors;
 	m_currentColors = p_colors;
 }

@@ -32,7 +32,6 @@ typedef struct Eyepoint {
 	MechS32 m_nearPlane;                     // 0x3c
 	MechS32 m_farPlane;                      // 0x40
 	MechS32 m_pixelAspect;                   // 0x44 — pixel width / height, 16.16
-	MechS32 m_unk0x48;                       // 0x48 — nothing uses it
 	MechS32 m_offsetX;                       // 0x4c — moves the projection centre off the view's
 	MechS32 m_offsetY;                       // 0x50
 	Matrix m_viewMatrix;                     // 0x54 — rows 0-2 the view rotation, row 3 the eye position
@@ -51,7 +50,6 @@ typedef struct Eyepoint {
 	MechS32 m_fovY;                          // 0xb0
 	MechS32 m_cullDistance;                  // 0xb4 — the far plane, or 0x7fffffff for an unlimited one
 	MechS32 m_detailScale;                   // 0xb8 — scales distances for the level of detail
-	undefined4 m_unk0xbc[(0xe0 - 0xbc) / 4]; // 0xbc
 } Eyepoint;
 
 // The camera's view modes (SetViewMode), after the game keys that pick them.

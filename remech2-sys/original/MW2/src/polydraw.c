@@ -18,13 +18,12 @@
 #include "vfx3d.h"
 #include "vfxa.h"
 
-Eyepoint g_mainEyepoint = {0, 0,   0, 0,   0,    0,       0x10000, 1000, 10000, -1000, 1,  0x48,
-						   0, 319, 0, 199, 0x40, 0x249f0, 0,       0,    0,     0,     {0}};
+Eyepoint g_mainEyepoint = {0,    0, 0,   0, 0,   0,    0x10000, 1000, 10000, -1000, 1,
+						   0x48, 0, 319, 0, 199, 0x40, 0x249f0, 0,    0,     0,     {0}};
 
 Eyepoint* g_eyepoint = &g_mainEyepoint;
 
-RenderSettings g_renderSettings = {0, 1, 1,       1,       1, 1, 1,    1,    1,    1, {0xe0, 0xef}, 1, 0, 0,
-								   0, 0, 0x186a0, 0x10000, 0, 0, NULL, NULL, NULL, 0, NULL};
+RenderSettings g_renderSettings = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0x186a0, 0, 0, NULL, NULL, NULL, 0, NULL};
 
 MechS32 g_horizonBandHeight = 0x24;
 

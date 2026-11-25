@@ -9,7 +9,6 @@ typedef struct Team {
 	MechS32 m_leader;         // 0x00 — a player index, or -1
 	MechS32 m_memberCount;    // 0x04
 	undefined4 m_affiliation; // 0x08
-	undefined4 m_unk0x0c;     // 0x0c
 	MechS32 m_side;           // 0x10
 	MechS32 m_formation;      // 0x14 — the template g_teamFormations copies
 	MechS32 m_members[8];     // 0x18 — player indices

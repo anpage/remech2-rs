@@ -28,7 +28,6 @@ private:
 	VideoDriver* m_videoDriver; // 0x0c
 	undefined4 m_typed;         // 0x10 — 1: drawn one character per TypeStep
 	MechU8 m_registered;        // 0x14 — in the video driver's typed glyph list
-	undefined4 m_unk0x15;       // 0x15 — only cleared, by the constructor
 	MechChar* m_text;           // 0x19
 
 public:

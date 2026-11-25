@@ -736,15 +736,6 @@ void UpdateEngine()
 	if (g_variant.m_engine >= 10000) {
 		g_variant.m_engineMass /= 2;
 	}
-
-	if (g_variant.m_engine >= 10000) {
-		g_variant.m_unk0x218 = 7;
-	}
-	else {
-		g_variant.m_unk0x218 = 0;
-	}
-
-	g_variant.m_unk0x21c = g_variant.m_maxMass - g_variant.m_engineMass;
 }
 
 void UpdateJumpJets()

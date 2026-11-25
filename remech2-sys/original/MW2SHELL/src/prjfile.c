@@ -164,10 +164,6 @@ MechS32 CloseArchive(MechS32 p_handle)
 			ArchiveFree(g_archiveSlots[p_handle].m_entries[index].m_data);
 			g_archiveSlots[p_handle].m_entries[index].m_data = NULL;
 		}
-		if (g_archiveSlots[p_handle].m_entries[index].m_unk0x04 != NULL) {
-			ArchiveFree(g_archiveSlots[p_handle].m_entries[index].m_unk0x04);
-			g_archiveSlots[p_handle].m_entries[index].m_unk0x04 = NULL;
-		}
 	}
 
 	g_archiveSlots[p_handle].m_open = 0;

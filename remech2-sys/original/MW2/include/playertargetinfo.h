@@ -16,8 +16,6 @@ typedef struct PlayerTargetInfo {
 	MechS32 m_heading;  // 0x14 — 16.16 degrees, towards the target
 	MechS32 m_pitch;    // 0x18 — 16.16 degrees, towards the target
 	MechS32 m_target;   // 0x1c — an AI target id (see ai.h)
-	MechS32 m_unk0x20;  // 0x20 — only ever cleared
-	MechS32 m_unk0x24;  // 0x24 — only ever cleared
 } PlayerTargetInfo;
 
 #pragma pack(pop)

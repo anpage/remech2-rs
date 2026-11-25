@@ -90,7 +90,6 @@ struct Player {
 	// active alert ranges (in hundreds), piloting; InitializeAI turns them into the members below.
 	MechU16 m_aiParams[8];           // 0x130
 	MechU16 m_stackCount;            // 0x140
-	undefined2 m_unk0x142;           // 0x142 — nothing reads or writes it
 	PlayerAi m_ai;                   // 0x144
 	MechS32 m_engageAtWill;          // 0x154 — it may be sent to attack: the "Engage at Will" order toggles it
 	MechS8 m_gunnery;                // 0x158 — lower is better: it fires on one roll in m_gunnery

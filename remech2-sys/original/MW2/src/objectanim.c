@@ -1352,7 +1352,7 @@ ProjectedVertex* ClipEdgeToNearPlane(Vertex* p_a, Vertex* p_b)
 }
 
 // Projects a view-space vertex onto the screen once per frame (m_projected), with its clip
-// outcodes (m_unk0x1c: 1 left, 2 right, 4 top, 8 bottom), accumulates the outcodes of the
+// outcodes (m_outcode: 1 left, 2 right, 4 top, 8 bottom), accumulates the outcodes of the
 // polygon being built and adds the vertex to its list (up to 20). The body is an __asm block.
 ProjectedVertex* ProjectVertex(ProjectedVertex* p_vertex)
 {

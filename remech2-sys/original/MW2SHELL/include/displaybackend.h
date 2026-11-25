@@ -32,7 +32,6 @@ struct DisplayBackend {
 	MechS32 (*m_blendPalettes)(PaletteColor* p_palette, MechS32 p_steps);                                    // 0x1c
 	// Returns 0 once the framebuffer can be drawn to (GDI: points the output buffer at the DIB bits).
 	MechS32 (*m_acquireFramebuffer)(void); // 0x20
-	undefined4 m_unk0x24;              // 0x24 — 0 in every back end, never read
 };
 typedef struct DisplayBackend DisplayBackend;
 #pragma pack()

@@ -75,7 +75,7 @@ ProjectedVertex* AllocProjectedVertex(void)
 	MechS32 recordSize;
 	ProjectedVertex* record;
 
-	recordSize = 0x20;
+	recordSize = sizeof(ProjectedVertex);
 	/* The gap compares as the unsigned addresses do: the two stacks share one buffer. */
 	g_drawBufferTop -= recordSize;
 	record = (ProjectedVertex*) g_drawBufferTop;

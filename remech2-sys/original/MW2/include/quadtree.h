@@ -9,7 +9,7 @@ struct Face;
 struct Shape;
 #include "shapegeom.h"
 
-// A quadtree node: its bounds, its four children (m_unk0x18 == 0) and m_unk0x18 entries
+// A quadtree node: its bounds, its four children (m_faceCount == 0) and m_faceCount entries
 // after the header (undefined4 each). AllocQuadtreeNode allocates it; Shape::m_collisionData holds the root
 // when the shape's m_collisionType is 5.
 typedef struct QuadtreeNode {

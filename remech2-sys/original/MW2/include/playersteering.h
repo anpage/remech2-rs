@@ -61,7 +61,6 @@ typedef struct PlayerSteering {
 	MechS8 m_autopilot;               // 0x42
 	MechS8 m_selfDestruct;            // 0x43 — ManeuverKama sets it near its target
 	MechS8 m_grantJumpJets;           // 0x44 — the "flygirl" cheat sets it: jump jets for a mech without them
-	undefined m_unk0x45[0x48 - 0x45]; // 0x45
 } PlayerSteering;
 
 #endif // PLAYERSTEERING_H

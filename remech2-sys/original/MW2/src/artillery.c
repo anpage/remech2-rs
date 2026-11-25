@@ -50,7 +50,6 @@ void FirstArtillery(Player* p_player)
 	mech->m_unk0xb4 = 0;
 	mech->m_autopilot = 0;
 	mech->m_velocityY = 0;
-	mech->m_unk0xf0 = 0;
 	MoveObj(mech->m_player->m_obj, 0, mech->m_height, 0);
 	UpdateObj(mech->m_player->m_obj);
 	GetObjWorldAngles(
@@ -247,7 +246,6 @@ MechS32 CreateArtillery(MechS32 p_index, Player* p_player)
 		slot->m_type = -1;
 		slot->m_state = c_weaponEmpty;
 		slot->m_time = 0;
-		slot->m_unk0x14 = 0;
 		slot->m_ammo = -1;
 		slot++;
 	}

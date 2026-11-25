@@ -124,7 +124,6 @@ void FirstMech(struct Player* p_player)
 	mech->m_flags |= 0x2000;
 	mech->m_powerState = 0;
 	mech->m_stateTime = 0;
-	mech->m_unk0x90 = 0;
 	mech->m_deltaHeat = 0;
 	mech->m_unk0xb4 = 0;
 	mech->m_autopilot = 0;
@@ -134,7 +133,6 @@ void FirstMech(struct Player* p_player)
 	mech->m_newVelocityX = 0;
 	mech->m_newVelocityY = 0;
 	mech->m_newVelocityZ = 0;
-	mech->m_unk0xf0 = 0;
 	mech->m_mobility = 0x10000;
 	MoveObj(mech->m_player->m_obj, 0, mech->m_height, 0);
 	UpdateObj(mech->m_player->m_obj);
@@ -1269,7 +1267,6 @@ void InitMechArrays(struct Mech* p_mech)
 		slot->m_type = -1;
 		slot->m_state = c_weaponEmpty;
 		slot->m_time = 0;
-		slot->m_unk0x14 = 0;
 		slot->m_ammo = -1;
 		slot->m_group = 0;
 		slot->m_target = -1;
@@ -1288,7 +1285,6 @@ void InitMechArrays(struct Mech* p_mech)
 		bin->m_shots = 0;
 		bin->m_weapon = -1;
 		bin->m_id = 0;
-		bin->m_unk0x08 = 0;
 		bin->m_damage = 0;
 		bin->m_shotHeat = 0;
 		bin->m_heat = 0;

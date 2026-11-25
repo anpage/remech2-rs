@@ -9,7 +9,6 @@
 // it, at a place in 16.16 fractions of the screen.
 typedef struct CockpitReadout {
 	MechS32 m_font;           // 0x00 — its font, from g_artResolution
-	MechS32 m_unk0x04;        // 0x04
 	MechS32 m_formattedValue; // 0x08 — the value it last formatted
 	MechChar* m_label;        // 0x0c
 	MechChar* m_text;         // 0x10

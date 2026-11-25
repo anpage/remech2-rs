@@ -62,10 +62,8 @@ public:
 private:
 	ButtonMenu* m_menu;               // 0x00
 	TMPackDataBase* m_database;       // 0x04
-	undefined4 m_unk0x08;             // 0x08 — never accessed
 	Font* m_font;                     // 0x0c
 	ArchiveReader* m_child;           // 0x10
-	undefined m_unk0x14[0x1c - 0x14]; // 0x14 — never accessed
 	TextGlyph* m_titleGlyph;          // 0x1c
 	Collection* m_topics;             // 0x20
 	undefined m_colors[0x100];        // 0x24

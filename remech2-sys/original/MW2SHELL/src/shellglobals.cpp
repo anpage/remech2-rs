@@ -143,7 +143,7 @@ MechS32 g_newPilotRegistered = 0;
 PaletteColor g_savedScreenPalette[0x100] = {0};
 
 // The sound settings.
-SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 0x10000, 0xf, 1, 1, 1, 1, 1, 9};
+SoundConfig g_soundConfig = {0x10000, 0x10000, 0x10000, 1, 1, 1, 1, 1, 9};
 
 // The difficulty settings.
 DifficultyConfig g_difficultyConfig = {0, 0, 1, 1, 1, 1};

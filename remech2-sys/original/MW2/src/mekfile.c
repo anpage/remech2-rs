@@ -220,7 +220,6 @@ MechS32 LoadMechConfig(Mech* p_mech, MechChar* p_name, MechS32 p_id, MechChar* p
 			slot->m_type = type;
 			slot->m_state = c_weaponReady;
 			slot->m_time = 0;
-			slot->m_unk0x14 = 0;
 			slot->m_group = group;
 			slot->m_slotId = weapon->m_type;
 			slot->m_binCount = 0;

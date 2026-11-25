@@ -155,7 +155,7 @@ void DrawHud(
 	}
 }
 
-// Draws the altimeter: the mech's height, the height of m_player's mark (Player::m_unk0x74) and
+// Draws the altimeter: the mech's height, the height of m_player's mark (Player::m_groundHeight) and
 // the height of the target, clamped to the gauge. p_x and p_y go unused.
 void DrawAltimeter(Mech* p_mech, MechS32 p_x, MechS32 p_y)
 {

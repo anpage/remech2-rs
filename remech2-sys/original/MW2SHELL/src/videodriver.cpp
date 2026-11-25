@@ -93,7 +93,6 @@ VideoDriver::VideoDriver()
 		g_defaultColorMap[i] = i;
 	}
 
-	m_unk0x3a2 = 0;
 	m_restoreColor = -1;
 
 	// Reset the palette for when we return from the sim

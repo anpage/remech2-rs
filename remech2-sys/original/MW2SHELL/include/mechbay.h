@@ -96,15 +96,12 @@ struct MekVariant {
 
 	MechChar m_title[0x100];             // 0x00 — '~' and the mech's name
 	MechChar m_variantName[0x40];        // 0x100
-	undefined m_unk0x140[0x200 - 0x140]; // 0x140 — never accessed on its own
 	MechS32 m_maxMass;                   // 0x200
 	MechS32 m_usedMass;                  // 0x204
 	MechS32 m_freeMass;                  // 0x208
 	MechS32 m_engine;                    // 0x20c — index into g_engines, + 10000 for an XL engine
 	MechS32 m_engineRating;              // 0x210
 	MechS32 m_engineMass;                // 0x214
-	MechS32 m_unk0x218;                  // 0x218 — 7 for an XL engine, else 0; never read
-	MechS32 m_unk0x21c;                  // 0x21c — m_maxMass less m_engineMass; never read
 	MechS32 m_gyroMass;                  // 0x220
 	MechS32 m_cockpitMass;               // 0x224
 	MechS32 m_heatSinkType;              // 0x228 — 1 single, 2 double
@@ -112,21 +109,15 @@ struct MekVariant {
 	MechS32 m_externalHeatSinks;         // 0x230 — heat sinks the engine can't hold, which take slots
 	MechS32 m_jumpJetUnitMass;           // 0x234 — mass of one jump jet
 	MechS32 m_jumpJetMass;               // 0x238
-	undefined4 m_unk0x23c;               // 0x23c — never accessed on its own
 	MechS32 m_endoSteel;                 // 0x240
 	MechS32 m_internalMass;              // 0x244
-	undefined4 m_unk0x248;               // 0x248 — never accessed on its own
 	MechS32 m_ferroFibrous;              // 0x24c
 	MechS32 m_armorMass;                 // 0x250
-	undefined4 m_unk0x254;               // 0x254 — never accessed on its own
 	MechS32 m_armorFactor;               // 0x258 — armor points m_armorMass buys
 	MechS32 m_armorAllocated;            // 0x25c
 	MechS32 m_weaponMass;                // 0x260
-	undefined4 m_unk0x264;               // 0x264 — never accessed on its own
 	MechS32 m_ammoMass;                  // 0x268
-	undefined4 m_unk0x26c;               // 0x26c — never accessed on its own
 	MechS32 m_equipmentMass;             // 0x270
-	undefined4 m_unk0x274;               // 0x274 — never accessed on its own
 	MechS32 m_walkingSpeed;              // 0x278 — shown as 10.8 kph per point
 	MechS32 m_runningSpeed;              // 0x27c
 	MechS32 m_jumpJets;                  // 0x280
@@ -135,7 +126,6 @@ struct MekVariant {
 	MechS32 m_selectedWeapon;            // 0x310 — a weapon id, or a weapon type * 100; -1 for none
 	MechS32 m_selectedLocation;          // 0x314 — index into g_locationNames
 	MechS32 m_criticals[8][12];          // 0x318 — item ids per location and slot, 0 when free
-	undefined4 m_unk0x498;               // 0x498 — never accessed on its own
 	MechS32 m_unassignedCount;           // 0x49c
 	Item m_unassigned[78];               // 0x4a0
 	Armor m_armor[8];                    // 0x710

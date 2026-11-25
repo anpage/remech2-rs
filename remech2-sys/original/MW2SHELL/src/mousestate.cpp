@@ -33,8 +33,8 @@ MouseState::MouseState(VideoDriver* p_videoDriver, Font* p_font, void* p_cursorS
 	m_leftDown = m_leftPressed = 0;
 	m_rightDown = m_rightPressed = 0;
 	m_middleDown = m_middlePressed = 0;
-	m_doubleClicked = m_unk0x1d = m_unk0x1e = 0;
-	m_lastClickTime = m_unk0x23 = m_unk0x27 = 0;
+	m_doubleClicked = 0;
+	m_lastClickTime = 0;
 	m_positionTextWidth = 0;
 	m_x = 0;
 	m_y = 0;

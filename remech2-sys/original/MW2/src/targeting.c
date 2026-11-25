@@ -67,7 +67,7 @@ MechChar g_largeMapExtraText[0x20];
 
 MechChar g_readoutLabel[8] = "x";
 
-CockpitReadout g_readout = {1, 0, -1, g_readoutLabel, g_readoutText, {0x28f, 0x28f}};
+CockpitReadout g_readout = {1, -1, g_readoutLabel, g_readoutText, {0x28f, 0x28f}};
 
 CockpitReadout* g_cockpitReadout = &g_readout;
 

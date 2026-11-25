@@ -36,7 +36,6 @@ typedef struct PrjIndex {
 
 typedef struct PrjTypeSlot {
 	PrjIndex* m_index; // 0x00 — loaded on first use
-	void* m_unk0x04;   // 0x04
 } PrjTypeSlot;
 
 // An open PROJ file.
@@ -44,7 +43,6 @@ typedef struct PrjFile {
 	MechS32 m_fd;                     // 0x00
 	MechU16 m_open;                   // 0x04
 	PrjHeader* m_header;              // 0x06
-	undefined m_unk0x0a[0x2a - 0x0a]; // 0x0a
 	PrjTypeSlot m_types[32];          // 0x2a
 	MechChar m_name[0x20];            // 0x12a
 } PrjFile;

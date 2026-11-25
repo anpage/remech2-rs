@@ -336,8 +336,6 @@ void LoadStarTable(StarTable* p_table)
 		else {
 			SetTeamFormationByName(i, table->m_stars[i].m_name);
 		}
-
-		g_teams[i].m_unk0x0c = 0;
 	}
 }
 
@@ -350,7 +348,6 @@ void SetTeamFormations(FormationNames* p_record)
 	record = p_record;
 	for (i = 0; i < 16; i++) {
 		SetTeamFormationByName(i, record->m_names[i]);
-		g_teams[i].m_unk0x0c = 0;
 	}
 }
 

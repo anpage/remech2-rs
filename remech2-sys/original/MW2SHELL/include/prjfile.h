@@ -21,15 +21,13 @@ typedef struct ArchiveHeader {
 } ArchiveHeader;
 
 typedef struct ArchiveSlotEntry {
-	void* m_data;    // 0x00
-	void* m_unk0x04; // 0x04 — only freed and cleared by CloseArchive; nothing else stores to it
+	void* m_data; // 0x00
 } ArchiveSlotEntry;
 
 typedef struct ArchiveSlot {
 	MechS32 m_fd;                     // 0x00
 	MechU16 m_open;                   // 0x04
 	ArchiveHeader* m_header;          // 0x06
-	undefined m_unk0x0a[0x2a - 0x0a]; // 0x0a — never accessed
 	ArchiveSlotEntry m_entries[0x20]; // 0x2a
 	MechChar m_name[0x20];            // 0x12a
 } ArchiveSlot;

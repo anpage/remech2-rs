@@ -29,7 +29,6 @@ typedef struct Mech {
 	struct SceneObject* m_objects[8]; // 0x68 — parts: the weapons fire from them, 6 and 7 are the jump jets
 	MechS32 m_topSpeed;               // 0x88 — the .MEK's speed, per throttle unit
 	MechS32 m_stateTime;              // 0x8c — the clock when the power or heat state changed (self-destruct's end)
-	MechS32 m_unk0x90;                // 0x90 — only ever cleared
 	MechS32 m_deltaHeat;              // 0x94 — heat added this tick
 	MechS32 m_heat;                   // 0x98 — 16.16: past 80 the mech overheats (m_flags 0x4)
 	MechS32 m_cooling;                // 0x9c — per tick: the .MEK's heat sinks times the climate's rate
@@ -53,7 +52,6 @@ typedef struct Mech {
 	MechS32 m_tons;                   // 0xe4 — ApplyCollisionDamage scales collision damage by it
 	MechS32 m_radius;                 // 0xe8 — splash damage reaches it this much further
 	MechS32 m_jumpThrust;             // 0xec — the jump jets' upward acceleration
-	MechS32 m_unk0xf0;                // 0xf0 — only ever cleared
 	MechS32 m_velocityX;              // 0xf4
 	MechS32 m_velocityY;              // 0xf8
 	MechS32 m_velocityZ;              // 0xfc

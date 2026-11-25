@@ -10,7 +10,6 @@ typedef struct WeaponBin {
 	MechS16 m_shots;      // 0x02 — shots left in the bin
 	MechU16 m_weapon;     // 0x04 — the index of its weapon in Mech::m_weapons
 	MechU16 m_id;         // 0x06 — its id in MechSection::m_slots
-	undefined2 m_unk0x08; // 0x08
 	MechU16 m_damage;     // 0x0a — WeaponDef::m_damage
 	MechS32 m_shotHeat;   // 0x0c — WeaponDef::m_shotHeat
 	MechS32 m_heat;       // 0x10 — WeaponDef::m_heat
@@ -25,14 +24,13 @@ enum {
 	c_weaponHeld = 3    // a volley ended with the trigger still down
 };
 
-// One of a mech's ten weapons (Mech::m_weapons). A slot with m_unk0x00 at -1 ends the list.
+// One of a mech's ten weapons (Mech::m_weapons). A slot with m_status at -1 ends the list.
 typedef struct WeaponSlot {
 	MechS32 m_status;     // 0x00
 	MechS32 m_type;       // 0x04 — an index into g_weaponDefs, or negative for none
 	MechS32 m_state;      // 0x08
 	MechS32 m_group;      // 0x0c — the weapon group, 0 to 2
 	MechS32 m_time;       // 0x10 — the clock of the last volley, or ticks into the current one
-	undefined4 m_unk0x14; // 0x14
 	MechS32 m_target;     // 0x18 — the locked target, for guided shots
 	MechS32 m_targetKind; // 0x1c
 	MechS32 m_ammo;       // 0x20 — -1 for unlimited

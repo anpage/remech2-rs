@@ -63,12 +63,10 @@ public:
 
 private:
 	MechS32 m_pictureSize;            // 0x00 — the last picture's, see VFX_PCX_resolution
-	undefined4 m_unk0x04;             // 0x04 — never accessed
 	TextGlyphList* m_overlayGlyphs;   // 0x16 — redrawn after the videos' frames
 	TextGlyphList* m_glyphs;          // 0x1a — redrawn before them
 	undefined4 m_paletteChanged;      // 0x1e — the next draw loads m_palette
 	undefined4 m_allColors;           // 0x22 — for m_setPalette
-	undefined m_unk0x26[0x2e - 0x26]; // 0x26 — never accessed
 
 public:
 	// LoopingMovie decodes into m_screenBuffer.m_pixels directly.
@@ -87,7 +85,6 @@ private:
 	PaletteColor m_palette[0x100]; // 0x92
 	MechS32 m_width;               // 0x392
 	MechS32 m_height;              // 0x396
-	undefined4 m_unk0x3a2;         // 0x3a2 — only cleared, by the constructor
 
 public:
 	// The color RestoreBackground fills with instead of copying the background, -1 to copy.

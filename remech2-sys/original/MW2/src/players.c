@@ -240,7 +240,5 @@ void InitPlayer(Player* p_player)
 	p_player->m_targetInfo.m_heading = 0;
 	p_player->m_targetInfo.m_pitch = 0;
 	p_player->m_targetInfo.m_target = -1;
-	p_player->m_targetInfo.m_unk0x20 = 0;
-	p_player->m_targetInfo.m_unk0x24 = 0;
 	memset(p_player->m_name, 0, 0x16);
 }

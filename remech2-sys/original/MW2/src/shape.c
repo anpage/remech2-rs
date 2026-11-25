@@ -93,7 +93,6 @@ Model* AddModel(
 	model->m_vertexCount = 0;
 	model->m_faceCount = 0;
 	model->m_transformCount = 0;
-	model->m_unk0x14 = 0;
 	model->m_faceOffset = (MechU16) (vertexBytes + sizeof(Model));
 	*p_extraData = (Face*) ((MechU8*) model + model->m_faceOffset) + p_faceCount;
 	SelectModel(p_shape, model);

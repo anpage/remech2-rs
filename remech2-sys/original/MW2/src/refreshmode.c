@@ -34,8 +34,7 @@ DisplayBackend g_displayBackend = {
 	DisplaySetPalette,
 	DisplaySetPaletteWithBrightness,
 	DisplayBlendPalettes,
-	DisplayAcquireFramebuffer,
-	0
+	DisplayAcquireFramebuffer
 };
 
 // Takes the place of the GDI refresh mode, which was mode 5.
