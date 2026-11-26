@@ -31,6 +31,7 @@
 #include "vfxa.h"
 #include "vfxrend.h"
 #include "view.h"
+#include "widescreen.h"
 
 #include <string.h>
 
@@ -105,6 +106,7 @@ int32_t InitDisplayGeometry(void)
 		g_currentPane.m_x1 = g_gameWindowGeometry->m_width - 1;
 		g_currentPane.m_y1 = g_gameWindowGeometry->m_height - 1;
 		g_screenPane = g_currentPane;
+		MechWidenViewPane(&g_screenPane);
 		result = 1;
 		InitPanes(&g_currentPane);
 		ResetTextColors();

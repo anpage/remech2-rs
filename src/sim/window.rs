@@ -143,7 +143,7 @@ pub unsafe extern "C" fn scale_point_to_screen(
     src: *mut Point,
     dst: *mut Point,
 ) -> *mut Point {
-    let (Some(src), Some(out)) = (unsafe { src.as_ref() }, unsafe { dst.as_mut() }) else {
+    let (Some(&src), Some(out)) = (unsafe { src.as_ref() }, unsafe { dst.as_mut() }) else {
         return dst;
     };
     (out.m_x, out.m_y) = scale_to_screen(src.m_x, src.m_y);
