@@ -111,6 +111,7 @@ impl FileCheck {
         fs::create_dir_all(files::resolve_in(game, "KEATING")).unwrap();
         fs::create_dir_all(files::resolve_in(game, "LAUNCH")).unwrap();
         fs::create_dir_all(files::resolve_in(game, "SMK")).unwrap();
+        fs::create_dir_all(files::resolve_in(game, "VFX")).unwrap();
 
         self.installed_from = match &source {
             Source::Image(path) => Some(MusicSource::Image(path.clone())),
@@ -151,6 +152,10 @@ impl FileCheck {
                 {
                     let mut status = status.lock().unwrap();
                     if let Some(error) = error {
+                        if !file.required {
+                            warn!("skipped optional {}: {error}", file.path.display());
+                            continue;
+                        }
                         *status = CopyStatus::Error(CopyError {
                             file: format!("{}", file.path.display()),
                             error,
@@ -380,7 +385,7 @@ impl Stage for FileCheck {
             return self.copy_ui(ctx);
         }
 
-        if self.missing_files.is_empty() {
+        if !self.missing_files.iter().any(|file| file.required) {
             return Ok(self.next_stage());
         }
 
@@ -400,12 +405,15 @@ struct GameFile {
     /// CRC32 of the reference copy
     crc32: u32,
     cd_paths: &'static [&'static str],
+    /// `true` if required for the game to run, `false` if optional
+    required: bool,
 }
 
 #[derive(Clone, Debug)]
 struct MissingFile {
     path: PathBuf,
     cd_paths: &'static [&'static str],
+    required: bool,
 }
 
 fn copy_from_folder(source: &Path, cd_paths: &[&str], path: &Path) -> Option<String> {
@@ -467,6 +475,7 @@ fn check_folder<P: AsRef<Path>>(
             missing_files.push(MissingFile {
                 path,
                 cd_paths: file.cd_paths,
+                required: file.required,
             });
         } else if !matches_reference(&path, file) {
             *differing += 1;
@@ -530,6 +539,12 @@ fn check_files() -> Vec<MissingFile> {
     check_folder(
         files::resolve_in(base_path, "SMK"),
         list::SMK_FILES,
+        &mut missing_files,
+        &mut differing,
+    );
+    check_folder(
+        files::resolve_in(base_path, "VFX"),
+        list::VFX_FILES,
         &mut missing_files,
         &mut differing,
     );
