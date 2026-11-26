@@ -22,6 +22,11 @@ extern "C"
 	void MechHudPane(PANE* p_pane);
 	// Centers a message box pane horizontally in the frame
 	void MechCenterMessagePane(PANE* p_pane);
+	// Widens p_page (the main 3D view) to the whole frame
+	void MechWidenViewPane(PANE* p_pane);
+	// Maps p_rect from 16.16 fractions to pixels of the 3D view. The frame in widescreen, otherwise as
+	// ScaleRectToScreen
+	void MechScaleRectToView(PANE* p_rect);
 
 #ifdef __cplusplus
 }

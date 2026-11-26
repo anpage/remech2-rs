@@ -1,4 +1,4 @@
-use std::mem::size_of;
+use std::{mem::size_of, ptr};
 
 use remech2_sys::{
     shared::{MechHeapAllocZeroed, PANE, WINDOW},
@@ -200,7 +200,7 @@ pub unsafe extern "C" fn select_pane(index: i32) {
         else {
             return;
         };
-        if widescreen() && (index == 0 || Some(index) == satellite_slot()) {
+        if widescreen() && Some(index) == satellite_slot() {
             cover_frame(target);
         }
         if index == sim::g_paneIndex {
@@ -290,4 +290,33 @@ pub unsafe extern "C" fn center_message_pane(pane: *mut PANE) {
         pane.m_x0 = (sim::g_gameWindowWidth - width) / 2;
         pane.m_x1 = pane.m_x0 + width - 1;
     }
+}
+
+#[unsafe(export_name = "MechWidenViewPane")]
+pub unsafe extern "C" fn widen_view_pane(pane: *mut PANE) {
+    if let (true, Some(pane)) = (widescreen(), unsafe { pane.as_mut() }) {
+        cover_frame(pane);
+    }
+}
+
+#[unsafe(export_name = "MechScaleRectToView")]
+pub unsafe extern "C" fn scale_rect_to_view(rect: *mut PANE) {
+    let Some(rect) = (unsafe { rect.as_mut() }) else {
+        return;
+    };
+
+    if !widescreen() {
+        unsafe { scale_rect_to_screen(ptr::null_mut(), rect, rect) };
+        return;
+    }
+
+    let (width, height) = unsafe { (sim::g_gameWindowWidth - 1, sim::g_gameWindowHeight - 1) };
+    let scale = |extent, v| unsafe { FixedMul16(extent, v) };
+
+    (rect.m_x0, rect.m_y0, rect.m_x1, rect.m_y1) = (
+        scale(width, rect.m_x0),
+        scale(height, rect.m_y0),
+        scale(width, rect.m_x1),
+        scale(height, rect.m_y1),
+    );
 }

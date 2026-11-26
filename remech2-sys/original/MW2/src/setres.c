@@ -17,6 +17,7 @@
 #include "timedoverlays.h"
 #include "types.h"
 #include "view.h"
+#include "widescreen.h"
 
 #include <stdlib.h>
 
@@ -42,6 +43,8 @@ void SetRes(void)
 		ScaleRectFromLowRes(&g_panes[i], &g_panes[i]);
 		ScaleRectToScreen(&g_mainPixelBuffer, &g_panes[i], &g_panes[i]);
 	}
+
+	MechWidenViewPane(&g_panes[0]);
 
 	for (i = 0; i < 5; i++) {
 		ScaleRectFromLowRes(&g_cockpitGaugePanes[i], &g_cockpitGaugePanes[i]);

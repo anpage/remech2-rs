@@ -28,6 +28,7 @@
 #include "targeting.h"
 #include "types.h"
 #include "vfxa.h"
+#include "widescreen.h"
 
 #include <stdio.h>
 
@@ -551,16 +552,16 @@ void UpdateDorcs(void)
 		g_dorcsTransition.m_def->m_first = &g_dorcsRectFrom;
 		if (!g_dorcsTransition.m_def->m_first->m_window) {
 			target = g_dorcsTransition.m_def->m_first;
-			ScaleRectToScreen(&g_mainPixelBuffer, target, target);
+			MechScaleRectToView(target);
 			target->m_window = &g_mainPixelBuffer;
 			target = g_dorcsTransition.m_def->m_second;
-			ScaleRectToScreen(&g_mainPixelBuffer, target, target);
+			MechScaleRectToView(target);
 			target->m_window = &g_mainPixelBuffer;
 			target = g_dorcsTransition.m_def->m_out;
 			target->m_window = &g_mainPixelBuffer;
 			target = &g_dorcsPoint;
 			target->m_window = &g_mainPixelBuffer;
-			ScaleRectToScreen(&g_mainPixelBuffer, target, target);
+			MechScaleRectToView(target);
 		}
 
 		g_dorcsTime = g_currentClock + 0x389;

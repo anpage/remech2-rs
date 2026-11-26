@@ -107,7 +107,13 @@ void UpdatePaletteFade(void)
 			StepPaletteFade(&g_paletteFade, ticks);
 			g_paletteFadeSteps -= ticks;
 			if (g_paletteFadeSteps == 0) {
-				/* existing body unchanged */
+				g_currentPalette = g_paletteFadeTarget;
+				if (g_paletteFadeBackSteps) {
+					StartPaletteFade(g_paletteFadeBack, g_paletteFadeBackSteps, 0);
+				}
+				else {
+					g_palettePending = 1;
+				}
 			}
 		}
 	}
